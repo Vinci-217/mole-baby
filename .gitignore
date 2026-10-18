@@ -1,0 +1,17 @@
+node_modules/
+dist/
+release/
+*.tsbuildinfo
+*.log
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/
+
+# Keep only the current review screenshots in source control.
+artifacts/*
+!artifacts/v3-home.png
+!artifacts/v3-food.png
+!artifacts/v3-adoption.png
+!artifacts/v3-native-pet.png

@@ -1,0 +1,180 @@
+name: Windows build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-build-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    name: Build and check Windows x64
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Check release version
+        shell: bash
+        run: |
+          node -e 'const {version}=require("./package.json"); const ref=process.env.GITHUB_REF; if(ref.startsWith("refs/tags/") && ref !== `refs/tags/v${version}`) throw Error(`Tag ${ref} must match package.json v${version}`); console.log(`Building v${version}`);'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test game rules
+        run: npm test
+
+      - name: Build renderer
+        run: npm run build
+
+      - name: Package installer and portable ZIP
+        run: npx --no-install electron-builder --win nsis zip --x64 --publish never
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Verify packaged assets and start Windows application
+        run: node scripts/verify-windows-package.cjs
+
+      - name: Upload Windows downloads
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: RamuHouse-Windows-x64
+          path: |
+            release/RamuHouse-*.zip
+            release/RamuHouse-*-Setup.exe
+            release/SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Upload Windows smoke screenshot
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Windows-smoke-screenshot
+          path: artifacts/windows-smoke.png
+          if-no-files-found: ignore
+          retention-days: 14
+
+  release:
+    name: Publish tagged release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download checked Windows packages
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: RamuHouse-Windows-x64
+          path: release
+
+      - name: Check artifact checksums
+        working-directory: release
+        run: sha256sum --check SHA256SUMS.txt
+
+      - name: Create release or replace its build attachments
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --clobber
+          else
+            gh release create "$RELEASE_TAG" release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --verify-tag --title "拉姆陪伴 $RELEASE_TAG" --generate-notes
+          fi
+
+  report:
+    name: Save tagged build receipt
+    if: always() && startsWith(github.ref, 'refs/tags/v')
+    needs: [build, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source for the receipt branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download checksums when the build succeeded
+        if: needs.build.result == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: RamuHouse-Windows-x64
+          path: ${{ runner.temp }}/ramu-downloads
+
+      - name: Record the build result over Git
+        if: always()
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          RELEASE_RESULT: ${{ needs.release.result }}
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const env = process.env;
+          const sumsPath = path.join(env.RUNNER_TEMP, 'ramu-downloads', 'SHA256SUMS.txt');
+          const downloads = fs.existsSync(sumsPath) ? fs.readFileSync(sumsPath, 'utf8').trim().split('\n').map(line => {
+            const match = line.match(/^([a-f0-9]{64})  (RamuHouse-[^/\\]+\.(?:zip|exe))$/);
+            if (!match) throw new Error('Invalid build checksum entry');
+            return { file: match[2], sha256: match[1] };
+          }) : [];
+          const receipt = {
+            version: require('./package.json').version,
+            tag: env.GITHUB_REF_NAME,
+            sourceSha: env.GITHUB_SHA,
+            buildResult: env.BUILD_RESULT,
+            releaseResult: env.RELEASE_RESULT,
+            runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
+            releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
+            downloads,
+            recordedAt: new Date().toISOString(),
+          };
+          fs.writeFileSync(path.join(env.RUNNER_TEMP, 'ramu-build-receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin refs/heads/build-reports >/dev/null; then
+            git fetch --depth=1 origin refs/heads/build-reports
+            git checkout -B build-reports FETCH_HEAD
+          else
+            git checkout --orphan build-reports
+            git rm -rf .
+          fi
+          for attempt in 1 2 3; do
+            mkdir -p reports
+            cp "$RUNNER_TEMP/ramu-build-receipt.json" "reports/$GITHUB_SHA.json"
+            git add -- "reports/$GITHUB_SHA.json"
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Record Windows build $GITHUB_RUN_ID ($BUILD_RESULT)"
+            if git push origin HEAD:refs/heads/build-reports; then exit 0; fi
+            git fetch --depth=1 origin refs/heads/build-reports
+            git reset --hard FETCH_HEAD
+          done
+          exit 1

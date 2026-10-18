@@ -1,0 +1,42 @@
+[
+  {
+    "file": "ramu-home.png",
+    "name": "拉姆小屋",
+    "goodsId": 160081,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160081.swf",
+    "spriteId": 16,
+    "zoom": 2,
+    "size": [
+      1981,
+      1167
+    ],
+    "nameSource": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/xml/JDGoodsXmlData.xml",
+    "sha256": "28fe232bb72b74556412f8e6cffd5bb7226ebff79dc9d70fac25d9fb770d475c"
+  },
+  {
+    "file": "lake-cabin.png",
+    "name": "神秘湖木屋",
+    "goodsId": 160038,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160038.swf",
+    "spriteId": 47,
+    "zoom": 2,
+    "size": [
+      2698,
+      1506
+    ],
+    "sha256": "7d460cb5d7bbfda7b081a17165c095305cdf1bd9b604749cd4c7846d6a65ba42"
+  },
+  {
+    "file": "original-earthen-home.png",
+    "name": "经典树洞小屋（名称待考）",
+    "goodsId": 160030,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160030.swf",
+    "spriteId": 35,
+    "zoom": 2,
+    "size": [
+      2278,
+      1297
+    ],
+    "sha256": "c31d3951226a50cef8d38ec2ea18151d5a0d337af16108878db66c4f1e704ba2"
+  }
+]

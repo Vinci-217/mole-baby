@@ -1,0 +1,218 @@
+{
+  "description": "Original game atlas static frames, exported through the same additive three-mask body ColorTransform as the live canvas. No generated artwork, redrawing, CSS body or added flowerpot. Native frame dimensions are retained.",
+  "upstream": "https://github.com/mli55/taomi-codex-pets",
+  "officialSource": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "detailedProvenance": "../../classic/SOURCE-RECORD.md",
+  "colorOffsets": {
+    "red": [
+      255,
+      -199,
+      -250
+    ],
+    "yellow": [
+      0,
+      -21,
+      -255
+    ],
+    "blue": [
+      -215,
+      -57,
+      31
+    ],
+    "pink": [
+      51,
+      -148,
+      0
+    ]
+  },
+  "maskBases": [
+    255,
+    204,
+    153
+  ],
+  "files": [
+    {
+      "filename": "junior-pink-idle.png",
+      "form": "junior",
+      "color": "pink",
+      "source": "../../classic/junior-neutral.png",
+      "mask": "../../classic/junior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "351d1a0097eeebdbce14dd368c9a92fb5950528076b2addbd91de92e5aa62b96"
+    },
+    {
+      "filename": "junior-yellow-idle.png",
+      "form": "junior",
+      "color": "yellow",
+      "source": "../../classic/junior-neutral.png",
+      "mask": "../../classic/junior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "6941f85c94c5e6c4f26d2efba9a5d12ba2003126489186abcfd3ed139a37c5d9"
+    },
+    {
+      "filename": "junior-blue-idle.png",
+      "form": "junior",
+      "color": "blue",
+      "source": "../../classic/junior-neutral.png",
+      "mask": "../../classic/junior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "94b7aecfff0de9de72d5f90274ccb2a78a72baeda46dd4591ff5d1cba95ea7db"
+    },
+    {
+      "filename": "junior-red-idle.png",
+      "form": "junior",
+      "color": "red",
+      "source": "../../classic/junior-neutral.png",
+      "mask": "../../classic/junior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "5c3dd4aed091ade3abe47b7582311ce69fc7aa62ecfca217648b1d7449118763"
+    },
+    {
+      "filename": "middle-pink-idle.png",
+      "form": "middle",
+      "color": "pink",
+      "source": "../../classic/middle-neutral.png",
+      "mask": "../../classic/middle-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "01f09838abc732ec04a8d52fc31f6eec93528066ea1f91e8cc7409cc6bce527b"
+    },
+    {
+      "filename": "middle-yellow-idle.png",
+      "form": "middle",
+      "color": "yellow",
+      "source": "../../classic/middle-neutral.png",
+      "mask": "../../classic/middle-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "221c47f3dabe9f758cd62647b57cf9e53f10d297f6575e2fa1b55ab7389f3983"
+    },
+    {
+      "filename": "middle-blue-idle.png",
+      "form": "middle",
+      "color": "blue",
+      "source": "../../classic/middle-neutral.png",
+      "mask": "../../classic/middle-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "484f725a0c2d7a7882ee88ec84fe17a232412078c4607ef8db8add10867db357"
+    },
+    {
+      "filename": "middle-red-idle.png",
+      "form": "middle",
+      "color": "red",
+      "source": "../../classic/middle-neutral.png",
+      "mask": "../../classic/middle-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "e89f84e6942d369db8ae634eba351aef2d727410b3101ec990f16f61c718a838"
+    },
+    {
+      "filename": "senior-pink-idle.png",
+      "form": "senior",
+      "color": "pink",
+      "source": "../../classic/senior-neutral.png",
+      "mask": "../../classic/senior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "4fcb770b5d8c913e72e40fd33cd1113931a3e6212bea75a18854db5a33eb74b8"
+    },
+    {
+      "filename": "senior-yellow-idle.png",
+      "form": "senior",
+      "color": "yellow",
+      "source": "../../classic/senior-neutral.png",
+      "mask": "../../classic/senior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "1358743c58b7fed375890ef5ebaf9c925659034a65ad9ef88381dd1b4086bd9d"
+    },
+    {
+      "filename": "senior-blue-idle.png",
+      "form": "senior",
+      "color": "blue",
+      "source": "../../classic/senior-neutral.png",
+      "mask": "../../classic/senior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "12f2e7a84efc853e2ec49915081157cb91ae1a0eaf45370d66fd10dbe7ef7611"
+    },
+    {
+      "filename": "senior-red-idle.png",
+      "form": "senior",
+      "color": "red",
+      "source": "../../classic/senior-neutral.png",
+      "mask": "../../classic/senior-mask.png",
+      "frame": {
+        "row": 0,
+        "column": 0,
+        "width": 192,
+        "height": 208
+      },
+      "sha256": "f76388555bd97ba33c09602ce70fc68f6955d47f310bbe790e5d8b4efaaeadff"
+    }
+  ],
+  "favicon": {
+    "file": "../../../favicon.png",
+    "source": "middle-red-idle.png",
+    "operation": "Crop nontransparent bounds, center with transparent padding, preserve native pixels without resampling",
+    "width": 183,
+    "height": 183,
+    "bbox": [
+      21,
+      26,
+      180,
+      182
+    ],
+    "padding": 12,
+    "sha256": "3b0b0999a0894f5f22bfea2f602d6a1c8f578cf987dc9949a8bd29df454b3d74"
+  }
+}

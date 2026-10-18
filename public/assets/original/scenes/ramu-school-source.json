@@ -1,0 +1,14 @@
+{
+  "file": "ramu-school.png",
+  "name": "拉姆学院原场景",
+  "mapId": 28,
+  "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/map/28.swf",
+  "spriteId": 64,
+  "zoom": 2,
+  "size": [
+    2033,
+    1245
+  ],
+  "sha256": "c462b0bfb2124281ce7d267912a879ff40dd9afcffc61d8ad7a53fce742b2afe",
+  "notes": "Original outdoor background layer without NPC or interactive overlay sprites; school lettering retained from original artwork."
+}
