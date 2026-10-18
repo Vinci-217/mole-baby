@@ -1,0 +1,9 @@
+.companion-ai-settings{margin:12px 0;padding:11px;border:1px solid #e6d5ad;border-radius:8px;background:#fffaf0;color:#6c573a;font-size:11px;line-height:1.7;text-align:left}
+.companion-ai-settings h4{margin:0 0 5px;font-size:12px;color:#835a2c}
+.companion-ai-settings p{margin:5px 0}.companion-ai-settings strong{font-weight:600}
+.companion-ai-settings label{display:block;margin-top:8px}.companion-ai-settings .ai-key-row{display:flex;gap:5px;margin:3px 0}
+.companion-ai-settings input{min-width:0;flex:1;width:100%;padding:6px 7px;border:1px solid #d7bd8d;border-radius:5px;background:#fffef9;font:inherit;color:#5b4931;box-shadow:none}
+.companion-ai-settings button{padding:5px 9px;border:1px solid #d8bb7f;border-radius:5px;background:#fff0ca;color:#725125;font:inherit;white-space:nowrap;box-shadow:none;translate:none}
+.companion-ai-settings button:disabled{opacity:.55;cursor:default}.companion-ai-settings button:hover:not(:disabled){background:#ffe6a4}
+.companion-ai-settings .ai-remove-key{margin:5px 0;background:#fffdf8;border-color:#e2ceae;color:#896445}
+.companion-ai-settings small{display:block;font-size:10px;color:#947a56}.companion-ai-settings .ai-settings-message{padding-top:4px;color:#88632e;overflow-wrap:anywhere}

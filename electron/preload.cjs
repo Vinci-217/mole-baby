@@ -1,5 +1,22 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+contextBridge.exposeInMainWorld('companionSpeech', Object.freeze({
+  getAvailability: () => ipcRenderer.invoke('companion-speech:get-availability'),
+  listen: () => ipcRenderer.invoke('companion-speech:listen'),
+  cancel: () => ipcRenderer.send('companion-speech:cancel'),
+}));
+
+contextBridge.exposeInMainWorld('companionAI', Object.freeze({
+  getSettings: () => ipcRenderer.invoke('companion-ai:get-settings'),
+  setKey: (key) => {
+    if (typeof key !== 'string') return Promise.reject(new TypeError('请输入 DeepSeek API Key。'));
+    return ipcRenderer.invoke('companion-ai:set-key', key);
+  },
+  clearKey: () => ipcRenderer.invoke('companion-ai:clear-key'),
+  chat: (messages) => ipcRenderer.invoke('companion-ai:chat', messages),
+  cancel: () => ipcRenderer.send('companion-ai:cancel'),
+}));
+
 function subscribeToState(channel, callback, selectInitial) {
   if (typeof callback !== 'function') throw new TypeError('A callback is required');
   let active = true;

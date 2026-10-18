@@ -1,7 +1,9 @@
-const { app, BrowserWindow, ipcMain, Notification, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
+const { createCompanionAI } = require('./deepseek.cjs');
+const { createCompanionSpeech } = require('./speech.cjs');
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
@@ -31,6 +33,8 @@ let companionPanel = false;
 let panelSide = 'right';
 let petCanMove = true;
 let mousePassthrough = false;
+let companionAI = null;
+let companionSpeech = null;
 
 function getDesktopState() {
   return {
@@ -375,6 +379,14 @@ function changePetMode(enabled) {
 }
 
 function registerIPC() {
+  handle('companion-ai:get-settings', () => companionAI.getSettings());
+  handle('companion-ai:set-key', (key) => companionAI.setKey(key));
+  handle('companion-ai:clear-key', () => companionAI.clearKey());
+  handle('companion-ai:chat', (messages) => companionAI.chat(messages));
+  listen('companion-ai:cancel', () => companionAI.cancel());
+  handle('companion-speech:get-availability', () => companionSpeech.getAvailability());
+  handle('companion-speech:listen', () => companionSpeech.listen());
+  listen('companion-speech:cancel', () => companionSpeech.cancel());
   listen('desktop:minimize', () => mainWindow.minimize());
   listen('desktop:close', () => app.quit());
   handle('desktop:toggle-always-on-top', () => {
@@ -448,7 +460,7 @@ function createWindow() {
   window.on('minimize', stopMovement);
   window.on('restore', scheduleWander);
   window.on('blur', () => { if (dragging) endPetDrag(); });
-  window.on('close', saveWindowState);
+  window.on('close', () => { companionAI.cancel(); companionSpeech.cancel(); saveWindowState(); });
   window.on('closed', () => {
     stopMovement();
     clearTimeout(saveTimer);
@@ -456,6 +468,10 @@ function createWindow() {
   });
   window.webContents.on('did-finish-load', () => {
     if (!window.isDestroyed()) publishState(true);
+  });
+  window.webContents.on('render-process-gone', () => { companionAI.cancel(); companionSpeech.cancel(); });
+  window.webContents.on('did-start-navigation', (_event, _url, isInPlace, isMainFrame) => {
+    if (isMainFrame && !isInPlace) { companionAI.cancel(); companionSpeech.cancel(); }
   });
   window.webContents.on('will-navigate', (event, target) => {
     if (!isOurURL(target)) event.preventDefault();
@@ -484,6 +500,8 @@ if (!app.requestSingleInstanceLock()) {
   });
   app.whenReady().then(() => {
     app.setAppUserModelId('com.molebaby.ramuhouse');
+    companionAI = createCompanionAI({ userDataPath: app.getPath('userData'), safeStorage });
+    companionSpeech = createCompanionSpeech();
     loadWindowState();
     registerIPC();
     createWindow();
@@ -511,6 +529,6 @@ if (!app.requestSingleInstanceLock()) {
     console.error('Unable to start the pet application:', error.message);
     app.quit();
   });
-  app.on('before-quit', () => { stopMovement(); saveWindowState(); });
+  app.on('before-quit', () => { companionAI?.dispose(); companionSpeech?.dispose(); stopMovement(); saveWindowState(); });
   app.on('window-all-closed', () => app.quit());
 }

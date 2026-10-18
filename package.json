@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "拉姆陪伴 · 原页游拉姆桌面宠物",
   "author": "Mole Baby",
@@ -9,13 +9,14 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run",
+    "test": "vitest run && node --test electron/deepseek.node-test.cjs electron/speech.node-test.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
     "test:browser": "node scripts/smoke.cjs",
     "dist:win:portable": "npm run build && electron-builder --win zip --x64",
-    "test:desktop:cloud": "node scripts/desktop-smoke.cjs"
+    "test:desktop:cloud": "node scripts/desktop-smoke.cjs",
+    "test:memory": "node scripts/memory-regression.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

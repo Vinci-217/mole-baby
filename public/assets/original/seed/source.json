@@ -42,11 +42,25 @@
       99
     ]
   },
-  "adaptation": "Separate original layers. Pot stays fixed; original nested body timeline sampled for blinking, with small pointer-driven body rotation. Seed embryo is original neutral white; selected body colour becomes visible after sprouting. No new painted pet artwork.",
+  "adaptation": "Original neutral seed body is recoloured at runtime with an exact body-only coverage mask using the four player-selected original game colour offsets. This same selected colour is retained through all growth stages. Eye whites, pupils, facial lines and the separate original pot remain unchanged. This seeded colour continuity is a desktop adaptation requested by the player, not a claim that the original game coloured its neutral seed embryo.",
   "files": {
     "pot.png": "4c5d208b3f05eac85e4157ed753678ed220a101ccde2624f66254226db387618",
     "body.png": "0a7078b95ba0a2da6cd53984bd8d1bff93a261c9c64eedcd1a098deb4325ec28",
     "body-still.png": "26de97033f1ab9d709f181fccc6fb712ac1854cd90781ccf5bbcbb8a2250bc30",
-    "source-motion.gif": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f"
+    "source-motion.gif": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f",
+    "body-mask.png": "9ecc3ad1abac5b0e0a53a431450f97ff40bb70ac02230014310173781dbc1f59"
+  },
+  "bodyColourMask": {
+    "file": "body-mask.png",
+    "channels": {
+      "red": "coverage of original white 255 body fill",
+      "green": "coverage of original gray 204 body fill",
+      "blue": "unused"
+    },
+    "method": "JPEXS original sprite37 61 frames, zoom1.544617. Difference exports of body shape5/15/31 original white orgray fills and outlines set to black separately. Nested eye sprites, highlight transforms and closed-eye lines are preserved. Runtime applies the same additive RGB palette as grown forms.",
+    "closedEyes": {
+      "zeroBasedAtlasFrame": 4,
+      "originalSpriteFrame": 5
+    }
   }
 }

@@ -158,3 +158,19 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 本项目为个人学习用途的非官方同人桌宠。拉姆角色、名称及原客户端美术权益归《摩尔庄园》原权利方所有；社区存档和本项目的导出、适配不改变这些权益归属，也不表示获得官方授权或由官方维护。本项目不恢复官方账号、服务器、交易或联网社交功能。
 
 小游戏另使用原拉姆学院地图背景：`public/assets/original/scenes/ramu-school.png`（2033×1245），来自同一固定提交的 `root/resource/map/28.swf`，sprite 64，2 倍导出；详见同目录 [ramu-school-source.json](public/assets/original/scenes/ramu-school-source.json)。
+
+## v0.5 小屋音乐、背景选择与合成音效
+
+小屋新增四种可持久化选择的背景：已有生成图 `generated/morning-study.png`，以及原客户端导出 `original/scenes/ramu-home.png`、`lake-cabin.png`、`original-earthen-home.png`。生成图与原图的来源分类沿用上文。
+
+新增三首直接保存原字节的原页游配乐，固定取自同一 RecMoleRes 提交 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff`：`audio/castle.mp3` ← `BGM_001g.mp3`（摩尔城堡）、`audio/pet-shop.mp3` ← `BGM_002.mp3`（宠物店等室内场景）、`audio/mystery-lake.mp3` ← `BGM_017b.mp3`（神秘湖）。名称对照随包保存的原 `audio/map-sounds.xml`，完整 URL、尺寸、哈希见 [audio/sources.json](public/assets/original/audio/sources.json)。文件随安装包保存，可离线播放；没有声称这三首原本属于本项目房间。
+
+本次未找到能确认身份的原版拉姆说话、吃饭录音。`src/pet-audio.ts` 的叫声、咀嚼、喝水、泡泡、呼吸、唤醒等声效为本地程序合成，不标记为原版录音。查找过程、实际证据及声音设计见 [audio-sources.md](research/audio-sources.md)。用户还可自行选择并在本机保存一份音乐文件，支持重启恢复与删除；该用户文件不属于仓库素材。
+
+## v0.5 四色种子与原照料动作
+
+种子继续使用原 `lamubone.swf` 的独立身体和花盆；新增 `seed/body-mask.png` 只标记原身体灰阶覆盖率，运行时应用已有四种颜色偏移，眼白、瞳孔、叶片和花盆保持原色。种子延续领养配色是用户要求的桌宠适配，不声称原版白色胚胎本来就有四色。闭眼采用原 sprite 37 第 5 帧。探针方法、原文件哈希和新增遮罩哈希见 [seed/source.json](public/assets/original/seed/source.json)。
+
+新增 [care](public/assets/original/care/README.md) 六张原素材图集（三级各一张 neutral 与 mask）：16 列 × 7 行、单格 192×208。使用原标签 `food`、`drenk`、`wash`、`medical`、`thirst`、`hungry`、`boring` 的短连续片段，没有重绘角色。原源帧、固定配准、裁切与每张 PNG 的 SHA-256 见 [care/source.json](public/assets/original/care/source.json)。显示速度和状态映射为桌宠适配；`boring` 未冒称为原版疾病或睡眠动作。成长形态睡眠另选已有原 `happy` 闭眼帧，叠加轻呼吸。
+
+用品种类、名字、原属性、原非零售价与本地活动品定价区分见 [items-states.md](research/items-states.md)。商店只展示已经有对应原 PNG 的 28 种用品；没有以可可果图案代替饮品、清洁用品。

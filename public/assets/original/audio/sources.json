@@ -1,0 +1,59 @@
+{
+  "repository": "https://github.com/Miigon/RecMoleRes",
+  "commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "retrieved_at_utc": "2026-10-18",
+  "files": [
+    {
+      "file": "castle.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_001g.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_001g.mp3",
+      "scene_label": "摩尔城堡",
+      "map_id": 1,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "duration_seconds": 46.08,
+      "bytes": 368665,
+      "sha256": "80afce61de22230d5feaeac266ec376b04c50453aa06b01dc583620c0b10ced5",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
+    },
+    {
+      "file": "pet-shop.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_002.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_002.mp3",
+      "scene_label": "宠物店",
+      "map_id": 21,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "duration_seconds": 30.093,
+      "bytes": 240769,
+      "sha256": "cb5c2b03c1edec1740d7dddea3b94175916644762d592362bb50fc27dddc6325",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
+    },
+    {
+      "file": "mystery-lake.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_017b.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_017b.mp3",
+      "scene_label": "神秘湖",
+      "map_id": 8,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "duration_seconds": 40.098,
+      "bytes": 320809,
+      "sha256": "9305823e91db7d770e6be123a976f48f5483cab261599da14f39c7724ef53351",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
+    },
+    {
+      "file": "map-sounds.xml",
+      "kind": "original-client-map-music-correspondence",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/%E5%AF%B9%E5%BA%94%E8%A1%A8.xml",
+      "bytes": 25484,
+      "sha256": "b47e2f01eb3231ace0eb592d1d46a820426377c5f069f6329e94a2b1e8d20bf7"
+    }
+  ],
+  "pet_sounds": {
+    "source": "src/pet-audio.ts",
+    "kind": "locally-generated-procedural-audio",
+    "official_recording": false,
+    "reason": "lamubone.swf contains no DefineSound or streamed audio tags; no independently identified original pet vocal recording was found in the inspected archive directories. Unidentified generic UI sounds were not relabeled as pet sounds."
+  }
+}

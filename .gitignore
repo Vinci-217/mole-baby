@@ -24,3 +24,16 @@ artifacts/*
 !artifacts/v4-native-seed.png
 !artifacts/v4-compact-food.png
 !artifacts/v4-contact-game.png
+
+# Local Flash exporter logs are not product files.
+logs/
+
+!artifacts/v5-native-seed.png
+!artifacts/v5-native-sidecar.png
+!artifacts/v5-native-compact.png
+!artifacts/v5-shop.png
+!artifacts/v5-memory-chat.png
+!artifacts/v5-room-background.png
+
+!artifacts/v5-native-fruit-game.png
+!artifacts/v5-native-memory-game.png

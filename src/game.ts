@@ -1,11 +1,18 @@
+import { ITEMS, getItem } from './catalog';
+import type { PetItem } from './catalog';
+export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
+export type { PetItem, ItemCategory } from './catalog';
+
 export type PetColor = 'pink' | 'yellow' | 'blue' | 'red';
 export type Stage = 0 | 1 | 2 | 3;
-export type Action = 'pet' | 'feed' | 'wash' | 'play' | 'sleep';
+export type Action = 'pet' | 'feed' | 'drink' | 'wash' | 'use' | 'play' | 'sleep';
 
 export interface PetStats {
   hunger: number;
+  thirst: number;
   happiness: number;
   cleanliness: number;
+  health: number;
   energy: number;
 }
 
@@ -30,15 +37,8 @@ export interface CareResult {
   ok: boolean;
 }
 
-export interface Food {
-  id: string;
-  name: string;
-  emoji: string;
-  price: number;
-  hunger: number;
-  happiness: number;
-  description: string;
-}
+/** Kept for old imports; shop items now carry all five original care effects. */
+export type Food = PetItem;
 
 export const COLORS: { id: PetColor; name: string; hex: string; light: string }[] = [
   { id: 'pink', name: '粉色', hex: '#ff6bff', light: '#ffe1ff' },
@@ -47,11 +47,8 @@ export const COLORS: { id: PetColor; name: string; hex: string; light: string }[
   { id: 'red', name: '红色', hex: '#ff3805', light: '#ffded3' },
 ];
 
-export const FOODS: Food[] = [
-  { id: 'berry', name: '可可果', emoji: '🍎', price: 8, hunger: 16, happiness: 4, description: '拉姆喜欢的可可果，给小肚子补充能量。' },
-  { id: 'biscuit', name: '熊熊饼干', emoji: '🍪', price: 12, hunger: 26, happiness: 5, description: '香香脆脆的小点心，是午后的小确幸。' },
-  { id: 'juice', name: '浆果果汁', emoji: '🧃', price: 15, hunger: 18, happiness: 12, description: '清爽的浆果果汁，喝一口心情也亮起来。' },
-];
+/** Stable reward order: old save IDs and minigame reward receipts depend on it. */
+export const FOODS: Food[] = ['berry', 'biscuit', 'juice'].map(id => getItem(id)!);
 
 // Timings are simplified for this desktop companion. Super Ram is not a growth stage.
 export const STAGES = [
@@ -72,6 +69,7 @@ const rounded = (value: number): number => Math.round(value * 1_000_000) / 1_000
 const grow = (growth: number, amount: number): number => rounded(clamp(growth + amount, GROWTH_MAX));
 
 export function createPet(name: string, color: PetColor, now = Date.now()): GameState {
+  if (!COLORS.some(entry => entry.id === color)) throw new RangeError('拉姆只有粉、黄、蓝、红四种基础颜色。');
   const safeName = Array.from(name.replace(/[\u0000-\u001f\u007f]/g, '').trim()).slice(0, 16).join('') || '小拉姆';
   return {
     version: 1,
@@ -81,8 +79,8 @@ export function createPet(name: string, color: PetColor, now = Date.now()): Game
     lastTick: now,
     growth: 0,
     coins: 100,
-    stats: { hunger: 82, happiness: 78, cleanliness: 88, energy: 85 },
-    inventory: { berry: 5, biscuit: 3, juice: 2 },
+    stats: { hunger: 82, thirst: 82, happiness: 78, cleanliness: 88, health: 100, energy: 85 },
+    inventory: Object.fromEntries(ITEMS.map(item => [item.id, 0])),
     sleeping: false,
     completedGames: 0,
     lastRewardAt: 0,
@@ -106,18 +104,29 @@ export function tick(state: GameState, now = Date.now()): GameState {
   if (!Number.isFinite(now) || now <= state.lastTick) return state;
   const hours = Math.min(now - state.lastTick, OFFLINE_CAP_MS) / 3_600_000;
   const rates = state.sleeping
-    ? { hunger: 3, happiness: 1, cleanliness: 1.5, energy: -22 }
-    : { hunger: 5, happiness: 3, cleanliness: 3.5, energy: 4 };
+    ? { hunger: 3, thirst: 3, happiness: 1, cleanliness: 1.5, energy: -22 }
+    : { hunger: 5, thirst: 6, happiness: 3, cleanliness: 3.5, energy: 4 };
 
   // Count only the part of the interval before a need drops below its healthy limit.
   // This gives credit for the healthy part of an absence, without growing indefinitely.
   const healthyHours = state.sleeping ? 0 : Math.max(0, Math.min(
     hours,
     (state.stats.hunger - 35) / rates.hunger,
+    (state.stats.thirst - 35) / rates.thirst,
     (state.stats.happiness - 35) / rates.happiness,
     (state.stats.cleanliness - 30) / rates.cleanliness,
     (state.stats.energy - 25) / rates.energy,
   ));
+
+  // Original needs include health. This companion has no death: neglect lowers it
+  // to one, and sustained care or the original universal medicine restores it.
+  // Split the interval at the first critical need so long and short ticks agree.
+  const caredHours = Math.max(0, Math.min(hours,
+    (state.stats.hunger - 20) / rates.hunger,
+    (state.stats.thirst - 20) / rates.thirst,
+    (state.stats.cleanliness - 20) / rates.cleanliness,
+  ));
+  const health = Math.max(1, clamp(state.stats.health + caredHours * 2) - (hours - caredHours) * 6);
 
   return {
     ...state,
@@ -125,6 +134,8 @@ export function tick(state: GameState, now = Date.now()): GameState {
     growth: grow(state.growth, healthyHours * 18),
     stats: {
       hunger: rounded(clamp(state.stats.hunger - hours * rates.hunger)),
+      thirst: rounded(clamp(state.stats.thirst - hours * rates.thirst)),
+      health: rounded(health),
       happiness: rounded(clamp(state.stats.happiness - hours * rates.happiness)),
       cleanliness: rounded(clamp(state.stats.cleanliness - hours * rates.cleanliness)),
       energy: rounded(clamp(state.stats.energy - hours * rates.energy)),
@@ -144,16 +155,28 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
   if (current.sleeping) return { state: current, message: '小拉姆正在休息，先轻轻叫醒它吧。', ok: false };
   const stats = { ...current.stats };
 
-  if (action === 'feed') {
-    const food = FOODS.find((item) => item.id === foodId);
-    if (!food) return { state: current, message: '先挑选一份食物吧。', ok: false };
-    if (!current.inventory[food.id]) return { state: current, message: `${food.name}吃完啦，去小铺补充一些吧。`, ok: false };
-    if (stats.hunger >= 95) return { state: current, message: '肚子饱饱的，留着等会儿再吃吧。', ok: false };
-    stats.hunger = clamp(stats.hunger + food.hunger);
-    stats.happiness = clamp(stats.happiness + food.happiness);
+  if (action === 'feed' || action === 'drink' || action === 'wash' || action === 'use') {
+    const item = getItem(foodId);
+    if (!item) return { state: current, message: action === 'wash' ? '先从背包挑选一份清洁用品，缺少时可以去商店购买。' : '先从背包挑选一份用品吧。', ok: false };
+    // Old clients used feed/juice before the drink action existed.
+    const rightCategory = action === 'use' || (action === 'feed' && (item.category === 'food' || item.id === 'juice'))
+      || (action === 'drink' && item.category === 'drink') || (action === 'wash' && item.category === 'clean');
+    if (!rightCategory) return { state: current, message: '这种用品需要在对应的照料分类里使用。', ok: false };
+    if (getStage(current.growth) < item.minStage) return { state: current, message: `${item.name}要等到${STAGES[item.minStage].name}才能使用，先留在背包里吧。`, ok: false };
+    if (!(current.inventory[item.id] > 0)) return { state: current, message: `${item.name}用完啦，去商店用摩尔豆补充一些吧。`, ok: false };
+    const keys = ['hunger', 'thirst', 'cleanliness', 'happiness', 'health'] as const;
+    if (!keys.some(key => item[key] > 0 && stats[key] < 100)) {
+      const message = item.category === 'food' ? '肚子饱饱的，留着等会儿再吃吧。'
+        : item.category === 'drink' ? '已经喝饱啦，饮品先留在背包里。'
+          : item.category === 'clean' ? '已经洗得香喷喷啦，清洁用品先收好。' : '身体很健康，药水先留着吧。';
+      return { state: current, message, ok: false };
+    }
+    for (const key of keys) stats[key] = clamp(stats[key] + item[key]);
     return {
-      state: { ...current, stats, growth: grow(current.growth, 4), inventory: { ...current.inventory, [food.id]: current.inventory[food.id] - 1 } },
-      message: `啊呜！${food.name}真好吃，谢谢你。`,
+      state: { ...current, stats, growth: grow(current.growth, item.category === 'clean' ? 3 : 4), inventory: { ...current.inventory, [item.id]: current.inventory[item.id] - 1 } },
+      message: item.category === 'clean' ? `${item.name}的泡泡香香的，洗干净啦！`
+        : item.category === 'drink' ? `咕嘟咕嘟，${item.name}真解渴！`
+          : item.category === 'medicine' ? '喝过药水，身体舒服多啦。谢谢你照顾我！' : `啊呜！${item.name}真好吃，谢谢你。`,
       ok: true,
     };
   }
@@ -162,13 +185,6 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     stats.happiness = clamp(stats.happiness + 6);
     return { state: { ...current, stats, growth: grow(current.growth, 1) }, message: '咕噜咕噜～最喜欢你摸摸我啦！', ok: true };
   }
-  if (action === 'wash') {
-    if (stats.cleanliness >= 98) return { state: current, message: '已经洗得香喷喷啦，来抱一下吧。', ok: false };
-    stats.cleanliness = clamp(stats.cleanliness + 35);
-    stats.happiness = clamp(stats.happiness + 4);
-    stats.energy = clamp(stats.energy - 3);
-    return { state: { ...current, stats, growth: grow(current.growth, 3) }, message: '泡泡飞呀飞，洗完澡又是干净的小拉姆！', ok: true };
-  }
   if (stats.energy < 12) return { state: current, message: '有一点困啦，睡一会儿再玩好不好？', ok: false };
   stats.happiness = clamp(stats.happiness + 16);
   stats.energy = clamp(stats.energy - 12);
@@ -176,17 +192,35 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
   return { state: { ...current, stats, growth: grow(current.growth, 3) }, message: '蹦蹦跳跳！和你一起玩最开心。', ok: true };
 }
 
-export function buyFood(state: GameState, foodId: string): CareResult {
-  const food = FOODS.find((item) => item.id === foodId);
-  if (!food) return { state, message: '小铺里暂时没有这种食物。', ok: false };
-  if (state.coins < food.price) return { state, message: '摩尔豆不够啦，玩一局小游戏赚一些吧。', ok: false };
-  const count = state.inventory[food.id] ?? 0;
-  if (count >= MAX_INVENTORY) return { state, message: '这种食物已经装满背包啦。', ok: false };
+export function buyItem(state: GameState, itemId: string): CareResult {
+  const item = getItem(itemId);
+  if (!item) return { state, message: '商店里暂时没有这种用品。', ok: false };
+  if (state.coins < item.price) return { state, message: '摩尔豆不够啦，玩一局小游戏赚一些吧。', ok: false };
+  const count = state.inventory[item.id] ?? 0;
+  if (count >= MAX_INVENTORY) return { state, message: '这种用品已经装满背包啦。', ok: false };
   return {
-    state: { ...state, coins: state.coins - food.price, inventory: { ...state.inventory, [food.id]: count + 1 } },
-    message: `收好啦，${food.name} × 1！`,
+    state: { ...state, coins: state.coins - item.price, inventory: { ...state.inventory, [item.id]: count + 1 } },
+    message: `收好啦，${item.name} × 1！`,
     ok: true,
   };
+}
+
+/** Backwards-compatible name; the shop now sells drinks and care supplies too. */
+export const buyFood = buyItem;
+
+export type PetConditionId = 'sleeping' | 'sick' | 'hungry' | 'thirsty' | 'dirty' | 'sad' | 'tired' | 'healthy';
+export interface PetCondition { id: PetConditionId; label: string; action: string; description: string }
+
+/** Need labels come from the original client; tired/sleep are desktop additions. */
+export function getPetCondition(state: GameState): PetCondition {
+  if (state.sleeping) return { id: 'sleeping', label: '睡梦中', action: 'sleep', description: '正在闭眼休息，点“叫醒”就可以继续互动。' };
+  if (state.stats.health <= 35) return { id: 'sick', label: '生病了', action: 'sick', description: '健康较低，记得照料饮食和清洁；万能药水可以帮助恢复。' };
+  if (state.stats.hunger < 30) return { id: 'hungry', label: '肚子饿了', action: 'hungry', description: '从背包挑一份食物，空背包可以去商店补充。' };
+  if (state.stats.thirst < 30) return { id: 'thirsty', label: '口渴了', action: 'thirsty', description: '需要喝一点麦香牛奶、果汁或其他饮品。' };
+  if (state.stats.cleanliness < 30) return { id: 'dirty', label: '需要清洁', action: 'dirty', description: '使用泡泡浴、洗面奶或沐浴露清洁一下吧。' };
+  if (state.stats.happiness < 30) return { id: 'sad', label: '有点难过', action: 'sad', description: '摸摸它、聊聊天，或者一起玩一会儿。' };
+  if (state.stats.energy < 25) return { id: 'tired', label: '有点困了', action: 'tired', description: '可以让拉姆闭上眼睛休息一会儿。' };
+  return { id: 'healthy', label: '状态很好', action: 'idle', description: '吃得饱、喝得足，正在安心地陪伴你。' };
 }
 
 export function rewardGame(state: GameState, score: number, now = Date.now()): CareResult {
@@ -241,13 +275,18 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
     if (!isIntegerIn(value.lastRewardAt, 0, value.lastTick)) return null;
     if (!isRecord(value.stats) || !isRecord(value.inventory)) return null;
     const { hunger, happiness, cleanliness, energy } = value.stats;
-    if (!isNumberIn(hunger, 0, 100) || !isNumberIn(happiness, 0, 100) || !isNumberIn(cleanliness, 0, 100) || !isNumberIn(energy, 0, 100)) return null;
+    // v0.4 saves have four stats. Add only new fields, preserving every old need,
+    // inventory count, growth point and timestamp before normal offline ticking.
+    const thirst = value.stats.thirst === undefined ? 82 : value.stats.thirst;
+    const health = value.stats.health === undefined ? 100 : value.stats.health;
+    if (!isNumberIn(hunger, 0, 100) || !isNumberIn(thirst, 0, 100) || !isNumberIn(health, 0, 100) || !isNumberIn(happiness, 0, 100) || !isNumberIn(cleanliness, 0, 100) || !isNumberIn(energy, 0, 100)) return null;
     const inventory: Record<string, number> = {};
     for (const [id, count] of Object.entries(value.inventory)) {
-      if (!FOODS.some((food) => food.id === id) || !isIntegerIn(count, 0, MAX_INVENTORY)) return null;
-      inventory[id] = count;
+      const item = getItem(id);
+      if (!item || !isIntegerIn(count, 0, MAX_INVENTORY) || Object.hasOwn(inventory, item.id)) return null;
+      inventory[item.id] = count;
     }
-    for (const food of FOODS) inventory[food.id] ??= 0;
+    for (const item of ITEMS) inventory[item.id] ??= 0;
     return tick({
       version: 1,
       name: value.name.trim(),
@@ -256,7 +295,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       lastTick: value.lastTick,
       growth: value.growth,
       coins: value.coins,
-      stats: { hunger, happiness, cleanliness, energy },
+      stats: { hunger, thirst, happiness, cleanliness, health, energy },
       inventory,
       sleeping: value.sleeping,
       completedGames: value.completedGames,

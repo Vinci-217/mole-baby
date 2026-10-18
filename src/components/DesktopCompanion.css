@@ -118,3 +118,37 @@
 html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;overflow:hidden}
 .transparent-stage{position:relative;width:100vw;height:100vh;overflow:hidden}
 .pet-mode .transparent-stage{position:relative;width:100vw;height:100vh;overflow:hidden}
+
+/* Keep the score, timer and entire play surface inside the actual 374px
+   native side window. Ready/result pages may scroll; active play never needs it. */
+.transparent-stage .fruit-dialog,.transparent-stage .memory-dialog{border-width:1px;padding:9px 10px 10px}
+.transparent-stage .fruit-heading h2,.transparent-stage .memory-heading h2{font-size:14px;margin:0}
+.transparent-stage .fruit-close,.transparent-stage .memory-close{width:22px;height:22px}
+.transparent-stage .fruit-scoreboard{font-size:10px;margin:6px 0;height:24px}
+.transparent-stage .fruit-scoreboard strong{font-size:16px}
+.transparent-stage .fruit-scoreboard .raster-game-art{width:20px;height:21px}
+.transparent-stage .fruit-score>span{font-size:9px}
+.transparent-stage .fruit-time-track{height:5px;margin-bottom:6px}
+.transparent-stage .fruit-arena{border-width:2px}
+.transparent-stage .fruit-controls{font-size:9px;margin:5px 0 0;line-height:16px}
+.transparent-stage .fruit-controls kbd{font-size:9px}
+.transparent-stage .fruit-dialog[data-phase=playing] .fruit-reward-note,.transparent-stage .fruit-dialog[data-phase=playing] .fruit-exit-hint{display:none}
+.transparent-stage .memory-scoreboard{margin:6px 0 0;padding:4px 6px;font-size:9px;border-width:1px}
+.transparent-stage .memory-scoreboard strong{font-size:14px}
+.transparent-stage .memory-scoreboard .raster-game-art{width:19px;height:19px}
+.transparent-stage .memory-prompt{font-size:9px;line-height:15px;margin:6px 0}
+.transparent-stage .memory-hint{font-size:8px;line-height:13px;margin:6px 0 0}
+.transparent-stage .memory-dialog[data-phase=playing] .memory-footnote,.transparent-stage .memory-dialog[data-phase=preview] .memory-footnote,.transparent-stage .memory-dialog[data-phase=celebrating] .memory-footnote{display:none}
+.transparent-stage .fruit-result,.transparent-stage .memory-result{padding-top:8px}
+.transparent-stage .fruit-trophy,.transparent-stage .memory-trophy{width:36px;height:43px;margin:0 auto 5px}
+.transparent-stage .fruit-result h3,.transparent-stage .memory-result h3{font-size:13px;margin:0 0 6px}
+.transparent-stage .fruit-result>p,.transparent-stage .memory-result>p{font-size:10px;line-height:1.6;margin:5px 0}
+.transparent-stage .fruit-result>p strong{font-size:14px}
+.transparent-stage .fruit-rewards,.transparent-stage .memory-rewards{margin:10px 0;padding:6px 2px}
+.transparent-stage .fruit-rewards>div,.transparent-stage .memory-rewards>div{border-width:1px;padding:6px 2px;gap:3px}
+.transparent-stage .fruit-rewards strong,.transparent-stage .memory-rewards strong{font-size:16px}
+.transparent-stage .fruit-rewards>div>span:last-child,.transparent-stage .memory-rewards span{font-size:9px}
+.transparent-stage .memory-rewards>div{grid-template-rows:23px 20px 13px}
+.transparent-stage .fruit-rewards .raster-game-art,.transparent-stage .memory-rewards .raster-game-art,.transparent-stage .fruit-growth-icon{width:20px;height:23px}
+.transparent-stage .fruit-result-actions,.transparent-stage .memory-result-actions{margin-top:10px;gap:7px}
+.transparent-stage .fruit-dialog[data-phase=finished] .fruit-reward-note,.transparent-stage .memory-dialog[data-phase=finished] .memory-footnote{font-size:8px;line-height:1.5;margin-top:8px}

@@ -100,7 +100,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
     }
   }
 
-  return <div className="memory-backdrop"><div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="memory-title" className="memory-dialog">
+  return <div className="memory-backdrop"><div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="memory-title" className="memory-dialog" data-phase={phase}>
     <div className="memory-heading"><div><span className="memory-eyebrow">拉姆游乐场</span><h2 id="memory-title">拉姆翻翻乐</h2></div><button className="memory-close" onClick={onClose} aria-label={['preview', 'playing'].includes(phase) ? '退出翻牌游戏，本局不领取奖励' : '关闭翻牌游戏'}></button></div>
     <p className="memory-description">记住熟悉的拉姆用品，把相同图案配成一对。</p>
     {phase === 'ready' && <><div className="memory-preview">{(['apple', 'biscuit', 'ball'] as const).map((kind, i) => <div key={i}><GameArt kind={kind}/><span>{names[symbols.indexOf(kind)]}</span></div>)}</div><div className="memory-instructions"><img className="memory-help-icon" src="./assets/original/ui/icon-book.png" alt="" /><div><strong>找到图案相同的两张卡片</strong><p>先用 3 秒记住位置，再翻开卡片配对。<br/>45 秒内找到全部 6 对，即可获得满分奖励。</p></div></div><button ref={firstButton} className="memory-primary" onClick={start} data-testid="memory-start">开始翻牌<span>45 秒</span></button></>}

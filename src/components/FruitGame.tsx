@@ -109,7 +109,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
 
   return (
     <div className="fruit-backdrop">
-      <div ref={dialogRef} className="fruit-dialog" role="dialog" aria-modal="true" aria-labelledby="fruit-title" aria-describedby="fruit-description">
+      <div ref={dialogRef} className="fruit-dialog" data-phase={phase} role="dialog" aria-modal="true" aria-labelledby="fruit-title" aria-describedby="fruit-description">
         <div className="fruit-heading">
           <div><span className="fruit-eyebrow">拉姆游乐场</span><h2 id="fruit-title">拉姆接果子</h2></div>
           <button type="button" className="fruit-close" onClick={onClose} aria-label={phase === 'playing' ? '退出游戏，本局不领取奖励' : '关闭小游戏'}></button>

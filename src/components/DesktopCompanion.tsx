@@ -1,26 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent, PointerEvent } from 'react';
-import { FOODS, GROWTH_MAX, STAGES } from '../game';
-import type { Action, GameState, Stage } from '../game';
+import type { PointerEvent, ReactNode } from 'react';
+import { GROWTH_MAX, STAGES, getPetCondition } from '../game';
+import type { Action, GameState, Stage, ItemCategory } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
+import CarePocket from './CarePocket';
 
 export type CompanionPanel = 'status' | 'food' | 'games' | 'growth' | 'chat' | 'settings';
 interface Props {
   pet: GameState; stage: Stage; action: string; actionId: number;
   bubble: string; bubbleVisible: boolean; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; quiet: boolean; sound: boolean;
-  reply: string; focusSeconds: number; focusing: boolean; saveError: boolean;
+  focusSeconds: number; focusing: boolean; saveError: boolean;
   onPanel: (panel: CompanionPanel | null) => void; onCare: (action: Action, food?: string) => void;
-  onBuy: (id: string) => void; onChat: (text: string) => void; onRename: (name: string) => void;
+  onBuy: (id: string) => void; onRename: (name: string) => void;
   onGame: (game: 'fruit' | 'memory') => void; onHome: () => void; onFocus: () => void;
   onWander: () => void; onQuiet: () => void; onSound: () => void;
   onExport: () => void; onImport: (file?: File) => void; onSay: (text: string) => void;
   onPet: () => void;
+  pocketCategory: ItemCategory; pocketVisit: number; chatContent: ReactNode; settingsContent: ReactNode;
 }
-const images = { food: 'items/180027', wash: 'items/180003', sleep: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', games: 'items/180004', status: 'ui/status-health' };
+const images = { food: 'items/180001', wash: 'items/180003', sleep: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', games: 'items/180004', status: 'ui/status-health' };
 function Icon({ path }: { path: string }) { return <img alt="" draggable={false} src={`./assets/original/${path}.png`}/>; }
-const panelLabels: Record<CompanionPanel, string> = { status: '状态', food: '喂食', games: '小游戏', growth: '成长', chat: '说话', settings: '设置' };
+const panelLabels: Record<CompanionPanel, string> = { status: '状态', food: '口袋', games: '小游戏', growth: '成长', chat: '说话', settings: '设置' };
 
 export default function DesktopCompanion(p: Props) {
   const [tools, setTools] = useState(false);
@@ -28,7 +30,6 @@ export default function DesktopCompanion(p: Props) {
   const [tilt, setTilt] = useState(0);
   const [shaking, setShaking] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [message, setMessage] = useState('');
   const [name, setName] = useState(p.pet.name);
   const root = useRef<HTMLDivElement>(null);
   const file = useRef<HTMLInputElement>(null);
@@ -56,7 +57,7 @@ export default function DesktopCompanion(p: Props) {
   function down(e: PointerEvent<HTMLButtonElement>) {
     if (e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    if (p.stage > 0) void window.desktop?.startPetDrag();
+    if (p.stage > 0 && !p.pet.sleeping) void window.desktop?.startPetDrag();
     if (p.panel) p.onPanel(null);
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     drag.current = { x, y, lastX: x, lastY: y, moved: false, direction: 0, turns: 0, turnAt: performance.now(), offset };
@@ -81,7 +82,7 @@ export default function DesktopCompanion(p: Props) {
         playPetVoice('shake', p.sound); p.onSay(p.stage === 0 ? '唔～ 花盆留在这里，轻轻摇就好。' : '呜～ 轻轻摇就好啦！');
       }
     }
-    if (p.stage > 0) {
+    if (p.stage > 0 && !p.pet.sleeping) {
       if (p.native) void window.desktop?.movePet(dx, dy);
       else {
         const box = root.current?.getBoundingClientRect();
@@ -102,11 +103,12 @@ export default function DesktopCompanion(p: Props) {
   const hasPanel = p.panel !== null;
   const side = p.native ? p.desktopState.panelSide : 'right';
   const stageName = STAGES[p.stage].name;
+  const condition = getPetCondition(p.pet);
   const remaining = `${Math.floor(p.focusSeconds / 60).toString().padStart(2, '0')}:${(p.focusSeconds % 60).toString().padStart(2, '0')}`;
   return <div ref={root} className={`companion-layout ${hasPanel ? 'panel-open' : ''} panel-${side} ${p.native ? 'is-native' : 'is-preview'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
     <div className={`desktop-pet compact-pet ${tools ? 'actions-open' : ''}`} onContextMenu={e => { e.preventDefault(); setTools(true); p.onPanel('status'); }}>
       <div className={`compact-bubble ${p.bubbleVisible ? 'visible' : ''}`} role="status">{p.bubble}</div>
-      <button className="compact-pet-name" onClick={() => show('status')} title="查看状态">{p.pet.name}</button>
+      <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')} title={p.pet.sleeping ? '正在睡觉，点击轻轻叫醒' : condition.description}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="点击拉姆展开互动，按住拖动" title={p.stage === 0 ? '点击互动，拖动可轻摇身体；花盆保持原位' : '点击互动，按住拖动'}
         onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) toggleTools(); }}>
         <Ram color={p.pet.color} stage={p.stage} action={p.action} actionId={p.actionId} sleeping={p.pet.sleeping} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
@@ -126,14 +128,14 @@ export default function DesktopCompanion(p: Props) {
       <header><strong>{p.pet.name}<span> · {stageName}</span></strong><button aria-label="关闭小窗" onClick={() => p.onPanel(null)}>×</button></header>
       <nav className="companion-tabs" aria-label="照料内容">{(Object.keys(panelLabels) as CompanionPanel[]).map(tab => <button key={tab} role="tab" aria-selected={p.panel === tab} onClick={() => show(tab)}>{panelLabels[tab]}</button>)}</nav>
       <div className="companion-content">
-        {p.panel === 'status' && <><div className="compact-profile"><div><Ram color={p.pet.color} stage={p.stage} action="still"/></div><p><b>{p.pet.name}</b><span>{stageName}</span></p><small>{p.pet.coins} 摩尔豆</small></div>
-          <div className="compact-stats">{([['hunger', '饱食'], ['happiness', '心情'], ['cleanliness', '清洁'], ['energy', '活力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div>
-          <p className="companion-note">{p.stage === 0 ? '种子期的花盆保持原位，身体会轻轻摆动。' : '点击下面的小图标照料我，也可以按住把我放到别处。'}</p></>}
-        {p.panel === 'food' && <><p className="companion-balance">口袋里有 {p.pet.coins} 摩尔豆</p>{FOODS.map((food, i) => <article className="compact-food" key={food.id}><Icon path={`items/${['180027', '180017', '180008'][i]}`}/><div><b>{food.name}</b><small>× {p.pet.inventory[food.id] ?? 0} · 饱食 +{food.hunger}</small><button className="compact-buy" onClick={() => p.onBuy(food.id)}>补充 · {food.price} 豆</button></div><button className="compact-button" disabled={p.pet.sleeping || !p.pet.inventory[food.id]} onClick={() => p.onCare('feed', food.id)}>喂一份</button></article>)}<p className="companion-note">{p.pet.sleeping ? '先叫醒拉姆，再喂它吃东西。' : '小肚子饱了，食物会留在口袋。'}</p></>}
+        {p.panel === 'status' && <><div className="compact-profile"><div><Ram color={p.pet.color} stage={p.stage} action={condition.action} sleeping={p.pet.sleeping}/></div><p><b>{p.pet.name}</b><span>{stageName} · {condition.label}</span></p><small>{p.pet.coins} 摩尔豆</small></div>
+          <div className="compact-stats">{([['hunger', '饱食'], ['thirst', '水分'], ['cleanliness', '清洁'], ['happiness', '心情'], ['health', '健康'], ['energy', '精力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div>
+          <p className="compact-condition" role="status">{condition.description}</p><p className="companion-note">{p.stage === 0 ? '种子期的花盆保持原位，身体会轻轻摆动。' : '点击下面的小图标照料我，也可以按住把我放到别处。'}</p></>}
+        {p.panel === 'food' && <CarePocket key={`${p.pocketCategory}:${p.pocketVisit}`} pet={p.pet} initialCategory={p.pocketCategory} onCare={p.onCare} onBuy={p.onBuy}/>}
         {p.panel === 'games' && <><article className="compact-game"><Icon path="items/180027"/><div><b>拉姆接果子</b><small>{p.stage === 0 ? '长大离开花盆后才能参加' : '20 秒 · 碰到果子才算接住'}</small></div><button className="compact-button" disabled={p.pet.sleeping || p.stage === 0} onClick={() => p.onGame('fruit')}>开始</button></article><article className="compact-game"><Icon path="items/180004"/><div><b>口袋翻翻乐</b><small>45 秒 · 找到 6 对图案</small></div><button className="compact-button" disabled={p.pet.sleeping} onClick={() => p.onGame('memory')}>开始翻牌</button></article><p className="companion-note">完成一局可获得摩尔豆、成长和 1 份食物。已完成 {p.pet.completedGames} 局。</p><button className="compact-text-button" onClick={p.onFocus}>{p.focusing ? '结束专注' : '陪我专注 25 分钟'}</button></>}
         {p.panel === 'growth' && <><p className="companion-balance">成长 {Math.floor(p.pet.growth)} / {GROWTH_MAX}</p><div className="compact-stages">{STAGES.map((s, i) => <div key={s.name} className={p.stage === i ? 'current' : ''}><Ram color={p.pet.color} stage={i as Stage} action="still"/><b>{s.name}</b><small>{s.threshold} 成长</small></div>)}</div><p className="companion-note">种子待在盆里，初级无叶，中级两叶，高级展开扇叶。照料、游戏和健康陪伴都会积累成长。</p></>}
-        {p.panel === 'chat' && <><div className="compact-chat" role="status"><b>{p.pet.name}</b><p>{p.reply}</p></div><form className="compact-chat-form" onSubmit={(e: FormEvent) => { e.preventDefault(); if (message.trim()) { p.onChat(message); setMessage(''); } }}><input aria-label="和拉姆说话" placeholder="今天过得怎么样？" value={message} onChange={e => setMessage(e.target.value)} maxLength={100}/><button className="compact-button" disabled={!message.trim()} aria-label="发送消息">发送</button></form><p className="companion-note">拉姆叫声的本地心情翻译</p></>}
-        {p.panel === 'settings' && <><form className="compact-rename" onSubmit={e => { e.preventDefault(); if (name.trim()) p.onRename(name.trim()); }}><label htmlFor="compact-rename">名字</label><input id="compact-rename" aria-label="拉姆的新名字" maxLength={12} value={name} onChange={e => setName(e.target.value)}/><button className="compact-button">保存</button></form>
+        {p.panel === 'chat' && p.chatContent}
+        {p.panel === 'settings' && <>{p.settingsContent}<form className="compact-rename" onSubmit={e => { e.preventDefault(); if (name.trim()) p.onRename(name.trim()); }}><label htmlFor="compact-rename">名字</label><input id="compact-rename" aria-label="拉姆的新名字" maxLength={12} value={name} onChange={e => setName(e.target.value)}/><button className="compact-button">保存</button></form>
           {([['安静陪伴', p.quiet, p.onQuiet], ['互动叫声', p.sound, p.onSound], ['桌面散步', p.desktopState.wandering, p.onWander]] as const).map(([label, checked, callback]) => <label className="compact-setting" key={label}><span>{label}</span><button type="button" role="switch" aria-label={label} aria-checked={checked} disabled={label === '桌面散步' && (!p.native || p.stage === 0)} onClick={callback}>{checked ? '开启' : '关闭'}</button></label>)}
           <p className="companion-note">拖拽与摇晃会轻声回应；可关闭叫声。种子期不散步。叫声使用系统语音或本地合成拟声。</p><div className="compact-backups"><button onClick={p.onExport}>导出存档</button><button onClick={() => file.current?.click()}>导入存档</button><input ref={file} hidden type="file" accept=".json,application/json" onChange={e => p.onImport(e.target.files?.[0])}/></div></>}
       </div>
