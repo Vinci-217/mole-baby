@@ -7,7 +7,7 @@ const { expect } = require('@playwright/test');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
-const profile = path.join(cloud, 'v3-test-config');
+const profile = path.join(cloud, 'v4-test-config');
 const artifacts = path.join(root, 'artifacts');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 let desktop;
@@ -90,10 +90,10 @@ async function verifyBackground(page, selector, suffix) {
   page.setDefaultTimeout(15000);
   const rendererErrors = [];
   const failedAssets = [];
-  const generatedAssets = [];
+  const retiredAssets = [];
   page.on('pageerror', error => rendererErrors.push(error.message));
   page.on('requestfailed', request => { if (/\.png(?:\?|$)/.test(request.url())) failedAssets.push(request.url()); });
-  page.on('request', request => { if (/\/assets\/(?:classic-room|classic-icons|classic-game-props|ram-generated-sheet)\.png(?:[?#]|$)/.test(request.url())) generatedAssets.push(request.url()); });
+  page.on('request', request => { if (/\/assets\/(?:classic-room|classic-icons|classic-game-props|ram-generated-sheet)\.png(?:[?#]|$)/.test(request.url())) retiredAssets.push(request.url()); });
   const bounds = () => desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
   const state = () => page.evaluate(() => window.desktop.getState());
   const save = () => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')));
@@ -156,7 +156,7 @@ async function verifyBackground(page, selector, suffix) {
   await expect(settings.getByRole('switch', { name: '桌面散步', exact: true })).toHaveAttribute('aria-checked', 'true');
   await settings.getByRole('switch', { name: '桌面散步', exact: true }).click();
   await expect.poll(async () => (await state()).wandering).toBe(false);
-  const room = await verifyBackground(page, '.cottage-scene', '/assets/original/scenes/ramu-home.png');
+  const room = await verifyBackground(page, '.cottage-scene', '/assets/generated/morning-study.png');
 
   const beforeLegacyPrefs = await save();
   await page.evaluate(() => localStorage.setItem('ramu-house-preferences-v2', JSON.stringify({ sound: false, quiet: true, artStyle: 'hd' })));
@@ -189,7 +189,7 @@ async function verifyBackground(page, selector, suffix) {
   await settings.getByLabel('拉姆的新名字', { exact: true }).fill('红豆陪伴');
   await settings.getByRole('button', { name: '保存', exact: true }).click();
   await expect.poll(async () => (await save()).name).toBe('红豆陪伴');
-  console.log(`PASS: native settings, file:// original room (${room.width}×${room.height}) and food PNGs, legacy preference migration, rename persistence`);
+  console.log(`PASS: native settings, file:// current room (${room.width}×${room.height}) and food PNGs, legacy preference migration, rename persistence`);
 
   await page.evaluate(() => { window.__desktopStates = []; window.__desktopUnsubscribe = window.desktop.onStateChanged(value => window.__desktopStates.push(value)); });
   const pinned = await page.evaluate(() => window.desktop.toggleAlwaysOnTop());
@@ -207,7 +207,7 @@ async function verifyBackground(page, selector, suffix) {
   await waitForClassic(page, '.scene-character');
   await expect(page.locator('.classic-toast')).toHaveCount(0);
   await page.mouse.move(10, 10);
-  await page.screenshot({ path: path.join(artifacts, 'v3-native-room.png') });
+  await page.screenshot({ path: path.join(artifacts, 'v4-native-room.png') });
   await page.getByRole('button', { name: '陪伴设置', exact: true }).click();
   await page.getByRole('button', { name: '让拉姆回到桌面陪我 ▸', exact: true }).click();
   await expect(page.locator('.transparent-stage .desktop-pet')).toBeVisible();
@@ -220,21 +220,21 @@ async function verifyBackground(page, selector, suffix) {
   await page.mouse.move(-30, -30);
   await page.evaluate(() => document.activeElement?.blur());
   await expect.poll(() => page.locator('.pet-toolbelt').evaluate(node => Number(getComputedStyle(node).opacity))).toBe(0);
-  await page.screenshot({ path: path.join(artifacts, 'v3-native-pet.png'), omitBackground: true });
+  await page.screenshot({ path: path.join(artifacts, 'v4-native-pet.png'), omitBackground: true });
   assert.equal(await page.locator('svg').count(), 0);
   assert.deepEqual(rendererErrors, []);
   assert.deepEqual(failedAssets, []);
-  assert.deepEqual(generatedAssets, [], 'The complete native flow must not request replaced generated artwork');
-  console.log('PASS: return to desktop, saved pet remains floating, no generated artwork/SVG, zero renderer errors and failed PNGs');
+  assert.deepEqual(retiredAssets, [], 'The complete native flow must not request replaced generated artwork');
+  console.log('PASS: return to desktop, saved pet remains floating, no retired v0.2 artwork/SVG, zero renderer errors and failed PNGs');
 
   await page.locator('.desktop-character').hover();
-  await page.screenshot({ path: path.join(artifacts, 'v3-native-pet-hover.png'), omitBackground: true });
+  await page.screenshot({ path: path.join(artifacts, 'v4-native-pet-hover.png'), omitBackground: true });
   const exited = desktop.waitForEvent('close', { timeout: 10000 });
   await page.getByRole('button', { name: '关闭拉姆', exact: true }).click();
   await exited;
   desktop = null;
   console.log('PASS: hover close exits the native application');
-  console.log('Screenshots: artifacts/v3-native-pet.png, artifacts/v3-native-room.png');
+  console.log('Screenshots: artifacts/v4-native-pet.png, artifacts/v4-native-room.png');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;

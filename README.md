@@ -1,6 +1,8 @@
-# 拉姆陪伴 · v0.3
+# 拉姆陪伴 · 下一版预览
 
 让熟悉的拉姆回到你的 Windows 桌面：轻轻摸一下、喂点食物，忙的时候让它安静地陪着你。支持 Windows 10/11 x64，使用 Electron + React + TypeScript，本地运行，无需账号或 API 密钥。
+
+当前分支为 [`next/art-direction`](https://github.com/Vinci-217/mole-baby/tree/next/art-direction)，版本 `0.4.0-dev.1`，用于下一版美术迭代，尚未发布 Release。先试用已发布的 [v0.3.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.3.0)：该版本已在 GitHub Actions 的 Windows 运行器完成构建、产物校验和应用启动检查。
 
 ![桌面陪伴预览](artifacts/v3-native-pet.png)
 
@@ -31,9 +33,19 @@ npm run desktop:dev
 npm run desktop
 ```
 
-## v0.3 的画面
+## 下一版画面预览
 
-角色、小屋、面板、按钮和道具均采用原页游素材导出的 PNG，不再使用之前生成的场景、图标与高清重绘。原版图集按原客户端的身体配色规则还原粉红、黄色、天蓝、红色；形态包括无叶初级、两叶中级与扇叶高级。
+本分支新增“晨光树洞书桌”背景：先对照原页游场景、UI 和道具，提炼大色块、深棕勾线、简化比例与活动留白，再用图片工具生成并修订新场景。它是参考原画风创作的新图，不是原客户端素材，也没有训练专用模型。
+
+这套流程已整理为可复用的 [mole-classic-art skill](skills/mole-classic-art/SKILL.md)，包含[视觉参考规则](skills/mole-classic-art/references/style-guide.md)和[生成提示词模板](skills/mole-classic-art/references/prompt-templates.md)。本次生成记录见 [generation-record.json](public/assets/generated/generation-record.json)。
+
+![下一版晨光树洞书桌预览](artifacts/v4-home.png)
+
+拉姆本体继续使用原图集，原 UI 与照料道具也继续复用。后续背景、UI、图标与标识可以原创，也可以与已有素材混用；重点是同屏的画风协调，不要求完整照搬原房间或原面板。该预览不影响已经发布的 v0.3.0 下载包。
+
+## v0.3.0 已发布版本
+
+v0.3.0 的角色、小屋、面板、按钮和道具采用原页游素材导出的 PNG，该版本移除了此前生成的场景、图标与高清重绘。原版图集按原客户端的身体配色规则还原粉红、黄色、天蓝、红色；形态包括无叶初级、两叶中级与扇叶高级。
 
 背景来自原家具资源“拉姆小屋”（160081）。界面使用原拉姆面板的橙黄边框、白底、胶囊按钮、状态条和道具格。可可果、熊熊饼干、浆果果汁、泡泡浴、运动足球等直接使用原道具 PNG。素材地址、原 SWF 编号、导出方式和校验记录见 [ASSETS.md](ASSETS.md)。
 
@@ -85,11 +97,11 @@ npm run test:browser             # 完整交互与两款小游戏的浏览器验
 
 网页模式提供桌面陪伴预览；真实透明窗口、屏幕位置移动和桌面散步由 Electron 实现。上面的桌面预览图用于展示交互布局。
 
-本地已通过 TypeScript 生产构建、40 项养成/存档逻辑测试、浏览器完整流程，以及 Linux Electron 原生窗口验证。GitHub Actions 在 Windows 构建 ZIP 和 NSIS 安装器，并校验包内运行文件。CI 中的启动检查不替代你在自己 Windows 桌面上的试用。
+v0.3.0 已通过 TypeScript 生产构建、40 项养成/存档逻辑测试、浏览器完整流程，以及 Linux Electron 原生窗口验证；其 GitHub Actions Windows 构建也已成功，生成 ZIP 与 NSIS 安装器，并完成包内运行文件校验和应用启动检查。CI 中的启动检查不替代你在自己 Windows 桌面上的试用；上述已发布版本的验证结论也不自动代表本分支每个后续改动均已验证。
 
-[Windows 构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)：推送 `main`、Pull Request 和手动运行会生成 Actions 构建产物；`v*` 版本标签构建成功后自动发布到 GitHub Releases。发布附件含 SHA256SUMS，可用于校验下载文件。构建结果也记录在独立的 `build-reports` 分支。
+[Windows 构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)：推送 `main` 或 `next/art-direction`、Pull Request 和手动运行会生成 Actions 构建产物；`v*` 版本标签构建成功后自动发布到 GitHub Releases。发布附件含 SHA256SUMS，可用于校验下载文件。标签发布的构建结果也记录在独立的 `build-reports` 分支。
 
-下一版美术在独立分支开发；版本标签固定对应可试用的源码，不会随迭代修改。
+下一版美术在 `next/art-direction` 独立分支开发；版本标签固定对应可试用的源码，不会随迭代修改。本预览尚未发布 v0.4 Release，稳定下载仍使用上方 v0.3.0 链接。
 
 云端 Electron 原生交互检查使用独立测试档案，执行：
 
@@ -106,9 +118,9 @@ npm run dist:win:portable # 生成 Windows x64 ZIP
 npm run dist:win          # 生成 Windows NSIS 安装器
 ```
 
-输出位于 `release/`，v0.3 的便携包文件名为 `RamuHouse-0.3.0-x64.zip`。旧版构建产物对应之前的界面，请使用 v0.3 压缩包。
+输出位于 `release/`，文件名带当前 `package.json` 的版本号。已发布的稳定便携包为 `RamuHouse-0.3.0-x64.zip`；在本分支自行打出的预览包不等同于 GitHub Releases 已发布版本。
 
-Linux 云环境生成 NSIS 安装器时受到 Wine 运行问题限制，可在 Windows 执行安装器打包命令。当前应用没有代码签名，尚未在真实 Windows 机器上完成安装与运行验收；生成 Windows 文件与完成目标系统验收是两个独立步骤。
+Windows 安装器由 GitHub Actions 的 Windows 运行器构建，也可在 Windows 执行上面的打包命令。当前应用没有代码签名；已完成 Windows CI 启动检查，仍需在用户实际桌面环境中试用透明窗口、系统通知和安装流程。
 
 ## 代码与素材
 
@@ -118,6 +130,7 @@ Linux 云环境生成 NSIS 安装器时受到 Wine 运行问题限制，可在 W
 - `src/components/`：角色和两个小游戏的交互与画面。
 - `electron/`：原生窗口、拖动、散步、提醒与受限 IPC。
 - `public/assets/`：本地角色、场景和道具素材，详细来源见 [ASSETS.md](ASSETS.md)。
+- `skills/mole-classic-art/`：原页游画风的参考分析、生成流程与复核规则。
 - `scripts/smoke.cjs`：浏览器交互验证。
 
 窗口开启 `contextIsolation` 和 renderer sandbox，关闭 Node.js 集成，并限制 IPC 来源。各云任务使用已有的隔离检出目录即可，无需额外创建 Git worktree。

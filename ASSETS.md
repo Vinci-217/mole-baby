@@ -1,6 +1,23 @@
-# 拉姆陪伴 v0.3 素材记录
+# 拉姆陪伴素材记录
 
-角色、小屋、照料道具和界面图片采用《摩尔庄园》原页游客户端的素材导出。本轮背景、按钮、图标和状态条没有使用图片模型重绘。项目是个人学习用途的非官方桌面改编；桌面陪伴、专注提醒、成长数值、离线变化、小游戏和奖励规则由本项目实现，不等同于原页游的全部功能或数值。
+已发布的 [v0.3.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.3.0) 中，角色、小屋、照料道具和界面图片采用《摩尔庄园》原页游客户端的素材导出，该版本的背景、按钮、图标和状态条没有使用图片模型重绘。v0.3.0 已在 GitHub Actions Windows 运行器完成构建、产物校验和应用启动检查，可先下载试用。
+
+当前 `next/art-direction` 分支是 `0.4.0-dev.1` 预览，新增参考原画风生成的原创背景，继续复用原拉姆角色、UI 和道具。它尚未发布 Release；新增图片与原客户端导出分开记录，允许原创素材与现有素材混用。
+
+项目是个人学习用途的非官方桌面改编；桌面陪伴、专注提醒、成长数值、离线变化、小游戏和奖励规则由本项目实现，不等同于原页游的全部功能或数值。
+
+## 下一版生成背景
+
+| 本地文件 | 用途 | 来源 |
+| --- | --- | --- |
+| `public/assets/generated/morning-study.png` | 晨光树洞书桌，新版房间背景 | 通过 `image_gen` 图片工具参考原页游画法生成并修订的新图，非原客户端导出 |
+| `public/assets/generated/generation-record.json` | 本次生成与参考记录 | 记录实际参考、提示词、生成及修订过程 |
+
+生成流程见 [mole-classic-art skill](skills/mole-classic-art/SKILL.md)，画法分析见 [style-guide.md](skills/mole-classic-art/references/style-guide.md)，可复用模板见 [prompt-templates.md](skills/mole-classic-art/references/prompt-templates.md)。它从原图提炼轮廓、色面、勾线、透视和场景留白，通过图片参考引导生成，不涉及专用模型训练，也不表示获得官方授权。
+
+本次背景采用新的树洞书桌构图，背景不预画拉姆、按钮或文字；原拉姆动画由应用独立叠加。最终图、参考路径与生成过程以 [generation-record.json](public/assets/generated/generation-record.json) 为准。下一版实际界面预览见 [v4-home.png](artifacts/v4-home.png)。
+
+## 原客户端素材总览
 
 原客户端背景、道具和 UI 来自社区存档 [Miigon/RecMoleRes](https://github.com/Miigon/RecMoleRes)，固定提交为 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff`。该仓库的 README 说明“本仓库存储了 RecMole 所用到的官方资源文件”；这是官方客户端美术的社区存档，不表示该 GitHub 仓库由游戏发行方运营。原拉姆动作图集来自下文列出的另一份公开导出记录。
 
@@ -60,7 +77,7 @@
 | `lake-cabin.png` | 神秘湖木屋，ID `160038` | [160038.swf](https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160038.swf) | 47 | 2698 × 1506 |
 | `original-earthen-home.png` | 树洞房，ID `160030`；原房型名称尚未确认 | [160030.swf](https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160030.swf) | 35 | 2278 × 1297 |
 
-“拉姆小屋”和“神秘湖木屋”的名称对照同提交 [JDGoodsXmlData.xml](https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/xml/JDGoodsXmlData.xml)，没有根据外观自行改名。默认房间使用拉姆小屋的树洞、圆窗、拉姆脸围栏与平台原画。
+“拉姆小屋”和“神秘湖木屋”的名称对照同提交 [JDGoodsXmlData.xml](https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/xml/JDGoodsXmlData.xml)，没有根据外观自行改名。v0.3.0 的默认房间使用拉姆小屋的树洞、圆窗、拉姆脸围栏与平台原画；下一版新增背景另见上方生成记录，这些原场景仍保留为素材与画风参考。
 
 房间由 JPEXS Free Flash Decompiler `26.3.0` 以 `-zoom 2 -export sprite` 静态栅格化。导出指定原始 Sprite，不执行 ActionScript，不添加生成纹理或重绘细节。例如：
 
@@ -120,7 +137,7 @@ java -Djava.awt.headless=true -Duser.home=/tmp/ramu-ffdec -Xmx512m \
 
 另有通用对话框、气泡等取自 [index.swf](https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/ui/index.swf)；每个实际文件的来源以清单为准。完整原界面参考图 `reference-pet-panel.png` 与 `reference-classic-pet-panel.png` 一并保留，用于比对原版配色、轮廓和控件比例。
 
-JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染为透明 PNG：通常使用 2 倍比例，工具栏按钮使用 3 倍比例，并保留普通、悬停、按下状态。应用以 HTML/CSS 重排这些原控件，布局与新增标签服务于桌面使用，不声称逐像素恢复原 Flash 页面的全部交互。UI 图像没有改成生成木纹、欧美绘本纹理或另一套角色画风。
+JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染为透明 PNG：通常使用 2 倍比例，工具栏按钮使用 3 倍比例，并保留普通、悬停、按下状态。应用以 HTML/CSS 重排这些原控件，布局与新增标签服务于桌面使用，不声称逐像素恢复原 Flash 页面的全部交互。本节所列 PNG 为原素材导出，不是生成图；后续原创控件如接入，会另记生成来源。
 
 ## 权益说明
 

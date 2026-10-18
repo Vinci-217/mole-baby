@@ -45,7 +45,7 @@ async function main() {
   for (const filename of [
     'package.json', 'electron/main.cjs', 'electron/preload.cjs', 'dist/index.html', 'dist/favicon.png',
     'dist/assets/classic/middle-neutral.png', 'dist/assets/classic/middle-mask.png',
-    'dist/assets/original/scenes/ramu-home.png', 'dist/assets/original/ui/button-orange.png',
+    'dist/assets/original/scenes/ramu-home.png', 'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
     'dist/assets/original/items/180027.png', 'dist/assets/original/items/180017.png',
     'dist/assets/original/items/180008.png',
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);

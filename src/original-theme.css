@@ -14,7 +14,7 @@
   --original-button: url('/assets/original/ui/button-orange.png');
   --original-blue-button: url('/assets/original/ui/button-blue.png');
   --original-slot: url('/assets/original/ui/item-slot.png');
-  --ramu-room-image: url('/assets/original/scenes/ramu-home.png');
+  --ramu-room-image: url('/assets/generated/morning-study.png');
 }
 
 button, input { font-family: inherit; }

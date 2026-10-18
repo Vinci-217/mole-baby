@@ -2,7 +2,7 @@ name: Windows build
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'next/art-direction']
     tags: ['v*']
   pull_request:
     branches: [main]

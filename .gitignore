@@ -15,3 +15,6 @@ artifacts/*
 !artifacts/v3-food.png
 !artifacts/v3-adoption.png
 !artifacts/v3-native-pet.png
+
+!artifacts/v4-home.png
+!artifacts/v4-food.png
