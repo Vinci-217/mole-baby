@@ -1,0 +1,20 @@
+{
+  "version": "0.4.0",
+  "tag": "v0.4.0",
+  "sourceSha": "a37380f93da53828df68e67fe8884c455a5a6d36",
+  "buildResult": "success",
+  "releaseResult": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39125326142",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.4.0",
+  "downloads": [
+    {
+      "file": "RamuHouse-0.4.0-x64.zip",
+      "sha256": "ff32bf9d201a8b6e0f976b237c9748b05ef38b10bdfed7e028cb718d663db064"
+    },
+    {
+      "file": "RamuHouse-0.4.0-Setup.exe",
+      "sha256": "62281e67a4382137e6c49a366d2adfd4baa8627d18d6c77abf7081718a95191a"
+    }
+  ],
+  "recordedAt": "2026-10-18T12:01:49.759Z"
+}
