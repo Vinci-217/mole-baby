@@ -47,7 +47,7 @@ async function main() {
     'dist/assets/classic/middle-neutral.png', 'dist/assets/classic/middle-mask.png',
     'dist/assets/original/scenes/ramu-home.png', 'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
     'dist/assets/original/items/180027.png', 'dist/assets/original/items/180017.png',
-    'dist/assets/original/items/180008.png',
+    'dist/assets/original/items/180008.png', 'dist/assets/original/seed/pot.png', 'dist/assets/original/seed/body.png',
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
   assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).version, version);
   assert.ok(![...paths].some(filename => /^(?:src\/|\.git\/|\.env(?:$|\.))/.test(filename)), 'Development source or local configuration was accidentally packaged');
@@ -69,23 +69,36 @@ async function main() {
   await page.waitForFunction(() => window.desktop?.isElectron === true);
   await page.getByRole('button', { name: '选择红色拉姆', exact: true }).click();
   await page.locator('#pet-name').fill('红豆');
+  await page.getByRole('radio').nth(1).check();
   await page.getByRole('button', { name: '带拉姆回家！', exact: true }).click();
   const character = page.locator('.desktop-character');
   await expect(character).toBeVisible();
+  await expect(character).toBeInViewport();
   await expect(character.locator('canvas[data-loaded="true"]')).toBeVisible();
   assert.equal(await character.locator('[data-fallback]').count(), 0, 'The original Ram PNG must load without a fallback');
   const state = await page.evaluate(() => window.desktop.getState());
   assert.equal(state.petMode, true);
   const bounds = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
-  assert.equal(bounds.width, 360);
-  assert.equal(bounds.height, 420);
+  assert.equal(bounds.width, 200);
+  assert.equal(bounds.height, 240);
   const painted = await character.locator('canvas').evaluate(canvas =>
     canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((value, index) => index % 4 === 3 && value > 0));
   assert.equal(painted, true, 'The original Ram canvas must contain visible pixels');
+  await character.click();
+  await expect(page.getByTestId('pet-actions')).toBeVisible();
+  await page.getByRole('button', { name: '喂食', exact: true }).click();
+  await expect(page.getByTestId('companion-panel')).toBeVisible();
+  const expanded = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
+  assert.equal(expanded.width, 540); assert.equal(expanded.height, 390);
+  assert.equal((await page.evaluate(() => window.desktop.getState())).petMode, true);
+  assert.equal(await page.locator('.cottage-scene').count(), 0);
+  await page.getByLabel('关闭小窗').click();
+  await expect.poll(() => desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds().width)).toBe(200);
+  await expect.poll(() => page.evaluate(() => [innerWidth, innerHeight])).toEqual([200, 240]);
   fs.mkdirSync(path.join(root, 'artifacts'), { recursive: true });
   await page.screenshot({ path: path.join(root, 'artifacts', 'windows-smoke.png') });
   assert.deepEqual(rendererErrors, []);
-  console.log('PASS: packaged Windows application starts, loads original Ram artwork and enters transparent companion mode');
+  console.log('PASS: packaged Windows application starts, loads original Ram artwork and enters small transparent companion mode and opens care beside it');
 
   const sums = [];
   for (const filename of [portable, installer]) {

@@ -5,7 +5,12 @@ const { pathToFileURL } = require('node:url');
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
-const PET_SIZE = { width: 360, height: 420 };
+const PET_SIZE = { width: 200, height: 240 };
+const COMPANION_SIZE = { width: 540, height: 390 };
+const COMPANION_EXTENSION = {
+  x: COMPANION_SIZE.width - PET_SIZE.width,
+  y: COMPANION_SIZE.height - PET_SIZE.height,
+};
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
 const INDEX_PATH = path.join(__dirname, '..', 'dist', 'index.html');
 
@@ -22,6 +27,10 @@ let dragging = false;
 let wanderTimer = null;
 let movementTimer = null;
 let motion = 'idle';
+let companionPanel = false;
+let panelSide = 'right';
+let petCanMove = true;
+let mousePassthrough = false;
 
 function getDesktopState() {
   return {
@@ -29,6 +38,8 @@ function getDesktopState() {
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
     motion,
+    companionPanel,
+    panelSide,
   };
 }
 
@@ -54,7 +65,7 @@ function changeMotion(next) {
 
 function canWander() {
   return mainWindow && !mainWindow.isDestroyed() && !mainWindow.isMinimized()
-    && petMode && wandering && !dragging;
+    && petMode && wandering && petCanMove && !companionPanel && !dragging;
 }
 
 function scheduleWander() {
@@ -105,7 +116,8 @@ function walkAlongDesktop() {
 }
 
 function startPetDrag() {
-  if (!petMode) return false;
+  if (!petMode || !petCanMove) return false;
+  if (companionPanel) changeCompanionPanel(false);
   dragging = true;
   stopMovement();
   return true;
@@ -124,7 +136,8 @@ function movePet(dx, dy) {
     || Math.abs(dx) > 10000 || Math.abs(dy) > 10000) {
     throw new TypeError('Pet movement must use finite screen-coordinate deltas');
   }
-  if (!petMode) return false;
+  if (!petMode || !petCanMove) return false;
+  if (companionPanel) changeCompanionPanel(false);
   stopMovement();
   const current = mainWindow.getBounds();
   const target = clampBounds({ ...current, x: current.x + Math.round(dx), y: current.y + Math.round(dy) }, PET_SIZE);
@@ -138,11 +151,78 @@ function movePet(dx, dy) {
 
 function changeWandering(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Wandering must be a boolean');
-  wandering = enabled;
+  wandering = enabled && petCanMove;
   stopMovement();
   scheduleWander();
   publishState();
   return wandering;
+}
+
+function changePetCanMove(enabled) {
+  if (typeof enabled !== 'boolean') throw new TypeError('Pet mobility must be a boolean');
+  if (petCanMove === enabled) return petCanMove;
+  petCanMove = enabled;
+  if (!enabled) { dragging = false; wandering = false; }
+  stopMovement();
+  scheduleWander();
+  publishState();
+  return petCanMove;
+}
+
+function changeMousePassthrough(ignore) {
+  if (typeof ignore !== 'boolean') throw new TypeError('Mouse passthrough must be a boolean');
+  const enabled = petMode && ignore;
+  if (enabled === mousePassthrough) return;
+  // Forward mouse movement so the renderer can make the pet interactive again
+  // when the cursor returns from transparent pixels. X11 forwarding differs
+  // across window managers, so cloud/Linux previews keep ordinary hit testing.
+  if (process.platform === 'win32' || process.platform === 'darwin') {
+    mainWindow.setIgnoreMouseEvents(enabled, { forward: true });
+    mousePassthrough = enabled;
+  }
+}
+
+function currentPetBounds() {
+  const bounds = mainWindow.getBounds();
+  return {
+    x: bounds.x + (companionPanel && panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
+    y: bounds.y + (companionPanel ? COMPANION_EXTENSION.y : 0),
+    ...PET_SIZE,
+  };
+}
+
+function companionBounds(base) {
+  const area = screen.getDisplayMatching(base).workArea;
+  const roomRight = area.x + area.width - (base.x + PET_SIZE.width);
+  const roomLeft = base.x - area.x;
+  panelSide = roomRight >= COMPANION_EXTENSION.x || roomRight >= roomLeft ? 'right' : 'left';
+  const expanded = {
+    x: base.x - (panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
+    y: base.y - COMPANION_EXTENSION.y,
+    ...COMPANION_SIZE,
+  };
+  // Most positions need no adjustment. Near an edge, keep the complete panel
+  // in the work area and derive the corresponding base bounds from that frame.
+  expanded.x = Math.round(Math.max(area.x, Math.min(expanded.x, area.x + area.width - expanded.width)));
+  expanded.y = Math.round(Math.max(area.y, Math.min(expanded.y, area.y + area.height - expanded.height)));
+  return expanded;
+}
+
+function changeCompanionPanel(open) {
+  if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
+  if (!petMode || open === companionPanel) return getDesktopState();
+  stopMovement();
+  const base = currentPetBounds();
+  const target = open ? companionBounds(base) : clampBounds(base, PET_SIZE);
+  changingMode = true;
+  companionPanel = open;
+  mainWindow.setBounds(target);
+  changingMode = false;
+  rememberBounds();
+  publishState();
+  scheduleSave();
+  scheduleWander();
+  return getDesktopState();
 }
 
 function settingsPath() {
@@ -159,7 +239,13 @@ function loadWindowState() {
   try {
     const state = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'));
     normalBounds = validBounds(state.normalBounds) ? state.normalBounds : null;
-    petBounds = validBounds(state.petBounds) ? state.petBounds : null;
+    petBounds = validBounds(state.petBounds) ? {
+      // Older releases used a large transparent frame. Keep its bottom centre
+      // while migrating its position, never its obsolete width or height.
+      x: state.petBounds.x + Math.round((state.petBounds.width - PET_SIZE.width) / 2),
+      y: state.petBounds.y + state.petBounds.height - PET_SIZE.height,
+      ...PET_SIZE,
+    } : null;
     normalAlwaysOnTop = state.normalAlwaysOnTop === true;
   } catch {
     // A missing or interrupted preferences file should never prevent startup.
@@ -168,7 +254,7 @@ function loadWindowState() {
 
 function rememberBounds() {
   if (!mainWindow || mainWindow.isDestroyed() || changingMode || mainWindow.isMinimized()) return;
-  if (petMode) petBounds = mainWindow.getBounds();
+  if (petMode) petBounds = currentPetBounds();
   else normalBounds = mainWindow.getNormalBounds();
 }
 
@@ -196,8 +282,10 @@ function clampBounds(bounds, fallbackSize) {
   const display = validBounds(bounds) ? screen.getDisplayMatching(bounds) : screen.getPrimaryDisplay();
   const area = display.workArea;
   const minimum = fallbackSize === PET_SIZE ? PET_SIZE : NORMAL_MINIMUM;
-  const width = Math.min(Math.max(minimum.width, Math.round(bounds?.width || fallbackSize.width)), area.width);
-  const height = Math.min(Math.max(minimum.height, Math.round(bounds?.height || fallbackSize.height)), area.height);
+  const width = fallbackSize === PET_SIZE ? PET_SIZE.width
+    : Math.min(Math.max(minimum.width, Math.round(bounds?.width || fallbackSize.width)), area.width);
+  const height = fallbackSize === PET_SIZE ? PET_SIZE.height
+    : Math.min(Math.max(minimum.height, Math.round(bounds?.height || fallbackSize.height)), area.height);
   const x = bounds?.x ?? area.x + Math.round((area.width - width) / 2);
   const y = bounds?.y ?? area.y + Math.round((area.height - height) / 2);
   return {
@@ -252,7 +340,10 @@ function changePetMode(enabled) {
   stopMovement();
   dragging = false;
   rememberBounds();
+  changeMousePassthrough(false);
   changingMode = true;
+  companionPanel = false;
+  panelSide = 'right';
   if (enabled) {
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
     const current = normalBounds || mainWindow.getBounds();
@@ -295,11 +386,16 @@ function registerIPC() {
     return enabled;
   });
   handle('desktop:set-pet-mode', changePetMode);
+  handle('desktop:set-companion-panel', changeCompanionPanel);
+  handle('desktop:set-pet-can-move', changePetCanMove);
   handle('desktop:get-state', getDesktopState);
   handle('desktop:move-pet', movePet);
   handle('desktop:start-pet-drag', startPetDrag);
   handle('desktop:end-pet-drag', endPetDrag);
   handle('desktop:wander', changeWandering);
+  listen('desktop:set-mouse-passthrough', (ignore) => {
+    if (typeof ignore === 'boolean') changeMousePassthrough(ignore);
+  });
   listen('desktop:notify', (title, body) => {
     if (!Notification.isSupported() || typeof title !== 'string' || typeof body !== 'string') return;
     new Notification({ title: title.slice(0, 100), body: body.slice(0, 500), silent: true }).show();
@@ -310,6 +406,10 @@ function createWindow() {
   petMode = false;
   wandering = false;
   dragging = false;
+  companionPanel = false;
+  panelSide = 'right';
+  petCanMove = true;
+  mousePassthrough = false;
   const bounds = clampBounds(normalBounds, NORMAL_SIZE);
   const area = screen.getDisplayMatching(bounds).workArea;
   const useDevelopmentServer = !app.isPackaged
@@ -325,7 +425,7 @@ function createWindow() {
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
-    hasShadow: true,
+    hasShadow: false,
     show: false,
     autoHideMenuBar: true,
     alwaysOnTop: normalAlwaysOnTop,
@@ -390,9 +490,16 @@ if (!app.requestSingleInstanceLock()) {
     const keepWindowVisible = () => {
       if (!mainWindow || mainWindow.isDestroyed()) return;
       stopMovement();
-      const bounds = clampBounds(mainWindow.getBounds(), petMode ? PET_SIZE : NORMAL_SIZE);
+      const base = petMode ? clampBounds(currentPetBounds(), PET_SIZE) : null;
+      const bounds = petMode
+        ? companionPanel ? companionBounds(base) : base
+        : clampBounds(mainWindow.getBounds(), NORMAL_SIZE);
+      changingMode = true;
       applyMinimum(bounds, petMode);
       mainWindow.setBounds(bounds);
+      changingMode = false;
+      scheduleSave();
+      publishState();
       scheduleWander();
     };
     screen.on('display-removed', keepWindowVisible);

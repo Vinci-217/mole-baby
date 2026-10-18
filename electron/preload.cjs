@@ -28,6 +28,18 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mode must be a boolean'));
     return ipcRenderer.invoke('desktop:set-pet-mode', enabled);
   },
+  setCompanionPanel: (open) => {
+    if (typeof open !== 'boolean') return Promise.reject(new TypeError('Companion panel visibility must be a boolean'));
+    return ipcRenderer.invoke('desktop:set-companion-panel', open);
+  },
+  setPetCanMove: (enabled) => {
+    if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mobility must be a boolean'));
+    return ipcRenderer.invoke('desktop:set-pet-can-move', enabled);
+  },
+  setMousePassthrough: (ignore) => {
+    if (typeof ignore !== 'boolean') throw new TypeError('Mouse passthrough must be a boolean');
+    ipcRenderer.send('desktop:set-mouse-passthrough', ignore);
+  },
   onPetModeChanged: (callback) => subscribeToState('desktop:pet-mode-changed', callback, (state) => state.petMode),
   onStateChanged: (callback) => subscribeToState('desktop:state-changed', callback, (state) => state),
   startPetDrag: () => ipcRenderer.invoke('desktop:start-pet-drag'),

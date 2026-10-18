@@ -43,3 +43,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ram-sprite, .ram-sprite * { animation: none !important; transition: none !important; }
 }
+.ram-artwork{transition:transform 140ms cubic-bezier(.2,.8,.3,1);transform-origin:50% 60%}
+.seed-pot-original{position:absolute;left:18.75%;top:45.67%;width:61.98%;height:49.52%;object-fit:fill;pointer-events:none}
+.seed-body-original{position:absolute;left:26.56%;top:17.31%;width:50%;height:47.6%;transform-origin:50% 92%;transition:transform 170ms cubic-bezier(.2,.8,.3,1);pointer-events:none}
+.seed-body-frame{display:block;width:100%;height:100%}

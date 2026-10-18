@@ -1,0 +1,52 @@
+{
+  "source": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "mirror": "https://github.com/mli55/taomi-codex-pets",
+  "source_swf_sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "rootSprite": 2526,
+  "rootLabel": "level1",
+  "rootFrame": 2,
+  "pot": {
+    "sprite": 4,
+    "scaleFromRoot": 0.7722931,
+    "translationTwips": [
+      -282,
+      -434
+    ]
+  },
+  "body": {
+    "sprites": [
+      39,
+      38,
+      37
+    ],
+    "frames": 61,
+    "cell": [
+      96,
+      99
+    ],
+    "columns": 8,
+    "sourceTimelineFps": 24,
+    "exportZoom": 1.544617
+  },
+  "registrationOn192x208": {
+    "pot": [
+      36,
+      95,
+      119,
+      103
+    ],
+    "body": [
+      51,
+      36,
+      96,
+      99
+    ]
+  },
+  "adaptation": "Separate original layers. Pot stays fixed; original nested body timeline sampled for blinking, with small pointer-driven body rotation. Seed embryo is original neutral white; selected body colour becomes visible after sprouting. No new painted pet artwork.",
+  "files": {
+    "pot.png": "4c5d208b3f05eac85e4157ed753678ed220a101ccde2624f66254226db387618",
+    "body.png": "0a7078b95ba0a2da6cd53984bd8d1bff93a261c9c64eedcd1a098deb4325ec28",
+    "body-still.png": "26de97033f1ab9d709f181fccc6fb712ac1854cd90781ccf5bbcbb8a2250bc30",
+    "source-motion.gif": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f"
+  }
+}

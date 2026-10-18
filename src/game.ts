@@ -55,10 +55,10 @@ export const FOODS: Food[] = [
 
 // Timings are simplified for this desktop companion. Super Ram is not a growth stage.
 export const STAGES = [
-  { name: '种子期', description: '一颗小小的种子，等待你的第一份关心。', threshold: 0 },
-  { name: '初级拉姆', description: '嫩芽探出头，开始认识这个温柔的世界。', threshold: 60 },
-  { name: '中级拉姆', description: '在陪伴中长大，已经是活泼的小伙伴。', threshold: 180 },
-  { name: '高级拉姆', description: '小小的身体，装着与你一起长大的回忆。', threshold: 420 },
+  { name: '种子期', description: '待在花盆里的种子，身体轻轻摆动。', threshold: 0 },
+  { name: '初级拉姆', description: '离开花盆，无叶的初级拉姆。', threshold: 60 },
+  { name: '中级拉姆', description: '长出两片嫩叶的中级拉姆。', threshold: 180 },
+  { name: '高级拉姆', description: '扇形叶片展开的高级拉姆。', threshold: 420 },
 ] as const;
 
 export const GROWTH_MAX = STAGES[3].threshold;
@@ -196,7 +196,7 @@ export function rewardGame(state: GameState, score: number, now = Date.now()): C
     return { state: current, message: '这份奖励已经领过啦，休息一下再开始新的一局。', ok: false };
   }
   const safeScore = Number.isFinite(score) ? Math.floor(clamp(score, 10)) : 0;
-  const coins = 4 + safeScore * 2;
+  const coins = Math.min(4 + safeScore * 2, MAX_COINS - current.coins);
   const food = FOODS[safeScore >= 8 ? 2 : safeScore >= 5 ? 1 : 0];
   const count = current.inventory[food.id] ?? 0;
   const foodReward = count < MAX_INVENTORY;

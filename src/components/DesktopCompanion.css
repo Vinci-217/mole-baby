@@ -1,0 +1,120 @@
+/* Small, deliberate desktop controls. The transparent base remains 200×240. */
+.companion-layout{position:relative;width:200px;height:240px;color:#624824;font:12px/1.5 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;isolation:isolate}
+.transparent-stage .companion-layout{width:100%;height:100%}
+.companion-layout .compact-pet{position:absolute;left:0;bottom:0;width:200px;height:240px;margin:0;padding:0;background:none;flex-shrink:0}
+.companion-layout.panel-open.panel-left .compact-pet{left:340px}
+.companion-layout .desktop-character{position:absolute;left:50px;top:71px;bottom:auto;width:100px;height:108.34px;margin:0;padding:0;border:0;background:transparent;filter:none;cursor:grab;touch-action:none;transform:none}
+.companion-layout .desktop-character:active{cursor:grabbing;translate:none}
+.companion-layout .desktop-character:focus-visible{outline:1px dashed #d79842;outline-offset:1px;border-radius:10px}
+.companion-layout .compact-pet-name{position:absolute;left:30px;right:30px;top:174px;padding:1px 3px;min-height:20px;text-align:center;font-size:10px;font-weight:400;color:#795b33;text-shadow:0 1px #fff;opacity:0;transition:opacity .12s}
+.companion-layout .compact-pet:hover .compact-pet-name,.companion-layout .actions-open .compact-pet-name{opacity:1}
+.companion-layout .compact-bubble{position:absolute;top:10px;left:10px;width:180px;min-height:36px;padding:6px 8px;border:1px solid #b6ad98;border-radius:11px;background:#fffef8;color:#6a604b;font-size:10px;text-align:center;opacity:0;pointer-events:none;box-shadow:0 1px 4px #251a0014;transition:opacity .12s;z-index:3}
+.companion-layout .compact-bubble.visible{opacity:1}
+.companion-layout .compact-bubble:after{content:'';position:absolute;width:7px;height:7px;bottom:-5px;left:90px;transform:rotate(45deg);background:#fffef8;border-right:1px solid #b6ad98;border-bottom:1px solid #b6ad98}
+.companion-layout .pet-actions{position:absolute;left:7px;bottom:14px;width:186px;height:34px;display:flex;align-items:center;justify-content:center;gap:1px;background:#fffef9;border:1px solid #e5c783;border-radius:9px;box-shadow:0 2px 6px #34230014;padding:2px;animation:compact-appear .1s ease-out}
+.companion-layout .pet-actions button{width:29px;height:28px;display:grid;place-items:center;padding:2px;border-radius:5px;transition:background .1s;translate:none}
+.companion-layout .pet-actions button:hover{background:#fff0ca}
+.companion-layout .pet-actions button img{width:23px;height:23px;object-fit:contain;pointer-events:none}
+.companion-layout .compact-focus{position:absolute;bottom:-4px;left:32px;right:32px;font-size:9px;padding:1px 5px;border-radius:5px;background:#fff8e5;color:#8b713e;white-space:nowrap}
+.companion-layout .compact-save-error{position:absolute;bottom:0;left:6px;font-size:9px;background:#fff4e5;color:#a64f2d}
+.companion-layout .companion-panel{position:absolute;left:200px;top:8px;width:332px;height:374px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #dbb56c;border-radius:11px;background:#fffefa;box-shadow:0 3px 10px #35230018;animation:compact-appear .12s ease-out}
+.companion-layout.panel-left .companion-panel{left:8px}
+.companion-panel>header{height:37px;min-height:37px;padding:8px 11px;background:#fff4d7;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0e0b9}
+.companion-panel>header strong{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.companion-panel>header strong span{font-size:10px;color:#9b845d;font-weight:400}
+.companion-panel>header button{width:23px;height:23px;font-size:20px;color:#9d8b6b;line-height:1;border-radius:5px;padding:0}
+.companion-panel>header button:hover{background:#f7e6bf;color:#705123}
+.companion-panel .companion-tabs{display:flex;gap:2px;padding:7px 8px 5px;flex-shrink:0;border-bottom:1px solid #f4ead2}
+.companion-panel .companion-tabs button{flex:1;min-width:0;font-size:10px;padding:4px 1px;border-radius:5px;color:#9a8664;white-space:nowrap;translate:none}
+.companion-panel .companion-tabs button[aria-selected=true]{background:#fff0c6;color:#aa6416;font-weight:600}
+.companion-panel .companion-tabs button:hover{background:#fff6df}
+.companion-panel .companion-content{padding:10px 12px;flex:1;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#e3c991 #fffefa}
+.companion-panel .companion-note{position:static;width:auto;transform:none;border:0;outline:0;background:none;box-shadow:none;font-size:10px;line-height:1.8;font-family:inherit;color:#aa9776;margin:10px 0 0;padding:0}
+.companion-panel .companion-note:before{display:none}
+.companion-panel .companion-balance{font-size:10px;color:#a18450;margin:0 0 7px}
+.companion-panel .compact-profile{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.companion-panel .compact-profile>div{width:43px;height:47px;flex-shrink:0}
+.companion-panel .compact-profile p{display:flex;flex-direction:column;gap:3px}
+.companion-panel .compact-profile b{font-size:12px;font-weight:600}
+.companion-panel .compact-profile p span{font-size:10px;color:#a58e64}
+.companion-panel .compact-profile>small{margin-left:auto;font-size:10px;color:#a18347}
+.companion-panel .compact-stats{display:grid;gap:9px}
+.companion-panel .compact-stats label{display:flex;align-items:center;gap:9px;font-size:10px}
+.companion-panel .compact-stats label span{width:26px;color:#907852}
+.companion-panel .compact-stats progress{appearance:none;height:6px;border:0;flex:1;min-width:0;border-radius:4px;background:#f0e9d8;overflow:hidden}
+.companion-panel .compact-stats progress::-webkit-progress-bar{background:#f0e9d8;border-radius:4px}
+.companion-panel .compact-stats progress::-webkit-progress-value{background:#dfaf56;border-radius:4px}
+.companion-panel .compact-stats progress::-moz-progress-bar{background:#dfaf56;border-radius:4px}
+.companion-panel .compact-stats b{font-size:9px;color:#b19a72;font-weight:400;width:20px;text-align:right}
+.companion-panel .compact-food,.companion-panel .compact-game{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #f1e9d7}
+.companion-panel .compact-food>img,.companion-panel .compact-game>img{width:35px;height:39px;object-fit:contain;flex-shrink:0}
+.companion-panel .compact-food>div,.companion-panel .compact-game>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.companion-panel .compact-food b,.companion-panel .compact-game b{font-size:11px;font-weight:600}
+.companion-panel .compact-food small,.companion-panel .compact-game small{font-size:9px;color:#ac9874;line-height:1.6}
+.companion-panel .compact-buy{padding:0;text-align:left;font-size:9px;color:#bf8a40;width:max-content}
+.companion-panel .compact-button{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #eacb8a;background:#fff4d6;color:#a16a26;border-radius:6px;min-height:26px;padding:4px 9px;font-size:10px;translate:none}
+.companion-panel .compact-button:hover:not(:disabled){background:#ffedbe}
+.companion-panel .compact-button:disabled{opacity:.45}
+.companion-panel .compact-stages{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.companion-panel .compact-stages>div{display:flex;align-items:center;flex-direction:column;padding:5px 2px;border-radius:6px}
+.companion-panel .compact-stages>div.current{background:#fff2d0}
+.companion-panel .compact-stages .ram-sprite{width:55px;height:60px}
+.companion-panel .compact-stages b{font-size:9px;font-weight:500;margin-top:7px}
+.companion-panel .compact-stages small{font-size:8px;color:#b8a27b;margin-top:4px}
+.companion-panel .compact-chat{background:#fff7e3;border-radius:7px;padding:10px;color:#907751;min-height:105px;font-size:11px}
+.companion-panel .compact-chat>b{font-size:10px;color:#ba8b42;font-weight:500}
+.companion-panel .compact-chat p{margin-top:8px;line-height:1.85;overflow-wrap:anywhere}
+.companion-panel .compact-chat-form{display:flex;align-items:center;gap:6px;margin-top:13px}
+.companion-panel input{border:1px solid #e8d5b1;border-radius:5px;background:#fff;min-width:0;font-size:10px;padding:6px 7px;color:#725b36;outline-offset:1px}
+.companion-panel .compact-chat-form input{flex:1;width:0}
+.companion-panel .compact-rename{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:10px}
+.companion-panel .compact-rename input{flex:1;width:0}
+.companion-panel .compact-setting{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f3ebd8;font-size:10px}
+.companion-panel .compact-setting button{font-size:9px;color:#b29b74;border:1px solid #e8dcc1;border-radius:5px;min-width:43px;padding:2px 6px}
+.companion-panel .compact-setting button[aria-checked=true]{background:#fff0bd;border-color:#e6c77c;color:#aa7926}
+.companion-panel .compact-backups{display:flex;gap:17px;margin-top:9px}
+.companion-panel .compact-backups button,.companion-panel .compact-text-button{font-size:10px;color:#af894c;padding:3px 0}
+.companion-panel .compact-text-button{margin-top:10px}
+.companion-panel>footer{display:flex;align-items:center;justify-content:space-between;min-height:33px;padding:5px 11px;border-top:1px solid #f0e7d1;background:#fffcf4;font-size:9px;color:#b19c76}
+.companion-panel>footer button{padding:2px 0;display:flex;align-items:center;gap:4px;translate:none}
+.companion-panel .compact-home{font-size:10px;color:#aa7b38}
+.companion-panel .compact-home img{width:20px;height:18px;object-fit:contain}
+.desktop-preview.companion-preview{display:block;position:relative;min-height:100vh;padding:0;overflow:hidden;background:#edf1f3;color:#76848b}
+.companion-preview>.companion-layout{position:absolute;left:calc(50% - 160px);bottom:20%;width:200px;height:240px;margin:0}
+.companion-preview>.companion-layout.panel-open{width:540px;height:390px}
+.companion-preview .preview-description{position:absolute;left:24px;top:24px;color:#8a969c;font:11px/1.9 'Microsoft YaHei',sans-serif;max-width:250px}
+.companion-preview .preview-description strong{font-size:12px;color:#73828a;font-weight:500;display:block}
+.companion-preview .preview-description span{font-size:10px;display:block;margin-top:5px}
+.classic-app .scene-pet{width:150px;height:165px;bottom:165px}
+.classic-app .scene-character{width:150px;height:163px;left:0;bottom:20px}
+.classic-app .scene-pet-name{font-size:12px}
+.classic-app .scene-pet-name small{font-size:9px}
+.transparent-stage .fruit-backdrop,.transparent-stage .memory-backdrop{background:transparent;padding:8px;justify-content:flex-end;align-items:flex-start}
+.transparent-stage:has(.panel-left) .fruit-backdrop,.transparent-stage:has(.panel-left) .memory-backdrop{justify-content:flex-start}
+.transparent-stage .fruit-dialog,.transparent-stage .memory-dialog{width:332px;max-height:374px;border-width:10px;padding:5px 8px 9px;box-shadow:none}
+.transparent-stage .fruit-heading h2,.transparent-stage .memory-heading h2{font-size:15px}
+.transparent-stage .fruit-eyebrow,.transparent-stage .memory-eyebrow,.transparent-stage .fruit-description,.transparent-stage .memory-description{display:none}
+.transparent-stage .fruit-preview{height:150px;margin-top:9px}
+.transparent-stage .fruit-primary,.transparent-stage .fruit-secondary,.transparent-stage .memory-primary,.transparent-stage .memory-secondary{min-height:31px;padding:5px 10px;font-size:10px}
+.transparent-stage .fruit-instructions,.transparent-stage .memory-instructions{margin:10px 0}
+.transparent-stage .fruit-instructions strong,.transparent-stage .memory-instructions strong{font-size:10px}
+.transparent-stage .fruit-instructions p,.transparent-stage .memory-instructions p{font-size:9px}
+.transparent-stage .fruit-reward-note,.transparent-stage .fruit-exit-hint,.transparent-stage .memory-footnote{font-size:8px;margin:6px 0 0}
+.transparent-stage .fruit-controls{font-size:9px;margin-top:6px}
+.transparent-stage .fruit-close,.transparent-stage .memory-close{width:25px;height:25px}
+.transparent-stage .memory-preview{height:145px;margin-top:10px}
+.transparent-stage .memory-preview>div{height:100px;width:72px}
+.transparent-stage .memory-board{gap:5px}
+.transparent-stage .memory-card{height:67px;padding:1px;border-width:4px}
+.transparent-stage .memory-card>.raster-game-art{width:35px;height:40px}
+.transparent-stage .memory-scoreboard{font-size:9px;padding:5px;margin-top:7px}
+.transparent-stage .memory-prompt,.transparent-stage .memory-hint{font-size:8px;margin:6px 0}
+.transparent-stage .memory-card-name{font-size:8px}
+@keyframes compact-appear{from{opacity:0;translate:0 3px}to{opacity:1;translate:0 0}}
+@media(max-width:600px){.companion-preview>.companion-layout{left:calc(50% - 100px);bottom:9%}.companion-preview>.companion-layout.panel-open{width:200px;height:620px}.companion-preview .companion-panel{width:min(332px,calc(100vw - 20px));left:calc(100px - min(166px,calc(50vw - 10px)));top:0;height:350px}.companion-preview .preview-description{left:15px;top:14px;max-width:230px}}
+@media(prefers-reduced-motion:reduce){.companion-layout *{animation:none!important;transition:none!important}}
+.compact-toast{position:fixed;bottom:3px;left:6px;right:6px;text-align:center;font:9px/1.5 'Microsoft YaHei',sans-serif;color:#9c834f;pointer-events:none;background:#fff9e9e8;border-radius:4px;padding:2px 5px;z-index:150}
+.desktop-preview.companion-preview>.compact-toast{left:50%;right:auto;transform:translateX(-50%);bottom:20px;max-width:320px;padding:6px 12px}
+html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;overflow:hidden}
+.transparent-stage{position:relative;width:100vw;height:100vh;overflow:hidden}
+.pet-mode .transparent-stage{position:relative;width:100vw;height:100vh;overflow:hidden}

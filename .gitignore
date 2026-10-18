@@ -18,3 +18,9 @@ artifacts/*
 
 !artifacts/v4-home.png
 !artifacts/v4-food.png
+
+!artifacts/v4-native-compact.png
+!artifacts/v4-native-sidecar.png
+!artifacts/v4-native-seed.png
+!artifacts/v4-compact-food.png
+!artifacts/v4-contact-game.png

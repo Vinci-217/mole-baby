@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PetColor, Stage } from '../game'
 import './Ram.css'
+import { sampleRamPose } from './ram-animation'
 
 interface RamProps {
   color: PetColor
@@ -10,10 +11,14 @@ interface RamProps {
   className?: string
   /** Compatibility only: every rendering path uses original game artwork. */
   artStyle?: 'classic' | 'hd'
+  actionId?: number | string
+  dragTilt?: number
+  dragging?: boolean
+  shaking?: boolean
+  onActionEnd?: () => void
 }
 
 type Form = 'junior' | 'middle' | 'senior'
-interface Clip { row: number; frames: number; delay: number; still?: number }
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 
 const CELL_WIDTH = 192
@@ -28,32 +33,6 @@ const COLOR_OFFSETS: Record<PetColor, readonly number[]> = {
 const sourceCache = new Map<Form, Promise<SheetSource>>()
 const tintedCache = new Map<string, Promise<HTMLCanvasElement>>()
 
-const clips: Record<string, Clip> = {
-  idle: { row: 0, frames: 6, delay: 300 },
-  'walk-right': { row: 1, frames: 8, delay: 140 },
-  'running-right': { row: 1, frames: 8, delay: 140 },
-  'walk-left': { row: 2, frames: 8, delay: 140 },
-  'running-left': { row: 2, frames: 8, delay: 140 },
-  pet: { row: 3, frames: 4, delay: 140 },
-  waving: { row: 3, frames: 4, delay: 140 },
-  feed: { row: 3, frames: 4, delay: 140 },
-  wash: { row: 4, frames: 5, delay: 140 },
-  sad: { row: 5, frames: 8, delay: 140 },
-  failed: { row: 5, frames: 8, delay: 140 },
-  sleep: { row: 6, frames: 6, delay: 300, still: 2 },
-  waiting: { row: 6, frames: 6, delay: 180 },
-  running: { row: 7, frames: 6, delay: 140 },
-  play: { row: 8, frames: 6, delay: 140 },
-  happy: { row: 8, frames: 6, delay: 140 },
-  reward: { row: 8, frames: 6, delay: 140 },
-  review: { row: 8, frames: 6, delay: 140 },
-}
-// Rest uses existing waiting poses; the middle form has no closed-eye frame.
-const sleepClips: Record<Form, Clip> = {
-  junior: { row: 6, frames: 6, delay: 300, still: 4 },
-  middle: { row: 6, frames: 6, delay: 300, still: 0 },
-  senior: { row: 6, frames: 6, delay: 300, still: 3 },
-}
 const ACTION_NAMES: Record<string, string> = {
   idle: '正在陪伴你', 'walk-right': '向右走', 'running-right': '向右走',
   'walk-left': '向左走', 'running-left': '向左走', pet: '开心地打招呼',
@@ -135,111 +114,96 @@ function getTintedSheet(form: Form, color: PetColor): Promise<HTMLCanvasElement>
   return pending
 }
 
-function ClassicFrames({ form, color, action, onError }: {
-  form: Form; color: PetColor; action: string; onError: () => void
+function ClassicFrames({ form, color, action, actionId, onError, onActionEnd }: {
+  form: Form; color: PetColor; action: string; actionId?: string | number;
+  onError: () => void; onActionEnd?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const errorRef = useRef(onError)
-  errorRef.current = onError
+  const errorRef = useRef(onError); errorRef.current = onError
+  const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   const [ready, setReady] = useState<{ key: string; sheet: HTMLCanvasElement } | null>(null)
   const key = `${form}:${color}`
   const sheet = ready?.key === key ? ready.sheet : null
-  const clip = action === 'sleep' ? sleepClips[form] : clips[action] ?? clips.idle
-
   useEffect(() => {
     let cancelled = false
-    getTintedSheet(form, color).then(loaded => {
-      if (!cancelled) setReady({ key, sheet: loaded })
-    }).catch(() => {
-      if (!cancelled) errorRef.current()
-    })
+    getTintedSheet(form, color).then(loaded => { if (!cancelled) setReady({ key, sheet: loaded }) })
+      .catch(() => { if (!cancelled) errorRef.current() })
     return () => { cancelled = true }
   }, [form, color, key])
-
   useEffect(() => {
-    const canvas = canvasRef.current
-    const context = canvas?.getContext('2d')
-    if (!canvas) return
-    if (!context) {
-      errorRef.current()
-      return
-    }
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    if (!sheet) return
-    context.imageSmoothingEnabled = true
-    context.imageSmoothingQuality = 'high'
+    const canvas = canvasRef.current, context = canvas?.getContext('2d')
+    if (!canvas || !context || !sheet) return
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let frame = media.matches ? 0 : clip.still ?? 0
-    let timer: ReturnType<typeof setTimeout> | undefined
-    let disposed = false
-    let inView = true
-    const draw = () => {
-      context.clearRect(0, 0, canvas.width, canvas.height)
-      context.drawImage(sheet, frame * CELL_WIDTH, clip.row * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT, 0, 0, canvas.width, canvas.height)
-      canvas.dataset.row = String(clip.row)
-      canvas.dataset.frame = String(frame)
-      canvas.dataset.loaded = 'true'
+    let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false
+    let previous = ''
+    const paint = (now: number) => {
+      if (stopped || document.hidden || !inView) { last = 0; return }
+      if (last && now - last < 250) elapsed += now - last
+      last = now
+      const pose = action === 'sleep' ? { row: 6, frame: form === 'junior' ? 4 : form === 'senior' ? 3 : 0, finished: false }
+        : sampleRamPose(action, elapsed, media.matches)
+      const signature = `${pose.row}:${pose.frame}`
+      if (signature !== previous) {
+        context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
+        context.drawImage(sheet, pose.frame * CELL_WIDTH, pose.row * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT, 0, 0, CELL_WIDTH, CELL_HEIGHT)
+        canvas.dataset.row = String(pose.row); canvas.dataset.frame = String(pose.frame); canvas.dataset.loaded = 'true'
+        previous = signature
+      }
+      if (pose.finished && !ended) { ended = true; endRef.current?.() }
+      if (!media.matches && action !== 'still' && action !== 'sleep' && !ended) request = requestAnimationFrame(paint)
     }
-    const stop = () => {
-      if (timer !== undefined) clearTimeout(timer)
-      timer = undefined
-    }
-    const schedule = () => {
-      stop()
-      if (disposed || document.hidden || !inView || media.matches || clip.still !== undefined) return
-      timer = setTimeout(() => {
-        frame = (frame + 1) % clip.frames
-        draw()
-        schedule()
-      }, clip.delay)
-    }
-    const motionChange = () => {
-      frame = media.matches ? 0 : clip.still ?? 0
-      draw()
-      schedule()
-    }
-    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(entries => {
-      inView = entries.some(entry => entry.isIntersecting)
-      schedule()
-    })
-    observer?.observe(canvas)
-    draw()
-    schedule()
-    document.addEventListener('visibilitychange', schedule)
-    media.addEventListener('change', motionChange)
-    return () => {
-      disposed = true
-      stop()
-      observer?.disconnect()
-      document.removeEventListener('visibilitychange', schedule)
-      media.removeEventListener('change', motionChange)
-    }
-  }, [sheet, clip])
-
-  return <canvas ref={canvasRef} className="ram-classic-frame" width={384} height={416} aria-hidden="true" data-form={form} data-color={color} />
+    const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; request = requestAnimationFrame(paint) }
+    const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
+    observer.observe(canvas); resume()
+    document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
+    return () => { stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
+  }, [sheet, form, action, actionId])
+  return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
 
-export default function Ram({ color, stage, action = 'idle', sleeping = false, className = '' }: RamProps) {
+function SeedBody({ action, actionId }: { action: string; actionId?: string | number }) {
+  const ref = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    let cancelled = false, request = 0, elapsed = 0, last = 0, previous = -1
+    const source = new Image(); source.src = './assets/original/seed/body.png'
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const paint = (now: number) => {
+      if (cancelled) return
+      if (last && now - last < 250 && !document.hidden) elapsed += now - last
+      last = now
+      const phase = elapsed % 9000
+      const active = action !== 'idle' && action !== 'still' && action !== 'sleep'
+      const frame = media.matches || action === 'still' || action === 'sleep' ? 0 : active ? Math.min(60, Math.floor(elapsed / 42)) : phase < 6000 ? 0 : Math.min(60, Math.floor((phase - 6000) / 42))
+      if (previous !== frame) {
+        const c = ref.current?.getContext('2d')
+        c?.clearRect(0, 0, 96, 99); c?.drawImage(source, frame % 8 * 96, Math.floor(frame / 8) * 99, 96, 99, 0, 0, 96, 99)
+        if (ref.current) ref.current.dataset.loaded = 'true'
+        previous = frame
+      }
+      if (!media.matches && !document.hidden) request = requestAnimationFrame(paint)
+    }
+    const resume = () => { cancelAnimationFrame(request); last = 0; if (source.complete && source.naturalWidth) request = requestAnimationFrame(paint) }
+    source.decode().then(resume).catch(() => {})
+    document.addEventListener('visibilitychange', resume)
+    return () => { cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume) }
+  }, [action, actionId])
+  return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed"/>
+}
+
+export default function Ram({ color, stage, action = 'idle', sleeping = false, className = '', actionId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const form: Form = stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const activeAction = sleeping ? 'sleep' : action
   const key = `${form}:${color}`
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
-  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级'][stage]}拉姆，${ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}${fallback ? '，动画暂未载入，显示同源原版静态形象' : ''}`
-
-  return (
-    <span
-      className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${activeAction === 'sleep' ? 'is-sleeping' : ''} ${className}`.trim()}
-      role="img"
-      aria-label={label}
-      data-art-style="classic"
-      data-stage={stage}
-      data-fallback={fallback || undefined}
-    >
-      <span className="ram-artwork">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" aria-hidden="true" draggable={false} /> : <ClassicFrames form={form} color={color} action={activeAction} onError={() => setFailedKey(key)} />}
-      </span>
-      {activeAction === 'sleep' && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}
-    </span>
-  )
+  const tilt = Math.max(-12, Math.min(12, dragTilt))
+  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级'][stage]}拉姆，${stage === 0 ? '花盆固定，身体轻轻摆动' : ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${sleeping ? 'is-sleeping' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
+    role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-fallback={fallback || undefined}>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${tilt}deg)` }}><SeedBody action={activeAction} actionId={actionId}/></span></>
+      : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}>
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} action={dragging ? 'drag' : activeAction} actionId={actionId} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+      </span>}
+    {sleeping && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}
+  </span>
 }

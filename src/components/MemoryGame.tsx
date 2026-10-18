@@ -1,3 +1,4 @@
+import type { GameReceipt } from './game-receipt';
 import { useEffect, useRef, useState } from 'react';
 import './MemoryGame.css';
 import GameArt from './GameArt';
@@ -12,7 +13,7 @@ function shuffle(): Card[] {
   return cards;
 }
 
-export default function MemoryGame({ onComplete, onClose }: { onComplete: (score: number) => void; onClose: () => void }) {
+export default function MemoryGame({ onComplete, onClose }: { onComplete: (score: number) => GameReceipt | void; onClose: () => void }) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [board, setBoard] = useState<Card[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
@@ -20,6 +21,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
   const [turns, setTurns] = useState(0);
   const [seconds, setSeconds] = useState(45);
   const [previewSeconds, setPreviewSeconds] = useState(3);
+  const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [score, setScore] = useState(0);
   const dialog = useRef<HTMLDivElement>(null);
   const firstButton = useRef<HTMLButtonElement>(null);
@@ -56,7 +58,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
     // Matching every pair earns ten points; partially finished rounds still reward practice.
     const finalScore = Math.min(10, Math.round(pairsRef.current / 6 * 10));
     setScore(finalScore); setSelected([]); selectedRef.current = []; setPhase('finished');
-    callbacks.current.onComplete(finalScore);
+    setReceipt(callbacks.current.onComplete(finalScore) ?? null);
   }
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
     const cards = shuffle(); boardRef.current = cards; setBoard(cards);
     selectedRef.current = []; setSelected([]); pairsRef.current = 0; setPairs(0);
     turnsRef.current = 0; setTurns(0); setSeconds(45); setPreviewSeconds(3);
-    locked.current = false; completed.current = false; startedAt.current = performance.now(); setPhase('preview');
+    setReceipt(null); locked.current = false; completed.current = false; startedAt.current = performance.now(); setPhase('preview');
   }
   function flip(index: number) {
     if (phase !== 'playing' || locked.current || boardRef.current[index].matched || selectedRef.current.includes(index)) return;
@@ -103,7 +105,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
     <p className="memory-description">记住熟悉的拉姆用品，把相同图案配成一对。</p>
     {phase === 'ready' && <><div className="memory-preview">{(['apple', 'biscuit', 'ball'] as const).map((kind, i) => <div key={i}><GameArt kind={kind}/><span>{names[symbols.indexOf(kind)]}</span></div>)}</div><div className="memory-instructions"><img className="memory-help-icon" src="./assets/original/ui/icon-book.png" alt="" /><div><strong>找到图案相同的两张卡片</strong><p>先用 3 秒记住位置，再翻开卡片配对。<br/>45 秒内找到全部 6 对，即可获得满分奖励。</p></div></div><button ref={firstButton} className="memory-primary" onClick={start} data-testid="memory-start">开始翻牌<span>45 秒</span></button></>}
     {['preview', 'playing', 'celebrating'].includes(phase) && <><div className="memory-scoreboard"><span><GameArt kind="clock"/><strong>{seconds}</strong> 秒</span><span data-testid="memory-pairs">配对 <strong>{pairs}</strong> / 6</span><span>已翻 {turns} 次</span></div><p className="memory-prompt" role="status">{phase === 'preview' ? `记住这些拉姆用品…… ${previewSeconds}` : phase === 'celebrating' ? '太棒啦！拉姆正在把奖励装进小口袋……' : '选两张，看看它们是不是好朋友？'}</p><div className="memory-board" data-testid="memory-board">{board.map((card, i) => { const shown = phase === 'preview' || card.matched || selected.includes(i); const kind = symbols[card.kind]; return <button key={card.id} data-testid="memory-card" data-kind={phase === 'preview' ? card.kind : undefined} className={`memory-card ${shown ? 'revealed' : ''} ${card.matched ? 'matched' : ''}`} aria-label={shown ? `${names[card.kind]}${card.matched ? '，已配对' : ''}` : `翻开第 ${i + 1} 张卡片`} disabled={phase !== 'playing' || card.matched} onClick={() => flip(i)}>{shown ? <><GameArt kind={kind}/><span className="memory-card-name">{names[card.kind]}</span>{card.matched && <span className="memory-matched-check">✓</span>}</> : <img className="memory-card-back" src="./assets/original/ui/sprout.png" alt="" />}</button>; })}</div><p className="memory-hint">点击翻牌，或使用 Tab 和 Enter 操作 · Esc 退出</p></>}
-    {phase === 'finished' && <div className="memory-result" data-testid="memory-result"><div className="memory-trophy"><GameArt kind="trophy"/></div><h3>{pairs === 6 ? '拉姆用品，全部配对成功！' : '拉姆翻翻乐，完成啦！'}</h3><p>找到了 {pairs} 对图案 · 翻牌 {turns} 次 · {score} 分</p><div className="memory-rewards"><div><strong>+{4 + score * 2}</strong><span>摩尔豆</span></div><div><GameArt kind={score >= 8 ? 'juice' : score >= 5 ? 'biscuit' : 'apple'} /><strong>+1</strong><span>{score >= 8 ? '浆果果汁' : score >= 5 ? '熊熊饼干' : '可可果'}</span></div><div><strong>+{3 + score}</strong><span>成长值</span></div></div><p className="memory-saved">奖励已装进口袋</p><div className="memory-result-actions"><button className="memory-secondary" onClick={start}>再玩一次</button><button className="memory-primary" onClick={onClose}>收好奖励</button></div></div>}
+    {phase === 'finished' && <div className="memory-result" data-testid="memory-result"><div className="memory-trophy"><GameArt kind="trophy"/></div><h3>{pairs === 6 ? '拉姆用品，全部配对成功！' : '拉姆翻翻乐，完成啦！'}</h3><p>找到了 {pairs} 对图案 · 翻牌 {turns} 次 · {score} 分</p><div className="memory-rewards"><div><strong>+{receipt?.coins ?? (4 + score * 2)}</strong><span>摩尔豆</span></div><div><GameArt kind={score >= 8 ? 'juice' : score >= 5 ? 'biscuit' : 'apple'} /><strong>+{receipt?.food ?? 1}</strong><span>{score >= 8 ? '浆果果汁' : score >= 5 ? '熊熊饼干' : '可可果'}</span></div><div><strong>+{receipt?.growth ?? (3 + score)}</strong><span>成长值</span></div></div><p className="memory-saved">{receipt?.message ?? '奖励已装进口袋'}</p><div className="memory-result-actions"><button className="memory-secondary" onClick={start}>再玩一次</button><button className="memory-primary" onClick={onClose}>{receipt?.ok === false ? '返回' : '收好奖励'}</button></div></div>}
     <p className="memory-footnote">配对越多，奖励越多。完整结束一局即可领奖，中途退出不发奖励。</p>
   </div></div>;
 }

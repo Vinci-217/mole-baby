@@ -5,6 +5,8 @@ declare global {
     alwaysOnTop: boolean;
     wandering: boolean;
     motion?: 'idle' | 'left' | 'right';
+    companionPanel: boolean;
+    panelSide: 'left' | 'right';
   }
   interface Window {
     desktop?: {
@@ -14,6 +16,9 @@ declare global {
       close: () => void;
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
+      setCompanionPanel: (open: boolean) => Promise<DesktopState>;
+      setPetCanMove: (enabled: boolean) => Promise<boolean>;
+      setMousePassthrough: (ignore: boolean) => void;
       onPetModeChanged: (callback: (enabled: boolean) => void) => () => void;
       onStateChanged: (callback: (state: DesktopState) => void) => () => void;
       startPetDrag: () => Promise<boolean>;

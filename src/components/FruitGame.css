@@ -27,3 +27,12 @@
 
 /* Keep the game dialogs on the same original-client panel skin. */
 .fruit-dialog{border:20px solid transparent;border-image:url('/assets/original/ui/panel-empty.png') 28 fill stretch;background:transparent;border-radius:0;box-shadow:none;padding:8px 12px 14px}.fruit-heading h2{font-size:22px;letter-spacing:0;color:#e56d00}.fruit-eyebrow{letter-spacing:0;color:#ad750d}.fruit-description{color:#90642d}.fruit-dialog>.fruit-primary{width:200px;margin:0 auto}.fruit-primary{color:#fff;text-shadow:1px 1px #a42b00,-1px -1px #a42b00,1px -1px #a42b00,-1px 1px #a42b00}.fruit-secondary{color:#fff;text-shadow:1px 1px #00528a,-1px -1px #00528a}.fruit-backdrop{background:#34362b66}.fruit-close{align-self:flex-start}.fruit-rewards>div{border:8px solid transparent;border-image:url('/assets/original/ui/item-slot.png') 12 fill stretch;background:transparent;border-radius:0;padding:8px 2px}
+.fruit-catch-band{position:absolute;height:3px;transform:translate(-50%,-50%);background:#ffe47a;border:1px solid #b79a39;border-radius:4px;box-shadow:0 0 0 2px #fff9;z-index:5;pointer-events:none;opacity:.8}
+.fruit-feedback{position:absolute;z-index:8;pointer-events:none;transform:translate(-50%,-50%);animation:fruit-contact .8s ease-out both;white-space:nowrap;text-align:center}
+.fruit-feedback>span{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);font:700 11px/1.5 'Microsoft YaHei',sans-serif;color:#855716;text-shadow:0 1px white,1px 0 white,-1px 0 white}
+.fruit-feedback.caught>.raster-game-art{width:18px;height:24px;animation:fruit-collected .28s ease-out both}
+.fruit-feedback.missed>span{color:#a47750;font-size:10px}
+.fruit-basket{aspect-ratio:auto!important}
+@keyframes fruit-contact{0%{opacity:1}60%{opacity:1;translate:0 -8px}100%{opacity:0;translate:0 -16px}}
+@keyframes fruit-collected{from{scale:1;opacity:1}to{scale:.15;opacity:0}}
+.fruit-dialog{width:440px;border:1px solid #dbb56c;border-image:none;background:#fffefa;border-radius:12px;box-shadow:0 4px 18px #3523001a;padding:17px 18px}.fruit-heading h2{font-size:19px}.fruit-eyebrow{font-size:9px}.fruit-primary,.fruit-secondary{min-height:34px;padding:6px 15px;background:#fff0c8;border:1px solid #e8c67d;border-radius:7px;color:#94652c;text-shadow:none;font-size:12px}.fruit-secondary{background:#edf5fa;border-color:#c1d9e6;color:#63849a}.fruit-close{width:28px;height:28px}.fruit-description{font-size:11px}.fruit-reward-note{font-size:9px}
