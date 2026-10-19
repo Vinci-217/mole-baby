@@ -1,0 +1,21 @@
+{
+  "version": "0.6.3",
+  "tag": "v0.6.3",
+  "sourceSha": "edfb8da2e1891023acf514f6f8c0845555dc67a4",
+  "buildResult": "success",
+  "releaseResult": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39187821214",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.6.3",
+  "downloads": [
+    {
+      "file": "mole-baby-0.6.3-x64.zip",
+      "sha256": "82cf878f29a8c9c7a624a4530addeac3f85a7b2bc5a6ed4c6e9a7dbab69d01bc"
+    },
+    {
+      "file": "mole-baby-0.6.3-Setup.exe",
+      "sha256": "eab78efafb2ba30a4b3094023e08c9436d5c7a5f24df941f1e7d280cdec4bb4f"
+    }
+  ],
+  "verificationLog": "PASS: installer, portable ZIP, executable and required ASAR payload\nPASS: packaged seed tint, fixed pot, offline speech availability and local-only API key save/reload/clear without network requests\nPASS: packaged Windows tray lifecycle, seed color/fixed pot, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for the checked downloads\n",
+  "recordedAt": "2026-10-19T02:04:01.868Z"
+}
