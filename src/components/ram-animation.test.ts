@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getRamActionDuration, sampleRamPose, sampleSeedPose } from './ram-animation'
+import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose } from './ram-animation'
 
 describe('original Ram care animation contract', () => {
   it.each([
@@ -41,5 +41,18 @@ describe('original Ram care animation contract', () => {
     expect(sampleRamPose('drag', 1000)).toEqual({ row: 0, frame: 0, finished: false })
     for (const time of [0, 80, 160, 240]) expect(sampleRamPose('catch', time).row).toBe(0)
     expect(sampleRamPose('catch', 249).finished).toBe(true)
+  })
+  it('keeps god-power care in its own nine-row atlas and ends every finite gesture', () => {
+    for (const action of ['feed', 'drink', 'wash', 'medical', 'brush-teeth', 'bubble-bath']) {
+      const duration = getRamActionDuration(action)!
+      for (let t = 0; t < duration; t += 40) {
+        const pose = sampleEvolvedPose(action, t)
+        expect(pose.sheet).toBeUndefined()
+        expect(pose.row).toBe(3)
+        expect(pose.frame).toBeLessThan(4)
+      }
+      expect(sampleEvolvedPose(action, duration).finished).toBe(true)
+    }
+    expect(sampleSeedPose('drag', 3000)).toEqual({ frame: 0, finished: false })
   })
 })

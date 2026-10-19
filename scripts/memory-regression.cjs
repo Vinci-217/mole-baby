@@ -28,10 +28,10 @@ async function readMemory(page) {
   const page = await browser.newPage({ viewport: { width: 1180, height: 820 } });
   const pageErrors = []; page.on('pageerror', error => pageErrors.push(error.message));
   await page.addInitScript(() => {
-    const originalSetInterval = window.setInterval;
-    window.setInterval = function (callback, delay, ...args) {
+    const originalSetTimeout = window.setTimeout;
+    window.setTimeout = function (callback, delay, ...args) {
       if (delay === 2_400_000) window.__reminder = callback;
-      return originalSetInterval(callback, delay, ...args);
+      return originalSetTimeout(callback, delay, ...args);
     };
     window.companionAI = {
       getSettings: async () => ({ configured: true, protection: 'os-encrypted' }),

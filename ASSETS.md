@@ -188,3 +188,7 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ## macOS 图标
 
 `public/icons/ramu.icns` 及 18/36 像素菜单栏 PNG 均从已有双叶拉姆 `ramu.png` 转换，保留原图与透明背景。ICNS 的 512/1024 像素版本由 256 像素源图放大，未生成或重画角色；尺寸和 SHA256 见 [SOURCE.json](public/icons/SOURCE.json)。
+
+## v0.8 神力拉姆
+
+新增神力超级、神奇水系、弹力木系、霹雳火系四种原形态，neutral/mask 图集取自固定上游提交；没有重绘角色，仍保留四种领养颜色。原资源路径、逐帧表、图集及静态降级图哈希见 [evolution-sources.json](public/assets/classic/evolution-sources.json)，考据、成长规则与动画适配范围见 [v8-evolution.md](research/v8-evolution.md)。静态图使用可复现的原图裁切与原配色导出，不是生成素材。

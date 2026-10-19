@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
-import type { PetColor, Stage } from '../game';
+import type { PetColor, Stage, Evolution } from '../game';
 import './FruitGame.css';
 import GameArt from './GameArt';
 import Ram from './Ram';
@@ -13,12 +13,13 @@ interface FruitGameProps {
   onClose: () => void;
   color?: PetColor;
   stage?: Stage;
+  evolution?: Evolution;
 }
 
 type Phase = 'ready' | 'playing' | 'finished';
 function BerryIllustration({ className = '' }: { className?: string }) { return <GameArt kind="apple" className={className}/>; }
 
-export default function FruitGame({ onComplete, onClose, color = 'red', stage = 1 }: FruitGameProps) {
+export default function FruitGame({ onComplete, onClose, color = 'red', stage = 1, evolution }: FruitGameProps) {
   const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [phase, setPhase] = useState<Phase>('ready');
   const [frame, setFrame] = useState<FruitModel>(initialFruitModel);
@@ -76,7 +77,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
       const delta = previousTime ? (now - previousTime) / 1000 : 0;
       previousTime = now;
       const direction = Number(heldKeys.current.has('ArrowRight')) - Number(heldKeys.current.has('ArrowLeft'));
-      const next = advanceFruitGame(model.current, delta, direction, stage);
+      const next = advanceFruitGame(model.current, delta, direction, stage, evolution);
       model.current = next; setFrame(next);
       if (next.elapsed >= GAME_SECONDS) {
         heldKeys.current.clear(); setPhase('finished');
@@ -87,7 +88,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
     };
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [phase, stage]);
+  }, [phase, stage, evolution]);
 
   const startGame = () => {
     if (stage === 0) return;
@@ -121,7 +122,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
             <BerryIllustration className="fruit-preview-berry fruit-preview-berry-one" />
             <BerryIllustration className="fruit-preview-berry fruit-preview-berry-two" />
             <BerryIllustration className="fruit-preview-berry fruit-preview-berry-three" />
-            <div className="fruit-preview-basket"><Ram color={color} stage={stage} action="still" /></div>
+            <div className="fruit-preview-basket"><Ram color={color} stage={stage} evolution={evolution} action="still" /></div>
             <span className="fruit-preview-label">{stage === 0 ? '长大离开花盆后再来接果子' : '碰到头顶接取线才算接住'}</span>
           </div>
           <div className="fruit-instructions"><GameArt kind="apple" className="fruit-instruction-icon" /><div><strong>移动拉姆，让果子落到头顶</strong><p>移动鼠标、滑动屏幕，或按 <kbd>←</kbd> <kbd>→</kbd> 移动拉姆。每局 20 秒，共有 10 颗可可果。</p></div></div>
@@ -136,8 +137,8 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
           <div className="fruit-time-track" role="progressbar" aria-label="剩余游戏时间" aria-valuemin={0} aria-valuemax={20} aria-valuenow={Math.max(0, Math.ceil(GAME_SECONDS - frame.elapsed))}><span style={{ width: `${Math.max(0, Math.ceil(GAME_SECONDS - frame.elapsed)) / GAME_SECONDS * 100}%` }} /></div>
           <div ref={arenaRef} className="fruit-arena" data-testid="game-arena" tabIndex={0} role="application" aria-label="接可可果场地，使用左右方向键移动拉姆，按 Escape 退出游戏" onPointerMove={moveBasket} onPointerDown={(event) => { event.currentTarget.focus(); event.currentTarget.setPointerCapture(event.pointerId); moveBasket(event); }} onKeyDown={(event) => handleArenaKey(event, true)} onKeyUp={(event) => handleArenaKey(event, false)} onBlur={() => heldKeys.current.clear()}>
             {frame.berries.map((berry) => <div key={berry.id} className="fruit-falling-berry" style={{ left: `${berry.x / FRUIT_ARENA.width * 100}%`, top: `${berry.y / FRUIT_ARENA.height * 100}%`, width: `${FRUIT_SIZE.width / FRUIT_ARENA.width * 100}%`, height: `${FRUIT_SIZE.height / FRUIT_ARENA.height * 100}%`, transform: `translate(-50%, -50%) rotate(${berry.rotation}deg)` }}><BerryIllustration /></div>)}
-            <div className="fruit-catch-band" data-testid="fruit-catch-band" style={{ left: `${getCatchBand(stage, frame.basket).x / 4}%`, top: `${getCatchBand(stage, frame.basket).y / 3}%`, width: `${getCatchBand(stage, frame.basket).halfWidth * 2 / 4}%` }}/>
-            <div className="fruit-basket" data-testid="fruit-game-basket" style={{ left: `${frame.basket / 4}%`, top: `${getCatchBand(stage, frame.basket).spriteTop / 3}%`, width: `${PET_WIDTH / 4}%`, height: `${PET_HEIGHT / 3}%` }}><Ram color={color} stage={stage} action={frame.elapsed - frame.lastCatchAt < .249 ? 'catch' : 'still'} actionId={frame.score}/></div>
+            <div className="fruit-catch-band" data-testid="fruit-catch-band" style={{ left: `${getCatchBand(stage, frame.basket, evolution).x / 4}%`, top: `${getCatchBand(stage, frame.basket, evolution).y / 3}%`, width: `${getCatchBand(stage, frame.basket, evolution).halfWidth * 2 / 4}%` }}/>
+            <div className="fruit-basket" data-testid="fruit-game-basket" style={{ left: `${frame.basket / 4}%`, top: `${getCatchBand(stage, frame.basket, evolution).spriteTop / 3}%`, width: `${PET_WIDTH / 4}%`, height: `${PET_HEIGHT / 3}%` }}><Ram color={color} stage={stage} evolution={evolution} action={frame.elapsed - frame.lastCatchAt < .249 ? 'catch' : 'still'} actionId={frame.score}/></div>
             {frame.feedback.map(effect => <div key={effect.id} className={`fruit-feedback ${effect.kind}`} data-testid={`fruit-${effect.kind}`} style={{ left: `${effect.x / 4}%`, top: `${effect.y / 3}%` }}><span>{effect.kind === 'caught' ? '+1 可可果' : '没接住'}</span>{effect.kind === 'caught' && <BerryIllustration/>}</div>)}
           </div>
           <p className="fruit-controls">移动鼠标 / 滑动屏幕 <span>或</span> <kbd>←</kbd><kbd>→</kbd></p>

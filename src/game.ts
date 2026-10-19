@@ -4,7 +4,14 @@ export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
 
 export type PetColor = 'pink' | 'yellow' | 'blue' | 'red';
-export type Stage = 0 | 1 | 2 | 3;
+export type Stage = 0 | 1 | 2 | 3 | 4;
+export type Evolution = 'super' | 'water' | 'wood' | 'fire';
+export const EVOLUTIONS: { id: Evolution; name: string; description: string }[] = [
+  { id: 'super', name: '神力超级拉姆', description: '金色神力头冠，神力超级形态。' },
+  { id: 'water', name: '神奇水系拉姆', description: '展开晶莹的水花头冠。' },
+  { id: 'wood', name: '弹力木系拉姆', description: '戴着翠绿的木系头冠。' },
+  { id: 'fire', name: '霹雳火系拉姆', description: '顶着明亮的火焰头冠。' },
+];
 export type Action = 'pet' | 'feed' | 'drink' | 'wash' | 'use' | 'play' | 'sleep';
 
 export interface PetStats {
@@ -23,6 +30,7 @@ export interface GameState {
   createdAt: number;
   lastTick: number;
   growth: number;
+  evolution?: Evolution;
   coins: number;
   stats: PetStats;
   inventory: Record<string, number>;
@@ -52,15 +60,16 @@ export const FOODS: Food[] = ['berry', 'biscuit', 'juice'].map(id => getItem(id)
 
 // Desktop adaptation: growth is earned by healthy elapsed time, never by clicks.
 // These durations are a playable slow pace, not a claim about original server timers.
-export const GROWTH_STAGE_HOURS = [24, 72, 168] as const;
+export const GROWTH_STAGE_HOURS = [24, 72, 168, 168] as const;
 export const STAGES = [
   { name: '种子期', description: '待在花盆里的种子，身体轻轻摆动。', threshold: 0 },
   { name: '初级拉姆', description: '离开花盆，无叶的初级拉姆。', threshold: 60 },
   { name: '中级拉姆', description: '长出两片嫩叶的中级拉姆。', threshold: 180 },
   { name: '高级拉姆', description: '扇形叶片展开的高级拉姆。', threshold: 420 },
+  { name: '神力拉姆', description: '四种原版神力形态，选择自己的成长方向。', threshold: 840 },
 ] as const;
 
-export const GROWTH_MAX = STAGES[3].threshold;
+export const GROWTH_MAX = STAGES[4].threshold;
 export const GAME_REWARD_COOLDOWN_MS = 10_000;
 const OFFLINE_CAP_MS = 24 * 60 * 60 * 1000;
 const MAX_INVENTORY = 9_999;
@@ -74,8 +83,7 @@ const grow = (growth: number, amount: number): number => clamp(growth + amount, 
 function growForHours(growth: number, hours: number): number {
   let result = growth, remaining = hours;
   while (remaining > 0 && result < GROWTH_MAX) {
-    const stage = getStage(result);
-    if (stage === 3) break;
+    const stage = Math.min(3, getStage(result)) as 0|1|2|3;
     const next = STAGES[stage + 1].threshold;
     const rate = (next - STAGES[stage].threshold) / GROWTH_STAGE_HOURS[stage];
     const spent = Math.min(remaining, (next - result) / rate);
@@ -105,7 +113,8 @@ export function createPet(name: string, color: PetColor, now = Date.now()): Game
   };
 }
 
-export function getStage(growth: number): Stage {
+export function getStage(growth: number, evolution?: Evolution): Stage {
+  if (growth >= STAGES[4].threshold && EVOLUTIONS.some(form => form.id === evolution)) return 4;
   if (growth >= STAGES[3].threshold) return 3;
   if (growth >= STAGES[2].threshold) return 2;
   if (growth >= STAGES[1].threshold) return 1;
@@ -114,7 +123,15 @@ export function getStage(growth: number): Stage {
 
 export function getNextStage(growth: number): (typeof STAGES)[number] | null {
   const stage = getStage(growth);
-  return stage === 3 ? null : STAGES[stage + 1];
+  return growth >= GROWTH_MAX ? null : STAGES[stage + 1];
+}
+
+export function evolvePet(state: GameState, evolution: Evolution, now = Date.now()): CareResult {
+  const current = tick(state, now);
+  const form = EVOLUTIONS.find(form => form.id === evolution);
+  if (!form || current.evolution || current.growth < GROWTH_MAX) return { state: current, ok: false, message: '继续健康成长，等高级阶段的陪伴进度积满后再选择进化吧。' };
+  if (current.sleeping) return { state: current, ok: false, message: '先轻轻叫醒拉姆，再一起选择成长的方向。' };
+  return { state: { ...current, evolution }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
 }
 
 /** Apply up to one day of elapsed time. Repeated ticks at the same instant are inert. */
@@ -288,6 +305,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
     if (!COLORS.some((color) => color.id === value.color)) return null;
     if (!isIntegerIn(value.createdAt, 0, now + 300_000) || !isIntegerIn(value.lastTick, value.createdAt, now + 300_000)) return null;
     if (!isNumberIn(value.growth, 0, GROWTH_MAX) || !isIntegerIn(value.coins, 0, MAX_COINS)) return null;
+    if (value.evolution !== undefined && (!EVOLUTIONS.some(form => form.id === value.evolution) || value.growth < GROWTH_MAX)) return null;
     if (typeof value.sleeping !== 'boolean' || !isIntegerIn(value.completedGames, 0, MAX_COINS)) return null;
     if (!isIntegerIn(value.lastRewardAt, 0, value.lastTick)) return null;
     if (!isRecord(value.stats) || !isRecord(value.inventory)) return null;
@@ -311,6 +329,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       createdAt: value.createdAt,
       lastTick: value.lastTick,
       growth: value.growth,
+      ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,
       stats: { hunger, thirst, happiness, cleanliness, health, energy },
       inventory,

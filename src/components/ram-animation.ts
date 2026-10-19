@@ -73,7 +73,7 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
   if (action === 'sleep') return { frame: 4, finished: false }
-  if (action === 'still') return { frame: 0, finished: false }
+  if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
   if (reduced) return { frame: 0, finished: false }
@@ -90,4 +90,15 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   }
   const phase = elapsed % 9000
   return { frame: phase < 6000 ? 0 : Math.min(60, Math.floor((phase - 6000) / 42)), finished: false }
+}
+
+/** Elemental atlases retain their own body/crown during every interaction.
+ * Their original happy pose has fully closed eyes; care rows use the short
+ * original greeting animation plus the consumed item's existing gesture. */
+export function sampleEvolvedPose(action: string, elapsed: number, reduced = false): Pose {
+  const pose = sampleRamPose(action, elapsed, reduced);
+  if (pose.finished || action === 'drag') return { row: 0, frame: 0, finished: pose.finished };
+  if (action === 'sleep') return { row: 8, frame: 0, finished: false };
+  if (pose.sheet) return { row: pose.sheet === 'care' && pose.row >= 4 ? 6 : 3, frame: reduced ? 0 : Math.floor(elapsed / 110) % 4, finished: false };
+  return pose;
 }

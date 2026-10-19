@@ -80,5 +80,7 @@ test('release notes can claim Apple trust only with matching verified receipts f
     write('x64',change);assert.throws(()=>prepareReleaseNotes(directory,'source','notes'));
   }
   for(const arch of ['arm64','x64'])write(arch,{mode:'local',developerIdSigned:false,stapled:false,gatekeeperAccepted:false});
-  assert.match(prepareReleaseNotes(directory,'source','notes'),/尚未经过 Apple 公证/);
+  const localNotes=prepareReleaseNotes(directory,'source','notes');
+  assert.match(localNotes,/尚未经过 Apple 公证/);
+  for(const instruction of ['mac-arm64.dmg','mac-x64.dmg','Applications','仍要打开','隐私与安全性','退出拉姆']) assert.ok(localNotes.includes(instruction), `Release must include Mac instruction: ${instruction}`);
 });

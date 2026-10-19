@@ -42,6 +42,10 @@ async function verifyApplication({ executable, archive, screenshot }) {
     const filename = `dist/assets/original/care/${form}-${layer}.png`;
     assert.ok(paths.has(filename), `Original care animation atlas is missing: ${filename}`);
   }
+  for (const form of ['super','water','wood','fire']) {
+    for (const layer of ['neutral','mask']) assert.ok(paths.has(`dist/assets/classic/${form}-${layer}.png`), 'Missing original god-power atlas');
+    for (const color of ['red','yellow','blue','pink']) assert.ok(paths.has(`dist/assets/original/pets/${form}-${color}-idle.png`), 'Missing matching original fallback');
+  }
   for (const track of ['sunshine-ranch','ramu-school','berry-jungle','snow-rink','playground','magic-carriage','farm-workshop','art-street','raceway']) assert.ok(paths.has(`dist/assets/original/audio/${track}.mp3`), `Missing classic BGM: ${track}`);
   for (const form of ['junior','middle','senior']) for (const layer of ['neutral','mask']) assert.ok(paths.has(`dist/assets/original/item-motion/${form}-${layer}.png`), 'Missing original per-item body atlas');
   assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).version, version);
@@ -86,7 +90,11 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-color', 'red');
   const seedPixel = await character.locator('.seed-body-frame').evaluate(canvas => Array.from(canvas.getContext('2d').getImageData(45, 58, 1, 1).data));
   assert.ok(seedPixel[3] > 200 && seedPixel[0] > seedPixel[2], 'the red seed is visibly red in the packaged app');
-  assert.equal(await page.evaluate(() => window.desktop.movePet(10, 10)), false, 'the seed pot stays fixed');
+  const seedBeforeDrag = await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].getBounds());
+  assert.equal(await page.evaluate(() => window.desktop.movePet(-10, -10)), true, 'manual dragging moves the seed and its pot');
+  const seedAfterDrag = await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].getBounds());
+  assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
+  assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());
   assert.equal(typeof speech.available, 'boolean');
   assert.ok(speech.available ? typeof speech.language === 'string' : typeof speech.reason === 'string', 'offline speech availability must explain its status without opening a microphone');
@@ -104,7 +112,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal((await page.evaluate(() => window.companionAI.getSettings())).configured, true);
   assert.equal((await page.evaluate(() => window.companionAI.clearKey())).configured, false);
   assert.equal(fs.existsSync(keyRecord), false);
-  console.log('PASS: packaged seed tint, fixed pot, platform speech guidance and local-only API key save/reload/clear without network requests');
+  console.log('PASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests');
   const actions = await openActions(page);
   assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-label'))), ['查看状态','喂食','洗澡','玩耍','休息','和拉姆说话','进入小屋']);
   await actions.getByRole('button', { name: '喂食', exact: true }).click();
@@ -114,7 +122,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal((await page.evaluate(() => window.desktop.getState())).petMode, true);
   assert.equal(await page.locator('.cottage-scene').count(), 0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态','背包','玩耍','对话']);
-  assert.equal(await panel.locator('.pocket-slot').count(), 9);
+  assert.equal(await panel.locator('.pocket-slot').count(), 16);
   await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
   await panel.getByRole('button', { name: '到小屋补充', exact: false }).click();
   await expect(page.locator('.shop-book')).toBeVisible();
@@ -124,6 +132,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await roomTab(page, '背包'); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).inventory.biscuit)).toBe(0);
   await roomTab(page, '设置');
+  await page.getByLabel('提醒间隔',{exact:true}).fill('7');
   const media = page.locator('.room-settings');
   assert.equal(await media.getByRole('group',{name:'选择背景音乐',exact:true}).getByRole('button').count(),12);
   await media.getByRole('button', { name: '星光温室', exact: true }).click();
@@ -135,6 +144,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await toDesktop(page); await openActions(page); await actions.getByRole('button',{name:'休息',exact:true}).click();
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','4');
   await actions.getByRole('button',{name:'叫醒',exact:true}).click();
+  await expect(page.getByRole('timer',{name:'休息提醒倒计时',exact:true})).toContainText(/休息 0[67]:/);
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-preferences-v2')).reminderMinutes),7);
   await page.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1')); pet.growth = 180; localStorage.setItem('ramu-house-save-v1', JSON.stringify(pet)); });
   await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({ timeout: 15000 });
   await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-color','red');
@@ -154,6 +165,19 @@ async function verifyApplication({ executable, archive, screenshot }) {
     await expect(page.getByRole('textbox',{name:'和拉姆说话',exact:true})).toHaveValue('我喜欢月光。');
     await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
   }
+  // Test the shipped evolution selector and original atlas for every form.
+  for (const [form, label] of Object.entries({super:'神力超级拉姆',water:'神奇水系拉姆',wood:'弹力木系拉姆',fire:'霹雳火系拉姆'})) {
+    await page.evaluate(() => { const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));pet.growth=840;delete pet.evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet)); });
+    await page.reload();await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({timeout:15000});
+    await openActions(page);await actions.getByRole('button',{name:'进入小屋',exact:true}).click();await roomTab(page,'成长');
+    await page.getByRole('button',{name:`选择${label}`,exact:true}).click();await page.getByRole('button',{name:'确认进化',exact:true}).click();
+    await toDesktop(page);await page.reload();
+    await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toHaveAttribute('data-form',form,{timeout:15000});
+    await expect(character.locator('.ram-sprite')).toHaveAttribute('data-stage','4');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).evolution),form);
+    assert.equal(await character.locator('[data-fallback]').count(),0);
+  }
+  console.log('PASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload');
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());
@@ -163,7 +187,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     await desktop.evaluate(({Menu}) => Menu.getApplicationMenu().items[0].submenu.items.find(item => item.label === '显示拉姆').click());
   } else await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].show());
   await expect(character).toBeVisible(); assert.deepEqual(rendererErrors,[]);
-  console.log(`PASS: packaged ${process.platform}/${process.arch} tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene`);
+  console.log(`PASS: packaged ${process.platform}/${process.arch} tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene`);
 
   } catch (error) {
     if (page && !page.isClosed()) {

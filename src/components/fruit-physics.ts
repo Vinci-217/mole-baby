@@ -1,4 +1,4 @@
-import type { Stage } from '../game';
+import type { Stage, Evolution } from '../game';
 
 // Everything, including the artwork and the collision band, shares this canvas.
 // Rendering these coordinates as percentages keeps them aligned on narrow screens.
@@ -21,6 +21,14 @@ const BODY_BOUNDS = {
   2: { left: 39, top: 85, right: 159, bottom: 169 },
   3: { left: 37, top: 105, right: 143, bottom: 193 },
 } as const;
+
+// Body-only bounds measured from each original evolution atlas mask, row 0.
+const EVOLVED_BODY_BOUNDS: Record<Evolution, { left: number; top: number; right: number; bottom: number }> = {
+  super: { left: 50, top: 116, right: 135, bottom: 187 },
+  water: { left: 32, top: 95, right: 154, bottom: 186 },
+  wood: { left: 39, top: 109, right: 144, bottom: 188 },
+  fire: { left: 38, top: 94, right: 156, bottom: 187 },
+};
 
 export interface Fruit {
   id: number;
@@ -58,8 +66,8 @@ export function clampCatcher(x: number): number {
   return Math.min(FRUIT_ARENA.width - PET_WIDTH / 2, Math.max(PET_WIDTH / 2, x));
 }
 
-export function getCatchBand(stage: Stage, basket: number): CatchBand {
-  const body = BODY_BOUNDS[stage];
+export function getCatchBand(stage: Stage, basket: number, evolution?: Evolution): CatchBand {
+  const body = stage === 4 ? EVOLVED_BODY_BOUNDS[evolution ?? 'super'] : BODY_BOUNDS[stage];
   const scale = PET_WIDTH / 192;
   const spriteTop = PET_FOOT_Y - body.bottom * scale;
   // A narrow, visible band across the upper part of the actual body. The band
@@ -96,15 +104,15 @@ export function crossingCatch(
 /** Advance only active, short frame intervals. Hidden tabs and long stalls must
  * never fast-forward fruit through the character or silently consume game time.
  */
-export function advanceFruitGame(previous: FruitModel, seconds: number, direction: number, stage: Stage): FruitModel {
+export function advanceFruitGame(previous: FruitModel, seconds: number, direction: number, stage: Stage, evolution?: Evolution): FruitModel {
   if (!Number.isFinite(seconds) || seconds <= 0 || seconds > .25 || previous.elapsed >= GAME_SECONDS) return previous;
   const delta = Math.min(seconds, .05, GAME_SECONDS - previous.elapsed);
   const elapsed = previous.elapsed + delta;
   const target = stage === 0 ? 200 : direction ? clampCatcher(previous.basket + Math.sign(direction) * MOVEMENT_SPEED * delta) : clampCatcher(previous.target);
   const distance = target - previous.basket;
   const basket = stage === 0 ? 200 : previous.basket + Math.sign(distance) * Math.min(Math.abs(distance), MOVEMENT_SPEED * delta);
-  const before = getCatchBand(stage, previous.basket);
-  const after = getCatchBand(stage, basket);
+  const before = getCatchBand(stage, previous.basket, evolution);
+  const after = getCatchBand(stage, basket, evolution);
   let score = previous.score;
   let missed = previous.missed;
   let spawned = previous.spawned;

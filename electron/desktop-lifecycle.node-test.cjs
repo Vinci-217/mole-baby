@@ -140,13 +140,16 @@ test('renderer close has no quit authority; only tray exit quits and destroys th
   assert.equal(run.stats.quit, 1); assert.equal(run.tray.destroyed, true);
 });
 
-test('seed/sleep mobility blocks native movement, and interaction pauses wandering', async t => {
+test('seed/sleep disables autonomous movement while manual dragging remains available', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   run.invoke('desktop:set-pet-mode', true); run.send('desktop:ready-to-show', true);
   const initial = run.window.getBounds();
   run.invoke('desktop:set-pet-can-move', false);
-  assert.equal(run.invoke('desktop:move-pet', -100, 0), false);
-  assert.deepEqual(run.window.getBounds(), initial);
+  assert.equal(run.invoke('desktop:start-pet-drag'), true);
+  assert.equal(run.invoke('desktop:move-pet', -100, 0), true);
+  assert.equal(run.window.getBounds().x, initial.x - 100);
+  run.invoke('desktop:end-pet-drag');
+  assert.equal(run.invoke('desktop:get-state').edgePose, 'visible', 'a seed never tucks itself away');
   assert.equal(run.invoke('desktop:get-state').wandering, false);
   run.invoke('desktop:set-pet-can-move', true);
   assert.equal(run.invoke('desktop:get-state').wandering, true, 'waking up restores the existing walk preference');

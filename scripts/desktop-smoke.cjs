@@ -126,11 +126,11 @@ async function verifyBackground(page, selector, suffix) {
   assert.ok(area.x+area.width-seedBounds.x-seedBounds.width <= 20, 'a fresh pet starts beside the bottom-right tray');
   assert.ok(area.y+area.height-seedBounds.y-seedBounds.height <= 20);
 
-  assert.equal(await page.evaluate(()=>window.desktop.movePet(40,30)),false); assert.equal(await page.evaluate(()=>window.desktop.wander(true)),false); assert.deepEqual(await bounds(),seedBounds);
+  assert.equal(await page.evaluate(()=>window.desktop.movePet(-40,-30)),true); assert.equal(await page.evaluate(()=>window.desktop.wander(true)),false); assert.equal((await bounds()).x,seedBounds.x-40);
   await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]); await expect(character).toBeInViewport();
-  const cb=await character.boundingBox(); await page.mouse.move(cb.x+50,cb.y+55); await page.mouse.down(); await page.mouse.move(cb.x+80,cb.y+45); await page.waitForTimeout(150); assert.notEqual(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)'); assert.deepEqual(await bounds(),seedBounds); await page.mouse.up();
-  await page.screenshot({path:path.join(artifacts,'v6-native-seed.png'),omitBackground:true});
-  console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and pot fixed under pointer/IPC drag');
+  const cb=await character.boundingBox(); await page.mouse.move(cb.x+50,cb.y+55); await page.mouse.down(); await page.mouse.move(cb.x+80,cb.y+45); await page.waitForTimeout(150); assert.notEqual(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)'); assert.notEqual((await bounds()).x,seedBounds.x-40); await page.mouse.up();
+  await page.screenshot({path:path.join(artifacts,'v8-native-seed.png'),omitBackground:true});
+  console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
 
   // Grow only this isolated fixture; normal adoption always starts with a seed.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});
@@ -139,10 +139,10 @@ async function verifyBackground(page, selector, suffix) {
   const before=await bounds(); const actions=await openActions(page); assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','休息','和拉姆说话','进入小屋']);
   await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(540); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
   const expanded=await bounds(),side=(await state()).panelSide; assert.equal(expanded.x+(side==='left'?340:0),before.x);assert.equal(expanded.y+250,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
-  assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),9);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
-  await page.screenshot({path:path.join(artifacts,'v6-native-sidecar.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
+  assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),16);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
+  await page.screenshot({path:path.join(artifacts,'v8-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
   const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
-  console.log('PASS seven tools and desktop-only tabs, nine-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
+  console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
 
   const mature=await character.boundingBox(),beforeDrag=await bounds();await page.mouse.move(mature.x+50,mature.y+55);await page.mouse.down();await page.mouse.move(mature.x+110,mature.y+75);await page.mouse.up();await expect.poll(async()=>(await bounds()).x).toBe(beforeDrag.x+60);await expect.poll(async()=>(await bounds()).y).toBe(beforeDrag.y+20);
   await page.keyboard.press('Escape');await page.evaluate(()=>window.desktop.wander(true));await expect.poll(async()=>(await state()).motion,{timeout:20000}).toMatch(/^(left|right)$/);await expect(character.locator('.ram-sprite')).toHaveClass(/action-walk-(left|right)/);

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buyFood, buyItem, care, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick } from './game';
+import { buyFood, buyItem, care, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick } from './game';
 
 const NOW = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -20,7 +20,7 @@ describe('pet creation and growth', () => {
 
   it('crosses precisely the four ordinary growth boundaries', () => {
     expect(getStage(0)).toBe(0);
-    for (const [index, stage] of STAGES.entries()) {
+    for (const [index, stage] of STAGES.slice(0, 4).entries()) {
       expect(getStage(stage.threshold)).toBe(index);
       if (index > 0) expect(getStage(stage.threshold - 0.001)).toBe(index - 1);
     }
@@ -329,9 +329,9 @@ describe('old saves and original needs', () => {
 describe('slow real companion growth', () => {
   const replenish = (state: ReturnType<typeof fresh>) => ({ ...state, stats: { hunger: 100, thirst: 100, happiness: 100, cleanliness: 100, health: 100, energy: 100 } });
   it('requires a real day for a healthy seed and several days for the later stages', () => {
-    expect(GROWTH_STAGE_HOURS).toEqual([24, 72, 168]);
+    expect(GROWTH_STAGE_HOURS).toEqual([24, 72, 168, 168]);
     let state = replenish(fresh());
-    for (let hour = 1; hour <= 24 + 72 + 168; hour++) {
+    for (let hour = 1; hour <= 24 + 72 + 168 + 168; hour++) {
       state = tick(replenish(state), NOW + hour * HOUR);
       if (hour === 23) expect(getStage(state.growth)).toBe(0);
       if (hour === 24) expect(state.growth).toBe(60);
@@ -362,5 +362,32 @@ describe('slow real companion growth', () => {
     for (const growth of [60, 180, 213, 420]) {
       expect(parseSave(JSON.stringify({ ...fresh(), growth }), NOW)?.growth).toBe(growth);
     }
+  });
+});
+
+
+describe('four original god-power evolution choices', () => {
+  it('keeps old senior saves ordinary until a deliberate choice, and rejects early/invalid choices', () => {
+    const old = { ...fresh(), growth: 420 };
+    expect(parseSave(JSON.stringify(old), NOW)?.evolution).toBeUndefined();
+    expect(evolvePet(old, 'water', NOW).ok).toBe(false);
+    const ready = { ...old, growth: GROWTH_MAX };
+    expect(getStage(ready.growth)).toBe(3);
+    expect(evolvePet({ ...ready, sleeping: true }, 'water', NOW).ok).toBe(false);
+    // @ts-expect-error invalid values must also be rejected at runtime
+    expect(evolvePet(ready, 'light', NOW).ok).toBe(false);
+  });
+  it('preserves all four colors, inventory and identity for each form across save/restore', () => {
+    for (const color of COLORS) for (const form of EVOLUTIONS) {
+      const ready = { ...createPet('小芽', color.id, NOW), growth: GROWTH_MAX };
+      const result = evolvePet(ready, form.id, NOW);
+      expect(result.ok).toBe(true);
+      expect(result.state).toEqual({ ...ready, evolution: form.id });
+      expect(getStage(result.state.growth, result.state.evolution)).toBe(4);
+      expect(parseSave(JSON.stringify(result.state), NOW)).toEqual(result.state);
+      expect(evolvePet(result.state, 'fire', NOW).ok).toBe(false);
+    }
+    expect(parseSave(JSON.stringify({ ...fresh(), evolution: 'water' }), NOW)).toBeNull();
+    expect(parseSave(JSON.stringify({ ...fresh(), growth: GROWTH_MAX, evolution: 'light' }), NOW)).toBeNull();
   });
 });

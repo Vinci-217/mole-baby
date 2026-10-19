@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import type { PetColor, Stage } from '../game'
+import type { PetColor, Stage, Evolution } from '../game'
 import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, type ItemMotion } from '../item-motion'
 import './Ram.css'
-import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose } from './ram-animation'
+import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose } from './ram-animation'
 
 interface RamProps {
   color: PetColor
   stage: Stage
+  evolution?: Evolution
   action?: string
   sleeping?: boolean
   className?: string
@@ -20,7 +21,7 @@ interface RamProps {
   shaking?: boolean
   onActionEnd?: () => void
 }
-type Form = 'junior' | 'middle' | 'senior'
+type Form = 'junior' | 'middle' | 'senior' | Evolution
 type SheetKind = 'classic' | 'care' | 'seed' | 'item'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
@@ -79,6 +80,7 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
+  if (['super', 'water', 'wood', 'fire'].includes(form) && kind !== 'seed') kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
@@ -146,7 +148,7 @@ function ClassicFrames({ form, color, action, actionId, itemMotion, onError, onA
       if (stopped || document.hidden || !inView) { last = 0; return }
       if (last && now - last < 250) elapsed += now - last
       last = now
-      const pose = sampleRamPose(action, elapsed, media.matches)
+      const pose = ['super', 'water', 'wood', 'fire'].includes(form) ? sampleEvolvedPose(action, elapsed, media.matches) : sampleRamPose(action, elapsed, media.matches)
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       const signature = `${pose.sheet ?? 'classic'}:${pose.row}:${pose.frame}`
       if (signature !== previous) {
@@ -162,7 +164,7 @@ function ClassicFrames({ form, color, action, actionId, itemMotion, onError, onA
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [sheets, action, actionId, itemMotion])
+  }, [sheets, action, actionId, itemMotion, form])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
 function SeedBody({ color, action, actionId, itemMotion, onActionEnd }: { color: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; onActionEnd?: () => void }) {
@@ -205,19 +207,19 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
   </span>
 }
-export default function Ram({ color, stage, action = 'idle', sleeping = false, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
-  const form: Form = stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
+export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+  const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
-  const activeAction = sleeping || action === 'sleep' ? 'sleep' : dragging && stage > 0 ? 'drag' : itemMotion ? itemMotion.action : action
+  const activeAction = sleeping || action === 'sleep' ? 'sleep' : dragging ? 'drag' : itemMotion ? itemMotion.action : action
   const resting = activeAction === 'sleep', key = `${form}:${color}`
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt))
-  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级'][stage]}拉姆，${stage === 0 ? '花盆固定，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${resting ? 'is-sleeping' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
-    role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
+    role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? -9 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}

@@ -63,3 +63,14 @@
 .ramu-v6 .confirm-buttons{justify-content:center}
 .ramu-v6 .scene-top-actions .game-button{font-size:14px}
 @media(max-width:700px){.room-game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.room-preferences{padding:12px}.room-rename{flex-wrap:wrap}.room-rename>label{width:100%}.ramu-v6 .room-dock{gap:9px 12px}.ramu-v6 .room-dock>button{width:57px}.ramu-v6 .room-dock>button>b{font-size:12px}.ramu-v6 .classic-logo>img{width:48px;height:48px}.ramu-v6 .classic-logo>span{font-size:29px}.ramu-v6 .paper-tabs{gap:2px;flex-wrap:wrap}.ramu-v6 .paper-tabs button{font-size:12px}.ramu-v6 .panel-paper{padding:15px}.ramu-v6 .adoption-panel{padding:24px 15px}.ramu-v6 .adoption-choice>span{font-size:12px}.ramu-v6 .adoption-note{font-size:12px}}
+
+/* A quiet, legible clock inside the existing transparent pet window. */
+.companion-layout .compact-reminder{position:absolute;top:225px;left:48px;right:48px;text-align:center;color:#765431;background:#fff8e8ec;border:1px solid #dfc99d;border-radius:8px;font-size:11px;line-height:14px;font-variant-numeric:tabular-nums;pointer-events:none;white-space:nowrap}
+.companion-layout .compact-reminder[data-paused=true]{color:#998b73}
+.reminder-interval{display:flex;align-items:center;gap:7px}.reminder-interval input{width:78px;padding:5px 8px;border:1px solid #d2ae71;border-radius:7px;background:#fffdf5;color:#755029;font-size:15px}
+.evolution-selection{margin-top:18px;text-align:center;padding:16px;border:1px solid #dfc187;border-radius:13px;background:#fff8e2}
+.evolution-selection h3{font-size:17px;color:#87562a}.evolution-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 18px}.evolution-grid>button{min-width:0;border:2px solid #e6ce9e;border-radius:11px;background:#fffdf4;padding:6px 4px 10px}.evolution-grid>button[aria-pressed=true]{border-color:#d78d19;background:#fff0b6}.evolution-grid>button:disabled{opacity:1}.evolution-grid .ram-sprite{max-width:125px}.evolution-grid b{display:block;font-size:13px}.evolution-selection p{font-size:13px;line-height:1.7;margin-top:13px;color:#967546}
+.classic-stage-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:650px){.evolution-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.classic-stage-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.game-panel .classic-stage-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:650px){.game-panel .classic-stage-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

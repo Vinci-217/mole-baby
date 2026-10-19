@@ -1,0 +1,883 @@
+{
+  "retrieved": "2026-10-19",
+  "upstream": "https://github.com/mli55/taomi-codex-pets",
+  "commit": "8e960bff00f07ce55acd160e0f3b9871454fda39",
+  "originalSources": {
+    "super": "http://mole.61.com/resource/petcloth/swf2/pet101/skill_7.swf",
+    "water": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_2.swf",
+    "wood": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_4.swf",
+    "fire": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_1.swf"
+  },
+  "files": {
+    "super-neutral.png": "3cc53b4d3a6ca9fa97cda28ed30107c44c1f76e3c670d1c0ba481fc853be2b3d",
+    "super-mask.png": "a21e46c18b322089fece3a7cd0335c118656fc60ef210fd85b4a143fb6ca20f2",
+    "water-neutral.png": "ea65971f26fdf920a16474824f2220fcd6043bc0eccd39bc7ec1107bb6f0460e",
+    "water-mask.png": "1cd10fde92e8ad5d883bef2abf27907eff6dc85f44aa7837b6d51ded4f43cba9",
+    "wood-neutral.png": "b483fccb858f263fc9884ae56997c02b6caa56ac3b9da57d5a4df68ccd475673",
+    "wood-mask.png": "af7022d7903de825dd74510d154b70fa1e1139ce4780b9f1eaa7ea54329c791c",
+    "fire-neutral.png": "9df59f633644b6697f3878a943724cd3c5648d01e27dd3940fe83830f88fb100",
+    "fire-mask.png": "2e84d0d91e94e22a3ab0976f68811a85f89d9ffdee7526cee268322bc6c28fe9"
+  },
+  "animation": {
+    "super": {
+      "sourceSpriteId": 940,
+      "sampling": "reviewed clips from full nested timelines",
+      "rows": [
+        {
+          "state": "idle",
+          "gameAction": "down",
+          "sourceFrameCount": 21,
+          "actionFrames": [
+            1,
+            5,
+            8,
+            12,
+            15,
+            19
+          ],
+          "frames": [
+            1,
+            5,
+            8,
+            12,
+            15,
+            19
+          ]
+        },
+        {
+          "state": "running-right",
+          "gameAction": "right",
+          "sourceFrameCount": 21,
+          "actionFrames": [
+            1,
+            4,
+            6,
+            9,
+            11,
+            14,
+            16,
+            19
+          ],
+          "frames": [
+            22,
+            25,
+            27,
+            30,
+            32,
+            35,
+            37,
+            40
+          ]
+        },
+        {
+          "state": "running-left",
+          "gameAction": "left",
+          "sourceFrameCount": 21,
+          "actionFrames": [
+            1,
+            4,
+            6,
+            9,
+            11,
+            14,
+            16,
+            19
+          ],
+          "frames": [
+            43,
+            46,
+            48,
+            51,
+            53,
+            56,
+            58,
+            61
+          ]
+        },
+        {
+          "state": "waving",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            1,
+            7,
+            13,
+            7
+          ],
+          "frames": [
+            471,
+            477,
+            483,
+            477
+          ]
+        },
+        {
+          "state": "jumping",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            127,
+            138,
+            149,
+            160,
+            171
+          ],
+          "frames": [
+            597,
+            608,
+            619,
+            630,
+            641
+          ],
+          "registration": {
+            "mode": "bounded",
+            "scale": 0.875,
+            "sourceCenter": [
+              327.9,
+              524.0
+            ]
+          }
+        },
+        {
+          "state": "failed",
+          "gameAction": "angry",
+          "sourceFrameCount": 57,
+          "actionFrames": [
+            1,
+            3,
+            6,
+            8,
+            11,
+            8,
+            6,
+            3
+          ],
+          "frames": [
+            150,
+            152,
+            155,
+            157,
+            160,
+            157,
+            155,
+            152
+          ]
+        },
+        {
+          "state": "waiting",
+          "gameAction": "boring",
+          "sourceFrameCount": 154,
+          "actionFrames": [
+            1,
+            8,
+            14,
+            21,
+            14,
+            8
+          ],
+          "frames": [
+            207,
+            214,
+            220,
+            227,
+            220,
+            214
+          ]
+        },
+        {
+          "state": "running",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            19,
+            28,
+            37,
+            46,
+            37,
+            28
+          ],
+          "frames": [
+            489,
+            498,
+            507,
+            516,
+            507,
+            498
+          ],
+          "registration": "bounded"
+        },
+        {
+          "state": "review",
+          "gameAction": "happy",
+          "sourceFrameCount": 86,
+          "actionFrames": [
+            8,
+            12,
+            20,
+            28,
+            20,
+            12
+          ],
+          "frames": [
+            71,
+            75,
+            83,
+            91,
+            83,
+            75
+          ]
+        }
+      ]
+    },
+    "water": {
+      "sourceSpriteId": 538,
+      "sampling": "reviewed clips from full nested timelines",
+      "rows": [
+        {
+          "state": "idle",
+          "gameAction": "down",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ],
+          "frames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ]
+        },
+        {
+          "state": "running-right",
+          "gameAction": "right",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            12,
+            13,
+            14,
+            15,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "state": "running-left",
+          "gameAction": "left",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            23,
+            24,
+            25,
+            26,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "state": "waving",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            1,
+            7,
+            13,
+            7
+          ],
+          "frames": [
+            332,
+            338,
+            344,
+            338
+          ]
+        },
+        {
+          "state": "jumping",
+          "gameAction": "woter",
+          "sourceFrameCount": 33,
+          "actionFrames": [
+            1,
+            4,
+            6,
+            10,
+            27
+          ],
+          "frames": [
+            658,
+            661,
+            663,
+            667,
+            684
+          ],
+          "registration": null
+        },
+        {
+          "state": "failed",
+          "gameAction": "angry",
+          "sourceFrameCount": 41,
+          "actionFrames": [
+            1,
+            6,
+            11,
+            16,
+            23,
+            16,
+            11,
+            6
+          ],
+          "frames": [
+            66,
+            71,
+            76,
+            81,
+            88,
+            81,
+            76,
+            71
+          ]
+        },
+        {
+          "state": "waiting",
+          "gameAction": "boring",
+          "sourceFrameCount": 81,
+          "actionFrames": [
+            1,
+            4,
+            8,
+            11,
+            8,
+            4
+          ],
+          "frames": [
+            107,
+            110,
+            114,
+            117,
+            114,
+            110
+          ]
+        },
+        {
+          "state": "running",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            127,
+            136,
+            145,
+            154,
+            163,
+            172
+          ],
+          "frames": [
+            458,
+            467,
+            476,
+            485,
+            494,
+            503
+          ],
+          "registration": {
+            "mode": "bounded",
+            "scale": 1.2173913043478262,
+            "sourceCenter": [
+              185.5,
+              596.6666666666666
+            ]
+          }
+        },
+        {
+          "state": "review",
+          "gameAction": "happy",
+          "sourceFrameCount": 32,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            2,
+            3,
+            2
+          ],
+          "frames": [
+            34,
+            35,
+            36,
+            35,
+            36,
+            35
+          ]
+        }
+      ]
+    },
+    "wood": {
+      "sourceSpriteId": 1029,
+      "sampling": "reviewed clips from full nested timelines",
+      "rows": [
+        {
+          "state": "idle",
+          "gameAction": "down",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ],
+          "frames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ]
+        },
+        {
+          "state": "running-right",
+          "gameAction": "right",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            12,
+            13,
+            14,
+            15,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "state": "running-left",
+          "gameAction": "left",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            23,
+            24,
+            25,
+            26,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "state": "waving",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            1,
+            7,
+            13,
+            7
+          ],
+          "frames": [
+            332,
+            338,
+            344,
+            338
+          ]
+        },
+        {
+          "state": "jumping",
+          "gameAction": "woter",
+          "sourceFrameCount": 54,
+          "actionFrames": [
+            1,
+            3,
+            6,
+            12,
+            24
+          ],
+          "frames": [
+            658,
+            660,
+            663,
+            669,
+            681
+          ],
+          "registration": null
+        },
+        {
+          "state": "failed",
+          "gameAction": "angry",
+          "sourceFrameCount": 41,
+          "actionFrames": [
+            1,
+            6,
+            11,
+            16,
+            23,
+            16,
+            11,
+            6
+          ],
+          "frames": [
+            66,
+            71,
+            76,
+            81,
+            88,
+            81,
+            76,
+            71
+          ]
+        },
+        {
+          "state": "waiting",
+          "gameAction": "boring",
+          "sourceFrameCount": 81,
+          "actionFrames": [
+            1,
+            4,
+            8,
+            11,
+            8,
+            4
+          ],
+          "frames": [
+            107,
+            110,
+            114,
+            117,
+            114,
+            110
+          ]
+        },
+        {
+          "state": "running",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            127,
+            136,
+            145,
+            154,
+            163,
+            172
+          ],
+          "frames": [
+            458,
+            467,
+            476,
+            485,
+            494,
+            503
+          ],
+          "registration": {
+            "mode": "bounded",
+            "scale": 1.0838709677419356,
+            "sourceCenter": [
+              182.66666666666666,
+              584.5833333333334
+            ]
+          }
+        },
+        {
+          "state": "review",
+          "gameAction": "happy",
+          "sourceFrameCount": 32,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            2,
+            3,
+            2
+          ],
+          "frames": [
+            34,
+            35,
+            36,
+            35,
+            36,
+            35
+          ]
+        }
+      ]
+    },
+    "fire": {
+      "sourceSpriteId": 898,
+      "sampling": "reviewed clips from full nested timelines",
+      "rows": [
+        {
+          "state": "idle",
+          "gameAction": "down",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ],
+          "frames": [
+            1,
+            3,
+            4,
+            6,
+            7,
+            9
+          ]
+        },
+        {
+          "state": "running-right",
+          "gameAction": "right",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            12,
+            13,
+            14,
+            15,
+            17,
+            18,
+            19,
+            20
+          ]
+        },
+        {
+          "state": "running-left",
+          "gameAction": "left",
+          "sourceFrameCount": 11,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "frames": [
+            23,
+            24,
+            25,
+            26,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "state": "waving",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            1,
+            7,
+            13,
+            7
+          ],
+          "frames": [
+            332,
+            338,
+            344,
+            338
+          ]
+        },
+        {
+          "state": "jumping",
+          "gameAction": "woter",
+          "sourceFrameCount": 69,
+          "actionFrames": [
+            1,
+            4,
+            7,
+            13,
+            24
+          ],
+          "frames": [
+            658,
+            661,
+            664,
+            670,
+            681
+          ],
+          "registration": null
+        },
+        {
+          "state": "failed",
+          "gameAction": "angry",
+          "sourceFrameCount": 41,
+          "actionFrames": [
+            1,
+            6,
+            11,
+            16,
+            23,
+            16,
+            11,
+            6
+          ],
+          "frames": [
+            66,
+            71,
+            76,
+            81,
+            88,
+            81,
+            76,
+            71
+          ]
+        },
+        {
+          "state": "waiting",
+          "gameAction": "boring",
+          "sourceFrameCount": 81,
+          "actionFrames": [
+            1,
+            4,
+            8,
+            11,
+            8,
+            4
+          ],
+          "frames": [
+            107,
+            110,
+            114,
+            117,
+            114,
+            110
+          ]
+        },
+        {
+          "state": "running",
+          "gameAction": "dance",
+          "sourceFrameCount": 209,
+          "actionFrames": [
+            127,
+            136,
+            145,
+            154,
+            163,
+            172
+          ],
+          "frames": [
+            458,
+            467,
+            476,
+            485,
+            494,
+            503
+          ],
+          "registration": {
+            "mode": "bounded",
+            "scale": 1.1586206896551725,
+            "sourceCenter": [
+              180.75,
+              605.25
+            ]
+          }
+        },
+        {
+          "state": "review",
+          "gameAction": "happy",
+          "sourceFrameCount": 32,
+          "actionFrames": [
+            1,
+            2,
+            3,
+            2,
+            3,
+            2
+          ],
+          "frames": [
+            34,
+            35,
+            36,
+            35,
+            36,
+            35
+          ]
+        }
+      ]
+    }
+  },
+  "adaptation": "Original atlas and additive four-colour masks. Sleep uses original closed-eye happy pose, not a tilted whole-body transform. Care uses finite original happy clips with existing item-specific accessory motion, never switches to ordinary senior body. Evolution timing/choice is a desktop adaptation, not original paid membership or server quest rules.",
+  "fallbacks": {
+    "super-pink-idle.png": "22b2b541726292e2ce9826b8a1ff362a6194abc3da3856c4100157ee0a53f29a",
+    "fire-blue-idle.png": "a53d420b7820f2f619fb5f09beab6779f2bfe6f9ba46eee277d9ed62dbda27ac",
+    "wood-yellow-idle.png": "04dbd7d4399012c80d73ad9faa3f06573292e780d0381a44083f014c6523883c",
+    "wood-pink-idle.png": "cd1c559bf72e14c3774c148ba55cdb2695f4e798d3e47e88c7d25b9367179dcc",
+    "fire-yellow-idle.png": "e3649eb168b116e827208d8d48805ef82c1863e2dc80df3a23e772dc4d1ec0e0",
+    "fire-red-idle.png": "0dc6d57ab451e948c85a61605e16e0de340cc5b67296169270c2a5ae2edd76da",
+    "water-red-idle.png": "c2b2082bc9b1865121d5c51bfca14387c97963a1b637318b3ceaf65bdc8f59af",
+    "wood-blue-idle.png": "d4b7511ab0899c759287a3c1b80f865a544a671a086d6f9e5c2cf620630a1a75",
+    "super-yellow-idle.png": "9685e0d0a81f462c5be2f0c1cc48336e51321a08e7f45d019077adefda53799d",
+    "super-red-idle.png": "050faee378172fce5980d2be4d1291174535bd7e546a92e302468f90fff2a6dd",
+    "super-blue-idle.png": "44cdd6a207a79d6d019537dcf53905063b6efe00b573b949a376f6bad095e9d2",
+    "fire-pink-idle.png": "425897949e62c1951cde8295e993b3c4f82f088563d458a8b9a78aa9ff1c07c9",
+    "water-pink-idle.png": "984cbf0efb6ce786135e17fc54e0aee9d1c553876961e76c369743d1dffa660b",
+    "water-yellow-idle.png": "7c2913073b39292810fc9473c6eba9053c14ccabd70242f159a8021be1d3f946",
+    "water-blue-idle.png": "7a3999eacc04bce794c822002f7572ff1746c01a3c0993f11415d025b88e46fd",
+    "wood-red-idle.png": "a73c3ec8a48cc8aea6aae0316f61050d5361eef3c3ceafd38083bebce4018c69"
+  },
+  "fallbackExport": "scripts/export-evolution-fallbacks.cjs"
+}

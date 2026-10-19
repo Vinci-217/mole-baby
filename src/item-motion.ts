@@ -82,6 +82,7 @@ export function getItemMouthAnchor(form: string | undefined, motion: ItemMotion,
   if (form === 'seed') return [50, 48]
   const anchor = MOUTH_ANCHORS[`${form}:${motion.body}`]?.[frame]
   if (anchor) return [anchor[0] / 192 * 100, anchor[1] / 208 * 100]
+  if (form && ['super', 'water', 'wood', 'fire'].includes(form)) return [48, form === 'super' || form === 'wood' ? 80 : 77]
   return [50, form === 'senior' ? 81 : form === 'middle' ? 66 : 63]
 }
 

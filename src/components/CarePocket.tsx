@@ -3,7 +3,7 @@ import { ITEMS, getStage } from '../game';
 import type { Action, GameState, ItemCategory, PetItem } from '../game';
 import './CarePocket.css';
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 16;
 const categories: { id: ItemCategory; name: string; icon: string }[] = [
   { id: 'food', name: '食物', icon: '180001' }, { id: 'drink', name: '饮品', icon: '180002' },
   { id: 'clean', name: '清洁', icon: '180003' }, { id: 'medicine', name: '药水', icon: '180005' },
@@ -35,7 +35,7 @@ export default function CarePocket({ pet, initialCategory = 'food', onCare, allo
   const [category, setCategory] = useState<ItemCategory>(initialCategory);
   const [page, setPage] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const stage = getStage(pet.growth);
+  const stage = getStage(pet.growth, pet.evolution);
   const items = ITEMS.filter(item => item.category === category);
   const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const visible = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -53,7 +53,7 @@ export default function CarePocket({ pet, initialCategory = 'food', onCare, allo
   return <section className="care-pocket" aria-label="拉姆背包">
     <header className="pocket-heading"><b>我的背包</b><span>{pet.coins} 摩尔豆</span></header>
     <nav className="pocket-categories" aria-label="物品分类">{categories.map(c => <button type="button" key={c.id} aria-pressed={category === c.id} onClick={() => changeCategory(c.id)}><img alt="" src={`./assets/original/items/${c.icon}.png`} draggable={false}/><span>{c.name}</span></button>)}</nav>
-    <div className="pocket-items" aria-label={`${categories.find(c => c.id === category)!.name}九宫格`}>
+    <div className="pocket-items" aria-label={`${categories.find(c => c.id === category)!.name}十六格`}>
       {Array.from({ length: PAGE_SIZE }, (_, index) => {
         const item = visible[index];
         if (!item) return <div className="pocket-slot pocket-slot-blank" key={`blank-${index}`} aria-hidden="true"/>;

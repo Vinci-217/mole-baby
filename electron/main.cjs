@@ -48,6 +48,7 @@ let movementTimer = null;
 let motion = 'idle';
 let companionPanel = false;
 let panelSide = 'right';
+// Compatibility IPC name: this controls autonomous motion only, never manual dragging.
 let petCanMove = true;
 let mousePassthrough = false;
 let companionAI = null;
@@ -238,7 +239,7 @@ function walkAlongDesktop() {
 }
 
 function startPetDrag() {
-  if (!petMode || !petCanMove) return false;
+  if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   dragging = true;
@@ -259,7 +260,7 @@ function movePet(dx, dy) {
     || Math.abs(dx) > 10000 || Math.abs(dy) > 10000) {
     throw new TypeError('Pet movement must use finite screen-coordinate deltas');
   }
-  if (!petMode || !petCanMove) return false;
+  if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   stopMovement();

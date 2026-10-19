@@ -87,7 +87,7 @@ async function checkFourSeedColors() {
   const pot = character.locator('.seed-pot-original'); await pot.evaluate(i => i.decode()); const potBefore = await pot.boundingBox(), c = await character.boundingBox();
   await page.mouse.move(c.x + 50, c.y + 60); await page.mouse.down(); await page.mouse.move(c.x + 85, c.y + 45); await page.waitForTimeout(180);
   assert.notEqual(await character.locator('.seed-body-original').evaluate(n => n.style.transform), 'rotate(0deg)');
-  const during = await pot.boundingBox(); assert.equal(during.x, potBefore.x); assert.equal(during.y, potBefore.y); await page.mouse.up();
+  const during = await pot.boundingBox(); assert.ok(during.x > potBefore.x + 20); assert.ok(during.y < potBefore.y - 5); await page.mouse.up();
   const actions = await openActions(page);
   assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label'))), ['查看状态', '喂食', '洗澡', '玩耍', '休息', '和拉姆说话', '进入小屋']);
   await actions.getByRole('button', { name: '喂食', exact: true }).click();
@@ -95,11 +95,11 @@ async function checkFourSeedColors() {
   assert.equal((await panel.boundingBox()).width, 332);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态', '背包', '玩耍', '对话']);
   assert.equal(await page.locator('.shop-book').count(), 0); assert.equal(await page.locator('.cottage-scene').count(), 0);
-  assert.equal(await pocket.locator('.pocket-slot').count(), 9); await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
-  const gridColumns = await pocket.locator('.pocket-items').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length); assert.equal(gridColumns, 3);
+  assert.equal(await pocket.locator('.pocket-slot').count(), 16); await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
+  const gridColumns = await pocket.locator('.pocket-items').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length); assert.equal(gridColumns, 4);
   await pocket.getByRole('button', { name: '到小屋补充', exact: false }).click(); await expect(page.locator('.shop-book')).toBeVisible();
   assert.equal(await page.locator('.companion-panel').count(), 0); await expect(page.locator('.cottage-scene')).toBeVisible();
-  console.log('PASS small fixed seed, seven ordered desktop tools, desktop-only basic tabs and three-column nine-slot bag');
+  console.log('PASS small draggable seed, seven ordered desktop tools, desktop-only basic tabs and four-column sixteen-slot bag');
 
   await buy(page, 'biscuit', '熊熊饼干'); assert.equal((await save(page)).coins, 85);
   await buy(page, '180002', '麦香牛奶', '饮品'); assert.equal((await save(page)).coins, 75);

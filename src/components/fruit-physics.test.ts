@@ -57,3 +57,14 @@ describe('quiet and finite Ram animation', () => {
     expect(sampleRamPose('play', 100, true)).toMatchObject({ row: 0, frame: 0 });
   });
 });
+
+it('aligns each god-power catch band with its original body, excluding the crown', () => {
+  for (const form of ['super', 'water', 'wood', 'fire'] as const) {
+    const band = getCatchBand(4, 200, form);
+    expect(Number.isFinite(band.spriteTop)).toBe(true);
+    expect(band.halfWidth).toBeGreaterThan(10);
+    expect(band.y).toBeGreaterThan(band.spriteTop + 40);
+    expect(crossingCatch({ x: band.x, y: band.y - 30 }, band.y + 20, band, band)).not.toBeNull();
+    expect(crossingCatch({ x: band.x + 100, y: band.y - 30 }, band.y + 20, band, band)).toBeNull();
+  }
+});
