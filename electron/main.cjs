@@ -267,7 +267,7 @@ function walkAlongDesktop() {
 
 function startPetDrag() {
   if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
-  const offset=edgeSide?(edgeSide==='left'?-1:1)*(edgePose==='peek'?85:125):0;
+  const offset=edgeSide&&edgePose!=='visible'?(edgeSide==='left'?-1:1)*(edgePose==='peek'?85:125):0;
   const bounds=mainWindow.getBounds();draggingFromEdge=Boolean(edgeSide);
   revealPet();
   if (companionPanel) changeCompanionPanel(false);

@@ -21,6 +21,8 @@ function requireFile(filename, magic) {
 
 async function verifySocialProps(page) {
   const character=page.getByTestId('desktop-character');
+  // Earlier drag checks may intentionally trigger the finite shake/dizzy cooldown.
+  await expect(character.locator('.ram-sprite')).not.toHaveAttribute('data-action','dizzy',{timeout:5000});
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   const panel=page.getByTestId('companion-panel');
   for(const [name,kind] of [['一起玩球','play'],['摸摸拉姆','pet'],['陪我专注','focus']]) {
@@ -239,6 +241,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
     if (page && !page.isClosed()) {
       console.error('Renderer loading diagnostics:', await page.evaluate(() => ({
         visibility: document.visibilityState,
+        action: document.querySelector('.ram-sprite')?.getAttribute('data-action'),
+        bubble: document.querySelector('.compact-bubble')?.textContent,
         desktop: document.querySelectorAll('.desktop-character').length,
         canvases: Array.from(document.querySelectorAll('.ram-classic-frame')).map(canvas => ({ ...canvas.dataset })),
         fallbacks: document.querySelectorAll('[data-fallback]').length,

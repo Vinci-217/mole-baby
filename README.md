@@ -2,13 +2,13 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.12.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.12.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.12.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.12.1) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.12.0-Setup.exe` 或 `mole-baby-0.12.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.12.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.12.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.12.1-Setup.exe` 或 `mole-baby-0.12.1-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.12.1-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.12.1-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -94,7 +94,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、190 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、191 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

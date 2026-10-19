@@ -198,3 +198,11 @@ test('docked pets only peek on hover, wait minutes between automatic peeks and r
  run.invoke('desktop:set-edge-hovered',false);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
  run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
 });
+
+test('starting a drag before the edge tuck animation keeps the visible pet under the pointer',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:end-pet-drag');
+ assert.equal(run.invoke('desktop:get-state').edgeSide,'right');assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
+ const before=run.window.getBounds();run.invoke('desktop:start-pet-drag');assert.equal(run.window.getBounds().x,before.x);
+ run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+});
