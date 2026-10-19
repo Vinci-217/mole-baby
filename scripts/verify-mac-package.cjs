@@ -6,6 +6,7 @@ const { execFileSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 const { verifyApplication, requireFile } = require('./package-smoke.cjs');
 const { writeChecksums } = require('./package-checksums.cjs');
+const { verifyMacTrust } = require('./mac-trust.cjs');
 const { version, build } = require('../package.json');
 async function main() {
   assert.equal(process.platform,'darwin','Run on the macOS packaging runner');
@@ -44,8 +45,10 @@ async function main() {
     if(attached) execFileSync('/usr/bin/hdiutil',['detach',mount],{stdio:'pipe'});
     await fs.promises.rm(mount,{recursive:true,force:true});
   }
-  console.log(`PASS: macOS ${arch} DMG/ZIP, bundle identity, native Mach-O architecture and ad-hoc signature`);
+  const trust = verifyMacTrust({ app, dmg: path.join(release,files[0]), mode: process.env.MOLE_MAC_DISTRIBUTION || 'local' });
+  console.log(`PASS: macOS ${arch} DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=${trust.mode}`);
   await verifyApplication({executable,archive,screenshot:`mac-${arch}-smoke.png`});
   await writeChecksums(release,files,`SHA256SUMS-mac-${arch}.txt`);
+  fs.writeFileSync(path.join(release,`macos-trust-${arch}.json`),JSON.stringify({ architecture:arch, sourceSha:process.env.GITHUB_SHA || null, ...trust },null,2)+'\n');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

@@ -93,7 +93,7 @@ jobs:
           - arch: x64
             runner: macos-15-intel
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       ELECTRON_DEV: '0'
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -105,6 +105,19 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Configure Mac signing and notarization
+        id: mac_signing
+        env:
+          CSC_LINK: ${{ secrets.MACOS_CERTIFICATE || secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD || secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node scripts/configure-mac-signing.cjs 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Check release version and native architecture
         run: |
           node -e 'const {version}=require("./package.json"); if(process.arch !== "${{ matrix.arch }}") throw Error("Runner architecture mismatch"); if(process.env.GITHUB_REF.startsWith("refs/tags/") && process.env.GITHUB_REF !== `refs/tags/v${version}`) throw Error("Tag/version mismatch");'
@@ -114,14 +127,25 @@ jobs:
         run: npm test
       - name: Build renderer
         run: npm run build
-      - name: Package native DMG and ZIP
-        run: npx --no-install electron-builder --mac dmg zip --${{ matrix.arch }} --publish never
+      - name: Package native DMG and ZIP (${{ steps.mac_signing.outputs.mode }})
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ steps.mac_signing.outputs.mode == 'notarized' && 'true' || 'false' }}
+          CSC_LINK: ${{ secrets.MACOS_CERTIFICATE || secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD || secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --no-install electron-builder --config electron-builder.mac.cjs --mac dmg zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
+          node scripts/notarize-mac-dmg.cjs ${{ matrix.arch }} 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Verify disk image, signature and actual Mac application
         shell: bash
         run: |
           set -o pipefail
           mkdir -p artifacts
-          node scripts/verify-mac-package.cjs ${{ matrix.arch }} 2>&1 | tee artifacts/mac-${{ matrix.arch }}-smoke.log
+          node scripts/verify-mac-package.cjs ${{ matrix.arch }} 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Upload checked Mac downloads
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -130,6 +154,7 @@ jobs:
             release/mole-baby-*-mac-${{ matrix.arch }}.dmg
             release/mole-baby-*-mac-${{ matrix.arch }}.zip
             release/SHA256SUMS-mac-${{ matrix.arch }}.txt
+            release/macos-trust-${{ matrix.arch }}.json
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
@@ -169,6 +194,7 @@ jobs:
           cat SHA256SUMS.txt SHA256SUMS-mac-arm64.txt SHA256SUMS-mac-x64.txt > combined.sha256
           mv combined.sha256 SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
+          node ../scripts/prepare-release-notes.cjs
 
       - name: Create release or replace its build attachments
         env:
@@ -178,14 +204,15 @@ jobs:
         shell: bash
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json --clobber
+            gh release edit "$RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
 
   report:
-    name: Save tagged build receipt
-    if: always() && startsWith(github.ref, 'refs/tags/v')
+    name: Save build receipt
+    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     needs: [build, mac, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -246,6 +273,10 @@ jobs:
             releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
             downloads,
             verificationLog,
+            macTrust: Object.fromEntries(['arm64','x64'].map(arch => {
+              const file = path.join(downloadsDir,`macos-trust-${arch}.json`);
+              return [arch, fs.existsSync(file) ? JSON.parse(fs.readFileSync(file,'utf8')) : null];
+            })),
             macVerificationLogs: Object.fromEntries(['arm64','x64'].map(arch => {
               const file = path.join(env.RUNNER_TEMP,'ramu-smoke',`mac-${arch}-smoke.log`);
               return [arch, fs.existsSync(file) ? fs.readFileSync(file,'utf8').slice(-12000) : null];

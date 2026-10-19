@@ -10,7 +10,7 @@
 | Mac Apple 芯片（M 系列） | `mole-baby-0.7.0-mac-arm64.dmg` |
 | Mac Intel | `mole-baby-0.7.0-mac-x64.dmg` |
 
-Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 版本采用本地签名，尚未进行 Apple 开发者公证；首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。详情见 [Mac 使用说明](docs/MACOS.md)。
+Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。v0.7.0 的 Mac 版本采用本地签名，尚未进行 Apple 开发者公证，后续版本以发布页实际信任状态为准；首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
 Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文件，旧存档与本机设置继续保留。
 
