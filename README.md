@@ -85,7 +85,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、157 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、163 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

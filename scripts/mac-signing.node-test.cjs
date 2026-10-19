@@ -3,12 +3,22 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
-const { REQUIRED, signingMode, macBuildConfig } = require('./mac-signing-policy.cjs');
+const { REQUIRED, signingMode, macBuildConfig, removeEmptySigningCredentials } = require('./mac-signing-policy.cjs');
 const { verifyMacTrust } = require('./mac-trust.cjs');
-const { notarizeDmg } = require('./notarize-mac-dmg.cjs');
+const { notarizeDmg: runDmgNotarization } = require('./notarize-mac-dmg.cjs');
+const notarizeDmg = options => runDmgNotarization({ log: () => {}, ...options });
 const { prepareReleaseNotes } = require('./prepare-release-notes.cjs');
 const credentials = Object.fromEntries(REQUIRED.map(name => [name, `dummy-${name}`]));
 const base = { mac: { identity: '-', notarize: false }, dmg: {} };
+
+test('absent GitHub Secrets do not become empty certificate imports', () => {
+  const env = { CSC_LINK: '', CSC_KEY_PASSWORD: '  ', APPLE_ID: '', KEEP: 'value' };
+  removeEmptySigningCredentials(env);
+  assert.deepEqual(env, { KEEP: 'value' });
+  const complete = { ...credentials };
+  removeEmptySigningCredentials(complete);
+  assert.deepEqual(complete, credentials);
+});
 
 test('no credentials is explicitly local; incomplete credentials never silently downgrade', () => {
   assert.equal(signingMode({}), 'local');

@@ -1,5 +1,12 @@
 const REQUIRED = ['CSC_LINK', 'CSC_KEY_PASSWORD', 'APPLE_ID', 'APPLE_APP_SPECIFIC_PASSWORD', 'APPLE_TEAM_ID'];
 
+function removeEmptySigningCredentials(env) {
+  // GitHub resolves absent Secrets to empty strings. electron-builder treats
+  // an empty CSC_LINK as a supplied certificate, rather than no certificate.
+  for (const name of REQUIRED) if (typeof env[name] === 'string' && !env[name].trim()) delete env[name];
+  return env;
+}
+
 function signingMode(env = process.env) {
   const requested = env.MOLE_MAC_DISTRIBUTION || 'auto';
   if (!['auto', 'local', 'notarized'].includes(requested)) throw new Error('Invalid MOLE_MAC_DISTRIBUTION; use auto, local or notarized.');
@@ -31,4 +38,4 @@ function macBuildConfig(base, env = process.env) {
   }
   return config;
 }
-module.exports = { REQUIRED, signingMode, macBuildConfig };
+module.exports = { REQUIRED, signingMode, macBuildConfig, removeEmptySigningCredentials };

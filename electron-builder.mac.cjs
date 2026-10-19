@@ -1,3 +1,4 @@
 const { build } = require('./package.json');
-const { macBuildConfig } = require('./scripts/mac-signing-policy.cjs');
+const { macBuildConfig, removeEmptySigningCredentials } = require('./scripts/mac-signing-policy.cjs');
+removeEmptySigningCredentials(process.env);
 module.exports = macBuildConfig(build);
