@@ -53,7 +53,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Verify packaged assets and start Windows application
-        run: node scripts/verify-windows-package.cjs
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node scripts/verify-windows-package.cjs 2>&1 | tee artifacts/windows-smoke.log
 
       - name: Upload Windows downloads
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -72,7 +76,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: Windows-smoke-screenshot
-          path: artifacts/v6-windows-smoke.png
+          path: |
+            artifacts/v6-windows-smoke.png
+            artifacts/windows-smoke.log
           if-no-files-found: ignore
           retention-days: 14
 
@@ -131,6 +137,14 @@ jobs:
           name: mole-baby-Windows-x64
           path: ${{ runner.temp }}/ramu-downloads
 
+      - name: Download Windows verification diagnostics
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: Windows-smoke-screenshot
+          path: ${{ runner.temp }}/ramu-smoke
+
       - name: Record the build result over Git
         if: always()
         env:
@@ -148,6 +162,8 @@ jobs:
             if (!match) throw new Error('Invalid build checksum entry');
             return { file: match[2], sha256: match[1] };
           }) : [];
+          const logPath = path.join(env.RUNNER_TEMP, 'ramu-smoke', 'windows-smoke.log');
+          const verificationLog = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').slice(-12000) : null;
           const receipt = {
             version: require('./package.json').version,
             tag: env.GITHUB_REF_NAME,
@@ -157,6 +173,7 @@ jobs:
             runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
             releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
             downloads,
+            verificationLog,
             recordedAt: new Date().toISOString(),
           };
           fs.writeFileSync(path.join(env.RUNNER_TEMP, 'ramu-build-receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);

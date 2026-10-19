@@ -63,7 +63,7 @@ async function main() {
   for (const track of ['sunshine-ranch','ramu-school','berry-jungle','snow-rink','playground','magic-carriage','farm-workshop','art-street','raceway']) assert.ok(paths.has(`dist/assets/original/audio/${track}.mp3`), `Missing classic BGM: ${track}`);
   for (const form of ['junior','middle','senior']) for (const layer of ['neutral','mask']) assert.ok(paths.has(`dist/assets/original/item-motion/${form}-${layer}.png`), 'Missing original per-item body atlas');
   assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).version, version);
-  assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).build.productName, '拉姆');
+  assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).name, 'mole-baby');
   assert.ok(![...paths].some(filename => /^(?:src\/|\.git\/|\.env(?:$|\.))/.test(filename)), 'Development source or local configuration was accidentally packaged');
   console.log('PASS: installer, portable ZIP, executable and required ASAR payload');
 
@@ -76,6 +76,7 @@ async function main() {
     timeout: 30000,
   });
   const page = await desktop.firstWindow();
+  assert.equal(await desktop.evaluate(({ app }) => app.getName()), '拉姆', 'Packaged application display name');
   page.setDefaultTimeout(15000);
   const rendererErrors = [];
   page.on('pageerror', error => rendererErrors.push(error.message));
