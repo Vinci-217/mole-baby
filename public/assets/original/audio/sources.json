@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/Miigon/RecMoleRes",
   "commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
-  "retrieved_at_utc": "2026-10-18",
+  "retrieved_at_utc": "2026-10-19",
   "files": [
     {
       "file": "castle.mp3",
@@ -11,7 +11,7 @@
       "scene_label": "摩尔城堡",
       "map_id": 1,
       "label_evidence": "map-sounds.xml comment and map/musicId attributes",
-      "duration_seconds": 46.08,
+      "duration_seconds": null,
       "bytes": 368665,
       "sha256": "80afce61de22230d5feaeac266ec376b04c50453aa06b01dc583620c0b10ced5",
       "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
@@ -24,7 +24,7 @@
       "scene_label": "宠物店",
       "map_id": 21,
       "label_evidence": "map-sounds.xml comment and map/musicId attributes",
-      "duration_seconds": 30.093,
+      "duration_seconds": null,
       "bytes": 240769,
       "sha256": "cb5c2b03c1edec1740d7dddea3b94175916644762d592362bb50fc27dddc6325",
       "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
@@ -37,7 +37,7 @@
       "scene_label": "神秘湖",
       "map_id": 8,
       "label_evidence": "map-sounds.xml comment and map/musicId attributes",
-      "duration_seconds": 40.098,
+      "duration_seconds": null,
       "bytes": 320809,
       "sha256": "9305823e91db7d770e6be123a976f48f5483cab261599da14f39c7724ef53351",
       "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing."
@@ -48,6 +48,123 @@
       "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/%E5%AF%B9%E5%BA%94%E8%A1%A8.xml",
       "bytes": 25484,
       "sha256": "b47e2f01eb3231ace0eb592d1d46a820426377c5f069f6329e94a2b1e8d20bf7"
+    },
+    {
+      "file": "sunshine-ranch.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_006c.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_006c.mp3",
+      "scene_label": "阳光牧场",
+      "map_id": 9,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 308061,
+      "sha256": "fa05c108269ffdcebc57954680a96ca814d56a47b92d6fe33e1c8109b5e840f2",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "ramu-school.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_008.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_008.mp3",
+      "scene_label": "拉姆学院",
+      "map_id": 28,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 302602,
+      "sha256": "bdb29d783a196587c3b32407e0b60ee3c98d28ef8e5315d47065baaf4f1f9692",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "berry-jungle.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_004.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_004.mp3",
+      "scene_label": "浆果丛林",
+      "map_id": 41,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 346279,
+      "sha256": "7a04d616ad78bc8307aa1f5a23a2867748df8ae2d32c2e81bb5de52ca0076533",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "snow-rink.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_003.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_003.mp3",
+      "scene_label": "摩尔拉雅滑冰场",
+      "map_id": 5,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 369267,
+      "sha256": "58561ed89e1c0a6bd1ef74de7ab76c3239419160929e3592db798f723f374509",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "playground.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_1003b.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_1003b.mp3",
+      "scene_label": "西部游乐场",
+      "map_id": 6,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 263339,
+      "sha256": "81ac341483fcc69353d9370c7c074d8dcbeb8b793334de605d817355120c287a",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "magic-carriage.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_026.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_026.mp3",
+      "scene_label": "魔法马车",
+      "map_id": 24,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 185574,
+      "sha256": "d36b8fc681cf535507b0562b191f03d83610ff3c03c42437aff4022b3ca2b200",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "farm-workshop.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_061.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_061.mp3",
+      "scene_label": "农场发明屋",
+      "map_id": 27,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 136673,
+      "sha256": "5410a7a0f91652b2b96bfa01f80a948debc2883e053154ade1e3c4debb67b4a3",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "art-street.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_1004.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_1004.mp3",
+      "scene_label": "咕噜艺术街",
+      "map_id": 59,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 308061,
+      "sha256": "091cd12341ab30ac7bba2ee4f5edcbb3fa8e1beb3bcaeafcd9840fa2b5121171",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
+    },
+    {
+      "file": "raceway.mp3",
+      "kind": "original-client-bgm",
+      "source_file": "BGM_016.mp3",
+      "source_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/bgSounds/BGM_016.mp3",
+      "scene_label": "摩摩赛车场",
+      "map_id": 36,
+      "label_evidence": "map-sounds.xml comment and map/musicId attributes",
+      "bytes": 256836,
+      "sha256": "7b73519b3e0f4bd9de1cf74b99bbf4a0b499023359f7ae065381b5de85cee840",
+      "processing": "Copied original MP3 bytes without transcoding, trimming, normalization, or mixing.",
+      "duration_seconds": null
     }
   ],
   "pet_sounds": {

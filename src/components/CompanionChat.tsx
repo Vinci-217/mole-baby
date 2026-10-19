@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
 import type { GameState } from '../game';
-import { appendMessage, buildMessages, clearMemory, forgetFact, localReply, rememberChat } from '../companion-memory';
+import { appendMessage, buildMessages, clearMemory, editFact, FACT_LABELS, forgetEvent, forgetFact, getCompanionMood, getDiary, localReply, rememberChat, setPersonality, setPlanStatus } from '../companion-memory';
 import type { CompanionMemory } from '../companion-memory';
 import './CompanionChat.css';
 
@@ -12,12 +12,12 @@ interface Recognition {
   start(): void; stop(): void; abort(): void;
 }
 type RecognitionConstructor = new () => Recognition;
+const isDocumentHidden = () => document.visibilityState === 'hidden';
 type SpeechWindow = Window & { SpeechRecognition?: RecognitionConstructor; webkitSpeechRecognition?: RecognitionConstructor };
 interface Props {
   pet: GameState; memory: CompanionMemory; onMemoryChange: Dispatch<SetStateAction<CompanionMemory>>;
   onReply(text: string): void; compact?: boolean; onSpeechBusyChange?(busy: boolean): void;
 }
-const factLabel = { nickname: '称呼', like: '喜欢', dislike: '不喜欢', plan: '计划' };
 
 export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = false, onSpeechBusyChange }: Props) {
   const [input, setInput] = useState('');
@@ -28,10 +28,13 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [speechNote, setSpeechNote] = useState('');
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
   const [readAloud, setReadAloud] = useState(() => { try { return localStorage.getItem('ramu-chat-read-aloud') === 'true'; } catch { return false; } });
   const alive = useRef(true), request = useRef(0), speechRequest = useRef(0), memoryRef = useRef(memory);
   const recognition = useRef<Recognition | null>(null), messagesEnd = useRef<HTMLDivElement>(null);
   const bridge = window.companionAI;
+  const mood = getCompanionMood(memory, pet), diary = getDiary(memory);
   memoryRef.current = memory;
   useEffect(() => {
     alive.current = true;
@@ -41,6 +44,14 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
   }, [bridge]);
   useEffect(() => { messagesEnd.current?.scrollIntoView({ block: 'nearest' }); }, [memory.messages.length, pending]);
   useEffect(() => { onSpeechBusyChange?.(listening || speaking); return () => onSpeechBusyChange?.(false); }, [listening, speaking, onSpeechBusyChange]);
+  useEffect(() => {
+    // Invalidate the whole speech turn, including an availability check that has
+    // not resolved yet. Restoring the window must not resume an old microphone.
+    const onVisibilityChange = () => { if (isDocumentHidden()) stopSpeech(); };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    onVisibilityChange();
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
 
   function updateMemory(transform: (previous: CompanionMemory) => CompanionMemory): CompanionMemory {
     // The ref builds this turn's prompt immediately; the authoritative update
@@ -55,7 +66,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     setListening(false); setSpeaking(false); setSpeechNote('');
   }
   function speak(text: string) {
-    if (!readAloud) return;
+    if (!readAloud || isDocumentHidden()) return;
     const synth = window.speechSynthesis;
     if (!synth) { setSpeechNote('这台设备暂不支持语音朗读。'); return; }
     const voice = synth.getVoices().find(v => v.lang.startsWith('zh'));
@@ -95,6 +106,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     if (!enabled) stopSpeech();
   }
   async function voiceInput() {
+    if (isDocumentHidden()) return;
     if (listening) { stopSpeech(); setSpeechNote('已结束录音。'); return; }
     const speechId = ++speechRequest.current;
     window.speechSynthesis?.cancel(); setSpeaking(false);
@@ -102,11 +114,11 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
       setListening(true); setSpeechNote('正在检查本机语音识别…');
       try {
         const availability = await window.companionSpeech.getAvailability();
-        if (!alive.current || speechRequest.current !== speechId) return;
+        if (!alive.current || speechRequest.current !== speechId || isDocumentHidden()) return;
         if (!availability.available) { setSpeechNote(availability.reason || '本机没有可用的中文语音识别，请安装中文语音包，或在输入框使用 Win + H 听写。'); return; }
         setSpeechNote('正在听，请说话。本机离线识别，录音不会发送给 DeepSeek。');
         const transcript = await window.companionSpeech.listen();
-        if (alive.current && speechRequest.current === speechId) {
+        if (alive.current && speechRequest.current === speechId && !isDocumentHidden()) {
           if (transcript) { setInput(old => `${old}${old ? ' ' : ''}${transcript}`.slice(0, 1000)); setSpeechNote('已转成文字，确认后点发送。'); }
           else setSpeechNote('这次没有听清，可以重试或继续打字。');
         }
@@ -120,7 +132,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     recognizer.lang = 'zh-CN'; recognizer.continuous = false; recognizer.interimResults = false;
     recognizer.onresult = result => {
       const transcript = result.results[0]?.[0]?.transcript;
-      if (alive.current && speechRequest.current === speechId && transcript) { setInput(old => `${old}${old ? ' ' : ''}${transcript}`.slice(0, 1000)); setSpeechNote('已转成文字，确认后点发送。'); }
+      if (alive.current && speechRequest.current === speechId && !isDocumentHidden() && transcript) { setInput(old => `${old}${old ? ' ' : ''}${transcript}`.slice(0, 1000)); setSpeechNote('已转成文字，确认后点发送。'); }
     };
     recognizer.onerror = event => { if (alive.current && speechRequest.current === speechId) setSpeechNote(event.error === 'not-allowed' ? '麦克风权限未开启，可以继续打字。' : '语音识别未完成，请重试或使用 Windows 听写。'); };
     recognizer.onend = () => { if (alive.current && speechRequest.current === speechId) setListening(false); };
@@ -128,12 +140,18 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     catch { setListening(false); setSpeechNote('暂时无法启动麦克风，请使用文字输入。'); }
   }
   function resetMemory() {
-    if (pending) cancel(); stopSpeech(); updateMemory(clearMemory); setError(''); setRetryText(''); setInput('');
+    if (pending) cancel(); stopSpeech(); updateMemory(clearMemory); setError(''); setRetryText(''); setInput(''); setEditing(null);
   }
   function forget(id: string, event = false) {
     stopSpeech();
-    updateMemory(previous => event ? { ...previous, events: previous.events.filter(item => item.id !== id), messages: [] } : forgetFact(previous, id));
+    updateMemory(previous => event ? forgetEvent(previous, id) : forgetFact(previous, id));
     setInput(''); setRetryText(''); setError('');
+  }
+  function saveEdit() {
+    if (!editing || !editValue.trim() || pending) return;
+    stopSpeech();
+    updateMemory(previous => editing === 'personality' ? setPersonality(previous, editValue) : editFact(previous, editing, editValue));
+    setEditing(null); setEditValue(''); setInput(''); setRetryText('');
   }
   return <section className={`companion-chat ${compact ? 'is-compact' : ''}`} aria-label="和拉姆聊天">
     <div className="chat-mode"><span>{configured ? 'DeepSeek · 联网对话' : '本地陪伴 · 无需密钥'}</span><label><input type="checkbox" checked={readAloud} onChange={e => toggleReadAloud(e.target.checked)}/>朗读回复</label></div>
@@ -149,11 +167,15 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     </form>
     {speechNote && <p className="chat-notice" role="status">{speechNote}</p>}
     {error && <div className="chat-error" role="status"><p>{error}</p>{retryText && !pending && <button type="button" onClick={() => void send(retryText, true)}>重试这条消息</button>}</div>}
-    <details className="companion-memories"><summary>我们的小本子 · {memory.facts.length} 条记忆</summary><p>{memory.personality}。只记录你主动告诉我的信息和实际发生的照料事件。</p>
-      {!memory.facts.length && <p>还没有记下称呼、喜好或计划。</p>}
-      <ul>{memory.facts.map(fact => <li key={fact.id}><span><b>{factLabel[fact.kind]}</b> {fact.value}</span><button type="button" disabled={pending} aria-label={`忘记${factLabel[fact.kind]}${fact.value}`} onClick={() => forget(fact.id)}>忘记</button></li>)}</ul>
+    <details className="companion-memories"><summary>我们的小本子 · {memory.facts.length} 条记忆</summary>
+      <p className="companion-relationship">{mood.label} · {mood.relationship}</p>
+      <div className="companion-temperament"><p>{memory.personality}</p><button type="button" disabled={pending} onClick={() => { setEditing('personality'); setEditValue(memory.personality); }}>调整性格</button></div>
+      {editing && <div className="memory-editor"><label htmlFor="memory-edit-value">{editing === 'personality' ? '陪伴的语气与性格' : '修改这条记忆'}</label><textarea id="memory-edit-value" value={editValue} maxLength={editing === 'personality' ? 80 : 160} onChange={e => setEditValue(e.target.value)} rows={2}/><div><button type="button" onClick={saveEdit} disabled={pending || !editValue.trim()}>保存修改</button><button type="button" onClick={() => setEditing(null)}>取消</button></div></div>}
+      {!memory.facts.length && <p>称呼、喜好、计划，还有你愿意分享的小事，都可以慢慢记下来。</p>}
+      <ul>{memory.facts.map(fact => <li key={fact.id}><span><b>{FACT_LABELS[fact.kind]}{fact.kind === 'plan' && fact.status === 'done' ? ' · 已完成' : ''}</b><p>{fact.value}</p>{fact.kind === 'plan' && <button type="button" disabled={pending} onClick={() => { stopSpeech(); updateMemory(previous => setPlanStatus(previous, fact.id, fact.status === 'done' ? 'active' : 'done')); }}>{fact.status === 'done' ? '继续这个计划' : '标记完成'}</button>}</span><div className="memory-row-actions"><button type="button" disabled={pending} aria-label={`修改${FACT_LABELS[fact.kind]}${fact.value}`} onClick={() => { setEditing(fact.id); setEditValue(fact.value); }}>修改</button><button type="button" disabled={pending} aria-label={`忘记${FACT_LABELS[fact.kind]}${fact.value}`} onClick={() => forget(fact.id)}>忘记</button></div></li>)}</ul>
       {!!memory.events.length && <details><summary>一起发生过的小事 · {memory.events.length}</summary><ul>{memory.events.slice(-8).reverse().map(event => <li key={event.id}><span>{new Date(event.at).toLocaleDateString('zh-CN')} · {event.detail}</span><button type="button" disabled={pending} aria-label={`忘记${event.detail}`} onClick={() => forget(event.id, true)}>忘记</button></li>)}</ul></details>}
-      <p className="chat-notice">删除一条记忆也会清除对话记录，避免旧对话再次提起它。最多保留 24 条信息、40 件小事和 40 条对话；不读取文件、键盘或屏幕。</p>
+      {!!diary.length && <details className="companion-diary"><summary>陪伴日记</summary>{diary.slice().reverse().map(day => <article key={day.day}><b>{day.day}</b><ul>{day.moments.map((moment, index) => <li key={index}>{moment}</li>)}</ul></article>)}<p>日记由实际记录整理，删除记忆后也会一起更新。</p></details>}
+      <details className="memory-explainer"><summary>记忆如何保存</summary><p>只记下你主动说的话和实际发生的照料。最多保留64条信息、120件小事和80条对话，不读取屏幕或文件。修改或忘记信息时会清除旧对话，避免再次引用。未来计划不会自动当成已经发生。</p></details>
       <button type="button" className="chat-clear-memory" disabled={pending || (!memory.facts.length && !memory.events.length && !memory.messages.length)} onClick={resetMemory}>清空记忆与对话</button>
     </details>
   </section>;

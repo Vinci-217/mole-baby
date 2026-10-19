@@ -1,15 +1,15 @@
 {
   "name": "mole-baby",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "拉姆陪伴 · 原页游拉姆桌面宠物",
-  "author": "Mole Baby",
+  "description": "拉姆 · mole-baby 桌面宠物",
+  "author": "mole-baby",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run && node --test electron/deepseek.node-test.cjs electron/speech.node-test.cjs",
+    "test": "vitest run && node --test electron/deepseek.node-test.cjs electron/speech.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
@@ -40,7 +40,7 @@
   },
   "build": {
     "appId": "com.molebaby.ramuhouse",
-    "productName": "拉姆陪伴",
+    "productName": "拉姆",
     "directories": {
       "output": "release"
     },
@@ -51,14 +51,17 @@
     ],
     "win": {
       "target": "nsis",
-      "artifactName": "RamuHouse-${version}-${arch}.${ext}",
-      "signAndEditExecutable": false
+      "artifactName": "mole-baby-${version}-${arch}.${ext}",
+      "signAndEditExecutable": true,
+      "icon": "public/icons/ramu.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "artifactName": "RamuHouse-${version}-Setup.${ext}"
+      "artifactName": "mole-baby-${version}-Setup.${ext}",
+      "installerIcon": "public/icons/ramu.ico",
+      "uninstallerIcon": "public/icons/ramu.ico"
     }
   }
 }

@@ -59,3 +59,48 @@
 @keyframes ram-sleep-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,.978)}}
 @keyframes ram-sleep-cloud{0%,100%{opacity:.45;translate:0 0}55%{opacity:.95;translate:1px -2px}}
 @media(prefers-reduced-motion:reduce){.ram-sprite .ram-pose-layer,.ram-sprite .ram-sleep-mark{animation:none!important;transform:none}}
+
+/* Accessories use percentage coordinates in the unchanged original viewport.
+   Never fit the pet to an accessory's extent: the desktop body stays 100px. */
+.ram-sprite{--care-mouth-x:50%;--care-mouth-y:63%;--care-x:0%;--care-y:0%;--care-angle:0deg;--care-scale-x:1;--care-scale-y:1;--care-opacity:1;--care-activity:0;--care-lift:0%;--care-wave:0%}
+.ram-sprite[data-stage="0"]{--care-mouth-y:48%}
+.ram-sprite[data-stage="2"]{--care-mouth-y:66%}
+.ram-sprite[data-stage="3"]{--care-mouth-y:81%}
+.ram-item-cue{position:absolute;inset:0;display:block;pointer-events:none;line-height:0;z-index:3;opacity:var(--care-opacity)}
+.ram-care-item,.ram-care-brush,.ram-care-peel{position:absolute;left:calc(var(--care-mouth-x) + var(--care-x));top:calc(var(--care-mouth-y) + var(--care-y));width:27%;height:27%;object-fit:contain;translate:-50% -45%;transform:rotate(var(--care-angle)) scale(var(--care-scale-x),var(--care-scale-y));transform-origin:30% 50%;filter:drop-shadow(0 1px 0 #46321a22)}
+.gesture-slice .ram-care-item{width:32%;height:27%;transform-origin:left center}
+.gesture-spoon .ram-care-item{width:30%;height:29%}
+.gesture-sip .ram-care-item{translate:-25% -10%;transform-origin:25% 5%}
+.gesture-gulp .ram-care-item,.gesture-fizz .ram-care-item,.gesture-medicine .ram-care-item{translate:-10% -10%;transform-origin:20% 5%;width:25%;height:31%}
+.gesture-squeeze .ram-care-item{width:23%;height:25%}
+.gesture-bath .ram-care-item{width:24%;height:24%;top:calc(var(--care-mouth-y) - 6% + var(--care-y))}
+.ram-care-tub{position:absolute;left:14%;top:calc(var(--care-mouth-y) + 8%);width:72%;height:29%;object-fit:fill;z-index:2}
+.ram-seed .ram-care-tub{left:68%;top:65%;width:28%;height:20%}
+.gesture-scrub .ram-care-item,.gesture-face-wash .ram-care-item{width:22%;height:23%}
+.gesture-brush .ram-care-toothpaste{left:24%;top:calc(var(--care-mouth-y) + 17%);width:18%;height:22%;translate:-50% -30%;transform:rotate(-18deg)}
+.ram-care-brush{left:calc(var(--care-mouth-x) + 11% + var(--care-x));width:45%;height:20%;translate:-35% -25%;transform-origin:24% 50%;z-index:2}
+.ram-care-particles{position:absolute;inset:0;translate:calc(var(--care-mouth-x) - 50%) var(--care-lift);z-index:3}
+.ram-care-particles i{position:absolute;left:44%;top:calc(var(--care-mouth-y) - 1%);width:5%;aspect-ratio:1;border:1px solid #b5d7dd;background:#faffffd9;border-radius:50%;translate:var(--care-wave) 0;box-shadow:inset 1px 1px 0 #fff}
+.ram-care-particles i:nth-child(2){left:53%;top:calc(var(--care-mouth-y) + 3%);width:6%}
+.ram-care-particles i:nth-child(3){left:36%;top:calc(var(--care-mouth-y) + 6%);width:4%}
+.ram-care-particles i:nth-child(4){left:62%;top:calc(var(--care-mouth-y) - 5%);width:3%}
+.ram-care-particles i:nth-child(5){left:55%;top:calc(var(--care-mouth-y) - 11%);width:4%}
+.ram-care-particles i:nth-child(6){left:29%;top:calc(var(--care-mouth-y) - 5%);width:3%}
+.gesture-bath .ram-care-particles i{top:calc(var(--care-mouth-y) + 8%);width:8%}
+.gesture-bath .ram-care-particles i:nth-child(even){top:calc(var(--care-mouth-y) + 3%);width:11%}
+.gesture-brush .ram-care-particles{translate:0 0}
+.gesture-brush .ram-care-particles i{width:4%;top:calc(var(--care-mouth-y) + 1%)}
+.gesture-brush .ram-care-particles i:nth-child(even){top:calc(var(--care-mouth-y) - 2%);width:5%}
+.gesture-face-wash .ram-care-particles{translate:0 -6%}
+.gesture-fizz .ram-care-particles i{left:64%;width:3%;background:#fff4d4;border-color:#c7a372}
+.gesture-fizz .ram-care-particles i:nth-child(2){left:70%;top:calc(var(--care-mouth-y) - 5%);width:2%}
+.gesture-crunch .ram-care-particles i{background:currentColor;border:0;border-radius:25%;width:3%;box-shadow:none;top:calc(var(--care-mouth-y) + 10%)}
+.gesture-pour-beans .ram-care-item{width:25%;height:28%;transform-origin:15% 5%}
+.gesture-pour-beans .ram-care-particles{translate:calc(var(--care-mouth-x) - 50%) 0}
+.gesture-pour-beans .ram-care-particles i{left:50%;top:calc(var(--care-mouth-y) + 1%);width:4%;height:3%;aspect-ratio:auto;background:currentColor;border:0;box-shadow:none;translate:var(--care-wave) var(--care-wave)}
+.gesture-pour-beans .ram-care-particles i:nth-child(2){left:56%;top:calc(var(--care-mouth-y) - 3%);width:3%;height:2%}
+.gesture-pour-beans .ram-care-particles i:nth-child(3){left:61%;top:calc(var(--care-mouth-y) - 5%);width:3%;height:2%}
+.gesture-medicine .ram-care-particles i,.gesture-glow .ram-care-particles i{background:currentColor;border-color:#fff8;box-shadow:0 0 5px currentColor}
+.ram-care-soft-puff{position:absolute;left:40%;top:calc(var(--care-mouth-y) + 6%);width:18%;height:8%;border-radius:50%;background:#fff9;filter:blur(2px);opacity:var(--care-activity);translate:0 var(--care-lift)}
+.ram-care-peel{left:30%;top:calc(var(--care-mouth-y) + 17%);width:14%;height:14%;clip-path:inset(48% 0 0);opacity:var(--care-activity);transform:rotate(-35deg);translate:0 var(--care-wave)}
+@media(prefers-reduced-motion:reduce){.ram-item-cue *{transition:none!important;animation:none!important}}

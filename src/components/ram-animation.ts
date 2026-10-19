@@ -1,4 +1,6 @@
-export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' }
+import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
+
+export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' }
 export const CARE_COLUMNS = 16
 export const CARE_ROWS = 7
 /** Each care row comes from the matching named animation in lamubone.swf. */
@@ -19,6 +21,8 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 export function getRamActionDuration(action: string): number | null {
+  const item = getItemMotionByAction(action)
+  if (item) return item.duration
   const care = CARE_ACTIONS[action]
   if (care) return care.duration
   const once = ONCE[action]
@@ -30,6 +34,12 @@ export function getRamActionDuration(action: string): number | null {
 export function sampleRamPose(action: string, elapsed: number, reduced = false): Pose {
   if (action === 'sleep') return { row: 8, frame: 0, finished: false }
   if (action === 'still' || action === 'drag') return { row: 0, frame: 0, finished: false }
+  const item = getItemMotionByAction(action)
+  if (item) {
+    const pose = sampleItemMotion(item, elapsed, reduced)
+    if (pose.finished) return { row: 0, frame: 0, finished: true }
+    return { sheet: 'item', row: item.body === 'eat' ? 0 : item.body === 'drink' ? 1 : item.body === 'wash' ? 2 : 3, frame: pose.bodyFrame, finished: false }
+  }
   const care = CARE_ACTIONS[action]
   if (care) {
     if (elapsed >= care.duration) return { row: 0, frame: 0, finished: true }
@@ -52,6 +62,10 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
   }
   if (reduced) return { row: 0, frame: 0, finished: false }
   if (action.includes('walk') || action.includes('running-')) return { row: action.endsWith('left') ? 2 : 1, frame: Math.floor(elapsed / 62.5) % 8, finished: false }
+  if (action === 'peek' || action === 'hide') {
+    const phase = elapsed % 5000
+    return { row: 0, frame: phase < 4200 ? 0 : Math.min(4, Math.floor((phase - 4200) / 170)), finished: false }
+  }
   const phase = elapsed % 7000
   return { row: 0, frame: phase < 6000 ? 0 : Math.min(5, Math.floor((phase - 6000) / 170)), finished: false }
 }
@@ -63,6 +77,12 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
   if (reduced) return { frame: 0, finished: false }
+  const item = getItemMotionByAction(action)
+  if (item) {
+    // Only the original body moves. The independently rendered pot is static.
+    const pose = sampleItemMotion(item, elapsed)
+    return { frame: Math.min(24, Math.round(pose.bodyFrame * 1.5)), finished: false }
+  }
   if (action === 'hungry' || action === 'thirsty' || action === 'sick' || action === 'tired' || action === 'sad') return { frame: elapsed % 8000 < 1000 ? 2 : 3, finished: false }
   if (action !== 'idle' && action !== 'waiting') {
     // A short portion of the original body squash/sway, once per interaction.

@@ -50,7 +50,9 @@ export const COLORS: { id: PetColor; name: string; hex: string; light: string }[
 /** Stable reward order: old save IDs and minigame reward receipts depend on it. */
 export const FOODS: Food[] = ['berry', 'biscuit', 'juice'].map(id => getItem(id)!);
 
-// Timings are simplified for this desktop companion. Super Ram is not a growth stage.
+// Desktop adaptation: growth is earned by healthy elapsed time, never by clicks.
+// These durations are a playable slow pace, not a claim about original server timers.
+export const GROWTH_STAGE_HOURS = [24, 72, 168] as const;
 export const STAGES = [
   { name: '种子期', description: '待在花盆里的种子，身体轻轻摆动。', threshold: 0 },
   { name: '初级拉姆', description: '离开花盆，无叶的初级拉姆。', threshold: 60 },
@@ -66,7 +68,23 @@ const MAX_COINS = 1_000_000_000;
 
 const clamp = (value: number, max = 100): number => Math.min(max, Math.max(0, value));
 const rounded = (value: number): number => Math.round(value * 1_000_000) / 1_000_000;
-const grow = (growth: number, amount: number): number => rounded(clamp(growth + amount, GROWTH_MAX));
+const grow = (growth: number, amount: number): number => clamp(growth + amount, GROWTH_MAX);
+
+/** Integrate across stage boundaries, so one long tick equals many short ticks. */
+function growForHours(growth: number, hours: number): number {
+  let result = growth, remaining = hours;
+  while (remaining > 0 && result < GROWTH_MAX) {
+    const stage = getStage(result);
+    if (stage === 3) break;
+    const next = STAGES[stage + 1].threshold;
+    const rate = (next - STAGES[stage].threshold) / GROWTH_STAGE_HOURS[stage];
+    const spent = Math.min(remaining, (next - result) / rate);
+    result = grow(result, spent * rate);
+    if (next - result < 0.0000001) result = next;
+    remaining -= spent;
+  }
+  return result;
+}
 
 export function createPet(name: string, color: PetColor, now = Date.now()): GameState {
   if (!COLORS.some(entry => entry.id === color)) throw new RangeError('拉姆只有粉、黄、蓝、红四种基础颜色。');
@@ -131,7 +149,7 @@ export function tick(state: GameState, now = Date.now()): GameState {
   return {
     ...state,
     lastTick: now,
-    growth: grow(state.growth, healthyHours * 18),
+    growth: growForHours(state.growth, healthyHours),
     stats: {
       hunger: rounded(clamp(state.stats.hunger - hours * rates.hunger)),
       thirst: rounded(clamp(state.stats.thirst - hours * rates.thirst)),
@@ -173,7 +191,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     }
     for (const key of keys) stats[key] = clamp(stats[key] + item[key]);
     return {
-      state: { ...current, stats, growth: grow(current.growth, item.category === 'clean' ? 3 : 4), inventory: { ...current.inventory, [item.id]: current.inventory[item.id] - 1 } },
+      state: { ...current, stats, inventory: { ...current.inventory, [item.id]: current.inventory[item.id] - 1 } },
       message: item.category === 'clean' ? `${item.name}的泡泡香香的，洗干净啦！`
         : item.category === 'drink' ? `咕嘟咕嘟，${item.name}真解渴！`
           : item.category === 'medicine' ? '喝过药水，身体舒服多啦。谢谢你照顾我！' : `啊呜！${item.name}真好吃，谢谢你。`,
@@ -183,13 +201,13 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
 
   if (action === 'pet') {
     stats.happiness = clamp(stats.happiness + 6);
-    return { state: { ...current, stats, growth: grow(current.growth, 1) }, message: '咕噜咕噜～最喜欢你摸摸我啦！', ok: true };
+    return { state: { ...current, stats }, message: '咕噜咕噜～最喜欢你摸摸我啦！', ok: true };
   }
   if (stats.energy < 12) return { state: current, message: '有一点困啦，睡一会儿再玩好不好？', ok: false };
   stats.happiness = clamp(stats.happiness + 16);
   stats.energy = clamp(stats.energy - 12);
   stats.hunger = clamp(stats.hunger - 5);
-  return { state: { ...current, stats, growth: grow(current.growth, 3) }, message: '蹦蹦跳跳！和你一起玩最开心。', ok: true };
+  return { state: { ...current, stats }, message: '蹦蹦跳跳！和你一起玩最开心。', ok: true };
 }
 
 export function buyItem(state: GameState, itemId: string): CareResult {
@@ -238,7 +256,6 @@ export function rewardGame(state: GameState, score: number, now = Date.now()): C
     state: {
       ...current,
       coins: clamp(current.coins + coins, MAX_COINS),
-      growth: grow(current.growth, 3 + safeScore),
       stats: {
         ...current.stats,
         happiness: clamp(current.stats.happiness + 8 + safeScore),

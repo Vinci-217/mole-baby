@@ -1,1 +1,65 @@
 .life-settings{margin:12px 0;padding:10px 0;border-top:1px solid #eaddbd;color:#8b7350}.life-settings>label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;padding:8px 0}.life-settings small{display:block;font-size:10px;color:#aa987a;margin-top:4px;line-height:1.7}.life-settings select{font:inherit;font-size:11px;padding:5px;border:1px solid #dfc99d;background:#fff9ea;border-radius:6px;color:#8b7350}.life-settings input[type=checkbox]{accent-color:#c29a49}.life-settings>p{font-size:10px;color:#ae6339}.companion-panel .life-settings{margin:8px 0;padding:6px 0}.companion-panel .life-settings>label{font-size:10px}.companion-panel .life-settings small{font-size:9px}.companion-panel .life-settings select{font-size:10px}.companion-layout .compact-pet-name.sleeping-badge{opacity:1;background:#fff9e7;border:1px solid #e0d4b5;border-radius:7px;font-size:9px;left:46px;right:46px;top:174px;min-height:19px;line-height:1.6;z-index:2}.compact-condition{font-size:10px;line-height:1.8;background:#fff4d9;border-radius:6px;padding:7px 8px;margin-top:10px;color:#aa8550}.food-dock-symbol{position:relative;display:block;width:60px;height:63px}.food-dock-symbol img{position:absolute;width:45px;height:52px;object-fit:contain;left:0;top:7px}.food-dock-symbol img+img{width:32px;height:47px;left:28px;top:3px}.room-change-button{background:#fff5d9ee;border:1px solid #bd9558;border-radius:10px;color:#8e6938;font-size:11px;padding:9px 12px;box-shadow:0 2px #53382024}.room-change-button:hover{background:#fff1c8}.classic-stat-grid .stat-thirst>i{background:#67bce1}.classic-stat-grid .stat-health>i{background:#9dcb5c}.classic-stat-grid .stat-energy>i{background:#bd9bd8}.classic-app .classic-dock .food-dock-symbol{margin:auto}.companion-panel .compact-stats{gap:7px}.companion-panel .compact-stats label span{width:27px}@media(max-width:700px){.food-dock-symbol{width:48px;height:48px}.food-dock-symbol img{width:36px;height:40px;top:5px}.food-dock-symbol img+img{width:26px;height:37px;left:23px;top:1px}.room-change-button{font-size:9px;padding:6px 8px}.scene-top-actions{gap:7px}}
+
+/* v6: fewer annotations, readable primary controls. */
+.ramu-v6 .classic-logo{display:flex;align-items:center;gap:5px;transform:none}
+.ramu-v6 .classic-logo>img{width:77px;height:77px;object-fit:contain}
+.ramu-v6 .classic-logo>span{font-size:42px}
+.ramu-v6 .room-dock{gap:18px}
+.ramu-v6 .room-dock>button{width:64px}
+.ramu-v6 .room-dock .original-ui-art{height:48px;width:48px;object-fit:contain;margin:auto}
+.ramu-v6 .room-dock .item-art{height:48px;width:48px}
+.ramu-v6 .room-dock>button>b{font-size:14px}
+.ramu-v6 .classic-footer{font-size:12px}
+.ramu-v6 .classic-footer>span{font-size:11px}
+.ramu-v6 .panel-paper{padding:20px 24px}
+.ramu-v6 .paper-tabs button{font-size:14px;padding:8px 5px}
+.ramu-v6 .profile-heading h3{font-size:22px}
+.ramu-v6 .profile-heading>div>span,.ramu-v6 .bean-count{font-size:14px}
+.ramu-v6 .classic-stat label{font-size:14px}
+.ramu-v6 .classic-stat label b{font-size:13px}
+.ramu-v6 .room-condition{font-size:14px;line-height:1.8;margin:18px 0;color:#9a7d50}
+.pet-relationship{display:flex;align-items:center;gap:15px;background:#fff3d5;border:1px solid #eed9ad;padding:12px 15px;border-radius:10px;margin:0 0 20px;font-size:14px}
+.pet-relationship>span{color:#aa8854}
+.room-game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.room-game-grid>article{text-align:center;background:#fff9e8;border:1px solid #e7d3a6;border-radius:12px;padding:18px 10px}
+.room-game-grid>article>img{width:62px;height:68px;object-fit:contain}
+.room-game-grid h3{font-size:17px;margin:8px 0}
+.room-game-grid p{font-size:13px;color:#a18a64;margin:8px 0 16px}
+.room-game-grid .game-button{font-size:13px;min-height:36px;padding:6px 12px}
+.room-game-note{font-size:14px;line-height:1.8;color:#a08358;margin:18px 0 0}
+.slow-growth{margin-top:24px;padding:18px;background:#fff7e3;border-radius:12px;font-size:14px;line-height:1.8}
+.slow-growth h3{font-size:18px;margin-bottom:8px}
+.slow-growth p{margin:7px 0}
+.slow-growth progress{display:block;width:100%;height:10px;margin:15px 0 8px;accent-color:#b7cf64}
+.slow-growth>span{color:#aa8750}
+.ramu-v6 .classic-stage-grid h3{font-size:15px}
+.ramu-v6 .classic-stage-grid article>span{font-size:13px}
+.room-preferences{border:1px solid #e7d2a8;border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.room-rename{display:flex;align-items:center;gap:12px;padding:0 0 14px;font-size:14px}
+.room-rename input{flex:1;min-width:0;border:1px solid #dfc390;border-radius:7px;background:#fffefa;color:#7c6037;padding:8px 10px;font-size:14px}
+.room-toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #f0e5ce;font-size:14px}
+.room-toggle-row>button{font-size:13px;background:#f2eddf;padding:6px 13px;border-radius:6px;color:#9c8966}
+.room-toggle-row>button[aria-checked=true]{background:#e5efc2;color:#6c8238}
+.room-backup{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding-top:15px;border-top:1px solid #f0e5ce}
+.room-backup .plain-danger{margin-left:auto;font-size:14px}
+.ramu-v6 .life-settings label{font-size:14px}
+.ramu-v6 .life-settings select{font-size:14px}
+.ramu-v6 .adoption-panel{width:min(640px,100%);padding:28px 30px}
+.ramu-v6 .adoption-header h1{font-size:28px;margin:0}
+.ramu-v6 .adoption-colors{margin:25px 0}
+.ramu-v6 .adoption-choice>span{font-size:14px}
+.adoption-selected{width:130px;height:141px;margin:20px auto}
+.ramu-v6 .adoption-name{margin:18px 0 25px}
+.ramu-v6 .adoption-name label{font-size:15px}
+.ramu-v6 .adoption-name input{font-size:16px}
+.ramu-v6 .adoption-note{font-size:13px;line-height:1.8;margin:20px 0 0;letter-spacing:0}
+.adoption-back{display:block;margin:18px auto 0;font-size:14px;color:#a87e3e}
+.farewell-page{min-height:100vh;background:#fff6df;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;color:#8a6538}
+.farewell-page>img{width:120px;height:120px;object-fit:contain}
+.farewell-page p{font-size:16px}
+.farewell-confirm{text-align:center;font-size:16px;line-height:1.8}
+.farewell-confirm>div:first-child{width:100px;height:108px;margin:0 auto 15px}
+.farewell-confirm p{margin:15px 0 25px}
+.ramu-v6 .confirm-buttons{justify-content:center}
+.ramu-v6 .scene-top-actions .game-button{font-size:14px}
+@media(max-width:700px){.room-game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.room-preferences{padding:12px}.room-rename{flex-wrap:wrap}.room-rename>label{width:100%}.ramu-v6 .room-dock{gap:9px 12px}.ramu-v6 .room-dock>button{width:57px}.ramu-v6 .room-dock>button>b{font-size:12px}.ramu-v6 .classic-logo>img{width:48px;height:48px}.ramu-v6 .classic-logo>span{font-size:29px}.ramu-v6 .paper-tabs{gap:2px;flex-wrap:wrap}.ramu-v6 .paper-tabs button{font-size:12px}.ramu-v6 .panel-paper{padding:15px}.ramu-v6 .adoption-panel{padding:24px 15px}.ramu-v6 .adoption-choice>span{font-size:12px}.ramu-v6 .adoption-note{font-size:12px}}

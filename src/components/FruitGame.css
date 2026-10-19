@@ -36,3 +36,10 @@
 @keyframes fruit-contact{0%{opacity:1}60%{opacity:1;translate:0 -8px}100%{opacity:0;translate:0 -16px}}
 @keyframes fruit-collected{from{scale:1;opacity:1}to{scale:.15;opacity:0}}
 .fruit-dialog{width:440px;border:1px solid #dbb56c;border-image:none;background:#fffefa;border-radius:12px;box-shadow:0 4px 18px #3523001a;padding:17px 18px}.fruit-heading h2{font-size:19px}.fruit-eyebrow{font-size:9px}.fruit-primary,.fruit-secondary{min-height:34px;padding:6px 15px;background:#fff0c8;border:1px solid #e8c67d;border-radius:7px;color:#94652c;text-shadow:none;font-size:12px}.fruit-secondary{background:#edf5fa;border-color:#c1d9e6;color:#63849a}.fruit-close{width:28px;height:28px}.fruit-description{font-size:11px}.fruit-reward-note{font-size:9px}
+
+/* Readable room games; rewards are coins and supplies. */
+.fruit-description,.fruit-instructions p,.fruit-controls,.fruit-hint,.fruit-result>p{font-size:14px;line-height:1.65}
+.fruit-instructions strong{font-size:15px}
+.fruit-reward-note,.fruit-exit-hint,.fruit-footnote,.fruit-saved,.fruit-reward-saved{font-size:13px;line-height:1.6}
+.fruit-rewards{grid-template-columns:repeat(2,1fr)}
+.fruit-rewards>div>span:last-child{font-size:14px}

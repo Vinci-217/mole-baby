@@ -6,6 +6,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
+const { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 // Run on the Windows runner after electron-builder has produced both targets.
 // Launch the packaged executable, so this also catches broken file:// paths,
@@ -13,8 +14,8 @@ const { expect } = require('@playwright/test');
 const root = path.resolve(__dirname, '..');
 const release = path.join(root, 'release');
 const { version, build } = require('../package.json');
-const portable = `RamuHouse-${version}-x64.zip`;
-const installer = `RamuHouse-${version}-Setup.exe`;
+const portable = `mole-baby-${version}-x64.zip`;
+const installer = `mole-baby-${version}-Setup.exe`;
 const unpacked = path.join(release, 'win-unpacked');
 const executable = path.join(unpacked, `${build.productName}.exe`);
 let desktop;
@@ -47,6 +48,9 @@ async function main() {
     'dist/assets/classic/middle-neutral.png', 'dist/assets/classic/middle-mask.png',
     'dist/assets/original/scenes/ramu-home.png', 'dist/assets/original/scenes/lake-cabin.png', 'dist/assets/original/scenes/original-earthen-home.png',
     'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
+    'dist/assets/generated/v6-starlight-greenhouse.png', 'dist/assets/generated/v6-creek-treehouse.png',
+    'dist/icons/ramu.png', 'dist/icons/tray.png', 'dist/icons/ramu.ico',
+    'dist/assets/original/item-motion/bath-tub.png', 'dist/assets/original/item-motion/toothbrush-generated.png',
     'dist/assets/original/audio/castle.mp3', 'dist/assets/original/audio/pet-shop.mp3', 'dist/assets/original/audio/mystery-lake.mp3',
     'dist/assets/original/items/180027.png', 'dist/assets/original/items/180017.png',
     'dist/assets/original/items/180008.png', 'dist/assets/original/items/180002.png', 'dist/assets/original/items/180003.png',
@@ -56,7 +60,10 @@ async function main() {
     const filename = `dist/assets/original/care/${form}-${layer}.png`;
     assert.ok(paths.has(filename), `Original care animation atlas is missing: ${filename}`);
   }
+  for (const track of ['sunshine-ranch','ramu-school','berry-jungle','snow-rink','playground','magic-carriage','farm-workshop','art-street','raceway']) assert.ok(paths.has(`dist/assets/original/audio/${track}.mp3`), `Missing classic BGM: ${track}`);
+  for (const form of ['junior','middle','senior']) for (const layer of ['neutral','mask']) assert.ok(paths.has(`dist/assets/original/item-motion/${form}-${layer}.png`), 'Missing original per-item body atlas');
   assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).version, version);
+  assert.equal(JSON.parse(asar.extractFile(archive, 'package.json').toString()).build.productName, '拉姆');
   assert.ok(![...paths].some(filename => /^(?:src\/|\.git\/|\.env(?:$|\.))/.test(filename)), 'Development source or local configuration was accidentally packaged');
   console.log('PASS: installer, portable ZIP, executable and required ASAR payload');
 
@@ -74,9 +81,7 @@ async function main() {
   page.on('pageerror', error => rendererErrors.push(error.message));
   assert.ok(page.url().startsWith('file:'), `Expected the packaged renderer: ${page.url()}`);
   await page.waitForFunction(() => window.desktop?.isElectron === true);
-  await page.getByRole('button', { name: '选择红色拉姆', exact: true }).click();
-  await page.locator('#pet-name').fill('红豆');
-  await page.getByRole('button', { name: '带拉姆回家！', exact: true }).click();
+  await adopt(page, '红色', '红豆');
   const character = page.locator('.desktop-character');
   await expect(character).toBeVisible();
   await expect(character).toBeInViewport();
@@ -111,46 +116,48 @@ async function main() {
   assert.equal((await page.evaluate(() => window.companionAI.clearKey())).configured, false);
   assert.equal(fs.existsSync(keyRecord), false);
   console.log('PASS: packaged seed tint, fixed pot, offline speech availability and local-only API key save/reload/clear without network requests');
-  await character.click();
-  await expect(page.getByTestId('pet-actions')).toBeVisible();
-  await page.getByRole('button', { name: '喂食', exact: true }).click();
-  await expect(page.getByTestId('companion-panel')).toBeVisible();
+  const actions = await openActions(page);
+  assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-label'))), ['查看状态','喂食','洗澡','玩耍','休息','和拉姆说话','进入小屋']);
+  await actions.getByRole('button', { name: '喂食', exact: true }).click();
+  const panel = page.getByTestId('companion-panel'); await expect(panel).toBeVisible();
   const expanded = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
-  assert.equal(expanded.width, 540); assert.equal(expanded.height, 390);
+  assert.equal(expanded.width, 540); assert.equal(expanded.height, 490);
   assert.equal((await page.evaluate(() => window.desktop.getState())).petMode, true);
   assert.equal(await page.locator('.cottage-scene').count(), 0);
-  const panel = page.getByTestId('companion-panel'), pocket = panel.locator('.care-pocket');
-  await expect(pocket.getByRole('button', { name: '使用熊熊饼干', exact: true })).toBeDisabled();
-  await pocket.getByRole('button', { name: '拉姆商店', exact: true }).click();
-  await pocket.getByRole('button', { name: '购买熊熊饼干', exact: true }).click();
+  assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态','背包','玩耍','对话']);
+  assert.equal(await panel.locator('.pocket-slot').count(), 9);
+  await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
+  await panel.getByRole('button', { name: '到小屋补充', exact: false }).click();
+  await expect(page.locator('.shop-book')).toBeVisible();
+  await buy(page, 'biscuit', '熊熊饼干');
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).coins)).toBe(85);
-  await pocket.getByRole('button', { name: '我的背包', exact: true }).click();
-  await pocket.getByRole('button', { name: '使用熊熊饼干', exact: true }).click();
+  await roomTab(page, '背包'); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).inventory.biscuit)).toBe(0);
-  await page.getByRole('button', { name: '休息', exact: true }).click();
-  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame', '4');
-  await page.getByRole('button', { name: '叫醒', exact: true }).first().click();
-  await panel.getByRole('tab', { name: '设置', exact: true }).click();
-  await panel.getByRole('button', { name: '拉姆小屋', exact: true }).click();
-  await panel.getByLabel('小屋背景音乐', { exact: true }).uncheck();
-  await panel.getByRole('button', { name: '进入小屋', exact: true }).click();
-  await expect(page.locator('.cottage-scene')).toBeVisible();
-  assert.ok(await page.locator('.cottage-scene').evaluate(node => getComputedStyle(node).backgroundImage.includes('/assets/original/scenes/ramu-home.png')));
-  await page.getByRole('button', { name: '回到桌面陪我 ▸', exact: true }).click();
-  await expect(character).toBeInViewport();
-  await character.click(); await page.getByRole('button', { name: '喂食', exact: true }).click();
-  await page.getByLabel('关闭小窗').click();
-  await expect.poll(() => desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds().width)).toBe(200);
-  await expect.poll(() => page.evaluate(() => [innerWidth, innerHeight])).toEqual([200, 240]);
+  await roomTab(page, '设置');
+  const media = page.locator('.room-settings');
+  assert.equal(await media.getByRole('group',{name:'选择背景音乐',exact:true}).getByRole('button').count(),12);
+  await media.getByRole('button', { name: '星光温室', exact: true }).click();
+  await media.getByLabel('小屋背景音乐', { exact: true }).uncheck();
+  await media.getByRole('button', {name:'预览夜晚',exact:true}).click();
+  await expect(page.locator('.cottage-scene')).toHaveAttribute('data-phase','night');
+  await page.locator('.time-scene-art img').evaluate(img => img.decode());
+  assert.ok((await page.locator('.time-scene-art img').getAttribute('src')).endsWith('/assets/generated/v6-starlight-greenhouse.png'));
+  await toDesktop(page); await openActions(page); await actions.getByRole('button',{name:'休息',exact:true}).click();
+  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','4');
+  await actions.getByRole('button',{name:'叫醒',exact:true}).click();
   await page.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1')); pet.growth = 180; localStorage.setItem('ramu-house-save-v1', JSON.stringify(pet)); });
-  await page.reload();
-  await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible();
-  await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-color', 'red');
-  assert.equal(await character.locator('[data-fallback]').count(), 0, 'grown original and care sheets load without fallback in ASAR');
-  fs.mkdirSync(path.join(root, 'artifacts'), { recursive: true });
-  await page.screenshot({ path: path.join(root, 'artifacts', 'v5-windows-smoke.png') });
-  assert.deepEqual(rendererErrors, []);
-  console.log('PASS: packaged Windows application starts, uses original assets, buys/consumes supplies, sleeps with closed eyes, switches room backgrounds and opens compact care beside the pet');
+  await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible();
+  await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-color','red');
+  assert.equal(await character.locator('[data-fallback]').count(),0);
+  await page.evaluate(async () => { await window.desktop.wander(false); await window.desktop.setEdgeHiding(false); });
+  fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
+  await page.screenshot({path:path.join(root,'artifacts','v6-windows-smoke.png')});
+  await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());
+  await expect.poll(() => desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);
+  assert.equal(await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().length),1, 'close must keep the tray process alive');
+  await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].show());
+  await expect(character).toBeVisible(); assert.deepEqual(rendererErrors,[]);
+  console.log('PASS: packaged Windows tray lifecycle, seed color/fixed pot, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene');
 
   const sums = [];
   for (const filename of [portable, installer]) {
@@ -163,6 +170,6 @@ async function main() {
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
-  try { if (desktop) await desktop.close(); }
+  try { if (desktop) await desktop.evaluate(({ app }) => app.quit()).catch(() => {}); }
   finally { if (profile) fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 250 }); }
 });

@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { chromium, expect } = require('@playwright/test');
+const { adopt } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const url = 'http://127.0.0.1:5188';
 const server = spawn(process.execPath, [path.join(root, 'node_modules/vite/bin/vite.js'), '--host', '127.0.0.1', '--port', '5188', '--strictPort'], { cwd: root, stdio: 'pipe' });
@@ -49,7 +50,7 @@ async function readMemory(page) {
     } });
   });
   await page.goto(url);
-  await page.getByRole('button', { name: '带拉姆回家！', exact: true }).click();
+  await adopt(page, '粉色', '小拉姆');
   await page.getByTestId('desktop-character').click();
   await page.getByRole('button', { name: '和拉姆说话', exact: true }).click();
   await page.getByText('DeepSeek · 联网对话', { exact: true }).waitFor();

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PetColor, Stage } from '../game'
+import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, type ItemMotion } from '../item-motion'
 import './Ram.css'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose } from './ram-animation'
 
@@ -12,13 +13,15 @@ interface RamProps {
   /** Compatibility only: every rendering path uses original game artwork. */
   artStyle?: 'classic' | 'hd'
   actionId?: number | string
+  /** The exact consumed item, retained for the whole finite care animation. */
+  itemId?: string
   dragTilt?: number
   dragging?: boolean
   shaking?: boolean
   onActionEnd?: () => void
 }
 type Form = 'junior' | 'middle' | 'senior'
-type SheetKind = 'classic' | 'care' | 'seed'
+type SheetKind = 'classic' | 'care' | 'seed' | 'item'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -38,10 +41,12 @@ const ACTION_NAMES: Record<string, string> = {
   thirsty: '有些口渴', dirty: '需要清洁', tired: '有点困了',
   sleep: '闭着眼睛睡觉，点击休息按钮可唤醒', wake: '慢慢醒来了', waiting: '安静地等你',
   drag: '被轻轻提起来了', running: '正在活动', play: '开心地玩耍', happy: '很开心', reward: '很开心', review: '很开心',
+  peek: '从角落探出头看你', hide: '在角落安静地陪伴',
 }
 function sheetSpec(form: Form, kind: SheetKind) {
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'care') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * CARE_ROWS, neutral: `./assets/original/care/${form}-neutral.png`, mask: `./assets/original/care/${form}-mask.png` }
+  if (kind === 'item') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * 4, neutral: `./assets/original/item-motion/${form}-neutral.png`, mask: `./assets/original/item-motion/${form}-mask.png` }
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
 }
 async function loadPng(path: string, width: number, height: number) {
@@ -99,19 +104,37 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
   tintedCache.set(key, pending)
   return pending
 }
-function ClassicFrames({ form, color, action, actionId, onError, onActionEnd }: {
+/** Body and accessory consume the exact same elapsed event clock. The
+ * accessory is moved, not used to resize/re-register the original body. */
+function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined, elapsed: number, reduced: boolean) {
+  if (!motion) return
+  const root = canvas.closest<HTMLElement>('.ram-sprite')
+  if (!root) return
+  const pose = sampleItemMotion(motion, elapsed, reduced)
+  const anchor = getItemMouthAnchor(canvas.dataset.form, motion, pose.bodyFrame)
+  const vars: Record<string, string> = {
+    '--care-mouth-x': `${anchor[0]}%`, '--care-mouth-y': `${anchor[1]}%`,
+    '--care-x': `${pose.x}%`, '--care-y': `${pose.y}%`, '--care-angle': `${pose.angle}deg`,
+    '--care-scale-x': String(pose.scaleX), '--care-scale-y': String(pose.scaleY), '--care-opacity': String(pose.opacity),
+    '--care-progress': String(pose.progress), '--care-activity': String(pose.activity),
+    '--care-lift': `${pose.activity * -12}%`, '--care-wave': `${Math.sin(pose.activity * motion.beats * Math.PI * 2) * 2}%`,
+  }
+  for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
+}
+function ClassicFrames({ form, color, action, actionId, itemMotion, onError, onActionEnd }: {
   form: Form; color: PetColor; action: string; actionId?: string | number;
+  itemMotion?: ItemMotion;
   onError: () => void; onActionEnd?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
-  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement } | null>(null)
+  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement } | null>(null)
   const key = `${form}:${color}`
   const sheets = ready?.key === key ? ready : null
   useEffect(() => {
     let cancelled = false
-    Promise.all([getTintedSheet(form, color, 'classic'), getTintedSheet(form, color, 'care')]).then(([classic, care]) => { if (!cancelled) setReady({ key, classic, care }) }).catch(() => { if (!cancelled) errorRef.current() })
+    Promise.all([getTintedSheet(form, color, 'classic'), getTintedSheet(form, color, 'care'), getTintedSheet(form, color, 'item')]).then(([classic, care, item]) => { if (!cancelled) setReady({ key, classic, care, item }) }).catch(() => { if (!cancelled) errorRef.current() })
     return () => { cancelled = true }
   }, [form, color, key])
   useEffect(() => {
@@ -124,10 +147,11 @@ function ClassicFrames({ form, color, action, actionId, onError, onActionEnd }: 
       if (last && now - last < 250) elapsed += now - last
       last = now
       const pose = sampleRamPose(action, elapsed, media.matches)
+      paintItemCue(canvas, itemMotion, elapsed, media.matches)
       const signature = `${pose.sheet ?? 'classic'}:${pose.row}:${pose.frame}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
-        context.drawImage(pose.sheet === 'care' ? sheets.care : sheets.classic, pose.frame * CELL_WIDTH, pose.row * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT, 0, 0, CELL_WIDTH, CELL_HEIGHT)
+        context.drawImage(pose.sheet === 'care' ? sheets.care : pose.sheet === 'item' ? sheets.item : sheets.classic, pose.frame * CELL_WIDTH, pose.row * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT, 0, 0, CELL_WIDTH, CELL_HEIGHT)
         canvas.dataset.row = String(pose.row); canvas.dataset.frame = String(pose.frame); canvas.dataset.sheet = pose.sheet ?? 'classic'; canvas.dataset.loaded = 'true'; previous = signature
       }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
@@ -138,10 +162,10 @@ function ClassicFrames({ form, color, action, actionId, onError, onActionEnd }: 
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [sheets, action, actionId])
+  }, [sheets, action, actionId, itemMotion])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
-function SeedBody({ color, action, actionId, onActionEnd }: { color: PetColor; action: string; actionId?: string | number; onActionEnd?: () => void }) {
+function SeedBody({ color, action, actionId, itemMotion, onActionEnd }: { color: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; onActionEnd?: () => void }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   useEffect(() => {
@@ -153,6 +177,7 @@ function SeedBody({ color, action, actionId, onActionEnd }: { color: PetColor; a
       if (last && now - last < 250) elapsed += now - last
       last = now
       const pose = sampleSeedPose(action, elapsed, media.matches)
+      if (ref.current) paintItemCue(ref.current, itemMotion, elapsed, media.matches)
       if (previous !== pose.frame) {
         const c = ref.current?.getContext('2d')
         c?.clearRect(0, 0, 96, 99); c?.drawImage(source, pose.frame % 8 * 96, Math.floor(pose.frame / 8) * 99, 96, 99, 0, 0, 96, 99)
@@ -166,23 +191,37 @@ function SeedBody({ color, action, actionId, onActionEnd }: { color: PetColor; a
     getTintedSheet('junior', color, 'seed').then(loaded => { if (!cancelled) { source = loaded; resume() } }).catch(() => {})
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [color, action, actionId])
+  }, [color, action, actionId, itemMotion])
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
-export default function Ram({ color, stage, action = 'idle', sleeping = false, className = '', actionId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+function ItemCue({ motion }: { motion: ItemMotion }) {
+  const clean = motion.body === 'wash'
+  return <span className={`ram-item-cue gesture-${motion.gesture}`} style={{ color: motion.accent }} aria-hidden="true" data-item-id={motion.itemId} data-item-gesture={motion.gesture}>
+    {motion.gesture === 'bath' && <img className="ram-care-tub" src="./assets/original/item-motion/bath-tub.png" alt="" draggable={false}/>}
+    <img className={`ram-care-item ${motion.gesture === 'brush' ? 'ram-care-toothpaste' : ''}`} src={motion.image} alt="" draggable={false}/>
+    {motion.gesture === 'brush' && <img className="ram-care-brush" src="./assets/original/item-motion/toothbrush-generated.png" alt="" draggable={false}/>}
+    {(clean || motion.gesture === 'fizz' || motion.gesture === 'medicine' || motion.gesture === 'glow' || motion.gesture === 'crunch' || motion.gesture === 'pour-beans') && <span className="ram-care-particles">{Array.from({ length: clean ? 6 : 3 }, (_, index) => <i key={index}/>)}</span>}
+    {motion.gesture === 'stretch' && <span className="ram-care-soft-puff"/>}
+    {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
+  </span>
+}
+export default function Ram({ color, stage, action = 'idle', sleeping = false, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const form: Form = stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
-  const activeAction = sleeping || action === 'sleep' ? 'sleep' : dragging && stage > 0 ? 'drag' : action
+  const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
+  const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
+  const activeAction = sleeping || action === 'sleep' ? 'sleep' : dragging && stage > 0 ? 'drag' : itemMotion ? itemMotion.action : action
   const resting = activeAction === 'sleep', key = `${form}:${color}`
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt))
-  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级'][stage]}拉姆，${stage === 0 ? '花盆固定，' : ''}${ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级'][stage]}拉姆，${stage === 0 ? '花盆固定，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${resting ? 'is-sleeping' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} onActionEnd={onActionEnd}/></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} action={activeAction} actionId={actionId} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}
     {resting && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}
+    {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
   </span>
 }

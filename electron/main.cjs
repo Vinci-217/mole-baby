@@ -1,20 +1,37 @@
-const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage, Tray, Menu, nativeImage } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { createCompanionAI } = require('./deepseek.cjs');
 const { createCompanionSpeech } = require('./speech.cjs');
+const { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop } = require('./desktop-geometry.cjs');
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
-const PET_SIZE = { width: 200, height: 240 };
-const COMPANION_SIZE = { width: 540, height: 390 };
+const COMPANION_SIZE = { width: 540, height: 490 };
 const COMPANION_EXTENSION = {
   x: COMPANION_SIZE.width - PET_SIZE.width,
   y: COMPANION_SIZE.height - PET_SIZE.height,
 };
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
 const INDEX_PATH = path.join(__dirname, '..', 'dist', 'index.html');
+
+// Keep the complete old Chromium profile (save, memories and encrypted Key)
+// when the visible product name changes. Development keeps its existing path.
+const originalUserDataPath = app.getPath('userData');
+const legacyProfiles = [
+  path.join(app.getPath('appData'), 'mole-baby'),
+  path.join(app.getPath('appData'), '拉姆陪伴'),
+  originalUserDataPath,
+];
+const explicitProfile = app.commandLine?.getSwitchValue('user-data-dir');
+const stableUserDataPath = explicitProfile ? path.resolve(explicitProfile)
+  : app.isPackaged
+    ? legacyProfiles.find(profile => ['Local Storage', 'window-state.json', 'companion-ai-key.json']
+      .some(filename => fs.existsSync(path.join(profile, filename)))) || legacyProfiles[0]
+    : originalUserDataPath;
+app.setPath('userData', stableUserDataPath);
+app.setName('拉姆');
 
 let mainWindow = null;
 let rendererURL = '';
@@ -35,6 +52,16 @@ let petCanMove = true;
 let mousePassthrough = false;
 let companionAI = null;
 let companionSpeech = null;
+let tray = null;
+let quitting = false;
+let rendererReady = false;
+let hasPet = false;
+let wanderPreference = true;
+let edgeHiding = true;
+let edgeSide = null;
+let edgePose = 'visible';
+let edgeTimer = null;
+let interacting = false;
 
 function getDesktopState() {
   return {
@@ -44,6 +71,9 @@ function getDesktopState() {
     motion,
     companionPanel,
     panelSide,
+    edgeSide,
+    edgePose,
+    edgeHiding,
   };
 }
 
@@ -51,6 +81,7 @@ function publishState(includePetMode = false) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   mainWindow.webContents.send('desktop:state-changed', getDesktopState());
   if (includePetMode) mainWindow.webContents.send('desktop:pet-mode-changed', petMode);
+  refreshTrayMenu();
 }
 
 function stopMovement() {
@@ -68,8 +99,95 @@ function changeMotion(next) {
 }
 
 function canWander() {
-  return mainWindow && !mainWindow.isDestroyed() && !mainWindow.isMinimized()
-    && petMode && wandering && petCanMove && !companionPanel && !dragging;
+  return canMoveOnDesktop() && wandering && edgeSide === null;
+}
+
+function canMoveOnDesktop() {
+  return Boolean(mainWindow && !mainWindow.isDestroyed() && canAnimateDesktop({
+    visible: mainWindow.isVisible() && !mainWindow.isMinimized(), petMode,
+    petCanMove, panel: companionPanel, dragging, interacting,
+  }));
+}
+
+function revealPet() {
+  clearTimeout(edgeTimer);
+  edgeTimer = null;
+  const changed = edgePose !== 'visible' || edgeSide !== null;
+  edgePose = 'visible';
+  edgeSide = null;
+  if (changed) publishState();
+  return getDesktopState();
+}
+
+function schedulePeek() {
+  clearTimeout(edgeTimer);
+  if (!edgeSide || !edgeHiding || !canMoveOnDesktop()) return;
+  edgeTimer = setTimeout(() => {
+    if (!edgeSide || !edgeHiding || !canMoveOnDesktop()) { revealPet(); return; }
+    edgePose = edgePose === 'hidden' ? 'peek' : 'hidden';
+    publishState();
+    schedulePeek();
+  }, edgePose === 'visible' ? 1600 : edgePose === 'peek' ? 2600 : 10000 + Math.random() * 9000);
+}
+
+function tuckIntoCorner(force = false) {
+  if (!edgeHiding || !canMoveOnDesktop()) return false;
+  const bounds = currentPetBounds();
+  const area = screen.getDisplayMatching(bounds).workArea;
+  const side = force
+    ? bounds.x + bounds.width / 2 < area.x + area.width / 2 ? 'left' : 'right'
+    : cornerSide(bounds, area);
+  if (!side) return false;
+  stopMovement();
+  const target = cornerBounds(bounds, area, side);
+  mainWindow.setPosition(target.x, target.y, false);
+  edgeSide = side;
+  edgePose = 'visible';
+  publishState();
+  scheduleSave();
+  schedulePeek();
+  return true;
+}
+
+function changeEdgeHiding(enabled) {
+  if (typeof enabled !== 'boolean') throw new TypeError('Edge hiding must be a boolean');
+  edgeHiding = enabled;
+  if (!enabled) { revealPet(); scheduleWander(); }
+  scheduleSave();
+  publishState();
+  return edgeHiding;
+}
+
+function changeInteracting(enabled) {
+  if (typeof enabled !== 'boolean') throw new TypeError('Interaction state must be a boolean');
+  if (enabled === interacting) return interacting;
+  interacting = enabled;
+  if (enabled) { stopMovement(); revealPet(); }
+  else if (!tuckIntoCorner()) scheduleWander();
+  return interacting;
+}
+
+function walkToCorner() {
+  if (!canMoveOnDesktop()) return;
+  revealPet();
+  stopMovement();
+  const start = currentPetBounds();
+  const area = screen.getDisplayMatching(start).workArea;
+  const side = start.x + start.width / 2 < area.x + area.width / 2 ? 'left' : 'right';
+  const target = cornerBounds(start, area, side);
+  const distance = Math.hypot(target.x - start.x, target.y - start.y);
+  if (distance < 2) { tuckIntoCorner(true); return; }
+  const startedAt = Date.now();
+  const duration = Math.max(1600, Math.min(12000, distance / 85 * 1000));
+  changeMotion(target.x < start.x ? 'left' : 'right');
+  movementTimer = setInterval(() => {
+    if (!canMoveOnDesktop()) { stopMovement(); return; }
+    const progress = Math.min(1, (Date.now() - startedAt) / duration);
+    const eased = progress * progress * (3 - 2 * progress);
+    mainWindow.setPosition(Math.round(start.x + (target.x - start.x) * eased),
+      Math.round(start.y + (target.y - start.y) * eased), false);
+    if (progress === 1) { stopMovement(); tuckIntoCorner(true); }
+  }, 33);
 }
 
 function scheduleWander() {
@@ -121,6 +239,7 @@ function walkAlongDesktop() {
 
 function startPetDrag() {
   if (!petMode || !petCanMove) return false;
+  revealPet();
   if (companionPanel) changeCompanionPanel(false);
   dragging = true;
   stopMovement();
@@ -130,7 +249,7 @@ function startPetDrag() {
 function endPetDrag() {
   dragging = false;
   scheduleSave();
-  scheduleWander();
+  if (!tuckIntoCorner()) scheduleWander();
   return true;
 }
 
@@ -141,6 +260,7 @@ function movePet(dx, dy) {
     throw new TypeError('Pet movement must use finite screen-coordinate deltas');
   }
   if (!petMode || !petCanMove) return false;
+  revealPet();
   if (companionPanel) changeCompanionPanel(false);
   stopMovement();
   const current = mainWindow.getBounds();
@@ -155,10 +275,13 @@ function movePet(dx, dy) {
 
 function changeWandering(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Wandering must be a boolean');
-  wandering = enabled && petCanMove;
+  wanderPreference = enabled;
+  wandering = wanderPreference && petCanMove;
+  if (enabled) revealPet();
   stopMovement();
   scheduleWander();
   publishState();
+  scheduleSave();
   return wandering;
 }
 
@@ -166,7 +289,8 @@ function changePetCanMove(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mobility must be a boolean');
   if (petCanMove === enabled) return petCanMove;
   petCanMove = enabled;
-  if (!enabled) { dragging = false; wandering = false; }
+  if (!enabled) { dragging = false; revealPet(); }
+  wandering = wanderPreference && enabled;
   stopMovement();
   scheduleWander();
   publishState();
@@ -215,6 +339,7 @@ function companionBounds(base) {
 function changeCompanionPanel(open) {
   if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
   if (!petMode || open === companionPanel) return getDesktopState();
+  if (open) revealPet();
   stopMovement();
   const base = currentPetBounds();
   const target = open ? companionBounds(base) : clampBounds(base, PET_SIZE);
@@ -251,6 +376,8 @@ function loadWindowState() {
       ...PET_SIZE,
     } : null;
     normalAlwaysOnTop = state.normalAlwaysOnTop === true;
+    wanderPreference = state.wandering !== false;
+    edgeHiding = state.edgeHiding !== false;
   } catch {
     // A missing or interrupted preferences file should never prevent startup.
   }
@@ -269,7 +396,7 @@ function saveWindowState() {
   try {
     const filename = settingsPath();
     fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ normalBounds, petBounds, normalAlwaysOnTop }));
+    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ normalBounds, petBounds, normalAlwaysOnTop, wandering: wanderPreference, edgeHiding }));
     fs.renameSync(`${filename}.tmp`, filename);
   } catch (error) {
     console.warn('Unable to save window position:', error.code || error.name);
@@ -285,6 +412,7 @@ function scheduleSave() {
 function clampBounds(bounds, fallbackSize) {
   const display = validBounds(bounds) ? screen.getDisplayMatching(bounds) : screen.getPrimaryDisplay();
   const area = display.workArea;
+  if (fallbackSize === PET_SIZE) return fitPetBounds(bounds, area);
   const minimum = fallbackSize === PET_SIZE ? PET_SIZE : NORMAL_MINIMUM;
   const width = fallbackSize === PET_SIZE ? PET_SIZE.width
     : Math.min(Math.max(minimum.width, Math.round(bounds?.width || fallbackSize.width)), area.width);
@@ -342,6 +470,7 @@ function changePetMode(enabled) {
   if (enabled === petMode) return petMode;
 
   stopMovement();
+  revealPet();
   dragging = false;
   rememberBounds();
   changeMousePassthrough(false);
@@ -350,12 +479,7 @@ function changePetMode(enabled) {
   panelSide = 'right';
   if (enabled) {
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
-    const current = normalBounds || mainWindow.getBounds();
-    const target = clampBounds({
-      x: petBounds?.x ?? current.x + current.width - PET_SIZE.width,
-      y: petBounds?.y ?? current.y + current.height - PET_SIZE.height,
-      ...PET_SIZE,
-    }, PET_SIZE);
+    const target = clampBounds(petBounds, PET_SIZE);
     petMode = true;
     applyMinimum(target, true);
     mainWindow.setResizable(false);
@@ -378,6 +502,78 @@ function changePetMode(enabled) {
   return petMode;
 }
 
+function iconPath(filename) {
+  const built = path.join(__dirname, '..', 'dist', 'icons', filename);
+  return fs.existsSync(built) ? built : path.join(__dirname, '..', 'public', 'icons', filename);
+}
+
+function hideToTray() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  companionAI?.cancel();
+  companionSpeech?.cancel();
+  dragging = false;
+  stopMovement();
+  revealPet();
+  changeMousePassthrough(false);
+  saveWindowState();
+  mainWindow.hide();
+  publishState();
+}
+
+function showFromTray(home = false) {
+  if (!mainWindow || mainWindow.isDestroyed()) { createWindow(); return; }
+  revealPet();
+  changePetMode(hasPet && !home);
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+  scheduleWander();
+}
+
+function markRendererReady(adopted) {
+  if (typeof adopted !== 'boolean') return;
+  hasPet = adopted;
+  refreshTrayMenu();
+  // React calls this after painting its first correctly sized mode. It also
+  // updates adoption state later, without reopening a window hidden to tray.
+  if (rendererReady || !mainWindow || mainWindow.isDestroyed()) return;
+  rendererReady = true;
+  mainWindow.show();
+  scheduleWander();
+}
+
+function refreshTrayMenu() {
+  if (!tray || tray.isDestroyed()) return;
+  const movable = hasPet && petCanMove;
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
+    { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
+    { type: 'separator' },
+    { label: '散步', type: 'checkbox', checked: wandering, enabled: movable, click: item => {
+      if (!mainWindow.isVisible()) showFromTray();
+      changeWandering(item.checked);
+    } },
+    { label: '躲到角落', enabled: movable, click: () => {
+      showFromTray();
+      changeEdgeHiding(true);
+      walkToCorner();
+    } },
+    { label: '暂停躲藏', type: 'checkbox', checked: !edgeHiding, click: item => changeEdgeHiding(!item.checked) },
+    { type: 'separator' },
+    { label: '退出拉姆', click: () => { quitting = true; app.quit(); } },
+  ]));
+}
+
+function createTray() {
+  if (tray && !tray.isDestroyed()) return;
+  const image = nativeImage.createFromPath(iconPath('tray.png'));
+  tray = new Tray(image);
+  tray.setToolTip('拉姆 · mole-baby');
+  tray.on('click', () => showFromTray());
+  tray.on('double-click', () => showFromTray());
+  refreshTrayMenu();
+}
+
 function registerIPC() {
   handle('companion-ai:get-settings', () => companionAI.getSettings());
   handle('companion-ai:set-key', (key) => companionAI.setKey(key));
@@ -385,10 +581,20 @@ function registerIPC() {
   handle('companion-ai:chat', (messages) => companionAI.chat(messages));
   listen('companion-ai:cancel', () => companionAI.cancel());
   handle('companion-speech:get-availability', () => companionSpeech.getAvailability());
-  handle('companion-speech:listen', () => companionSpeech.listen());
+  handle('companion-speech:listen', () => {
+    // A renderer may finish its availability probe after the user has closed
+    // the window to tray. Checking at the microphone boundary prevents that
+    // stale continuation from starting a recording in a hidden window.
+    if (!mainWindow || mainWindow.isDestroyed() || !mainWindow.isVisible() || mainWindow.isMinimized()) {
+      throw new Error('请先从托盘打开拉姆，再开始语音输入。');
+    }
+    return companionSpeech.listen();
+  });
   listen('companion-speech:cancel', () => companionSpeech.cancel());
-  listen('desktop:minimize', () => mainWindow.minimize());
-  listen('desktop:close', () => app.quit());
+  listen('desktop:minimize', hideToTray);
+  listen('desktop:close', hideToTray);
+  listen('desktop:hide-to-tray', hideToTray);
+  listen('desktop:ready-to-show', markRendererReady);
   handle('desktop:toggle-always-on-top', () => {
     const enabled = !mainWindow.isAlwaysOnTop();
     mainWindow.setAlwaysOnTop(enabled, 'floating');
@@ -400,6 +606,9 @@ function registerIPC() {
   handle('desktop:set-pet-mode', changePetMode);
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
+  handle('desktop:set-edge-hiding', changeEdgeHiding);
+  handle('desktop:set-interacting', changeInteracting);
+  handle('desktop:reveal-pet', revealPet);
   handle('desktop:get-state', getDesktopState);
   handle('desktop:move-pet', movePet);
   handle('desktop:start-pet-drag', startPetDrag);
@@ -416,12 +625,15 @@ function registerIPC() {
 
 function createWindow() {
   petMode = false;
-  wandering = false;
+  wandering = wanderPreference;
   dragging = false;
   companionPanel = false;
   panelSide = 'right';
   petCanMove = true;
   mousePassthrough = false;
+  interacting = false;
+  rendererReady = false;
+  revealPet();
   const bounds = clampBounds(normalBounds, NORMAL_SIZE);
   const area = screen.getDisplayMatching(bounds).workArea;
   const useDevelopmentServer = !app.isPackaged
@@ -432,13 +644,14 @@ function createWindow() {
     ...bounds,
     minWidth: Math.min(NORMAL_MINIMUM.width, area.width),
     minHeight: Math.min(NORMAL_MINIMUM.height, area.height),
-    title: '拉姆陪伴',
-    icon: path.join(__dirname, '..', 'dist', 'favicon.png'),
+    title: '拉姆',
+    icon: iconPath('ramu.png'),
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
     hasShadow: false,
     show: false,
+    skipTaskbar: true,
     autoHideMenuBar: true,
     alwaysOnTop: normalAlwaysOnTop,
     webPreferences: {
@@ -453,16 +666,19 @@ function createWindow() {
 
   const window = mainWindow;
   window.setMenu(null);
-  window.once('ready-to-show', () => window.show());
   window.on('move', scheduleSave);
   window.on('resize', scheduleSave);
   window.on('always-on-top-changed', () => publishState());
-  window.on('minimize', stopMovement);
+  window.on('minimize', event => { event.preventDefault(); hideToTray(); });
   window.on('restore', scheduleWander);
   window.on('blur', () => { if (dragging) endPetDrag(); });
-  window.on('close', () => { companionAI.cancel(); companionSpeech.cancel(); saveWindowState(); });
+  window.on('close', event => {
+    if (!quitting) { event.preventDefault(); hideToTray(); return; }
+    companionAI.cancel(); companionSpeech.cancel(); saveWindowState();
+  });
   window.on('closed', () => {
     stopMovement();
+    clearTimeout(edgeTimer);
     clearTimeout(saveTimer);
     mainWindow = null;
   });
@@ -493,10 +709,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (!mainWindow) return;
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.show();
-    mainWindow.focus();
+    showFromTray();
   });
   app.whenReady().then(() => {
     app.setAppUserModelId('com.molebaby.ramuhouse');
@@ -505,9 +718,11 @@ if (!app.requestSingleInstanceLock()) {
     loadWindowState();
     registerIPC();
     createWindow();
+    createTray();
     const keepWindowVisible = () => {
       if (!mainWindow || mainWindow.isDestroyed()) return;
       stopMovement();
+      revealPet();
       const base = petMode ? clampBounds(currentPetBounds(), PET_SIZE) : null;
       const bounds = petMode
         ? companionPanel ? companionBounds(base) : base
@@ -523,12 +738,16 @@ if (!app.requestSingleInstanceLock()) {
     screen.on('display-removed', keepWindowVisible);
     screen.on('display-metrics-changed', keepWindowVisible);
     app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+      showFromTray();
     });
   }).catch((error) => {
     console.error('Unable to start the pet application:', error.message);
     app.quit();
   });
-  app.on('before-quit', () => { companionAI?.dispose(); companionSpeech?.dispose(); stopMovement(); saveWindowState(); });
-  app.on('window-all-closed', () => app.quit());
+  app.on('before-quit', () => {
+    quitting = true;
+    companionAI?.dispose(); companionSpeech?.dispose(); stopMovement(); clearTimeout(edgeTimer); saveWindowState();
+  });
+  app.on('will-quit', () => { if (tray && !tray.isDestroyed()) tray.destroy(); });
+  app.on('window-all-closed', () => { if (quitting) app.quit(); });
 }

@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "kind": "original-generated-backgrounds",
+  "official_client_asset": false,
+  "images": [
+    {
+      "file": "v6-starlight-greenhouse.png",
+      "source": "/workspace/generated_images/exec-f0aa10f8-04c9-4e14-8e6a-2ccf7dc6e11a.png",
+      "prompt": "Generate one opaque image sheet with EXACTLY FOUR equal landscape panels arranged in a clean 2 by 2 grid, no gutters and no dividing border; each panel is 16:10 and depicts exactly the SAME room from exactly the same camera with identical furniture positions. Top-left morning, top-right noon, bottom-left dusk, bottom-right night. No labels or lettering. This sheet will be cropped into four backgrounds. Study attached original early Chinese Flash browser-game references: image1 ramu-home supplies simplified warm outlines and flat stage language; image2 lake-cabin supplies slightly crooked wooden structure and large clear ground; image3 reference-pet-panel supplies only flat crisp color conventions, DO NOT copy any UI; image4 biscuit supplies only simple highlights. Create a NEW original leaf-roof greenhouse inside a hollow tree: large cyan glass arched roof at back, chunky warm yellow-brown frame, two broad-leaf plants in simple clay pots at left, small watering can and two oversized simple gardening books at back right; a leaf-shaped hanging lamp upper right. Broad honey-yellow wooden platform occupies lower half, CENTRAL LOWER floor clear empty and low detail. Warm dark-brown continuous contours, mildly irregular curves and few short angular edges, clean flat Flash game vector-like illustration but output raster, only 2-4 broad hard-edged colors per material. Simple large shapes, sunny lively green and honey amber, no tiny busy decoration. Morning pale yellow hard-edged patch; noon clear bright cyan and grass green; dusk peach-coral sky with amber window and lamp; night deep blue sky with small simple stars and warm lamp, stage still readable at night. IMPORTANT every panel same composition/perspective, no changes to object shapes. No characters, no pets, no animals, no faces, no text, no logos, no HUD, no UI, no panel borders. No watercolor, no paper, no brushes, no realistic wood grain, no 3D, no volumetric sunbeams, no blur or depth of field. All art edge to edge opaque. Sheet target 2048x1280 if possible.",
+      "tool": "image_gen.imagegen",
+      "generated_at_local_date": "2026-10-19",
+      "timezone": "Asia/Shanghai",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/scenes/lake-cabin.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png"
+      ],
+      "transparent_background": false,
+      "dimensions": [
+        1586,
+        992
+      ],
+      "usage": "Opaque 2 by 2 scene sheet. Top-left morning, top-right noon, bottom-left dusk, bottom-right night. CSS clips individual panels and uses cover scaling at runtime; no image pixels were edited.",
+      "review": "Actually inspected against original scenes, pet UI and bear biscuit: readable chunky outlines, broad hard-edged color areas, central lower floor clear, no characters or lettering; night includes stars and warm lamp. Geometry has small model-generated differences between phases.",
+      "manual_pixel_edits": "None. Original generated PNG copied byte for byte; no raster repainting, filters or resampling.",
+      "sha256": "555240ef449396a49e1304c6518b4917bde798dc411bb9a4e977c463169d9459",
+      "bytes": 1959521
+    },
+    {
+      "file": "v6-creek-treehouse.png",
+      "source": "/workspace/generated_images/exec-c25a5648-b815-4249-b7ac-9c0db8595d80.png",
+      "prompt": "Generate one opaque image sheet with EXACTLY FOUR equal landscape panels arranged in a 2 by 2 grid, no gutters, no dividing lines. Each panel ratio 16:10, same camera and SAME layout in all four. Top-left morning, top-right noon, bottom-left dusk, bottom-right night. No labels. This is a time-varying original background for a desktop pet. Attached original early Chinese Flash browser-game scenes provide the drawing language: warm dark-brown clean outlines, chunky slightly crooked planks, strong flat green/cyan/honey-yellow colors, only 2-4 broad hard edged color patches per material; do not copy original room positions. Create a new cozy CREEKSIDE TREEHOUSE VERANDA. Wide open-sided wooden pavilion set above a small curving blue stream, a huge tree trunk on far left, curved roof beam upper edge, a rounded little doorway and leaf curtain at back left, a simple wide bench with ONE yellow cushion at back right, one short hanging leaf lantern near upper right. Distant rounded treetops and a little curved bridge visible at back center. Lower half a LARGE EMPTY light honey-colored wooden platform, center clear for pet sprite, bottom 16 percent low detail for toolbar. Few large charming shapes, not a cluttered fantasy tavern. Gentle overhead angle, toy-stage depth from overlap, mildly asymmetric handmade shapes. Morning cyan sky and lemon-yellow short floor patch; noon vivid cyan sky/green forest and short shadows; dusk peach-coral sky and warm amber lantern; night navy sky with few simple small stars, blue stream, amber lamp and warm still readable veranda. Same geometry in each phase, light changes only. Opaque art to every edge. No pets, no characters, no animals, no faces, no text, no labels, no logos, no buttons, no UI, no borders. NO 3D rendering, no watercolor/paper texture, no realistic wood grain, no volumetric lighting, no blurry bokeh. Clean flat Flash-era Chinese children's browser-game art. Target entire sheet2048x1280 if possible.",
+      "tool": "image_gen.imagegen",
+      "generated_at_local_date": "2026-10-19",
+      "timezone": "Asia/Shanghai",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/scenes/lake-cabin.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png"
+      ],
+      "transparent_background": false,
+      "dimensions": [
+        1586,
+        992
+      ],
+      "usage": "Opaque 2 by 2 scene sheet. Top-left morning, top-right noon, bottom-left dusk, bottom-right night. CSS clips individual panels and uses cover scaling at runtime; no image pixels were edited.",
+      "review": "Actually inspected against original scenes, pet UI and bear biscuit: readable chunky outlines, broad hard-edged color areas, central lower floor clear, no characters or lettering; night includes stars and warm lamp. Geometry has small model-generated differences between phases.",
+      "manual_pixel_edits": "None. Original generated PNG copied byte for byte; no raster repainting, filters or resampling.",
+      "sha256": "9a0be4f04b79e1517d0a06e7d5cc88cce28cb1992b16bc03a8db37a2361b0515",
+      "bytes": 1871923
+    }
+  ]
+}

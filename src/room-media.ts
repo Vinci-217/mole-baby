@@ -1,15 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocalScenePhase } from './scene-time';
+import type { ScenePhase, SceneTimeMode } from './scene-time';
 
-export const ROOM_BACKGROUNDS = [
+export interface RoomBackground { id: string; label: string; src: string; phaseSheet?: boolean }
+export const ROOM_BACKGROUNDS: readonly RoomBackground[] = [
   { id: 'morning', label: '晨光书桌', src: './assets/generated/morning-study.png' },
   { id: 'ramu-home', label: '拉姆小屋', src: './assets/original/scenes/ramu-home.png' },
   { id: 'lake-cabin', label: '神秘湖木屋', src: './assets/original/scenes/lake-cabin.png' },
   { id: 'earthen-home', label: '树洞房', src: './assets/original/scenes/original-earthen-home.png' },
-] as const;
+  { id: 'starlight-greenhouse', label: '星光温室', src: './assets/generated/v6-starlight-greenhouse.png', phaseSheet: true },
+  { id: 'creek-treehouse', label: '溪畔树屋', src: './assets/generated/v6-creek-treehouse.png', phaseSheet: true },
+];
 export const ROOM_MUSIC = [
-  { id: 'castle', label: '摩尔城堡', src: './assets/original/audio/castle.mp3' },
-  { id: 'pet-shop', label: '宠物店', src: './assets/original/audio/pet-shop.mp3' },
+  { id: 'castle', label: '摩尔城堡', also: '淘淘乐街 · 粒粒小广场', src: './assets/original/audio/castle.mp3' },
+  { id: 'pet-shop', label: '宠物店', also: '摩尔餐厅 · 游戏小屋', src: './assets/original/audio/pet-shop.mp3' },
   { id: 'mystery-lake', label: '神秘湖', src: './assets/original/audio/mystery-lake.mp3' },
+  { id: 'sunshine-ranch', label: '阳光牧场', also: '开心农场', src: './assets/original/audio/sunshine-ranch.mp3' },
+  { id: 'ramu-school', label: '拉姆学院', src: './assets/original/audio/ramu-school.mp3' },
+  { id: 'berry-jungle', label: '浆果丛林', also: '彩虹瀑布', src: './assets/original/audio/berry-jungle.mp3' },
+  { id: 'snow-rink', label: '摩尔拉雅滑冰场', src: './assets/original/audio/snow-rink.mp3' },
+  { id: 'playground', label: '西部游乐场', also: '东部游乐场 · 拉姆运动场', src: './assets/original/audio/playground.mp3' },
+  { id: 'magic-carriage', label: '魔法马车', src: './assets/original/audio/magic-carriage.mp3' },
+  { id: 'farm-workshop', label: '农场发明屋', src: './assets/original/audio/farm-workshop.mp3' },
+  { id: 'art-street', label: '咕噜艺术街', src: './assets/original/audio/art-street.mp3' },
+  { id: 'raceway', label: '摩摩赛车场', src: './assets/original/audio/raceway.mp3' },
 ] as const;
 export interface RoomMediaPreferences {
   backgroundId: string;
@@ -20,7 +34,11 @@ export interface RoomMediaPreferences {
 export interface RoomMediaController {
   inRoom: boolean;
   settings: RoomMediaPreferences;
-  background: (typeof ROOM_BACKGROUNDS)[number];
+  background: RoomBackground;
+  phase: ScenePhase;
+  localPhase: ScenePhase;
+  timeMode: SceneTimeMode;
+  setTimeMode: (mode: SceneTimeMode) => void;
   customName: string | null;
   playing: boolean;
   error: string | null;
@@ -65,6 +83,9 @@ async function musicStore<T>(mode: IDBTransactionMode, operation: (store: IDBObj
  * Pass speechBusy while recording/talking to soften the music underneath it. */
 export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaController {
   const [settings, setSettings] = useState(loadPreferences);
+  const localPhase = useLocalScenePhase();
+  // Preview is transient. Stored preferences always follow the real local time.
+  const [timeMode, setTimeMode] = useState<SceneTimeMode>('auto');
   const [custom, setCustom] = useState<{ name: string; url: string } | null>(null);
   const [customLoaded, setCustomLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -94,7 +115,9 @@ export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaCont
     return () => { live = false; if (customUrl.current) URL.revokeObjectURL(customUrl.current); };
   }, []);
   const resumeMusic = useCallback(() => {
-    if (!active.current || !audio.current) return;
+    // A room can remain mounted while the native window lives in the tray.
+    // Guard every playback entry, including a track change while hidden.
+    if (!active.current || document.visibilityState === 'hidden' || !audio.current) return;
     void audio.current.play().then(() => setError(null)).catch(reason => {
       if (reason instanceof DOMException && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')) return;
       setError('这首音乐暂时无法播放，可以换一首或重新导入。');
@@ -105,7 +128,10 @@ export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaCont
     if (!customLoaded) return;
     const element = new Audio(source); element.loop = true; element.preload = 'metadata';
     audio.current = element;
-    const started = () => setPlaying(true), stopped = () => setPlaying(false);
+    const started = () => {
+      if (document.visibilityState === 'hidden' || !active.current) { element.pause(); return; }
+      setPlaying(true);
+    }, stopped = () => setPlaying(false);
     const failed = () => { setPlaying(false); setError('这首音乐暂时无法播放，可以换一首或重新导入。'); };
     element.addEventListener('playing', started); element.addEventListener('pause', stopped); element.addEventListener('error', failed);
     if (active.current) resumeMusic();
@@ -118,6 +144,14 @@ export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaCont
     if (inRoom && settings.musicEnabled) resumeMusic();
     else audio.current?.pause();
   }, [inRoom, settings.musicEnabled, resumeMusic]);
+  useEffect(() => {
+    const visibilityChanged = () => {
+      if (document.visibilityState === 'hidden') audio.current?.pause();
+      else resumeMusic(); // Respects both room membership and the user's switch.
+    };
+    document.addEventListener('visibilitychange', visibilityChanged);
+    return () => document.removeEventListener('visibilitychange', visibilityChanged);
+  }, [resumeMusic]);
   useEffect(() => {
     if (!inRoom) return;
     const unlock = () => resumeMusic();
@@ -157,5 +191,5 @@ export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaCont
     if (customUrl.current) URL.revokeObjectURL(customUrl.current);
     customUrl.current = null; setCustom(null); update({ musicId: 'castle' }); setError(null);
   }, [update]);
-  return { inRoom, settings, background: ROOM_BACKGROUNDS.find(background => background.id === settings.backgroundId) ?? ROOM_BACKGROUNDS[0], customName: custom?.name ?? null, playing, error, update, importMusic, removeMusic, resumeMusic };
+  return { inRoom, settings, background: ROOM_BACKGROUNDS.find(background => background.id === settings.backgroundId) ?? ROOM_BACKGROUNDS[0], phase: timeMode === 'auto' ? localPhase : timeMode, localPhase, timeMode, setTimeMode, customName: custom?.name ?? null, playing, error, update, importMusic, removeMusic, resumeMusic };
 }

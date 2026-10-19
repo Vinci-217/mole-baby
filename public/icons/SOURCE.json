@@ -1,0 +1,20 @@
+{
+  "description": "Application and tray icon: unchanged original red middle-stage Ram with exactly two leaves, transparently cropped, padded and resized. No redrawing or generated body.",
+  "source": "../assets/original/pets/middle-red-idle.png",
+  "sourceSha256": "e89f84e6942d369db8ae634eba351aef2d727410b3101ec990f16f61c718a838",
+  "officialSource": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "provenance": "../assets/original/pets/source-record.json",
+  "sizes": {
+    "ramu.ico": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256
+    ],
+    "ramu.png": 256,
+    "tray.png": 32
+  }
+}

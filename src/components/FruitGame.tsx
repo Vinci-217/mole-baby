@@ -148,12 +148,12 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
           <div className="fruit-trophy"><GameArt kind="trophy"/></div>
           <h3>{frame.score >= 7 ? '拉姆接到了好多果子！' : frame.score > 0 ? '可可果收好啦！' : '练习完成，下次会更棒！'}</h3>
           <p>本局接取计分：<strong>{frame.score}</strong> / 10 颗</p>
-          <div className="fruit-rewards"><div><strong>+{receipt?.coins ?? (4 + frame.score * 2)}</strong><span>摩尔豆</span></div><div><GameArt kind={frame.score >= 8 ? 'juice' : frame.score >= 5 ? 'biscuit' : 'apple'} /><strong>+{receipt?.food ?? 1}</strong><span>{frame.score >= 8 ? '浆果果汁' : frame.score >= 5 ? '熊熊饼干' : '可可果'}</span></div><div><img className="fruit-growth-icon" src="./assets/original/ui/sprout.png" alt="" /><strong>+{receipt?.growth ?? (3 + frame.score)}</strong><span>成长值</span></div></div>
+          <div className="fruit-rewards"><div><strong>+{receipt?.coins ?? (4 + frame.score * 2)}</strong><span>摩尔豆</span></div><div><GameArt kind={frame.score >= 8 ? 'juice' : frame.score >= 5 ? 'biscuit' : 'apple'} /><strong>+{receipt?.food ?? 1}</strong><span>{frame.score >= 8 ? '浆果果汁' : frame.score >= 5 ? '熊熊饼干' : '可可果'}</span></div></div>
           <p className="fruit-reward-saved">{receipt?.ok === false ? receipt.message : `${receipt?.message ?? '以上奖励已入背包'} 接到的果子用于本局计分。`}</p>
           <div className="fruit-result-actions"><button ref={replayRef} type="button" className="fruit-secondary" onClick={startGame}>再来一局</button><button type="button" className="fruit-primary" onClick={onClose}>{receipt?.ok === false ? '返回' : '收好奖励'}</button></div>
         </div>}
 
-        <p className="fruit-reward-note">每次成功接取折算 +2 摩尔豆、+1 成长<br />完成另得 4 摩尔豆、3 成长和 1 份食物（不是每颗入背包）</p>
+        <p className="fruit-reward-note">完成一局，获得摩尔豆和一份用品奖励。</p>
       </div>
     </div>
   );

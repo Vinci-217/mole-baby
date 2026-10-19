@@ -1,0 +1,21 @@
+.cottage-scene.time-scene{background-image:none;overflow:hidden}
+.time-scene-art{position:absolute;inset:0;z-index:-3;overflow:hidden;pointer-events:none;container-type:size;background:#a5dbe9}
+.time-scene-image{display:block;width:100%;height:100%;object-fit:cover;transition:filter 1.4s ease}
+.time-scene-sheet{position:absolute;left:50%;top:50%;width:max(200cqw,320cqh);height:max(125cqw,200cqh);max-width:none;transform:translate(var(--scene-x),var(--scene-y));object-fit:fill}
+.time-scene-tint{position:absolute;inset:0;transition:background-color 1.4s;mix-blend-mode:multiply}
+.time-scene[data-phase=morning] .time-scene-image{filter:brightness(1.04) saturate(.96)}
+.time-scene[data-phase=morning] .time-scene-tint{background:#fff4bf12}
+.time-scene[data-phase=noon] .time-scene-image{filter:brightness(1.03) saturate(1.06)}
+.time-scene[data-phase=dusk] .time-scene-image{filter:brightness(.91) saturate(1.03)}
+.time-scene[data-phase=dusk] .time-scene-tint{background:#f3aa825c}
+.time-scene[data-phase=night] .time-scene-image{filter:brightness(.62) saturate(.82)}
+.time-scene[data-phase=night] .time-scene-tint{background:#737ebc8c}
+.time-scene-window-light{position:absolute;left:18%;top:38%;width:34%;height:35%;background:#fff4a529;clip-path:polygon(16% 0,48% 0,100% 100%,0 100%);opacity:0}
+.time-scene[data-phase=morning] .time-scene-window-light{opacity:1}
+.time-scene[data-phase=dusk] .time-scene-window-light{opacity:.7;background:#ffb45b35}
+.time-scene-lamp{position:absolute;right:17%;top:25%;width:24%;height:44%;border-radius:50%;background:radial-gradient(ellipse,#ffe4a562,#ffdc6226 45%,transparent 70%);opacity:0;transition:opacity 1.4s}
+.time-scene[data-phase=dusk] .time-scene-lamp{opacity:.5}
+.time-scene[data-phase=night] .time-scene-lamp{opacity:1}
+.time-scene[data-background=lake-cabin] .time-scene-lamp{right:38%;top:22%;width:24%;height:52%}
+.time-scene[data-background=earthen-home] .time-scene-lamp{right:42%;top:22%;width:25%;height:48%}
+@media(prefers-reduced-motion:reduce){.time-scene-image,.time-scene-lamp,.time-scene-tint{transition:none}}

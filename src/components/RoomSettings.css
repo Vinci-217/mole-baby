@@ -1,1 +1,29 @@
-.room-settings{font-size:12px;color:#624832;line-height:1.5}.room-settings h3{font-size:14px;margin:14px 0 8px;color:#79502b}.room-background-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.room-background-options button{min-width:0;border:1px solid #dec398!important;border-radius:9px!important;padding:3px!important;background:#fff9e9!important;color:#76502d!important;box-shadow:none!important;overflow:hidden}.room-background-options button[aria-pressed=true]{border-color:#d58b36!important;background:#fff0c9!important;outline:1px solid #d58b36;outline-offset:1px}.room-background-options img{display:block;width:100%;height:66px;object-fit:cover;border-radius:6px}.room-background-options span{display:block;padding:3px 0 1px;font-size:11px}.room-music-switch,.room-music-select,.room-volume{display:flex;align-items:center;gap:8px;margin:10px 0}.room-music-switch{justify-content:space-between}.room-music-switch input{width:15px;height:15px;accent-color:#b97b31}.room-music-select select{min-width:0;flex:1;width:140px;border:1px solid #dec398;border-radius:6px;padding:5px 7px;background:#fffcf1;color:#624832;font:inherit}.room-volume input{min-width:0;flex:1;accent-color:#b97b31;height:16px}.room-volume span{min-width:30px;text-align:right;font-size:11px}.room-music-import{display:flex;gap:6px;flex-wrap:wrap}.room-music-import button,.room-play-music{font:inherit!important;color:#79502b!important;background:#fff3d5!important;border:1px solid #dec398!important;border-radius:6px!important;box-shadow:none!important;padding:5px 9px!important}.room-music-note{color:#917657;font-size:11px;margin:8px 0}.room-music-message{font-size:11px;color:#926126}.room-settings button:focus-visible,.room-settings select:focus-visible,.room-settings input:focus-visible{outline:2px solid #bb823d!important;outline-offset:2px}
+.room-settings{font-size:14px;color:#624832;line-height:1.5}
+.room-settings h3{font-size:17px;margin:21px 0 12px;color:#79502b}
+.room-background-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.room-background-options button{min-width:0;border:2px solid #e4cba0!important;border-radius:11px!important;padding:4px!important;background:#fff9e9!important;color:#76502d!important;box-shadow:none!important;overflow:hidden}
+.room-background-options button[aria-pressed=true]{border-color:#dd8d21!important;background:#fff0c9!important;outline:1px solid #dd8d21;outline-offset:1px}
+.room-background-thumb{display:block!important;position:relative;height:90px;padding:0!important;overflow:hidden;border-radius:7px;container-type:size;background:#b8e5f5}
+.room-background-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.room-background-thumb.is-phase-sheet img{position:absolute;left:50%;top:50%;width:max(200cqw,320cqh);height:max(125cqw,200cqh);max-width:none;transform:translate(var(--scene-x),var(--scene-y));object-fit:fill}
+.room-background-options button>span:last-child{display:block;padding:7px 0 3px;font-size:14px;font-weight:700}
+.room-time-options{display:flex;align-items:center;gap:5px;margin-top:14px;flex-wrap:wrap}
+.room-time-options button{font:inherit!important;border:1px solid #dbc08e!important;border-radius:8px!important;padding:7px 9px!important;background:#fffcf0!important;box-shadow:none!important;min-height:35px}
+.room-time-options button[aria-pressed=true]{background:#ffe8a5!important;border-color:#d29232!important;color:#775017!important}
+.room-time-status{font-size:13px;color:#886b48;margin-top:8px}
+.room-music-switch,.room-volume{display:flex;align-items:center;gap:10px;margin:13px 0}
+.room-music-switch{justify-content:space-between}
+.room-music-switch input{width:20px;height:20px;accent-color:#b97b31}
+.room-track-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
+.room-track-list button{display:flex;align-items:center;gap:8px;min-width:0;min-height:40px;text-align:left;padding:8px 10px!important;border:1px solid #dec79e!important;background:#fffdf3!important;color:#79552d!important;border-radius:8px!important;font-size:14px!important;box-shadow:none!important;line-height:1.35;overflow:hidden}
+.room-track-list button>span{color:#ba8b34;font-size:19px;flex-shrink:0}
+.room-track-list button[aria-pressed=true]{background:#fff0bd!important;border-color:#d69328!important;font-weight:700}
+.room-track-list button.room-custom-track{grid-column:1/-1;overflow-wrap:anywhere}
+.room-volume input{min-width:0;flex:1;accent-color:#b97b31;height:20px}
+.room-volume span{min-width:37px;text-align:right;font-size:14px}
+.room-music-import{display:flex;gap:8px;flex-wrap:wrap}
+.room-music-import button,.room-play-music{font:inherit!important;color:#79502b!important;background:#fff3d5!important;border:1px solid #dec398!important;border-radius:8px!important;box-shadow:none!important;padding:8px 12px!important;min-height:38px}
+.room-music-note{color:#917657;font-size:13px;margin:11px 0}
+.room-music-message{font-size:14px;color:#926126}
+.room-settings button:focus-visible,.room-settings select:focus-visible,.room-settings input:focus-visible{outline:2px solid #bb823d!important;outline-offset:2px}
+@media(max-width:440px){.room-background-thumb{height:76px}.room-track-list button{font-size:13px!important;padding:8px!important}.room-time-options{gap:4px}.room-time-options button{padding:7px!important}}

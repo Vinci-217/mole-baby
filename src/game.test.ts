@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buyFood, buyItem, care, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, ITEMS, parseSave, rewardGame, STAGES, tick } from './game';
+import { buyFood, buyItem, care, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick } from './game';
 
 const NOW = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -26,7 +26,7 @@ describe('pet creation and growth', () => {
     }
     expect(getNextStage(0)).toEqual(STAGES[1]);
     expect(getNextStage(GROWTH_MAX)).toBeNull();
-    expect(care({ ...fresh(), growth: GROWTH_MAX - 0.1 }, 'pet', undefined, NOW).state.growth).toBe(GROWTH_MAX);
+    expect(care({ ...fresh(), growth: GROWTH_MAX - 0.1 }, 'pet', undefined, NOW).state.growth).toBe(GROWTH_MAX - 0.1);
   });
 });
 
@@ -36,7 +36,7 @@ describe('time and sleep', () => {
     const result = tick(original, NOW + HOUR);
     expect(result.stats.hunger).toBe(77);
     expect(result.stats.energy).toBe(81);
-    expect(result.growth).toBe(18);
+    expect(result.growth).toBe(2.5);
     expect(original.stats.hunger).toBe(82);
     expect(original.growth).toBe(0);
     expect(tick({ ...original, stats: { ...original.stats, hunger: 30 } }, NOW + HOUR).growth).toBe(0);
@@ -82,7 +82,7 @@ describe('care and shopping', () => {
     expect(result.ok).toBe(true);
     expect(result.state.inventory.biscuit).toBe(2);
     expect(result.state.stats.hunger).toBe(100);
-    expect(result.state.growth).toBe(4);
+    expect(result.state.growth).toBe(0);
     expect(original.inventory.biscuit).toBe(3);
     expect(care(result.state, 'feed', 'biscuit', NOW).ok).toBe(false);
   });
@@ -107,13 +107,13 @@ describe('care and shopping', () => {
 });
 
 describe('minigame rewards', () => {
-  it('grants coins, one food, growth and a completion; clamps excessive scores', () => {
+  it('grants coins, one food and a completion without instant growth; clamps excessive scores', () => {
     const original = fresh();
     const reward = rewardGame(original, 999, NOW);
     expect(reward.ok).toBe(true);
     expect(reward.state.coins).toBe(124);
     expect(reward.state.inventory.juice).toBe(1);
-    expect(reward.state.growth).toBe(13);
+    expect(reward.state.growth).toBe(0);
     expect(reward.state.completedGames).toBe(1);
     expect(original.completedGames).toBe(0);
     expect(rewardGame(original, -1, NOW).state.coins).toBe(104);
@@ -135,7 +135,7 @@ describe('save validation', () => {
     expect(parseSave(JSON.stringify(fresh()), NOW)).toEqual(fresh());
     const restored = parseSave(JSON.stringify(fresh()), NOW + HOUR);
     expect(restored?.stats.hunger).toBe(77);
-    expect(restored?.growth).toBe(18);
+    expect(restored?.growth).toBe(2.5);
   });
 
   it.each([null, '', '{', 'null', '[]', '{}', '42'])('rejects invalid JSON or save shape: %s', (raw) => {
@@ -322,5 +322,45 @@ describe('old saves and original needs', () => {
     let many = cared;
     for (let hour = 1; hour <= 16; hour++) many = tick(many, NOW + hour * HOUR);
     expect(many.stats).toEqual(tick(cared, NOW + 16 * HOUR).stats);
+  });
+});
+
+
+describe('slow real companion growth', () => {
+  const replenish = (state: ReturnType<typeof fresh>) => ({ ...state, stats: { hunger: 100, thirst: 100, happiness: 100, cleanliness: 100, health: 100, energy: 100 } });
+  it('requires a real day for a healthy seed and several days for the later stages', () => {
+    expect(GROWTH_STAGE_HOURS).toEqual([24, 72, 168]);
+    let state = replenish(fresh());
+    for (let hour = 1; hour <= 24 + 72 + 168; hour++) {
+      state = tick(replenish(state), NOW + hour * HOUR);
+      if (hour === 23) expect(getStage(state.growth)).toBe(0);
+      if (hour === 24) expect(state.growth).toBe(60);
+      if (hour === 95) expect(getStage(state.growth)).toBe(1);
+      if (hour === 96) expect(state.growth).toBeCloseTo(180, 4);
+      if (hour === 263) expect(getStage(state.growth)).toBe(2);
+    }
+    expect(state.growth).toBe(GROWTH_MAX);
+  });
+  it('cannot accelerate a seed by repeated petting, feeding or game rewards', () => {
+    let state = fresh();
+    for (let click = 0; click < 500; click++) {
+      state = care(state, 'pet', undefined, NOW).state;
+      state.inventory.berry = 1;
+      state.stats.hunger = 10;
+      state = care(state, 'feed', 'berry', NOW).state;
+      state = rewardGame({ ...state, completedGames: 0 }, 10, NOW).state;
+    }
+    expect(state.growth).toBe(0);
+    expect(getStage(state.growth)).toBe(0);
+  });
+  it('integrates accurately across boundaries and preserves old mature saves', () => {
+    const initial = { ...replenish(fresh()), growth: 59 };
+    const once = tick(initial, NOW + 2 * HOUR);
+    const split = tick(tick(initial, NOW + HOUR), NOW + 2 * HOUR);
+    expect(split.growth).toBeCloseTo(once.growth, 5);
+    expect(once.growth).toBeCloseTo(60 + 1.6 * (120 / 72), 5);
+    for (const growth of [60, 180, 213, 420]) {
+      expect(parseSave(JSON.stringify({ ...fresh(), growth }), NOW)?.growth).toBe(growth);
+    }
   });
 });

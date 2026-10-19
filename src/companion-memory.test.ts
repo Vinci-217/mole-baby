@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createPet } from './game';
-import { appendMessage, buildMessages, clearMemory, createMemory, forgetFact, localReply, MEMORY_LIMITS, parseMemory, recordCare, recordEvent, rememberChat } from './companion-memory';
+import { appendMessage, buildMessages, clearMemory, createMemory, forgetFact, forgetEvent, editFact, getCompanionMood, getDiary, selectMemories, setPersonality, setPlanStatus, localReply, MEMORY_LIMITS, parseMemory, recordCare, recordEvent, rememberChat } from './companion-memory';
 
 const NOW = 1_800_000_000_000;
 const pet = () => createPet('小芽', 'pink', NOW);
@@ -52,15 +52,15 @@ describe('companion memory', () => {
   });
   it('bounds all memory collections and deduplicates repeated care renders', () => {
     let memory = createMemory(pet());
-    for (let n = 0; n < 80; n++) {
+    for (let n = 0; n < 160; n++) {
       memory = rememberChat(memory, `我喜欢小点心${n}。`, NOW + n * 60_000);
       memory = recordEvent(memory, { kind: 'feed', detail: `喂食${n}`, at: NOW + n * 60_000 });
     }
     expect(memory.facts).toHaveLength(MEMORY_LIMITS.facts);
     expect(memory.messages).toHaveLength(MEMORY_LIMITS.messages);
     expect(memory.events).toHaveLength(MEMORY_LIMITS.events);
-    memory = recordCare(memory, 'wash', undefined, NOW + 100 * 60_000);
-    const deduplicated = recordCare(memory, 'wash', undefined, NOW + 100 * 60_000 + 1);
+    memory = recordCare(memory, 'wash', undefined, NOW + 200 * 60_000);
+    const deduplicated = recordCare(memory, 'wash', undefined, NOW + 200 * 60_000 + 1);
     expect(deduplicated).toBe(memory);
   });
   it('validates imported memory, refuses another pet, and strips secrets/control characters', () => {
@@ -103,5 +103,81 @@ describe('companion memory', () => {
     expect(data.userMemories.at(-1).value).toBe(memory.facts.at(-1)?.value);
     expect(memory.facts).toHaveLength(24);
     expect(memory.events).toHaveLength(40);
+  });
+});
+
+
+describe('personal continuity and accountable memories', () => {
+  it('keeps actual user-shared events after they leave the short dialogue window', () => {
+    let memory = rememberChat(createMemory(pet()), '今天我完成了毕业论文。', NOW);
+    expect(memory.facts).toMatchObject([{ kind: 'story', value: '今天我完成了毕业论文' }]);
+    for (let i = 1; i <= 90; i++) memory = appendMessage(memory, 'user', `普通聊天${i}`, NOW + i);
+    expect(memory.messages.some(message => message.content.includes('毕业论文'))).toBe(false);
+    expect(selectMemories(memory, '你还记得我的毕业论文吗？', NOW + 100).facts.some(fact => fact.value.includes('毕业论文'))).toBe(true);
+    expect(buildMessages(pet(), memory, '我的毕业论文', NOW + 100)[0].content).toContain('今天我完成了毕业论文');
+  });
+  it('retrieves an older relevant disclosure ahead of a crowded recent memory list', () => {
+    let memory = rememberChat(createMemory(pet()), '我养了一只叫团子的猫。', NOW);
+    for (let i = 1; i <= 60; i++) memory = rememberChat(memory, `我喜欢点心${i}。`, NOW + i * 86_400_000);
+    const selected = selectMemories(memory, '你还记得团子那只猫吗？', NOW + 61 * 86_400_000);
+    expect(selected.facts).toHaveLength(16);
+    expect(selected.facts.some(fact => fact.value.includes('团子'))).toBe(true);
+    expect(buildMessages(pet(), memory, '团子那只猫', NOW + 61 * 86_400_000)[0].content).toContain('团子');
+  });
+  it('does not turn questions, hypothetical stories, future plans or model claims into past facts', () => {
+    let memory = createMemory(pet());
+    for (const text of ['如果我今天拿了冠军', '今天我会成功吗？', '假如我昨天中奖了', '你记得我昨天去海边吗？']) memory = rememberChat(memory, text, NOW);
+    memory = appendMessage(memory, 'assistant', '你昨天去过海边', NOW);
+    expect(memory.facts).toEqual([]);
+    memory = rememberChat(memory, '我明天要去看海。', NOW + 1);
+    expect(memory.facts).toMatchObject([{ kind: 'plan', value: '我明天要去看海' }]);
+    expect(memory.events).toEqual([]);
+    expect(buildMessages(pet(), memory, '你好')[0].content).toContain('不能把旧话里的“今天/昨天”说成此刻');
+    expect(localReply(pet(), memory, '记得我的计划吗')).not.toContain('去过');
+  });
+  it('manages plans and companion preferences explicitly and preserves them on v1 import', () => {
+    let memory = rememberChat(createMemory(pet()), '我下周三要考试。希望你安静陪我。', NOW);
+    expect(memory.facts.map(f => f.kind)).toEqual(['plan', 'boundary']);
+    memory = setPlanStatus(memory, memory.facts[0].id, 'done');
+    memory = setPersonality(memory, '有点害羞，喜欢听故事');
+    const restored = parseMemory(memory, pet());
+    expect(restored.personality).toBe('有点害羞，喜欢听故事');
+    expect(restored.facts[0].status).toBe('done');
+    expect(localReply(pet(), restored, '记得我的考试计划吗')).toContain('标记为完成');
+    expect(createMemory(pet()).personality).not.toBe(restored.personality);
+  });
+  it('forgetting and editing remove every derived diary and old context copy', () => {
+    let memory = rememberChat(createMemory(pet()), '今天我领养了一只橘猫。', NOW);
+    const original = memory.facts[0];
+    memory = recordEvent(memory, { kind: 'shared', detail: original.value, at: NOW + 1 });
+    expect(getDiary(memory)[0].moments.join('')).toContain('橘猫');
+    const forgotten = forgetFact(memory, original.id);
+    expect(JSON.stringify(getDiary(forgotten))).not.toContain('橘猫');
+    expect(buildMessages(pet(), forgotten, '你好')[0].content).not.toContain('橘猫');
+    const edited = editFact(memory, original.id, '当时我只是去看了小猫');
+    expect(buildMessages(pet(), edited, '你好')[0].content).not.toContain('橘猫');
+    expect(edited.facts[0].value).toBe('当时我只是去看了小猫');
+    const eventOnly = recordCare(createMemory(pet()), 'wash', '用了牙刷', NOW);
+    expect(getDiary(forgetEvent(eventOnly, eventOnly.events[0].id))).toEqual([]);
+  });
+  it('forms diary summaries only from successful event records and user stories', () => {
+    let memory = rememberChat(createMemory(pet()), '今天我走了五公里。', NOW);
+    memory = recordCare(memory, 'drink', '你给我喝了牛奶', NOW + 1);
+    memory = appendMessage(memory, 'assistant', '我们一起坐了热气球', NOW + 2);
+    const diary = getDiary(memory);
+    expect(diary[0].count).toBe(2);
+    expect(diary[0].moments.join('')).toContain('五公里');
+    expect(diary[0].moments.join('')).not.toContain('热气球');
+  });
+  it('cannot farm closeness with repeated clicks and responds to actual needs or feelings', () => {
+    let memory = createMemory(pet());
+    for (let i = 0; i < 100; i++) memory = recordCare(memory, 'pet', undefined, NOW + i * 60_000);
+    const base = getCompanionMood(memory, pet(), NOW + 101 * 60_000);
+    expect(base.affection).toBe(3);
+    memory = rememberChat(memory, '我最近压力有点大。', NOW + 102 * 60_000);
+    expect(getCompanionMood(memory, pet(), NOW + 102 * 60_000).id).toBe('concerned');
+    expect(getCompanionMood(memory, { ...pet(), sleeping: true }).id).toBe('sleepy');
+    expect(localReply(pet(), memory, '我最近压力有点大')).toContain('安静陪');
+    expect(localReply(pet(), memory, '我最近压力有点大')).not.toContain('必须');
   });
 });

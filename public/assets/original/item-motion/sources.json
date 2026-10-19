@@ -1,0 +1,886 @@
+{
+  "source": {
+    "url": "http://mole.61.com/resource/NPC/lamubone.swf",
+    "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+    "cell": [
+      192,
+      208
+    ],
+    "columns": 16,
+    "rows": [
+      "food",
+      "drenk",
+      "wash",
+      "medical"
+    ],
+    "sourceFps": 24,
+    "sampling": "16 frames, two original frames per step; fixed body-and-foliage registration per action at classic idle scale where possible; wash, medical and condition rows omit disconnected prop components; all original pixels connected to the body and foliage remain, including eyes and original occluding props; food/drink retain nearby props, whose remote edges may lie outside the viewport; wash uses original post-bath drying/eye-squeeze frames 174–204 to keep the full body and foliage visible in the compact viewport",
+    "sleep": {
+      "classic": {
+        "row": 8,
+        "frame": 0,
+        "sourceAction": "original happy closed eyes"
+      },
+      "seed": {
+        "frame": 4,
+        "sourceSprite": 37,
+        "sourceFrame": 5
+      }
+    }
+  },
+  "rows": [
+    "original food body without generic bowl/food",
+    "original drenk body without generic baby bottle",
+    "original wash body and foliage without unrelated props",
+    "original medical body and foliage without unrelated props"
+  ],
+  "registration": "Exactly the same fixed source viewport as v0.5.0 care; no fit-to-prop resizing",
+  "forms": {
+    "junior": [
+      {
+        "action": "food",
+        "start": 1,
+        "sourceFrameCount": 152,
+        "actionFrames": [
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91
+        ],
+        "frames": [
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.0514285714285714,
+          "sourceViewport": [
+            52.19565217391304,
+            145.72826086956522,
+            234.80434782608697,
+            343.554347826087
+          ],
+          "bodyReference": [
+            15,
+            43,
+            175,
+            158
+          ],
+          "sourceCoreUnion": [
+            56,
+            206,
+            231,
+            306
+          ],
+          "bodyBottom": 296.0,
+          "translation": [
+            -54.879999999999995,
+            -153.22285714285715
+          ]
+        }
+      },
+      {
+        "action": "drenk",
+        "start": 153,
+        "sourceFrameCount": 275,
+        "actionFrames": [
+          165,
+          167,
+          169,
+          171,
+          173,
+          175,
+          177,
+          179,
+          181,
+          183,
+          185,
+          187,
+          189,
+          191,
+          193,
+          195
+        ],
+        "frames": [
+          317,
+          319,
+          321,
+          323,
+          325,
+          327,
+          329,
+          331,
+          333,
+          335,
+          337,
+          339,
+          341,
+          343,
+          345,
+          347
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.3834586466165413,
+          "sourceViewport": [
+            116.1086956521739,
+            193.7934782608696,
+            254.89130434782612,
+            344.1413043478261
+          ],
+          "bodyReference": [
+            15,
+            43,
+            175,
+            158
+          ],
+          "sourceCoreUnion": [
+            119,
+            231,
+            252,
+            309
+          ],
+          "bodyBottom": 308.0,
+          "translation": [
+            -160.6315789473684,
+            -268.10526315789474
+          ]
+        }
+      },
+      {
+        "action": "wash",
+        "start": 428,
+        "sourceFrameCount": 206,
+        "actionFrames": [
+          174,
+          176,
+          178,
+          180,
+          182,
+          184,
+          186,
+          188,
+          190,
+          192,
+          194,
+          196,
+          198,
+          200,
+          202,
+          204
+        ],
+        "frames": [
+          601,
+          603,
+          605,
+          607,
+          609,
+          611,
+          613,
+          615,
+          617,
+          619,
+          621,
+          623,
+          625,
+          627,
+          629,
+          631
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.7692307692307692,
+          "sourceViewport": [
+            13.73913043478261,
+            218.69565217391303,
+            122.2608695652174,
+            336.2608695652174
+          ],
+          "bodyReference": [
+            15,
+            43,
+            175,
+            158
+          ],
+          "sourceCoreUnion": [
+            16,
+            236,
+            117,
+            308
+          ],
+          "bodyBottom": 308.0,
+          "translation": [
+            -24.307692307692307,
+            -386.9230769230769
+          ]
+        }
+      },
+      {
+        "action": "medical",
+        "start": 634,
+        "sourceFrameCount": 131,
+        "actionFrames": [
+          35,
+          37,
+          39,
+          41,
+          43,
+          45,
+          47,
+          49,
+          51,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65
+        ],
+        "frames": [
+          668,
+          670,
+          672,
+          674,
+          676,
+          678,
+          680,
+          682,
+          684,
+          686,
+          688,
+          690,
+          692,
+          694,
+          696,
+          698
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.509433962264151,
+          "sourceViewport": [
+            9.062500000000002,
+            204.32500000000002,
+            136.2625,
+            342.125
+          ],
+          "bodyReference": [
+            15,
+            43,
+            175,
+            158
+          ],
+          "sourceCoreUnion": [
+            19,
+            251,
+            125,
+            309
+          ],
+          "bodyBottom": 309.0,
+          "translation": [
+            -13.679245283018872,
+            -308.41509433962267
+          ]
+        }
+      }
+    ],
+    "middle": [
+      {
+        "action": "food",
+        "start": 1,
+        "sourceFrameCount": 143,
+        "actionFrames": [
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91,
+          93,
+          95,
+          97
+        ],
+        "frames": [
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91,
+          93,
+          95,
+          97
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.218543046357616,
+          "sourceViewport": [
+            253.71739130434784,
+            172.20652173913044,
+            411.2826086956522,
+            342.9021739130435
+          ],
+          "bodyReference": [
+            36,
+            81,
+            164,
+            174
+          ],
+          "sourceCoreUnion": [
+            257,
+            198,
+            408,
+            320
+          ],
+          "bodyBottom": 315.0,
+          "translation": [
+            -309.1655629139073,
+            -209.841059602649
+          ]
+        }
+      },
+      {
+        "action": "drenk",
+        "start": 144,
+        "sourceFrameCount": 146,
+        "actionFrames": [
+          49,
+          51,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79
+        ],
+        "frames": [
+          192,
+          194,
+          196,
+          198,
+          200,
+          202,
+          204,
+          206,
+          208,
+          210,
+          212,
+          214,
+          216,
+          218,
+          220,
+          222
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.2105263157894737,
+          "sourceViewport": [
+            139.69565217391306,
+            193.26086956521738,
+            298.30434782608694,
+            365.0869565217391
+          ],
+          "bodyReference": [
+            36,
+            81,
+            164,
+            174
+          ],
+          "sourceCoreUnion": [
+            143,
+            227,
+            295,
+            337
+          ],
+          "bodyBottom": 337.0,
+          "translation": [
+            -169.10526315789474,
+            -233.9473684210526
+          ]
+        }
+      },
+      {
+        "action": "wash",
+        "start": 290,
+        "sourceFrameCount": 206,
+        "actionFrames": [
+          174,
+          176,
+          178,
+          180,
+          182,
+          184,
+          186,
+          188,
+          190,
+          192,
+          194,
+          196,
+          198,
+          200,
+          202,
+          204
+        ],
+        "frames": [
+          463,
+          465,
+          467,
+          469,
+          471,
+          473,
+          475,
+          477,
+          479,
+          481,
+          483,
+          485,
+          487,
+          489,
+          491,
+          493
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.1870967741935483,
+          "sourceViewport": [
+            122.63043478260869,
+            189.42391304347822,
+            284.3695652173913,
+            364.64130434782606
+          ],
+          "bodyReference": [
+            36,
+            81,
+            164,
+            174
+          ],
+          "sourceCoreUnion": [
+            126,
+            222,
+            281,
+            336
+          ],
+          "bodyBottom": 336.0,
+          "translation": [
+            -145.5741935483871,
+            -224.8645161290322
+          ]
+        }
+      },
+      {
+        "action": "medical",
+        "start": 496,
+        "sourceFrameCount": 115,
+        "actionFrames": [
+          35,
+          37,
+          39,
+          41,
+          43,
+          45,
+          47,
+          49,
+          51,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65
+        ],
+        "frames": [
+          530,
+          532,
+          534,
+          536,
+          538,
+          540,
+          542,
+          544,
+          546,
+          548,
+          550,
+          552,
+          554,
+          556,
+          558,
+          560
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.2156862745098038,
+          "sourceViewport": [
+            138.35483870967744,
+            188.70967741935482,
+            296.2903225806452,
+            359.80645161290323
+          ],
+          "bodyReference": [
+            36,
+            81,
+            164,
+            174
+          ],
+          "sourceCoreUnion": [
+            142,
+            192,
+            293,
+            337
+          ],
+          "bodyBottom": 337.0,
+          "translation": [
+            -168.19607843137254,
+            -229.41176470588232
+          ]
+        }
+      }
+    ],
+    "senior": [
+      {
+        "action": "food",
+        "start": 1,
+        "sourceFrameCount": 165,
+        "actionFrames": [
+          66,
+          68,
+          70,
+          72,
+          74,
+          76,
+          78,
+          80,
+          82,
+          84,
+          86,
+          88,
+          90,
+          92,
+          94,
+          96
+        ],
+        "frames": [
+          66,
+          68,
+          70,
+          72,
+          74,
+          76,
+          78,
+          80,
+          82,
+          84,
+          86,
+          88,
+          90,
+          92,
+          94,
+          96
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.183431952662722,
+          "sourceViewport": [
+            154.14,
+            138.62,
+            316.38,
+            314.38
+          ],
+          "bodyReference": [
+            33,
+            100,
+            148,
+            195
+          ],
+          "sourceCoreUnion": [
+            174,
+            142,
+            313,
+            311
+          ],
+          "bodyBottom": 309.0,
+          "translation": [
+            -182.41420118343194,
+            -164.0473372781065
+          ]
+        }
+      },
+      {
+        "action": "drenk",
+        "start": 166,
+        "sourceFrameCount": 144,
+        "actionFrames": [
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91,
+          93,
+          95,
+          97,
+          99,
+          101,
+          103,
+          105,
+          107
+        ],
+        "frames": [
+          242,
+          244,
+          246,
+          248,
+          250,
+          252,
+          254,
+          256,
+          258,
+          260,
+          262,
+          264,
+          266,
+          268,
+          270,
+          272
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.3071895424836601,
+          "sourceViewport": [
+            36.76749999999999,
+            175.94,
+            183.64749999999998,
+            335.06
+          ],
+          "bodyReference": [
+            33,
+            100,
+            148,
+            195
+          ],
+          "sourceCoreUnion": [
+            51,
+            179,
+            165,
+            332
+          ],
+          "bodyBottom": 332.0,
+          "translation": [
+            -48.062091503267965,
+            -229.98692810457516
+          ]
+        }
+      },
+      {
+        "action": "wash",
+        "start": 310,
+        "sourceFrameCount": 207,
+        "actionFrames": [
+          174,
+          176,
+          178,
+          180,
+          182,
+          184,
+          186,
+          188,
+          190,
+          192,
+          194,
+          196,
+          198,
+          200,
+          202,
+          204
+        ],
+        "frames": [
+          483,
+          485,
+          487,
+          489,
+          491,
+          493,
+          495,
+          497,
+          499,
+          501,
+          503,
+          505,
+          507,
+          509,
+          511,
+          513
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.2195121951219512,
+          "sourceViewport": [
+            30.72,
+            148.72,
+            188.16,
+            319.28000000000003
+          ],
+          "bodyReference": [
+            33,
+            100,
+            148,
+            195
+          ],
+          "sourceCoreUnion": [
+            34,
+            152,
+            173,
+            316
+          ],
+          "bodyBottom": 287.0,
+          "translation": [
+            -37.46341463414634,
+            -181.3658536585366
+          ]
+        }
+      },
+      {
+        "action": "medical",
+        "start": 517,
+        "sourceFrameCount": 143,
+        "actionFrames": [
+          39,
+          41,
+          43,
+          45,
+          47,
+          49,
+          51,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65,
+          67,
+          69
+        ],
+        "frames": [
+          555,
+          557,
+          559,
+          561,
+          563,
+          565,
+          567,
+          569,
+          571,
+          573,
+          575,
+          577,
+          579,
+          581,
+          583,
+          585
+        ],
+        "registration": {
+          "mode": "fixed body-and-foliage registration; disconnected props omitted for wash/medical/conditions",
+          "scale": 1.3157894736842106,
+          "sourceViewport": [
+            42.72,
+            175.96,
+            188.64,
+            334.03999999999996
+          ],
+          "bodyReference": [
+            33,
+            100,
+            148,
+            195
+          ],
+          "sourceCoreUnion": [
+            58,
+            179,
+            166,
+            331
+          ],
+          "bodyBottom": 331.0,
+          "translation": [
+            -56.21052631578948,
+            -231.5263157894737
+          ]
+        }
+      }
+    ]
+  },
+  "files": {
+    "middle-neutral.png": "01d62a7dbd05d5802bb40f5a18b0345388a6253ccc56c83876f169e1025b0a10",
+    "junior-neutral.png": "e667f9f63c216ac5e870858b35f8b264cee7fc2fbba5b72133ad3458e42b770a",
+    "middle-mask.png": "93d1f79100303344e4e8cb8d2e416f4e19a908d22ee98f67a9edbe4ae8461462",
+    "senior-mask.png": "198052cc3f5a92e5fb2e90606a1c519e7f80cd8b235402f9ef7eddfad7e1bb76",
+    "senior-neutral.png": "2dfb308bbabf0ed7b07288be950a5e780deffcbb77c1b74b3c280bfdfaa78778",
+    "bath-tub.png": "664496a936f49163c44a93c1c829cb0d24ee061dd367396b56fb0821c0db4b74",
+    "junior-mask.png": "31d62ba93b363d05b2e36c4eec2145904a9540e80b8102a63f6e50d1817971a5",
+    "toothbrush-generated.png": "229d66e92e5cc5acd923cd3128ff256832f5909c0922c44a20f77f5127334e07"
+  },
+  "notes": "Project item-specific adaptation of original body and item assets. These recipes are not 28 official per-item clips.",
+  "props": {
+    "bath-tub.png": {
+      "kind": "original SWF shape export",
+      "sourceShape": 205,
+      "source": "http://mole.61.com/resource/NPC/lamubone.swf"
+    },
+    "toothbrush-generated.png": {
+      "kind": "image-model generated prop, not official artwork",
+      "createdFor": "mole-baby v0.6.0",
+      "prompt": "Single tiny turquoise side-view toothbrush, early Chinese Flash webgame prop style, warm dark outline, white bristles with toothpaste, no text, no characters, transparent background",
+      "originalGenerationFile": "exec-0c728227-069f-4f27-9268-ea98f97521d8.png"
+    }
+  }
+}

@@ -174,3 +174,13 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 新增 [care](public/assets/original/care/README.md) 六张原素材图集（三级各一张 neutral 与 mask）：16 列 × 7 行、单格 192×208。使用原标签 `food`、`drenk`、`wash`、`medical`、`thirst`、`hungry`、`boring` 的短连续片段，没有重绘角色。原源帧、固定配准、裁切与每张 PNG 的 SHA-256 见 [care/source.json](public/assets/original/care/source.json)。显示速度和状态映射为桌宠适配；`boring` 未冒称为原版疾病或睡眠动作。成长形态睡眠另选已有原 `happy` 闭眼帧，叠加轻呼吸。
 
 用品种类、名字、原属性、原非零售价与本地活动品定价区分见 [items-states.md](research/items-states.md)。商店只展示已经有对应原 PNG 的 28 种用品；没有以可可果图案代替饮品、清洁用品。
+
+## v0.6 四时段原创场景与 12 首原配乐
+
+新增 `generated/v6-starlight-greenhouse.png` 星光温室和 `generated/v6-creek-treehouse.png` 溪畔树屋，均由 `image_gen.imagegen` 参考本仓库原场景、UI 和道具生成。它们是独立原创场景，不是原客户端导出。每张为 1586×992 的四时段图，由 CSS 显示对应单幅；没有用程序绘画或重画角色。完整提示词、参考图片、日期、透明设置、尺寸和人工处理记录见 [v6-scenes-provenance.json](public/assets/generated/v6-scenes-provenance.json)。实际观察、接入时间规则与配乐考据见 [v6-scenes-music.md](research/v6-scenes-music.md)。
+
+原版背景音乐由三首扩至十二首，新增阳光牧场、拉姆学院、浆果丛林、摩尔拉雅滑冰场、西部游乐场、魔法马车、农场发明屋、咕噜艺术街、摩摩赛车场。均保存固定 RecMoleRes 提交的原 MP3 字节，逐首来源、名称依据、大小和 SHA-256 追加到 [audio/sources.json](public/assets/original/audio/sources.json)。城堡、淘淘乐街和粒粒小广场原本共用同一曲；宠物店与餐厅也共用曲目，未把同一音频换名冒充多首。用户自选的音频只保存在其本机，不上传或纳入素材目录。
+
+## v0.6 双叶图标与用品动作
+
+应用与托盘图标从原中级红色拉姆双叶待机帧导出，ICO 包含 Windows 常用尺寸，来源见 [icons/SOURCE.json](public/icons/SOURCE.json)。用品动作使用移除固定道具后的原始身体帧和实际物品 PNG，四行动作图集与 SHA256 见 [item-motion/sources.json](public/assets/original/item-motion/sources.json)。木浴盆为原 SWF shape 205；辅助牙刷为透明背景生成 PNG，提示词记录在同一来源文件中。28 种差异配方与局限见 [v6-item-motion.md](research/v6-item-motion.md)，不冒称 28 段官方专属逐帧动画。

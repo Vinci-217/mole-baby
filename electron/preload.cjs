@@ -40,6 +40,11 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   getState: () => ipcRenderer.invoke('desktop:get-state'),
   minimize: () => ipcRenderer.send('desktop:minimize'),
   close: () => ipcRenderer.send('desktop:close'),
+  hideToTray: () => ipcRenderer.send('desktop:hide-to-tray'),
+  readyToShow: (hasPet) => {
+    if (typeof hasPet !== 'boolean') throw new TypeError('Adoption state must be a boolean');
+    ipcRenderer.send('desktop:ready-to-show', hasPet);
+  },
   toggleAlwaysOnTop: () => ipcRenderer.invoke('desktop:toggle-always-on-top'),
   setPetMode: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mode must be a boolean'));
@@ -52,6 +57,15 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   setPetCanMove: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mobility must be a boolean'));
     return ipcRenderer.invoke('desktop:set-pet-can-move', enabled);
+  },
+  setEdgeHiding: (enabled) => {
+    if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Edge hiding must be a boolean'));
+    return ipcRenderer.invoke('desktop:set-edge-hiding', enabled);
+  },
+  revealPet: () => ipcRenderer.invoke('desktop:reveal-pet'),
+  setInteracting: (enabled) => {
+    if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Interaction state must be a boolean'));
+    return ipcRenderer.invoke('desktop:set-interacting', enabled);
   },
   setMousePassthrough: (ignore) => {
     if (typeof ignore !== 'boolean') throw new TypeError('Mouse passthrough must be a boolean');

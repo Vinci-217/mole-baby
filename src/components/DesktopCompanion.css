@@ -152,3 +152,39 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .transparent-stage .fruit-rewards .raster-game-art,.transparent-stage .memory-rewards .raster-game-art,.transparent-stage .fruit-growth-icon{width:20px;height:23px}
 .transparent-stage .fruit-result-actions,.transparent-stage .memory-result-actions{margin-top:10px;gap:7px}
 .transparent-stage .fruit-dialog[data-phase=finished] .fruit-reward-note,.transparent-stage .memory-dialog[data-phase=finished] .memory-footnote{font-size:8px;line-height:1.5;margin-top:8px}
+
+/* v6: daily care only; a nine-slot pocket fits beside the same small pet. */
+.companion-layout .companion-panel{height:474px;max-height:calc(100vh - 16px)}
+.companion-layout .pet-actions{left:5px;width:190px;gap:1px}
+.companion-layout .pet-actions button{width:25px;height:28px;padding:2px}
+.companion-layout .pet-actions button img{width:22px;height:22px}
+.companion-layout .compact-pet{transition:transform .65s cubic-bezier(.2,.75,.25,1)}
+.companion-layout:not(.panel-open).edge-hidden.edge-right .compact-pet{transform:translateX(125px)}
+.companion-layout:not(.panel-open).edge-hidden.edge-left .compact-pet{transform:translateX(-125px)}
+.companion-layout:not(.panel-open).edge-peek.edge-right .compact-pet{transform:translateX(85px) rotate(-5deg)}
+.companion-layout:not(.panel-open).edge-peek.edge-left .compact-pet{transform:translateX(-85px) rotate(5deg)}
+.companion-layout.edge-hidden .compact-bubble,.companion-layout.edge-hidden .compact-pet-name,.companion-layout.edge-peek .compact-bubble{opacity:0;pointer-events:none}
+.companion-layout .compact-pet-name{font-size:12px;line-height:18px}
+.companion-layout .compact-pet-name.sleeping-badge{font-size:11px}
+.companion-layout .compact-bubble{top:0;font-size:12px;line-height:1.5;max-height:66px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+.companion-panel>header strong{font-size:14px}
+.companion-panel>header strong span{font-size:12px}
+.companion-panel .companion-tabs button{font-size:13px;padding:5px 3px}
+.companion-panel>footer{font-size:12px;min-height:36px}
+.companion-panel .compact-home{font-size:12px}
+.companion-panel .compact-profile{gap:10px;margin-bottom:16px}
+.companion-panel .compact-profile b{font-size:15px}
+.companion-panel .compact-profile p span,.companion-panel .compact-profile>small{font-size:12px}
+.companion-panel .compact-stats{gap:13px}
+.companion-panel .compact-stats label{font-size:13px}
+.companion-panel .compact-stats label span{width:30px}
+.companion-panel .compact-stats progress{height:8px}
+.companion-panel .compact-stats b{font-size:12px;width:26px}
+.compact-condition{font-size:13px;line-height:1.7;margin-top:16px}
+.desktop-play{display:grid;gap:12px;padding:7px 0}
+.desktop-play h3{font-size:16px;font-weight:600;margin-bottom:5px}
+.desktop-play>button{display:flex;align-items:center;gap:15px;background:#fff7df;border:1px solid #e8d1a0;border-radius:9px;padding:10px 15px;font-size:14px;text-align:left}
+.desktop-play>button>img{width:36px;height:36px;object-fit:contain}
+.desktop-play>button.desktop-play-home{border:0;background:none;font-size:13px;color:#a77c39;padding:7px}
+.companion-preview>.companion-layout.panel-open{height:490px}
+@media(max-width:600px){.companion-preview>.companion-layout.panel-open{height:735px}.companion-preview .companion-panel{height:474px;max-height:calc(100vh - 255px)}.companion-preview>.companion-layout{bottom:15px}}
