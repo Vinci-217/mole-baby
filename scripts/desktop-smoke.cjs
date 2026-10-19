@@ -155,6 +155,15 @@ async function verifyBackground(page, selector, suffix) {
   const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
   console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
 
+  await actions.getByRole('button',{name:'玩耍',exact:true}).click();
+  await panel.getByRole('button',{name:'听拉姆说一句',exact:true}).click();
+  const spoken=page.getByRole('button',{name:'回应拉姆的话',exact:true});await fullyInsideNativeWindow(spoken,'companion speech bubble');
+  const sharedLine=await spoken.innerText();await page.screenshot({path:path.join(artifacts,'v10-native-presence.png'),omitBackground:true});
+  await spoken.click();await expect(panel.getByRole('log')).toContainText(sharedLine);await expect(panel).toHaveAttribute('aria-label','拉姆对话');
+  await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);
+  await expect(page.getByRole('timer')).toHaveCount(0);
+  console.log('PASS warm local speech fits the small native window and actual bubble click preserves context in the adjacent chat');
+
   const mature=await character.boundingBox(),beforeDrag=await bounds();await page.mouse.move(mature.x+50,mature.y+55);await page.mouse.down();await page.mouse.move(mature.x+110,mature.y+75);await page.mouse.up();await expect.poll(async()=>(await bounds()).x).toBe(beforeDrag.x+60);await expect.poll(async()=>(await bounds()).y).toBe(beforeDrag.y+20);
   await page.keyboard.press('Escape');await page.evaluate(()=>window.desktop.wander(true));await expect.poll(async()=>(await state()).motion,{timeout:20000}).toMatch(/^(left|right)$/);await expect(character.locator('.ram-sprite')).toHaveClass(/action-walk-(left|right)/);
   await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();await expect.poll(async()=>(await state()).motion).toBe('idle');await page.evaluate(()=>window.desktop.wander(false));await page.getByLabel('关闭小窗').click();await page.keyboard.press('Escape');

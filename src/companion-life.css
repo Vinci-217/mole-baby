@@ -80,3 +80,6 @@
 .scene-timer{display:block;margin:5px auto 0;background:#fff6da;border:1px solid #e3bb68;border-radius:8px;padding:3px 10px;font-size:13px}
 
 .companion-layout .compact-reminder{left:27px;right:27px;font-size:12px}
+.companion-layout .compact-bubble.visible,.scene-bubble.visible{pointer-events:auto;cursor:pointer;translate:none}
+.companion-layout .compact-bubble:focus-visible,.scene-bubble:focus-visible{outline:2px solid #e8b349;outline-offset:2px}
+.companion-layout .compact-bubble:not(.visible),.scene-bubble:not(.visible){pointer-events:none}

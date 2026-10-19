@@ -32,6 +32,11 @@ async function verifySocialProps(page) {
   }
   await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toBeVisible();
   await panel.getByRole('button',{name:'结束专注',exact:true}).click();await expect(page.getByRole('timer')).toHaveCount(0);
+  await panel.getByRole('button',{name:'听拉姆说一句',exact:true}).click();
+  const bubble=page.getByRole('button',{name:'回应拉姆的话',exact:true});await expect(bubble).toBeVisible();
+  const shared=await bubble.innerText();assert.ok(shared.length>10);
+  await bubble.click();await expect(panel.getByRole('log')).toContainText(shared);
+  await expect(panel).toHaveAttribute('aria-label','拉姆对话');
   await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
 }
 
@@ -113,6 +118,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
   await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
+  console.log('PASS: local thoughtful speech and clickable chat continuity in the shipped native window');
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());
   assert.equal(typeof speech.available, 'boolean');
   assert.ok(speech.available ? typeof speech.language === 'string' : typeof speech.reason === 'string', 'offline speech availability must explain its status without opening a microphone');

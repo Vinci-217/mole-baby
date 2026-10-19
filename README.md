@@ -2,13 +2,13 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.9.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.9.1) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.10.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.10.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.9.1-Setup.exe` 或 `mole-baby-0.9.1-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.9.1-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.9.1-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.10.0-Setup.exe` 或 `mole-baby-0.10.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.10.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.10.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -25,6 +25,8 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 所有阶段都可手动拖动，包括睡着的拉姆。长大后还能散步、随轻摇摆动；拖到角落会躲起来，偶尔探头，点击即可出来。种子不会自动走动，但可以连同花盆手动拖动，拖到任一侧边也可收起与探头，并保持拖放高度。睡觉使用闭眼帧、轻呼吸和可见的叫醒入口；四种颜色从种子到神力形态保持一致。
 
 设置可开关散步、角落躲藏、安静陪伴和互动音效。计时时长可自定义 1–240 分钟；点击「开始计时」或「陪我专注」才启动，显示倒计时与翻页书本，到时气泡提醒和提示音，随后停止。取消不提醒，重启不自动计时，睡眠与计时独立。提示音可单独关闭。
+
+它也会偶尔主动说些暖心的话：成长、生活、小小的进步和文化片语，结合当前阶段、本地时间与真实记忆。默认约20分钟一次，可在小屋设置改成约10/20/40分钟或关闭；睡觉、专注、安静模式、打开操作面板和躲到侧边时不打扰。点击气泡可继续聊天；「玩耍 → 听拉姆说一句」可主动邀请。离线即可使用，不自动请求 DeepSeek。
 
 ## 背包、商店与动作
 
@@ -85,11 +87,12 @@ npm run build              # TypeScript 与生产构建
 npm run test:browser       # 商店、物品、记忆、背景、音乐和完整游戏
 npm run test:companion-update # 手动单次计时、提示音与16种进化/颜色组合
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包
+npm run test:presence      # 主动陪伴频率、静默、文化追问与记忆边界
 npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、170 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、176 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

@@ -1,3 +1,4 @@
+import { presenceFollowUp } from './companion-presence';
 import { COLORS, getStage, STAGES, EVOLUTIONS } from './game';
 import type { GameState } from './game';
 
@@ -177,6 +178,8 @@ export function buildMessages(pet: GameState, memory: CompanionMemory, userText:
 export function localReply(pet: GameState, memory: CompanionMemory, userText: string): string {
   const text = clean(userText), name = memory.facts.find(f => f.kind === 'nickname')?.value;
   const address = name ? `${name}，` : '';
+  const previous=memory.messages.filter(m=>m.role==='assistant').at(-1)?.content;
+  const followUp=previous?presenceFollowUp(previous,text):null;if(followUp)return address+followUp;
   if (/我叫什么|我的名字|你.*记得.*名字|记得我是谁/.test(text)) return name ? `记得呀，你让我叫你${name}。咕噜～` : '你还没告诉我怎么称呼你呢。可以说“叫我小明”，我会记在我们的小本子里。';
   if (/我不喜欢什么/.test(text)) { const list = memory.facts.filter(f => f.kind === 'dislike'); return list.length ? `你告诉过我，你不喜欢${list.map(f => f.value).join('、')}。` : '你还没告诉过我不喜欢什么，我不会乱猜。'; }
   if (/我喜欢什么|记得.*喜欢/.test(text)) { const list = memory.facts.filter(f => f.kind === 'like'); return list.length ? `你告诉过我，你喜欢${list.map(f => f.value).join('、')}。我记着呢。` : '你还没告诉过我喜欢什么。愿意和我说说吗？'; }
