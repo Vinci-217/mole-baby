@@ -1,0 +1,12 @@
+{
+  "version": "0.6.1",
+  "tag": "v0.6.1",
+  "sourceSha": "07f0f41f647659c5fcdedc187300adc4c046a287",
+  "buildResult": "failure",
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39187290237",
+  "releaseUrl": null,
+  "downloads": [],
+  "verificationLog": "PASS: installer, portable ZIP, executable and required ASAR payload\nPASS: packaged seed tint, fixed pot, offline speech availability and local-only API key save/reload/clear without network requests\nPASS: packaged Windows tray lifecycle, seed color/fixed pot, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for the checked downloads\nnode:fs:1948\r\n  binding.unlink(getValidatedPath(path));\r\n          ^\r\n\r\nError: EBUSY: resource busy or locked, unlink 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ramu-windows-smoke-JfbdIz\\DIPS'\r\n    at unlinkSync (node:fs:1948:11)\r\n    at _unlinkSync (node:internal/fs/rimraf:215:14)\r\n    at rimrafSync (node:internal/fs/rimraf:196:7)\r\n    at node:internal/fs/rimraf:254:9\r\n    at Array.forEach (<anonymous>)\r\n    at _rmdirSync (node:internal/fs/rimraf:251:7)\r\n    at rimrafSync (node:internal/fs/rimraf:194:7)\r\n    at Object.rmSync (node:fs:1239:10)\r\n    at D:\\a\\mole-baby\\mole-baby\\scripts\\verify-windows-package.cjs:175:29 {\r\n  errno: -4082,\r\n  code: 'EBUSY',\r\n  syscall: 'unlink',\r\n  path: 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\ramu-windows-smoke-JfbdIz\\\\DIPS'\r\n}\r\n\r\nNode.js v22.23.3\r\n",
+  "recordedAt": "2026-10-19T01:55:45.532Z"
+}
