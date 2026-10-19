@@ -129,7 +129,10 @@ async function verifyStageSettings(page){
   for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
     await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();
     await expect(settings.getByRole('button',{name:`切换到${label}`,exact:true})).toHaveAttribute('aria-pressed','true');
-    expect((await save()).growth).toBe([0,60,180,420,840][stage]);
+    // An already selected stage keeps its progress, and the real clock may tick.
+    const growth=(await save()).growth,thresholds=[0,60,180,420,840];
+    expect(growth).toBeGreaterThanOrEqual(thresholds[stage]);
+    if(stage<4)expect(growth).toBeLessThan(thresholds[stage+1]);else expect(growth).toBe(840);
   }
   for(const [form,label] of Object.entries({super:'神力超级拉姆',fire:'霹雳火系拉姆',wood:'弹力木系拉姆',water:'神奇水系拉姆'})){
     await settings.getByRole('button',{name:`切换为${label}`,exact:true}).click();await expect.poll(async()=>(await save()).evolution).toBe(form);

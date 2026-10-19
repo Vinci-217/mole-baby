@@ -6,7 +6,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
 (async()=>{
  for(let n=0;n<100;n++){if(server.exitCode!==null)throw Error(logs);try{if((await fetch(url)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});
- const p=await browser.newPage({viewport:{width:1180,height:820}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(url);await adopt(p,'蓝色','小蓝');
+ const p=await browser.newPage({viewport:{width:1180,height:820}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.install();await p.goto(url);await adopt(p,'蓝色','小蓝');await p.clock.fastForward(16000);
  await verifyStageSettings(p);await openActions(p);const pet=p.locator('.compact-pet');
  const bounds=await pet.boundingBox(),character=await p.getByTestId('desktop-character').boundingBox();assert.equal(bounds.width,160);assert.equal(character.width,100);assert.equal(character.x-bounds.x,30);
  const buttons=p.getByTestId('pet-actions').getByRole('button');assert.equal(await buttons.count(),7);
