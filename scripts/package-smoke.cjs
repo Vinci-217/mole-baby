@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { adopt, openActions, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -190,7 +190,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   for (const [form, label] of Object.entries({super:'神力超级拉姆',water:'神奇水系拉姆',wood:'弹力木系拉姆',fire:'霹雳火系拉姆'})) {
     await page.evaluate(() => { const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));pet.growth=840;delete pet.evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet)); });
     await page.reload();await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({timeout:15000});
-    await openActions(page);await actions.getByRole('button',{name:'进入小屋',exact:true}).click();await roomTab(page,'成长');
+    await enterHome(page);await roomTab(page,'成长');
     await page.getByRole('button',{name:`选择${label}`,exact:true}).click();await page.getByRole('button',{name:'确认进化',exact:true}).click();
     await toDesktop(page);await page.reload();
     await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toHaveAttribute('data-form',form,{timeout:15000});

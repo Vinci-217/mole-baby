@@ -24,6 +24,7 @@ async function enterHome(page) {
   await expect(page.locator('.cottage-scene')).toBeVisible();
 }
 async function roomTab(page, label) {
+  await expect(page.locator('.cottage-scene')).toBeVisible({timeout:15000});
   const paperButton = page.locator('.paper-tabs').getByRole('button', { name: label, exact: true });
   if (await paperButton.isVisible()) { await paperButton.click(); return; }
   // Every room function is also reachable without an open paper dialog.
