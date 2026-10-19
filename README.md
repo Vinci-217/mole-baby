@@ -2,9 +2,9 @@
 
 小小一只拉姆，留在 Windows 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows v0.6.2](https://github.com/Vinci-217/mole-baby/releases/tag/v0.6.2) · [Windows 构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows v0.6.3](https://github.com/Vinci-217/mole-baby/releases/tag/v0.6.3) · [Windows 构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-安装版：`mole-baby-0.6.2-Setup.exe`。免安装版：完整解压 `mole-baby-0.6.2-x64.zip`，运行 `拉姆.exe`。附件包含 SHA256 校验文件。旧版本存档与本机设置继续保留。
+安装版：`mole-baby-0.6.3-Setup.exe`。免安装版：完整解压 `mole-baby-0.6.3-x64.zip`，运行 `拉姆.exe`。附件包含 SHA256 校验文件。旧版本存档与本机设置继续保留。
 
 ![桌面拉姆与九宫格背包](artifacts/v6-native-sidecar.png)
 
