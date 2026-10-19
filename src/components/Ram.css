@@ -109,9 +109,8 @@
 .social-ball{left:var(--social-bx,85%);top:var(--social-by,80%);width:24%;aspect-ratio:1;transform:rotate(var(--social-spin,0deg))}
 .social-hand{left:var(--social-hx,70%);top:var(--social-hy,20%);width:53%;height:auto}
 .social-book{left:var(--social-bookx,50%);top:var(--social-booky,90%);width:49%;line-height:0;perspective:120px}
-.social-book>img{display:block;width:100%}.social-book-page{position:absolute;inset:0;clip-path:inset(0 0 0 50%);transform:scaleX(var(--social-page,1));transform-origin:50% 50%;backface-visibility:hidden}
-.ram-sprite:is(.action-pet,.action-play,.action-focus,.action-dizzy) .ram-pose-layer{transform:translateY(var(--social-lift,0%)) rotate(var(--social-angle,0deg))}
+.social-book>img{display:block;width:100%}.social-book-page{position:absolute;left:50%;top:12%;width:43%;height:65%;transform:rotateY(var(--social-page,0deg));transform-origin:left center;opacity:var(--social-pageOpacity,0);transform-style:preserve-3d}.social-book-page>img{position:absolute;left:-25%;top:-12%;width:165%;height:125%;object-fit:fill;backface-visibility:visible}
+.ram-sprite:is(.action-pet,.action-play,.action-focus,.action-dizzy) .ram-pose-layer{transform:translateY(var(--social-lift,0%)) rotate(var(--social-angle,0deg)) perspective(200px) rotateX(var(--social-readTilt,0deg))}
 .ram-seed.is-sleeping .ram-pose-layer{animation:none;transform:none}
-.social-dizzy-stars{position:absolute;left:50%;top:16%;width:65%;height:20%;translate:-50% -50%;transform:rotate(var(--social-stars,0deg));color:#ffc527;text-shadow:0 1px #9e6c18;line-height:1}
-.social-dizzy-stars i{position:absolute;left:0;top:40%;font-size:17px;font-style:normal}.social-dizzy-stars i:nth-child(2){left:43%;top:0}.social-dizzy-stars i:nth-child(3){left:85%;top:40%}
+.social-dizzy-stars{position:absolute;inset:0;pointer-events:none}.social-dizzy-stars>i{position:absolute;width:12%;height:12%;transform:translate(-50%,-50%);line-height:0}.social-dizzy-stars>i>img{position:absolute;width:200%;height:200%;left:-50%;top:-50%;object-fit:contain}
 @media(prefers-reduced-motion:reduce){.ram-sprite:is(.action-pet,.action-play,.action-focus,.action-dizzy) .ram-pose-layer{transform:none}.social-dizzy-stars{transform:none}}

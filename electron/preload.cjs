@@ -38,6 +38,8 @@ function subscribeToState(channel, callback, selectInitial) {
 contextBridge.exposeInMainWorld('desktop', Object.freeze({
   isElectron: true,
   platform: process.platform,
+  openMacSettings: kind=>ipcRenderer.invoke('desktop:open-mac-settings',kind),
+  openMacGuide: ()=>ipcRenderer.invoke('desktop:open-mac-guide'),
   getState: () => ipcRenderer.invoke('desktop:get-state'),
   minimize: () => ipcRenderer.send('desktop:minimize'),
   close: () => ipcRenderer.send('desktop:close'),
@@ -64,6 +66,10 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     return ipcRenderer.invoke('desktop:set-edge-hiding', enabled);
   },
   revealPet: () => ipcRenderer.invoke('desktop:reveal-pet'),
+  setEdgeHovered: (hovered) => {
+    if(typeof hovered!=='boolean')return Promise.reject(new TypeError('Edge hover must be a boolean'));
+    return ipcRenderer.invoke('desktop:set-edge-hovered',hovered);
+  },
   setInteracting: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Interaction state must be a boolean'));
     return ipcRenderer.invoke('desktop:set-interacting', enabled);

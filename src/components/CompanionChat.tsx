@@ -169,7 +169,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
       <textarea ref={inputField} id="companion-chat-input" aria-label="和拉姆说话" rows={2} maxLength={1000} placeholder="比如：叫我小米，我喜欢草莓。" value={input} onChange={e => setInput(e.target.value)} disabled={pending}/>
       <div className="chat-send-row"><button type="button" onClick={() => void voiceInput()} disabled={pending} aria-pressed={listening}>{listening ? '结束录音' : '语音输入'}</button>{pending ? <button type="button" onClick={cancel}>停止等待</button> : <button type="submit" aria-label="发送消息" disabled={!input.trim() || listening}>发送</button>}</div>
     </form>
-    {speechNote && <p className="chat-notice" role="status">{speechNote}</p>}
+    {speechNote && <p className="chat-notice" role="status">{speechNote}{window.desktop?.platform==='darwin'&&<button type="button" onClick={()=>void window.desktop?.openMacSettings('dictation').catch(()=>setSpeechNote('请手动进入系统设置 → 键盘 → 听写。'))}>打开听写设置</button>}</p>}
     {error && <div className="chat-error" role="status"><p>{error}</p>{retryText && !pending && <button type="button" onClick={() => void send(retryText, true)}>重试这条消息</button>}</div>}
     <details className="companion-memories"><summary>我们的小本子 · {memory.facts.length} 条记忆</summary>
       <p className="companion-relationship">{mood.label} · {mood.relationship}</p>

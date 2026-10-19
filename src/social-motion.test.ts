@@ -2,6 +2,18 @@ import { describe,it,expect } from 'vitest';
 import { sampleSocialMotion, SOCIAL_DURATIONS } from './social-motion';
 import type { Stage } from './game';
 describe('stage-specific prop and body choreography',()=>{
+  it('orbits three stars horizontally above each head with depth instead of spinning a flat triangle',()=>{
+    for(const stage of [0,1,2,3,4] as Stage[]){
+      const a=sampleSocialMotion(stage,'dizzy',300),b=sampleSocialMotion(stage,'dizzy',600);
+      expect(a.orbit).toHaveLength(3);expect(a.orbit.map(v=>v.x)).not.toEqual(b.orbit.map(v=>v.x));
+      expect(Math.max(...a.orbit.map(v=>v.y))-Math.min(...a.orbit.map(v=>v.y))).toBeLessThan(7);
+      expect(a.orbit.every(v=>v.y<23)).toBe(true);expect(Math.abs(a.bodyAngle)).toBeLessThan(1);
+    }
+  });
+  it('holds a reading pose and turns a separate page right to left around its binding',()=>{
+    const still=sampleSocialMotion(2,'focus',3000),turn=sampleSocialMotion(2,'focus',6500),later=sampleSocialMotion(2,'focus',7300);
+    expect(still.pageOpacity).toBe(0);expect(turn.pageOpacity).toBeGreaterThan(.5);expect(turn.page).toBeLessThan(0);expect(later.page).toBeLessThan(turn.page);expect(turn.readTilt).toBeGreaterThan(4);
+  });
   it('never lifts the seed pot, keeps props within the native pet area and ends gestures',()=>{
     for(const stage of [0,1,2,3,4] as Stage[]) for(const action of ['pet','play','dizzy'] as const){
       const duration=SOCIAL_DURATIONS[action];

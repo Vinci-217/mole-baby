@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -9,7 +9,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run && node --test electron/deepseek.node-test.cjs electron/speech.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs scripts/mac-signing.node-test.cjs",
+    "test": "vitest run && node --test electron/deepseek.node-test.cjs electron/speech.node-test.cjs electron/mac-settings.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs scripts/mac-signing.node-test.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
@@ -23,7 +23,8 @@
     "test:companion-update": "node scripts/companion-update-regression.cjs",
     "test:social": "node scripts/social-motion-regression.cjs",
     "test:presence": "node scripts/presence-regression.cjs",
-    "test:hover-rest": "node scripts/hover-rest-regression.cjs"
+    "test:hover-rest": "node scripts/hover-rest-regression.cjs",
+    "test:reading-dizzy": "node scripts/reading-dizzy-regression.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

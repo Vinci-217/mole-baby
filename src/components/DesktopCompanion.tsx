@@ -27,11 +27,20 @@ export default function DesktopCompanion(p: Props) {
   const [tools, setTools] = useState(false), [dragging, setDragging] = useState(false);
   const [tilt, setTilt] = useState(0), [shaking, setShaking] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const root = useRef<HTMLDivElement>(null), revealClick = useRef(false);
+  const root = useRef<HTMLDivElement>(null);
+  const docked=p.native&&p.desktopState.edgeSide!==null;
+  const dockedRef=useRef(docked);dockedRef.current=docked;
+  const edgeHover=useRef(false);
+  const peek=(hovered:boolean)=>{
+    if(!dockedRef.current){edgeHover.current=false;return;}
+    if(edgeHover.current===hovered)return;edgeHover.current=hovered;
+    void window.desktop?.setEdgeHovered(hovered);
+  };
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const revealTools = () => { clearTimeout(hideTimer.current); hideTimer.current=undefined; if(!drag.current?.moved) setTools(true); };
+  const revealTools = () => { clearTimeout(hideTimer.current); hideTimer.current=undefined;if(dockedRef.current){setTools(false);peek(true);return;} if(!drag.current?.moved) setTools(true); };
   const hideTools = () => {
+    if(dockedRef.current){peek(false);setTools(false);return;}
     if(hideTimer.current!==undefined)return;
     hideTimer.current=setTimeout(()=>{hideTimer.current=undefined;if(!root.current?.querySelector('.compact-pet :focus-visible'))setTools(false);},220);
   };
@@ -42,13 +51,15 @@ export default function DesktopCompanion(p: Props) {
       if (drag.current?.moved) return;
       const target = document.elementFromPoint(e.clientX, e.clientY);
       // Forwarded moves still reveal tools while the transparent window passes clicks through.
-      if(target?.closest('.desktop-character,.pet-actions,.compact-hover-bridge,.compact-pet-name'))revealTools();else hideTools();
+      if(dockedRef.current){peek(Boolean(target?.closest('.desktop-character')));setTools(false);}
+      else if(target?.closest('.desktop-character,.pet-actions,.compact-hover-bridge,.compact-pet-name'))revealTools();else hideTools();
       window.desktop?.setMousePassthrough(!target?.closest('button,input,textarea,select,summary,[role="dialog"],a,.compact-hover-bridge'));
     };
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  useEffect(() => { void window.desktop?.setInteracting(tools || dragging || p.panel !== null); }, [tools, dragging, p.panel]);
+  useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null); }, [tools, dragging, p.panel,docked]);
+  useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
   useEffect(() => () => { void window.desktop?.setInteracting(false); }, []);
   useEffect(() => () => clearTimeout(shakeTimer.current), []);
   useEffect(() => () => clearTimeout(hideTimer.current), []);
@@ -56,12 +67,10 @@ export default function DesktopCompanion(p: Props) {
     const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') { p.onPanel(null); setTools(false); } };
     document.addEventListener('keydown', escape); return () => document.removeEventListener('keydown', escape);
   }, [p.onPanel]);
-  const touchPet = () => { void window.desktop?.revealPet(); revealTools(); p.onPet(); };
+  const touchPet = () => {if(dockedRef.current){peek(true);return;} void window.desktop?.revealPet(); revealTools(); p.onPet(); };
   function down(e: PointerEvent<HTMLButtonElement>) {
     if (e.button !== 0) return;
-    revealClick.current = false; e.currentTarget.setPointerCapture(e.pointerId);
-    if (p.native && p.desktopState.edgePose !== 'visible') { revealClick.current = true; void window.desktop?.revealPet().then(() => setTools(true)); return; }
-    void window.desktop?.startPetDrag();
+    e.currentTarget.setPointerCapture(e.pointerId);
     if (p.panel) p.onPanel(null);
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     drag.current = { x, y, lastX: x, lastY: y, moved: false, direction: 0, turns: 0, turnAt: performance.now(), offset };
@@ -70,7 +79,7 @@ export default function DesktopCompanion(p: Props) {
     const d = drag.current; if (!d) {revealTools();return;}
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     if (!d.moved && Math.hypot(x - d.x, y - d.y) < 5) return;
-    if (!d.moved) { d.moved = true; setDragging(true); setTools(false); p.onPanel(null); playPetVoice('lift', p.sound); }
+    if (!d.moved) { d.moved = true;void window.desktop?.startPetDrag(); setDragging(true); setTools(false); p.onPanel(null); playPetVoice('lift', p.sound); }
     const dx = x - d.lastX, dy = y - d.lastY;
     setTilt(Math.max(-12, Math.min(12, dx * 1.25)));
     if (Math.abs(dx) > 3) {
@@ -91,23 +100,22 @@ export default function DesktopCompanion(p: Props) {
     d.lastX = x; d.lastY = y;
   }
   function up(e: PointerEvent<HTMLButtonElement>, cancelled = false) {
-    if (revealClick.current) { revealClick.current = false; drag.current = null; setDragging(false); if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); void window.desktop?.endPetDrag(); return; }
     const d = drag.current; drag.current = null;
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
-    setDragging(false); setTilt(0); void window.desktop?.endPetDrag();
-    if (d?.moved) { if(!cancelled)revealTools();playPetVoice('drop', p.sound); if (p.stage === 0) p.onSay('把我的小花盆放在这里，陪着你。'); }
+    setDragging(false); setTilt(0); if(d?.moved)void window.desktop?.endPetDrag();
+    if (d?.moved) { if(!cancelled)setTools(true);playPetVoice('drop', p.sound); if (p.stage === 0) p.onSay('把我的小花盆放在这里，陪着你。'); }
     else if (!cancelled) touchPet();
   }
   const show = (panel: CompanionPanel) => { setTools(true); p.onPanel(panel); };
   const side = p.native ? p.desktopState.panelSide : 'right';
   const condition = getPetCondition(p.pet);
   const edge = p.native ? p.desktopState.edgePose : 'visible';
-  const toolsVisible=!dragging&&edge==='visible'&&(tools||p.panel!==null);
-  return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
-    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerLeave={hideTools} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault(); void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
-      <button type="button" className={`compact-bubble ${p.bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible} tabIndex={p.bubbleVisible?0:-1} disabled={!p.bubbleVisible} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
-      <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
-      <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={edge !== 'visible' ? '点一下，让我出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
+  const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
+  return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerLeave={hideTools} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
+      <button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
+      <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
+      <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         <Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} sleeping={p.pet.sleeping} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
       </button>
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>

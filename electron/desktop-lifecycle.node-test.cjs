@@ -72,7 +72,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32') {
   const runtimeProcess = Object.create(process);
   Object.defineProperty(runtimeProcess, 'platform', { value: platform });
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
-    require: localRequire, __dirname, console, URL, process: runtimeProcess,
+    require: localRequire, __dirname, console, URL, Date, process: runtimeProcess,
     setTimeout, clearTimeout, setInterval, clearInterval,
   }, { filename: 'main.cjs' });
   await new Promise(resolve => setImmediate(resolve));
@@ -183,4 +183,18 @@ test('macOS is menu-bar resident, never flashes before readiness, and uses nativ
   assert.equal(run.window.allSpaces, false, 'the room stays in its own desktop space');
   run.stats.appMenu[0].submenu.find(item => item.accelerator === 'Command+Q').click();
   assert.equal(run.stats.quit, 1);
+});
+
+test('docked pets only peek on hover, wait minutes between automatic peeks and require a drag to release',async t=>{
+ t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',-5000,-200);run.invoke('desktop:end-pet-drag');
+ t.mock.timers.tick(1601);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+ const due=run.invoke('desktop:get-state').edgeNextPeekAt;assert.ok(due-Date.now()>118000&&due-Date.now()<=300000);
+ t.mock.timers.tick(118000);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+ t.mock.timers.tick(due-Date.now()+1);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
+ run.invoke('desktop:set-interacting',true);assert.equal(run.invoke('desktop:get-state').edgeSide,'left');run.invoke('desktop:set-interacting',false);
+ run.invoke('desktop:set-edge-hovered',true);t.mock.timers.tick(600000);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');assert.equal(run.invoke('desktop:get-state').edgeSide,'left');
+ run.invoke('desktop:set-edge-hovered',false);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
 });

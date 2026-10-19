@@ -196,3 +196,7 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ## v0.9 手掌、书本与站立闭眼种子
 
 新增透明手掌与打开的书本，均由图片模型参考原道具、原 UI 生成，原字节保存。提示词、参考、透明设置、尺寸与 SHA256 见 [v9-social-provenance.json](public/assets/generated/v9-social-provenance.json)。球继续使用原 `180004.png`。种子睡姿改为站立身体加原闭眼线，图集追加适配帧，不改变既有61帧，见 [seed/source.json](public/assets/original/seed/source.json)。动作分镜、阶段差别与范围见 [v9-interactions.md](research/v9-interactions.md)。
+
+## v0.12 眩晕与翻页素材
+
+`v12-dizzy-star.png`、`v12-turning-page.png`为参考原UI与道具后使用image_gen生成的透明PNG，原拉姆主体继续播放原图集。完整提示词、参考、尺寸、透明范围与SHA256见`public/assets/generated/v12-motion-provenance.json`；运行时轨道和书脊翻页由同一动作时钟驱动。

@@ -78,3 +78,5 @@
 .companion-layout .compact-bubble:focus-visible,.scene-bubble:focus-visible{outline:2px solid #e8b349;outline-offset:2px}
 .companion-layout .compact-bubble:not(.visible),.scene-bubble:not(.visible){pointer-events:none}
 .scene-wake{display:block;margin:5px auto 0;font-size:13px;color:#765431;padding:3px 10px;background:#fff6da;border:1px solid #e3bb68;border-radius:8px}
+
+.mac-help{padding:18px;margin:12px 0 20px;border:1px solid #e4c47d;border-radius:12px;background:#fff9e8}.mac-help h3{font-size:17px}.mac-help p{font-size:14px;line-height:1.8;margin:10px 0}.mac-help>div{display:flex;gap:12px;flex-wrap:wrap}

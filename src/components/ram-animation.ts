@@ -35,12 +35,12 @@ export function getRamActionDuration(action: string): number | null {
  */
 export function sampleRamPose(action: string, elapsed: number, reduced = false): Pose {
   if (action === 'sleep') return { row: 8, frame: 0, finished: false }
-  if (action === 'focus') return { row: 0, frame: reduced || elapsed % 8000 < 7600 ? 0 : 1, finished: false }
+  if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
     const duration=SOCIAL_DURATIONS[action as 'pet'|'play'|'dizzy'];
     if (elapsed>=duration) return {row:0,frame:0,finished:true};
     if (reduced) return {row:0,frame:0,finished:false};
-    return {row:action==='dizzy'?5:action==='play'?8:3,frame:reduced?0:Math.floor(elapsed/(action==='dizzy'?200:220))%(action==='pet'?4:6),finished:false};
+    return {row:action==='dizzy'?0:action==='play'?8:3,frame:action==='dizzy'?0:Math.floor(elapsed/220)%(action==='pet'?4:6),finished:false};
   }
   if (action === 'still' || action === 'drag') return { row: 0, frame: 0, finished: false }
   const item = getItemMotionByAction(action)
@@ -84,7 +84,7 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   if (action === 'sleep') return { frame: 61, finished: false }
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   if (action === 'pet' || action === 'play') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:reduced?0:Math.floor(elapsed/350)%2,finished:elapsed>=SOCIAL_DURATIONS[action]}
-  if (action === 'focus') return { frame: reduced || elapsed%8000<7600 ? 0 : 2, finished:false }
+  if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }

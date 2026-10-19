@@ -24,6 +24,7 @@ function signingMode(env = process.env) {
 function macBuildConfig(base, env = process.env) {
   const mode = signingMode(env);
   const config = { ...base, mac: { ...base.mac }, dmg: { ...base.dmg } };
+  if(Array.isArray(base.dmg?.contents))config.dmg.contents=[...base.dmg.contents,{x:290,y:325,type:'file',path:require('node:path').join(__dirname,'../electron/Mac 打开说明.html')}];
   if (mode === 'notarized') {
     // Let electron-builder select the imported Developer ID Application identity.
     delete config.mac.identity;

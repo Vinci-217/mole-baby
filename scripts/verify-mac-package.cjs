@@ -38,6 +38,7 @@ async function main() {
   try {
     execFileSync('/usr/bin/hdiutil',['attach',path.join(release,files[0]),'-readonly','-nobrowse','-mountpoint',mount],{stdio:'pipe'});attached=true;
     assert.ok(fs.lstatSync(path.join(mount,'Applications')).isSymbolicLink());
+    const guide=fs.readFileSync(path.join(mount,'Mac 打开说明.html'),'utf8');assert.ok(guide.includes('x-apple.systempreferences:com.apple.preference.security?General'));assert.ok(guide.includes('仍要打开'));
     const diskArchive=path.join(mount,`${build.productName}.app/Contents/Resources/app.asar`);
     const hash=filename=>createHash('sha256').update(fs.readFileSync(filename)).digest('hex');
     assert.equal(hash(diskArchive),hash(archive));

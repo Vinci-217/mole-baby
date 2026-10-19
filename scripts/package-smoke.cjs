@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyEdgePeek, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -46,14 +46,14 @@ async function verifyApplication({ executable, archive, screenshot }) {
   requireFile(archive);
   const paths = new Set(asar.listPackage(archive).map(item => item.replace(/\\/g, '/').replace(/^\//, '')));
   for (const filename of [
-    'package.json', 'electron/main.cjs', 'electron/preload.cjs', 'electron/deepseek.cjs', 'electron/speech.cjs', 'dist/index.html', 'dist/favicon.png',
+    'package.json', 'electron/main.cjs', 'electron/mac-settings.cjs', 'electron/Mac 打开说明.html', 'electron/preload.cjs', 'electron/deepseek.cjs', 'electron/speech.cjs', 'dist/index.html', 'dist/favicon.png',
     'dist/assets/classic/middle-neutral.png', 'dist/assets/classic/middle-mask.png',
     'dist/assets/original/scenes/ramu-home.png', 'dist/assets/original/scenes/lake-cabin.png', 'dist/assets/original/scenes/original-earthen-home.png',
     'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
     'dist/assets/generated/v6-starlight-greenhouse.png', 'dist/assets/generated/v6-creek-treehouse.png',
     'dist/icons/ramu.png', 'dist/icons/tray.png', 'dist/icons/ramu.ico',
     'dist/icons/ramu.icns', 'dist/icons/tray-mac.png', 'dist/icons/tray-mac@2x.png',
-    'dist/assets/generated/v9-petting-hand.png', 'dist/assets/generated/v9-study-book.png',
+    'dist/assets/generated/v9-petting-hand.png', 'dist/assets/generated/v9-study-book.png', 'dist/assets/generated/v12-dizzy-star.png', 'dist/assets/generated/v12-turning-page.png',
     'dist/assets/original/item-motion/bath-tub.png', 'dist/assets/original/item-motion/toothbrush-generated.png',
     'dist/assets/original/audio/castle.mp3', 'dist/assets/original/audio/pet-shop.mp3', 'dist/assets/original/audio/mystery-lake.mp3',
     'dist/assets/original/items/180027.png', 'dist/assets/original/items/180017.png',
@@ -109,6 +109,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const painted = await character.locator('canvas').evaluate(canvas =>
     canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((value, index) => index % 4 === 3 && value > 0));
   assert.equal(painted, true, 'The original Ram canvas must contain visible pixels');
+  await page.evaluate(()=>window.desktop.setEdgeHiding(false));
   await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   await character.hover();await expect(page.getByTestId('pet-actions')).toBeVisible();assert.equal(await page.locator('.compact-reminder').count(),0);
   await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
@@ -121,6 +122,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const seedAfterDrag = await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
+  for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
+  console.log('PASS: both docked edges hover/click only peek, actual pointer drag releases the seed, random 2–5 minute cadence');
   await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
   console.log('PASS: local thoughtful speech and clickable chat continuity in the shipped native window');
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());
@@ -195,6 +198,16 @@ async function verifyApplication({ executable, archive, screenshot }) {
     await page.keyboard.press('Meta+V');
     await expect(page.getByRole('textbox',{name:'和拉姆说话',exact:true})).toHaveValue('我喜欢月光。');
     await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
+    await enterHome(page);await roomTab(page,'设置');const help=page.getByRole('region',{name:'Mac 使用帮助',exact:true});await expect(help).toBeVisible();
+    await desktop.evaluate(({shell})=>{globalThis.__macHelpOriginal={openExternal:shell.openExternal,openPath:shell.openPath};globalThis.__macHelpCalls=[];shell.openExternal=async uri=>{globalThis.__macHelpCalls.push(uri);};shell.openPath=async file=>{globalThis.__macHelpCalls.push(file);return '';};});
+    try{
+      await help.getByRole('button',{name:'打开隐私与安全',exact:true}).click();await expect(help.getByRole('status')).toContainText('隐私与安全');
+      await help.getByRole('button',{name:'打开听写设置',exact:true}).click();await expect(help.getByRole('status')).toContainText('中文听写');
+      await help.getByRole('button',{name:'首次打开说明',exact:true}).click();await expect(help.getByRole('status')).toContainText('安装与首次启动');
+      const calls=await desktop.evaluate(()=>globalThis.__macHelpCalls);assert.match(calls[0],/^x-apple\.systempreferences:com\.apple\.preference\.security/);assert.match(calls[1],/^x-apple\.systempreferences:com\.apple\.preference\.keyboard/);
+      assert.equal(calls[2],path.join(userData,'help','Mac 打开说明.html'));assert.ok(fs.readFileSync(calls[2],'utf8').includes('仍要打开'));
+    }finally{await desktop.evaluate(({shell})=>{Object.assign(shell,globalThis.__macHelpOriginal);delete globalThis.__macHelpCalls;delete globalThis.__macHelpOriginal;});}
+    await toDesktop(page);console.log('PASS: Mac settings buttons route to fixed privacy/dictation panes and extract a usable first-open guide from ASAR');
   }
   // Test the shipped evolution selector and original atlas for every form.
   for (const [form, label] of Object.entries({super:'神力超级拉姆',water:'神奇水系拉姆',wood:'弹力木系拉姆',fire:'霹雳火系拉姆'})) {

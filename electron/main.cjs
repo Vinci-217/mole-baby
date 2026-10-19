@@ -1,10 +1,13 @@
-const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage, Tray, Menu, nativeImage, shell } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { createCompanionAI } = require('./deepseek.cjs');
 const { createCompanionSpeech } = require('./speech.cjs');
 const { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop } = require('./desktop-geometry.cjs');
+const { edgeDelay } = require('./edge-timing.cjs');
+const { createMacHelp } = require('./mac-settings.cjs');
+const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
@@ -63,6 +66,9 @@ let edgeSide = null;
 let edgePose = 'visible';
 let edgeTimer = null;
 let interacting = false;
+let edgeHovered = false;
+let edgeNextPeekAt = null;
+let draggingFromEdge = false;
 
 function getDesktopState() {
   return {
@@ -75,6 +81,7 @@ function getDesktopState() {
     edgeSide,
     edgePose,
     edgeHiding,
+    edgeNextPeekAt,
   };
 }
 
@@ -118,6 +125,7 @@ function canHideAtEdge() {
 function revealPet() {
   clearTimeout(edgeTimer);
   edgeTimer = null;
+  edgeHovered = false;edgeNextPeekAt=null;
   const changed = edgePose !== 'visible' || edgeSide !== null;
   edgePose = 'visible';
   edgeSide = null;
@@ -127,13 +135,26 @@ function revealPet() {
 
 function schedulePeek() {
   clearTimeout(edgeTimer);
-  if (!edgeSide || !edgeHiding || !canHideAtEdge()) return;
+  edgeNextPeekAt=null;
+  if (!edgeSide || !edgeHiding || edgeHovered || !canHideAtEdge()) return;
+  const delay=edgeDelay(edgePose);
+  if(edgePose==='hidden')edgeNextPeekAt=Date.now()+delay;
   edgeTimer = setTimeout(() => {
-    if (!edgeSide || !edgeHiding || !canHideAtEdge()) { revealPet(); return; }
+    edgeNextPeekAt=null;
+    if (!edgeSide || !edgeHiding || edgeHovered || !canHideAtEdge()) return;
     edgePose = edgePose === 'hidden' ? 'peek' : 'hidden';
     publishState();
     schedulePeek();
-  }, edgePose === 'visible' ? 1600 : edgePose === 'peek' ? 2600 : 10000 + Math.random() * 9000);
+  }, delay);
+}
+
+function changeEdgeHovered(hovered) {
+  if(typeof hovered!=='boolean')throw new TypeError('Edge hover must be a boolean');
+  if(!edgeSide||!edgeHiding||!petMode||dragging||hovered===edgeHovered)return getDesktopState();
+  edgeHovered=hovered;clearTimeout(edgeTimer);edgeNextPeekAt=null;
+  edgePose=hovered?'peek':'hidden';publishState();
+  if(!hovered)schedulePeek();
+  return getDesktopState();
 }
 
 function tuckIntoCorner(force = false) {
@@ -168,8 +189,8 @@ function changeInteracting(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Interaction state must be a boolean');
   if (enabled === interacting) return interacting;
   interacting = enabled;
-  if (enabled) { stopMovement(); revealPet(); }
-  else if (!tuckIntoCorner()) scheduleWander();
+  if (enabled) { stopMovement(); if(!edgeSide)revealPet(); }
+  else if(edgeSide)schedulePeek();else if (!tuckIntoCorner()) scheduleWander();
   return interacting;
 }
 
@@ -246,15 +267,19 @@ function walkAlongDesktop() {
 
 function startPetDrag() {
   if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
+  const offset=edgeSide?(edgeSide==='left'?-1:1)*(edgePose==='peek'?85:125):0;
+  const bounds=mainWindow.getBounds();draggingFromEdge=Boolean(edgeSide);
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   dragging = true;
+  if(offset)mainWindow.setPosition(bounds.x+offset,bounds.y,false);
   stopMovement();
   return true;
 }
 
 function endPetDrag() {
   dragging = false;
+  if(draggingFromEdge){const fitted=clampBounds(mainWindow.getBounds(),PET_SIZE);mainWindow.setPosition(fitted.x,fitted.y,false);draggingFromEdge=false;}
   scheduleSave();
   if (!tuckIntoCorner()) scheduleWander();
   return true;
@@ -271,7 +296,9 @@ function movePet(dx, dy) {
   if (companionPanel) changeCompanionPanel(false);
   stopMovement();
   const current = mainWindow.getBounds();
-  const target = clampBounds({ ...current, x: current.x + Math.round(dx), y: current.y + Math.round(dy) }, PET_SIZE);
+  const desired={...current,x:current.x+Math.round(dx),y:current.y+Math.round(dy)};
+  const target = clampBounds(desired, PET_SIZE);
+  if(dragging&&draggingFromEdge){const area=screen.getDisplayMatching(current).workArea;target.x=Math.max(area.x-125,Math.min(area.x+area.width-PET_SIZE.width+125,desired.x));}
   mainWindow.setPosition(target.x, target.y, false);
   scheduleSave();
   // movePet also works without explicit drag lifecycle calls: movement delays
@@ -572,6 +599,11 @@ function refreshTrayMenu() {
       walkToCorner();
     } },
     { label: '暂停躲藏', type: 'checkbox', checked: !edgeHiding, click: item => changeEdgeHiding(!item.checked) },
+    ...(process.platform==='darwin'?[{label:'Mac 使用帮助',submenu:[
+      {label:'打开隐私与安全',click:()=>{void macHelp.openSettings('security').catch(()=>{});}},
+      {label:'打开听写设置',click:()=>{void macHelp.openSettings('dictation').catch(()=>{});}},
+      {label:'首次打开说明',click:()=>{void macHelp.openGuide().catch(()=>{});}},
+    ]}]:[]),
     { type: 'separator' },
     { label: '退出拉姆', click: () => { quitting = true; app.quit(); } },
   ]));
@@ -624,6 +656,9 @@ function registerIPC() {
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
   handle('desktop:set-edge-hiding', changeEdgeHiding);
+  handle('desktop:set-edge-hovered', changeEdgeHovered);
+  handle('desktop:open-mac-settings', kind=>macHelp.openSettings(kind));
+  handle('desktop:open-mac-guide', ()=>macHelp.openGuide());
   handle('desktop:set-interacting', changeInteracting);
   handle('desktop:reveal-pet', revealPet);
   handle('desktop:get-state', getDesktopState);

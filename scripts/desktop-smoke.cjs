@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyEdgePeek, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -132,6 +132,7 @@ async function verifyBackground(page, selector, suffix) {
   await page.screenshot({path:path.join(artifacts,'v9-native-seed.png'),omitBackground:true});
   console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
 
+  await page.evaluate(()=>window.desktop.setEdgeHiding(false));
   await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   await character.hover();await expect(page.getByTestId('pet-actions')).toBeVisible();assert.equal(await page.locator('.compact-reminder').count(),0);
   await page.getByTestId('pet-actions').getByRole('button',{name:'开始计时',exact:true}).click();
@@ -140,16 +141,8 @@ async function verifyBackground(page, selector, suffix) {
   await page.getByRole('button',{name:'取消计时',exact:true}).click();await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   console.log('PASS real pointer hover opens tools through native passthrough, leave hides tools, and the clock replaces rest without an idle bar');
 
-  // Seed pots can be manually placed at either side, at any height.
-  for(const edge of ['left','right']) {
-    const beforeEdge=await bounds(),targetY=area.y+Math.min(240,area.height-240);
-    await page.evaluate(async({dx,dy})=>{await window.desktop.setInteracting(false);await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.endPetDrag();},{dx:(edge==='left'?area.x:area.x+area.width-200)-beforeEdge.x,dy:targetY-beforeEdge.y});
-    await expect.poll(async()=>(await state()).edgePose,{timeout:5000}).toBe('hidden');
-    assert.equal((await bounds()).y,targetY);assert.equal((await state()).wandering,false);
-    await character.click({position:{x:edge==='left'?90:10,y:54},force:true});
-    await expect.poll(async()=>(await state()).edgePose).toBe('visible');await expect(page.getByTestId('pet-actions')).toBeVisible();await expect(character).toBeInViewport();
-  }
-  console.log('PASS seed manually hides at both vertical edges without walking or changing height');
+  for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
+  console.log('PASS both seed edges: hover/click only peek, no tools, random 2–5 minute cadence, physical pointer drag out and unchanged height');
 
   // Grow only this isolated fixture; normal adoption always starts with a seed.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});
@@ -176,7 +169,7 @@ async function verifyBackground(page, selector, suffix) {
   await page.keyboard.press('Escape');await page.evaluate(()=>window.desktop.wander(true));await expect.poll(async()=>(await state()).motion,{timeout:20000}).toMatch(/^(left|right)$/);await expect(character.locator('.ram-sprite')).toHaveClass(/action-walk-(left|right)/);
   await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();await expect.poll(async()=>(await state()).motion).toBe('idle');await page.evaluate(()=>window.desktop.wander(false));await page.getByLabel('关闭小窗').click();await page.keyboard.press('Escape');
   await page.evaluate(async()=>{await window.desktop.setEdgeHiding(true);await window.desktop.setInteracting(false);await window.desktop.startPetDrag();});const nowBounds=await bounds();await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:rightX-nowBounds.x,dy:area.y+area.height-240-nowBounds.y});await page.evaluate(()=>window.desktop.endPetDrag());
-  await expect.poll(async()=>(await state()).edgePose,{timeout:5000}).toBe('hidden');await expect.poll(async()=>(await state()).edgePose,{timeout:21000}).toBe('peek');await expect(page.locator('.companion-layout')).toHaveClass(/edge-peek/);await page.evaluate(()=>window.desktop.revealPet());assert.equal((await state()).edgePose,'visible');await page.evaluate(()=>window.desktop.setEdgeHiding(false));
+  await expect.poll(async()=>(await state()).edgePose,{timeout:5000}).toBe('hidden');const nextPeek=(await state()).edgeNextPeekAt-Date.now();assert.ok(nextPeek>118000&&nextPeek<=300000);await page.evaluate(()=>window.desktop.setEdgeHovered(true));await expect.poll(async()=>(await state()).edgePose).toBe('peek');await expect(page.locator('.companion-layout')).toHaveClass(/edge-peek/);await page.evaluate(()=>window.desktop.revealPet());assert.equal((await state()).edgePose,'visible');await page.evaluate(()=>window.desktop.setEdgeHiding(false));
   const pinned=await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());assert.equal((await state()).alwaysOnTop,pinned);await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());
   console.log('PASS real mature dragging, timed directional walking, interaction pause, corner tuck/peek/reveal and pin state');
 

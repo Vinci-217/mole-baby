@@ -191,5 +191,8 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .pet-actions .timer-tool{position:relative}
 .companion-layout .timer-tool.running{background:#fff0ba;box-shadow:inset 0 0 0 1px #d6a64a}
 .companion-layout .tool-countdown{position:absolute;top:30px;left:50%;transform:translateX(-50%);color:#765431;font-size:11px;line-height:13px;font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px #fff;pointer-events:none}
+.companion-layout.is-edge-docked .compact-pet-name{opacity:0!important;pointer-events:none}
+.companion-layout.is-edge-docked .ram-social{display:none}
+.companion-layout.is-pet-dragging .compact-pet{transition:none}
 .companion-preview>.companion-layout.panel-open{height:490px}
 @media(max-width:600px){.companion-preview>.companion-layout.panel-open{height:735px}.companion-preview .companion-panel{height:474px;max-height:calc(100vh - 255px)}.companion-preview>.companion-layout{bottom:15px}}

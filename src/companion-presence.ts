@@ -2,7 +2,7 @@ import { getStage } from './game';
 import type { GameState } from './game';
 import type { CompanionMemory } from './companion-memory';
 
-export type PresenceTopic='growth'|'work'|'progress'|'culture'|'life'|'memory'|'care'|'feeling';
+export type PresenceTopic='growth'|'work'|'progress'|'culture'|'life'|'memory'|'care'|'feeling'|'reading';
 export interface PresenceLine { id:string; topic:PresenceTopic; text:string }
 export interface PresenceJournal { version:1; petId:string; history:{id:string;topic:PresenceTopic;at:number}[] }
 export const presenceKey=(pet:Pick<GameState,'createdAt'>)=>`ramu-presence-v1:${pet.createdAt}`;
@@ -15,7 +15,13 @@ export const CULTURE = [
   {id:'culture-cloud',quote:'行到水穷处，坐看云起时',text:'“行到水穷处，坐看云起时。”偶尔停一停，也可能看见不一样的风景。',reply:'这句出自王维《终南别业》。走到溪流尽头，就坐下看看云起；它让我想到，暂时停一停，并不等于之前走的路白费了。'},
   {id:'culture-lantern',quote:'灯火可亲',text:'灯火可亲。一盏小灯、一段安静的时间，也能让普通的日子暖起来。',reply:'“灯火可亲”让我想到温暖的灯光和安静读书的时刻。也可以只是听一首喜欢的歌，不必把休息也安排成任务。'},
 ] as const;
-const BANK:Record<Exclude<PresenceTopic,'memory'|'care'|'feeling'|'growth'|'culture'>,string[]>={
+const READING=[
+ '我把这一页翻过去，接着陪你慢慢读。','先读懂一小段，就可以为自己开心一下。','遇到不懂的字，可以先做个记号，回头再找答案。','有时候把一段话读出声，会发现新的意思。',
+ '书里有好多小世界，今天想走进哪一个？','读到喜欢的句子，可以留在自己的小本子里。','同一本书，过些日子再读，也许会有新的发现。','我在这边安安静静翻书，陪你按自己的节奏学。',
+ '刚读过的内容，可以试着用自己的话讲一遍。','一个小问题，也可能是认识新东西的开始。','学得慢一些没关系，理解比赶页数更有意思。','翻完这一页，我想把好奇心也一起留下来。',
+ '读书也可以只是喜欢，不必每一页都有收获。','有空讲讲你最近喜欢的书吧，我想听听。','把书合上想一小会儿，也是在读懂它。','今天的这段安静时光，我很喜欢。',
+];
+const BANK:Record<Exclude<PresenceTopic,'memory'|'care'|'feeling'|'growth'|'culture'|'reading'>,string[]>={
   work:['手边的事可以一件件来，我就在这里陪着你。','不用一口气把所有事做好，先把眼前的一小点安顿好。','想歇一小会儿就歇一会儿，回来以后我们再慢慢继续。','肩膀可以放松一点点。今天的你，也值得被好好照顾。','如果手边忙完一小段，可以看看远处，给眼睛一小片风景。','这会儿想安静做事也好，想说两句也好，我都在。','杯子里的水要是空了，顺手给自己倒一点吧。','难的事情可以先拆小一点，我陪你慢慢琢磨。'],
   progress:['今天哪怕只多懂一点点，也算在往前走。','做得慢一些没关系，认真走过的小步也有分量。','不必每件事都有漂亮的结果，愿意尝试就很珍贵。','遇到暂时不懂的地方，可以先留个小问号，慢慢找答案。','如果刚好做成了一点小事，记得也为自己开心一下。','进步有时候很安静，像种子在土里慢慢生根。','换一种办法再试试，也是在认识自己的路。','今天做不到的，可以留给更有精神的时候。'],
   life:['有时候，一首喜欢的歌就能让这一小会儿变得柔软。','窗外要是有好看的天色，记得替我多看一眼呀。','我喜欢我们这样，各忙各的，也彼此有个照应。','想和我分享一件小事吗？很小很小的那种也可以。','生活里不只有待办清单，也有值得慢慢尝一口的甜。','今天要是遇到一件可爱的小事，可以讲给我听。','喜欢的东西，不一定要有什么用。喜欢就已经很好了。','我在这里轻轻晃一晃；你在自己的节奏里慢慢来。'],
@@ -29,7 +35,7 @@ const GROWTH=[
 ];
 export function newPresenceJournal(pet:GameState):PresenceJournal{return {version:1,petId:String(pet.createdAt),history:[]};}
 export function readPresenceJournal(pet:GameState):PresenceJournal{
- try{const raw=JSON.parse(localStorage.getItem(presenceKey(pet))||'null');if(raw?.version!==1||raw.petId!==String(pet.createdAt)||!Array.isArray(raw.history))return newPresenceJournal(pet);return {...newPresenceJournal(pet),history:raw.history.filter((v:unknown)=>{const x=v as {id?:unknown;topic?:unknown;at?:unknown};return x&&typeof x.id==='string'&&x.id.length<50&&['growth','work','progress','culture','life','memory','care','feeling'].includes(String(x.topic))&&typeof x.at==='number'&&Number.isFinite(x.at)&&x.at>=0;}).slice(-48)};}catch{return newPresenceJournal(pet);}
+ try{const raw=JSON.parse(localStorage.getItem(presenceKey(pet))||'null');if(raw?.version!==1||raw.petId!==String(pet.createdAt)||!Array.isArray(raw.history))return newPresenceJournal(pet);return {...newPresenceJournal(pet),history:raw.history.filter((v:unknown)=>{const x=v as {id?:unknown;topic?:unknown;at?:unknown};return x&&typeof x.id==='string'&&x.id.length<50&&['growth','work','progress','culture','life','memory','care','feeling','reading'].includes(String(x.topic))&&typeof x.at==='number'&&Number.isFinite(x.at)&&x.at>=0;}).slice(-48)};}catch{return newPresenceJournal(pet);}
 }
 export function rememberPresence(journal:PresenceJournal,line:PresenceLine,now:number):PresenceJournal{
  const next={...journal,history:[...journal.history,{id:line.id,topic:line.topic,at:now}].slice(-48)};
@@ -60,10 +66,12 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
  const boundaries=facts.filter(f=>f.kind==='boundary').map(f=>f.value).join(' ');
  return lines.filter(v=>!(/不要.*(?:鸡汤|说教|大道理)/.test(boundaries)&&['progress','culture'].includes(v.topic))&&!(/(?:别|不要).*提醒.*(?:休息|喝水)/.test(boundaries)&&v.topic==='work'));
 }
-export function choosePresence(pet:GameState,memory:CompanionMemory,journal:PresenceJournal,now=Date.now(),manual=false):PresenceLine|null{
+export function choosePresence(pet:GameState,memory:CompanionMemory,journal:PresenceJournal,now=Date.now(),manual=false,reading=false):PresenceLine|null{
  if(pet.sleeping||(!manual&&wantsQuiet(memory)))return null;
  const recent=journal.history.filter(h=>h.at<=now&&now-h.at<3*86400000),last=recent.at(-1);
- const candidates=presenceCandidates(pet,memory,now).filter(line=>!recent.slice(-16).some(h=>h.id===line.id)&&line.topic!==last?.topic&&!(line.topic==='care'&&recent.some(h=>h.topic==='care'&&now-h.at<3600000)));
+ const noLecture=memory.facts.some(f=>f.kind==='boundary'&&/不要.*(?:鸡汤|说教|大道理)/.test(f.value));
+ const available:PresenceLine[]=reading?[...READING.map((text,i)=>({id:`study-${i}`,topic:'reading' as const,text})),...(!noLecture?CULTURE.map(v=>({id:`study-${v.id}`,topic:'culture' as const,text:v.text.replace('长出叶子','长大')})):[])]:presenceCandidates(pet,memory,now);
+ const candidates=available.filter(line=>!recent.slice(-(reading?12:16)).some(h=>h.id===line.id)&&(reading||line.topic!==last?.topic)&&!(line.topic==='care'&&recent.some(h=>h.topic==='care'&&now-h.at<3600000)));
  if(!candidates.length)return null;
  const personal=candidates.filter(c=>['memory','feeling'].includes(c.topic));
  const choices=personal.length&&recent.length%4===0?personal:candidates;
@@ -74,6 +82,7 @@ export function choosePresence(pet:GameState,memory:CompanionMemory,journal:Pres
  return {...selected,text:address+selected.text};
 }
 export function presenceFollowUp(previous:string,input:string):string|null{
+ if(/书|这一页|翻书|读懂/.test(previous)&&/你.*(?:什么书|哪本书|读什么|看什么)/.test(input))return '我捧着的是陪伴用的小书，里面的文字是装饰；我们可以一起聊古诗、读书方法，也可以聊你最近喜欢的书。';
  if(!/什么意思|怎么理解|再说|刚才|这句|解释/.test(input))return null;
  const cultural=CULTURE.find(v=>previous.includes(v.quote));if(cultural)return cultural.reply;
  if(/一点点|进步|慢慢长大/.test(previous))return '我想说，不用把自己和别人摆在同一条刻度上。你愿意学一点、试一点，那就是属于你的那一步。';

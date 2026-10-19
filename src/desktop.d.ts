@@ -14,6 +14,7 @@ declare global {
     edgeSide: 'left' | 'right' | null;
     edgePose: 'visible' | 'hidden' | 'peek';
     edgeHiding: boolean;
+    edgeNextPeekAt?: number | null;
   }
   interface Window {
     companionSpeech?: {
@@ -31,6 +32,8 @@ declare global {
     desktop?: {
       isElectron: boolean;
       platform: string;
+      openMacSettings: (kind:'security'|'dictation')=>Promise<boolean>;
+      openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;
       minimize: () => void;
       close: () => void;
@@ -42,6 +45,7 @@ declare global {
       setPetCanMove: (enabled: boolean) => Promise<boolean>;
       setEdgeHiding: (enabled: boolean) => Promise<boolean>;
       revealPet: () => Promise<DesktopState>;
+      setEdgeHovered: (hovered: boolean) => Promise<DesktopState>;
       setInteracting: (enabled: boolean) => Promise<boolean>;
       setMousePassthrough: (ignore: boolean) => void;
       onPetModeChanged: (callback: (enabled: boolean) => void) => () => void;

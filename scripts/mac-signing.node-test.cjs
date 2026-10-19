@@ -7,7 +7,7 @@ const { REQUIRED, signingMode, macBuildConfig, removeEmptySigningCredentials } =
 const { verifyMacTrust } = require('./mac-trust.cjs');
 const { notarizeDmg: runDmgNotarization } = require('./notarize-mac-dmg.cjs');
 const notarizeDmg = options => runDmgNotarization({ log: () => {}, ...options });
-const { prepareReleaseNotes } = require('./prepare-release-notes.cjs');
+const { prepareReleaseNotes,writeReleaseFiles } = require('./prepare-release-notes.cjs');
 const credentials = Object.fromEntries(REQUIRED.map(name => [name, `dummy-${name}`]));
 const base = { mac: { identity: '-', notarize: false }, dmg: {} };
 
@@ -42,6 +42,12 @@ test('notarized configuration forces Developer ID distribution, hardened runtime
   assert.equal(base.mac.identity, '-', 'configuration must not mutate local defaults');
   assert.equal(JSON.stringify(config).includes('dummy-'), false, 'credentials stay out of generated config');
   assert.equal(macBuildConfig(base, {}).mac.identity, '-');
+});
+
+test('Mac installer includes an accessible pre-launch guide outside the blocked application',()=>{
+ const source={...base,dmg:{contents:[{x:150,y:220},{x:430,y:220,type:'link',path:'/Applications'}]}};
+ const config=macBuildConfig(source,{});assert.equal(source.dmg.contents.length,2);assert.equal(config.dmg.contents.length,3);
+ const guide=config.dmg.contents[2];assert.equal(path.basename(guide.path),'Mac 打开说明.html');assert.ok(fs.readFileSync(guide.path,'utf8').includes('x-apple.systempreferences:'));
 });
 
 test('Gatekeeper acceptance requires a real Developer ID, both tickets and both policy assessments', () => {
@@ -83,4 +89,13 @@ test('release notes can claim Apple trust only with matching verified receipts f
   const localNotes=prepareReleaseNotes(directory,'source','notes');
   assert.match(localNotes,/尚未经过 Apple 公证/);
   for(const instruction of ['mac-arm64.dmg','mac-x64.dmg','Applications','仍要打开','隐私与安全性','退出拉姆']) assert.ok(localNotes.includes(instruction), `Release must include Mac instruction: ${instruction}`);
+});
+
+test('release includes a standalone Mac guide with an idempotent matching checksum',t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'mole-guide-release-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));fs.mkdirSync(path.join(root,'release'));fs.mkdirSync(path.join(root,'electron'));
+ const guide=fs.readFileSync(path.join(__dirname,'../electron/Mac 打开说明.html'));fs.writeFileSync(path.join(root,'electron/Mac 打开说明.html'),guide);fs.writeFileSync(path.join(root,'RELEASE_NOTES.md'),'new release');
+ for(const arch of ['arm64','x64'])fs.writeFileSync(path.join(root,`release/macos-trust-${arch}.json`),JSON.stringify({architecture:arch,sourceSha:'source',mode:'local'}));
+ fs.writeFileSync(path.join(root,'release/SHA256SUMS.txt'),'original  original.zip\n');writeReleaseFiles(root,'source');writeReleaseFiles(root,'source');
+ assert.deepEqual(fs.readFileSync(path.join(root,'release/mole-baby-mac-help.html')),guide);const lines=fs.readFileSync(path.join(root,'release/SHA256SUMS.txt'),'utf8').trim().split('\n');assert.equal(lines.length,2);
+ assert.equal(lines[1],require('node:crypto').createHash('sha256').update(guide).digest('hex')+'  mole-baby-mac-help.html');assert.match(fs.readFileSync(path.join(root,'release/RELEASE_NOTES.md'),'utf8'),/独立 Mac 打开说明/);
 });

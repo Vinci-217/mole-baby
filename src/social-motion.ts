@@ -21,17 +21,26 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
   const contact=action==='play'?Math.max(0,1-Math.abs((progress*2%1)-.5)*7):0;
   const formFactor=evolution==='water'?.65:evolution==='fire'?1.3:evolution==='wood'?.85:1;
   const contactX=stage===4 ? evolution==='super'?82:evolution==='wood'?87:evolution==='water'?92:94 : p.contactX;
+  const readingPhase=(time%8000)/8000;
+  const turn=Math.max(0,Math.min(1,(readingPhase-.74)/.2));
+  const haloY=stage===0?12:stage===1?18:stage===2?4:stage===3?7:3;
+  const orbit=Array.from({length:3},(_,i)=>{
+    const phase=time/1250*Math.PI*2+i*Math.PI*2/3,depth=Math.sin(phase);
+    return {x:50+Math.cos(phase)*(stage===0?22:stage===1?27:34),y:haloY+depth*3,scale:.8+(depth+1)*.16,opacity:.65+(depth+1)*.175,angle:Math.sin(phase)*16};
+  });
   return {
     finished:ended, opacity:ended?0:reduced?1:Math.max(0,enter),
-    bodyAngle:reduced?0:action==='dizzy'?Math.sin(time/125)*p.sway:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*p.sway*.35:Math.sin(time/1300)*.5,
-    bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*.7:0,
+    bodyAngle:reduced?0:action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*p.sway*.35:stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
+    bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*.7:action==='focus'?1+Math.sin(time/1800)*.5:0,
     ballX:reduced?contactX:115-Math.sin(progress*Math.PI*2)**2*(115-contactX),
     ballY:reduced?p.contact:p.contact-Math.abs(Math.sin(progress*Math.PI*4))*(stage===0?9:stage===1?20:stage===2?14:10)*formFactor,
     ballAngle:time/(stage===0?22:12),
     handX:reduced?62:62+Math.sin(progress*Math.PI*(stage===0?4:6))*(stage===0?5:9)+(1-enter)*27,
     handY:p.head-(1-enter)*17+(reduced?0:Math.abs(rhythm)*1.5),
     bookX:p.bookX, bookY:p.bookY,
-    page:reduced?1:Math.cos(Math.max(0,(progress-.65)/.15)*Math.PI),
-    stars:time/12,
+    page:reduced?0:-180*(turn*turn*(3-2*turn)),
+    pageOpacity:reduced?0:readingPhase<.74||readingPhase>.98?0:Math.min(1,(readingPhase-.74)*25,(.98-readingPhase)*30),
+    readTilt:reduced||action!=='focus'?0:7+Math.sin(time/1800)*2,
+    stars:time/12,orbit,
   };
 }

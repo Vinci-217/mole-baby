@@ -204,10 +204,10 @@ jobs:
         shell: bash
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html --clobber
             gh release edit "$RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
 
   report:

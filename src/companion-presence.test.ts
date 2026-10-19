@@ -7,6 +7,12 @@ const NOW=1_800_000_000_000;
 const pet=()=>createPet('小芽','blue',NOW-86400000);
 afterEach(()=>vi.unstubAllGlobals());
 describe('thoughtful desktop companionship',()=>{
+ it('offers book and study topics while reading, keeps silence boundaries and does not invent an actual book title',()=>{
+  const p=pet();let m=createMemory(p),j=newPresenceJournal(p);
+  for(let i=0;i<30;i++){const line=choosePresence(p,m,j,NOW+i*300000,false,true)!;expect(['reading','culture']).toContain(line.topic);expect(line.id.startsWith('study-')).toBe(true);j=rememberPresence(j,line,NOW+i*300000);}
+  m=rememberChat(m,'希望你安静陪我。',NOW);expect(choosePresence(p,m,j,NOW,false,true)).toBeNull();
+  expect(presenceFollowUp('我在这边安安静静翻书','你在看什么书')).toContain('陪伴用的小书');
+ });
  it('offers growth, work, progress, culture and life without inventing shared memories',()=>{
   const p=pet(),m=createMemory(p),lines=presenceCandidates(p,m,NOW);
   expect(new Set(lines.map(l=>l.topic))).toEqual(new Set(['growth','work','progress','culture','life']));

@@ -18,6 +18,7 @@ import type { GameReceipt } from './components/game-receipt';
 import CarePocket from './components/CarePocket';
 import { CompanionChat } from './components/CompanionChat';
 import { AISettings } from './components/AISettings';
+import MacHelp from './components/MacHelp';
 import RoomSettings from './components/RoomSettings';
 import { useRoomMedia } from './room-media';
 import { appendMessage, createMemory, loadMemory, parseMemory, recordCare, recordEvent, saveMemory, memoryKey, getCompanionMood } from './companion-memory';
@@ -129,8 +130,8 @@ export default function App() {
     window.desktop?.notify('拉姆 · 计时结束', text);
     setMemory(m => m ? recordEvent(m, { kind: 'reminder', detail: '你开始的计时结束了，我提醒你休息。' }) : m);
   });
-  const tellPresence = usePresence({pet,memory:currentMemory,enabled:prefs.presence,minutes:prefs.presenceMinutes,
-    blocked:!floating||prefs.quiet||current.sleeping||timer.running||panel!==null||game!==null||voiceBusy||action!=='idle'||bubbleVisible||desktopState.edgePose!=='visible',
+  const tellPresence = usePresence({pet,memory:currentMemory,enabled:prefs.presence,minutes:prefs.presenceMinutes,reading:timer.running,
+    blocked:!floating||prefs.quiet||current.sleeping||panel!==null||game!==null||voiceBusy||!['idle','focus'].includes(action)||bubbleVisible||desktopState.edgeSide!==null,
     onLine:line=>{speak(line.text,14000);ambient.current={line,at:Date.now()};}
   });
   function respondToBubble() {
@@ -193,7 +194,7 @@ export default function App() {
   function startTimer() {
     if (!prefs.reminders) return;
     prepareReminderSound(); timer.start(); if (Date.now() >= careUntil.current) animate('focus');
-    speak(`好呀，我陪你专注 ${prefs.reminderMinutes} 分钟，结束时提醒你。`);
+    speak(`我翻开书陪你读一会儿，${prefs.reminderMinutes} 分钟后提醒你。`);
   }
   function focusToggle() { if (timer.running) { timer.cancel(); if (action === 'focus') { clearTimeout(timers.current.animation); setAction('idle'); } speak('计时已取消，想开始时再叫我。'); } else startTimer(); }
   async function toggleWander() { if (!window.desktop) { speak('在桌面应用里，我就可以在你的桌面走来走去啦。'); return; } try { await window.desktop.wander(!desktopState.wandering); } catch { notify('暂时无法切换走动状态。'); } }
@@ -246,7 +247,7 @@ export default function App() {
   const visitShop = () => { void enterHome('shop'); };
   const foodContent = <CarePocket key={`${pocketCategory}:${pocketVisit}`} pet={current} initialCategory={pocketCategory} onCare={doCare} busy={Boolean(actionItemId)} allowShop={!floating} onVisitShop={visitShop}/>;
   const chatContent = <CompanionChat key={current.createdAt} pet={current} memory={currentMemory} onMemoryChange={changeMemory} onReply={onChatReply} compact={floating} onSpeechBusyChange={setVoiceBusy}/>;
-  const extraSettings = <><AISettings/><RoomSettings media={roomMedia}/><div className="life-settings">
+  const extraSettings = <><MacHelp/><AISettings/><RoomSettings media={roomMedia}/><div className="life-settings">
     <label><span>主动陪伴</span><input type="checkbox" aria-label="主动陪伴" checked={prefs.presence} onChange={e=>setPrefs(p=>({...p,presence:e.target.checked}))}/></label>
     <label><span>说话频率</span><select aria-label="主动陪伴频率" value={prefs.presenceMinutes} onChange={e=>setPrefs(p=>({...p,presenceMinutes:Number(e.target.value)}))}><option value={10}>约10分钟</option><option value={20}>约20分钟</option><option value={40}>约40分钟</option></select></label>
     <label><span>专注计时</span><input type="checkbox" aria-label="休息与喝水提醒" checked={prefs.reminders} onChange={e => setPrefs(p => ({ ...p, reminders: e.target.checked }))}/></label>
