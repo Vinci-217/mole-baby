@@ -10,6 +10,8 @@ async function adopt(page, color = '蓝色', name = '小蓝') {
   await page.getByTestId('desktop-character').waitFor();
 }
 async function openActions(page) {
+  const edge=await page.evaluate(async()=>window.desktop?.getState? (await window.desktop.getState()).edgePose : 'visible');
+  if(edge!=='visible') await page.evaluate(()=>window.desktop.revealPet());
   const actions = page.getByTestId('pet-actions');
   if (!(await actions.isVisible())) await page.getByTestId('desktop-character').click();
   await expect(actions).toBeVisible();

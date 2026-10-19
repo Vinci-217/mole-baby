@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-19",
+  "tool": "image_gen.imagegen",
+  "transparent_background": true,
+  "references": [
+    "public/assets/original/items/180017.png",
+    "public/assets/original/ui/icon-book-large.png",
+    "public/assets/original/ui/reference-pet-panel.png"
+  ],
+  "observations": [
+    "原图外轮廓连续深棕，曲线圆润，内部线少。",
+    "书本与手使用夸张的大剪影，读得清，不附加角色身体。",
+    "奶白、蜂蜜黄与短浅蓝袖口用大块色面分区。",
+    "采用短高光与少量硬边阴影，不添加写实纹理。",
+    "独立透明道具叠在原角色附近，原角色及花盆不重绘。"
+  ],
+  "files": [
+    {
+      "file": "v9-petting-hand.png",
+      "prompt": "Create one side-view cartoon glove hand for a gentle head-petting animation. A cream white soft four-finger glove, fingers together extending horizontally LEFT, palm down, a small rounded thumb underneath, wrist cuff at RIGHT. It floats above a little pet's forehead and strokes from right to left. Simple short pale-blue cuff, warm light-gray shadow, delicate dark brown outline. Entire silhouette visible. Match the attached early Chinese Flash game prop references: crisp warm dark brown outline, simple broad flat color fills, 2-3 hard edged tones per material, short graphic highlight, friendly toy proportions, no realistic skin, no texture, no 3D, no cast shadow or ground. This is a small overlay accessory for the unchanged original Ram pet, readable at 32 pixels. Output one fully isolated complete object with real transparent background and generous transparent margin. No pet, no lettering, no UI, no checkerboard.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "0dd8c3bf2654a6d7ef50f7619a60c6bd83da319f868743dfee0343df571f90f5",
+      "modification": "None; copied original generated PNG bytes. No crop, repaint or new pet image. Displayed at overlay size by CSS."
+    },
+    {
+      "file": "v9-study-book.png",
+      "prompt": "Create one open children's study book seen from a gentle front elevated angle. Two chunky cream pages, golden honey-orange cover edges, simple center crease, just two subtle short tan strokes on each page to suggest study without readable writing. Very broad simple shapes, low-detail, symmetrical enough to animate page turning. No stand, no hands. Match the attached early Chinese Flash game prop references: crisp warm dark brown outline, simple broad flat color fills, 2-3 hard edged tones per material, short graphic highlight, friendly toy proportions, no realistic skin, no texture, no 3D, no cast shadow or ground. This is a small overlay accessory for the unchanged original Ram pet, readable at 32 pixels. Output one fully isolated complete object with real transparent background and generous transparent margin. No pet, no lettering, no UI, no checkerboard.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "e64d4db5cab382d043eeb04ec84c8a22999da9c82cbe5ba8e3b583a112461005",
+      "modification": "None; copied original generated PNG bytes. No crop, repaint or new pet image. Displayed at overlay size by CSS."
+    }
+  ]
+}

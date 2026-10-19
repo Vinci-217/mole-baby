@@ -110,6 +110,11 @@ function canMoveOnDesktop() {
   }));
 }
 
+function canHideAtEdge() {
+  return Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()
+    && !mainWindow.isMinimized() && petMode && hasPet && !companionPanel && !dragging && !interacting);
+}
+
 function revealPet() {
   clearTimeout(edgeTimer);
   edgeTimer = null;
@@ -122,9 +127,9 @@ function revealPet() {
 
 function schedulePeek() {
   clearTimeout(edgeTimer);
-  if (!edgeSide || !edgeHiding || !canMoveOnDesktop()) return;
+  if (!edgeSide || !edgeHiding || !canHideAtEdge()) return;
   edgeTimer = setTimeout(() => {
-    if (!edgeSide || !edgeHiding || !canMoveOnDesktop()) { revealPet(); return; }
+    if (!edgeSide || !edgeHiding || !canHideAtEdge()) { revealPet(); return; }
     edgePose = edgePose === 'hidden' ? 'peek' : 'hidden';
     publishState();
     schedulePeek();
@@ -132,7 +137,7 @@ function schedulePeek() {
 }
 
 function tuckIntoCorner(force = false) {
-  if (!edgeHiding || !canMoveOnDesktop()) return false;
+  if (!edgeHiding || !canHideAtEdge()) return false;
   const bounds = currentPetBounds();
   const area = screen.getDisplayMatching(bounds).workArea;
   const side = force
@@ -169,6 +174,7 @@ function changeInteracting(enabled) {
 }
 
 function walkToCorner() {
+  if (!petCanMove) { tuckIntoCorner(true); return; }
   if (!canMoveOnDesktop()) return;
   revealPet();
   stopMovement();
@@ -290,7 +296,7 @@ function changePetCanMove(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mobility must be a boolean');
   if (petCanMove === enabled) return petCanMove;
   petCanMove = enabled;
-  if (!enabled) { dragging = false; revealPet(); }
+  if (!enabled) { stopMovement(); }
   wandering = wanderPreference && enabled;
   stopMovement();
   scheduleWander();
@@ -558,8 +564,10 @@ function refreshTrayMenu() {
       if (!mainWindow.isVisible()) showFromTray();
       changeWandering(item.checked);
     } },
-    { label: '躲到角落', enabled: movable, click: () => {
+    { label: '躲到角落', enabled: hasPet, click: () => {
       showFromTray();
+      if (companionPanel) changeCompanionPanel(false);
+      interacting = false; dragging = false;
       changeEdgeHiding(true);
       walkToCorner();
     } },

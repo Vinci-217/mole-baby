@@ -22,36 +22,25 @@ async function importBackup(page, value) {
   await page.locator('input[type=file][accept*=json]').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(typeof value === 'string' ? value : JSON.stringify(value)) });
 }
 async function checkReminders(fixture) {
-  for (const mode of ['enabled', 'quiet', 'sleeping', 'focus']) {
-    const page = await browser.newPage({ viewport: { width: 1180, height: 820 } });
-    const now = Date.now();
-    await page.clock.install({ time: now });
-    await page.addInitScript(({ fixture, now, mode }) => {
-      localStorage.setItem('ramu-house-save-v1', JSON.stringify({ ...fixture, createdAt: now, lastTick: now, sleeping: mode === 'sleeping' }));
-      localStorage.setItem('ramu-house-preferences-v2', JSON.stringify({ sound: false, quiet: mode === 'quiet', reminders: true, reminderMinutes: mode === 'focus' ? 20 : 40 }));
-    }, { fixture, now, mode });
-    await page.goto(url); await page.getByTestId('desktop-character').waitFor();
-    if (mode === 'focus') {
-      await openActions(page); await page.getByTestId('pet-actions').getByRole('button', { name: '玩耍', exact: true }).click();
-      await page.getByTestId('companion-panel').getByRole('button', { name: '陪我专注', exact: true }).click();
-    }
-    await page.clock.fastForward((mode === 'focus' ? 21 : 41) * 60000);
-    const hasReminder = () => page.evaluate(() => {
-      const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1'));
-      const memory = JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${pet.createdAt}`) || '{}');
-      return (memory.events || []).some(event => event.kind === 'reminder');
-    });
-    if (mode === 'enabled') {
-      await expect(page.locator('.compact-bubble')).toContainText('站起来伸伸懒腰');
-      await expect(page.locator('.compact-bubble')).toHaveClass(/visible/);
-      await expect.poll(hasReminder).toBe(true);
-    } else {
-      assert.equal(await hasReminder(), false, `${mode} suppresses reminders`);
-      await expect(page.locator('.compact-bubble')).not.toHaveClass(/visible/);
-    }
+  for (const mode of ['idle','started','quiet','sleeping','cancelled']) {
+    const page=await browser.newPage({viewport:{width:1180,height:820}});const now=Date.now();await page.clock.install({time:now});
+    await page.addInitScript(({fixture,now,mode})=>{
+      localStorage.setItem('ramu-house-save-v1',JSON.stringify({...fixture,createdAt:now,lastTick:now,sleeping:mode==='sleeping'}));
+      localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,quiet:mode==='quiet',reminders:true,reminderMinutes:3}));
+    },{fixture,now,mode});
+    await page.goto(url);await page.getByTestId('desktop-character').waitFor();
+    await expect(page.getByRole('timer')).toHaveCount(0);
+    if(mode!=='idle') await page.getByRole('button',{name:'开始计时',exact:true}).click();
+    if(mode==='cancelled') await page.getByRole('button',{name:'取消计时',exact:true}).click();
+    await page.clock.fastForward(181000);
+    const count=()=>page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));return JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${p.createdAt}`)).events.filter(e=>e.kind==='reminder').length;});
+    const expected=['idle','cancelled'].includes(mode)?0:1;
+    await expect.poll(count).toBe(expected);
+    await page.clock.fastForward(600000);await expect.poll(count).toBe(expected);
+    await expect(page.getByRole('timer')).toHaveCount(0);
     await page.close();
   }
-  console.log('PASS real reminder timers and quiet/sleep/focus suppression');
+  console.log('PASS manual timer: no auto-start, one completion only, explicit cancel and real deadline independent of quiet/pet sleep');
 }
 async function checkFourSeedColors() {
   const samples = [];
@@ -108,7 +97,9 @@ async function checkFourSeedColors() {
   await page.locator('.shop-book').getByRole('button', { name: '翻开药水商品书', exact: true }).click();
   await page.locator('.book-product[data-item-id="180005"]').click(); await expect(page.getByRole('button', { name: '购买万能药水', exact: true })).toBeDisabled(); assert.equal((await save(page)).coins, 65);
   await page.screenshot({ path: path.join(artifacts, 'v6-bookshop.png') });
-  await roomTab(page, '背包'); const beforeFood = await save(page); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
+  await roomTab(page, '背包');
+  for (const slot of await pocket.locator('.pocket-slot').all()) { const b=await slot.boundingBox(); assert.ok(Math.abs(b.width-b.height)<1,'room inventory cells are square'); }
+  const beforeFood = await save(page); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(async () => (await save(page)).inventory.biscuit).toBe(0); assert.ok((await save(page)).stats.hunger > beforeFood.stats.hunger + 10); await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action', 'idle');
   await pocket.getByRole('button', { name: '饮品', exact: true }).click(); const beforeDrink = await save(page); await (await selectPocket(page, '180002', '麦香牛奶')).click();
   await expect.poll(async () => (await save(page)).inventory['180002']).toBe(0); assert.ok((await save(page)).stats.thirst > beforeDrink.stats.thirst + 10); assert.ok(Math.abs((await save(page)).stats.hunger - beforeDrink.stats.hunger) < 1); await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action', 'idle');
@@ -118,7 +109,7 @@ async function checkFourSeedColors() {
   console.log('PASS room-only four-book shop, bean purchase guards, varied supplies and correct consumption/effects without click growth');
 
   await toDesktop(page); await openActions(page); await actions.getByRole('button', { name: '休息', exact: true }).click();
-  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping', 'true'); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame', '4');
+  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping', 'true'); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame', '61');
   await expect(actions.getByRole('button', { name: '叫醒', exact: true })).toBeVisible(); assert.equal((await save(page)).sleeping, true);
   await enterHome(page); await roomTab(page, '游戏');
   await expect(page.getByRole('button', { name: '开始接果子', exact: true })).toBeDisabled(); await expect(page.getByRole('button', { name: '开始翻牌', exact: true })).toBeDisabled();

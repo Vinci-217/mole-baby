@@ -12,12 +12,12 @@ interface Props {
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string;
   bubble: string; bubbleVisible: boolean; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
-  focusSeconds: number; focusing: boolean; saveError: boolean;
-  reminderSeconds: number; reminders: boolean; reminderPaused: boolean;
+  saveError: boolean;
+  reminderSeconds: number; reminders: boolean; timerRunning: boolean; timerFinished: boolean;
   onPanel: (panel: CompanionPanel | null) => void;
   onCare: (action: Action, item?: string) => void;
   onHome: () => void; onShop: () => void; onFocus: () => void;
-  onSay: (text: string) => void; onPet: () => void;
+  onSay: (text: string) => void; onShake: () => void; onPet: () => void;
   pocketCategory: ItemCategory; pocketVisit: number; chatContent: ReactNode;
 }
 const icons = { food: 'items/180001', wash: 'items/180003', sleep: 'ui/status-sleep', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
@@ -69,7 +69,7 @@ export default function DesktopCompanion(p: Props) {
       if (now - d.turnAt > 850) d.turns = 0;
       if (d.direction && direction !== d.direction) { d.turns++; d.turnAt = now; }
       d.direction = direction;
-      if (d.turns >= 3) { d.turns = 0; setShaking(true); clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 700); playPetVoice('shake', p.sound); p.onSay('唔～轻轻摇就好啦。'); }
+      if (d.turns >= 3) { d.turns = 0; setShaking(true); clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 3200); p.onShake(); }
     }
     {
       if (p.native) void window.desktop?.movePet(dx, dy);
@@ -92,7 +92,6 @@ export default function DesktopCompanion(p: Props) {
   const show = (panel: CompanionPanel) => { setTools(true); p.onPanel(panel); };
   const side = p.native ? p.desktopState.panelSide : 'right';
   const condition = getPetCondition(p.pet);
-  const remaining = `${Math.floor(p.focusSeconds / 60).toString().padStart(2, '0')}:${(p.focusSeconds % 60).toString().padStart(2, '0')}`;
   const edge = p.native ? p.desktopState.edgePose : 'visible';
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
     <div className={`desktop-pet compact-pet ${tools ? 'actions-open' : ''}`} onContextMenu={e => { e.preventDefault(); void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
@@ -110,8 +109,7 @@ export default function DesktopCompanion(p: Props) {
         <button aria-label="和拉姆说话" title="对话" onClick={() => show('chat')}><Icon path={icons.chat}/></button>
         <button aria-label="进入小屋" title="小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
       </nav>}
-      {p.reminders && <span className="compact-reminder" role="timer" aria-label="休息提醒倒计时" data-paused={p.reminderPaused}>{p.reminderPaused ? '已暂停' : '休息'} {reminderTime(p.reminderSeconds)}</span>}
-      {p.focusing && <button className="compact-focus" onClick={p.onFocus} aria-label="结束专注">{remaining}</button>}
+      {p.reminders && <button className="compact-reminder" title={p.timerRunning ? '点击取消本次计时' : '点击开始一次计时'} onClick={p.onFocus} aria-label={p.timerRunning ? '取消计时' : '开始计时'}><span {...(p.timerRunning ? {role:'timer', 'aria-label':'专注倒计时'} : {})}>{p.timerRunning ? `计时 ${reminderTime(p.reminderSeconds)}` : p.timerFinished ? '计时结束 · 再来一次' : '开始计时'}</span></button>}
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel && <section className="companion-panel" role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
@@ -120,7 +118,7 @@ export default function DesktopCompanion(p: Props) {
       <div className="companion-content">
         {p.panel === 'status' && <><div className="compact-profile"><div><Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={condition.action} sleeping={p.pet.sleeping}/></div><p><b>{p.pet.name}</b><span>{condition.label}</span></p><small>{p.pet.coins} 豆</small></div><div className="compact-stats">{([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div><p className="compact-condition" role="status">{condition.description}</p>{p.pet.sleeping && <button className="compact-button" onClick={() => p.onCare('sleep')}>轻轻叫醒</button>}</>}
         {p.panel === 'food' && <CarePocket key={`${p.pocketCategory}:${p.pocketVisit}`} pet={p.pet} initialCategory={p.pocketCategory} onCare={p.onCare} onVisitShop={p.onShop}/>}
-        {p.panel === 'play' && <div className="desktop-play"><h3>陪我玩一会儿</h3><button disabled={p.pet.sleeping} onClick={() => p.onCare('play')}><Icon path="items/180004"/>一起玩球</button><button disabled={p.pet.sleeping} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button><button onClick={p.onFocus}><Icon path="ui/icon-clock"/>{p.focusing ? '结束专注' : '陪我专注'}</button><button className="desktop-play-home" onClick={p.onHome}>去小屋玩小游戏 ›</button></div>}
+        {p.panel === 'play' && <div className="desktop-play"><h3>陪我玩一会儿</h3><button disabled={p.pet.sleeping} onClick={() => p.onCare('play')}><Icon path="items/180004"/>一起玩球</button><button disabled={p.pet.sleeping} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button><button disabled={!p.reminders} onClick={p.onFocus}><Icon path="ui/icon-clock"/>{p.timerRunning ? '结束专注' : '陪我专注'}</button><button className="desktop-play-home" onClick={p.onHome}>去小屋玩小游戏 ›</button></div>}
         {p.panel === 'chat' && p.chatContent}
       </div><footer><button className="compact-home" onClick={p.onHome}><Icon path={icons.home}/>进入小屋</button><button onClick={() => p.native ? window.desktop?.hideToTray() : p.onPanel(null)}>{p.native ? '收进托盘' : '收起'}</button></footer>
     </section>}

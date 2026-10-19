@@ -1,3 +1,4 @@
+import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
 
 export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' }
@@ -21,6 +22,7 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 export function getRamActionDuration(action: string): number | null {
+  if (isSocialAction(action) && action !== 'focus') return SOCIAL_DURATIONS[action]
   const item = getItemMotionByAction(action)
   if (item) return item.duration
   const care = CARE_ACTIONS[action]
@@ -33,6 +35,13 @@ export function getRamActionDuration(action: string): number | null {
  */
 export function sampleRamPose(action: string, elapsed: number, reduced = false): Pose {
   if (action === 'sleep') return { row: 8, frame: 0, finished: false }
+  if (action === 'focus') return { row: 0, frame: reduced || elapsed % 8000 < 7600 ? 0 : 1, finished: false }
+  if (isSocialAction(action)) {
+    const duration=SOCIAL_DURATIONS[action as 'pet'|'play'|'dizzy'];
+    if (elapsed>=duration) return {row:0,frame:0,finished:true};
+    if (reduced) return {row:0,frame:0,finished:false};
+    return {row:action==='dizzy'?5:action==='play'?8:3,frame:reduced?0:Math.floor(elapsed/(action==='dizzy'?200:220))%(action==='pet'?4:6),finished:false};
+  }
   if (action === 'still' || action === 'drag') return { row: 0, frame: 0, finished: false }
   const item = getItemMotionByAction(action)
   if (item) {
@@ -72,8 +81,11 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
 /** Original seed timeline has closed eyes in frames 4 and 5, and large eyes in
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
-  if (action === 'sleep') return { frame: 4, finished: false }
+  if (action === 'sleep') return { frame: 61, finished: false }
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
+  if (action === 'pet' || action === 'play') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:reduced?0:Math.floor(elapsed/350)%2,finished:elapsed>=SOCIAL_DURATIONS[action]}
+  if (action === 'focus') return { frame: reduced || elapsed%8000<7600 ? 0 : 2, finished:false }
+  if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
   if (reduced) return { frame: 0, finished: false }

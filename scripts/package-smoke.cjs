@@ -19,6 +19,22 @@ function requireFile(filename, magic) {
   }
 }
 
+async function verifySocialProps(page) {
+  const character=page.getByTestId('desktop-character');
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  const panel=page.getByTestId('companion-panel');
+  for(const [name,kind] of [['一起玩球','play'],['摸摸拉姆','pet'],['陪我专注','focus']]) {
+    await panel.getByRole('button',{name,exact:true}).click();
+    await expect(character.locator(`[data-social-action=${kind}]`)).toBeVisible();
+    await expect.poll(()=>character.locator('.ram-sprite').evaluate(n=>Number(n.style.getPropertyValue('--social-opacity'))),{timeout:10000}).toBeGreaterThan(.8);
+    const image=character.locator(kind==='play'?'.social-ball':kind==='pet'?'.social-hand':'.social-book>img').first();
+    await image.evaluate(n=>n.decode());const box=await image.boundingBox();assert.ok(box.width>20&&box.height>10);
+  }
+  await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toBeVisible();
+  await panel.getByRole('button',{name:'结束专注',exact:true}).click();await expect(page.getByRole('timer')).toHaveCount(0);
+  await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
+}
+
 async function verifyApplication({ executable, archive, screenshot }) {
   let desktop, profile, page;
   try {
@@ -32,6 +48,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     'dist/assets/generated/v6-starlight-greenhouse.png', 'dist/assets/generated/v6-creek-treehouse.png',
     'dist/icons/ramu.png', 'dist/icons/tray.png', 'dist/icons/ramu.ico',
     'dist/icons/ramu.icns', 'dist/icons/tray-mac.png', 'dist/icons/tray-mac@2x.png',
+    'dist/assets/generated/v9-petting-hand.png', 'dist/assets/generated/v9-study-book.png',
     'dist/assets/original/item-motion/bath-tub.png', 'dist/assets/original/item-motion/toothbrush-generated.png',
     'dist/assets/original/audio/castle.mp3', 'dist/assets/original/audio/pet-shop.mp3', 'dist/assets/original/audio/mystery-lake.mp3',
     'dist/assets/original/items/180027.png', 'dist/assets/original/items/180017.png',
@@ -95,6 +112,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const seedAfterDrag = await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
+  await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());
   assert.equal(typeof speech.available, 'boolean');
   assert.ok(speech.available ? typeof speech.language === 'string' : typeof speech.reason === 'string', 'offline speech availability must explain its status without opening a microphone');
@@ -123,6 +141,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(await page.locator('.cottage-scene').count(), 0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态','背包','玩耍','对话']);
   assert.equal(await panel.locator('.pocket-slot').count(), 16);
+  const slot=await panel.locator('.pocket-slot').first().boundingBox();assert.ok(Math.abs(slot.width-slot.height)<1,'every backpack cell is square');
   await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
   await panel.getByRole('button', { name: '到小屋补充', exact: false }).click();
   await expect(page.locator('.shop-book')).toBeVisible();
@@ -142,10 +161,12 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await page.locator('.time-scene-art img').evaluate(img => img.decode());
   assert.ok((await page.locator('.time-scene-art img').getAttribute('src')).endsWith('/assets/generated/v6-starlight-greenhouse.png'));
   await toDesktop(page); await openActions(page); await actions.getByRole('button',{name:'休息',exact:true}).click();
-  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','4');
+  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
   await actions.getByRole('button',{name:'叫醒',exact:true}).click();
-  await expect(page.getByRole('timer',{name:'休息提醒倒计时',exact:true})).toContainText(/休息 0[67]:/);
+  await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-preferences-v2')).reminderMinutes),7);
+  await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toContainText(/计时 0[67]:/);await page.getByRole('button',{name:'取消计时',exact:true}).click();
+
   await page.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1')); pet.growth = 180; localStorage.setItem('ramu-house-save-v1', JSON.stringify(pet)); });
   await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({ timeout: 15000 });
   await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-color','red');
@@ -177,6 +198,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
     assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).evolution),form);
     assert.equal(await character.locator('[data-fallback]').count(),0);
   }
+  await verifySocialProps(page);
+  console.log('PASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app');
   console.log('PASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload');
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});

@@ -12,27 +12,40 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
   for(let i=0;i<100;i++) { if(server.exitCode !== null) throw Error(logs); try { if((await fetch(url)).ok) break; } catch {} if(i===99) throw Error('Vite not ready'); await new Promise(resolve=>setTimeout(resolve,100)); }
   browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless:true});
   const page = await browser.newPage({viewport:{width:1180,height:820}}); const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.clock.install();
-  await page.goto(url); await adopt(page, '蓝色', '小芽'); await enterHome(page); await roomTab(page,'设置');
-  await page.getByLabel('提醒间隔',{exact:true}).fill('3'); await toDesktop(page);
+  await page.addInitScript(()=>{
+    localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,reminders:true,reminderMinutes:1,reminderSound:true}));
+    const Audio=window.AudioContext;window.AudioContext=class extends Audio {constructor(...args){super(...args);window.__audio=this;}createOscillator(){window.__alarmNotes=(window.__alarmNotes||0)+1;return super.createOscillator();}};
+  });
+  await page.clock.install();await page.goto(url);await adopt(page,'蓝色','小芽');
+  const character=page.getByTestId('desktop-character');await character.locator('.seed-body-frame[data-loaded=true]').waitFor();
   await page.clock.pauseAt(new Date(Date.now()+1000));
-  await enterHome(page);await roomTab(page,'设置');await page.getByLabel('提醒间隔',{exact:true}).fill('4');await page.getByLabel('提醒间隔',{exact:true}).fill('3');await toDesktop(page);
-  const timer=page.getByRole('timer',{name:'休息提醒倒计时'});
-  await expect(timer).toContainText('03:00'); await page.clock.fastForward(1000);await expect(timer).toContainText('02:59');
-  await openActions(page); await page.getByRole('button',{name:'休息',exact:true}).click();
-  await expect(timer).toHaveAttribute('data-paused','true');const paused=await timer.textContent();
-  await page.clock.fastForward(120000);assert.equal(await timer.textContent(),paused);
-  const body=page.getByTestId('desktop-character').locator('.seed-body-original');
-  await expect(body).toHaveCSS('transform', /matrix/); assert.equal(await body.evaluate(node=>node.style.transform),'rotate(-9deg)');
-  const character=page.getByTestId('desktop-character');const box=await character.boundingBox();await page.mouse.move(box.x+50,box.y+50);await page.mouse.down();await page.mouse.move(box.x+20,box.y+40);await page.mouse.up();
-  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');
-  await page.screenshot({path:path.join(root,'artifacts/v8-seed-sleep-countdown.png')});
-  await openActions(page);await page.getByRole('button',{name:'叫醒',exact:true}).click();await expect(timer).toHaveAttribute('data-paused','false');
-  await page.clock.fastForward(180000);await expect(page.locator('.compact-bubble')).toContainText('站起来伸伸懒腰');
-  await expect(timer).toContainText('03:00');
-  await enterHome(page);await roomTab(page,'设置');assert.equal(await page.getByLabel('提醒间隔',{exact:true}).inputValue(),'3');
-  await page.getByLabel('休息与喝水提醒',{exact:true}).uncheck();await toDesktop(page);await expect(timer).toHaveCount(0);
-  console.log('PASS custom reminder interval, visible countdown, pause/resume, deadline feedback, sleeping seed manual drag and upright original closed eyes');
+  await expect(page.getByRole('timer')).toHaveCount(0);await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
+  await page.clock.fastForward(120000);await expect(page.getByRole('timer')).toHaveCount(0);
+  await page.getByRole('button',{name:'开始计时',exact:true}).click();
+  await expect(page.getByRole('timer',{name:'专注倒计时'})).toContainText('01:00');
+  await expect(character.locator('[data-social-action=focus]')).toBeVisible();
+  await page.clock.fastForward(1000);await expect(page.getByRole('timer')).toContainText('00:59');
+  await page.getByRole('button',{name:'取消计时',exact:true}).click();await page.clock.fastForward(65000);await expect(page.getByRole('timer')).toHaveCount(0);assert.equal(await page.evaluate(()=>window.__alarmNotes||0),0);
+  await page.getByRole('button',{name:'开始计时',exact:true}).click();await page.clock.fastForward(61000);
+  await expect(page.locator('.compact-bubble')).toContainText('计时结束');await expect.poll(()=>page.evaluate(()=>window.__alarmNotes)).toBe(6);await expect(page.getByRole('timer')).toHaveCount(0);
+  await page.clock.fastForward(120000);assert.equal(await page.evaluate(()=>window.__alarmNotes),6);
+  await page.reload();await expect(page.getByRole('timer')).toHaveCount(0);
+  await openActions(page);await page.getByRole('button',{name:'休息',exact:true}).click();await page.clock.fastForward(50);
+  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
+  assert.equal(await character.locator('.seed-body-original').evaluate(node=>node.style.transform),'rotate(0deg)');
+  assert.equal(await character.locator('.ram-pose-layer').evaluate(node=>getComputedStyle(node).transform),'none');
+  await page.screenshot({path:path.join(root,'artifacts/v9-seed-upright.png')});
+  await page.getByRole('button',{name:'叫醒',exact:true}).click();await page.clock.fastForward(1000);
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  await page.getByRole('button',{name:'一起玩球',exact:true}).click();await page.clock.runFor(800);await expect(character.locator('.social-ball')).toBeVisible();
+  assert.ok(Number(await character.locator('.ram-sprite').evaluate(n=>n.style.getPropertyValue('--social-opacity')))>.8);
+  await page.screenshot({path:path.join(root,'artifacts/v9-seed-ball.png')});
+  await page.clock.fastForward(4500);await page.getByRole('button',{name:'摸摸拉姆',exact:true}).click();await page.clock.runFor(600);await expect(character.locator('.social-hand')).toBeVisible();
+  assert.ok(Number(await character.locator('.ram-sprite').evaluate(n=>n.style.getPropertyValue('--social-opacity')))>.8);
+  await page.screenshot({path:path.join(root,'artifacts/v9-seed-pet.png')});await page.clock.fastForward(2500);
+  for(let i=0;i<5;i++) await page.getByRole('button',{name:'摸摸拉姆',exact:true}).click();await page.clock.fastForward(50);await expect(character.locator('[data-social-action=dizzy]')).toBeVisible();await expect(page.locator('.compact-bubble')).toContainText('晕乎乎');
+  await page.clock.fastForward(3500);await expect(character.locator('[data-social-action=dizzy]')).toHaveCount(0);
+  console.log('PASS manual one-shot timer, no auto-start/restart, cancellation, six-note real AudioContext chime, upright closed eyes and seed ball/hand/dizzy interactions');
   await page.close();
   const forms={super:'神力超级拉姆',water:'神奇水系拉姆',wood:'弹力木系拉姆',fire:'霹雳火系拉姆'};
   for (const color of ['red','yellow','blue','pink']) for(const [form,label] of Object.entries(forms)) {
@@ -40,7 +53,7 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
     await p.goto(url);await adopt(p,'蓝色','小芽');
     await p.evaluate(color=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));pet.growth=840;pet.color=color;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,reminders:false}));},color);
     await p.reload();await expect(p.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-stage','3');
-    await enterHome(p);await roomTab(p,'成长');await p.getByRole('button',{name:`选择${label}`,exact:true}).click();if(color==='red'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v8-evolution-picker.png')});
+    await enterHome(p);await roomTab(p,'成长');await p.getByRole('button',{name:`选择${label}`,exact:true}).click();if(color==='red'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v9-evolution-picker.png')});
     await p.getByRole('button',{name:'确认进化',exact:true}).click();
     assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).evolution),form);
     await toDesktop(p);await p.reload();
@@ -54,7 +67,7 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
     if(color==='pink') assert.ok(pixel[0]>pixel[1]+60&&pixel[2]>pixel[1]+60);
     assert.ok(await ram.locator('canvas').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,192,208).data.some((value,index)=>index%4===3&&value>200)));
     await openActions(p);await p.getByRole('button',{name:'休息',exact:true}).click();await expect(ram.locator('canvas')).toHaveAttribute('data-row','8');await expect(ram).toHaveAttribute('data-sleeping','true');
-    if(color==='blue'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v8-water-sleep.png')});
+    if(color==='blue'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v9-water-sleep.png')});
     await p.close();
   }
   assert.deepEqual(errors,[]);

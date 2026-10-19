@@ -19,14 +19,15 @@
       38,
       37
     ],
-    "frames": 61,
+    "frames": 62,
     "cell": [
       96,
       99
     ],
     "columns": 8,
     "sourceTimelineFps": 24,
-    "exportZoom": 1.544617
+    "exportZoom": 1.544617,
+    "originalFrames": 61
   },
   "registrationOn192x208": {
     "pot": [
@@ -45,10 +46,10 @@
   "adaptation": "Original neutral seed body is recoloured at runtime with an exact body-only coverage mask using the four player-selected original game colour offsets. This same selected colour is retained through all growth stages. Eye whites, pupils, facial lines and the separate original pot remain unchanged. This seeded colour continuity is a desktop adaptation requested by the player, not a claim that the original game coloured its neutral seed embryo.",
   "files": {
     "pot.png": "4c5d208b3f05eac85e4157ed753678ed220a101ccde2624f66254226db387618",
-    "body.png": "0a7078b95ba0a2da6cd53984bd8d1bff93a261c9c64eedcd1a098deb4325ec28",
+    "body.png": "da20cad0c9002f304a238ef1ff84a1415e95c458ab11f21b848c428724cd9104",
     "body-still.png": "26de97033f1ab9d709f181fccc6fb712ac1854cd90781ccf5bbcbb8a2250bc30",
     "source-motion.gif": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f",
-    "body-mask.png": "9ecc3ad1abac5b0e0a53a431450f97ff40bb70ac02230014310173781dbc1f59"
+    "body-mask.png": "f9906495852744c7e2f0189a374875b156a10fedc83b6996238ed5ef10768c6f"
   },
   "bodyColourMask": {
     "file": "body-mask.png",
@@ -59,8 +60,16 @@
     },
     "method": "JPEXS original sprite37 61 frames, zoom1.544617. Difference exports of body shape5/15/31 original white orgray fills and outlines set to black separately. Nested eye sprites, highlight transforms and closed-eye lines are preserved. Runtime applies the same additive RGB palette as grown forms.",
     "closedEyes": {
-      "zeroBasedAtlasFrame": 4,
-      "originalSpriteFrame": 5
+      "zeroBasedAtlasFrame": 61,
+      "originalShape": 35,
+      "adaptation": "eyes over standing body, not the tilted original sprite37 frame5"
     }
+  },
+  "uprightSleep": {
+    "atlasFrame": 61,
+    "body": "standing sprite8 at original frame0 matrix; no rotation, scaling or sway",
+    "eyes": "original closed-eye shape35, translationTwips [180,-260], original eye sprites omitted",
+    "pot": "unchanged independent layer",
+    "export": "JPEXS ffdec-cli.jar, sprite37 appended frame62, zoom1.544617; same original-white/original-gray difference masks; original 61 atlas cells preserved"
   }
 }

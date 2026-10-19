@@ -192,3 +192,7 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ## v0.8 神力拉姆
 
 新增神力超级、神奇水系、弹力木系、霹雳火系四种原形态，neutral/mask 图集取自固定上游提交；没有重绘角色，仍保留四种领养颜色。原资源路径、逐帧表、图集及静态降级图哈希见 [evolution-sources.json](public/assets/classic/evolution-sources.json)，考据、成长规则与动画适配范围见 [v8-evolution.md](research/v8-evolution.md)。静态图使用可复现的原图裁切与原配色导出，不是生成素材。
+
+## v0.9 手掌、书本与站立闭眼种子
+
+新增透明手掌与打开的书本，均由图片模型参考原道具、原 UI 生成，原字节保存。提示词、参考、透明设置、尺寸与 SHA256 见 [v9-social-provenance.json](public/assets/generated/v9-social-provenance.json)。球继续使用原 `180004.png`。种子睡姿改为站立身体加原闭眼线，图集追加适配帧，不改变既有61帧，见 [seed/source.json](public/assets/original/seed/source.json)。动作分镜、阶段差别与范围见 [v9-interactions.md](research/v9-interactions.md)。

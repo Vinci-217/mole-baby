@@ -67,3 +67,20 @@ export function playPetVoice(kind: PetVoice, enabled: boolean) {
     }).catch(() => { /* A muted device does not block care. */ });
   } catch { /* Optional sound never blocks interaction. */ }
 }
+
+/** Unlock only on the user's Start gesture; no sound plays on launch. */
+export function prepareReminderSound() {
+  try { context ??= new AudioContext(); void context.resume().catch(() => {}); } catch { /* Optional audio device. */ }
+}
+/** A distinct two-part chime, independent of pet chirp throttling and TTS. */
+export function playReminderSound(enabled: boolean) {
+  if (!enabled) return;
+  try {
+    context ??= new AudioContext(); const audio = context;
+    void audio.resume().then(() => {
+      [659.25, 783.99, 1046.5, 659.25, 783.99, 1046.5].forEach((pitch, index) => {
+        note(audio, audio.currentTime + index * .23 + (index > 2 ? .18 : 0), .38, pitch, pitch, .075, 'sine');
+      });
+    }).catch(() => {});
+  } catch { /* Countdown completion still displays its visual notification. */ }
+}

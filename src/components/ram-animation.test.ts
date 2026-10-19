@@ -16,7 +16,7 @@ describe('original Ram care animation contract', () => {
   it('holds genuine closed-eye source frames in every motion preference', () => {
     for (const reduced of [false, true]) for (const time of [0, 400, 9000, 1e9]) {
       expect(sampleRamPose('sleep', time, reduced)).toEqual({ row: 8, frame: 0, finished: false })
-      expect(sampleSeedPose('sleep', time, reduced)).toEqual({ frame: 4, finished: false })
+      expect(sampleSeedPose('sleep', time, reduced)).toEqual({ frame: 61, finished: false })
     }
   })
   it.each(['hungry', 'thirsty', 'sick', 'tired', 'dirty', 'sad'])('%s retains a condition pose after its initial reaction', action => {

@@ -30,7 +30,7 @@ async function readMemory(page) {
   await page.addInitScript(() => {
     const originalSetTimeout = window.setTimeout;
     window.setTimeout = function (callback, delay, ...args) {
-      if (delay === 2_400_000) window.__reminder = callback;
+      if (delay >= 2_390_000 && delay <= 2_400_000) window.__reminder = callback;
       return originalSetTimeout(callback, delay, ...args);
     };
     window.companionAI = {
@@ -51,6 +51,7 @@ async function readMemory(page) {
   });
   await page.goto(url);
   await adopt(page, '粉色', '小拉姆');
+  await page.getByRole('button',{name:'开始计时',exact:true}).click();
   await page.getByTestId('desktop-character').click();
   await page.getByRole('button', { name: '和拉姆说话', exact: true }).click();
   await page.getByText('DeepSeek · 联网对话', { exact: true }).waitFor();

@@ -13,7 +13,6 @@ function fitPetBounds(bounds, area) {
 }
 
 function cornerSide(bounds, area, tolerance = 70) {
-  if (area.y + area.height - (bounds.y + bounds.height) > tolerance) return null;
   const left = bounds.x - area.x;
   const right = area.x + area.width - bounds.x - bounds.width;
   if (Math.min(left, right) > tolerance) return null;
@@ -23,7 +22,7 @@ function cornerSide(bounds, area, tolerance = 70) {
 function cornerBounds(bounds, area, side) {
   return fitPetBounds({
     x: side === 'left' ? area.x : area.x + area.width - PET_SIZE.width,
-    y: area.y + area.height - PET_SIZE.height,
+    y: bounds.y,
   }, area);
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { PetColor, Stage, Evolution } from '../game'
 import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, type ItemMotion } from '../item-motion'
 import './Ram.css'
+import SocialCue, { paintSocialCue } from './SocialCue'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose } from './ram-animation'
 
 interface RamProps {
@@ -35,13 +36,13 @@ const sourceCache = new Map<string, Promise<SheetSource>>()
 const tintedCache = new Map<string, Promise<HTMLCanvasElement>>()
 const ACTION_NAMES: Record<string, string> = {
   idle: '正在陪伴你', 'walk-right': '向右走', 'running-right': '向右走',
-  'walk-left': '向左走', 'running-left': '向左走', pet: '开心地打招呼',
+  'walk-left': '向左走', 'running-left': '向左走', pet: '被小手轻轻摸摸',
   waving: '正在打招呼', feed: '开心地吃东西', eat: '开心地吃东西', drink: '正在喝水',
   wash: '正在洗澡', medical: '正在接受照料', use: '正在接受照料',
   sad: '有点难过', failed: '有点难过', sick: '有些不舒服', hungry: '肚子饿了',
   thirsty: '有些口渴', dirty: '需要清洁', tired: '有点困了',
   sleep: '闭着眼睛睡觉，点击休息按钮可唤醒', wake: '慢慢醒来了', waiting: '安静地等你',
-  drag: '被轻轻提起来了', running: '正在活动', play: '开心地玩耍', happy: '很开心', reward: '很开心', review: '很开心',
+  drag: '被轻轻提起来了', running: '正在活动', play: '和小球一起玩耍', focus: '翻开书安静陪你专注', dizzy: '有点头晕，停下来缓一缓', happy: '很开心', reward: '很开心', review: '很开心',
   peek: '从角落探出头看你', hide: '在角落安静地陪伴',
 }
 function sheetSpec(form: Form, kind: SheetKind) {
@@ -150,6 +151,7 @@ function ClassicFrames({ form, color, action, actionId, itemMotion, onError, onA
       last = now
       const pose = ['super', 'water', 'wood', 'fire'].includes(form) ? sampleEvolvedPose(action, elapsed, media.matches) : sampleRamPose(action, elapsed, media.matches)
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
+      paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const signature = `${pose.sheet ?? 'classic'}:${pose.row}:${pose.frame}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
@@ -179,7 +181,7 @@ function SeedBody({ color, action, actionId, itemMotion, onActionEnd }: { color:
       if (last && now - last < 250) elapsed += now - last
       last = now
       const pose = sampleSeedPose(action, elapsed, media.matches)
-      if (ref.current) paintItemCue(ref.current, itemMotion, elapsed, media.matches)
+      if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
       if (previous !== pose.frame) {
         const c = ref.current?.getContext('2d')
         c?.clearRect(0, 0, 96, 99); c?.drawImage(source, pose.frame % 8 * 96, Math.floor(pose.frame / 8) * 99, 96, 99, 0, 0, 96, 99)
@@ -211,7 +213,7 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
-  const activeAction = sleeping || action === 'sleep' ? 'sleep' : dragging ? 'drag' : itemMotion ? itemMotion.action : action
+  const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : itemMotion ? itemMotion.action : action
   const resting = activeAction === 'sleep', key = `${form}:${color}`
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
@@ -219,10 +221,11 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${resting ? 'is-sleeping' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? -9 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}
+    <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction}/>
     {resting && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
   </span>

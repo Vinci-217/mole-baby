@@ -8,8 +8,8 @@
 .pocket-categories button[aria-pressed=true]{border-color:#ec980c;background:#ffdd75;color:#754311;box-shadow:inset 0 1px #fff8ce}
 .pocket-categories button:hover{background:#fff0bf}
 .pocket-categories img{width:23px;height:25px;object-fit:contain;flex-shrink:0}
-.pocket-items{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.pocket-slot{position:relative;display:grid;place-items:center;min-width:0;height:72px;padding:6px 8px 14px;border:2px solid #e8a12e;border-radius:11px;background:#fffdf7;transition:background .12s,border-color .12s}
+.pocket-items{width:min(100%,340px);margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.pocket-slot{position:relative;display:grid;place-items:center;min-width:0;height:auto;aspect-ratio:1;padding:6px 8px 14px;border:2px solid #e8a12e;border-radius:11px;background:#fffdf7;transition:background .12s,border-color .12s}
 .pocket-slot:hover{background:#fff5d8}
 .pocket-slot[aria-pressed=true]{border-color:#f18800;background:#fff1b8;box-shadow:inset 0 0 0 2px #ffce59}
 .pocket-slot>img{height:46px;max-width:80%;object-fit:contain;pointer-events:none}
@@ -39,7 +39,7 @@
 .companion-panel .pocket-categories button{min-height:32px;padding:2px;font-size:12px;gap:2px}
 .companion-panel .pocket-categories img{width:19px;height:22px}
 .companion-panel .pocket-items{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-.companion-panel .pocket-slot{height:48px;padding:3px 5px 13px;border-width:1px;border-radius:7px}
+.companion-panel .pocket-slot{height:auto;aspect-ratio:1;padding:3px 5px 13px;border-width:1px;border-radius:7px}
 .companion-panel .pocket-slot[aria-pressed=true]{box-shadow:inset 0 0 0 1px #ffbc35}
 .companion-panel .pocket-slot>img{height:32px;max-width:75%}
 .companion-panel .pocket-slot-count{font-size:12px;line-height:16px;right:4px;bottom:1px}
@@ -58,9 +58,9 @@
 .companion-panel .pocket-heading{padding-bottom:4px;line-height:19px}
 .companion-panel .pocket-categories{margin-bottom:6px}
 .companion-panel .pocket-categories button{min-height:30px}
-.companion-panel .pocket-items{gap:4px}
-.companion-panel .pocket-slot{height:42px;padding:2px 4px 10px}
-.companion-panel .pocket-slot>img{height:30px}
+.companion-panel .pocket-items{gap:4px;width:min(100%,192px);margin:0 auto}
+.companion-panel .pocket-slot{height:auto;aspect-ratio:1;padding:2px 4px 10px}
+.companion-panel .pocket-slot>img{height:30px;max-width:80%}
 .companion-panel .pocket-pages{min-height:24px;height:24px;padding:0}
 .companion-panel .pocket-pages>button{height:23px;line-height:22px}
 .companion-panel .pocket-selection{grid-template-columns:34px minmax(0,1fr) auto;gap:5px;padding:5px 0;min-height:48px}
@@ -69,3 +69,8 @@
 .companion-panel .pocket-selection p{font-size:12px;line-height:17px;margin:1px 0 0}
 .companion-panel .pocket-use{grid-column:auto;justify-self:end;min-height:29px;padding:3px 7px;font-size:12px}
 .companion-panel .pocket-visit-shop{min-height:22px;height:22px;line-height:20px;padding:0;margin:0 auto}
+
+.pocket-slot{min-height:0}
+.pocket-slot>img,.companion-panel .pocket-slot>img{position:absolute;left:16%;top:5%;width:68%;height:68%;max-width:none;object-fit:contain}
+.companion-panel .pocket-selection{min-height:45px}
+.companion-panel .companion-content:has(.care-pocket){padding-top:7px;padding-bottom:7px}

@@ -129,8 +129,19 @@ async function verifyBackground(page, selector, suffix) {
   assert.equal(await page.evaluate(()=>window.desktop.movePet(-40,-30)),true); assert.equal(await page.evaluate(()=>window.desktop.wander(true)),false); assert.equal((await bounds()).x,seedBounds.x-40);
   await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]); await expect(character).toBeInViewport();
   const cb=await character.boundingBox(); await page.mouse.move(cb.x+50,cb.y+55); await page.mouse.down(); await page.mouse.move(cb.x+80,cb.y+45); await page.waitForTimeout(150); assert.notEqual(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)'); assert.notEqual((await bounds()).x,seedBounds.x-40); await page.mouse.up();
-  await page.screenshot({path:path.join(artifacts,'v8-native-seed.png'),omitBackground:true});
+  await page.screenshot({path:path.join(artifacts,'v9-native-seed.png'),omitBackground:true});
   console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
+
+  // Seed pots can be manually placed at either side, at any height.
+  for(const edge of ['left','right']) {
+    const beforeEdge=await bounds(),targetY=area.y+Math.min(240,area.height-240);
+    await page.evaluate(async({dx,dy})=>{await window.desktop.setInteracting(false);await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.endPetDrag();},{dx:(edge==='left'?area.x:area.x+area.width-200)-beforeEdge.x,dy:targetY-beforeEdge.y});
+    await expect.poll(async()=>(await state()).edgePose,{timeout:5000}).toBe('hidden');
+    assert.equal((await bounds()).y,targetY);assert.equal((await state()).wandering,false);
+    await character.click({position:{x:edge==='left'?90:10,y:54},force:true});
+    await expect.poll(async()=>(await state()).edgePose).toBe('visible');await expect(page.getByTestId('pet-actions')).toBeVisible();await expect(character).toBeInViewport();
+  }
+  console.log('PASS seed manually hides at both vertical edges without walking or changing height');
 
   // Grow only this isolated fixture; normal adoption always starts with a seed.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});
@@ -140,7 +151,7 @@ async function verifyBackground(page, selector, suffix) {
   await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(540); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
   const expanded=await bounds(),side=(await state()).panelSide; assert.equal(expanded.x+(side==='left'?340:0),before.x);assert.equal(expanded.y+250,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),16);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
-  await page.screenshot({path:path.join(artifacts,'v8-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
+  await page.screenshot({path:path.join(artifacts,'v9-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
   const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
   console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
 

@@ -7,29 +7,34 @@ export function reminderTime(seconds: number): string {
   return `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
 }
 
-/** One deadline drives both the visible clock and the reminder. Pause preserves
- * remaining time; changing the interval or adopting a pet starts a new cycle. */
-export function useRestReminder(petId: number | undefined, enabled: boolean, minutes: number, paused: boolean, onDue: () => void) {
+/** A manual, one-shot timer. Pet sleep/quiet mode never changes its deadline.
+ * Reopening, changing pets/duration or disabling reminders returns to idle. */
+export function useRestReminder(petId: number | undefined, enabled: boolean, minutes: number, onDue: () => void) {
   const duration = validReminderMinutes(minutes) * 60000;
-  const clock = useRef({ key: '', remaining: duration });
   const callback = useRef(onDue); callback.current = onDue;
-  const [seconds, setSeconds] = useState(Math.ceil(duration / 1000));
+  const [deadline, setDeadline] = useState<number | null>(null);
+  const [seconds, setSeconds] = useState(duration / 1000);
+  const [finished, setFinished] = useState(false);
+  const generation = useRef(0);
+  const cancel = () => { generation.current++; setDeadline(null); setFinished(false); setSeconds(duration / 1000); };
+  const start = () => {
+    if (petId === undefined || !enabled) return;
+    generation.current++; setFinished(false); setSeconds(duration / 1000); setDeadline(Date.now() + duration);
+  };
+  useEffect(() => { generation.current++; setDeadline(null); setFinished(false); setSeconds(duration / 1000); }, [petId, enabled, duration]);
   useEffect(() => {
-    const key = `${petId}:${enabled}:${duration}`;
-    if (clock.current.key !== key) clock.current = { key, remaining: duration };
-    setSeconds(Math.ceil(clock.current.remaining / 1000));
-    if (petId === undefined || !enabled || paused) return;
-    let deadline = Date.now() + clock.current.remaining;
-    let timeout: ReturnType<typeof setTimeout>;
+    if (deadline === null) return;
+    const token = generation.current;
+    let fired = false;
     const due = () => {
-      callback.current();
-      deadline = Date.now() + duration;
-      setSeconds(duration / 1000);
-      timeout = setTimeout(due, duration);
+      if (fired || token !== generation.current) return;
+      fired = true; setSeconds(0); setDeadline(null); setFinished(true); callback.current();
     };
-    timeout = setTimeout(due, clock.current.remaining);
-    const interval = setInterval(() => setSeconds(Math.max(0, Math.ceil((deadline - Date.now()) / 1000))), 1000);
-    return () => { clearTimeout(timeout); clearInterval(interval); clock.current.remaining = Math.max(0, deadline - Date.now()); };
-  }, [petId, enabled, duration, paused]);
-  return seconds;
+    const update = () => { if (token === generation.current) setSeconds(Math.max(0, Math.ceil((deadline - Date.now()) / 1000))); };
+    update();
+    const interval = setInterval(update, 1000);
+    const timeout = setTimeout(due, Math.max(0, deadline - Date.now()));
+    return () => { clearTimeout(timeout); clearInterval(interval); };
+  }, [deadline]);
+  return { seconds, running: deadline !== null, finished, start, cancel };
 }

@@ -149,8 +149,15 @@ test('seed/sleep disables autonomous movement while manual dragging remains avai
   assert.equal(run.invoke('desktop:move-pet', -100, 0), true);
   assert.equal(run.window.getBounds().x, initial.x - 100);
   run.invoke('desktop:end-pet-drag');
-  assert.equal(run.invoke('desktop:get-state').edgePose, 'visible', 'a seed never tucks itself away');
+  assert.equal(run.invoke('desktop:get-state').edgePose, 'visible', 'a centrally placed seed stays visible');
   assert.equal(run.invoke('desktop:get-state').wandering, false);
+  run.invoke('desktop:move-pet', -5000, -300);
+  const edgeY=run.window.getBounds().y;
+  run.invoke('desktop:end-pet-drag');
+  assert.equal(run.invoke('desktop:get-state').edgeSide, 'left');
+  assert.equal(run.window.getBounds().y, edgeY, 'seed edge placement preserves the selected vertical position');
+  assert.equal(run.invoke('desktop:get-state').wandering, false, 'hiding never enables seed locomotion');
+  run.invoke('desktop:reveal-pet');
   run.invoke('desktop:set-pet-can-move', true);
   assert.equal(run.invoke('desktop:get-state').wandering, true, 'waking up restores the existing walk preference');
   assert.equal(run.invoke('desktop:set-interacting', true), true);

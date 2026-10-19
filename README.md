@@ -2,19 +2,19 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.8.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.8.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.9.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.9.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.8.0-Setup.exe` 或 `mole-baby-0.8.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.8.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.8.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.9.0-Setup.exe` 或 `mole-baby-0.9.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.9.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.9.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
 Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文件，旧存档与本机设置继续保留。
 
-![桌面拉姆与4×4背包](artifacts/v8-native-backpack.png)
+![桌面拉姆与4×4背包](artifacts/v9-native-backpack.png)
 
 ## 桌面陪伴
 
@@ -22,15 +22,17 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 
 单击拉姆，脚下依次显示 **状态、吃、洗澡、玩耍、休息、对话、小屋**。基础照料、背包、玩球、专注和聊天在旁边小窗完成；商店、完整小游戏、成长和设置进入小屋使用。角色约 100×108 像素，基础透明窗口 200×240，侧窗展开 540×490；空间不足时自动放在左侧。Windows 和 Mac 透明空白区域可穿透鼠标；Mac 桌宠可跟随桌面空间，小屋留在当前空间。
 
-所有阶段都可手动拖动，包括睡着的拉姆。长大后还能散步、随轻摇摆动；拖到角落会躲起来，偶尔探头，点击即可出来。种子不会自动移动，但可以连同花盆手动拖动。睡觉使用闭眼帧、轻呼吸和可见的叫醒入口；四种颜色从种子到神力形态保持一致。
+所有阶段都可手动拖动，包括睡着的拉姆。长大后还能散步、随轻摇摆动；拖到角落会躲起来，偶尔探头，点击即可出来。种子不会自动走动，但可以连同花盆手动拖动，拖到任一侧边也可收起与探头，并保持拖放高度。睡觉使用闭眼帧、轻呼吸和可见的叫醒入口；四种颜色从种子到神力形态保持一致。
 
-设置可开关散步、角落躲藏、安静陪伴和互动音效。提醒间隔可自定义 1–240 分钟，显示倒计时；睡眠、安静与专注时保留剩余时间，恢复后继续；支持 25 分钟专注计时。
+设置可开关散步、角落躲藏、安静陪伴和互动音效。计时时长可自定义 1–240 分钟；点击「开始计时」或「陪我专注」才启动，显示倒计时与翻页书本，到时气泡提醒和提示音，随后停止。取消不提醒，重启不自动计时，睡眠与计时独立。提示音可单独关闭。
 
 ## 背包、商店与动作
 
-28 种用品分食物、饮品、清洁和药水。背包为 4×4 十六格；小屋商店以四本商品书分类，翻开后左页挑物品、右页查看价格并购买。新领养有 100 摩尔豆和空背包，购买后按次消耗，洗澡也需要用品。照料动画期间按钮显示正在照料，防止连续误用。
+28 种用品分食物、饮品、清洁和药水。背包为 4×4 正方形十六格；小屋商店以四本商品书分类，翻开后左页挑物品、右页查看价格并购买。新领养有 100 摩尔豆和空背包，购买后按次消耗，洗澡也需要用品。照料动画期间按钮显示正在照料，防止连续误用。
 
 已从原客户端配置确认 `180027` 叫 **可可果**；咕咕果补水、爽爽果清洁。另有熊熊饼干、巧克力豆、麦香牛奶、运动可乐、泡泡浴、牙膏等。原非零价格和效果有对应来源，活动零价物品采用本地商店价，详见 [用品与状态核对](research/items-states.md)。
+
+玩球会出现原足球、摸摸有小手轻抚、专注有书本翻页，各成长阶段有不同锚点和身体反应。连续快速摸摸或来回摇晃会短暂头晕，显示星星后恢复。详见 [分阶段互动设计](research/v9-interactions.md)。
 
 全部 28 种用品有动作配方，区分咀嚼、啜饮、可乐气泡、刷牙、泡澡、擦洗和药水等。主体使用原页游帧，按实际用品叠加原图标与动作；**不是 28 段官方逐品专属动画**。辅助牙刷为生成 PNG，不用 SVG 重画宠物。详见 [动作来源与实现](research/v6-item-motion.md)。
 
@@ -81,12 +83,13 @@ npm run dev                # 网页开发
 npm test                   # 规则、迁移、动画、记忆和 Native 生命周期
 npm run build              # TypeScript 与生产构建
 npm run test:browser       # 商店、物品、记忆、背景、音乐和完整游戏
-npm run test:companion-update # 自定义倒计时与16种进化/颜色组合
+npm run test:companion-update # 手动单次计时、提示音与16种进化/颜色组合
+npm run test:social         # 八种形态的球/手/书实画面与正方形背包
 npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、167 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、170 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 
