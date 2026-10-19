@@ -20,7 +20,7 @@ function requireFile(filename, magic) {
 }
 
 async function verifyApplication({ executable, archive, screenshot }) {
-  let desktop, profile;
+  let desktop, profile, page;
   try {
   requireFile(archive);
   const paths = new Set(asar.listPackage(archive).map(item => item.replace(/\\/g, '/').replace(/^\//, '')));
@@ -57,7 +57,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     cwd: root,
     timeout: 30000,
   });
-  const page = await desktop.firstWindow();
+  page = await desktop.firstWindow();
   assert.equal(await desktop.evaluate(({ app }) => app.getName()), '拉姆', 'Packaged application display name');
   page.setDefaultTimeout(15000);
   const rendererErrors = [];
@@ -136,7 +136,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','4');
   await actions.getByRole('button',{name:'叫醒',exact:true}).click();
   await page.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1')); pet.growth = 180; localStorage.setItem('ramu-house-save-v1', JSON.stringify(pet)); });
-  await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible();
+  await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({ timeout: 15000 });
   await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-color','red');
   assert.equal(await character.locator('[data-fallback]').count(),0);
   await page.evaluate(async () => { await window.desktop.wander(false); await window.desktop.setEdgeHiding(false); });
@@ -165,6 +165,17 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect(character).toBeVisible(); assert.deepEqual(rendererErrors,[]);
   console.log(`PASS: packaged ${process.platform}/${process.arch} tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene`);
 
+  } catch (error) {
+    if (page && !page.isClosed()) {
+      console.error('Renderer loading diagnostics:', await page.evaluate(() => ({
+        visibility: document.visibilityState,
+        desktop: document.querySelectorAll('.desktop-character').length,
+        canvases: Array.from(document.querySelectorAll('.ram-classic-frame')).map(canvas => ({ ...canvas.dataset })),
+        fallbacks: document.querySelectorAll('[data-fallback]').length,
+      })).catch(() => 'renderer unavailable'));
+      await page.screenshot({path:path.join(root,'artifacts',screenshot)}).catch(() => {});
+    }
+    throw error;
   } finally {
     if (desktop) {
       const closed = desktop.waitForEvent('close', { timeout: 20000 });
