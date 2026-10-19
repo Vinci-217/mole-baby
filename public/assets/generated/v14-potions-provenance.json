@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-19",
+  "tool": "image_gen",
+  "transparent_background": true,
+  "purpose": "四款桌宠原创换色药水图标，借鉴原物品的画法，不是官方原道具导出。",
+  "observations": [
+    "连贯的深色局部轮廓，瓶口与叶片以短线概括。",
+    "大圆瓶身、短颈、双叶塞，缩到32–48像素仍能识别。",
+    "红黄蓝粉液体采用少量大色面；眼白、角色叶片和花盆不在本次设计范围。",
+    "玻璃以浅蓝边和短白高光表达，不增加场景灯光。",
+    "透明边距完整，图标不带文字、面板或角色；九宫格和背包标签由界面提供。"
+  ],
+  "images": [
+    {
+      "file": "recolor-red.png",
+      "original": "/workspace/generated_images/exec-93bf75e9-cf84-49c1-a8e3-9b08ea9bd284.png",
+      "references": [
+        "/workspace/mole-baby/public/assets/original/items/180005.png",
+        "/workspace/mole-baby/public/assets/original/items/180017.png",
+        "/workspace/mole-baby/public/assets/original/ui/reference-pet-panel.png"
+      ],
+      "prompt": "Draw ONE isolated small inventory icon for a nostalgic Chinese Flash browser pet game. Study the attached original blue medicine bottle for the flat glass outline language, the bear biscuit for broad warm linework and hard highlights, and the original orange pet panel only for icon clarity at 32-48 pixels. Design a new color-changing potion, NOT the original medical bottle: a squat round glass flask filled with bright Ram red liquid, a short wide neck and a little two-leaf green stopper, a plain small cream oval label containing just ONE red droplet symbol, no letters. Friendly chunky silhouette, clean dark-local-color outline, 2-4 broad flat color areas, exactly one short crisp white glass highlight and one simple darker red liquid patch. No 3D rendering, soft glow, tiny ornament, gradients, text, watermark, Ram face, UI border, checkerboard or background. Center the entire bottle with 12% true transparent padding. The bottle fills most of the image so it reads when reduced to 40 pixels. This will be the red potion; matching blue, yellow and pink variants will follow, preserve a reusable simple bottle shape.",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "1a5bd10bcb90b6a8ba84f8b1d668a57f1a7aaf5b45ecf87f9cb36c6afc0b57c3"
+    },
+    {
+      "file": "recolor-blue.png",
+      "references": [
+        "/workspace/generated_images/exec-93bf75e9-cf84-49c1-a8e3-9b08ea9bd284.png"
+      ],
+      "prompt": "Edit the attached red color-potion icon into its blue variant. Preserve the exact bottle silhouette, green two-leaf stopper, blue-white glass rim, cream label, composition, outline thickness, transparent padding and flat Chinese Flash inventory-item style. Change ONLY the red liquid and its dark red shadow patches, red droplet on the label and red-local-color outer outline to bright sky blue, matching the original Ram blue body and its corresponding darker shade. Keep the leaf stopper green, the glass pale blue-white and the label cream. One isolated icon, no text, no scene, no border; true transparent background.",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "31c53a9b18752de3fe171e48ba89eca7986b208b9c4cf811cefa1e1397f3dfa5",
+      "original": "/workspace/generated_images/exec-f41e0de8-506f-4d7a-8e01-da7a1c2fdf35.png"
+    },
+    {
+      "file": "recolor-yellow.png",
+      "references": [
+        "/workspace/generated_images/exec-93bf75e9-cf84-49c1-a8e3-9b08ea9bd284.png"
+      ],
+      "prompt": "Edit the attached red color-potion icon into its yellow variant. Preserve the exact bottle silhouette, green two-leaf stopper, blue-white glass rim, cream label, composition, outline thickness, transparent padding and flat Chinese Flash inventory-item style. Change ONLY the red liquid and its dark red shadow patches, red droplet on the label and red-local-color outer outline to bright sunny golden yellow, matching the original Ram yellow body and its corresponding darker shade. Keep the leaf stopper green, the glass pale blue-white and the label cream. One isolated icon, no text, no scene, no border; true transparent background.",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "d6c52172c1319cfe1829376a3cb89ece77f6752da64d6143d2c658d714b52a81",
+      "original": "/workspace/generated_images/exec-19c51ac1-931f-4372-aa4b-9ae688e4cf0c.png"
+    },
+    {
+      "file": "recolor-pink.png",
+      "references": [
+        "/workspace/generated_images/exec-93bf75e9-cf84-49c1-a8e3-9b08ea9bd284.png"
+      ],
+      "prompt": "Edit the attached red color-potion icon into its pink variant. Preserve the exact bottle silhouette, green two-leaf stopper, blue-white glass rim, cream label, composition, outline thickness, transparent padding and flat Chinese Flash inventory-item style. Change ONLY the red liquid and its dark red shadow patches, red droplet on the label and red-local-color outer outline to bright cheerful pink, matching the original Ram pink body and its corresponding darker shade. Keep the leaf stopper green, the glass pale blue-white and the label cream. One isolated icon, no text, no scene, no border; true transparent background.",
+      "size": [
+        1254,
+        1254
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "cc64d81801e08d5b3a7d6b20b4cb57c32b2549474a3c367c778a01cf11bd38af",
+      "original": "/workspace/generated_images/exec-30835cc3-023b-4cf4-b00f-ff6b3551699c.png"
+    }
+  ],
+  "edits": "仅将图片工具输出复制到语义文件名；未做像素修改。"
+}

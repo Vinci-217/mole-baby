@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent, ReactNode } from 'react';
 import { STAGES, getPetCondition } from '../game';
-import type { Action, GameState, Stage, ItemCategory } from '../game';
+import type { Action, GameState, Stage, ItemCategory, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import { reminderTime } from '../use-rest-reminder';
@@ -9,7 +9,7 @@ import CarePocket from './CarePocket';
 
 export type CompanionPanel = 'status' | 'food' | 'play' | 'chat';
 interface Props {
-  pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string;
+  pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
   saveError: boolean;
@@ -116,7 +116,7 @@ export default function DesktopCompanion(p: Props) {
       <button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} sleeping={p.pet.sleeping} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
+        <Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
       </button>
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
         <button aria-label="查看状态" title="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>

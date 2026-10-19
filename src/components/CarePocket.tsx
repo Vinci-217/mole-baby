@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ITEMS, getStage } from '../game';
+import { COLORS, ITEMS, getStage } from '../game';
 import type { Action, GameState, ItemCategory, PetItem } from '../game';
 import './CarePocket.css';
 
@@ -11,6 +11,7 @@ const categories: { id: ItemCategory; name: string; icon: string }[] = [
 
 /** Group equal values so the selected item's effect fits in one readable line. */
 export function itemEffectLine(item: PetItem): string {
+  if (item.changesColor) return `变为${COLORS.find(c=>c.id===item.changesColor)!.name} · 保留成长与回忆`;
   if (item.category === 'medicine' && item.health >= 100) return '恢复健康 · 四项照料 +20';
   const labels = { hunger: '饱食', thirst: '水分', cleanliness: '清洁', happiness: '心情', health: '健康' } as const;
   const groups = new Map<number, string[]>();
@@ -43,9 +44,10 @@ export default function CarePocket({ pet, initialCategory = 'food', onCare, allo
     ?? visible.find(item => (pet.inventory[item.id] ?? 0) > 0) ?? visible[0];
   const count = selected ? pet.inventory[selected.id] ?? 0 : 0;
   const locked = selected ? stage < selected.minStage : false;
+  const sameColor = selected?.changesColor === pet.color;
   const action: Action = category === 'food' ? 'feed' : category === 'drink' ? 'drink' : category === 'clean' ? 'wash' : 'use';
   const buttonLabel = pet.sleeping ? '先叫醒拉姆' : busy ? '正在照料…' : locked ? `${['种子期', '初级', '中级', '高级'][selected.minStage]}可用`
-    : !count ? '背包里没有' : category === 'food' ? '喂一份' : category === 'drink' ? '喝一份' : '用一份';
+    : !count ? '背包里没有' : sameColor ? '已经是这个颜色' : category === 'food' ? '喂一份' : category === 'drink' ? '喝一份' : '用一份';
 
   function changeCategory(next: ItemCategory) { setCategory(next); setPage(0); setSelectedId(null); }
   function turnPage(next: number) { setPage(Math.max(0, Math.min(pages - 1, next))); setSelectedId(null); }
@@ -66,7 +68,7 @@ export default function CarePocket({ pet, initialCategory = 'food', onCare, allo
     <nav className="pocket-pages" aria-label="背包翻页"><button type="button" aria-label="背包上一页" disabled={page === 0} onClick={() => turnPage(page - 1)}>‹</button><span>{page + 1} / {pages}</span><button type="button" aria-label="背包下一页" disabled={page + 1 >= pages} onClick={() => turnPage(page + 1)}>›</button></nav>
     {selected && <div className="pocket-selection" data-selected-item={selected.id}>
       <img src={selected.image} alt="" draggable={false}/><div><b>{selected.name}</b><p title={itemEffectLine(selected)}>{itemEffectLine(selected)}</p></div>
-      <button type="button" className="pocket-use" aria-label={`使用${selected.name}`} disabled={!count || pet.sleeping || locked || busy} onClick={() => onCare(action, selected.id)}>{buttonLabel}</button>
+      <button type="button" className="pocket-use" aria-label={`使用${selected.name}`} disabled={!count || pet.sleeping || locked || busy || sameColor} onClick={() => onCare(action, selected.id)}>{buttonLabel}</button>
     </div>}
     {onVisitShop && <button type="button" className="pocket-visit-shop" onClick={onVisitShop}>{allowShop ? '去商店补充' : '到小屋补充'} <span aria-hidden="true">›</span></button>}
   </section>;

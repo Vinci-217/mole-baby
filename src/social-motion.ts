@@ -12,6 +12,7 @@ export function isSocialAction(action: string): action is SocialAction { return 
 /** One event clock drives prop contact and the pet reaction. Stage 0 never
  * lifts the pot; its transform is applied to the independently layered body. */
 export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: number, reduced = false, evolution?: Evolution) {
+  const flying=stage>=3;
   const p=profiles[stage], duration=action==='focus'?Infinity:SOCIAL_DURATIONS[action];
   const ended=elapsed>=duration;
   const time=reduced?0:Math.max(0,elapsed);
@@ -30,13 +31,14 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
   });
   return {
     finished:ended, opacity:ended?0:reduced?1:Math.max(0,enter),
-    bodyAngle:reduced?0:action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*p.sway*.35:stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
-    bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*.7:action==='focus'?1+Math.sin(time/1800)*.5:0,
+    bodyAngle:reduced?0:action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*(flying?.4:p.sway*.35):stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
+    bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*(flying?.35:.7):action==='focus'?1+Math.sin(time/1800)*.5:0,
     ballX:reduced?contactX:115-Math.sin(progress*Math.PI*2)**2*(115-contactX),
     ballY:reduced?p.contact:p.contact-Math.abs(Math.sin(progress*Math.PI*4))*(stage===0?9:stage===1?20:stage===2?14:10)*formFactor,
     ballAngle:time/(stage===0?22:12),
-    handX:reduced?62:62+Math.sin(progress*Math.PI*(stage===0?4:6))*(stage===0?5:9)+(1-enter)*27,
-    handY:p.head-(1-enter)*17+(reduced?0:Math.abs(rhythm)*1.5),
+    handX:reduced?(flying?65:62):(flying?65:62)+Math.sin(progress*Math.PI*(stage===0?4:6))*(flying?4:stage===0?5:9)+(1-enter)*27,
+    handY:(stage===4?15:p.head)-(1-enter)*17+(reduced?0:Math.abs(rhythm)*(flying?.7:1.5)),
+    handWidth:flying?42:53,
     bookX:p.bookX, bookY:p.bookY,
     page:reduced?0:-180*(turn*turn*(3-2*turn)),
     pageOpacity:reduced?0:readingPhase<.74||readingPhase>.98?0:Math.min(1,(readingPhase-.74)*25,(.98-readingPhase)*30),

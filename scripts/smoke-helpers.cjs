@@ -102,6 +102,8 @@ async function verifyEdgePeek(page,desktop,side){
   await place(targetX);
   await expect.poll(async()=>(await state()).edgePose,{timeout:6000}).toBe('hidden');await settle('hidden');
   await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
+  await expect(character.locator('.ram-sprite')).toHaveClass(/is-peeking/);
+  const lean=await character.locator('.seed-body-original,.ram-artwork').first().evaluate(n=>{const m=new DOMMatrix(getComputedStyle(n).transform);return Math.atan2(m.b,m.a)*180/Math.PI;});expect(lean).toBeCloseTo(-7,1);
   await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   await character.click({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgeSide).toBe(side);
   await expect.poll(async()=>(await state()).edgePose).toBe('peek');await expect(page.getByTestId('pet-actions')).toHaveCount(0);
@@ -147,4 +149,15 @@ async function verifyStageSettings(page){
   if(memoryBefore){expect(memoryAfter.facts).toEqual(memoryBefore.facts);expect(memoryAfter.messages).toEqual(memoryBefore.messages);for(const event of memoryBefore.events)expect(memoryAfter.events.some(e=>e.id===event.id)).toBe(true);}
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings };
+async function verifyRecolorPotion(page){
+  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+  const before=await save(),color=before.color==='blue'?'pink':'blue',name=color==='blue'?'蓝色换色药水':'粉色换色药水',id=`recolor-${color}`;
+  expect(before.coins).toBeGreaterThanOrEqual(80);await enterHome(page);await buy(page,id,name,'药水');
+  expect((await save()).coins).toBe(before.coins-80);expect((await save()).inventory[id]).toBe((before.inventory[id]??0)+1);
+  await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await page.locator('.pocket-categories').getByRole('button',{name:'药水',exact:true}).click();await(await selectPocket(page,id,name)).click();
+  await expect(page.locator('[data-item-gesture=recolor]')).toBeVisible();await expect.poll(async()=>(await save()).color).toBe(color);await expect(page.locator('[data-item-gesture=recolor]')).toHaveCount(0,{timeout:6000});
+  await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-color',color);
+  const after=await save();for(const key of ['name','createdAt','evolution','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.inventory[id]??0).toBe(before.inventory[id]??0);for(const key of Object.keys(before.inventory))expect(after.inventory[key]).toBe(before.inventory[key]);
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion };

@@ -1,6 +1,6 @@
 import { getItem } from './catalog'
 
-export type ItemGesture = 'nibble' | 'pour-beans' | 'crunch' | 'peel' | 'slice' | 'spoon' | 'stretch' | 'glow' | 'sip' | 'gulp' | 'fizz' | 'squeeze' | 'bath' | 'scrub' | 'face-wash' | 'brush' | 'rinse' | 'medicine'
+export type ItemGesture = 'nibble' | 'pour-beans' | 'crunch' | 'peel' | 'slice' | 'spoon' | 'stretch' | 'glow' | 'sip' | 'gulp' | 'fizz' | 'squeeze' | 'bath' | 'scrub' | 'face-wash' | 'brush' | 'rinse' | 'medicine' | 'recolor'
 export interface ItemMotion {
   action: string
   duration: number
@@ -18,6 +18,10 @@ export interface ItemMotion {
 
 type Recipe = readonly [action: string, gesture: ItemGesture, duration: number, beats: number, tilt: number, accent: string]
 const RECIPES: Record<string, Recipe> = {
+  'recolor-red':['drink-color-red','recolor',2800,2,-24,'#ff6548'],
+  'recolor-yellow':['drink-color-yellow','recolor',2800,2,-24,'#ffd438'],
+  'recolor-blue':['drink-color-blue','recolor',2800,2,-24,'#48c8fa'],
+  'recolor-pink':['drink-color-pink','recolor',2800,2,-24,'#fa83d5'],
   berry: ['eat-cocoa', 'nibble', 1900, 3, -12, '#b4d66a'],
   biscuit: ['eat-bear-biscuit', 'crunch', 2100, 4, 9, '#e7bd70'],
   juice: ['drink-berry-juice', 'sip', 2200, 3, -18, '#ffa642'],
@@ -130,11 +134,18 @@ export function sampleItemMotion(motion: ItemMotion, elapsed: number, reduced = 
     case 'face-wash': x = wave * 8; y = Math.cos(cycle * Math.PI * 2) * 4 - 7; angle += wave * 10; break
     case 'brush': x = wave * 5.5; y = Math.sin(cycle * Math.PI * 4) * 1.1; angle += wave * 6; break
     case 'rinse': x = Math.cos(cycle * Math.PI * 2) * 15; y = Math.sin(cycle * Math.PI * 2) * 10 - 4; angle += wave * 14; break
-    case 'medicine': x -= 1; y -= bite * 1.2; angle -= bite * 24; break
+    case 'medicine': case 'recolor': x -= 1; y -= bite * 1.2; angle -= bite * 24; break
   }
   const bodyFrame = motion.body === 'eat'
     ? Math.min(15, Math.round((.5 - .5 * Math.cos(cycle * Math.PI * 2)) * 15))
     : motion.body === 'drink' ? Math.min(15, Math.floor(activity * 16)) : Math.min(15, Math.round((.5 - .5 * Math.cos(cycle * Math.PI * 2)) * 15))
   if (reduced) return { progress, activity: .5, x: motion.gesture === 'bath' ? 28 : 0, y: motion.gesture === 'face-wash' ? -7 : 0, angle: motion.tilt, scaleX: 1, scaleY: 1, opacity: finished ? 0 : 1, bodyFrame: motion.body === 'wash' ? 5 : 0, finished }
   return { progress, activity, x, y, angle, scaleX, scaleY, opacity: finished ? 0 : Math.min(1, approach * 3) * (1 - depart), bodyFrame, finished }
+}
+
+/** State is saved immediately; only the original body tint blends after sipping. */
+export function colorBlend(elapsed: number, duration: number, reduced = false): number {
+  if (reduced) return 1;
+  const t=Math.max(0,Math.min(1,(elapsed/duration-.42)/.18));
+  return t*t*(3-2*t);
 }

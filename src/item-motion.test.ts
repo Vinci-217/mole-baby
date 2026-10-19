@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ITEMS } from './catalog'
-import { getItemMotion, getItemMotionByAction, sampleItemMotion } from './item-motion'
+import { getItemMotion, getItemMotionByAction, sampleItemMotion, colorBlend } from './item-motion'
 import { getRamActionDuration, sampleRamPose, sampleSeedPose } from './components/ram-animation'
 
 describe('item-specific care animation contract', () => {
@@ -73,3 +73,8 @@ describe('item-specific care animation contract', () => {
     }
   })
 })
+
+
+it('changes body colour only after the sip and finishes the blend before the bottle leaves',()=>{
+ const motion=getItemMotion('recolor-blue');expect(motion.gesture).toBe('recolor');expect(colorBlend(motion.duration*.3,motion.duration)).toBe(0);expect(colorBlend(motion.duration*.51,motion.duration)).toBeCloseTo(.5,5);expect(colorBlend(motion.duration*.7,motion.duration)).toBe(1);expect(colorBlend(0,motion.duration,true)).toBe(1);
+});

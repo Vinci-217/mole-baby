@@ -200,3 +200,10 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ## v0.12 眩晕与翻页素材
 
 `v12-dizzy-star.png`、`v12-turning-page.png`为参考原UI与道具后使用image_gen生成的透明PNG，原拉姆主体继续播放原图集。完整提示词、参考、尺寸、透明范围与SHA256见`public/assets/generated/v12-motion-provenance.json`；运行时轨道和书脊翻页由同一动作时钟驱动。
+
+
+### v0.14 换色药水与飞行适配
+
+`assets/generated/recolor-{red,yellow,blue,pink}.png` 是图片模型参考原万能药水、熊熊饼干和状态面板绘制的四款原创透明瓶装图标；不是原变色丸的导出。完整提示词、参考、原始输出路径、透明检查、尺寸与 SHA-256 在 `assets/generated/v14-potions-provenance.json`。仅复制原始输出，没有像素修改。
+
+原 `petfood.xml` 的 Tool=2/ColorType 提供变色类道具依据；本项目瓶装名称与80豆售价为本地玩法设定。角色、叶片、眼睛、花盆和飞行仍用既有原图集与配色遮罩，记录见 `research/v14-flight-recolor.md`。

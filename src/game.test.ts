@@ -220,6 +220,7 @@ describe('original item catalogue', () => {
     expect(new Set(ITEMS.map(item => item.id)).size).toBe(ITEMS.length);
     expect(new Set(ITEMS.map(item => item.category))).toEqual(new Set(['food', 'drink', 'clean', 'medicine']));
     for (const item of ITEMS) {
+      if(item.changesColor){expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);expect(item.localPrice).toBe(true);expect(item.originalPrice).toBe(0);expect(COLORS.some(c=>c.id===item.changesColor)).toBe(true);continue;}
       const original = source.get(item.sourceId)!;
       expect(original.Name).toBe(item.name);
       expect(item.hunger).toBe(Number(original.Hungry));
@@ -252,7 +253,7 @@ describe('original item catalogue', () => {
   });
 
   it('applies all original item effects and consumes exactly one item', () => {
-    for (const item of ITEMS) {
+    for (const item of ITEMS.filter(item=>!item.changesColor)) {
       const state = { ...fresh(), growth: GROWTH_MAX, stats: { hunger: 10, thirst: 10, cleanliness: 10, happiness: 10, health: 10, energy: 80 } };
       state.inventory[item.id] = 2;
       const result = care(state, 'use', item.id, NOW);
@@ -445,4 +446,27 @@ describe('deliberate settings stage selection', () => {
     expect(changePetStage(current,4,'invalid' as 'super').ok).toBe(false);
     expect(changePetStage(current,4).state.evolution).toBe('super');
   });
+});
+
+
+describe('local four-colour potion transactions',()=>{
+ it('requires a purchased bottle and preserves the pet through every stage and target colour',()=>{
+  for(const stage of [0,1,2,3,4] as const)for(const color of COLORS){
+   const potion=ITEMS.find(v=>v.changesColor===color.id)!;
+   const original={...fresh(),color:(color.id==='red'?'blue':'red') as 'red'|'blue',growth:STAGES[stage].threshold,...(stage===4?{evolution:'water' as const}:{}),coins:500,stats:{hunger:100,thirst:100,cleanliness:100,happiness:100,health:100,energy:100}};
+   expect(care(original,'use',potion.id,NOW).ok).toBe(false);
+   const bought=buyItem(original,potion.id);expect(bought.state.coins).toBe(500-potion.price);expect(bought.state.inventory[potion.id]).toBe(1);
+   const used=care(bought.state,'use',potion.id,NOW);expect(used.ok).toBe(true);expect(used.state.color).toBe(color.id);expect(used.state.inventory[potion.id]).toBe(0);
+   for(const key of ['name','createdAt','growth','evolution','stats','completedGames'] as const)expect(used.state[key]).toEqual(original[key]);
+   expect(parseSave(JSON.stringify(used.state),NOW)?.color).toBe(color.id);
+  }
+ });
+ it('never consumes a bottle for the same colour or during sleep, and migrates old inventory with empty slots',()=>{
+  const potion=ITEMS.find(v=>v.changesColor===fresh().color)!;const original=fresh();original.inventory[potion.id]=2;
+  const same=care(original,'use',potion.id,NOW);expect(same.ok).toBe(false);expect(same.state.inventory[potion.id]).toBe(2);
+  const different={...original,color:(original.color==='red'?'blue':'red') as 'red'|'blue',sleeping:true};expect(care(different,'use',potion.id,NOW).ok).toBe(false);
+  const old=fresh();for(const v of ITEMS.filter(v=>v.changesColor))delete old.inventory[v.id];const restored=parseSave(JSON.stringify(old),NOW)!;
+  for(const v of ITEMS.filter(v=>v.changesColor))expect(restored.inventory[v.id]).toBe(0);
+  expect(COLORS).toHaveLength(4);
+ });
 });

@@ -240,6 +240,10 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     if (!rightCategory) return { state: current, message: '这种用品需要在对应的照料分类里使用。', ok: false };
     if (getStage(current.growth) < item.minStage) return { state: current, message: `${item.name}要等到${STAGES[item.minStage].name}才能使用，先留在背包里吧。`, ok: false };
     if (!(current.inventory[item.id] > 0)) return { state: current, message: `${item.name}用完啦，去商店用摩尔豆补充一些吧。`, ok: false };
+    if (item.changesColor) {
+      if (current.color === item.changesColor) return {state:current,ok:false,message:'已经是这个颜色啦，药水先收好。'};
+      return {state:{...current,color:item.changesColor,inventory:{...current.inventory,[item.id]:current.inventory[item.id]-1}},ok:true,message:`咕嘟～换成${COLORS.find(c=>c.id===item.changesColor)!.name}啦，还是陪着你的我。`};
+    }
     const keys = ['hunger', 'thirst', 'cleanliness', 'happiness', 'health'] as const;
     if (!keys.some(key => item[key] > 0 && stats[key] < 100)) {
       const message = item.category === 'food' ? '肚子饱饱的，留着等会儿再吃吧。'

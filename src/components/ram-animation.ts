@@ -105,12 +105,30 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
 }
 
 /** Elemental atlases retain their own body/crown during every interaction.
- * Their original happy pose has fully closed eyes; care rows use the short
- * original greeting animation plus the consumed item's existing gesture. */
+ * Their original happy pose has fully closed eyes. During care their own
+ * original flight cycle stays registered while the corresponding item moves. */
 export function sampleEvolvedPose(action: string, elapsed: number, reduced = false): Pose {
-  const pose = sampleRamPose(action, elapsed, reduced);
-  if (pose.finished || action === 'drag') return { row: 0, frame: 0, finished: pose.finished };
+  return sampleFlyingPose(action, elapsed, reduced, 'super');
+}
+
+/** Original down cycles: senior/elemental 11 frames, super 21, at 24 fps.
+ * Keep one source registration during affection instead of jumping to happy's
+ * differently scaled, upright-leaf sequence. flightTime survives action changes. */
+export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
   if (action === 'sleep') return { row: 8, frame: 0, finished: false };
-  if (pose.sheet) return { row: pose.sheet === 'care' && pose.row >= 4 ? 6 : 3, frame: reduced ? 0 : Math.floor(elapsed / 110) % 4, finished: false };
-  return pose;
+  if (action === 'still' || action === 'drag' || reduced) {
+    const duration = getRamActionDuration(action);
+    return { row: 0, frame: 0, finished: duration !== null && elapsed >= duration };
+  }
+  const sourceFrames = form === 'super' ? [1,5,8,12,15,19] : form === 'senior' ? [1,3,4,6,7,8] : [1,3,4,6,7,9];
+  const count = form === 'super' ? 21 : 11;
+  const phase = Math.floor(Math.max(0,flightTime) / (1000/24)) % count + 1;
+  let frame = 0;
+  for (let i = 1; i < sourceFrames.length; i++) if (phase >= sourceFrames[i]) frame = i;
+  const duration = getRamActionDuration(action);
+  const finished = duration !== null && elapsed >= duration;
+  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
+    return sampleRamPose(action,elapsed,reduced);
+  }
+  return { row: 0, frame, finished };
 }

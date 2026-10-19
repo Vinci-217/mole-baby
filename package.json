@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -25,7 +25,8 @@
     "test:presence": "node scripts/presence-regression.cjs",
     "test:hover-rest": "node scripts/hover-rest-regression.cjs",
     "test:reading-dizzy": "node scripts/reading-dizzy-regression.cjs",
-    "test:layout-stage": "node scripts/layout-stage-regression.cjs"
+    "test:layout-stage": "node scripts/layout-stage-regression.cjs",
+    "test:flight-recolor": "node scripts/flight-recolor-regression.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

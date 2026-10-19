@@ -2,6 +2,7 @@
  * Activity gifts have explicit local shop prices; see research/items-states.md.
  * Stable berry/biscuit/juice IDs keep existing v1 saves and rewards intact.
  */
+import type { PetColor } from './game';
 export type ItemCategory = 'food' | 'drink' | 'clean' | 'medicine';
 export const CATEGORY_LABELS: Record<ItemCategory, string> = { food: '食物', drink: '饮品', clean: '清洁', medicine: '药水' };
 export interface PetItem {
@@ -21,6 +22,7 @@ export interface PetItem {
   health: number;
   minStage: 0 | 1 | 2 | 3;
   description: string;
+  changesColor?: PetColor;
 }
 
 export const ITEMS: PetItem[] = [
@@ -53,6 +55,16 @@ export const ITEMS: PetItem[] = [
   { id: '180071', sourceId: '180071', name: '拉姆能量星', category: 'food', image: './assets/original/items/180071.png', emoji: '🍽️', price: 45, originalPrice: 0, localPrice: true, hunger: 30, thirst: 30, cleanliness: 30, happiness: 30, health: 0, minStage: 0, description: '饱食+30，水分+30，清洁+30，心情+30；活动道具，商店价格为桌宠设定。' },
   { id: '180073', sourceId: '180073', name: '优质牛奶', category: 'drink', image: './assets/original/items/180073.png', emoji: '🥛', price: 60, originalPrice: 0, localPrice: true, hunger: 50, thirst: 50, cleanliness: 0, happiness: 50, health: 0, minStage: 0, description: '饱食+50，水分+50，心情+50；活动道具，商店价格为桌宠设定。' },
 ];
+
+// Original petfood.xml has Tool=2 colour-changing items. These four bottled
+// variants and their bean price are this desktop adaptation, not official IDs.
+export const COLOR_POTIONS = ([['red','红色'],['yellow','黄色'],['blue','蓝色'],['pink','粉色']] as const).map(([color,name]): PetItem => ({
+  id:`recolor-${color}`,sourceId:`recolor-${color}`,name:`${name}换色药水`,category:'medicine',
+  image:`./assets/generated/recolor-${color}.png`,emoji:'🧪',price:80,originalPrice:0,localPrice:true,
+  hunger:0,thirst:0,cleanliness:0,happiness:0,health:0,minStage:0,changesColor:color,
+  description:`变为${name}，保留阶段、物品和回忆。`,
+}));
+ITEMS.push(...COLOR_POTIONS);
 
 /** Accept a source numeric ID at API boundaries, return the stable save ID. */
 export function getItem(id: string | undefined): PetItem | undefined {

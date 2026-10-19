@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose } from './ram-animation'
+import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose, sampleFlyingPose } from './ram-animation'
 
 describe('original Ram care animation contract', () => {
   it.each([
@@ -48,11 +48,23 @@ describe('original Ram care animation contract', () => {
       for (let t = 0; t < duration; t += 40) {
         const pose = sampleEvolvedPose(action, t)
         expect(pose.sheet).toBeUndefined()
-        expect(pose.row).toBe(3)
-        expect(pose.frame).toBeLessThan(4)
+        expect(pose.row).toBe(0)
+        expect(pose.frame).toBeLessThan(6)
       }
       expect(sampleEvolvedPose(action, duration).finished).toBe(true)
     }
     expect(sampleSeedPose('drag', 3000)).toEqual({ frame: 0, finished: false })
   })
 })
+
+
+describe('continuous original airborne posture',()=>{
+ it('cycles the source down row throughout idle and affection without switching registration',()=>{
+  for(const form of ['senior','super','water','wood','fire']){
+   const frames=new Set<number>();for(let t=0;t<2000;t+=20){const pose=sampleFlyingPose('idle',t,false,form);expect(pose.row).toBe(0);expect(pose.sheet).toBeUndefined();frames.add(pose.frame);expect(sampleFlyingPose('pet',t%2000,false,form,t).frame).toBe(pose.frame);}
+   expect(frames.size).toBe(6);
+   expect(sampleFlyingPose('pet',0,false,form,350).frame).toBe(sampleFlyingPose('idle',350,false,form,350).frame);
+   expect(sampleFlyingPose('idle',1000,true,form).frame).toBe(0);expect(sampleFlyingPose('sleep',1000,false,form).row).toBe(8);
+  }
+ });
+});
