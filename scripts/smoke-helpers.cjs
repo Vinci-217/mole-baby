@@ -79,19 +79,25 @@ async function makeTired(page) {
 }
 async function verifyEdgePeek(page,desktop,side){
   const character=page.getByTestId('desktop-character');
+  const settle=async pose=>{
+    // Native state arrives before the 650 ms CSS transition finishes. Use the
+    // painted position so forced pointer events hit the exposed strip.
+    const x=(side==='left'?-1:1)*(pose==='hidden'?125:85);
+    await expect.poll(()=>page.locator('.compact-pet').evaluate(n=>new DOMMatrix(getComputedStyle(n).transform).m41)).toBeCloseTo(x,1);
+  };
   await page.keyboard.press('Escape');await page.mouse.move(1,239);await page.waitForTimeout(300);
   const {bounds,area}=await desktop.evaluate(({BrowserWindow,screen})=>{const bounds=BrowserWindow.getAllWindows()[0].getBounds();return {bounds,area:screen.getDisplayMatching(bounds).workArea};});
   const targetX=side==='left'?area.x:area.x+area.width-200,targetY=area.y+Math.min(240,area.height-240);
   await page.evaluate(async({dx,dy})=>{await window.desktop.setEdgeHovered(false);await window.desktop.setEdgeHiding(true);await window.desktop.setInteracting(false);await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.endPetDrag();},{dx:targetX-bounds.x,dy:targetY-bounds.y});
   const state=()=>page.evaluate(()=>window.desktop.getState());
-  await expect.poll(async()=>(await state()).edgePose,{timeout:6000}).toBe('hidden');
-  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');
+  await expect.poll(async()=>(await state()).edgePose,{timeout:6000}).toBe('hidden');await settle('hidden');
+  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
   await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   await character.click({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgeSide).toBe(side);
   await expect.poll(async()=>(await state()).edgePose).toBe('peek');await expect(page.getByTestId('pet-actions')).toHaveCount(0);
-  await page.mouse.move(100,5);await expect.poll(async()=>(await state()).edgePose).toBe('hidden');
+  await page.mouse.move(100,5);await expect.poll(async()=>(await state()).edgePose).toBe('hidden');await settle('hidden');
   const until=(await state()).edgeNextPeekAt-Date.now();expect(until).toBeGreaterThan(118000);expect(until).toBeLessThanOrEqual(300000);
-  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');
+  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
   const start=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
   const localX=side==='left'?12:188,y=125;await page.mouse.move(localX,y);await page.mouse.down();
   // Keep physical screen coordinates stable while the native window follows the drag.
