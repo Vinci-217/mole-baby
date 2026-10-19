@@ -171,6 +171,12 @@ async function main() {
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
-  try { if (desktop) await desktop.evaluate(({ app }) => app.quit()).catch(() => {}); }
-  finally { if (profile) fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 250 }); }
+  if (desktop) {
+    // The quit IPC can resolve before Chromium releases the Windows profile.
+    // Register first, then wait for the actual process close before deleting it.
+    const closed = desktop.waitForEvent('close', { timeout: 20000 });
+    await desktop.evaluate(({ app }) => app.quit()).catch(() => {});
+    await closed;
+  }
+  if (profile) await fs.promises.rm(profile, { recursive: true, force: true, maxRetries: 15, retryDelay: 250 });
 });
