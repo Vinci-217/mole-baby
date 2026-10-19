@@ -35,6 +35,8 @@ export interface GameState {
   stats: PetStats;
   inventory: Record<string, number>;
   sleeping: boolean;
+  /** Short grace period after the user wakes a tired pet; persisted across reloads. */
+  awakeUntil?: number;
   completedGames: number;
   lastRewardAt: number;
 }
@@ -72,6 +74,9 @@ export const STAGES = [
 export const GROWTH_MAX = STAGES[4].threshold;
 export const GAME_REWARD_COOLDOWN_MS = 10_000;
 const OFFLINE_CAP_MS = 24 * 60 * 60 * 1000;
+export const REST_ENERGY = 20;
+export const WAKE_ENERGY = 85;
+export const WAKE_GRACE_MS = 15 * 60 * 1000;
 const MAX_INVENTORY = 9_999;
 const MAX_COINS = 1_000_000_000;
 
@@ -134,9 +139,8 @@ export function evolvePet(state: GameState, evolution: Evolution, now = Date.now
   return { state: { ...current, evolution }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
 }
 
-/** Apply up to one day of elapsed time. Repeated ticks at the same instant are inert. */
-export function tick(state: GameState, now = Date.now()): GameState {
-  if (!Number.isFinite(now) || now <= state.lastTick) return state;
+/** Integrate one continuous awake/asleep span; transitions are handled by tick. */
+function advanceStats(state: GameState, now: number): GameState {
   const hours = Math.min(now - state.lastTick, OFFLINE_CAP_MS) / 3_600_000;
   const rates = state.sleeping
     ? { hunger: 3, thirst: 3, happiness: 1, cleanliness: 1.5, energy: -22 }
@@ -178,12 +182,35 @@ export function tick(state: GameState, now = Date.now()): GameState {
   };
 }
 
+function settleRest(state: GameState, now: number): GameState {
+  if(state.sleeping&&state.stats.energy>=WAKE_ENERGY)return {...state,sleeping:false};
+  if(!state.sleeping&&state.stats.energy<=REST_ENERGY&&now>=(state.awakeUntil??0))return {...state,sleeping:true};
+  return state;
+}
+
+/** Automatic rest follows energy, independent of the user's one-shot focus timer.
+ * Split elapsed time at sleep/wake boundaries so long absences and short ticks agree. */
+export function tick(state: GameState, now = Date.now()): GameState {
+  if(!Number.isFinite(now)||now<=state.lastTick)return state;
+  let cursor=now-Math.min(now-state.lastTick,OFFLINE_CAP_MS);
+  let current=settleRest(cursor===state.lastTick?state:{...state,lastTick:cursor},cursor);
+  while(cursor<now){
+    const untilTransition=current.sleeping
+      ? (WAKE_ENERGY-current.stats.energy)/22*3_600_000
+      : Math.max((current.stats.energy-REST_ENERGY)/4*3_600_000,(current.awakeUntil??0)-cursor);
+    const end=Math.min(now,cursor+Math.max(1,untilTransition));
+    current=settleRest(advanceStats(current,end),end);cursor=end;
+  }
+  return current;
+}
+
 export function care(state: GameState, action: Action, foodId?: string, now = Date.now()): CareResult {
   const current = tick(state, now);
   if (action === 'sleep') {
+    const waking=state.sleeping||current.sleeping;
     return {
-      state: { ...current, sleeping: !current.sleeping },
-      message: current.sleeping ? `${current.name}醒来啦，今天也想和你在一起！` : '晚安呀，睡一会儿就能恢复精力。',
+      state: { ...current, sleeping: !waking, ...(waking?{awakeUntil:now+WAKE_GRACE_MS}:{}) },
+      message: waking ? `${current.name}醒来啦，今天也想和你在一起！` : '晚安呀，睡一会儿就能恢复精力。',
       ok: true,
     };
   }
@@ -254,7 +281,7 @@ export function getPetCondition(state: GameState): PetCondition {
   if (state.stats.thirst < 30) return { id: 'thirsty', label: '口渴了', action: 'thirsty', description: '需要喝一点麦香牛奶、果汁或其他饮品。' };
   if (state.stats.cleanliness < 30) return { id: 'dirty', label: '需要清洁', action: 'dirty', description: '使用泡泡浴、洗面奶或沐浴露清洁一下吧。' };
   if (state.stats.happiness < 30) return { id: 'sad', label: '有点难过', action: 'sad', description: '摸摸它、聊聊天，或者一起玩一会儿。' };
-  if (state.stats.energy < 25) return { id: 'tired', label: '有点困了', action: 'tired', description: '可以让拉姆闭上眼睛休息一会儿。' };
+  if (state.stats.energy < 25) return { id: 'tired', label: '有点困了', action: 'tired', description: '困了会自己闭眼休息，睡着后可以轻轻叫醒。' };
   return { id: 'healthy', label: '状态很好', action: 'idle', description: '吃得饱、喝得足，正在安心地陪伴你。' };
 }
 
@@ -334,6 +361,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       stats: { hunger, thirst, happiness, cleanliness, health, energy },
       inventory,
       sleeping: value.sleeping,
+      ...(isIntegerIn(value.awakeUntil,0,now+WAKE_GRACE_MS)?{awakeUntil:value.awakeUntil}:{}),
       completedGames: value.completedGames,
       lastRewardAt: value.lastRewardAt,
     }, now);

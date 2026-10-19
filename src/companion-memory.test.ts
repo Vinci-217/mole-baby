@@ -108,6 +108,13 @@ describe('companion memory', () => {
 
 
 describe('personal continuity and accountable memories', () => {
+  it('does not count autonomous rest as user interaction or passive affection',()=>{
+    const p=pet();let m=createMemory(p);
+    m=recordEvent(m,{kind:'auto-sleep',detail:'自己睡着',at:NOW});
+    m=recordEvent(m,{kind:'auto-wake',detail:'自然醒来',at:NOW+86400000});
+    expect(getCompanionMood(m,p,NOW+86400000).affection).toBe(0);
+    expect(getDiary(m)).toHaveLength(2);
+  });
   it('keeps actual user-shared events after they leave the short dialogue window', () => {
     let memory = rememberChat(createMemory(pet()), '今天我完成了毕业论文。', NOW);
     expect(memory.facts).toMatchObject([{ kind: 'story', value: '今天我完成了毕业论文' }]);

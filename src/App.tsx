@@ -84,6 +84,7 @@ export default function App() {
   const petRef = useRef(pet); petRef.current = pet;
   const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout> }>({});
   const ambient = useRef<{line:PresenceLine;at:number}|null>(null);
+  const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
   const importInput = useRef<HTMLInputElement>(null);
 
   const adoptionFocus = useRef<HTMLInputElement>(null);
@@ -141,6 +142,14 @@ export default function App() {
     void openPanel('chat');
   }
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !pet?.sleeping); }, [hasPet,pet?.sleeping,stage]);
+  useEffect(()=>{
+    const before=previousRest.current;previousRest.current=pet?{petId:pet.createdAt,sleeping:pet.sleeping}:null;
+    if(!pet||before?.petId!==pet.createdAt||before.sleeping===pet.sleeping)return;
+    if(!pet.sleeping&&(pet.awakeUntil??0)>Date.now())return; // Manual wake already records its actual care event.
+    const text=pet.sleeping?'有点困啦，我闭上眼睡一会儿，想我时可以轻轻叫醒。':'睡饱啦，我又有精神陪你了。';
+    if(!prefs.quiet&&!timer.running){speak(text);playPetVoice(pet.sleeping?'sleep':'wake',prefs.sound);}
+    setMemory(m=>m?recordEvent(m,{kind:pet.sleeping?'auto-sleep':'auto-wake',detail:pet.sleeping?'我困了，自己闭上眼休息。':'我恢复了精力，自然醒来。'}):m);
+  },[pet?.createdAt,pet?.sleeping,prefs.quiet,prefs.sound,timer.running,speak]);
 
   function animate(next: string, itemId?: string) {
     const motion = itemId ? getItemMotion(itemId) : null;
@@ -170,6 +179,7 @@ export default function App() {
     }
     if (type === 'wash' && !itemId) { setPocketCategory('clean'); void openPanel('food'); return; }
     const saved = petRef.current; if (!saved) return;
+    if(type==='sleep'&&!saved.sleeping)return; // Sleep is autonomous; the user only wakes it.
     if (type !== 'sleep' && Date.now() < careUntil.current) return;
     const item = getItem(itemId), next = type === 'sleep' && saved.sleeping ? 'wake' : type;
     const detail = item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined;
@@ -245,14 +255,14 @@ export default function App() {
     <div className="timer-settings-actions"><button className="game-button small" disabled={!prefs.reminders} onClick={focusToggle}>{timer.running ? '取消计时' : '开始计时'}</button><span>{timer.running ? reminderTime(timer.seconds) : timer.finished ? '已结束，等待下次开始' : '点击开始后才计时'}</span></div>
     {memorySaveError && <p role="alert">回忆暂未保存，请导出备份。</p>}
   </div></>;
-  const statusContent = <><div className="profile-heading"><div className="profile-mini"><Ram color={current.color} stage={stage} evolution={current.evolution} sleeping={current.sleeping}/></div><div><h3>{current.name}</h3><span>{STAGES[stage].name} · 相伴第 {days} 天</span></div><span className="bean-count">{current.coins} 摩尔豆</span></div><div className="pet-relationship"><b>{mood.label}</b><span>{mood.relationship}</span></div><div className="classic-stat-grid">{stats.map(s => <div className="classic-stat" key={s.id}><label><span><UiArt name={s.icon}/>{s.name}</span><b>{Math.round(current.stats[s.id])}</b></label><div role="progressbar" aria-label={s.name} aria-valuenow={Math.round(current.stats[s.id])} aria-valuemin={0} aria-valuemax={100} className={`classic-progress stat-${s.id}`}><i style={{ width: `${current.stats[s.id]}%` }}/></div></div>)}</div><p className="room-condition">{condition.description}</p><div className="panel-shortcuts"><button className="game-button green" onClick={() => { setPocketCategory('food'); setPanel('food'); }}>打开背包</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping ? '叫醒拉姆' : '睡一觉'}</button></div></>;
+  const statusContent = <><div className="profile-heading"><div className="profile-mini"><Ram color={current.color} stage={stage} evolution={current.evolution} sleeping={current.sleeping}/></div><div><h3>{current.name}</h3><span>{STAGES[stage].name} · 相伴第 {days} 天</span></div><span className="bean-count">{current.coins} 摩尔豆</span></div><div className="pet-relationship"><b>{mood.label}</b><span>{mood.relationship}</span></div><div className="classic-stat-grid">{stats.map(s => <div className="classic-stat" key={s.id}><label><span><UiArt name={s.icon}/>{s.name}</span><b>{Math.round(current.stats[s.id])}</b></label><div role="progressbar" aria-label={s.name} aria-valuenow={Math.round(current.stats[s.id])} aria-valuemin={0} aria-valuemax={100} className={`classic-progress stat-${s.id}`}><i style={{ width: `${current.stats[s.id]}%` }}/></div></div>)}</div><p className="room-condition">{condition.description}</p><div className="panel-shortcuts"><button className="game-button green" onClick={() => { setPocketCategory('food'); setPanel('food'); }}>打开背包</button>{current.sleeping && <button className="game-button" onClick={() => doCare('sleep')}>叫醒拉姆</button>}</div></>;
   const gameOverlay = <>{game === 'fruit' && <FruitGame color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'memory' && <MemoryGame onClose={() => setGame(null)} onComplete={completeGame}/>} {game && !['fruit','memory'].includes(game) && <MoreGames kind={game as ExtraGame} onClose={() => setGame(null)} onComplete={completeGame}/>}</>;
 
   if (floating && pet) return <div className={petMode ? 'transparent-stage' : 'desktop-preview companion-preview'}>
-    {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>点一下互动，按住拖动。</span></div>}
+    {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>移上来互动，点击摸摸，按住拖动。</span></div>}
     <DesktopCompanion pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} bubble={bubble} bubbleVisible={bubbleVisible}
       panel={panel && ['status','food','play','chat'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
-      sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} timerFinished={timer.finished} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent}
+      sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent}
       onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onPresence={()=>tellPresence(true)} onPet={() => doCare('pet')}/>
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;
@@ -264,7 +274,7 @@ export default function App() {
     <TimeScene media={roomMedia}>
       <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button className="room-change-button" onClick={() => setPanel('settings')}>布置小屋</button><span className="coin-sign">{current.coins} 摩尔豆</span><button className="game-button" onClick={() => void toDesktop()}>回到桌面</button></div>}</div>
       {pet && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
-        <div className="scene-pet"><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了，点休息可叫醒' : mood.label}</small>{prefs.reminders && <button className="scene-timer" onClick={focusToggle}>{timer.running ? `计时 ${reminderTime(timer.seconds)} · 取消` : timer.finished ? '计时结束 · 再来一次' : '开始计时'}</button>}</span></div>
+        <div className="scene-pet"><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>
         <nav className="classic-dock room-dock" aria-label="小屋功能">
           <button aria-label="我的拉姆" onClick={() => setPanel('status')}><UiArt name="status-health"/><b>状态</b></button>
           <button aria-label="打开背包" onClick={() => { setPocketCategory('food'); setPanel('food'); }}><UiArt name="toolbar-bag-normal"/><b>背包</b></button>

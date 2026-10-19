@@ -1,0 +1,42 @@
+const assert=require('node:assert/strict'),path=require('node:path');
+const {spawn}=require('node:child_process');
+const {chromium,expect}=require('@playwright/test');
+const {adopt,openActions}=require('./smoke-helpers.cjs');
+const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5197';
+const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5197','--strictPort'],{cwd:root,stdio:'pipe'});
+let browser,logs='';server.stderr.on('data',d=>logs+=d);
+const save=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+(async()=>{
+ for(let n=0;n<100;n++){if(server.exitCode!==null)throw Error(logs);try{if((await fetch(url)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});
+ const p=await browser.newPage({viewport:{width:1180,height:820}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.clock.install();await p.goto(url);await adopt(p);await p.clock.pauseAt(new Date(Date.now()+1000));
+ const character=p.getByTestId('desktop-character'),actions=p.getByTestId('pet-actions');
+ await p.mouse.move(0,0);await p.clock.runFor(250);await expect(actions).toHaveCount(0);
+ await expect(p.locator('.compact-reminder')).toHaveCount(0);const before=await save(p);
+ await character.hover();await expect(actions).toBeVisible();
+ assert.deepEqual(await actions.getByRole('button').evaluateAll(ns=>ns.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','开始计时','和拉姆说话','进入小屋']);
+ assert.equal((await save(p)).stats.happiness,before.stats.happiness,'hover does not pet or change needs');
+ await expect(p.getByRole('button',{name:'休息',exact:true})).toHaveCount(0);
+ const box=await character.boundingBox();await p.mouse.move(box.x+50,box.y+115);await p.clock.runFor(400);await expect(actions).toBeVisible();
+ await actions.getByRole('button',{name:'开始计时',exact:true}).click();await expect(p.getByRole('timer')).toContainText('40:00');
+ const timer=await p.getByRole('timer').boundingBox();assert.ok(timer.width<55&&timer.height<20,'countdown is a small icon label, not a separate bar');
+ await p.screenshot({path:path.join(root,'artifacts/v11-hover-timer.png')});
+ await p.mouse.move(0,0);await p.clock.runFor(300);await expect(actions).toHaveCount(0);await p.clock.fastForward(60000);
+ await character.hover();await expect(p.getByRole('timer')).toContainText('39:');await p.getByRole('button',{name:'取消计时',exact:true}).click();await expect(p.getByRole('timer')).toHaveCount(0);
+ await p.mouse.move(0,0);await p.clock.runFor(300);await character.focus();await expect(actions).toBeVisible();await p.keyboard.press('Tab');await expect(actions.getByRole('button',{name:'查看状态',exact:true})).toBeFocused();
+ console.log('PASS hover-only tools, icon order, no idle timer bar or hover side effects, bridge reachability, keyboard access and timer continuing while tools are hidden');
+
+ await p.evaluate(()=>{const x=JSON.parse(localStorage.getItem('ramu-house-save-v1'));x.stats.energy=20.01;x.lastTick=Date.now();delete x.awakeUntil;localStorage.setItem('ramu-house-save-v1',JSON.stringify(x));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,reminders:true,reminderMinutes:1}));});
+ await p.reload();await openActions(p);await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(15000);await p.clock.runFor(100);
+ await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
+ await expect(p.locator('.compact-bubble')).not.toContainText('有点困啦');
+ assert.equal(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)');
+ await expect(p.getByRole('button',{name:'叫醒拉姆',exact:true})).toBeVisible();await p.clock.fastForward(46000);await expect(p.locator('.compact-bubble')).toContainText('计时结束');assert.equal((await save(p)).sleeping,true);
+ await p.screenshot({path:path.join(root,'artifacts/v11-auto-sleep.png')});
+ await p.getByRole('button',{name:'叫醒拉姆',exact:true}).click();assert.equal((await save(p)).sleeping,false);const grace=(await save(p)).awakeUntil;
+ await p.clock.fastForward(300000);assert.equal((await save(p)).sleeping,false);await p.reload();assert.equal((await save(p)).awakeUntil,grace);
+ await p.clock.fastForward(300000);assert.equal((await save(p)).sleeping,false);await p.clock.fastForward(301000);assert.equal((await save(p)).sleeping,true);
+ await p.clock.fastForward(4*3600000);assert.equal((await save(p)).sleeping,false);await expect(p.getByRole('button',{name:'叫醒拉姆',exact:true})).toHaveCount(0);
+ assert.deepEqual(errors,[]);console.log('PASS live automatic sleep, upright closed eyes, independent one-shot timer, manual wake grace across restart and natural wake');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.kill('SIGTERM');});

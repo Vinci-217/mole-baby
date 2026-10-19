@@ -13,7 +13,7 @@ async function openActions(page) {
   const edge=await page.evaluate(async()=>window.desktop?.getState? (await window.desktop.getState()).edgePose : 'visible');
   if(edge!=='visible') await page.evaluate(()=>window.desktop.revealPet());
   const actions = page.getByTestId('pet-actions');
-  if (!(await actions.isVisible())) await page.getByTestId('desktop-character').click();
+  if (!(await actions.isVisible())) await page.getByTestId('desktop-character').hover();
   await expect(actions).toBeVisible();
   return actions;
 }
@@ -68,4 +68,13 @@ async function buy(page, id, label, category = '食物') {
   await expect(button).toBeEnabled();
   await button.click();
 }
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy };
+// Test fixture: drain energy without a manual sleep command, then let the real clock policy rest.
+async function makeTired(page) {
+  await page.evaluate(()=>{
+    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));
+    p.stats.energy=15;p.sleeping=false;delete p.awakeUntil;p.lastTick=Math.max(p.createdAt,Date.now()-1000);
+    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
+  });
+  await page.reload();await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');
+}
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired };

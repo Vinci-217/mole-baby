@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('node:path');
 const {spawn}=require('node:child_process');
 const {chromium,expect}=require('@playwright/test');
-const {adopt,openActions,enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
+const {makeTired,adopt,openActions,enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
 const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5196';
 const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5196','--strictPort'],{cwd:root,stdio:'pipe'});
 let logs='',browser;server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);
@@ -62,8 +62,8 @@ const memory=page=>page.evaluate(()=>JSON.parse(localStorage.getItem(`ramu-compa
  // Fresh pet: focus and sleep independently suppress spontaneous speech.
  const p=await browser.newPage();await p.addInitScript(()=>localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:true,presenceMinutes:10,reminderMinutes:40})));
  await p.clock.install();await p.goto(url);await adopt(p);await p.clock.pauseAt(new Date(Date.now()+1000));
- await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(1200000);assert.equal(await journal(p),null);
- await p.getByRole('button',{name:'取消计时',exact:true}).click();await openActions(p);await p.getByRole('button',{name:'休息',exact:true}).click();await p.clock.fastForward(1200000);assert.equal(await journal(p),null);
+ await openActions(p);await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(1200000);assert.equal(await journal(p),null);
+ await p.getByRole('button',{name:'取消计时',exact:true}).click();await openActions(p);await makeTired(p);await p.clock.fastForward(1200000);assert.equal(await journal(p),null);
  await expect(p.getByTestId('desktop-character').locator('.seed-body-frame')).toHaveAttribute('data-frame','61');await expect(p.getByRole('timer')).toHaveCount(0);
  console.log('PASS focus and seed sleep suppress spontaneous bubbles without changing the manual timer');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.kill('SIGTERM');});

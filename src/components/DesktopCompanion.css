@@ -186,5 +186,10 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .desktop-play>button{display:flex;align-items:center;gap:15px;background:#fff7df;border:1px solid #e8d1a0;border-radius:9px;padding:10px 15px;font-size:14px;text-align:left}
 .desktop-play>button>img{width:36px;height:36px;object-fit:contain}
 .desktop-play>button.desktop-play-home{border:0;background:none;font-size:13px;color:#a77c39;padding:7px}
+.compact-hover-bridge{position:absolute;left:42px;top:176px;width:116px;height:31px}
+.companion-layout .pet-actions{z-index:2}
+.companion-layout .pet-actions .timer-tool{position:relative}
+.companion-layout .timer-tool.running{background:#fff0ba;box-shadow:inset 0 0 0 1px #d6a64a}
+.companion-layout .tool-countdown{position:absolute;top:30px;left:50%;transform:translateX(-50%);color:#765431;font-size:11px;line-height:13px;font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px #fff;pointer-events:none}
 .companion-preview>.companion-layout.panel-open{height:490px}
 @media(max-width:600px){.companion-preview>.companion-layout.panel-open{height:735px}.companion-preview .companion-panel{height:474px;max-height:calc(100vh - 255px)}.companion-preview>.companion-layout{bottom:15px}}

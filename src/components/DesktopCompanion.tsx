@@ -13,14 +13,14 @@ interface Props {
   bubble: string; bubbleVisible: boolean; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
   saveError: boolean;
-  reminderSeconds: number; reminders: boolean; timerRunning: boolean; timerFinished: boolean;
+  reminderSeconds: number; reminders: boolean; timerRunning: boolean;
   onPanel: (panel: CompanionPanel | null) => void;
   onCare: (action: Action, item?: string) => void;
   onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onPet: () => void;
   pocketCategory: ItemCategory; pocketVisit: number; chatContent: ReactNode;
 }
-const icons = { food: 'items/180001', wash: 'items/180003', sleep: 'ui/status-sleep', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
+const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
 function Icon({ path }: { path: string }) { return <img alt="" draggable={false} src={`./assets/original/${path}.png`}/>; }
 const labels: Record<CompanionPanel, string> = { status: '状态', food: '背包', play: '玩耍', chat: '对话' };
 export default function DesktopCompanion(p: Props) {
@@ -29,13 +29,21 @@ export default function DesktopCompanion(p: Props) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const root = useRef<HTMLDivElement>(null), revealClick = useRef(false);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const revealTools = () => { clearTimeout(hideTimer.current); hideTimer.current=undefined; if(!drag.current?.moved) setTools(true); };
+  const hideTools = () => {
+    if(hideTimer.current!==undefined)return;
+    hideTimer.current=setTimeout(()=>{hideTimer.current=undefined;if(!root.current?.querySelector('.compact-pet :focus-visible'))setTools(false);},220);
+  };
   const drag = useRef<{ x: number; y: number; lastX: number; lastY: number; moved: boolean; direction: number; turns: number; turnAt: number; offset: { x: number; y: number } } | null>(null);
   useEffect(() => {
     if (!p.native) return;
     const hit = (e: MouseEvent) => {
       if (drag.current?.moved) return;
       const target = document.elementFromPoint(e.clientX, e.clientY);
-      window.desktop?.setMousePassthrough(!target?.closest('button,input,textarea,select,summary,[role="dialog"],a'));
+      // Forwarded moves still reveal tools while the transparent window passes clicks through.
+      if(target?.closest('.desktop-character,.pet-actions,.compact-hover-bridge,.compact-pet-name'))revealTools();else hideTools();
+      window.desktop?.setMousePassthrough(!target?.closest('button,input,textarea,select,summary,[role="dialog"],a,.compact-hover-bridge'));
     };
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
@@ -43,11 +51,12 @@ export default function DesktopCompanion(p: Props) {
   useEffect(() => { void window.desktop?.setInteracting(tools || dragging || p.panel !== null); }, [tools, dragging, p.panel]);
   useEffect(() => () => { void window.desktop?.setInteracting(false); }, []);
   useEffect(() => () => clearTimeout(shakeTimer.current), []);
+  useEffect(() => () => clearTimeout(hideTimer.current), []);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') { p.onPanel(null); setTools(false); } };
     document.addEventListener('keydown', escape); return () => document.removeEventListener('keydown', escape);
   }, [p.onPanel]);
-  const toggleTools = () => { void window.desktop?.revealPet(); const show = !tools; setTools(show); if (!show) p.onPanel(null); p.onPet(); };
+  const touchPet = () => { void window.desktop?.revealPet(); revealTools(); p.onPet(); };
   function down(e: PointerEvent<HTMLButtonElement>) {
     if (e.button !== 0) return;
     revealClick.current = false; e.currentTarget.setPointerCapture(e.pointerId);
@@ -58,7 +67,7 @@ export default function DesktopCompanion(p: Props) {
     drag.current = { x, y, lastX: x, lastY: y, moved: false, direction: 0, turns: 0, turnAt: performance.now(), offset };
   }
   function move(e: PointerEvent<HTMLButtonElement>) {
-    const d = drag.current; if (!d) return;
+    const d = drag.current; if (!d) {revealTools();return;}
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     if (!d.moved && Math.hypot(x - d.x, y - d.y) < 5) return;
     if (!d.moved) { d.moved = true; setDragging(true); setTools(false); p.onPanel(null); playPetVoice('lift', p.sound); }
@@ -86,30 +95,30 @@ export default function DesktopCompanion(p: Props) {
     const d = drag.current; drag.current = null;
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     setDragging(false); setTilt(0); void window.desktop?.endPetDrag();
-    if (d?.moved) { playPetVoice('drop', p.sound); if (p.stage === 0) p.onSay('把我的小花盆放在这里，陪着你。'); }
-    else if (!cancelled) toggleTools();
+    if (d?.moved) { if(!cancelled)revealTools();playPetVoice('drop', p.sound); if (p.stage === 0) p.onSay('把我的小花盆放在这里，陪着你。'); }
+    else if (!cancelled) touchPet();
   }
   const show = (panel: CompanionPanel) => { setTools(true); p.onPanel(panel); };
   const side = p.native ? p.desktopState.panelSide : 'right';
   const condition = getPetCondition(p.pet);
   const edge = p.native ? p.desktopState.edgePose : 'visible';
+  const toolsVisible=!dragging&&edge==='visible'&&(tools||p.panel!==null);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
-    <div className={`desktop-pet compact-pet ${tools ? 'actions-open' : ''}`} onContextMenu={e => { e.preventDefault(); void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerLeave={hideTools} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault(); void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
       <button type="button" className={`compact-bubble ${p.bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible} tabIndex={p.bubbleVisible?0:-1} disabled={!p.bubbleVisible} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
-      <button className="desktop-character" data-testid="desktop-character" aria-label="点击拉姆展开互动，按住拖动" title={edge !== 'visible' ? '点一下，让我出来' : '点击互动，按住拖动'} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) toggleTools(); }}>
+      <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={edge !== 'visible' ? '点一下，让我出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         <Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} sleeping={p.pet.sleeping} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
       </button>
-      {tools && <nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作">
+      {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
         <button aria-label="查看状态" title="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>
         <button aria-label="喂食" title="吃" onClick={() => show('food')}><Icon path={icons.food}/></button>
         <button aria-label="洗澡" title="洗澡" onClick={() => p.onCare('wash')}><Icon path={icons.wash}/></button>
         <button aria-label="玩耍" title="玩耍" onClick={() => show('play')}><Icon path={icons.play}/></button>
-        <button aria-label={p.pet.sleeping ? '叫醒' : '休息'} title={p.pet.sleeping ? '叫醒' : '休息'} onClick={() => p.onCare('sleep')}><Icon path={icons.sleep}/></button>
+        <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} title={p.timerRunning?`取消计时 · ${reminderTime(p.reminderSeconds)}`:'开始计时'} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label="专注倒计时">{reminderTime(p.reminderSeconds)}</span>}</button>
         <button aria-label="和拉姆说话" title="对话" onClick={() => show('chat')}><Icon path={icons.chat}/></button>
         <button aria-label="进入小屋" title="小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
-      </nav>}
-      {p.reminders && <button className="compact-reminder" title={p.timerRunning ? '点击取消本次计时' : '点击开始一次计时'} onClick={p.onFocus} aria-label={p.timerRunning ? '取消计时' : '开始计时'}><span {...(p.timerRunning ? {role:'timer', 'aria-label':'专注倒计时'} : {})}>{p.timerRunning ? `计时 ${reminderTime(p.reminderSeconds)}` : p.timerFinished ? '计时结束 · 再来一次' : '开始计时'}</span></button>}
+      </nav></>}
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel && <section className="companion-panel" role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">

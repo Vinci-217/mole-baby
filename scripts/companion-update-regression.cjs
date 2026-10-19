@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { chromium, expect } = require('@playwright/test');
-const { adopt, openActions, enterHome, roomTab, toDesktop } = require('./smoke-helpers.cjs');
+const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..'), url = 'http://127.0.0.1:5194';
 const server = spawn(process.execPath, [path.join(root,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5194','--strictPort'], { cwd: root, stdio:'pipe' });
 let logs = '', browser;
@@ -18,9 +18,9 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
   });
   await page.clock.install();await page.goto(url);await adopt(page,'蓝色','小芽');
   const character=page.getByTestId('desktop-character');await character.locator('.seed-body-frame[data-loaded=true]').waitFor();
-  await page.clock.pauseAt(new Date(Date.now()+1000));
+  await page.clock.pauseAt(new Date(Date.now()+1000));await openActions(page);
   await expect(page.getByRole('timer')).toHaveCount(0);await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
-  await page.clock.fastForward(120000);await expect(page.getByRole('timer')).toHaveCount(0);
+  await page.clock.fastForward(120000);await expect(page.getByRole('timer')).toHaveCount(0);await openActions(page);
   await page.getByRole('button',{name:'开始计时',exact:true}).click();
   await expect(page.getByRole('timer',{name:'专注倒计时'})).toContainText('01:00');
   await expect(character.locator('[data-social-action=focus]')).toBeVisible();
@@ -30,12 +30,12 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
   await expect(page.locator('.compact-bubble')).toContainText('计时结束');await expect.poll(()=>page.evaluate(()=>window.__alarmNotes)).toBe(6);await expect(page.getByRole('timer')).toHaveCount(0);
   await page.clock.fastForward(120000);assert.equal(await page.evaluate(()=>window.__alarmNotes),6);
   await page.reload();await expect(page.getByRole('timer')).toHaveCount(0);
-  await openActions(page);await page.getByRole('button',{name:'休息',exact:true}).click();await page.clock.fastForward(50);
+  await openActions(page);await makeTired(page);await page.clock.fastForward(50);
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
   assert.equal(await character.locator('.seed-body-original').evaluate(node=>node.style.transform),'rotate(0deg)');
   assert.equal(await character.locator('.ram-pose-layer').evaluate(node=>getComputedStyle(node).transform),'none');
   await page.screenshot({path:path.join(root,'artifacts/v9-seed-upright.png')});
-  await page.getByRole('button',{name:'叫醒',exact:true}).click();await page.clock.fastForward(1000);
+  await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await page.clock.fastForward(1000);
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   await page.getByRole('button',{name:'一起玩球',exact:true}).click();await page.clock.runFor(800);await expect(character.locator('.social-ball')).toBeVisible();
   assert.ok(Number(await character.locator('.ram-sprite').evaluate(n=>n.style.getPropertyValue('--social-opacity')))>.8);
@@ -66,7 +66,7 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
     if(color==='yellow') assert.ok(pixel[0]>170&&pixel[1]>170&&pixel[2]<80);
     if(color==='pink') assert.ok(pixel[0]>pixel[1]+60&&pixel[2]>pixel[1]+60);
     assert.ok(await ram.locator('canvas').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,192,208).data.some((value,index)=>index%4===3&&value>200)));
-    await openActions(p);await p.getByRole('button',{name:'休息',exact:true}).click();await expect(ram.locator('canvas')).toHaveAttribute('data-row','8');await expect(ram).toHaveAttribute('data-sleeping','true');
+    await openActions(p);await makeTired(p);await expect(ram.locator('canvas')).toHaveAttribute('data-row','8');await expect(ram).toHaveAttribute('data-sleeping','true');
     if(color==='blue'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v9-water-sleep.png')});
     await p.close();
   }

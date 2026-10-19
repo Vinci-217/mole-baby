@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buyFood, buyItem, care, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick } from './game';
+import { buyFood, buyItem, care, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick, WAKE_GRACE_MS } from './game';
 
 const NOW = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -62,7 +62,9 @@ describe('time and sleep', () => {
     expect(rested.growth).toBe(0);
     expect(care(rested, 'feed', 'berry', NOW + 3 * HOUR).ok).toBe(false);
     expect(care(rested, 'sleep', undefined, NOW + 3 * HOUR).state.sleeping).toBe(false);
-    expect(tick(sleeping, NOW + 24 * HOUR).stats.energy).toBe(100);
+    const nextDay=tick(sleeping,NOW+24*HOUR);
+    expect(nextDay.sleeping).toBe(false);
+    expect(nextDay.stats.energy).toBeCloseTo(79.454545,4); // Two natural naps and awake time, rather than sleeping forever.
   });
 
   it('awards the same elapsed growth for one long interval or many short ones', () => {
@@ -71,6 +73,37 @@ describe('time and sleep', () => {
     for (let hour = 1; hour <= 12; hour++) many = tick(many, NOW + hour * HOUR);
     expect(many.growth).toBeCloseTo(once.growth, 5);
     expect(many.stats).toEqual(once.stats);
+  });
+});
+
+describe('autonomous rest',()=>{
+  it('sleeps at low energy, recovers while asleep and naturally wakes without user input',()=>{
+    const p={...fresh(),stats:{...fresh().stats,energy:24}};
+    const asleep=tick(p,NOW+HOUR);expect(asleep.sleeping).toBe(true);expect(asleep.stats.energy).toBe(20);
+    const resting=tick(asleep,NOW+2*HOUR);expect(resting.sleeping).toBe(true);expect(resting.stats.energy).toBe(42);
+    const awake=tick(resting,NOW+4*HOUR);expect(awake.sleeping).toBe(false);expect(awake.stats.energy).toBeCloseTo(84.818182,5);
+    expect(p.sleeping).toBe(false);
+  });
+  it('gives a manually woken pet a persisted grace period without forcing energy to refill',()=>{
+    const asleep={...fresh(),sleeping:true,stats:{...fresh().stats,energy:10}};
+    const awake=care(asleep,'sleep',undefined,NOW).state;
+    expect(awake).toMatchObject({sleeping:false,awakeUntil:NOW+WAKE_GRACE_MS});expect(awake.stats.energy).toBe(10);
+    const restored=parseSave(JSON.stringify(awake),NOW+5*60000)!;expect(restored.sleeping).toBe(false);
+    expect(restored.awakeUntil).toBe(NOW+WAKE_GRACE_MS);expect(restored.stats.energy).toBeLessThan(10);
+    expect(tick(restored,NOW+WAKE_GRACE_MS+1000).sleeping).toBe(true);
+  });
+  it('integrates consistently across a complete day and both sleep boundaries',()=>{
+    const p={...fresh(),stats:{...fresh().stats,energy:24}};
+    const once=tick(p,NOW+24*HOUR);let many=p;
+    for(let n=1;n<=24*60;n++)many=tick(many,NOW+n*60000);
+    expect(many.sleeping).toBe(once.sleeping);expect(many.growth).toBeCloseTo(once.growth,3);
+    for(const key of Object.keys(once.stats) as (keyof typeof once.stats)[])expect(many.stats[key]).toBeCloseTo(once.stats[key],3);
+  });
+  it('ignores corrupt or excessive optional wake grace without discarding an older save',()=>{
+    for(const value of ['forever',-1,NOW+86400000]){
+      const restored=parseSave(JSON.stringify({...fresh(),awakeUntil:value}),NOW)!;
+      expect(restored).not.toBeNull();expect(restored.awakeUntil).toBeUndefined();
+    }
   });
 });
 

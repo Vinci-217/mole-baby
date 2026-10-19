@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -22,7 +22,8 @@
     "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --x64 && node scripts/notarize-mac-dmg.cjs x64",
     "test:companion-update": "node scripts/companion-update-regression.cjs",
     "test:social": "node scripts/social-motion-regression.cjs",
-    "test:presence": "node scripts/presence-regression.cjs"
+    "test:presence": "node scripts/presence-regression.cjs",
+    "test:hover-rest": "node scripts/hover-rest-regression.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

@@ -113,7 +113,7 @@ export function getDiary(memory: CompanionMemory): DiaryDay[] {
 }
 export function getCompanionMood(memory: CompanionMemory, pet: GameState, now = Date.now()): CompanionMood {
   // One point per real companion day and a few different care categories; clicks cannot farm affection.
-  const actual = [...memory.events.filter(e => e.kind !== 'reminder' && e.at <= now).map(e => ({ at: e.at, kind: e.kind })), ...memory.messages.filter(m => m.role === 'user' && m.at <= now).map(m => ({ at: m.at, kind: 'chat' }))];
+  const actual = [...memory.events.filter(e => !['reminder','auto-sleep','auto-wake'].includes(e.kind) && e.at <= now).map(e => ({ at: e.at, kind: e.kind })), ...memory.messages.filter(m => m.role === 'user' && m.at <= now).map(m => ({ at: m.at, kind: 'chat' }))];
   const days = new Set(actual.map(e => dayKey(e.at))).size;
   const kinds = new Set(actual.map(e => e.kind)).size;
   const affection = Math.min(100, days * 2 + Math.min(8, kinds));

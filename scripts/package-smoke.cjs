@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -109,6 +109,10 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const painted = await character.locator('canvas').evaluate(canvas =>
     canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((value, index) => index % 4 === 3 && value > 0));
   assert.equal(painted, true, 'The original Ram canvas must contain visible pixels');
+  await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
+  await character.hover();await expect(page.getByTestId('pet-actions')).toBeVisible();assert.equal(await page.locator('.compact-reminder').count(),0);
+  await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
+  console.log('PASS: real native hover and leave show/hide tools, no click needed and no idle timer bar');
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-color', 'red');
   const seedPixel = await character.locator('.seed-body-frame').evaluate(canvas => Array.from(canvas.getContext('2d').getImageData(45, 58, 1, 1).data));
   assert.ok(seedPixel[3] > 200 && seedPixel[0] > seedPixel[2], 'the red seed is visibly red in the packaged app');
@@ -138,8 +142,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(fs.existsSync(keyRecord), false);
   console.log('PASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests');
   const actions = await openActions(page);
-  assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-label'))), ['查看状态','喂食','洗澡','玩耍','休息','和拉姆说话','进入小屋']);
-  await actions.getByRole('button', { name: '喂食', exact: true }).click();
+  assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(node => node.getAttribute('aria-label'))), ['查看状态','喂食','洗澡','玩耍','开始计时','和拉姆说话','进入小屋']);
+  await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await expect(panel).toBeVisible();
   const expanded = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(expanded.width, 540); assert.equal(expanded.height, 490);
@@ -166,12 +170,12 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect(page.locator('.cottage-scene')).toHaveAttribute('data-phase','night');
   await page.locator('.time-scene-art img').evaluate(img => img.decode());
   assert.ok((await page.locator('.time-scene-art img').getAttribute('src')).endsWith('/assets/generated/v6-starlight-greenhouse.png'));
-  await toDesktop(page); await openActions(page); await actions.getByRole('button',{name:'休息',exact:true}).click();
+  await toDesktop(page); await openActions(page); await makeTired(page);
   await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
-  await actions.getByRole('button',{name:'叫醒',exact:true}).click();
-  await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();
+  await openActions(page);await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-preferences-v2')).reminderMinutes),7);
-  await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toContainText(/计时 0[67]:/);await page.getByRole('button',{name:'取消计时',exact:true}).click();
+  await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toContainText(/0[67]:/);await page.getByRole('button',{name:'取消计时',exact:true}).click();
 
   await page.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1')); pet.growth = 180; localStorage.setItem('ramu-house-save-v1', JSON.stringify(pet)); });
   await page.reload(); await expect(character.locator('.ram-classic-frame[data-loaded=true]')).toBeVisible({ timeout: 15000 });
@@ -183,7 +187,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const afterDrag = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(afterDrag.x, beforeDrag.x - 30); assert.equal(afterDrag.y, beforeDrag.y - 15);
   if (process.platform === 'darwin') {
-    await openActions(page); await actions.getByRole('button',{name:'和拉姆说话',exact:true}).click();
+    await openActions(page);await actions.getByRole('button',{name:'和拉姆说话',exact:true}).click();
     await page.getByRole('button',{name:'语音输入',exact:true}).click();
     await expect(page.locator('.chat-notice')).toContainText('听写');
     await expect(page.getByRole('textbox',{name:'和拉姆说话',exact:true})).toBeFocused();

@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -132,6 +132,14 @@ async function verifyBackground(page, selector, suffix) {
   await page.screenshot({path:path.join(artifacts,'v9-native-seed.png'),omitBackground:true});
   console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
 
+  await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
+  await character.hover();await expect(page.getByTestId('pet-actions')).toBeVisible();assert.equal(await page.locator('.compact-reminder').count(),0);
+  await page.getByTestId('pet-actions').getByRole('button',{name:'开始计时',exact:true}).click();
+  await fullyInsideNativeWindow(page.getByRole('timer'),'small clock countdown');
+  await page.screenshot({path:path.join(artifacts,'v11-native-timer.png'),omitBackground:true});
+  await page.getByRole('button',{name:'取消计时',exact:true}).click();await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
+  console.log('PASS real pointer hover opens tools through native passthrough, leave hides tools, and the clock replaces rest without an idle bar');
+
   // Seed pots can be manually placed at either side, at any height.
   for(const edge of ['left','right']) {
     const beforeEdge=await bounds(),targetY=area.y+Math.min(240,area.height-240);
@@ -147,15 +155,15 @@ async function verifyBackground(page, selector, suffix) {
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});
   await page.reload(); await waitForClassic(page,'.desktop-character'); await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);});
   const current=await bounds(); const targetX=area.x+Math.min(350,area.width-550),targetY=area.y+Math.min(400,area.height-250); await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:targetX-current.x,dy:targetY-current.y});
-  const before=await bounds(); const actions=await openActions(page); assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','休息','和拉姆说话','进入小屋']);
-  await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(540); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
+  const before=await bounds(); const actions=await openActions(page); assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','开始计时','和拉姆说话','进入小屋']);
+  await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(540); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
   const expanded=await bounds(),side=(await state()).panelSide; assert.equal(expanded.x+(side==='left'?340:0),before.x);assert.equal(expanded.y+250,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),16);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
   await page.screenshot({path:path.join(artifacts,'v9-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
-  const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
+  const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
   console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
 
-  await actions.getByRole('button',{name:'玩耍',exact:true}).click();
+  await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
   await panel.getByRole('button',{name:'听拉姆说一句',exact:true}).click();
   const spoken=page.getByRole('button',{name:'回应拉姆的话',exact:true});await fullyInsideNativeWindow(spoken,'companion speech bubble');
   const sharedLine=await spoken.innerText();await page.screenshot({path:path.join(artifacts,'v10-native-presence.png'),omitBackground:true});
@@ -172,7 +180,7 @@ async function verifyBackground(page, selector, suffix) {
   const pinned=await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());assert.equal((await state()).alwaysOnTop,pinned);await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());
   console.log('PASS real mature dragging, timed directional walking, interaction pause, corner tuck/peek/reveal and pin state');
 
-  await openActions(page);await actions.getByRole('button',{name:'休息',exact:true}).click();await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row','8');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame','0');await actions.getByRole('button',{name:'叫醒',exact:true}).click();await expect.poll(async()=>(await save()).sleeping).toBe(false);
+  await openActions(page);await makeTired(page);await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row','8');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame','0');await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await expect.poll(async()=>(await save()).sleeping).toBe(false);
   await enterHome(page);await buy(page,'biscuit','熊熊饼干');await expect.poll(async()=>(await save()).coins).toBe(85);await roomTab(page,'背包');const beforeFood=await save();await(await selectPocket(page,'biscuit','熊熊饼干')).click();await expect.poll(async()=>(await save()).inventory.biscuit).toBe(0);assert.ok((await save()).stats.hunger>beforeFood.stats.hunger+10);await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action','eat-bear-biscuit');
   const foodImage=page.locator('.care-pocket .pocket-slot[data-item-id="biscuit"] img');await foodImage.evaluate(i=>i.decode());assert.ok((await foodImage.getAttribute('src')).includes('original/items/'));
   const beforeShortGames=(await save()).completedGames;await roomTab(page,'游戏');await page.getByRole('button',{name:'开始接果子',exact:true}).click();await page.getByTestId('fruit-game-start').click();await expect(page.locator('.fruit-dialog')).toHaveAttribute('data-phase','playing');await fullyInsideNativeWindow(page.locator('.fruit-scoreboard'),'fruit score/timer');await fullyInsideNativeWindow(page.getByTestId('game-arena'),'fruit surface');await page.screenshot({path:path.join(artifacts,'v6-native-fruit-game.png')});await page.keyboard.press('Escape');

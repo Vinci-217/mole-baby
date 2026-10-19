@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { chromium, expect } = require('@playwright/test');
-const { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const url = 'http://127.0.0.1:5174';
 const server = spawn(process.execPath, [path.join(root, 'node_modules/vite/bin/vite.js'), '--host', '127.0.0.1', '--port', '5174', '--strictPort'], { cwd: root, stdio: 'pipe' });
@@ -30,6 +30,7 @@ async function checkReminders(fixture) {
     },{fixture,now,mode});
     await page.goto(url);await page.getByTestId('desktop-character').waitFor();
     await expect(page.getByRole('timer')).toHaveCount(0);
+    await openActions(page);
     if(mode!=='idle') await page.getByRole('button',{name:'开始计时',exact:true}).click();
     if(mode==='cancelled') await page.getByRole('button',{name:'取消计时',exact:true}).click();
     await page.clock.fastForward(181000);
@@ -78,8 +79,8 @@ async function checkFourSeedColors() {
   assert.notEqual(await character.locator('.seed-body-original').evaluate(n => n.style.transform), 'rotate(0deg)');
   const during = await pot.boundingBox(); assert.ok(during.x > potBefore.x + 20); assert.ok(during.y < potBefore.y - 5); await page.mouse.up();
   const actions = await openActions(page);
-  assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label'))), ['查看状态', '喂食', '洗澡', '玩耍', '休息', '和拉姆说话', '进入小屋']);
-  await actions.getByRole('button', { name: '喂食', exact: true }).click();
+  assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label'))), ['查看状态', '喂食', '洗澡', '玩耍', '开始计时', '和拉姆说话', '进入小屋']);
+  await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await panel.waitFor(); const pocket = page.locator('.care-pocket');
   assert.equal((await panel.boundingBox()).width, 332);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态', '背包', '玩耍', '对话']);
@@ -108,12 +109,12 @@ async function checkFourSeedColors() {
   assert.ok((await save(page)).growth < .05, 'repeated shopping and care do not instantly grow a seed');
   console.log('PASS room-only four-book shop, bean purchase guards, varied supplies and correct consumption/effects without click growth');
 
-  await toDesktop(page); await openActions(page); await actions.getByRole('button', { name: '休息', exact: true }).click();
+  await toDesktop(page); await openActions(page); await makeTired(page);
   await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping', 'true'); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame', '61');
-  await expect(actions.getByRole('button', { name: '叫醒', exact: true })).toBeVisible(); assert.equal((await save(page)).sleeping, true);
+  await expect(page.getByRole('button', { name: '叫醒拉姆', exact: true })).toBeVisible(); assert.equal((await save(page)).sleeping, true);
   await enterHome(page); await roomTab(page, '游戏');
   await expect(page.getByRole('button', { name: '开始接果子', exact: true })).toBeDisabled(); await expect(page.getByRole('button', { name: '开始翻牌', exact: true })).toBeDisabled();
-  await toDesktop(page); await openActions(page); await actions.getByRole('button', { name: '叫醒', exact: true }).click();
+  await toDesktop(page); await openActions(page); await page.getByRole('button', { name: '叫醒拉姆', exact: true }).click();
   await enterHome(page); await roomTab(page, '游戏'); await expect(page.getByRole('button', { name: '开始接果子', exact: true })).toBeDisabled();
   await roomTab(page, '设置');
   await page.getByLabel('拉姆的新名字').fill('小叶子'); await page.locator('.room-rename').getByRole('button', { name: '保存', exact: true }).click();
@@ -124,8 +125,8 @@ async function checkFourSeedColors() {
   await importBackup(page, legacy); await expect.poll(async () => (await save(page)).name).toBe('叶叶'); assert.equal((await save(page)).inventory.berry, 2); assert.equal((await save(page)).inventory.juice, 3); assert.ok(Number.isFinite((await save(page)).stats.thirst) && Number.isFinite((await save(page)).stats.health)); assert.equal((await save(page)).color, 'blue');
   await page.evaluate(() => localStorage.setItem('ramu-house-preferences-v2', JSON.stringify({ sound: false, quiet: true, artStyle: 'hd' })));
   await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); assert.equal(await page.locator('[data-art-style=hd]').count(), 0); assert.equal((await save(page)).name, '叶叶');
-  await openActions(page); await actions.getByRole('button', { name: '玩耍', exact: true }).click(); await panel.getByRole('button', { name: '陪我专注', exact: true }).click(); await page.getByRole('button', { name: '结束专注', exact: true }).first().click();
-  await actions.getByRole('button', { name: '休息', exact: true }).click(); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row', '8'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame', '0'); await actions.getByRole('button', { name: '叫醒', exact: true }).click();
+  await openActions(page);await actions.getByRole('button', { name: '玩耍', exact: true }).click(); await panel.getByRole('button', { name: '陪我专注', exact: true }).click(); await page.getByRole('button', { name: '结束专注', exact: true }).first().click();
+  await makeTired(page); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row', '8'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame', '0'); await page.getByRole('button', { name: '叫醒拉姆', exact: true }).click(); await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();
   console.log('PASS sleep/wake guards, backup validation, legacy-save need migration, no generated fallback, mature closed-eye sleep and focus');
 
   await panel.getByRole('tab', { name: '背包', exact: true }).click();
@@ -134,12 +135,12 @@ async function checkFourSeedColors() {
     await (await selectPocket(page, id, name)).click(); await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action', action);
     await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'item'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row', row);
     await expect.poll(() => character.locator('.ram-classic-frame').getAttribute('data-frame')).not.toBe('0');
-    await expect.poll(async () => (await save(page)).inventory[id]).toBe(before - 1); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'classic');
+    await expect.poll(async () => (await save(page)).inventory[id]).toBe(before - 1); await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action', 'tired'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'care');
   }
   console.log('PASS distinct item actions including brushing vs bathing, original-body motion, finite timelines and single-item use');
   await say(page, '叫我小橙。'); await say(page, '我喜欢草莓蛋糕。');
   const facts = await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('ramu-house-save-v1')); return JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${p.createdAt}`)).facts; }); assert.ok(facts.some(f => f.kind === 'nickname' && f.value === '小橙')); assert.ok(facts.some(f => f.kind === 'like' && f.value === '草莓蛋糕'));
-  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await openActions(page); await actions.getByRole('button', { name: '和拉姆说话', exact: true }).click();
+  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await openActions(page);await actions.getByRole('button', { name: '和拉姆说话', exact: true }).click();
   await say(page, '我叫什么？'); await expect(panel.locator('.companion-history')).toContainText('小橙'); await say(page, '我喜欢什么？'); await expect(panel.locator('.companion-history')).toContainText('草莓蛋糕');
   await page.screenshot({ path: path.join(artifacts, 'v6-memory-chat.png') });
   console.log('PASS persistent nickname/preferences and local recall without DeepSeek requests');
@@ -176,7 +177,7 @@ async function checkFourSeedColors() {
   await settings.locator('input[type=file][accept^="audio/"]').setInputFiles({name:'broken.mp3',mimeType:'audio/mpeg',buffer:Buffer.from('not audio')}); await expect(settings.getByRole('status').filter({hasText:'无法读取这段音频'})).toBeVisible(); assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId),'castle');
   await settings.getByLabel('小屋背景音乐',{exact:true}).uncheck(); await tracks.getByRole('button',{name:'宠物店',exact:true}).click(); await settings.getByLabel('背景音乐音量',{exact:true}).fill('32');
   await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page); await roomTab(page,'设置'); await expect(backgrounds.getByRole('button',{name:'溪畔树屋',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(settings.getByLabel('小屋背景音乐',{exact:true})).not.toBeChecked(); await expect(tracks.getByRole('button',{name:'宠物店',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(settings.getByLabel('背景音乐音量',{exact:true})).toHaveValue('32');
-  await page.screenshot({path:path.join(artifacts,'v6-room-settings.png')}); await toDesktop(page); await openActions(page); await actions.getByRole('button',{name:'喂食',exact:true}).click(); await page.setViewportSize({width:390,height:844}); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false); await expect(pocket).toBeVisible();
+  await page.screenshot({path:path.join(artifacts,'v6-room-settings.png')}); await toDesktop(page); await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); await page.setViewportSize({width:390,height:844}); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false); await expect(pocket).toBeVisible();
   assert.deepEqual(errors,[]); assert.deepEqual(assetFailures,[]); assert.deepEqual(aiRequests,[]);
   console.log('PASS six backgrounds/four real-time phases, all 12 real audio decodes, room-only playback, IndexedDB music import/restart/delete/invalid guards and narrow-screen layout');
   await checkReminders(initial);
