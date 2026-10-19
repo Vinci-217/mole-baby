@@ -15,6 +15,23 @@
       256
     ],
     "ramu.png": 256,
-    "tray.png": 32
+    "tray.png": 32,
+    "ramu.icns": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "tray-mac.png": 18,
+    "tray-mac@2x.png": 36
+  },
+  "macConversion": "Format conversion and Lanczos resizing of the existing ramu.png; no new artwork. 512/1024 representations are upscaled from the 256px source.",
+  "macFiles": {
+    "ramu.icns": "b659f4afb8b86786bd761e96555afc1a4df4b68ea2a55c08f87c8d633bbb0651",
+    "tray-mac.png": "1e43d4d317b662132a72b502e52ee2a1f8ab1105f14c8e5347780598b9c1f32f",
+    "tray-mac@2x.png": "43294540649aa5ffd26fc3819b3cfe60827bf054ade079bec8718d1ecf5a7ec9"
   }
 }

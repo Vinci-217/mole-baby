@@ -33,6 +33,10 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
   const [readAloud, setReadAloud] = useState(() => { try { return localStorage.getItem('ramu-chat-read-aloud') === 'true'; } catch { return false; } });
   const alive = useRef(true), request = useRef(0), speechRequest = useRef(0), memoryRef = useRef(memory);
   const recognition = useRef<Recognition | null>(null), messagesEnd = useRef<HTMLDivElement>(null);
+  const inputField = useRef<HTMLTextAreaElement>(null);
+  const dictationHelp = window.desktop?.platform === 'darwin' || /Macintosh|Mac OS X/.test(navigator.userAgent)
+    ? '可在系统设置 → 键盘中开启听写，在输入框使用系统听写快捷键。'
+    : '可在输入框使用系统听写；Windows 快捷键为 Win + H。';
   const bridge = window.companionAI;
   const mood = getCompanionMood(memory, pet), diary = getDiary(memory);
   memoryRef.current = memory;
@@ -115,7 +119,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
       try {
         const availability = await window.companionSpeech.getAvailability();
         if (!alive.current || speechRequest.current !== speechId || isDocumentHidden()) return;
-        if (!availability.available) { setSpeechNote(availability.reason || '本机没有可用的中文语音识别，请安装中文语音包，或在输入框使用 Win + H 听写。'); return; }
+        if (!availability.available) { setSpeechNote(availability.reason || `本机没有可用的中文语音识别。${dictationHelp}`); if (availability.method === 'system-dictation') inputField.current?.focus(); return; }
         setSpeechNote('正在听，请说话。本机离线识别，录音不会发送给 DeepSeek。');
         const transcript = await window.companionSpeech.listen();
         if (alive.current && speechRequest.current === speechId && !isDocumentHidden()) {
@@ -127,14 +131,14 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
       return;
     }
     const Constructor = (window as SpeechWindow).SpeechRecognition ?? (window as SpeechWindow).webkitSpeechRecognition;
-    if (!Constructor) { setSpeechNote('当前运行环境没有语音识别服务。可使用 Windows 语音输入（Win + H）在输入框中听写。'); return; }
+    if (!Constructor) { setSpeechNote(`当前运行环境没有语音识别服务。${dictationHelp}`); return; }
     const recognizer = new Constructor(); recognition.current = recognizer;
     recognizer.lang = 'zh-CN'; recognizer.continuous = false; recognizer.interimResults = false;
     recognizer.onresult = result => {
       const transcript = result.results[0]?.[0]?.transcript;
       if (alive.current && speechRequest.current === speechId && !isDocumentHidden() && transcript) { setInput(old => `${old}${old ? ' ' : ''}${transcript}`.slice(0, 1000)); setSpeechNote('已转成文字，确认后点发送。'); }
     };
-    recognizer.onerror = event => { if (alive.current && speechRequest.current === speechId) setSpeechNote(event.error === 'not-allowed' ? '麦克风权限未开启，可以继续打字。' : '语音识别未完成，请重试或使用 Windows 听写。'); };
+    recognizer.onerror = event => { if (alive.current && speechRequest.current === speechId) setSpeechNote(event.error === 'not-allowed' ? '麦克风权限未开启，可以继续打字。' : `语音识别未完成。${dictationHelp}`); };
     recognizer.onend = () => { if (alive.current && speechRequest.current === speechId) setListening(false); };
     try { recognizer.start(); setListening(true); setSpeechNote('正在听，请说话。语音识别由浏览器服务提供，可能需要联网。'); }
     catch { setListening(false); setSpeechNote('暂时无法启动麦克风，请使用文字输入。'); }
@@ -162,7 +166,7 @@ export function CompanionChat({ pet, memory, onMemoryChange, onReply, compact = 
     </div>
     <form className="companion-chat-form" onSubmit={(event: FormEvent) => { event.preventDefault(); void send(input); }}>
       <label className="chat-input-label" htmlFor="companion-chat-input">和拉姆说话</label>
-      <textarea id="companion-chat-input" aria-label="和拉姆说话" rows={2} maxLength={1000} placeholder="比如：叫我小米，我喜欢草莓。" value={input} onChange={e => setInput(e.target.value)} disabled={pending}/>
+      <textarea ref={inputField} id="companion-chat-input" aria-label="和拉姆说话" rows={2} maxLength={1000} placeholder="比如：叫我小米，我喜欢草莓。" value={input} onChange={e => setInput(e.target.value)} disabled={pending}/>
       <div className="chat-send-row"><button type="button" onClick={() => void voiceInput()} disabled={pending} aria-pressed={listening}>{listening ? '结束录音' : '语音输入'}</button>{pending ? <button type="button" onClick={cancel}>停止等待</button> : <button type="submit" aria-label="发送消息" disabled={!input.trim() || listening}>发送</button>}</div>
     </form>
     {speechNote && <p className="chat-notice" role="status">{speechNote}</p>}

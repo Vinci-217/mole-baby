@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const vm = require('node:vm');
 
-async function launch(legacyName, customProfile = false) {
+async function launch(legacyName, customProfile = false, platform = 'win32') {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mole-native-'));
   if (legacyName) fs.mkdirSync(path.join(profile, legacyName, 'Local Storage'), { recursive: true });
   const handles = new Map(); const listeners = new Map(); const windows = [];
@@ -18,6 +18,7 @@ async function launch(legacyName, customProfile = false) {
   app.setPath = (key, value) => { if (key === 'userData') app.userData = value; };
   app.setName = value => { app.name = value; };
   app.setAppUserModelId = () => {};
+  app.dock = { hide() { stats.dockHidden = true; } };
   app.requestSingleInstanceLock = () => true;
   app.whenReady = () => Promise.resolve();
   app.quit = () => { stats.quit++; app.emit('before-quit'); app.emit('will-quit'); };
@@ -44,6 +45,7 @@ async function launch(legacyName, customProfile = false) {
     setBounds(bounds) { this.bounds = { ...bounds }; }
     setPosition(x, y) { this.bounds.x = x; this.bounds.y = y; }
     setAlwaysOnTop(value) { this.top = value; }
+    setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
     setMinimumSize() {} setResizable() {} setIgnoreMouseEvents() {} setMenu() {}
     show() { this.visible = true; } hide() { this.visible = false; } focus() {} restore() {}
   }
@@ -58,7 +60,7 @@ async function launch(legacyName, customProfile = false) {
   const display = { workArea: { x: 0, y: 0, width: 1920, height: 1040 } };
   screen.getPrimaryDisplay = screen.getDisplayMatching = () => display;
   const electron = { app, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
-    Menu: { buildFromTemplate: template => template }, nativeImage: { createFromPath: value => value },
+    Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => value },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
     Notification: { isSupported: () => false } };
   const companionAI = { cancel: () => stats.aiCancelled++, dispose() {} };
@@ -67,8 +69,10 @@ async function launch(legacyName, customProfile = false) {
     : name === './deepseek.cjs' ? { createCompanionAI: () => companionAI }
       : name === './speech.cjs' ? { createCompanionSpeech: () => companionSpeech }
         : name.startsWith('./') ? require(path.join(__dirname, name)) : require(name);
+  const runtimeProcess = Object.create(process);
+  Object.defineProperty(runtimeProcess, 'platform', { value: platform });
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
-    require: localRequire, __dirname, console, URL, process,
+    require: localRequire, __dirname, console, URL, process: runtimeProcess,
     setTimeout, clearTimeout, setInterval, clearInterval,
   }, { filename: 'main.cjs' });
   await new Promise(resolve => setImmediate(resolve));
@@ -150,4 +154,23 @@ test('seed/sleep mobility blocks native movement, and interaction pauses wanderi
   run.invoke('desktop:set-companion-panel', true);
   assert.equal(run.window.getBounds().height, 490);
   assert.equal(run.invoke('desktop:get-state').edgePose, 'visible');
+});
+
+test('macOS is menu-bar resident, never flashes before readiness, and uses native editing shortcuts', async t => {
+  const run = await launch(undefined, false, 'darwin'); t.after(() => run.cleanup());
+  assert.equal(run.stats.dockHidden, true);
+  assert.ok(run.stats.appMenu.some(item => item.role === 'editMenu'));
+  run.app.emit('activate');
+  assert.equal(run.window.isVisible(), false, 'early macOS activation cannot flash the room');
+  run.invoke('desktop:set-pet-mode', true); run.send('desktop:ready-to-show', true);
+  assert.equal(run.window.allSpaces, true);
+  assert.equal(run.window.spaceOptions.visibleOnFullScreen, true);
+  run.send('desktop:close'); run.tray.emit('click');
+  assert.equal(run.window.isVisible(), false, 'opening the status menu must not also restore the window');
+  run.tray.menu.find(item => item.label === '显示拉姆').click();
+  assert.equal(run.window.isVisible(), true);
+  run.invoke('desktop:set-pet-mode', false);
+  assert.equal(run.window.allSpaces, false, 'the room stays in its own desktop space');
+  run.stats.appMenu[0].submenu.find(item => item.accelerator === 'Command+Q').click();
+  assert.equal(run.stats.quit, 1);
 });

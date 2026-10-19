@@ -17,7 +17,7 @@ declare global {
   }
   interface Window {
     companionSpeech?: {
-      getAvailability: () => Promise<{ available: boolean; language?: string; reason?: string }>;
+      getAvailability: () => Promise<{ available: boolean; language?: string; reason?: string; method?: 'system-dictation' }>;
       listen: () => Promise<string>;
       cancel: () => void;
     };
@@ -30,6 +30,7 @@ declare global {
     };
     desktop?: {
       isElectron: boolean;
+      platform: string;
       getState: () => Promise<DesktopState>;
       minimize: () => void;
       close: () => void;

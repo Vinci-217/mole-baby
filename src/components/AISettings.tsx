@@ -41,7 +41,7 @@ export function AISettings() {
       <label htmlFor="deepseek-api-key">{configured ? '替换 API Key' : 'API Key'}</label>
       <div className="ai-key-row"><input id="deepseek-api-key" type="password" autoComplete="off" spellCheck={false} value={key} onChange={e => setKey(e.target.value)} maxLength={256} placeholder="输入 DeepSeek API Key" disabled={busy}/><button type="submit" disabled={busy || !key.trim()}>{busy ? '处理中…' : '保存'}</button></div>
       {configured && <button type="button" className="ai-remove-key" disabled={busy} onClick={() => void remove()}>删除本机密钥</button>}
-    </form> : <p>请在 Windows 桌面版中设置密钥；当前预览使用本地对话。</p>}
+    </form> : <p>请在桌面版中设置密钥；当前预览使用本地对话。</p>}
     <details><summary>本机保存与联网说明</summary><p>仅支持 DeepSeek 官方 deepseek-chat。联网时发送当前拉姆状态、最近对话与小本子里相关的记忆。Key 留在本机，不随存档导出。</p>{configured && <p>{protection === 'os-encrypted' ? 'Key 使用系统加密存储，界面不会读回完整内容。' : '当前系统无法提供系统加密，Key 保存在本机配置文件中。'}</p>}</details>
     {message && <p role="status" className="ai-settings-message">{message}</p>}
   </section>;

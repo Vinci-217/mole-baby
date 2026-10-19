@@ -1,4 +1,4 @@
-name: Windows build
+name: Desktop build
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: windows-build-${{ github.ref }}
+  group: desktop-build-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
@@ -77,15 +77,77 @@ jobs:
         with:
           name: Windows-smoke-screenshot
           path: |
-            artifacts/v6-windows-smoke.png
+            artifacts/windows-smoke.png
             artifacts/windows-smoke.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+  mac:
+    name: Build and check macOS ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check release version and native architecture
+        run: |
+          node -e 'const {version}=require("./package.json"); if(process.arch !== "${{ matrix.arch }}") throw Error("Runner architecture mismatch"); if(process.env.GITHUB_REF.startsWith("refs/tags/") && process.env.GITHUB_REF !== `refs/tags/v${version}`) throw Error("Tag/version mismatch");'
+      - name: Install dependencies
+        run: npm ci
+      - name: Test game and platform rules
+        run: npm test
+      - name: Build renderer
+        run: npm run build
+      - name: Package native DMG and ZIP
+        run: npx --no-install electron-builder --mac dmg zip --${{ matrix.arch }} --publish never
+      - name: Verify disk image, signature and actual Mac application
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node scripts/verify-mac-package.cjs ${{ matrix.arch }} 2>&1 | tee artifacts/mac-${{ matrix.arch }}-smoke.log
+      - name: Upload checked Mac downloads
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mole-baby-mac-${{ matrix.arch }}
+          path: |
+            release/mole-baby-*-mac-${{ matrix.arch }}.dmg
+            release/mole-baby-*-mac-${{ matrix.arch }}.zip
+            release/SHA256SUMS-mac-${{ matrix.arch }}.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Upload Mac verification diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mac-smoke-${{ matrix.arch }}
+          path: |
+            artifacts/mac-${{ matrix.arch }}-smoke.png
+            artifacts/mac-${{ matrix.arch }}-smoke.log
           if-no-files-found: ignore
           retention-days: 14
 
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, mac]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -94,15 +156,19 @@ jobs:
       - name: Check out tagged release notes
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Download checked Windows packages
+      - name: Download checked Windows and Mac packages
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: mole-baby-Windows-x64
+          pattern: mole-baby-*
+          merge-multiple: true
           path: release
 
       - name: Check artifact checksums
         working-directory: release
-        run: sha256sum --check SHA256SUMS.txt
+        run: |
+          cat SHA256SUMS.txt SHA256SUMS-mac-arm64.txt SHA256SUMS-mac-x64.txt > combined.sha256
+          mv combined.sha256 SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
 
       - name: Create release or replace its build attachments
         env:
@@ -112,15 +178,15 @@ jobs:
         shell: bash
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --clobber
           else
-            gh release create "$RELEASE_TAG" release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file RELEASE_NOTES.md
           fi
 
   report:
     name: Save tagged build receipt
     if: always() && startsWith(github.ref, 'refs/tags/v')
-    needs: [build, release]
+    needs: [build, mac, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -129,26 +195,29 @@ jobs:
       - name: Check out source for the receipt branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Download checksums when the build succeeded
-        if: needs.build.result == 'success'
-        continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: mole-baby-Windows-x64
-          path: ${{ runner.temp }}/ramu-downloads
-
-      - name: Download Windows verification diagnostics
+      - name: Download checked platform artifacts
         if: always()
         continue-on-error: true
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: Windows-smoke-screenshot
+          pattern: mole-baby-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/ramu-downloads
+
+      - name: Download platform verification diagnostics
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: '*smoke*'
+          merge-multiple: true
           path: ${{ runner.temp }}/ramu-smoke
 
       - name: Record the build result over Git
         if: always()
         env:
           BUILD_RESULT: ${{ needs.build.result }}
+          MAC_RESULT: ${{ needs.mac.result }}
           RELEASE_RESULT: ${{ needs.release.result }}
         shell: bash
         run: |
@@ -156,24 +225,31 @@ jobs:
           const fs = require('node:fs');
           const path = require('node:path');
           const env = process.env;
-          const sumsPath = path.join(env.RUNNER_TEMP, 'ramu-downloads', 'SHA256SUMS.txt');
-          const downloads = fs.existsSync(sumsPath) ? fs.readFileSync(sumsPath, 'utf8').trim().split('\n').map(line => {
-            const match = line.match(/^([a-f0-9]{64})  (mole-baby-[^/\\]+\.(?:zip|exe))$/);
+          const downloadsDir = path.join(env.RUNNER_TEMP, 'ramu-downloads');
+          const sumsFiles = fs.existsSync(downloadsDir) ? fs.readdirSync(downloadsDir).filter(name => /^SHA256SUMS(?:-mac-(?:arm64|x64))?\.txt$/.test(name)).sort() : [];
+          const downloads = sumsFiles.flatMap(name => fs.readFileSync(path.join(downloadsDir,name), 'utf8').trim().split('\n')).filter(Boolean).map(line => {
+            const match = line.match(/^([a-f0-9]{64})  (mole-baby-[^/\\]+\.(?:zip|exe|dmg))$/);
             if (!match) throw new Error('Invalid build checksum entry');
             return { file: match[2], sha256: match[1] };
-          }) : [];
+          });
+          if (env.BUILD_RESULT === 'success' && env.MAC_RESULT === 'success' && downloads.length !== 6) throw new Error('Expected six checked Windows/Mac downloads');
           const logPath = path.join(env.RUNNER_TEMP, 'ramu-smoke', 'windows-smoke.log');
           const verificationLog = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').slice(-12000) : null;
           const receipt = {
             version: require('./package.json').version,
             tag: env.GITHUB_REF_NAME,
             sourceSha: env.GITHUB_SHA,
-            buildResult: env.BUILD_RESULT,
+            buildResult: env.BUILD_RESULT === 'success' && env.MAC_RESULT === 'success' ? 'success' : 'failure',
+            platforms: { windows: env.BUILD_RESULT, mac: env.MAC_RESULT },
             releaseResult: env.RELEASE_RESULT,
             runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
             releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
             downloads,
             verificationLog,
+            macVerificationLogs: Object.fromEntries(['arm64','x64'].map(arch => {
+              const file = path.join(env.RUNNER_TEMP,'ramu-smoke',`mac-${arch}-smoke.log`);
+              return [arch, fs.existsSync(file) ? fs.readFileSync(file,'utf8').slice(-12000) : null];
+            })),
             recordedAt: new Date().toISOString(),
           };
           fs.writeFileSync(path.join(env.RUNNER_TEMP, 'ramu-build-receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);

@@ -1,18 +1,26 @@
 # 拉姆 · mole-baby
 
-小小一只拉姆，留在 Windows 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
+小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows v0.6.3](https://github.com/Vinci-217/mole-baby/releases/tag/v0.6.3) · [Windows 构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.7.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.7.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-安装版：`mole-baby-0.6.3-Setup.exe`。免安装版：完整解压 `mole-baby-0.6.3-x64.zip`，运行 `拉姆.exe`。附件包含 SHA256 校验文件。旧版本存档与本机设置继续保留。
+| 电脑 | 下载文件 |
+| --- | --- |
+| Windows x64 | `mole-baby-0.7.0-Setup.exe` 或 `mole-baby-0.7.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.7.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.7.0-mac-x64.dmg` |
+
+Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 版本采用本地签名，尚未进行 Apple 开发者公证；首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。详情见 [Mac 使用说明](docs/MACOS.md)。
+
+Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文件，旧存档与本机设置继续保留。
 
 ![桌面拉姆与九宫格背包](artifacts/v6-native-sidecar.png)
 
 ## 桌面陪伴
 
-启动后拉姆出现在桌面右下角，使用双叶拉姆图标常驻托盘。关闭或最小化窗口会收进托盘；从托盘恢复，右键菜单“退出拉姆”才真正结束程序。首次运行先领养，不会闪出小屋。
+启动后拉姆出现在桌面右下角，使用双叶拉姆图标常驻 Windows 托盘或 Mac 菜单栏。关闭或最小化窗口会收进托盘；从托盘恢复，选择图标菜单里的“退出拉姆”才真正结束程序；Mac 也支持 Command+Q。首次运行先领养，不会闪出小屋。
 
-单击拉姆，脚下依次显示 **状态、吃、洗澡、玩耍、休息、对话、小屋**。基础照料、背包、玩球、专注和聊天在旁边小窗完成；商店、完整小游戏、成长和设置进入小屋使用。角色约 100×108 像素，基础透明窗口 200×240，侧窗展开 540×490；空间不足时自动放在左侧。Windows 透明空白区域可穿透鼠标。
+单击拉姆，脚下依次显示 **状态、吃、洗澡、玩耍、休息、对话、小屋**。基础照料、背包、玩球、专注和聊天在旁边小窗完成；商店、完整小游戏、成长和设置进入小屋使用。角色约 100×108 像素，基础透明窗口 200×240，侧窗展开 540×490；空间不足时自动放在左侧。Windows 和 Mac 透明空白区域可穿透鼠标；Mac 桌宠可跟随桌面空间，小屋留在当前空间。
 
 长大后能散步、拖动、随轻摇摆动；拖到角落会躲起来，偶尔探头，点击即可出来。种子花盆固定，只摆动身体。睡觉使用闭眼帧、轻呼吸和可见的叫醒入口；四种颜色从种子到高级保持一致。
 
@@ -48,9 +56,11 @@
 
 无需密钥也可基本对话。每只拉姆有稳定性格，记住主动告诉它的称呼、喜好、往事、计划与边界，也记录实际照料、成长和游戏经历；对话结合关系与心情，支持旧话题回忆和完成计划。小本子可查看、更改或忘记记忆；删除同步清理相关对话上下文。容量为 64 条事实、120 条经历、80 条消息，不读取电脑文件或屏幕。
 
-在 **小屋 → 设置 → DeepSeek 对话** 输入自己的 API Key，启用 `deepseek-chat`。目前只支持 DeepSeek；Key 只在本机 Electron 主进程保存，Windows 优先使用系统加密，不能加密时明确提示本地文件方式。Key 不读回界面，不进网页存储或备份。仅发送对话时访问固定 DeepSeek 接口，支持取消与重试。
+在 **小屋 → 设置 → DeepSeek 对话** 输入自己的 API Key，启用 `deepseek-chat`。目前只支持 DeepSeek；Key 只在本机 Electron 主进程保存，Windows 使用系统加密、Mac 使用钥匙串支持的系统加密，不能加密时明确提示本地文件方式。Key 不读回界面，不进网页存储或备份。仅发送对话时访问固定 DeepSeek 接口，支持取消与重试。
 
 Windows 语音输入使用已安装的中文 System.Speech 离线识别，用户点击才开麦，转文字后确认发送；缺少识别引擎或权限会提示，可用 Win+H 听写。回复可选系统中文朗读。浏览器预览取决于浏览器能力。收进托盘会取消录音、待启动录音与朗读。自动化使用模拟 API 和语音进程，真实服务调用、中文识别准确率需要用户本机 Key、语音组件及麦克风验证。
+
+Mac 语音输入使用系统听写：在“系统设置 → 键盘”开启听写，点击“语音输入”会说明用法并聚焦输入框，按系统听写快捷键说话，确认文字后发送。回复可用系统中文朗读。是否离线由 macOS、语言包和系统听写设置决定，应用不把录音发送给 DeepSeek。
 
 完整 Prompt、上下文组织和情感记忆规则见 [对话 Harness](docs/COMPANION_HARNESS.md)。
 
@@ -66,7 +76,7 @@ Node.js 22 或 24：
 
 ```bash
 npm ci
-npm run desktop:dev        # Windows 桌面开发
+npm run desktop:dev        # Windows / Mac 桌面开发
 npm run dev                # 网页开发
 npm test                   # 规则、迁移、动画、记忆和 Native 生命周期
 npm run build              # TypeScript 与生产构建
@@ -75,15 +85,18 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、155 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、157 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 
 ```powershell
 npm run dist:win:portable # Windows x64 ZIP
 npm run dist:win          # Windows NSIS 安装器
+npm run dist:mac          # 在 Mac 上构建当前架构的 DMG + ZIP
+npm run dist:mac:arm64    # Apple 芯片
+npm run dist:mac:x64      # Intel
 ```
 
-GitHub Actions 构建 Windows EXE，检查打包素材、实际启动与核心流程，再发布安装包、ZIP 和 SHA256SUMS。构建记录不替代每台电脑的安装和真实麦克风测试。美术规范位于 [mole-classic-art skill](skills/mole-classic-art/SKILL.md)，资源来源见 [ASSETS.md](ASSETS.md)。
+GitHub Actions 在 Windows、Apple 芯片 Mac 和 Intel Mac 上分别构建并启动实际应用。Mac 另外校验原生架构、本地签名、DMG 挂载和包内容，三个平台全部通过后再统一发布安装包、ZIP 和 SHA256SUMS。构建记录不替代每台电脑的安装和真实麦克风测试。美术规范位于 [mole-classic-art skill](skills/mole-classic-art/SKILL.md)，资源来源见 [ASSETS.md](ASSETS.md)。
 
 《摩尔庄园》非官方同人桌宠，角色与原游戏素材权益归原权利方。

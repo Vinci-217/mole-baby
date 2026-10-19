@@ -8,6 +8,7 @@ const UNAVAILABLE = '语音输入需要 Windows 桌面版和系统中文语音�
 const NO_RECOGNIZER = '系统没有可供桌面程序使用的中文语音识别引擎，请在 Windows 语言设置中安装中文语音组件。';
 const MICROPHONE = '无法打开麦克风，请检查 Windows 麦克风权限、输入设备及中文语音组件。';
 const CANCELLED = '已取消语音输入。';
+const MAC_DICTATION = '在系统设置 → 键盘中开启“听写”，然后在对话输入框按系统听写快捷键说话，确认文字后发送。回复可使用系统中文朗读。';
 
 // Both commands are fixed source. No renderer text is ever interpreted as a
 // PowerShell command, and -EncodedCommand avoids command-line quoting issues.
@@ -126,6 +127,7 @@ function createCompanionSpeech({ platform = process.platform, spawn = spawnProce
   }
 
   function getAvailability() {
+    if (!disposed && platform === 'darwin') return Promise.resolve({ available: false, method: 'system-dictation', reason: MAC_DICTATION });
     if (disposed || platform !== 'win32') return Promise.resolve({ available: false, reason: UNAVAILABLE });
     if (probe) return probe;
     probe = run('probe').promise.then((data) => {
@@ -138,6 +140,7 @@ function createCompanionSpeech({ platform = process.platform, spawn = spawnProce
   }
 
   function listen() {
+    if (!disposed && platform === 'darwin') return Promise.reject(new Error(MAC_DICTATION));
     if (disposed || platform !== 'win32') return Promise.reject(new Error(UNAVAILABLE));
     if (active) return Promise.reject(new Error('正在听你说话，请先结束这次语音输入。'));
     const task = run('listen');

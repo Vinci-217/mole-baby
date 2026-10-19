@@ -496,6 +496,9 @@ function changePetMode(enabled) {
     normalBounds = target;
   }
   changingMode = false;
+  if (process.platform === 'darwin') {
+    mainWindow.setVisibleOnAllWorkspaces(enabled, { visibleOnFullScreen: enabled, skipTransformProcessType: true });
+  }
   publishState(true);
   saveWindowState();
   scheduleWander();
@@ -522,6 +525,7 @@ function hideToTray() {
 
 function showFromTray(home = false) {
   if (!mainWindow || mainWindow.isDestroyed()) { createWindow(); return; }
+  if (!rendererReady) return;
   revealPet();
   changePetMode(hasPet && !home);
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -566,11 +570,15 @@ function refreshTrayMenu() {
 
 function createTray() {
   if (tray && !tray.isDestroyed()) return;
-  const image = nativeImage.createFromPath(iconPath('tray.png'));
+  const image = nativeImage.createFromPath(iconPath(process.platform === 'darwin' ? 'tray-mac.png' : 'tray.png'));
   tray = new Tray(image);
   tray.setToolTip('拉姆 · mole-baby');
-  tray.on('click', () => showFromTray());
-  tray.on('double-click', () => showFromTray());
+  // On macOS, either mouse button opens the native status menu. Restoring on
+  // click as well would open the pet while the user is trying to select Exit.
+  if (process.platform !== 'darwin') {
+    tray.on('click', () => showFromTray());
+    tray.on('double-click', () => showFromTray());
+  }
   refreshTrayMenu();
 }
 
@@ -712,7 +720,20 @@ if (!app.requestSingleInstanceLock()) {
     showFromTray();
   });
   app.whenReady().then(() => {
-    app.setAppUserModelId('com.molebaby.ramuhouse');
+    if (process.platform === 'win32') app.setAppUserModelId('com.molebaby.ramuhouse');
+    if (process.platform === 'darwin') {
+      app.dock.hide();
+      Menu.setApplicationMenu(Menu.buildFromTemplate([
+        { label: '拉姆', submenu: [
+          { label: '显示拉姆', click: () => showFromTray() },
+          { label: '进入小屋', click: () => showFromTray(true) },
+          { type: 'separator' },
+          { label: '退出拉姆', accelerator: 'Command+Q', click: () => { quitting = true; app.quit(); } },
+        ] },
+        { role: 'editMenu' },
+        { role: 'windowMenu' },
+      ]));
+    }
     companionAI = createCompanionAI({ userDataPath: app.getPath('userData'), safeStorage });
     companionSpeech = createCompanionSpeech();
     loadWindowState();

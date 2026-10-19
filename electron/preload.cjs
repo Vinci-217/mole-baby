@@ -37,6 +37,7 @@ function subscribeToState(channel, callback, selectInitial) {
 
 contextBridge.exposeInMainWorld('desktop', Object.freeze({
   isElectron: true,
+  platform: process.platform,
   getState: () => ipcRenderer.invoke('desktop:get-state'),
   minimize: () => ipcRenderer.send('desktop:minimize'),
   close: () => ipcRenderer.send('desktop:close'),

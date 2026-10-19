@@ -116,3 +116,15 @@ test('shutdown cancels active microphone use and denies future capture', async (
   assert.equal((await speech.getAvailability()).available, false);
   assert.equal(network.killed(), 1);
 });
+
+test('macOS offers OS dictation without spawning Windows commands or opening a microphone', async t => {
+  const network = mockProcess({ payload: {} });
+  const speech = fixture(t, network, { platform: 'darwin' });
+  const status = await speech.getAvailability();
+  assert.equal(status.available, false);
+  assert.equal(status.method, 'system-dictation');
+  assert.match(status.reason, /系统设置.*键盘.*听写/);
+  assert.doesNotMatch(status.reason, /Windows|Win \+ H/);
+  await assert.rejects(speech.listen(), /系统听写/);
+  assert.equal(network.calls.length, 0);
+});

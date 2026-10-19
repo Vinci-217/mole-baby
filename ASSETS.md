@@ -184,3 +184,7 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ## v0.6 双叶图标与用品动作
 
 应用与托盘图标从原中级红色拉姆双叶待机帧导出，ICO 包含 Windows 常用尺寸，来源见 [icons/SOURCE.json](public/icons/SOURCE.json)。用品动作使用移除固定道具后的原始身体帧和实际物品 PNG，四行动作图集与 SHA256 见 [item-motion/sources.json](public/assets/original/item-motion/sources.json)。木浴盆为原 SWF shape 205；辅助牙刷为透明背景生成 PNG，提示词记录在同一来源文件中。28 种差异配方与局限见 [v6-item-motion.md](research/v6-item-motion.md)，不冒称 28 段官方专属逐帧动画。
+
+## macOS 图标
+
+`public/icons/ramu.icns` 及 18/36 像素菜单栏 PNG 均从已有双叶拉姆 `ramu.png` 转换，保留原图与透明背景。ICNS 的 512/1024 像素版本由 256 像素源图放大，未生成或重画角色；尺寸和 SHA256 见 [SOURCE.json](public/icons/SOURCE.json)。

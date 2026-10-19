@@ -160,7 +160,7 @@ export default function App() {
   async function openPanel(next: Panel) { if (floating && next && ['shop','games','growth','settings'].includes(next)) { await enterHome(next); return; } if (next === 'food') setPocketVisit(v => v + 1); setPanel(next); if (petMode) { try { await window.desktop?.setCompanionPanel(next !== null); } catch { notify('小窗暂时无法打开，请再试一次。'); } } }
   async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false); await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false); }
   function focusToggle() { if (focusUntil) { setFocusUntil(null); speak('好呀，想休息的时候就休息。'); } else { setFocusUntil(Date.now() + 25 * 60000); speak('拉姆～ 我会安静陪你，25 分钟后提醒你休息。'); } }
-  async function toggleWander() { if (!window.desktop) { speak('在 Windows 桌面应用里，我就可以在你的桌面走来走去啦。'); return; } try { await window.desktop.wander(!desktopState.wandering); } catch { notify('暂时无法切换走动状态。'); } }
+  async function toggleWander() { if (!window.desktop) { speak('在桌面应用里，我就可以在你的桌面走来走去啦。'); return; } try { await window.desktop.wander(!desktopState.wandering); } catch { notify('暂时无法切换走动状态。'); } }
   function startGame(kind: GameKind) {
     if (floating) { void enterHome('games'); return; }
     if (petRef.current?.sleeping) { notify('先轻轻叫醒拉姆吧。'); return; }

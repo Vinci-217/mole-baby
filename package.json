@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -16,7 +16,10 @@
     "test:browser": "node scripts/smoke.cjs",
     "dist:win:portable": "npm run build && electron-builder --win zip --x64",
     "test:desktop:cloud": "node scripts/desktop-smoke.cjs",
-    "test:memory": "node scripts/memory-regression.cjs"
+    "test:memory": "node scripts/memory-regression.cjs",
+    "dist:mac": "npm run build && electron-builder --mac dmg zip",
+    "dist:mac:arm64": "npm run build && electron-builder --mac dmg zip --arm64",
+    "dist:mac:x64": "npm run build && electron-builder --mac dmg zip --x64"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -62,6 +65,41 @@
       "artifactName": "mole-baby-${version}-Setup.${ext}",
       "installerIcon": "public/icons/ramu.ico",
       "uninstallerIcon": "public/icons/ramu.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.entertainment",
+      "artifactName": "mole-baby-${version}-mac-${arch}.${ext}",
+      "icon": "public/icons/ramu.icns",
+      "minimumSystemVersion": "12.0",
+      "identity": "-",
+      "hardenedRuntime": true,
+      "notarize": false,
+      "extendInfo": {
+        "LSUIElement": true
+      }
+    },
+    "dmg": {
+      "title": "拉姆 ${version}",
+      "contents": [
+        {
+          "x": 150,
+          "y": 220
+        },
+        {
+          "x": 430,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 580,
+        "height": 400
+      }
     }
   }
 }
