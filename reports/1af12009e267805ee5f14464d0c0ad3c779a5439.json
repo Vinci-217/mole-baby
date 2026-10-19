@@ -1,39 +1,39 @@
 {
   "version": "0.9.1",
-  "tag": "main",
+  "tag": "v0.9.1",
   "sourceSha": "1af12009e267805ee5f14464d0c0ad3c779a5439",
   "buildResult": "success",
   "platforms": {
     "windows": "success",
     "mac": "success"
   },
-  "releaseResult": "skipped",
-  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39213400494",
-  "releaseUrl": null,
+  "releaseResult": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39213400436",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.9.1",
   "downloads": [
     {
       "file": "mole-baby-0.9.1-mac-arm64.dmg",
-      "sha256": "ecf1f32718bd9c247d432a6b66868187a719965efdef0e69478b04aadc238b7a"
+      "sha256": "a08ae56bdedc9bd0f36fd2fff85b05275dbfb3d98960f1a5c939c16dcb5bc5c2"
     },
     {
       "file": "mole-baby-0.9.1-mac-arm64.zip",
-      "sha256": "fef76826073a457880dfc724284e617e787f6f94c285829d550105f23d62de70"
+      "sha256": "2fda10b03ea46833d3f97698530617284b1a9c83ef3c180c8f96bc51707ee5c4"
     },
     {
       "file": "mole-baby-0.9.1-mac-x64.dmg",
-      "sha256": "c9b079e77cee34bda4bfbb5eb19f96cc0e889c7a66c9be2908dc2fd05ff05eec"
+      "sha256": "53dd4b8d18d96ecebb507e28f190ca240f02912319c307603bef6afcfccab0ba"
     },
     {
       "file": "mole-baby-0.9.1-mac-x64.zip",
-      "sha256": "31cff01d06b34c2b4678ca0964d645b5e9e0d8919f2e525c138cd8a18bff5277"
+      "sha256": "64761468a9ab13249a5ba696b040a8e48102231a17cacea4b76d0788b10c8979"
     },
     {
       "file": "mole-baby-0.9.1-x64.zip",
-      "sha256": "d677e8341c28aa97f48771045abb55e67d3d09df9bbdcc8e46b72d113247265b"
+      "sha256": "07bf8357815b5faf6d381009a17009a311cbf67a4c3d5e806cd7b87a2fca1506"
     },
     {
       "file": "mole-baby-0.9.1-Setup.exe",
-      "sha256": "9ff2dd0ac73a20429d3958caf299d66499c919a015e7bd51792cf07399a5b3a6"
+      "sha256": "6d0525f766450695669277f5b84215fdeb0c5ff1bc7d78a8b782cdc121b50310"
     }
   ],
   "verificationLog": "PASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: packaged win32/x64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for checked downloads\n",
@@ -59,5 +59,5 @@
     "arm64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=arm64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=arm64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=arm64 electron=35.7.5 appOutDir=release/mac-arm64\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac-arm64\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac-arm64/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=arm64 file=release/mole-baby-0.9.1-mac-arm64.zip\n  • building        target=DMG arch=arm64 file=release/mole-baby-0.9.1-mac-arm64.dmg\n  • downloaded      label=dmgbuild-bundle-arm64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.9.1-mac-arm64.dmg.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.9.1-mac-arm64.zip.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS arm64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: packaged darwin/arm64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-arm64.txt generated for checked downloads\n",
     "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=x64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=x64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=x64 electron=35.7.5 appOutDir=release/mac\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=x64 file=release/mole-baby-0.9.1-mac-x64.zip\n  • building        target=DMG arch=x64 file=release/mole-baby-0.9.1-mac-x64.dmg\n  • downloaded      label=dmgbuild-bundle-x86_64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.9.1-mac-x64.zip.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.9.1-mac-x64.dmg.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS x64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: packaged darwin/x64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-x64.txt generated for checked downloads\n"
   },
-  "recordedAt": "2026-10-19T07:07:00.439Z"
+  "recordedAt": "2026-10-19T07:09:53.125Z"
 }
