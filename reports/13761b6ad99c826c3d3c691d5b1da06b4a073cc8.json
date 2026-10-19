@@ -1,0 +1,33 @@
+{
+  "version": "0.7.0",
+  "tag": "main",
+  "sourceSha": "13761b6ad99c826c3d3c691d5b1da06b4a073cc8",
+  "buildResult": "failure",
+  "platforms": {
+    "windows": "success",
+    "mac": "failure"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39198438280",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.7.0-x64.zip",
+      "sha256": "86173181af4aac43356957ebda621b8bd90baee1f65e9a364f12490fce7264e1"
+    },
+    {
+      "file": "mole-baby-0.7.0-Setup.exe",
+      "sha256": "5782ccc7ebe56da2ea0a3d78466dae5a5b6894d05f398dafa8392a6fea6a9202"
+    }
+  ],
+  "verificationLog": "PASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, fixed pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: packaged win32/x64 tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for checked downloads\n",
+  "macTrust": {
+    "arm64": null,
+    "x64": null
+  },
+  "macVerificationLogs": {
+    "arm64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=arm64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=arm64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=arm64 electron=35.7.5 appOutDir=release/mac-arm64\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac-arm64\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • empty password will be used for code signing  reason=CSC_KEY_PASSWORD is not defined\n  ⨯ /Users/runner/work/mole-baby/mole-baby not a file\n",
+    "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=x64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=x64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=x64 electron=35.7.5 appOutDir=release/mac\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • empty password will be used for code signing  reason=CSC_KEY_PASSWORD is not defined\n  ⨯ /Users/runner/work/mole-baby/mole-baby not a file\n"
+  },
+  "recordedAt": "2026-10-19T04:17:47.744Z"
+}
