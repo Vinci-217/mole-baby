@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyEdgePeek, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyEdgePeek, verifyStageSettings, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -121,16 +121,16 @@ async function verifyBackground(page, selector, suffix) {
   await adopt(page, '红色', '红豆');
   const character = page.getByTestId('desktop-character'); await expect(character.locator('.seed-body-frame[data-loaded=true]')).toBeVisible(); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-color','red');
   assert.ok(Object.values((await save()).inventory).every(count => count === 0)); await expect.poll(async () => (await state()).petMode).toBe(true);
-  assert.deepEqual({width:(await bounds()).width,height:(await bounds()).height},{width:200,height:240});
+  assert.deepEqual({width:(await bounds()).width,height:(await bounds()).height},{width:160,height:240});
   const area = await desktop.evaluate(({screen}) => screen.getPrimaryDisplay().workArea); const seedBounds=await bounds();
   assert.ok(area.x+area.width-seedBounds.x-seedBounds.width <= 20, 'a fresh pet starts beside the bottom-right tray');
   assert.ok(area.y+area.height-seedBounds.y-seedBounds.height <= 20);
 
   assert.equal(await page.evaluate(()=>window.desktop.movePet(-40,-30)),true); assert.equal(await page.evaluate(()=>window.desktop.wander(true)),false); assert.equal((await bounds()).x,seedBounds.x-40);
-  await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]); await expect(character).toBeInViewport();
+  await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]); await expect(character).toBeInViewport();
   const cb=await character.boundingBox(); await page.mouse.move(cb.x+50,cb.y+55); await page.mouse.down(); await page.mouse.move(cb.x+80,cb.y+45); await page.waitForTimeout(150); assert.notEqual(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)'); assert.notEqual((await bounds()).x,seedBounds.x-40); await page.mouse.up();
   await page.screenshot({path:path.join(artifacts,'v9-native-seed.png'),omitBackground:true});
-  console.log('PASS bottom-right tray pet, 200x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
+  console.log('PASS bottom-right tray pet, 160x240 native window, four-color original seed and manual seed pointer/IPC drag with autonomous wandering disabled');
 
   await page.evaluate(()=>window.desktop.setEdgeHiding(false));
   await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
@@ -142,18 +142,20 @@ async function verifyBackground(page, selector, suffix) {
   console.log('PASS real pointer hover opens tools through native passthrough, leave hides tools, and the clock replaces rest without an idle bar');
 
   for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
-  console.log('PASS both seed edges: hover/click only peek, no tools, random 2–5 minute cadence, physical pointer drag out and unchanged height');
+  console.log('PASS free left/near-right placement, exact right docking, hover/click only peek, 2–5 minute cadence and physical drag out');
+
+  await verifyStageSettings(page);console.log('PASS actual settings choose all five stages/four evolutions, persist upgrades/downgrades and preserve identity, items and memories');
 
   // Grow only this isolated fixture; normal adoption always starts with a seed.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});
   await page.reload(); await waitForClassic(page,'.desktop-character'); await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);});
   const current=await bounds(); const targetX=area.x+Math.min(350,area.width-550),targetY=area.y+Math.min(400,area.height-250); await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:targetX-current.x,dy:targetY-current.y});
   const before=await bounds(); const actions=await openActions(page); assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','开始计时','和拉姆说话','进入小屋']);
-  await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(540); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
+  await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(500); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
   const expanded=await bounds(),side=(await state()).panelSide; assert.equal(expanded.x+(side==='left'?340:0),before.x);assert.equal(expanded.y+250,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),16);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
-  await page.screenshot({path:path.join(artifacts,'v9-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
-  const rightX=area.x+area.width-200;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
+  await page.screenshot({path:path.join(artifacts,'v9-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
+  const rightX=area.x+area.width-160;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
   console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
 
   await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
@@ -161,7 +163,7 @@ async function verifyBackground(page, selector, suffix) {
   const spoken=page.getByRole('button',{name:'回应拉姆的话',exact:true});await fullyInsideNativeWindow(spoken,'companion speech bubble');
   const sharedLine=await spoken.innerText();await page.screenshot({path:path.join(artifacts,'v10-native-presence.png'),omitBackground:true});
   await spoken.click();await expect(panel.getByRole('log')).toContainText(sharedLine);await expect(panel).toHaveAttribute('aria-label','拉姆对话');
-  await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([200,240]);
+  await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);
   await expect(page.getByRole('timer')).toHaveCount(0);
   console.log('PASS warm local speech fits the small native window and actual bubble click preserves context in the adjacent chat');
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
-import { COLORS, FOODS, STAGES, EVOLUTIONS, GROWTH_MAX, evolvePet, GROWTH_STAGE_HOURS, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
-import type { Action, GameState, PetColor, ItemCategory, Evolution } from './game';
+import { COLORS, FOODS, STAGES, EVOLUTIONS, GROWTH_MAX, evolvePet, changePetStage, GROWTH_STAGE_HOURS, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
+import type { Action, GameState, PetColor, ItemCategory, Evolution, Stage } from './game';
 import Ram from './components/Ram';
 import FruitGame from './components/FruitGame';
 import MemoryGame from './components/MemoryGame';
@@ -19,6 +19,7 @@ import CarePocket from './components/CarePocket';
 import { CompanionChat } from './components/CompanionChat';
 import { AISettings } from './components/AISettings';
 import MacHelp from './components/MacHelp';
+import StageSettings from './components/StageSettings';
 import RoomSettings from './components/RoomSettings';
 import { useRoomMedia } from './room-media';
 import { appendMessage, createMemory, loadMemory, parseMemory, recordCare, recordEvent, saveMemory, memoryKey, getCompanionMood } from './companion-memory';
@@ -186,6 +187,15 @@ export default function App() {
     const detail = item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined;
     apply(care(saved, type, itemId, Date.now()), next, detail, itemId);
   }
+  function chooseStage(next: Stage, evolution?: Evolution) {
+    const saved = petRef.current; if (!saved) return;
+    const result = changePetStage(saved, next, evolution);
+    if (!result.ok || result.state === saved) { notify(result.message); return; }
+    clearTimeout(timers.current.animation); careUntil.current = 0; dizzyUntil.current = 0; touches.current = [];
+    setActionItemId(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
+    petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
+    setMemory(m => m ? recordEvent(m, { kind: 'stage-choice', detail: `你在设置里把我的形态切换为${result.state.evolution ? EVOLUTIONS.find(v => v.id === result.state.evolution)!.name : STAGES[next].name}。` }) : m);
+  }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
   function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop) setPreview(true); speak('拉姆～ 好久不见，我们又在一起啦！', 10000); }
   async function toDesktop() { setPanel(null); setGame(null); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetMode(true); } catch { notify('窗口切换失败，请稍后再试。'); } } else setPreview(true); }
@@ -317,7 +327,7 @@ export default function App() {
       {panel === 'play' && <div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" disabled={current.sleeping} onClick={()=>tellPresence(true)}>听拉姆说一句</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div>}
       {panel === 'settings' && <><section className="room-preferences"><form className="room-rename" onSubmit={e => { e.preventDefault(); if (name.trim()) { setPet(p => p ? { ...p, name: name.trim().slice(0,12) } : p); notify('名字保存好啦。'); } }}><label htmlFor="rename">拉姆的名字</label><input id="rename" aria-label="拉姆的新名字" value={name} maxLength={12} onChange={e => setName(e.target.value)}/><button className="game-button small" disabled={!name.trim()}>保存</button></form>
         {([['安静陪伴',prefs.quiet,() => setPrefs(p => ({...p,quiet:!p.quiet})),false],['互动音效',prefs.sound,() => setPrefs(p => ({...p,sound:!p.sound})),false],['桌面散步',desktopState.wandering,() => void toggleWander(),!window.desktop],['角落躲藏',desktopState.edgeHiding,() => void window.desktop?.setEdgeHiding(!desktopState.edgeHiding),!window.desktop]] as const).map(([label,checked,callback,disabled]) => <label className="room-toggle-row" key={label}><span>{label}</span><button role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={callback}>{checked ? '开启' : '关闭'}</button></label>)}
-        <div className="room-backup"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={() => importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e => void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={() => setReset(true)}>送别拉姆</button></div></section>{extraSettings}</>}
+        <div className="room-backup"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={() => importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e => void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={() => setReset(true)}>送别拉姆</button></div></section><StageSettings pet={current} onChange={chooseStage}/>{extraSettings}</>}
     </GameDialog>}
     {reset && pet && <GameDialog title="和拉姆说再见？" onClose={() => setReset(false)}><div className="farewell-confirm"><div><Ram color={current.color} stage={stage} evolution={current.evolution}/></div><h3>送别 {current.name}</h3><p>这会删除它的成长、物品和本机回忆。重新打开后，可以领养一颗新的种子。</p><div className="confirm-buttons"><button className="game-button" onClick={exportSave}>先导出存档</button><button className="game-button" onClick={() => void abandonPet()}>确认送别</button></div></div></GameDialog>}
     {gameOverlay}{toast && <div className="classic-toast" role="status">{toast}</div>}

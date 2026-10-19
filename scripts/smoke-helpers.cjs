@@ -1,4 +1,5 @@
 const { expect } = require('@playwright/test');
+const {PET_SIZE}=require('../electron/desktop-geometry.cjs');
 
 async function adopt(page, color = '蓝色', name = '小蓝') {
   const colors = page.getByRole('button', { name: /^选择.+色拉姆$/ });
@@ -80,16 +81,25 @@ async function makeTired(page) {
 async function verifyEdgePeek(page,desktop,side){
   const character=page.getByTestId('desktop-character');
   const settle=async pose=>{
-    // Native state arrives before the 650 ms CSS transition finishes. Use the
+    // Native state arrives before the 850 ms CSS transition finishes. Use the
     // painted position so forced pointer events hit the exposed strip.
-    const x=(side==='left'?-1:1)*(pose==='hidden'?125:85);
+    const x=(side==='left'?-1:1)*(pose==='hidden'?105:65);
     await expect.poll(()=>page.locator('.compact-pet').evaluate(n=>new DOMMatrix(getComputedStyle(n).transform).m41)).toBeCloseTo(x,1);
   };
   await page.keyboard.press('Escape');await page.mouse.move(1,239);await page.waitForTimeout(300);
-  const {bounds,area}=await desktop.evaluate(({BrowserWindow,screen})=>{const bounds=BrowserWindow.getAllWindows()[0].getBounds();return {bounds,area:screen.getDisplayMatching(bounds).workArea};});
-  const targetX=side==='left'?area.x:area.x+area.width-200,targetY=area.y+Math.min(240,area.height-240);
-  await page.evaluate(async({dx,dy})=>{await window.desktop.setEdgeHovered(false);await window.desktop.setEdgeHiding(true);await window.desktop.setInteracting(false);await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.endPetDrag();},{dx:targetX-bounds.x,dy:targetY-bounds.y});
+  const {area}=await desktop.evaluate(({BrowserWindow,screen})=>{const bounds=BrowserWindow.getAllWindows()[0].getBounds();return {area:screen.getDisplayMatching(bounds).workArea};});
+  const targetX=side==='left'?area.x:area.x+area.width-PET_SIZE.width,targetY=area.y+Math.min(240,area.height-240);
+  const place=async x=>{
+    await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.setInteracting(false);});
+    const current=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
+    await page.evaluate(async({dx,dy})=>{await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.setEdgeHiding(true);await window.desktop.endPetDrag();},{dx:x-current.x,dy:targetY-current.y});
+  };
   const state=()=>page.evaluate(()=>window.desktop.getState());
+  if(side==='left'){
+    await place(targetX);await page.waitForTimeout(950);expect((await state()).edgeSide).toBeNull();await expect(character).toBeInViewport();return;
+  }
+  await place(targetX-20);await page.waitForTimeout(950);expect((await state()).edgeSide).toBeNull();
+  await place(targetX);
   await expect.poll(async()=>(await state()).edgePose,{timeout:6000}).toBe('hidden');await settle('hidden');
   await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
   await expect(page.getByTestId('pet-actions')).toHaveCount(0);
@@ -99,7 +109,7 @@ async function verifyEdgePeek(page,desktop,side){
   const until=(await state()).edgeNextPeekAt-Date.now();expect(until).toBeGreaterThan(118000);expect(until).toBeLessThanOrEqual(300000);
   await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
   const start=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-  const localX=side==='left'?12:188,y=125;await page.mouse.move(localX,y);await page.mouse.down();
+  const localX=side==='left'?12:PET_SIZE.width-12,y=125;await page.mouse.move(localX,y);await page.mouse.down();
   // Keep physical screen coordinates stable while the native window follows the drag.
   for(let n=1;n<=8;n++){
     const current=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
@@ -109,4 +119,29 @@ async function verifyEdgePeek(page,desktop,side){
   await page.mouse.up();await expect.poll(async()=>(await state()).edgeSide).toBeNull();await expect.poll(async()=>(await state()).edgePose).toBe('visible');
   const after=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());expect(after.y).toBe(targetY);await expect(character).toBeInViewport();
 }
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek };
+async function verifyStageSettings(page){
+  await enterHome(page);await roomTab(page,'设置');
+  const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+  const memoryKey=`ramu-companion-memory-v1:${before.createdAt}`;
+  const memoryBefore=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'null'),memoryKey);
+  const settings=page.getByRole('region',{name:'当前成长阶段',exact:true});
+  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+  for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
+    await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();
+    await expect(settings.getByRole('button',{name:`切换到${label}`,exact:true})).toHaveAttribute('aria-pressed','true');
+    expect((await save()).growth).toBe([0,60,180,420,840][stage]);
+  }
+  for(const [form,label] of Object.entries({super:'神力超级拉姆',fire:'霹雳火系拉姆',wood:'弹力木系拉姆',water:'神奇水系拉姆'})){
+    await settings.getByRole('button',{name:`切换为${label}`,exact:true}).click();await expect.poll(async()=>(await save()).evolution).toBe(form);
+  }
+  await toDesktop(page);await page.reload();
+  const sprite=page.getByTestId('desktop-character').locator('.ram-sprite');
+  await expect(sprite).toHaveAttribute('data-stage','4');await expect(sprite).toHaveAttribute('data-evolution','water');await expect(sprite).toHaveAttribute('data-color',before.color);
+  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();
+  await toDesktop(page);await page.reload();await expect(sprite).toHaveAttribute('data-stage','0');await expect(sprite).toHaveAttribute('data-color',before.color);
+  const after=await save();for(const key of ['name','color','createdAt','coins','inventory','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.evolution).toBeUndefined();
+  const memoryAfter=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'null'),memoryKey);
+  if(memoryBefore){expect(memoryAfter.facts).toEqual(memoryBefore.facts);expect(memoryAfter.messages).toEqual(memoryBefore.messages);for(const event of memoryBefore.events)expect(memoryAfter.events.some(e=>e.id===event.id)).toBe(true);}
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings };

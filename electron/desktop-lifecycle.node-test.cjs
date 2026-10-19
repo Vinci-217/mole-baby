@@ -97,7 +97,7 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   run.invoke('desktop:set-pet-mode', true);
   run.send('desktop:ready-to-show', true);
   assert.equal(run.window.isVisible(), true);
-  assert.deepEqual(run.window.getBounds(), { x: 1708, y: 792, width: 200, height: 240 });
+  assert.deepEqual(run.window.getBounds(), { x: 1754, y: 792, width: 160, height: 240 });
   assert.equal(run.tray.tooltip, '拉姆 · mole-baby');
 });
 
@@ -151,10 +151,10 @@ test('seed/sleep disables autonomous movement while manual dragging remains avai
   run.invoke('desktop:end-pet-drag');
   assert.equal(run.invoke('desktop:get-state').edgePose, 'visible', 'a centrally placed seed stays visible');
   assert.equal(run.invoke('desktop:get-state').wandering, false);
-  run.invoke('desktop:move-pet', -5000, -300);
+  run.invoke('desktop:move-pet', 5000, -300);
   const edgeY=run.window.getBounds().y;
   run.invoke('desktop:end-pet-drag');
-  assert.equal(run.invoke('desktop:get-state').edgeSide, 'left');
+  assert.equal(run.invoke('desktop:get-state').edgeSide, 'right');
   assert.equal(run.window.getBounds().y, edgeY, 'seed edge placement preserves the selected vertical position');
   assert.equal(run.invoke('desktop:get-state').wandering, false, 'hiding never enables seed locomotion');
   run.invoke('desktop:reveal-pet');
@@ -188,20 +188,20 @@ test('macOS is menu-bar resident, never flashes before readiness, and uses nativ
 test('docked pets only peek on hover, wait minutes between automatic peeks and require a drag to release',async t=>{
  t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
- run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',-5000,-200);run.invoke('desktop:end-pet-drag');
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',5000,-200);run.invoke('desktop:end-pet-drag');
  t.mock.timers.tick(1601);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
  const due=run.invoke('desktop:get-state').edgeNextPeekAt;assert.ok(due-Date.now()>118000&&due-Date.now()<=300000);
  t.mock.timers.tick(118000);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
  t.mock.timers.tick(due-Date.now()+1);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
- run.invoke('desktop:set-interacting',true);assert.equal(run.invoke('desktop:get-state').edgeSide,'left');run.invoke('desktop:set-interacting',false);
- run.invoke('desktop:set-edge-hovered',true);t.mock.timers.tick(600000);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');assert.equal(run.invoke('desktop:get-state').edgeSide,'left');
+ run.invoke('desktop:set-interacting',true);assert.equal(run.invoke('desktop:get-state').edgeSide,'right');run.invoke('desktop:set-interacting',false);
+ run.invoke('desktop:set-edge-hovered',true);t.mock.timers.tick(600000);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');assert.equal(run.invoke('desktop:get-state').edgeSide,'right');
  run.invoke('desktop:set-edge-hovered',false);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
- run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
 });
 
 test('starting a drag before the edge tuck animation keeps the visible pet under the pointer',async t=>{
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
- run.invoke('desktop:start-pet-drag');run.invoke('desktop:end-pet-drag');
+ run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',5000,0);run.invoke('desktop:end-pet-drag');
  assert.equal(run.invoke('desktop:get-state').edgeSide,'right');assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
  const before=run.window.getBounds();run.invoke('desktop:start-pet-drag');assert.equal(run.window.getBounds().x,before.x);
  run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);

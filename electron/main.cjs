@@ -11,7 +11,7 @@ const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
-const COMPANION_SIZE = { width: 540, height: 490 };
+const COMPANION_SIZE = { width: 500, height: 490 };
 const COMPANION_EXTENSION = {
   x: COMPANION_SIZE.width - PET_SIZE.width,
   y: COMPANION_SIZE.height - PET_SIZE.height,
@@ -157,13 +157,11 @@ function changeEdgeHovered(hovered) {
   return getDesktopState();
 }
 
-function tuckIntoCorner(force = false) {
+function tuckIntoCorner() {
   if (!edgeHiding || !canHideAtEdge()) return false;
   const bounds = currentPetBounds();
   const area = screen.getDisplayMatching(bounds).workArea;
-  const side = force
-    ? bounds.x + bounds.width / 2 < area.x + area.width / 2 ? 'left' : 'right'
-    : cornerSide(bounds, area);
+  const side = cornerSide(bounds, area);
   if (!side) return false;
   stopMovement();
   const target = cornerBounds(bounds, area, side);
@@ -195,26 +193,25 @@ function changeInteracting(enabled) {
 }
 
 function walkToCorner() {
-  if (!petCanMove) { tuckIntoCorner(true); return; }
-  if (!canMoveOnDesktop()) return;
+  if (!canHideAtEdge()) return;
   revealPet();
   stopMovement();
   const start = currentPetBounds();
   const area = screen.getDisplayMatching(start).workArea;
-  const side = start.x + start.width / 2 < area.x + area.width / 2 ? 'left' : 'right';
+  const side = 'right';
   const target = cornerBounds(start, area, side);
   const distance = Math.hypot(target.x - start.x, target.y - start.y);
-  if (distance < 2) { tuckIntoCorner(true); return; }
+  if (distance < 2) { tuckIntoCorner(); return; }
   const startedAt = Date.now();
-  const duration = Math.max(1600, Math.min(12000, distance / 85 * 1000));
+  const duration = petCanMove ? Math.max(1600, Math.min(12000, distance / 85 * 1000)) : 850;
   changeMotion(target.x < start.x ? 'left' : 'right');
   movementTimer = setInterval(() => {
-    if (!canMoveOnDesktop()) { stopMovement(); return; }
+    if (!canHideAtEdge()) { stopMovement(); return; }
     const progress = Math.min(1, (Date.now() - startedAt) / duration);
     const eased = progress * progress * (3 - 2 * progress);
     mainWindow.setPosition(Math.round(start.x + (target.x - start.x) * eased),
       Math.round(start.y + (target.y - start.y) * eased), false);
-    if (progress === 1) { stopMovement(); tuckIntoCorner(true); }
+    if (progress === 1) { stopMovement(); tuckIntoCorner(); }
   }, 33);
 }
 
@@ -267,7 +264,7 @@ function walkAlongDesktop() {
 
 function startPetDrag() {
   if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
-  const offset=edgeSide&&edgePose!=='visible'?(edgeSide==='left'?-1:1)*(edgePose==='peek'?85:125):0;
+  const offset=edgeSide&&edgePose!=='visible'?(edgeSide==='left'?-1:1)*(edgePose==='peek'?65:105):0;
   const bounds=mainWindow.getBounds();draggingFromEdge=Boolean(edgeSide);
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
@@ -298,7 +295,7 @@ function movePet(dx, dy) {
   const current = mainWindow.getBounds();
   const desired={...current,x:current.x+Math.round(dx),y:current.y+Math.round(dy)};
   const target = clampBounds(desired, PET_SIZE);
-  if(dragging&&draggingFromEdge){const area=screen.getDisplayMatching(current).workArea;target.x=Math.max(area.x-125,Math.min(area.x+area.width-PET_SIZE.width+125,desired.x));}
+  if(dragging&&draggingFromEdge){const area=screen.getDisplayMatching(current).workArea;target.x=Math.max(area.x-105,Math.min(area.x+area.width-PET_SIZE.width+105,desired.x));}
   mainWindow.setPosition(target.x, target.y, false);
   scheduleSave();
   // movePet also works without explicit drag lifecycle calls: movement delays

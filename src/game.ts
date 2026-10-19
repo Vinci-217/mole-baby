@@ -131,6 +131,20 @@ export function getNextStage(growth: number): (typeof STAGES)[number] | null {
   return growth >= GROWTH_MAX ? null : STAGES[stage + 1];
 }
 
+/** Deliberate local stage selection, separate from the slow natural growth clock. */
+export function changePetStage(state: GameState, stage: Stage, evolution?: Evolution, now = Date.now()): CareResult {
+  if (!Number.isInteger(stage) || stage < 0 || stage > 4 || (evolution !== undefined && !EVOLUTIONS.some(form => form.id === evolution))) {
+    return { state, ok: false, message: '请选择一个拉姆阶段。' };
+  }
+  const form = stage === 4 ? evolution ?? state.evolution ?? 'super' : undefined;
+  if (getStage(state.growth, state.evolution) === stage && state.evolution === form) {
+    return { state, ok: true, message: `现在就是${STAGES[stage].name}啦。` };
+  }
+  const next = { ...state, growth: STAGES[stage].threshold, lastTick: now };
+  if (form) next.evolution = form; else delete next.evolution;
+  return { state: next, ok: true, message: `已经切换为${form ? EVOLUTIONS.find(v => v.id === form)!.name : STAGES[stage].name}。` };
+}
+
 export function evolvePet(state: GameState, evolution: Evolution, now = Date.now()): CareResult {
   const current = tick(state, now);
   const form = EVOLUTIONS.find(form => form.id === evolution);

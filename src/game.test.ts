@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buyFood, buyItem, care, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick, WAKE_GRACE_MS } from './game';
+import { buyFood, buyItem, care, changePetStage, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick, WAKE_GRACE_MS } from './game';
 
 const NOW = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -422,5 +422,27 @@ describe('four original god-power evolution choices', () => {
     }
     expect(parseSave(JSON.stringify({ ...fresh(), evolution: 'water' }), NOW)).toBeNull();
     expect(parseSave(JSON.stringify({ ...fresh(), growth: GROWTH_MAX, evolution: 'light' }), NOW)).toBeNull();
+  });
+});
+
+
+describe('deliberate settings stage selection', () => {
+  it('switches every form in both directions without replacing identity, supplies or needs', () => {
+    const original={...fresh(),name:'小红',inventory:{...fresh().inventory,biscuit:3},coins:427};
+    for (const stage of [4,3,2,1,0,4] as const) for (const form of EVOLUTIONS) {
+      const from={...original,growth:GROWTH_MAX,evolution:'water' as const};
+      const result=changePetStage(from,stage,form.id,NOW+1000);
+      expect(result.ok).toBe(true);expect(getStage(result.state.growth,result.state.evolution)).toBe(stage);
+      expect(result.state).toMatchObject({name:original.name,color:original.color,createdAt:original.createdAt,coins:427,inventory:original.inventory,stats:original.stats});
+      expect(result.state.evolution).toBe(stage===4?form.id:undefined);
+      expect(parseSave(JSON.stringify(result.state),NOW+1000)?.evolution).toBe(stage===4?form.id:undefined);
+    }
+  });
+  it('preserves natural progress on repeated selection and rejects invalid stages/forms', () => {
+    const current={...fresh(),growth:213};
+    expect(changePetStage(current,2).state).toBe(current);
+    for(const stage of [-1,5,1.5,NaN])expect(changePetStage(current,stage as 0).ok).toBe(false);
+    expect(changePetStage(current,4,'invalid' as 'super').ok).toBe(false);
+    expect(changePetStage(current,4).state.evolution).toBe('super');
   });
 });

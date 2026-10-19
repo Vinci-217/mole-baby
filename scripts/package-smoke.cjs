@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyEdgePeek, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyEdgePeek, verifyStageSettings, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -106,7 +106,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     assert.equal(await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].isVisibleOnAllWorkspaces()), true);
   }
   const bounds = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
-  assert.equal(bounds.width, 200);
+  assert.equal(bounds.width, 160);
   assert.equal(bounds.height, 240);
   const painted = await character.locator('canvas').evaluate(canvas =>
     canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((value, index) => index % 4 === 3 && value > 0));
@@ -125,7 +125,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
   for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
-  console.log('PASS: both docked edges hover/click only peek, actual pointer drag releases the seed, random 2–5 minute cadence');
+  console.log('PASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence');
+  await verifyStageSettings(page);console.log('PASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories');
   await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
   console.log('PASS: local thoughtful speech and clickable chat continuity in the shipped native window');
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());
@@ -151,7 +152,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await expect(panel).toBeVisible();
   const expanded = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
-  assert.equal(expanded.width, 540); assert.equal(expanded.height, 490);
+  assert.equal(expanded.width, 500); assert.equal(expanded.height, 490);
   assert.equal((await page.evaluate(() => window.desktop.getState())).petMode, true);
   assert.equal(await page.locator('.cottage-scene').count(), 0);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态','背包','玩耍','对话']);
