@@ -1,0 +1,45 @@
+{
+  "version": "0.7.0",
+  "tag": "v0.7.0",
+  "sourceSha": "8d8ccfdeba503bf839684fc3c0cc2353c7ba3c23",
+  "buildResult": "success",
+  "platforms": {
+    "windows": "success",
+    "mac": "success"
+  },
+  "releaseResult": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39195552222",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.7.0",
+  "downloads": [
+    {
+      "file": "mole-baby-0.7.0-mac-arm64.dmg",
+      "sha256": "d542ba99a4c88863fa99a192f62ce90763ed3dba26d9fb20ad06e9811a9a31e0"
+    },
+    {
+      "file": "mole-baby-0.7.0-mac-arm64.zip",
+      "sha256": "e651014d08e1ba8c3373e780e54044c8abdb163960a136aaa1f32cdc2d8ce829"
+    },
+    {
+      "file": "mole-baby-0.7.0-mac-x64.dmg",
+      "sha256": "efb95470200ef806c1c5012c7c46ca8e24d4353a13af1ece7125ca7be1bc4914"
+    },
+    {
+      "file": "mole-baby-0.7.0-mac-x64.zip",
+      "sha256": "a854dfce5ea3fb9b5099933a228289d81ad02a84e0e41e6a928822d8e2d4f294"
+    },
+    {
+      "file": "mole-baby-0.7.0-x64.zip",
+      "sha256": "a74f4296f85f5b28411c3670b3490c0fbbcbcc496b7fdec08b920f3ba3bcd19f"
+    },
+    {
+      "file": "mole-baby-0.7.0-Setup.exe",
+      "sha256": "caf6a46249ee34947c1def2fb17ba571c3d3f96bff77e68d52c362827f30494c"
+    }
+  ],
+  "verificationLog": "PASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, fixed pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: packaged win32/x64 tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for checked downloads\n",
+  "macVerificationLogs": {
+    "arm64": "PASS: macOS arm64 DMG/ZIP, bundle identity, native Mach-O architecture and ad-hoc signature\nPASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, fixed pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: packaged darwin/arm64 tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-arm64.txt generated for checked downloads\n",
+    "x64": "PASS: macOS x64 DMG/ZIP, bundle identity, native Mach-O architecture and ad-hoc signature\nPASS: required ASAR payload and packaged application identity\nPASS: packaged seed tint, fixed pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: packaged darwin/x64 tray lifecycle, native dragging, ordered desktop tools/nine-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-x64.txt generated for checked downloads\n"
+  },
+  "recordedAt": "2026-10-19T03:42:26.818Z"
+}
