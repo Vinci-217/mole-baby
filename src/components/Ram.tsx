@@ -3,6 +3,8 @@ import type { PetColor, Stage, Evolution } from '../game'
 import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, colorBlend, type ItemMotion } from '../item-motion'
 import './Ram.css'
 import SocialCue, { paintSocialCue } from './SocialCue'
+import { createPetSoundClock } from '../pet-audio'
+import { itemSoundScore, socialSoundScore } from '../pet-sound-score'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleFlyingPose } from './ram-animation'
 
 interface RamProps {
@@ -13,6 +15,7 @@ interface RamProps {
   sleeping?: boolean
   peeking?: boolean
   fromColor?: PetColor
+  sound?: boolean
   className?: string
   /** Compatibility only: every rendering path uses original game artwork. */
   artStyle?: 'classic' | 'hd'
@@ -37,13 +40,14 @@ const COLOR_OFFSETS: Record<PetColor, readonly number[]> = {
 const sourceCache = new Map<string, Promise<SheetSource>>()
 const tintedCache = new Map<string, Promise<HTMLCanvasElement>>()
 const ACTION_NAMES: Record<string, string> = {
+  'watch-butterfly':'好奇地看着小蝴蝶', 'look-around':'轻轻转身张望',
   idle: '正在陪伴你', 'walk-right': '向右走', 'running-right': '向右走',
   'walk-left': '向左走', 'running-left': '向左走', pet: '被小手轻轻摸摸',
   waving: '正在打招呼', feed: '开心地吃东西', eat: '开心地吃东西', drink: '正在喝水',
   wash: '正在洗澡', medical: '正在接受照料', use: '正在接受照料',
   sad: '有点难过', failed: '有点难过', sick: '有些不舒服', hungry: '肚子饿了',
   thirsty: '有些口渴', dirty: '需要清洁', tired: '有点困了',
-  sleep: '闭着眼睛睡觉，点击休息按钮可唤醒', wake: '慢慢醒来了', waiting: '安静地等你',
+  sleep: '闭着眼睛睡觉，可以轻轻叫醒', wake: '慢慢醒来了', waiting: '安静地等你',
   drag: '被轻轻提起来了', running: '正在活动', play: '和小球一起玩耍', focus: '翻开书安静陪你专注', dizzy: '有点头晕，停下来缓一缓', happy: '很开心', reward: '很开心', review: '很开心',
   peek: '从角落探出头看你', hide: '在角落安静地陪伴',
 }
@@ -126,9 +130,10 @@ function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined,
   }
   for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
 }
-function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, onError, onActionEnd }: {
+function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, sound, onError, onActionEnd }: {
   form: Form; color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number;
   itemMotion?: ItemMotion;
+  sound?: boolean;
   onError: () => void; onActionEnd?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -147,6 +152,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, o
   useEffect(() => {
     const canvas = canvasRef.current, context = canvas?.getContext('2d')
     if (!canvas || !context || !sheets) return
+    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),sound===true)
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
     const paint = (now: number) => {
@@ -154,6 +160,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, o
       if (last && now - last < 250) { elapsed += now - last; flightClock.current += now - last }
       last = now
       const pose = ['senior', 'super', 'water', 'wood', 'fire'].includes(form) ? sampleFlyingPose(action, elapsed, media.matches, form, flightClock.current) : sampleRamPose(action, elapsed, media.matches)
+      if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
@@ -173,14 +180,15 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, o
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
-    return () => { stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [sheets, action, actionId, itemMotion, form])
+    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
+  }, [sheets, action, actionId, itemMotion, form, sound])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
-function SeedBody({ color, fromColor, action, actionId, itemMotion, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; onActionEnd?: () => void }) {
+function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; sound?: boolean; onActionEnd?: () => void }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   useEffect(() => {
+    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),sound===true)
     let cancelled = false, request = 0, elapsed = 0, last = 0, previous = '', ended = false
     let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -189,6 +197,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, onActionEnd 
       if (last && now - last < 250) elapsed += now - last
       last = now
       const pose = sampleSeedPose(action, elapsed, media.matches)
+      if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${pose.frame}:${Math.round(mix*255)}`;
       if (previous !== signature) {
@@ -203,8 +212,8 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, onActionEnd 
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; if (source) request = requestAnimationFrame(paint) }
     Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null]).then(([loaded,old])=>{if(!cancelled){source=loaded;oldSource=old;resume()}}).catch(()=>{})
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
-    return () => { cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [color, fromColor, action, actionId, itemMotion])
+    return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
+  }, [color, fromColor, action, actionId, itemMotion, sound])
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
 function ItemCue({ motion }: { motion: ItemMotion }) {
@@ -218,7 +227,7 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
   </span>
 }
-export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, fromColor, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, fromColor, sound = false, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
@@ -231,9 +240,9 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} fromColor={fromColor} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} fromColor={fromColor} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}
     <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction}/>
     {resting && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}

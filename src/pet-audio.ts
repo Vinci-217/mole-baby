@@ -1,86 +1,111 @@
-export type PetVoice = 'pet' | 'lift' | 'shake' | 'drop' | 'catch' | 'feed' | 'drink' | 'wash' | 'sleep' | 'wake' | 'sick';
-let lastVoiceAt = -Infinity;
-let lastKind: PetVoice | null = null;
-let context: AudioContext | null = null;
+import type { Foley, SoundScore } from './pet-sound-score'
 
-function envelope(audio: AudioContext, start: number, length: number, level: number) {
-  const gain = audio.createGain();
-  gain.gain.setValueAtTime(.0001, start);
-  gain.gain.exponentialRampToValueAtTime(level, start + Math.min(.025, length / 4));
-  gain.gain.exponentialRampToValueAtTime(.0001, start + length);
-  gain.connect(audio.destination);
-  return gain;
+export type PetVoice = 'pet' | 'lift' | 'shake' | 'drop' | 'catch' | 'feed' | 'drink' | 'wash' | 'sleep' | 'wake' | 'sick'
+let lastVoiceAt = -Infinity, lastEffectAt = -Infinity
+let lastKind: PetVoice | null = null, context: AudioContext | null = null
+let settings = {enabled: true, volume: .45, speechBusy: false}
+const channels = new Set<GainNode>()
+const canPlay = (enabled = true) => enabled && settings.enabled && settings.volume > 0 && !settings.speechBusy && !document.hidden && !window.speechSynthesis?.speaking
+const level = () => canPlay() ? settings.volume : 0
+function syncChannels() { for (const channel of channels) channel.gain.setValueAtTime(level(), channel.context.currentTime) }
+export function configurePetSound(next: typeof settings) {
+  settings = {...next, volume: Number.isFinite(next.volume) ? Math.max(0,Math.min(1,next.volume)) : .45}
+  syncChannels()
 }
-function note(audio: AudioContext, start: number, length: number, pitch: number, target: number, level: number, type: OscillatorType = 'sine') {
-  const oscillator = audio.createOscillator(), gain = envelope(audio, start, length, level);
-  oscillator.type = type; oscillator.frequency.setValueAtTime(pitch, start); oscillator.frequency.exponentialRampToValueAtTime(target, start + length);
-  oscillator.connect(gain); oscillator.start(start); oscillator.stop(start + length);
-  oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+if (typeof document !== 'undefined') document.addEventListener('visibilitychange', syncChannels)
+function audioContext() { if (!context || context.state === 'closed') context = new AudioContext(); return context }
+function channel(audio: AudioContext) { const output = audio.createGain(); output.gain.value = level(); output.connect(audio.destination); channels.add(output); return output }
+function dispose(output: GainNode) { output.disconnect(); channels.delete(output) }
+function envelope(audio: BaseAudioContext, start: number, length: number, gain: number, output: AudioNode) {
+  const node = audio.createGain()
+  node.gain.setValueAtTime(.0001,start)
+  node.gain.exponentialRampToValueAtTime(Math.max(.0001,gain),start+Math.min(.015,length/4))
+  node.gain.exponentialRampToValueAtTime(.0001,start+length)
+  node.connect(output); return node
 }
-function rustle(audio: AudioContext, start: number, length: number, frequency: number, level: number) {
-  const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * length), audio.sampleRate), samples = buffer.getChannelData(0);
-  for (let index = 0; index < samples.length; index++) samples[index] = (Math.random() * 2 - 1) * .65;
-  const source = audio.createBufferSource(), filter = audio.createBiquadFilter(), gain = envelope(audio, start, length, level);
-  source.buffer = buffer; filter.type = 'bandpass'; filter.frequency.value = frequency; filter.Q.value = 1.5;
-  source.connect(filter); filter.connect(gain); source.start(start); source.stop(start + length);
-  source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
+function note(audio: BaseAudioContext, start: number, length: number, pitch: number, target: number, gain: number, output: AudioNode, type: OscillatorType = 'sine') {
+  const source=audio.createOscillator(), amp=envelope(audio,start,length,gain,output)
+  source.type=type;source.frequency.setValueAtTime(pitch,start);source.frequency.exponentialRampToValueAtTime(target,start+length)
+  source.connect(amp);source.start(start);source.stop(start+length)
+  source.onended=()=>{source.disconnect();amp.disconnect()}
 }
-/** Quiet, locally synthesized foley and vocal syllables. These are generated
- * sounds, not official game recordings. Speech playback always takes priority. */
+function rustle(audio: BaseAudioContext, start: number, length: number, frequency: number, gain: number, output: AudioNode) {
+  const buffer=audio.createBuffer(1,Math.ceil(audio.sampleRate*length),audio.sampleRate), samples=buffer.getChannelData(0)
+  for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*.65
+  const source=audio.createBufferSource(), filter=audio.createBiquadFilter(), amp=envelope(audio,start,length,gain,output)
+  source.buffer=buffer;filter.type='bandpass';filter.frequency.value=frequency;filter.Q.value=1.5
+  source.connect(filter);filter.connect(amp);source.start(start);source.stop(start+length)
+  source.onended=()=>{source.disconnect();filter.disconnect();amp.disconnect()}
+}
+/** Program-synthesized foley, not official recordings. Shared by live/offline review. */
+export function renderFoley(audio: BaseAudioContext, kind: Foley, at: number, strength: number, output: AudioNode) {
+  const n=(length:number,pitch:number,target:number,gain:number)=>note(audio,at,length,pitch,target,gain*strength,output)
+  const noise=(length:number,pitch:number,gain:number)=>rustle(audio,at,length,pitch,gain*strength,output)
+  switch(kind){
+    case 'nibble':noise(.065,1050,.035);n(.08,190,130,.022);break
+    case 'crunch':noise(.09,2100,.065);n(.07,170,105,.025);break
+    case 'sip':noise(.075,780,.021);n(.12,330,185,.04);break
+    case 'gulp':n(.15,255,125,.065);n(.08,440,230,.012);break
+    case 'bubble':n(.08,420,970,.035);break
+    case 'brush':noise(.065,2450,.045);break
+    case 'water':noise(.24,1600,.04);n(.09,780,340,.015);break
+    case 'cloth':noise(.11,850,.04);break
+    case 'page':noise(.14,1800,.035);break
+    case 'ball':n(.11,175,65,.08);break
+    case 'magic':n(.25,784,790,.035);note(audio,at+.1,.3,1047,1050,.028*strength,output);break
+    case 'voice':n(.16,390,290,.035);n(.2,570,430,.012);break
+  }
+}
+/** A visual-frame clock dispatches each contact once. Never queues future care
+ * sounds: cancel, hidden windows and delayed frames cannot produce a burst. */
+export function createPetSoundClock(score: SoundScore, enabled: boolean) {
+  let previous=-1, output: GainNode | null=null, stopped=false
+  return {
+    tick(elapsed: number) {
+      if(stopped||!Number.isFinite(elapsed)||elapsed<previous)return
+      const cycle=score.loop?Math.floor(elapsed/score.loop):0
+      const due=score.cues.filter(cue=>{const at=cue.at+cycle*(score.loop??0);return at>previous&&at<=elapsed&&elapsed-at<=120})
+      previous=elapsed
+      if(!due.length||!canPlay(enabled))return
+      try {const audio=audioContext();void audio.resume().catch(()=>{});output??=channel(audio);for(const cue of due)renderFoley(audio,cue.kind,audio.currentTime,cue.strength,output)}catch{/* Optional audio device. */}
+    },
+    stop(){stopped=true;if(output)dispose(output);output=null},
+  }
+}
+function oneShot(play:(audio:AudioContext,output:GainNode)=>void) {
+  try{const audio=audioContext();void audio.resume().catch(()=>{});const output=channel(audio);play(audio,output);setTimeout(()=>dispose(output),1200)}catch{/* Sound never blocks care. */}
+}
+/** Speech (including native speech) takes priority over every pet effect. */
 export function playPetVoice(kind: PetVoice, enabled: boolean) {
-  if (!enabled || performance.now() - lastVoiceAt < (lastKind === kind ? 700 : 180) || window.speechSynthesis?.speaking) return;
-  lastVoiceAt = performance.now(); lastKind = kind;
-  try {
-    context ??= new AudioContext();
-    const audio = context;
-    void audio.resume().then(() => {
-      const now = audio.currentTime;
-      if (kind === 'feed') {
-        for (let index = 0; index < 3; index++) {
-          const start = now + index * .15;
-          rustle(audio, start, .085, 1050 + index * 70, .045);
-          note(audio, start, .1, 180, 120, .025);
-        }
-        return;
-      }
-      if (kind === 'drink') {
-        for (let index = 0; index < 3; index++) note(audio, now + index * .17, .14, 290 + index * 22, 145, .055);
-        return;
-      }
-      if (kind === 'wash') {
-        for (let index = 0; index < 7; index++) note(audio, now + index * .065, .1, 380 + index % 3 * 135, 680 + index % 3 * 170, .025);
-        rustle(audio, now + .03, .48, 1450, .017);
-        return;
-      }
-      if (kind === 'sleep') { rustle(audio, now, .65, 480, .018); return; }
-      const pitches: Record<Exclude<PetVoice, 'feed' | 'drink' | 'wash' | 'sleep'>, readonly [number, number]> = {
-        pet: [240, 290], lift: [250, 340], shake: [290, 210], drop: [200, 270], catch: [260, 300], wake: [220, 320], sick: [210, 180],
-      };
-      pitches[kind].forEach((pitch, index) => {
-        const start = now + index * .15, length = kind === 'sick' ? .24 : .18;
-        const source = audio.createOscillator(), filter = audio.createBiquadFilter(), gain = envelope(audio, start, length, kind === 'sick' ? .023 : .035);
-        source.type = 'sawtooth'; source.frequency.setValueAtTime(pitch, start); source.frequency.exponentialRampToValueAtTime(pitch * .84, start + length);
-        filter.type = 'bandpass'; filter.Q.value = 2.8; filter.frequency.setValueAtTime(index ? 520 : 920, start); filter.frequency.linearRampToValueAtTime(index ? 420 : 650, start + length);
-        source.connect(filter); filter.connect(gain); source.start(start); source.stop(start + length);
-        source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
-      });
-    }).catch(() => { /* A muted device does not block care. */ });
-  } catch { /* Optional sound never blocks interaction. */ }
+  const now=performance.now()
+  if(!canPlay(enabled)||now-lastVoiceAt<(lastKind===kind?700:180))return
+  lastVoiceAt=now;lastKind=kind
+  oneShot((audio,output)=>{
+    const at=audio.currentTime
+    if(['feed','drink','wash'].includes(kind)){renderFoley(audio,kind==='feed'?'nibble':kind==='drink'?'sip':'bubble',at,.7,output);return}
+    if(kind==='sleep'){rustle(audio,at,.55,480,.018,output);return}
+    const pitch=kind==='sick'?210:kind==='shake'?290:kind==='lift'?350:kind==='wake'?330:270
+    note(audio,at,.16,pitch,pitch*.85,.038,output)
+    note(audio,at+.14,.18,pitch*1.18,pitch*1.04,.025,output)
+  })
 }
-
-/** Unlock only on the user's Start gesture; no sound plays on launch. */
-export function prepareReminderSound() {
-  try { context ??= new AudioContext(); void context.resume().catch(() => {}); } catch { /* Optional audio device. */ }
+export function playGameSound(kind: 'flip'|'match'|'catch'|'move'|'perfect'|'purchase'|'reward', enabled: boolean) {
+  if(!canPlay(enabled)||performance.now()-lastEffectAt<75)return
+  lastEffectAt=performance.now()
+  oneShot((audio,output)=>{
+    const at=audio.currentTime
+    if(kind==='flip'||kind==='move'){renderFoley(audio,'page',at,.7,output);return}
+    if(kind==='catch'){renderFoley(audio,'bubble',at,.7,output);return}
+    const pitches=kind==='reward'?[523,659,784]:kind==='purchase'?[660,880]:kind==='perfect'?[784,1047]:[659,880]
+    pitches.forEach((pitch,i)=>note(audio,at+i*.09,.19,pitch,pitch,.04,output))
+  })
 }
-/** A distinct two-part chime, independent of pet chirp throttling and TTS. */
+/** Unlock on the user's Start gesture; never plays on launch. */
+export function prepareReminderSound() {try{void audioContext().resume().catch(()=>{})}catch{/* Optional audio. */}}
+/** The explicit timer's chime has its own switch and bypasses pet mute/TTS. */
 export function playReminderSound(enabled: boolean) {
-  if (!enabled) return;
-  try {
-    context ??= new AudioContext(); const audio = context;
-    void audio.resume().then(() => {
-      [659.25, 783.99, 1046.5, 659.25, 783.99, 1046.5].forEach((pitch, index) => {
-        note(audio, audio.currentTime + index * .23 + (index > 2 ? .18 : 0), .38, pitch, pitch, .075, 'sine');
-      });
-    }).catch(() => {});
-  } catch { /* Countdown completion still displays its visual notification. */ }
+  if(!enabled)return
+  try{const audio=audioContext();void audio.resume().then(()=>{
+    [659.25,783.99,1046.5,659.25,783.99,1046.5].forEach((pitch,i)=>note(audio,audio.currentTime+i*.23+(i>2?.18:0),.38,pitch,pitch,.075,audio.destination))
+  }).catch(()=>{})}catch{/* The visual completion notification still appears. */}
 }

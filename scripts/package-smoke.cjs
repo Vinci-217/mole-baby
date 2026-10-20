@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -62,6 +62,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     'dist/assets/original/items/180008.png', 'dist/assets/original/items/180002.png', 'dist/assets/original/items/180003.png',
     'dist/assets/original/seed/pot.png', 'dist/assets/original/seed/body.png', 'dist/assets/original/seed/body-mask.png',
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
+  assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
   for (const form of ['junior', 'middle', 'senior']) for (const layer of ['neutral', 'mask']) {
     const filename = `dist/assets/original/care/${form}-${layer}.png`;
@@ -228,6 +229,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifySocialProps(page);
   console.log('PASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app');
   console.log('PASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload');
+  await verifyPetLife(page);console.log('PASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application');
   await verifyRecolorPotion(page);console.log('PASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies');
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});

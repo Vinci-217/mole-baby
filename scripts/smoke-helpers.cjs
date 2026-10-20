@@ -14,7 +14,9 @@ async function openActions(page) {
   const edge=await page.evaluate(async()=>window.desktop?.getState? (await window.desktop.getState()).edgePose : 'visible');
   if(edge!=='visible') await page.evaluate(()=>window.desktop.revealPet());
   const actions = page.getByTestId('pet-actions');
-  if (!(await actions.isVisible())) await page.getByTestId('desktop-character').hover();
+  // A still-visible toolbar can belong to the panel's previous native bounds.
+  // Re-enter the pet after resize so normal pointer events target its new anchor.
+  await page.getByTestId('desktop-character').hover();
   await expect(actions).toBeVisible();
   return actions;
 }
@@ -160,4 +162,15 @@ async function verifyRecolorPotion(page){
   const after=await save();for(const key of ['name','createdAt','evolution','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.inventory[id]??0).toBe(before.inventory[id]??0);for(const key of Object.keys(before.inventory))expect(after.inventory[key]).toBe(before.inventory[key]);
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion };
+async function verifyPetLife(page){
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  await page.getByRole('button',{name:'看看小蝴蝶',exact:true}).click();
+  const ram=page.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-action','watch-butterfly');
+  const image=ram.locator('.social-butterfly>img');await expect(image).toBeVisible();expect(await image.evaluate(n=>n.complete&&n.naturalWidth>0)).toBe(true);
+  const scroll=await page.locator('.companion-content').evaluate(n=>({height:n.clientHeight,content:n.scrollHeight}));expect(scroll.content).toBeLessThanOrEqual(scroll.height+1);
+  await expect(ram).not.toHaveAttribute('data-action','watch-butterfly',{timeout:8500});await expect(ram.locator('.social-butterfly')).toHaveCount(0);await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
+  await enterHome(page);await roomTab(page,'设置');await page.getByRole('slider',{name:'拉姆音量',exact:true}).fill('31');await page.getByRole('checkbox',{name:'自然小动作',exact:true}).uncheck();
+  await toDesktop(page);await page.reload();await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('31');await expect(page.getByRole('checkbox',{name:'自然小动作',exact:true})).not.toBeChecked();await toDesktop(page);
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife };

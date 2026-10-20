@@ -37,9 +37,10 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
   if (action === 'sleep') return { row: 8, frame: 0, finished: false }
   if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
-    const duration=SOCIAL_DURATIONS[action as 'pet'|'play'|'dizzy'];
+    const duration=SOCIAL_DURATIONS[action as Exclude<keyof typeof SOCIAL_DURATIONS,'focus'>];
     if (elapsed>=duration) return {row:0,frame:0,finished:true};
     if (reduced) return {row:0,frame:0,finished:false};
+    if(action==='watch-butterfly'||action==='look-around')return {row:0,frame:[0,1,2,3,2,1][Math.floor(elapsed/650)%6],finished:false};
     return {row:action==='dizzy'?0:action==='play'?8:3,frame:action==='dizzy'?0:Math.floor(elapsed/220)%(action==='pet'?4:6),finished:false};
   }
   if (action === 'still' || action === 'drag') return { row: 0, frame: 0, finished: false }
@@ -85,6 +86,7 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   if (action === 'pet' || action === 'play') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:reduced?0:Math.floor(elapsed/350)%2,finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
+  if (action === 'watch-butterfly' || action === 'look-around') return {frame:reduced?0:[0,1,2,1][Math.floor(elapsed/700)%4],finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
@@ -127,7 +129,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   for (let i = 1; i < sourceFrames.length; i++) if (phase >= sourceFrames[i]) frame = i;
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
-  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
+  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
     return sampleRamPose(action,elapsed,reduced);
   }
   return { row: 0, frame, finished };

@@ -207,3 +207,9 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 `assets/generated/recolor-{red,yellow,blue,pink}.png` 是图片模型参考原万能药水、熊熊饼干和状态面板绘制的四款原创透明瓶装图标；不是原变色丸的导出。完整提示词、参考、原始输出路径、透明检查、尺寸与 SHA-256 在 `assets/generated/v14-potions-provenance.json`。仅复制原始输出，没有像素修改。
 
 原 `petfood.xml` 的 Tool=2/ColorType 提供变色类道具依据；本项目瓶装名称与80豆售价为本地玩法设定。角色、叶片、眼睛、花盆和飞行仍用既有原图集与配色遮罩，记录见 `research/v14-flight-recolor.md`。
+
+### v0.15 小蝴蝶与动作音效
+
+`generated/v15-butterfly.png` 由 image_gen 参考原拉姆小屋、原橙白宠物面板和熊熊饼干生成；是新设计的小道具，不是原客户端导出。原字节复制，角色图集没有重绘。五项观察、完整提示词、透明设置、尺寸及 SHA-256 在 `generated/v15-butterfly-provenance.json`。
+
+`pet-audio.ts` / `pet-sound-score.ts` 的12类拟声与小游戏短提示均为本机 Web Audio 合成，不是官方原声或声音克隆。原12首场景 BGM 未改字节。动作时钟、静音、语音优先及实际验证记录见 `research/v15-companion-audit.md`。

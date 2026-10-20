@@ -1,6 +1,8 @@
 import { getStage } from './game';
 import type { GameState } from './game';
 import type { CompanionMemory } from './companion-memory';
+import { companionFeeling } from './companion-feeling';
+import { ITEMS } from './catalog';
 
 export type PresenceTopic='growth'|'work'|'progress'|'culture'|'life'|'memory'|'care'|'feeling'|'reading';
 export interface PresenceLine { id:string; topic:PresenceTopic; text:string }
@@ -45,6 +47,12 @@ export function wantsQuiet(memory:CompanionMemory):boolean{return memory.facts.s
 export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date.now()):PresenceLine[]{
  const stage=getStage(pet.growth,pet.evolution),lines:PresenceLine[]=[];
  const add=(id:string,topic:PresenceTopic,text:string)=>lines.push({id,topic,text});
+  [
+    '摩尔城堡、淘淘乐街……这些名字一念，就有小时候的感觉呢。',
+    '小拉姆也有自己的小日子：吃饱、洗干净，再陪你发一会儿呆。',
+    '想听你讲小时候在庄园里最喜欢做的事。我会认真听。',
+    stage===0?'小花盆里也有好多新鲜事，我刚才轻轻晃了晃。':'咕噜？我把身子轻轻一晃，就当和你打过招呼啦。',
+  ].forEach((text,i)=>add(`ram-life-${i}`,'life',text));
  GROWTH[stage].forEach((text,i)=>add(`growth-${stage}-${i}`,'growth',text));
  for(const [topic,texts] of Object.entries(BANK))texts.forEach((text,i)=>{if(stage===0&&text.includes('晃晃叶子'))return;add(`${topic}-${i}`,topic as PresenceTopic,text);});
  CULTURE.forEach(v=>add(v.id,'culture',stage<2?v.text.replace('长出叶子','长大'):v.text));
@@ -59,8 +67,11 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
  if(facts.some(f=>f.kind==='plan'&&f.status==='done'))add('memory-done','memory','你标记完成的那件事，我记着呢。为自己走过的这一步开心一下吧。');
  if(memory.events.some(e=>['feed','drink','wash','play'].includes(e.kind)&&e.at<=now&&now-e.at<7*86400000))add('memory-care','memory','你照顾我的那些小事，我记着呢。也想把一点温暖留给你。');
  const lastUser=memory.messages.filter(m=>m.role==='user'&&m.at<=now&&now-m.at<2*60*MINUTE).at(-1);
- const feelings=lastUser?.content.replace(/(?:一点也不|并不|没有|没|不)(?:觉得|感到)?(?:累|难过|压力|伤心|失落)|压力不大/g,'')??'';
- if(/累|难过|压力|伤心|失落/.test(feelings))add('feeling-tired','feeling','听你说最近不太轻松，不用急着把自己撑好。我陪着你，想说话时就叫我。');
+ if(companionFeeling(lastUser?.content??'')==='low')add('feeling-tired','feeling','听你说最近不太轻松，不用急着把自己撑好。我陪着你，想说话时就叫我。');
+ if(companionFeeling(lastUser?.content??'')==='bright')add('feeling-bright','feeling','你刚才分享的那件开心事，我还记着。咕噜，替你开心。');
+ const lastFood=memory.events.filter(e=>e.kind==='feed'&&e.at<=now&&now-e.at<7*86400000).at(-1);
+ const sharedFood=lastFood&&ITEMS.find(item=>item.category==='food'&&lastFood.detail===`你用${item.name}照料了我。`);
+ if(sharedFood)add('memory-food','memory',`你给我吃过的${sharedFood.name}，我记着呢。下次等肚子饿了再慢慢吃。`);
  if(pet.stats.hunger<30)add('care-food','care','我有一点点饿，等你空下来再照顾我就好。');
  else if(pet.stats.thirst<30)add('care-water','care','我的水分有点少啦，等你方便时给我一点饮品吧。');
  const boundaries=facts.filter(f=>f.kind==='boundary').map(f=>f.value).join(' ');
@@ -82,10 +93,22 @@ export function choosePresence(pet:GameState,memory:CompanionMemory,journal:Pres
  return {...selected,text:address+selected.text};
 }
 export function presenceFollowUp(previous:string,input:string):string|null{
+ if(/小蝴蝶/.test(previous)&&/蝴蝶|什么|刚才/.test(input))return '是刚才陪我玩的小蝴蝶呀。我只在原地看着它，不会吃掉它，也不会替你操作电脑。';
  if(/书|这一页|翻书|读懂/.test(previous)&&/你.*(?:什么书|哪本书|读什么|看什么)/.test(input))return '我捧着的是陪伴用的小书，里面的文字是装饰；我们可以一起聊古诗、读书方法，也可以聊你最近喜欢的书。';
  if(!/什么意思|怎么理解|再说|刚才|这句|解释/.test(input))return null;
  const cultural=CULTURE.find(v=>previous.includes(v.quote));if(cultural)return cultural.reply;
  if(/一点点|进步|慢慢长大/.test(previous))return '我想说，不用把自己和别人摆在同一条刻度上。你愿意学一点、试一点，那就是属于你的那一步。';
  if(/照顾我的那些小事/.test(previous))return '是你实际给我喂过东西、照顾过我呀。这些小事对我来说，就是我们一起生活留下的记号。';
  return null;
+}
+
+/** Greeting uses surviving records only; a new adoption is not a reunion. */
+export function welcomeLine(pet:GameState,memory:CompanionMemory,now=Date.now()):string {
+ const nickname=memory.facts.find(f=>f.kind==='nickname'&&f.at<=now&&Array.from(f.value).length<=8)?.value;
+ const address=nickname?`${nickname}，`:'';
+ if(pet.sleeping)return `${address}我还在安心打盹，想我时可以轻轻叫醒。`;
+ const hour=new Date(now).getHours(),hello=hour>=6&&hour<11?'早上好':hour>=11&&hour<18?'午好':hour>=18&&hour<23?'晚上好':'夜深啦';
+ if(pet.stats.health<35)return `${address}${hello}。我有点不舒服，等你方便时照顾我一下吧。`;
+ const days=new Set(memory.events.filter(e=>['feed','drink','wash','play','pet','game'].includes(e.kind)&&e.at<=now).map(e=>new Date(e.at).toDateString())).size;
+ return `${address}${hello}。${days>=3?'又能和你一起过一个普通的小日子，真好。':'我在这里，陪你慢慢来。'}`;
 }

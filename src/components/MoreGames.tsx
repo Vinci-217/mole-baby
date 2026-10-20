@@ -7,9 +7,10 @@ import {
 } from './extra-game-rules';
 import type { BeatJudgment, OrchardFruit } from './extra-game-rules';
 import './MoreGames.css';
+import { playGameSound } from '../pet-audio';
 
 export type ExtraGame = 'rhythm' | 'orchard' | 'puzzle';
-type Props = { kind: ExtraGame; onComplete: (score: number) => GameReceipt | void; onClose: () => void };
+type Props = { kind: ExtraGame; onComplete: (score: number) => GameReceipt | void; onClose: () => void; sound?: boolean };
 type Phase = 'ready' | 'playing' | 'finished' | 'closed';
 const titles: Record<ExtraGame, string> = { rhythm: '节奏拍拍乐', orchard: '草地采果', puzzle: '小屋拼拼乐' };
 const instructions: Record<ExtraGame, string> = {
@@ -22,7 +23,7 @@ const orchardImages = ['180027', '180028', '180030'] as const;
 /** A keyed session prevents a parent changing the selected game from sharing a round. */
 export default function MoreGames(props: Props) { return <GameSession key={props.kind} {...props}/>; }
 
-function GameSession({ kind, onComplete, onClose }: Props) {
+function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -74,6 +75,7 @@ function GameSession({ kind, onComplete, onClose }: Props) {
     const hit = rhythmHit(elapsedRef.current, judgmentsRef.current, lastTap.current);
     lastTap.current = elapsedRef.current;
     if (!hit) { setFeedback({ message: '跟着果子的节奏来～', at: elapsedRef.current }); return; }
+    playGameSound(hit.judgment==='perfect'?'perfect':'catch',sound);
     const next = [...judgmentsRef.current]; next[hit.index] = hit.judgment;
     judgmentsRef.current = next; setJudgments(next);
     setFeedback({ message: hit.judgment === 'perfect' ? '正好！' : '接上啦！', at: elapsedRef.current });
@@ -82,6 +84,7 @@ function GameSession({ kind, onComplete, onClose }: Props) {
     if (phaseRef.current !== 'playing' || pausedRef.current) return;
     const index = orchardClaim(fruitsRef.current, claimedRef.current, elapsedRef.current, slot);
     if (index < 0) return;
+    playGameSound('catch',sound);
     const next = new Set(claimedRef.current); next.add(index); claimedRef.current = next; setClaimed(next);
     setFeedback({ message: '+1 采到啦！', at: elapsedRef.current });
   }
@@ -89,6 +92,7 @@ function GameSession({ kind, onComplete, onClose }: Props) {
     if (phaseRef.current !== 'playing' || pausedRef.current) return;
     const next = puzzleMove(boardRef.current, index);
     if (!next) return;
+    if(!puzzleSolved(next))playGameSound('move',sound);
     boardRef.current = next; setBoard(next); setMoves(previous => previous + 1);
     if (puzzleSolved(next)) finish(10);
   }

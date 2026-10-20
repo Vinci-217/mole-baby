@@ -2,6 +2,12 @@ import { describe,it,expect } from 'vitest';
 import { sampleSocialMotion, SOCIAL_DURATIONS } from './social-motion';
 import type { Stage } from './game';
 describe('stage-specific prop and body choreography',()=>{
+  it('keeps butterfly curiosity gentle, bounded and still with reduced motion',()=>{
+    for(const stage of [0,1,2,3,4] as Stage[])for(let t=0;t<6500;t+=80){
+      const p=sampleSocialMotion(stage,'watch-butterfly',t);expect(p.butterflyX).toBeGreaterThanOrEqual(34);expect(p.butterflyX).toBeLessThanOrEqual(84);expect(p.butterflyY).toBeGreaterThanOrEqual(16);expect(Math.abs(p.bodyAngle)).toBeLessThanOrEqual(stage>=3?.7:2.5);if(stage===0)expect(p.bodyY).toBe(0);
+    }
+    expect(sampleSocialMotion(4,'watch-butterfly',0,true)).toEqual(sampleSocialMotion(4,'watch-butterfly',1000,true));
+  });
   it('orbits three stars horizontally above each head with depth instead of spinning a flat triangle',()=>{
     for(const stage of [0,1,2,3,4] as Stage[]){
       const a=sampleSocialMotion(stage,'dizzy',300),b=sampleSocialMotion(stage,'dizzy',600);

@@ -7,6 +7,7 @@ import Ram from './Ram';
 import type { GameReceipt } from './game-receipt';
 import { advanceFruitGame, initialFruitModel, getCatchBand, FRUIT_ARENA, FRUIT_SIZE, PET_WIDTH, PET_HEIGHT, GAME_SECONDS } from './fruit-physics';
 import type { FruitModel } from './fruit-physics';
+import { playGameSound } from '../pet-audio';
 
 interface FruitGameProps {
   onComplete: (score: number) => GameReceipt | void;
@@ -14,12 +15,13 @@ interface FruitGameProps {
   color?: PetColor;
   stage?: Stage;
   evolution?: Evolution;
+  sound?: boolean;
 }
 
 type Phase = 'ready' | 'playing' | 'finished';
 function BerryIllustration({ className = '' }: { className?: string }) { return <GameArt kind="apple" className={className}/>; }
 
-export default function FruitGame({ onComplete, onClose, color = 'red', stage = 1, evolution }: FruitGameProps) {
+export default function FruitGame({ onComplete, onClose, color = 'red', stage = 1, evolution, sound = false }: FruitGameProps) {
   const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [phase, setPhase] = useState<Phase>('ready');
   const [frame, setFrame] = useState<FruitModel>(initialFruitModel);
@@ -78,6 +80,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
       previousTime = now;
       const direction = Number(heldKeys.current.has('ArrowRight')) - Number(heldKeys.current.has('ArrowLeft'));
       const next = advanceFruitGame(model.current, delta, direction, stage, evolution);
+      if(next.score>model.current.score)playGameSound('catch',sound);
       model.current = next; setFrame(next);
       if (next.elapsed >= GAME_SECONDS) {
         heldKeys.current.clear(); setPhase('finished');
@@ -88,7 +91,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
     };
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [phase, stage, evolution]);
+  }, [phase, stage, evolution, sound]);
 
   const startGame = () => {
     if (stage === 0) return;

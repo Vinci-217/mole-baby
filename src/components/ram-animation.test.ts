@@ -59,6 +59,15 @@ describe('original Ram care animation contract', () => {
 
 
 describe('continuous original airborne posture',()=>{
+ it('ends both new curiosity gestures in every stage and never changes an airborne source registration',()=>{
+  for(const action of ['look-around','watch-butterfly']){
+   const duration=getRamActionDuration(action)!;expect(duration).toBeGreaterThan(0);
+   expect(sampleRamPose(action,duration).finished).toBe(true);expect(sampleSeedPose(action,duration).finished).toBe(true);
+   for(const form of ['senior','super','water','wood','fire'])for(const t of [0,800,1800,duration]){
+    const pose=sampleFlyingPose(action,t,false,form,t);expect(pose.row).toBe(0);expect(pose.sheet).toBeUndefined();expect(pose.finished).toBe(t===duration);
+   }
+  }
+ });
  it('cycles the source down row throughout idle and affection without switching registration',()=>{
   for(const form of ['senior','super','water','wood','fire']){
    const frames=new Set<number>();for(let t=0;t<2000;t+=20){const pose=sampleFlyingPose('idle',t,false,form);expect(pose.row).toBe(0);expect(pose.sheet).toBeUndefined();frames.add(pose.frame);expect(sampleFlyingPose('pet',t%2000,false,form,t).frame).toBe(pose.frame);}

@@ -26,7 +26,7 @@ const memory=page=>page.evaluate(()=>JSON.parse(localStorage.getItem(`ramu-compa
  await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await page.clock.fastForward(15000);await page.clock.fastForward(180000);
  assert.equal((await journal(page)).history.length,1,'no repeat after only three minutes');
  await page.reload();await page.clock.fastForward(180000);assert.equal((await journal(page)).history.length,1,'reload respects persisted cadence');
- await page.clock.fastForward(240000);assert.equal((await journal(page)).history.length,2);
+ await page.clock.fastForward(240000);await page.clock.runFor(16000);assert.equal((await journal(page)).history.length,2,'an interrupted idle gesture may defer one check, but cannot restart the three-minute wait');
  await expect(page.locator('.compact-bubble')).toHaveClass(/visible/);assert.notEqual(await page.locator('.compact-bubble').innerText(),first);
  console.log('PASS thoughtful cadence, no startup timer, no fabricated memories or passive affection, clickable context and restart-safe cooldown');
 

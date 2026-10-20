@@ -1,6 +1,6 @@
 import type { Evolution, Stage } from './game';
-export type SocialAction = 'pet' | 'play' | 'focus' | 'dizzy';
-export const SOCIAL_DURATIONS = { pet: 2400, play: 4200, dizzy: 3200 } as const;
+export type SocialAction = 'pet' | 'play' | 'focus' | 'dizzy' | 'watch-butterfly' | 'look-around';
+export const SOCIAL_DURATIONS = { pet: 2400, play: 4200, dizzy: 3200, 'watch-butterfly':6500, 'look-around':3600 } as const;
 const profiles = [
   { head: 20, contactX: 88, contact: 48, bookX: 76, bookY: 87, sway: 4, lift: 0, phase: .1 },
   { head: 30, contactX: 100, contact: 58, bookX: 50, bookY: 83, sway: 2, lift: 3, phase: .3 },
@@ -8,7 +8,7 @@ const profiles = [
   { head: 22, contactX: 87, contact: 81, bookX: 49, bookY: 94, sway: 2.5, lift: .7, phase: .7 },
   { head: 18, contactX: 94, contact: 75, bookX: 49, bookY: 93, sway: 3, lift: 1, phase: .9 },
 ] as const;
-export function isSocialAction(action: string): action is SocialAction { return ['pet','play','focus','dizzy'].includes(action); }
+export function isSocialAction(action: string): action is SocialAction { return ['pet','play','focus','dizzy','watch-butterfly','look-around'].includes(action); }
 /** One event clock drives prop contact and the pet reaction. Stage 0 never
  * lifts the pot; its transform is applied to the independently layered body. */
 export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: number, reduced = false, evolution?: Evolution) {
@@ -31,7 +31,7 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
   });
   return {
     finished:ended, opacity:ended?0:reduced?1:Math.max(0,enter),
-    bodyAngle:reduced?0:action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*(flying?.4:p.sway*.35):stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
+    bodyAngle:reduced?0:['watch-butterfly','look-around'].includes(action)?Math.sin(progress*Math.PI*2)*(flying?.7:stage===0?2:2.5)*Math.sin(progress*Math.PI):action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*(flying?.4:p.sway*.35):stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
     bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*(flying?.35:.7):action==='focus'?1+Math.sin(time/1800)*.5:0,
     ballX:reduced?contactX:115-Math.sin(progress*Math.PI*2)**2*(115-contactX),
     ballY:reduced?p.contact:p.contact-Math.abs(Math.sin(progress*Math.PI*4))*(stage===0?9:stage===1?20:stage===2?14:10)*formFactor,
@@ -39,6 +39,10 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
     handX:reduced?(flying?65:62):(flying?65:62)+Math.sin(progress*Math.PI*(stage===0?4:6))*(flying?4:stage===0?5:9)+(1-enter)*27,
     handY:(stage===4?15:p.head)-(1-enter)*17+(reduced?0:Math.abs(rhythm)*(flying?.7:1.5)),
     handWidth:flying?42:53,
+    butterflyX:reduced?77:59+Math.sin(progress*Math.PI*2)*25,
+    butterflyY:Math.max(flying?28:20,p.head-12)+(reduced?0:Math.sin(progress*Math.PI*4)*4),
+    butterflyAngle:reduced?-12:Math.cos(progress*Math.PI*2)*18,
+    butterflyWing:reduced?1:.42+Math.abs(Math.sin(time/85))*.58,
     bookX:p.bookX, bookY:p.bookY,
     page:reduced?0:-180*(turn*turn*(3-2*turn)),
     pageOpacity:reduced?0:readingPhase<.74||readingPhase>.98?0:Math.min(1,(readingPhase-.74)*25,(.98-readingPhase)*30),

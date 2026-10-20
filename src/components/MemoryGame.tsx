@@ -2,6 +2,7 @@ import type { GameReceipt } from './game-receipt';
 import { useEffect, useRef, useState } from 'react';
 import './MemoryGame.css';
 import GameArt from './GameArt';
+import { playGameSound } from '../pet-audio';
 
 type Phase = 'ready' | 'preview' | 'playing' | 'celebrating' | 'finished';
 type Card = { id: number; kind: number; matched: boolean };
@@ -13,7 +14,7 @@ function shuffle(): Card[] {
   return cards;
 }
 
-export default function MemoryGame({ onComplete, onClose }: { onComplete: (score: number) => GameReceipt | void; onClose: () => void }) {
+export default function MemoryGame({ onComplete, onClose, sound=false }: { onComplete: (score: number) => GameReceipt | void; onClose: () => void; sound?: boolean }) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [board, setBoard] = useState<Card[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
@@ -83,10 +84,11 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
   function flip(index: number) {
     if (phase !== 'playing' || locked.current || boardRef.current[index].matched || selectedRef.current.includes(index)) return;
     const next = [...selectedRef.current, index]; selectedRef.current = next; setSelected(next);
-    if (next.length !== 2) return;
+    if (next.length !== 2) {playGameSound('flip',sound);return;}
     turnsRef.current += 1; setTurns(turnsRef.current);
     const [a, b] = next;
     if (boardRef.current[a].kind === boardRef.current[b].kind) {
+      playGameSound('match',sound);
       const cards = boardRef.current.map((card, i) => i === a || i === b ? { ...card, matched: true } : card);
       boardRef.current = cards; setBoard(cards); pairsRef.current += 1; setPairs(pairsRef.current);
       selectedRef.current = []; setSelected([]);
@@ -95,6 +97,7 @@ export default function MemoryGame({ onComplete, onClose }: { onComplete: (score
         else setPhase('celebrating');
       }
     } else {
+      playGameSound('flip',sound);
       locked.current = true;
       flipTimer.current = setTimeout(() => { selectedRef.current = []; setSelected([]); locked.current = false; }, 720);
     }

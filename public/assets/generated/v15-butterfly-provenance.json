@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-20",
+  "tool": "image_gen",
+  "purpose": "桌面拉姆好奇互动的小蝴蝶道具；原创适配，不是官方原游戏道具。",
+  "transparent_background": true,
+  "file": "v15-butterfly.png",
+  "original": "/workspace/generated_images/exec-ea1255ed-8f1d-4e4b-84ba-7399f35d2771.png",
+  "references": [
+    "public/assets/original/scenes/ramu-home.png",
+    "public/assets/original/ui/reference-pet-panel.png",
+    "public/assets/original/items/180017.png"
+  ],
+  "observations": [
+    "轮廓：深棕局部色连贯勾线，保留圆弧与短折线，不用黑色厚外框。",
+    "形状：原小屋与饼干均用易读的大剪影；蝴蝶只保留四翼、短身体与两条触角。",
+    "色面：蜂蜜黄、橙、棕三组局部色，不增加角色服装或重画角色。",
+    "高光：参考饼干的短奶白高光；模型输出有轻微色面过渡，实机小尺寸复核后接受，不宣称逐像素复刻。",
+    "空间：透明道具在原拉姆上方小范围飞动，给气泡与快捷栏留白；角色本体、叶片、头冠、眼白与花盆保持原图。"
+  ],
+  "prompt": "Create ONE tiny butterfly prop for a nostalgic early Chinese Flash virtual pet desktop companion. The three reference images are the original tree-house scene (use ONLY its clean broad flat shapes and warm dark local-color outlines), the original orange-white pet UI panel (use ONLY clarity at very small sizes), and the bear biscuit inventory item (use ONLY simple asymmetrical chunky silhouette and crisp hard highlights). Draw a single friendly golden-yellow butterfly seen from the front, wings fully open: two broad rounded upper wings and two smaller lower wings, an extremely short brown body, two short curved antennae, one large orange patch on each upper wing. No face, eyes, mouth, limbs, text, glitter, scene, shadow, logo or panel. 2-3 broad flat color areas, short cream highlights, warm brown thin outline, slightly irregular simple Flash vector-like contour, no soft gradients, no 3D, no texture, no ornamental tiny lines. It must remain recognizable displayed at 18 pixels wide. Center one complete butterfly with generous 20% true transparent padding. Do not redraw any Ram character or include original UI or scene. We animate this small prop in code; no sprite sheet.",
+  "modifications": "原字节复制；没有改绘、裁切、重编码或用程序生成新插画。运行时通过DOM变换驱动飞行与扇翼。",
+  "size": [
+    1374,
+    1145
+  ],
+  "alphaRange": [
+    0,
+    255
+  ],
+  "bytes": 431458,
+  "sha256": "2f86dd8e3b3e417cc88678a7ddcd7443c7b89795b3b050d48cea89157ee58554"
+}
