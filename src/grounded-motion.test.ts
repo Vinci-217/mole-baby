@@ -1,0 +1,8 @@
+import {describe,it,expect} from 'vitest'
+import {groundedMotion,usesGroundedPose} from './grounded-motion'
+describe('calm original junior and middle layers',()=>{
+ it('retains a stable body for social actions without affecting care or flying forms',()=>{for(const f of ['junior','middle'])for(const a of ['idle','pet','play','focus','watch-butterfly','look-around','drag'])expect(usesGroundedPose(f,a)).toBe(true);for(const f of ['seed','senior','super','water','wood','fire'])expect(usesGroundedPose(f,'idle')).toBe(false);expect(usesGroundedPose('middle','eat-bear-biscuit')).toBe(false)})
+ it('blinks through half, closed and open eyes without changing the body registration',()=>{expect([5200,5270,5320,5390,5420].map(t=>groundedMotion('junior','idle',t,t).frame)).toEqual([0,1,2,1,0]);expect(groundedMotion('middle','idle',0,4020).frame).toBe(2)})
+ it('closes its eyes at the actual hand contact and reads downward',()=>{expect(groundedMotion('junior','pet',800,800).frame).toBe(2);expect(groundedMotion('middle','focus',500,500).eyeY).toBe(1.45)})
+ it('keeps continuous small gaze/leaf movement and stays still for reduced motion or dragging',()=>{for(const f of ['junior','middle']){let prev=groundedMotion(f,'idle',0,0);for(let t=16;t<18000;t+=16){const p=groundedMotion(f,'idle',t,t);expect(Math.abs(p.eyeX-prev.eyeX)).toBeLessThan(.02);expect(Math.abs(p.leafAngle-prev.leafAngle)).toBeLessThan(.02);prev=p}for(const a of ['drag','still'])expect(groundedMotion(f,a,1500,1500)).toEqual({frame:0,eyeX:0,eyeY:0,leafAngle:0});expect(groundedMotion(f,'focus',1500,1500,true)).toEqual({frame:0,eyeX:0,eyeY:0,leafAngle:0})}})
+})

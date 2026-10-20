@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PetColor, Stage, Evolution } from '../game'
 import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, colorBlend, type ItemMotion } from '../item-motion'
+import { groundedMotion, usesGroundedPose } from '../grounded-motion'
 import './Ram.css'
 import SocialCue, { paintSocialCue } from './SocialCue'
 import { createPetSoundClock } from '../pet-audio'
@@ -28,7 +29,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = 'junior' | 'middle' | 'senior' | Evolution
-type SheetKind = 'classic' | 'care' | 'seed' | 'item'
+type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -53,6 +54,7 @@ const ACTION_NAMES: Record<string, string> = {
 }
 function sheetSpec(form: Form, kind: SheetKind) {
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
+  if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
   if (kind === 'care') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * CARE_ROWS, neutral: `./assets/original/care/${form}-neutral.png`, mask: `./assets/original/care/${form}-mask.png` }
   if (kind === 'item') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * 4, neutral: `./assets/original/item-motion/${form}-neutral.png`, mask: `./assets/original/item-motion/${form}-mask.png` }
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
@@ -140,13 +142,13 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const flightClock = useRef(0)
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
-  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; previous: HTMLCanvasElement[] | null } | null>(null)
+  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; previous: HTMLCanvasElement[] | null } | null>(null)
   const key = `${form}:${color}:${fromColor??''}`
   const sheets = ready?.key === key ? ready : null
   useEffect(() => {
     let cancelled = false
-    const load=(c:PetColor)=>Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item')]);
-    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([[classic,care,item],previous])=>{if(!cancelled)setReady({key,classic,care,item,previous})}).catch(()=>{if(!cancelled)errorRef.current()});
+    const load=(c:PetColor)=>Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item'),...(['junior','middle'].includes(form)?[getTintedSheet(form,c,'grounded')]:[])]);
+    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([[classic,care,item,grounded],previous])=>{if(!cancelled)setReady({key,classic,care,item,grounded,previous})}).catch(()=>{if(!cancelled)errorRef.current()});
     return () => { cancelled = true }
   }, [form, color, fromColor, key])
   useEffect(() => {
@@ -164,14 +166,24 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
-      const signature = `${pose.sheet ?? 'classic'}:${pose.row}:${pose.frame}:${Math.round(mix*255)}`
+      const grounded = sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches) : null
+      const sheet=grounded?'grounded':pose.sheet??'classic', frame=grounded?.frame??pose.frame, row=grounded?0:pose.row
+      const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
-        const target=pose.sheet==='care'?sheets.care:pose.sheet==='item'?sheets.item:sheets.classic;
-        const old=sheets.previous?.[pose.sheet==='care'?1:pose.sheet==='item'?2:0];
-        if(old&&mix<1){context.drawImage(old,pose.frame*CELL_WIDTH,pose.row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.globalAlpha=mix;}
-        context.drawImage(target,pose.frame*CELL_WIDTH,pose.row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.globalAlpha=1;
-        canvas.dataset.row = String(pose.row); canvas.dataset.frame = String(pose.frame); canvas.dataset.sheet = pose.sheet ?? 'classic'; canvas.dataset.loaded = 'true'; previous = signature
+        const target=sheet==='grounded'?sheets.grounded!:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
+        const old=sheets.previous?.[sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
+        const draw=(source:HTMLCanvasElement)=>{
+          context.drawImage(source,frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
+          if(grounded){
+            if(frame===0)context.drawImage(source,3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
+            context.save();context.translate(96,110);context.rotate(grounded.leafAngle*Math.PI/180);context.translate(-96,-110)
+            context.drawImage(source,4*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.restore()
+          }
+        }
+        if(old&&mix<1){draw(old);context.globalAlpha=mix}
+        draw(target);context.globalAlpha=1
+        canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';previous=signature
       }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && action !== 'sleep' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
@@ -237,7 +249,7 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt)) + (peeking && !resting && !dragging ? -7 : 0)
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
-  return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
+  return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>

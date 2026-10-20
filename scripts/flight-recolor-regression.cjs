@@ -6,7 +6,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
 const colors={red:'红色',yellow:'黄色',blue:'蓝色',pink:'粉色'},forms=[['seed',0],['junior',60],['middle',180],['senior',420],['super',840],['water',840],['wood',840],['fire',840]];
 async function tint(p){return p.getByTestId('desktop-character').locator('canvas').evaluate(async c=>{
  const form=c.dataset.form,seed=form==='seed',cw=seed?96:192,ch=seed?99:208,frame=Number(c.dataset.frame),row=seed?Math.floor(frame/8):Number(c.dataset.row),column=seed?frame%8:frame;
- const sheet=c.dataset.sheet||'classic',src=seed?'./assets/original/seed/body-mask.png':sheet==='item'?`./assets/original/item-motion/${form}-mask.png`:sheet==='care'?`./assets/original/care/${form}-mask.png`:`./assets/classic/${form}-mask.png`;
+ const sheet=c.dataset.sheet||'classic',src=seed?'./assets/original/seed/body-mask.png':sheet==='grounded'?`./assets/original/grounded/${form}-mask.png`:sheet==='item'?`./assets/original/item-motion/${form}-mask.png`:sheet==='care'?`./assets/original/care/${form}-mask.png`:`./assets/classic/${form}-mask.png`;
  window.__v14Masks??={};let im=window.__v14Masks[src];if(!im){im=new Image();im.src=src;await im.decode();window.__v14Masks[src]=im;}
  const canvas=document.createElement('canvas');canvas.width=cw;canvas.height=ch;canvas.getContext('2d').drawImage(im,column*cw,row*ch,cw,ch,0,0,cw,ch);
  const mask=canvas.getContext('2d').getImageData(0,0,cw,ch).data,pixels=c.getContext('2d').getImageData(0,0,cw,ch).data;let count=0,r=0,g=0,b=0;

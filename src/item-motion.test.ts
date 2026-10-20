@@ -78,3 +78,7 @@ describe('item-specific care animation contract', () => {
 it('changes body colour only after the sip and finishes the blend before the bottle leaves',()=>{
  const motion=getItemMotion('recolor-blue');expect(motion.gesture).toBe('recolor');expect(colorBlend(motion.duration*.3,motion.duration)).toBe(0);expect(colorBlend(motion.duration*.51,motion.duration)).toBeCloseTo(.5,5);expect(colorBlend(motion.duration*.7,motion.duration)).toBe(1);expect(colorBlend(0,motion.duration,true)).toBe(1);
 });
+
+it('plays the body timeline forward once while props keep their individual beats',()=>{
+ for(const item of ITEMS){const motion=getItemMotion(item.id);let previous=0;for(let t=0;t<motion.duration;t+=16){const frame=sampleItemMotion(motion,t).bodyFrame;expect(frame,`${item.id} at ${t}ms`).toBeGreaterThanOrEqual(previous);previous=frame}}
+});

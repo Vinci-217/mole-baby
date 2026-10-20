@@ -64,6 +64,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
+  for(const form of ['junior','middle'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/grounded/${form}-${layer}.png`),'Missing calm original-layer atlas');
   for (const form of ['junior', 'middle', 'senior']) for (const layer of ['neutral', 'mask']) {
     const filename = `dist/assets/original/care/${form}-${layer}.png`;
     assert.ok(paths.has(filename), `Original care animation atlas is missing: ${filename}`);
@@ -168,6 +169,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).coins)).toBe(85);
   await roomTab(page, '背包'); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).inventory.biscuit)).toBe(0);
+  await expect(page.getByTestId('care-gain')).toContainText(/饱食\s*\+\d+/,{timeout:6000});await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
+  console.log('PASS: actual capped food gain appears after care and fades away');
   await roomTab(page, '设置');
   await page.getByLabel('提醒间隔',{exact:true}).fill('7');
   const media = page.locator('.room-settings');

@@ -130,3 +130,9 @@
 .gesture-recolor .ram-care-particles i>img{position:absolute;inset:-50%;width:200%;height:200%;object-fit:contain}
 .social-butterfly{position:absolute;left:var(--butterfly-x,77%);top:var(--butterfly-y,8%);width:26%;translate:-50% -50%;transform:rotate(var(--butterfly-angle,-12deg)) scaleX(var(--butterfly-wing,1))}.social-butterfly>img{display:block;width:100%;height:auto}
 @media(prefers-reduced-motion:reduce){.ram-sprite:is(.action-watch-butterfly,.action-look-around) .ram-pose-layer{transform:none}}
+
+/* Keep the same calm breathing clock across grounded social interactions. */
+.ram-grounded:not(.is-sleeping):not(.is-dragging) .ram-flight-layer{animation:ram-grounded-breathe 5.8s ease-in-out infinite}
+.ram-grounded:not(.is-sleeping) .ram-pose-layer{animation:none}
+@keyframes ram-grounded-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,.995)}}
+@media(prefers-reduced-motion:reduce){.ram-grounded .ram-flight-layer{animation:none!important;transform:none}}

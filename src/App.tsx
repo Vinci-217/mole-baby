@@ -28,6 +28,8 @@ import './companion-life.css';
 import { usePresence } from './use-presence';
 import { presenceKey, welcomeLine, wantsQuiet } from './companion-presence';
 import { useIdleLife } from './use-idle-life';
+import CareFeedback from './components/CareFeedback';
+import {careGains,type CareFeedbackData} from './care-feedback';
 import type { PresenceLine } from './companion-presence';
 import { useRestReminder, validReminderMinutes, reminderTime } from './use-rest-reminder';
 
@@ -68,6 +70,7 @@ export default function App() {
   const dizzyUntil = useRef(0);
   const [actionItemId, setActionItemId] = useState<string | undefined>();
   const [actionFromColor,setActionFromColor]=useState<PetColor|undefined>();
+  const [careFeedback,setCareFeedback]=useState<CareFeedbackData|null>(null);
   const [action, setAction] = useState('idle');
   const [petMode, setPetMode] = useState(false);
   const [preview, setPreview] = useState(() => !window.desktop && readSave() !== null);
@@ -86,7 +89,7 @@ export default function App() {
   const [voiceBusy, setVoiceBusy] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const petRef = useRef(pet); petRef.current = pet;
-  const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout> }>({});
+  const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout>; feedback?: ReturnType<typeof setTimeout> }>({});
   const ambient = useRef<{line:PresenceLine;at:number}|null>(null);
   const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
   const importInput = useRef<HTMLInputElement>(null);
@@ -162,17 +165,18 @@ export default function App() {
     setMemory(m=>m?recordEvent(m,{kind:pet.sleeping?'auto-sleep':'auto-wake',detail:pet.sleeping?'我困了，自己闭上眼休息。':'我恢复了精力，自然醒来。'}):m);
   },[pet?.createdAt,pet?.sleeping,prefs.quiet,prefs.sound,timer.running,speak]);
 
-  function animate(next: string, itemId?: string, fromColor?: PetColor) {
+  function animate(next: string, itemId?: string, fromColor?: PetColor, feedback?:CareFeedbackData) {
     const motion = itemId ? getItemMotion(itemId) : null;
     const duration = motion?.duration ?? getRamActionDuration(next) ?? 900;
     setActionId(n => n + 1); setActionFromColor(fromColor); setActionItemId(itemId); setAction(motion?.action ?? next);
-    careUntil.current = itemId ? Date.now() + duration : 0;
-    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, duration + 50);
+    careUntil.current = itemId ? Date.now() + duration + 50 : 0;
+    clearTimeout(timers.current.feedback);setCareFeedback(null);
+    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined);if(feedback?.gains.length&&petRef.current?.createdAt===feedback.petId){setBubbleVisible(false);setCareFeedback(feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2050);} }, duration + 50);
   }
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
     const before = petRef.current; petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
     if (result.ok) {
-      if (nextAction) { if (nextAction !== 'buy' || Date.now() >= careUntil.current) { animate(nextAction, itemId, before?.color !== result.state.color ? before?.color : undefined); if(nextAction==='buy'||nextAction==='reward')playGameSound(nextAction==='buy'?'purchase':'reward',prefs.sound);else if(nextAction==='wake'||nextAction==='sleep')playPetVoice(nextAction,prefs.sound); } setMemory(m => m ? recordCare(m, nextAction, detail) : m); }
+      if (nextAction) { if (nextAction !== 'buy' || Date.now() >= careUntil.current) { animate(nextAction, itemId, before?.color !== result.state.color ? before?.color : undefined, before&&itemId?{id:Date.now(),petId:result.state.createdAt,gains:careGains(before,result.state,itemId)}:undefined); if(nextAction==='buy'||nextAction==='reward')playGameSound(nextAction==='buy'?'purchase':'reward',prefs.sound);else if(nextAction==='wake'||nextAction==='sleep')playPetVoice(nextAction,prefs.sound); } setMemory(m => m ? recordCare(m, nextAction, detail) : m); }
       if (before && getStage(before.growth, before.evolution) < getStage(result.state.growth, result.state.evolution)) { speak(`${result.state.name}长大啦！现在是${STAGES[getStage(result.state.growth, result.state.evolution)].name}！`, 10000); setMemory(m => m ? recordEvent(m, { kind: 'growth', detail: `我长成了${STAGES[getStage(result.state.growth, result.state.evolution)].name}。` }) : m); }
     }
   }
@@ -200,7 +204,7 @@ export default function App() {
     const result = changePetStage(saved, next, evolution);
     if (!result.ok || result.state === saved) { notify(result.message); return; }
     clearTimeout(timers.current.animation); careUntil.current = 0; dizzyUntil.current = 0; touches.current = [];
-    setActionItemId(undefined);setActionFromColor(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
+    setCareFeedback(null);clearTimeout(timers.current.feedback);setActionItemId(undefined);setActionFromColor(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
     petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
     setMemory(m => m ? recordEvent(m, { kind: 'stage-choice', detail: `你在设置里把我的形态切换为${result.state.evolution ? EVOLUTIONS.find(v => v.id === result.state.evolution)!.name : STAGES[next].name}。` }) : m);
   }
@@ -227,7 +231,7 @@ export default function App() {
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
     window.companionAI?.cancel(); window.companionSpeech?.cancel(); window.speechSynthesis?.cancel();
-    setPet(null); setMemory(null); setReset(false); setPanel(null); setGame(null); timer.cancel(); setPreview(false); setName('小拉姆'); setAdoptionStep('color'); setWaitingForReopen(true); setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); careUntil.current = 0;
+    setCareFeedback(null);clearTimeout(timers.current.feedback);setPet(null); setMemory(null); setReset(false); setPanel(null); setGame(null); timer.cancel(); setPreview(false); setName('小拉姆'); setAdoptionStep('color'); setWaitingForReopen(true); setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); careUntil.current = 0;
     clearTimeout(timers.current.animation); clearTimeout(timers.current.bubble); setBubbleVisible(false); setToast('');
     window.desktop?.readyToShow(false); window.desktop?.hideToTray();
     await window.desktop?.setPetCanMove(false); await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false);
@@ -282,7 +286,7 @@ export default function App() {
 
   if (floating && pet) return <div className={petMode ? 'transparent-stage' : 'desktop-preview companion-preview'}>
     {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>移上来互动，点击摸摸，按住拖动。</span></div>}
-    <DesktopCompanion pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible}
+    <DesktopCompanion pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['status','food','play','chat'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
       sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent}
       onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onPresence={()=>tellPresence(true)} onCurious={watchButterfly} onPet={() => doCare('pet')}/>
@@ -296,7 +300,7 @@ export default function App() {
     <TimeScene media={roomMedia}>
       <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button className="room-change-button" onClick={() => setPanel('settings')}>布置小屋</button><span className="coin-sign">{current.coins} 摩尔豆</span><button className="game-button" onClick={() => void toDesktop()}>回到桌面</button></div>}</div>
       {pet && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
-        <div className="scene-pet"><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>
+        <div className="scene-pet"><CareFeedback feedback={careFeedback?.petId===current.createdAt?careFeedback:null}/><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>
         <nav className="classic-dock room-dock" aria-label="小屋功能">
           <button aria-label="我的拉姆" onClick={() => setPanel('status')}><UiArt name="status-health"/><b>状态</b></button>
           <button aria-label="打开背包" onClick={() => { setPocketCategory('food'); setPanel('food'); }}><UiArt name="toolbar-bag-normal"/><b>背包</b></button>

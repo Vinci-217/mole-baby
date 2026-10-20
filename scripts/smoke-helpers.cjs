@@ -133,6 +133,7 @@ async function verifyStageSettings(page){
   for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
     await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();
     await expect(settings.getByRole('button',{name:`切换到${label}`,exact:true})).toHaveAttribute('aria-pressed','true');
+    if(stage===1||stage===2){const canvas=page.locator('.scene-character canvas');await expect(canvas).toHaveAttribute('data-sheet','grounded');await expect(canvas).toHaveAttribute('data-form',stage===1?'junior':'middle');}
     // An already selected stage keeps its progress, and the real clock may tick.
     const growth=(await save()).growth,thresholds=[0,60,180,420,840];
     expect(growth).toBeGreaterThanOrEqual(thresholds[stage]);
@@ -147,6 +148,7 @@ async function verifyStageSettings(page){
   await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();
   await toDesktop(page);await page.reload();await expect(sprite).toHaveAttribute('data-stage','0');await expect(sprite).toHaveAttribute('data-color',before.color);
   const after=await save();for(const key of ['name','color','createdAt','coins','inventory','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.evolution).toBeUndefined();
+  console.log('PASS: original junior/middle layered atlases load through actual stage settings');
   const memoryAfter=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'null'),memoryKey);
   if(memoryBefore){expect(memoryAfter.facts).toEqual(memoryBefore.facts);expect(memoryAfter.messages).toEqual(memoryBefore.messages);for(const event of memoryBefore.events)expect(memoryAfter.events.some(e=>e.id===event.id)).toBe(true);}
 }
@@ -158,6 +160,8 @@ async function verifyRecolorPotion(page){
   expect((await save()).coins).toBe(before.coins-80);expect((await save()).inventory[id]).toBe((before.inventory[id]??0)+1);
   await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await page.locator('.pocket-categories').getByRole('button',{name:'药水',exact:true}).click();await(await selectPocket(page,id,name)).click();
   await expect(page.locator('[data-item-gesture=recolor]')).toBeVisible();await expect.poll(async()=>(await save()).color).toBe(color);await expect(page.locator('[data-item-gesture=recolor]')).toHaveCount(0,{timeout:6000});
+  await expect(page.getByTestId('care-gain')).toContainText(`变为${color==='blue'?'蓝色':'粉色'}`);await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
+  console.log('PASS: successful colour-potion feedback appears after use and fades away');
   await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-color',color);
   const after=await save();for(const key of ['name','createdAt','evolution','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.inventory[id]??0).toBe(before.inventory[id]??0);for(const key of Object.keys(before.inventory))expect(after.inventory[key]).toBe(before.inventory[key]);
 }

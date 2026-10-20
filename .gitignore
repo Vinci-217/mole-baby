@@ -73,3 +73,8 @@ logs/
 !artifacts/v15-life-colors.png
 !artifacts/v15-play-pocket.png
 !artifacts/v15-audio-review.json
+
+!artifacts/v16-grounded-colors.png
+!artifacts/v16-care-gain.png
+
+__pycache__/

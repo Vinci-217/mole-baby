@@ -213,3 +213,7 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 `generated/v15-butterfly.png` 由 image_gen 参考原拉姆小屋、原橙白宠物面板和熊熊饼干生成；是新设计的小道具，不是原客户端导出。原字节复制，角色图集没有重绘。五项观察、完整提示词、透明设置、尺寸及 SHA-256 在 `generated/v15-butterfly-provenance.json`。
 
 `pet-audio.ts` / `pet-sound-score.ts` 的12类拟声与小游戏短提示均为本机 Web Audio 合成，不是官方原声或声音克隆。原12首场景 BGM 未改字节。动作时钟、静音、语音优先及实际验证记录见 `research/v15-companion-audit.md`。
+
+### v0.16 二、三阶段原角色分层
+
+`original/grounded` 四张 PNG 从同一原 `lamubone.swf` 的初级 down 第3帧、中级 down 第1帧提取身体、眼白、瞳孔和叶片。闭眼线复用原 happy 的 shape665；半闭眼为原眼睛的纵向压缩。原始角色未重绘，运行时呼吸、目光、眨眼和叶片微摆为桌宠动画适配，不冒充官方完整时序。固定配准、源文件哈希、图集哈希与可复现的三步导出脚本见 [grounded/README.md](public/assets/original/grounded/README.md) 和 [source.json](public/assets/original/grounded/source.json)。用品增益提示复用既有状态图标，没有新增生成素材。

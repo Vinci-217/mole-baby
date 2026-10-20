@@ -1,0 +1,77 @@
+{
+  "description": "Original SWF layers recomposed for calm desktop motion; blink timing and gaze are adaptations, not official animation timelines.",
+  "source": "lamubone.swf",
+  "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "cell": [
+    192,
+    208
+  ],
+  "columns": [
+    "body-white-eyes",
+    "half-blink",
+    "original-happy-eyelids",
+    "pupils",
+    "leaves"
+  ],
+  "canonicalFrames": {
+    "junior": 3,
+    "middle": 1
+  },
+  "closedEyeShape": 665,
+  "registration": {
+    "junior": {
+      "sourceBodyBounds": [
+        10,
+        0,
+        165,
+        130
+      ],
+      "targetBodyBounds": [
+        19,
+        47,
+        171,
+        154
+      ],
+      "scale": 0.9806451612903225,
+      "translation": [
+        9.193548387096783,
+        26.516129032258064
+      ]
+    },
+    "middle": {
+      "sourceBodyBounds": [
+        110,
+        326,
+        288,
+        451
+      ],
+      "targetBodyBounds": [
+        39,
+        84,
+        161,
+        171
+      ],
+      "scale": 0.6853932584269663,
+      "translation": [
+        -36.3932584269663,
+        -138.1123595505618
+      ]
+    }
+  },
+  "sourceUrl": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "mirror": "https://github.com/mli55/taomi-codex-pets",
+  "exporter": "JPEXS 26.3.0; original SWF XML, neutral/palette-probe PNG, fixed registration",
+  "adaptations": [
+    "junior source down frame 3; middle source down frame 1",
+    "original body, eye white, pupil and middle leaf placements retained separately",
+    "half-blink compresses original eyes vertically to 22%; closed eyes reuse original happy shape 665 at original eye centres",
+    "single uniform scale per form; same registration for every layer; runtime colour masks preserve eye whites and leaves",
+    "no independent ground shadow; original body shading retained"
+  ],
+  "files": {
+    "middle-neutral.png": "93d80cb888a00993ab46b45483bb7e36abcc96efa5667d1d14eade50a9e4e533",
+    "junior-neutral.png": "e41efc175e09a2b78b214c303c7274c8db2b04e4f24649abd46ebc81d14a0191",
+    "middle-mask.png": "567ffa16b694f2b9afc97a52004682e72e769995a23956ff26f6f034605ee77d",
+    "junior-mask.png": "d0eb5a277e7b761415394319cec764e3649db5f66e62e90d25d5b90cd1c54e04"
+  }
+}

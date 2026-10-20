@@ -6,11 +6,13 @@ import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import { reminderTime } from '../use-rest-reminder';
 import CarePocket from './CarePocket';
+import CareFeedback from './CareFeedback';
+import type {CareFeedbackData} from '../care-feedback';
 
 export type CompanionPanel = 'status' | 'food' | 'play' | 'chat';
 interface Props {
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
-  bubble: string; bubbleVisible: boolean; panel: CompanionPanel | null;
+  bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
   saveError: boolean;
   reminderSeconds: number; reminders: boolean; timerRunning: boolean;
@@ -113,7 +115,7 @@ export default function DesktopCompanion(p: Props) {
   const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
     <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerLeave={hideTools} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
-      <button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
+      <CareFeedback feedback={docked?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         <Ram sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} dragging={dragging} dragTilt={tilt} shaking={shaking}/>

@@ -136,9 +136,9 @@ export function sampleItemMotion(motion: ItemMotion, elapsed: number, reduced = 
     case 'rinse': x = Math.cos(cycle * Math.PI * 2) * 15; y = Math.sin(cycle * Math.PI * 2) * 10 - 4; angle += wave * 14; break
     case 'medicine': case 'recolor': x -= 1; y -= bite * 1.2; angle -= bite * 24; break
   }
-  const bodyFrame = motion.body === 'eat'
-    ? Math.min(15, Math.round((.5 - .5 * Math.cos(cycle * Math.PI * 2)) * 15))
-    : motion.body === 'drink' ? Math.min(15, Math.floor(activity * 16)) : Math.min(15, Math.round((.5 - .5 * Math.cos(cycle * Math.PI * 2)) * 15))
+  // Play the reviewed original body clip forward once. Tool beats stay separate;
+  // rewinding the whole face at every bite used to make it pump and stutter.
+  const bodyFrame = Math.min(15, Math.floor(activity * 16))
   if (reduced) return { progress, activity: .5, x: motion.gesture === 'bath' ? 28 : 0, y: motion.gesture === 'face-wash' ? -7 : 0, angle: motion.tilt, scaleX: 1, scaleY: 1, opacity: finished ? 0 : 1, bodyFrame: motion.body === 'wash' ? 5 : 0, finished }
   return { progress, activity, x, y, angle, scaleX, scaleY, opacity: finished ? 0 : Math.min(1, approach * 3) * (1 - depart), bodyFrame, finished }
 }
