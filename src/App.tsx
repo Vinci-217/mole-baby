@@ -29,6 +29,7 @@ import { usePresence } from './use-presence';
 import { presenceKey, welcomeLine, wantsQuiet } from './companion-presence';
 import { useIdleLife } from './use-idle-life';
 import CareFeedback from './components/CareFeedback';
+import {timerMemoryDetail} from './companion-moments';
 import {careGains,type CareFeedbackData} from './care-feedback';
 import type { PresenceLine } from './companion-presence';
 import { useRestReminder, validReminderMinutes, reminderTime } from './use-rest-reminder';
@@ -135,7 +136,7 @@ export default function App() {
     const text = '计时结束啦！站起来伸伸懒腰，喝口水，看看远处吧。';
     speak(text, 15000); notify(text); playReminderSound(prefs.reminderSound);
     window.desktop?.notify('拉姆 · 计时结束', text);
-    setMemory(m => m ? recordEvent(m, { kind: 'reminder', detail: '你开始的计时结束了，我提醒你休息。' }) : m);
+    setMemory(m => m ? recordEvent(m, { kind: 'reminder', detail: timerMemoryDetail(prefs.reminderMinutes) }) : m);
   });
   const tellPresence = usePresence({pet,memory:currentMemory,enabled:prefs.presence,minutes:prefs.presenceMinutes,reading:timer.running,
     blocked:!floating||prefs.quiet||current.sleeping||panel!==null||game!==null||voiceBusy||!['idle','focus'].includes(action)||bubbleVisible||desktopState.edgeSide!==null,
@@ -181,11 +182,12 @@ export default function App() {
     }
   }
   function showDizzy() {
-    if (petRef.current?.sleeping || Date.now() < dizzyUntil.current) return;
+    if (petRef.current?.sleeping || Date.now() < dizzyUntil.current || Date.now() < careUntil.current) return;
     dizzyUntil.current = Date.now() + 3200; touches.current = [];
     animate('dizzy'); speak('晕乎乎的……让我缓一缓，轻轻摸就好啦。', 4500); playPetVoice('shake', prefs.sound);
   }
   function doCare(type: Action, itemId?: string) {
+    if(type!=='sleep'&&Date.now()<careUntil.current&&!(type==='wash'&&!itemId))return;
     if (['pet','play'].includes(type) && Date.now() < dizzyUntil.current) return;
     if (type === 'pet' && !petRef.current?.sleeping) {
       const now=Date.now(); touches.current=[...touches.current.filter(at=>now-at<1800),now];
@@ -253,7 +255,23 @@ export default function App() {
   }
   function onChatReply(text: string) { speak(text, 10000); if (!petRef.current?.sleeping && Date.now() >= careUntil.current) animate('look-around'); }
   function exportSave() { if (!pet) return; const url = URL.createObjectURL(new Blob([JSON.stringify({ ...pet, companionMemory: currentMemory }, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `ramu-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); notify('存档已经导出，记得收好。'); }
-  async function importSave(file?: File) { if (!file) return; try { if (file.size > 1000000) throw Error(); const raw = JSON.parse(await file.text()); const restored = parseSave(JSON.stringify({ ...raw, companionMemory: undefined }), Date.now()); if (!restored) throw Error(); setPet(restored); setMemory(raw.companionMemory ? parseMemory(raw.companionMemory, restored) : loadMemory(restored)); setName(restored.name); notify('存档已恢复，欢迎回来！'); } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); } if (importInput.current) importInput.current.value = ''; }
+  async function importSave(file?: File) {
+    if (!file) return;
+    try {
+      if (file.size > 1000000) throw Error();
+      const raw = JSON.parse(await file.text());
+      const restored = parseSave(JSON.stringify({ ...raw, companionMemory: undefined }), Date.now());
+      if (!restored) throw Error();
+      clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
+      careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
+      setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
+      setAction('idle'); setActionId(n => n + 1); timer.cancel();
+      petRef.current = restored; setPet(restored);
+      setMemory(raw.companionMemory ? parseMemory(raw.companionMemory, restored) : loadMemory(restored));
+      setName(restored.name); notify('存档已恢复，欢迎回来！');
+    } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); }
+    if (importInput.current) importInput.current.value = '';
+  }
 
   function completeGame(score: number): GameReceipt {
     const now = Date.now(), saved = petRef.current;
@@ -267,7 +285,7 @@ export default function App() {
 
   const mood = getCompanionMood(currentMemory, current);
   const visitShop = () => { void enterHome('shop'); };
-  const foodContent = <CarePocket key={`${pocketCategory}:${pocketVisit}`} pet={current} initialCategory={pocketCategory} onCare={doCare} busy={Boolean(actionItemId)} allowShop={!floating} onVisitShop={visitShop}/>;
+  const foodContent = <CarePocket key={`${pocketCategory}:${pocketVisit}`} pet={current} initialCategory={pocketCategory} onCare={doCare} busyItemId={actionItemId} allowShop={!floating} onVisitShop={visitShop}/>;
   const chatContent = <CompanionChat key={current.createdAt} pet={current} memory={currentMemory} onMemoryChange={changeMemory} onReply={onChatReply} compact={floating} onSpeechBusyChange={setVoiceBusy}/>;
   const extraSettings = <><MacHelp/><AISettings/><RoomSettings media={roomMedia}/><div className="life-settings">
     <label><span>自然小动作</span><input type="checkbox" aria-label="自然小动作" checked={prefs.lively} onChange={e=>setPrefs(p=>({...p,lively:e.target.checked}))}/></label>

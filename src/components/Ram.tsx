@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
+import { easeGaze, type PetGaze } from '../pet-attention'
 import type { PetColor, Stage, Evolution } from '../game'
 import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, colorBlend, type ItemMotion } from '../item-motion'
 import { groundedMotion, usesGroundedPose } from '../grounded-motion'
@@ -23,6 +25,7 @@ interface RamProps {
   actionId?: number | string
   /** The exact consumed item, retained for the whole finite care animation. */
   itemId?: string
+  gaze?: RefObject<PetGaze>
   dragTilt?: number
   dragging?: boolean
   shaking?: boolean
@@ -132,14 +135,17 @@ function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined,
   }
   for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
 }
-function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, sound, onError, onActionEnd }: {
+function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, sound, gaze, startedAt, onError, onActionEnd }: {
   form: Form; color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number;
   itemMotion?: ItemMotion;
-  sound?: boolean;
+  sound?: boolean; gaze?: RefObject<PetGaze>; startedAt:number;
   onError: () => void; onActionEnd?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const flightClock = useRef(0)
+  const eyePosition=useRef<PetGaze>({x:0,y:0})
+  const gazeRef=useRef(gaze);gazeRef.current=gaze
+  const soundRef=useRef(sound);soundRef.current=sound
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; previous: HTMLCanvasElement[] | null } | null>(null)
@@ -154,19 +160,22 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   useEffect(() => {
     const canvas = canvasRef.current, context = canvas?.getContext('2d')
     if (!canvas || !context || !sheets) return
-    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),sound===true)
+    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
     const paint = (now: number) => {
       if (stopped || document.hidden || !inView) { last = 0; return }
-      if (last && now - last < 250) { elapsed += now - last; flightClock.current += now - last }
+      const delta=last&&now-last<250?now-last:0
+      elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
+      flightClock.current+=delta
+      eyePosition.current=media.matches?{x:0,y:0}:easeGaze(eyePosition.current,gazeRef.current?.current??{x:0,y:0},delta)
       last = now
       const pose = ['senior', 'super', 'water', 'wood', 'fire'].includes(form) ? sampleFlyingPose(action, elapsed, media.matches, form, flightClock.current) : sampleRamPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
-      const grounded = sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches) : null
+      const grounded = sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
       const sheet=grounded?'grounded':pose.sheet??'classic', frame=grounded?.frame??pose.frame, row=grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
@@ -183,6 +192,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         }
         if(old&&mix<1){draw(old);context.globalAlpha=mix}
         draw(target);context.globalAlpha=1
+        if(grounded){canvas.dataset.gazeX=grounded.eyeX.toFixed(2);canvas.dataset.gazeY=grounded.eyeY.toFixed(2)}
         canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';previous=signature
       }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
@@ -193,20 +203,22 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [sheets, action, actionId, itemMotion, form, sound])
+  }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
-function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; sound?: boolean; onActionEnd?: () => void }) {
+function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, startedAt, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; sound?: boolean; startedAt:number; onActionEnd?: () => void }) {
   const ref = useRef<HTMLCanvasElement>(null)
+  const soundRef=useRef(sound);soundRef.current=sound
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   useEffect(() => {
-    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),sound===true)
+    const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     let cancelled = false, request = 0, elapsed = 0, last = 0, previous = '', ended = false
     let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const paint = (now: number) => {
       if (cancelled || !source || document.hidden) { last = 0; return }
-      if (last && now - last < 250) elapsed += now - last
+      const delta=last&&now-last<250?now-last:0
+      elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       last = now
       const pose = sampleSeedPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
@@ -225,7 +237,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, onAct
     Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null]).then(([loaded,old])=>{if(!cancelled){source=loaded;oldSource=old;resume()}}).catch(()=>{})
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
-  }, [color, fromColor, action, actionId, itemMotion, sound])
+  }, [color, fromColor, action, actionId, itemMotion, startedAt])
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
 function ItemCue({ motion }: { motion: ItemMotion }) {
@@ -239,7 +251,10 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
   </span>
 }
-export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, fromColor, sound = false, className = '', actionId, itemId, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+  const clock=useRef({key:'',startedAt:0})
+  const eventKey=`${action}:${actionId??0}:${itemId??''}`
+  if(clock.current.key!==eventKey)clock.current={key:eventKey,startedAt:performance.now()}
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
@@ -252,9 +267,9 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}
     <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction}/>
     {resting && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}

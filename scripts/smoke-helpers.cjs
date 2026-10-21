@@ -145,6 +145,10 @@ async function verifyStageSettings(page){
   await toDesktop(page);await page.reload();
   const sprite=page.getByTestId('desktop-character').locator('.ram-sprite');
   await expect(sprite).toHaveAttribute('data-stage','4');await expect(sprite).toHaveAttribute('data-evolution','water');await expect(sprite).toHaveAttribute('data-color',before.color);
+  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();
+  await toDesktop(page);const character=page.getByTestId('desktop-character');await character.hover({position:{x:94,y:54}});
+  await expect.poll(async()=>Number(await character.locator('canvas').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
+  console.log('PASS: nearby pointer attention responds in the actual desktop window');
   await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();
   await toDesktop(page);await page.reload();await expect(sprite).toHaveAttribute('data-stage','0');await expect(sprite).toHaveAttribute('data-color',before.color);
   const after=await save();for(const key of ['name','color','createdAt','coins','inventory','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.evolution).toBeUndefined();

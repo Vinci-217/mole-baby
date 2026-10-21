@@ -4,6 +4,7 @@ import { STAGES, getPetCondition } from '../game';
 import type { Action, GameState, Stage, ItemCategory, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
+import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CarePocket from './CarePocket';
 import CareFeedback from './CareFeedback';
@@ -30,6 +31,8 @@ export default function DesktopCompanion(p: Props) {
   const [tilt, setTilt] = useState(0), [shaking, setShaking] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const root = useRef<HTMLDivElement>(null);
+  const gaze=useRef<PetGaze>({x:0,y:0});
+  const look=(x:number,y:number)=>{const box=root.current?.querySelector('.desktop-character')?.getBoundingClientRect();gaze.current=box&&!dockedRef.current&&!drag.current?.moved?pointerGaze(x,y,box):{x:0,y:0};};
   const docked=p.native&&p.desktopState.edgeSide!==null;
   const dockedRef=useRef(docked);dockedRef.current=docked;
   const edgeHover=useRef(false);
@@ -51,6 +54,7 @@ export default function DesktopCompanion(p: Props) {
     if (!p.native) return;
     const hit = (e: MouseEvent) => {
       if (drag.current?.moved) return;
+      look(e.clientX,e.clientY);
       const target = document.elementFromPoint(e.clientX, e.clientY);
       // Forwarded moves still reveal tools while the transparent window passes clicks through.
       if(dockedRef.current){peek(Boolean(target?.closest('.desktop-character')));setTools(false);}
@@ -89,7 +93,7 @@ export default function DesktopCompanion(p: Props) {
       if (now - d.turnAt > 850) d.turns = 0;
       if (d.direction && direction !== d.direction) { d.turns++; d.turnAt = now; }
       d.direction = direction;
-      if (d.turns >= 3) { d.turns = 0; setShaking(true); clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 3200); p.onShake(); }
+      if (d.turns >= 3 && !p.itemId) { d.turns = 0; setShaking(true); clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 3200); p.onShake(); }
     }
     {
       if (p.native) void window.desktop?.movePet(dx, dy);
@@ -114,11 +118,11 @@ export default function DesktopCompanion(p: Props) {
   const edge = p.native ? p.desktopState.edgePose : 'visible';
   const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${p.desktopState.edgeSide ?? 'none'}`} style={!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : undefined}>
-    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerLeave={hideTools} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('status'); }}>
       <CareFeedback feedback={docked?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
+        <Ram gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={p.action} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
       </button>
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
         <button aria-label="查看状态" title="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>
@@ -136,7 +140,7 @@ export default function DesktopCompanion(p: Props) {
       <nav className="companion-tabs" aria-label="日常照料">{(Object.keys(labels) as CompanionPanel[]).map(tab => <button key={tab} role="tab" aria-selected={p.panel === tab} onClick={() => show(tab)}>{labels[tab]}</button>)}</nav>
       <div className="companion-content">
         {p.panel === 'status' && <><div className="compact-profile"><div><Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={condition.action} sleeping={p.pet.sleeping}/></div><p><b>{p.pet.name}</b><span>{condition.label}</span></p><small>{p.pet.coins} 豆</small></div><div className="compact-stats">{([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div><p className="compact-condition" role="status">{condition.description}</p>{p.pet.sleeping && <button className="compact-button" onClick={() => p.onCare('sleep')}>轻轻叫醒</button>}</>}
-        {p.panel === 'food' && <CarePocket key={`${p.pocketCategory}:${p.pocketVisit}`} pet={p.pet} initialCategory={p.pocketCategory} onCare={p.onCare} onVisitShop={p.onShop}/>}
+        {p.panel === 'food' && <CarePocket key={`${p.pocketCategory}:${p.pocketVisit}`} pet={p.pet} initialCategory={p.pocketCategory} busyItemId={p.itemId} onCare={p.onCare} onVisitShop={p.onShop}/>}
         {p.panel === 'play' && <div className="desktop-play"><h3>陪我玩一会儿</h3><button disabled={p.pet.sleeping} onClick={() => p.onCare('play')}><Icon path="items/180004"/>一起玩球</button><button disabled={p.pet.sleeping} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button><button disabled={!p.reminders} onClick={p.onFocus}><Icon path="ui/icon-clock"/>{p.timerRunning ? '结束专注' : '陪我专注'}</button><button disabled={p.pet.sleeping} onClick={p.onPresence}><Icon path="ui/toolbar-talk-normal"/>听拉姆说一句</button><button disabled={p.pet.sleeping} onClick={p.onCurious}><img alt="" draggable={false} src="./assets/generated/v15-butterfly.png"/>看看小蝴蝶</button><button className="desktop-play-home" onClick={p.onHome}>去小屋玩小游戏 ›</button></div>}
         {p.panel === 'chat' && p.chatContent}
       </div><footer><button className="compact-home" onClick={p.onHome}><Icon path={icons.home}/>进入小屋</button><button onClick={() => p.native ? window.desktop?.hideToTray() : p.onPanel(null)}>{p.native ? '收进托盘' : '收起'}</button></footer>

@@ -169,6 +169,10 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).coins)).toBe(85);
   await roomTab(page, '背包'); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).inventory.biscuit)).toBe(0);
+  await expect(page.getByRole('region',{name:'拉姆背包',exact:true})).toHaveAttribute('aria-busy','true');
+  await expect(page.getByRole('button',{name:'使用熊熊饼干',exact:true})).toBeDisabled();
+  await expect(page.locator('.care-pocket [data-selected-item]')).toHaveAttribute('data-selected-item','biscuit');
+  console.log('PASS: care use is locked and the consumed item remains selected');
   await expect(page.getByTestId('care-gain')).toContainText(/饱食\s*\+\d+/,{timeout:6000});await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
   console.log('PASS: actual capped food gain appears after care and fades away');
   await roomTab(page, '设置');

@@ -74,3 +74,7 @@
 .pocket-slot>img,.companion-panel .pocket-slot>img{position:absolute;left:16%;top:5%;width:68%;height:68%;max-width:none;object-fit:contain}
 .companion-panel .pocket-selection{min-height:45px}
 .companion-panel .companion-content:has(.care-pocket){padding-top:7px;padding-bottom:7px}
+
+.pocket-slot.is-using{border-color:#c08c32;box-shadow:inset 0 0 0 2px #ffd66c}
+.pocket-slot>.pocket-using-icon{position:absolute;inset:3px 3px auto auto;width:15px;height:15px;max-width:none;object-fit:contain;pointer-events:none;opacity:1;filter:none}
+.care-pocket[aria-busy=true] .pocket-use{color:#8e6a30;background:#fff0bc}

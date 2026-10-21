@@ -58,7 +58,7 @@ export function renderFoley(audio: BaseAudioContext, kind: Foley, at: number, st
 }
 /** A visual-frame clock dispatches each contact once. Never queues future care
  * sounds: cancel, hidden windows and delayed frames cannot produce a burst. */
-export function createPetSoundClock(score: SoundScore, enabled: boolean) {
+export function createPetSoundClock(score: SoundScore, enabled: boolean | (()=>boolean)) {
   let previous=-1, output: GainNode | null=null, stopped=false
   return {
     tick(elapsed: number) {
@@ -66,7 +66,7 @@ export function createPetSoundClock(score: SoundScore, enabled: boolean) {
       const cycle=score.loop?Math.floor(elapsed/score.loop):0
       const due=score.cues.filter(cue=>{const at=cue.at+cycle*(score.loop??0);return at>previous&&at<=elapsed&&elapsed-at<=120})
       previous=elapsed
-      if(!due.length||!canPlay(enabled))return
+      if(!due.length||!canPlay(typeof enabled==='function'?enabled():enabled))return
       try {const audio=audioContext();void audio.resume().catch(()=>{});output??=channel(audio);for(const cue of due)renderFoley(audio,cue.kind,audio.currentTime,cue.strength,output)}catch{/* Optional audio device. */}
     },
     stop(){stopped=true;if(output)dispose(output);output=null},

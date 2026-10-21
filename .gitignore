@@ -78,3 +78,5 @@ logs/
 !artifacts/v16-care-gain.png
 
 __pycache__/
+
+!artifacts/v17-attention.png
