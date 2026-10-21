@@ -1,0 +1,63 @@
+{
+  "version": "0.18.0",
+  "tag": "main",
+  "sourceSha": "596187ba403ad4b3d99d03a882189627cfea2ae0",
+  "buildResult": "success",
+  "platforms": {
+    "windows": "success",
+    "mac": "success"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/39620086031",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.18.0-mac-arm64.dmg",
+      "sha256": "79093e5a1ad5292e7ef97c28b6959fd72f640c387fff18de8cc9b81b9fe48612"
+    },
+    {
+      "file": "mole-baby-0.18.0-mac-arm64.zip",
+      "sha256": "9872c84c509c7e473960137f13fa09a4aef4a9c9024a35b95ab49f005be0acef"
+    },
+    {
+      "file": "mole-baby-0.18.0-mac-x64.dmg",
+      "sha256": "af6c7f7a6344f33e5bc892c20d85f736e719bac393b3aa1209c149fcd639e579"
+    },
+    {
+      "file": "mole-baby-0.18.0-mac-x64.zip",
+      "sha256": "1ad5ede26674340e52f101e211f2d7139be9f4a27cecfeafc06a03b3ccac1206"
+    },
+    {
+      "file": "mole-baby-0.18.0-x64.zip",
+      "sha256": "3c617b7ec108f341c8a3e61381f823b8175517414b5a2cfaa6256cdabd4ada45"
+    },
+    {
+      "file": "mole-baby-0.18.0-Setup.exe",
+      "sha256": "8489ccc8b3d2f5ab5fc50f4a47d272abe9a98a2a3accbbc779ff410385394e3a"
+    }
+  ],
+  "verificationLog": "PASS: required ASAR payload and packaged application identity\nPASS: real native hover and leave show/hide tools, no click needed and no idle timer bar\nPASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence\nPASS: nearby pointer attention responds in the actual desktop window\nPASS: autonomous wandering takes short random 12-28px steps and preserves placement height\nPASS: super Ram follows native movement with original side-facing flight and returns to front\nPASS: original junior/middle layered atlases load through actual stage settings\nPASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories\nPASS: local thoughtful speech and clickable chat continuity in the shipped native window\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: care use is locked and the consumed item remains selected\nPASS: actual capped food gain appears after care and fades away\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application\nPASS: successful colour-potion feedback appears after use and fades away\nPASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies\nPASS: nine scene choices and three original-style four-phase backgrounds render in the actual application\nPASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory\nPASS: packaged win32/x64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS.txt generated for checked downloads\n",
+  "macTrust": {
+    "arm64": {
+      "architecture": "arm64",
+      "sourceSha": "596187ba403ad4b3d99d03a882189627cfea2ae0",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "596187ba403ad4b3d99d03a882189627cfea2ae0",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "macVerificationLogs": {
+    "arm64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=arm64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=arm64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=arm64 electron=35.7.5 appOutDir=release/mac-arm64\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac-arm64\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac-arm64/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=arm64 file=release/mole-baby-0.18.0-mac-arm64.zip\n  • building        target=DMG arch=arm64 file=release/mole-baby-0.18.0-mac-arm64.dmg\n  • downloaded      label=dmgbuild-bundle-arm64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.18.0-mac-arm64.zip.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.18.0-mac-arm64.dmg.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS arm64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: required ASAR payload and packaged application identity\nPASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations\nPASS: real native hover and leave show/hide tools, no click needed and no idle timer bar\nPASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence\nPASS: nearby pointer attention responds in the actual desktop window\nPASS: autonomous wandering takes short random 12-28px steps and preserves placement height\nPASS: super Ram follows native movement with original side-facing flight and returns to front\nPASS: original junior/middle layered atlases load through actual stage settings\nPASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories\nPASS: local thoughtful speech and clickable chat continuity in the shipped native window\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: care use is locked and the consumed item remains selected\nPASS: actual capped food gain appears after care and fades away\nPASS: Mac settings buttons route to fixed privacy/dictation panes and extract a usable first-open guide from ASAR\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application\nPASS: successful colour-potion feedback appears after use and fades away\nPASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies\nPASS: nine scene choices and three original-style four-phase backgrounds render in the actual application\nPASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory\nPASS: packaged darwin/arm64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-arm64.txt generated for checked downloads\n",
+    "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=x64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=x64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=x64 electron=35.7.5 appOutDir=release/mac\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=x64 file=release/mole-baby-0.18.0-mac-x64.zip\n  • building        target=DMG arch=x64 file=release/mole-baby-0.18.0-mac-x64.dmg\n  • downloaded      label=dmgbuild-bundle-x86_64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.18.0-mac-x64.zip.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.18.0-mac-x64.dmg.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS x64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: required ASAR payload and packaged application identity\nPASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations\nPASS: real native hover and leave show/hide tools, no click needed and no idle timer bar\nPASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence\nPASS: nearby pointer attention responds in the actual desktop window\nPASS: autonomous wandering takes short random 12-28px steps and preserves placement height\nPASS: super Ram follows native movement with original side-facing flight and returns to front\nPASS: original junior/middle layered atlases load through actual stage settings\nPASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories\nPASS: local thoughtful speech and clickable chat continuity in the shipped native window\nPASS: packaged seed tint, draggable pot, platform speech guidance and local-only API key save/reload/clear without network requests\nPASS: care use is locked and the consumed item remains selected\nPASS: actual capped food gain appears after care and fades away\nPASS: Mac settings buttons route to fixed privacy/dictation panes and extract a usable first-open guide from ASAR\nPASS: original ball, generated hand/book, visible per-stage body/prop motion, manual timer/cancel and no startup countdown in the shipped app\nPASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload\nPASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application\nPASS: successful colour-potion feedback appears after use and fades away\nPASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies\nPASS: nine scene choices and three original-style four-phase backgrounds render in the actual application\nPASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory\nPASS: packaged darwin/x64 tray lifecycle, native dragging, ordered desktop tools/sixteen-slot bag, room-only bookshop, real supplies, sleep/wake and four-phase generated scene\nPASS: SHA256SUMS-mac-x64.txt generated for checked downloads\n"
+  },
+  "recordedAt": "2026-10-21T14:54:09.622Z"
+}
