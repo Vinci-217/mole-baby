@@ -2,13 +2,13 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.17.3](https://github.com/Vinci-217/mole-baby/releases/tag/v0.17.3) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.18.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.18.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.17.3-Setup.exe` 或 `mole-baby-0.17.3-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.17.3-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.17.3-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.18.0-Setup.exe` 或 `mole-baby-0.18.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.18.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.18.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -60,13 +60,21 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 
 商店「药水」书中有红、黄、蓝、粉四种换色药水，每瓶80摩尔豆。购买后在背包「药水」中使用，先喝下再渐变换色；同色不消耗，睡着时先叫醒。阶段、进化形态、名字、库存和记忆保留，所有动作使用同一原身体遮罩配色，眼白、叶片和花盆不染色。瓶装药水和售价是桌宠适配，原配置的变色类道具依据见 [飞行与换色记录](research/v14-flight-recolor.md)。
 
-小屋有 **接果子、翻翻乐、节奏拍拍乐、草地采果、小屋拼拼乐** 五个游戏。接果碰撞、消失、反馈和计分同步；完成一局按实际成绩获得摩尔豆与一份用品，提前退出不领奖，奖励不增加成长。新游戏支持暂停与隐藏冻结。
+小屋有 **接果子、翻翻乐、节奏拍拍乐、草地采果、小屋拼拼乐、小屋寻宝** 六个游戏。接果碰撞、消失、反馈和计分同步；完成一局按实际成绩获得摩尔豆与一份用品，提前退出不领奖，奖励不增加成长。新游戏支持暂停与隐藏冻结。
+
+小屋寻宝沿用当前背景和时段，从六件原版用品里找出清单中的三件，不限时，可请拉姆提示。找到时图案淡出、清单同步勾选，找齐后点击「收好宝物」才结算一次；使用提示会略降低本局分数。种子也能待在花盆里一起找。完成的游戏会记录真实地点、玩法、得分和摩尔豆，离线也能问「上次寻宝在哪里？」；删除回忆后不再提起。
+
+![和拉姆一起小屋寻宝](artifacts/v18-treasure.png)
 
 ## 小屋、真实时间与音乐
 
 ![夜晚的星光温室](artifacts/v6-room-night.png)
 
-六个背景：晨光书桌、拉姆小屋、神秘湖木屋、树洞房，以及新创作的星光温室、溪畔树屋。所有场景默认按本地真实时间显示早晨、白天、傍晚和夜晚；可临时预览时段，重启恢复自动时间。新场景为参考旧页游画风生成的四时段插图，来源与提示词有记录，并非训练专用模型。
+九处风景：晨光书桌、拉姆小屋、神秘湖木屋、树洞房、星光温室、溪畔树屋，以及新增的 **浆果野餐地、海风贝壳屋、晴空观星阁**。所有场景默认按本地真实时间显示早晨、白天、傍晚和夜晚；可临时预览时段，重启恢复自动时间。新场景为参考旧页游画风生成的四时段插图，来源与提示词有记录，并非训练专用模型。
+
+小屋右上角「布置小屋」直接打开风景与音乐页面。三列大图预览、选中标记和时段切换方便挑选；图册可滚动，重开会将已保存的背景显示在可见范围。十二首经典配乐显示当前曲目与播放状态，可调音量或导入自己的音乐。
+
+![小屋布置大图预览](artifacts/v18-decor.png)
 
 内置 12 首有来源记录的原页游 BGM，可换曲、调音量、关闭，也能导入不超过 20 MB 的有效本地音频，存入本机 IndexedDB，重启保留。只在小屋播放，回桌面或收进托盘暂停；录音和朗读时降低配乐音量。经典场景存在共用配乐，名称与来源按原地图配置核对，见 [音乐与场景研究](research/v6-scenes-music.md)。
 
@@ -104,6 +112,7 @@ npm run test:browser       # 商店、物品、记忆、背景、音乐和完整
 npm run test:companion-update # 手动单次计时、提示音与16种进化/颜色组合
 npm run test:flight-recolor # 32形态/颜色组合、实际购药、换色像素与持续悬浮
 npm run test:flight-facing  # 五种飞行形态×四色的原版侧脸、转向与持续悬浮
+npm run test:room-iteration # 九背景、三套新场景四时段、寻宝交互/奖励/回忆与两种窗口尺寸
 npm run test:layout-stage   # 窄边距、五阶段/四神力切换与存档保留
 npm run test:reading-dizzy  # 八形态看书翻页、头顶星星绕圈及视觉截图
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包
@@ -116,7 +125,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、226 项单元与 Native 生命周期测试、20种飞行形态/颜色的浏览器渲染检查和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、232 项单元与 Native 生命周期测试、九背景与寻宝的浏览器回归、原有商店/游戏/音乐全流程和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

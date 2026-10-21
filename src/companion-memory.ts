@@ -1,5 +1,5 @@
 import { presenceFollowUp } from './companion-presence';
-import {timerMemoryReply,todaysTimers} from './companion-moments';
+import {timerMemoryReply,todaysTimers,gameMemoryReply} from './companion-moments';
 import { companionFeeling } from './companion-feeling';
 import { COLORS, getStage, STAGES, EVOLUTIONS } from './game';
 import type { GameState } from './game';
@@ -181,6 +181,7 @@ export function localReply(pet: GameState, memory: CompanionMemory, userText: st
   const text = clean(userText), name = memory.facts.find(f => f.kind === 'nickname')?.value;
   const address = name ? `${name}，` : '';
   if(/今天/.test(text)&&/(?:计时|专注|陪伴.*(?:多久|多长)|(?:多久|多长).*陪伴)/.test(text))return address+timerMemoryReply(memory);
+  const sharedGame=gameMemoryReply(memory,text);if(sharedGame)return address+sharedGame;
   const previous=memory.messages.filter(m=>m.role==='assistant').at(-1)?.content;
   const followUp=previous?presenceFollowUp(previous,text):null;if(followUp)return address+followUp;
   if (/我叫什么|我的名字|你.*记得.*名字|记得我是谁/.test(text)) return name ? `记得呀，你让我叫你${name}。咕噜～` : '你还没告诉我怎么称呼你呢。可以说“叫我小明”，我会记在我们的小本子里。';

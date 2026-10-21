@@ -221,3 +221,9 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 ### v0.17.2 Mac菜单栏模板图标
 
 Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透明轮廓，通过 Electron `setTemplateImage(true)` 交给 macOS AppKit 自动着色，适配深浅外观和高亮状态。两张PNG、应用图标与其哈希均未改动，没有新增生成素材或重绘角色。`artifacts/v171-mac-menu-preview.png` 是用相同透明轮廓制作的界面显示方式示意，不是Mac实机截图；原生成品另检查模板标志、18pt逻辑尺寸和1x/2x档。
+
+### v0.18 三处四时段风景与小屋寻宝
+
+`generated/v18-berry-picnic.png`、`v18-seashell-cottage.png`、`v18-sky-observatory.png` 是沿用仓库美术 skill，以原小屋、神秘湖木屋、宠物面板和熊熊饼干作直接参考，通过 image_gen 生成的原创背景，不是原客户端导出。每张为1586×992不透明四时段图；原 PNG 按字节复制，完整提示词、参考、日期、尺寸、SHA256和生成差异记录见 [v18-scenes-provenance.json](public/assets/generated/v18-scenes-provenance.json) 与 [风景研究](research/v18-scenes.md)。
+
+小屋寻宝是本桌宠新增玩法，物品沿用原编号 PNG，拉姆沿用原图集及四色遮罩，配对拾取反馈为界面动画。找到的三件图案是清单线索，结算的摩尔豆与一份用品由现有本地奖励规则计算，不声称是原页游玩法或官方奖励。

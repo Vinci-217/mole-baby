@@ -10,6 +10,9 @@ export const ROOM_BACKGROUNDS: readonly RoomBackground[] = [
   { id: 'earthen-home', label: '树洞房', src: './assets/original/scenes/original-earthen-home.png' },
   { id: 'starlight-greenhouse', label: '星光温室', src: './assets/generated/v6-starlight-greenhouse.png', phaseSheet: true },
   { id: 'creek-treehouse', label: '溪畔树屋', src: './assets/generated/v6-creek-treehouse.png', phaseSheet: true },
+  { id: 'berry-picnic', label: '浆果野餐地', src: './assets/generated/v18-berry-picnic.png', phaseSheet: true },
+  { id: 'seashell-cottage', label: '海风贝壳屋', src: './assets/generated/v18-seashell-cottage.png', phaseSheet: true },
+  { id: 'sky-observatory', label: '晴空观星阁', src: './assets/generated/v18-sky-observatory.png', phaseSheet: true },
 ];
 export const ROOM_MUSIC = [
   { id: 'castle', label: '摩尔城堡', also: '淘淘乐街 · 粒粒小广场', src: './assets/original/audio/castle.mp3' },

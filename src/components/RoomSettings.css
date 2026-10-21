@@ -1,29 +1,56 @@
-.room-settings{font-size:14px;color:#624832;line-height:1.5}
-.room-settings h3{font-size:17px;margin:21px 0 12px;color:#79502b}
-.room-background-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.room-background-options button{min-width:0;border:2px solid #e4cba0!important;border-radius:11px!important;padding:4px!important;background:#fff9e9!important;color:#76502d!important;box-shadow:none!important;overflow:hidden}
-.room-background-options button[aria-pressed=true]{border-color:#dd8d21!important;background:#fff0c9!important;outline:1px solid #dd8d21;outline-offset:1px}
-.room-background-thumb{display:block!important;position:relative;height:90px;padding:0!important;overflow:hidden;border-radius:7px;container-type:size;background:#b8e5f5}
+.room-settings{font-size:14px;color:#704a24;line-height:1.5;min-width:0}
+.room-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:7px 0 12px}
+.room-settings .room-section-heading h3{font-size:19px;margin:0;color:#b76a13;line-height:1.5}
+.room-section-heading>span{font-size:14px;color:#976d36;min-width:0;text-align:right}
+.room-selection-label{padding:3px 10px;border:1px solid #f1c874;border-radius:14px;background:#fff8de}
+.room-time-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.room-time-options{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.room-time-options button{font:inherit;border:1px solid #e9b75b;border-radius:9px;padding:7px 11px;background:#fffcf0;box-shadow:none;min-height:36px;color:#8f5c23}
+.room-time-options button[aria-pressed=true]{background:#ffe294;border-color:#e69b24;color:#9b570c;font-weight:700}
+.room-time-status{font-size:14px;color:#937046;margin:0;white-space:nowrap}
+.room-background-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;max-height:390px;overflow-y:auto;overscroll-behavior:contain;padding:4px;scrollbar-width:thin;scrollbar-color:#eeb850 #fff4d4;scroll-padding:4px}
+.room-background-options button{min-width:0;border:2px solid #ecd2a5;border-radius:12px;padding:4px;background:#fffaf0;color:#8e5923;box-shadow:none;overflow:hidden;text-align:left;align-self:start}
+.room-background-options button:hover{border-color:#e9a140;background:#fff4d7}
+.room-background-options button[aria-pressed=true]{border-color:#ee9213;background:#fff0ba;box-shadow:0 0 0 1px #ee9213}
+.room-background-thumb{display:block;position:relative;aspect-ratio:16/10;padding:0;overflow:hidden;border-radius:7px;container-type:size;background:#b8e5f5}
 .room-background-thumb img{display:block;width:100%;height:100%;object-fit:cover}
 .room-background-thumb.is-phase-sheet img{position:absolute;left:50%;top:50%;width:max(200cqw,320cqh);height:max(125cqw,200cqh);max-width:none;transform:translate(var(--scene-x),var(--scene-y));object-fit:fill}
-.room-background-options button>span:last-child{display:block;padding:7px 0 3px;font-size:14px;font-weight:700}
-.room-time-options{display:flex;align-items:center;gap:5px;margin-top:14px;flex-wrap:wrap}
-.room-time-options button{font:inherit!important;border:1px solid #dbc08e!important;border-radius:8px!important;padding:7px 9px!important;background:#fffcf0!important;box-shadow:none!important;min-height:35px}
-.room-time-options button[aria-pressed=true]{background:#ffe8a5!important;border-color:#d29232!important;color:#775017!important}
-.room-time-status{font-size:13px;color:#886b48;margin-top:8px}
-.room-music-switch,.room-volume{display:flex;align-items:center;gap:10px;margin:13px 0}
-.room-music-switch{justify-content:space-between}
-.room-music-switch input{width:20px;height:20px;accent-color:#b97b31}
-.room-track-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
-.room-track-list button{display:flex;align-items:center;gap:8px;min-width:0;min-height:40px;text-align:left;padding:8px 10px!important;border:1px solid #dec79e!important;background:#fffdf3!important;color:#79552d!important;border-radius:8px!important;font-size:14px!important;box-shadow:none!important;line-height:1.35;overflow:hidden}
-.room-track-list button>span{color:#ba8b34;font-size:19px;flex-shrink:0}
-.room-track-list button[aria-pressed=true]{background:#fff0bd!important;border-color:#d69328!important;font-weight:700}
-.room-track-list button.room-custom-track{grid-column:1/-1;overflow-wrap:anywhere}
-.room-volume input{min-width:0;flex:1;accent-color:#b97b31;height:20px}
-.room-volume span{min-width:37px;text-align:right;font-size:14px}
-.room-music-import{display:flex;gap:8px;flex-wrap:wrap}
-.room-music-import button,.room-play-music{font:inherit!important;color:#79502b!important;background:#fff3d5!important;border:1px solid #dec398!important;border-radius:8px!important;box-shadow:none!important;padding:8px 12px!important;min-height:38px}
-.room-music-note{color:#917657;font-size:13px;margin:11px 0}
-.room-music-message{font-size:14px;color:#926126}
-.room-settings button:focus-visible,.room-settings select:focus-visible,.room-settings input:focus-visible{outline:2px solid #bb823d!important;outline-offset:2px}
-@media(max-width:440px){.room-background-thumb{height:76px}.room-track-list button{font-size:13px!important;padding:8px!important}.room-time-options{gap:4px}.room-time-options button{padding:7px!important}}
+/* Classic one-image scenes preview the same time lighting as the main room.
+   Four-phase generated artwork remains untouched. */
+.room-background-thumb:not(.is-phase-sheet)[data-phase=morning] img{filter:brightness(1.04) saturate(.96)}
+.room-background-thumb:not(.is-phase-sheet)[data-phase=noon] img{filter:brightness(1.03) saturate(1.06)}
+.room-background-thumb:not(.is-phase-sheet)[data-phase=dusk] img{filter:brightness(.91) saturate(1.03)}
+.room-background-thumb:not(.is-phase-sheet)[data-phase=night] img{filter:brightness(.62) saturate(.82)}
+.room-thumb-time-tint{position:absolute;inset:0;mix-blend-mode:multiply;pointer-events:none}
+.room-background-thumb[data-phase=morning] .room-thumb-time-tint{background:#fff4bf12}
+.room-background-thumb[data-phase=dusk] .room-thumb-time-tint{background:#f3aa825c}
+.room-background-thumb[data-phase=night] .room-thumb-time-tint{background:#737ebc8c}
+.room-background-label{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:35px;padding:6px 5px 3px;font-size:14px;font-weight:700}
+.room-background-label>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.room-background-label b{flex-shrink:0;font-size:12px;color:#b6660c}
+.room-music-section{margin-top:22px;padding-top:18px;border-top:2px solid #f6d37e}
+.room-music-current{display:flex;align-items:center;gap:12px;background:#fff8e2;border:1px solid #f0d399;border-radius:12px;padding:11px 14px;margin:12px 0}
+.room-music-disc{display:grid;place-items:center;flex-shrink:0;width:41px;height:41px;border:2px solid #eda733;border-radius:50%;background:#ffdf80;color:#a06319;font:700 26px Georgia,serif;line-height:1}
+.room-now-playing{display:flex;flex-direction:column;min-width:0;gap:1px;flex:1}
+.room-now-playing>span{font-size:13px;color:#98713d}
+.room-now-playing>strong{font-size:16px;color:#9f5d15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.room-music-switch{display:flex;align-items:center;gap:9px;font-size:14px;flex-shrink:0}
+.room-music-switch input{width:20px;height:20px;margin:0;accent-color:#e89a23}
+.room-track-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0;max-height:260px;overflow-y:auto;overscroll-behavior:contain;padding:2px;scrollbar-width:thin;scrollbar-color:#eeb850 #fff4d4}
+.room-track-list button{display:flex;align-items:center;gap:9px;min-width:0;min-height:44px;text-align:left;padding:8px 11px;border:1px solid #e8cda0;background:#fffdf3;color:#89612f;border-radius:9px;font-size:14px;box-shadow:none;line-height:1.35;overflow:hidden}
+.room-track-list button>span:first-child{color:#c39239;font-size:21px;flex-shrink:0}
+.room-track-list button:hover{border-color:#e8a140;background:#fff5d6}
+.room-track-list button[aria-pressed=true]{background:#ffedac;border-color:#e79b21;font-weight:700;color:#a36415}
+.room-track-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.room-track-list button.room-custom-track{grid-column:1/-1}
+.room-volume{display:flex;align-items:center;gap:12px;margin:15px 0;font-size:14px}
+.room-volume input{min-width:0;flex:1;accent-color:#e89a23;height:24px}
+.room-volume>span{min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+.room-music-import{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px}
+.room-music-import button{font:inherit;color:#a1621f;background:#fff2cf;border:1px solid #e8be72;border-radius:9px;box-shadow:none;padding:8px 12px;min-height:39px}
+.room-music-import button:hover:not(:disabled){background:#ffe6a5;border-color:#de9b35}
+.room-music-note{color:#997745;font-size:14px;margin-left:auto}
+.room-music-message{font-size:14px;color:#9b641e;margin-top:12px;overflow-wrap:anywhere}
+.room-settings button:focus-visible,.room-settings select:focus-visible,.room-settings input:focus-visible{outline:2px solid #079cda;outline-offset:2px}
+@media(max-width:700px){.room-background-options{grid-template-columns:repeat(2,minmax(0,1fr));max-height:333px;gap:9px}.room-track-list{grid-template-columns:repeat(2,minmax(0,1fr))}.room-music-switch>span{max-width:7em}.room-time-status{margin-left:auto}}
+@media(max-width:440px){.room-settings .room-section-heading h3{font-size:17px}.room-section-heading{gap:7px}.room-section-heading>span{font-size:13px}.room-selection-label{padding:2px 7px}.room-background-label{font-size:13px;padding-right:2px;padding-left:2px}.room-background-label b{font-size:11px}.room-time-options{gap:4px}.room-time-options button{padding:7px 8px}.room-music-current{padding:10px;gap:8px}.room-music-disc{width:34px;height:34px;font-size:23px}.room-music-switch{font-size:13px;gap:6px}.room-music-switch>span{max-width:5em}.room-now-playing>strong{font-size:15px}.room-track-list button{font-size:13px;padding:8px}.room-music-note{width:100%;margin:3px 0 0}}

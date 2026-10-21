@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "kind": "original-generated-backgrounds",
+  "official_client_asset": false,
+  "generated_at_local_date": "2026-10-21",
+  "timezone": "Asia/Shanghai",
+  "reference_observations": [
+    "轮廓：原树洞以连贯深棕外线和少量结构线区分大物体，木屋用深本色边界。",
+    "形状：圆窗、宽叶和木板略不对称，以圆弧配短折角，不是写实建筑。",
+    "色面：蜂蜜黄、明亮草绿、青蓝为主，木与水用大块色面和少量长斑。",
+    "高光：原饼干和橙黄UI均只用少量短高光，背景不靠细密刻画。",
+    "空间：轻俯视玩具舞台，家具在后方/两侧，中央下部留给真实原拉姆。"
+  ],
+  "images": [
+    {
+      "file": "v18-berry-picnic.png",
+      "label": "浆果野餐地",
+      "source": "/workspace/generated_images/exec-43b0b344-bf88-45fd-961e-a36bed73d3fb.png",
+      "prompt": "Create ONE opaque four-phase background sheet for a small desktop pet, EXACTLY 2 columns by 2 rows, four equal landscape panels, no gutters or borders. Overall sheet target 2048x1280, each panel 16:10. All panels depict the SAME new BERRY PICNIC ORCHARD from exactly the same elevated camera with identical object positions: top-left morning, top-right noon, bottom-left sunset, bottom-right night. This is clean 2009-era Chinese Flash browser-game scenery. Study attached image1 original hollow-tree room for broad empty stage and flat warm-brown contours, image2 lake cabin for uneven chunky structure and color patches, image3 pet panel for crisp simple fill conventions ONLY (do not copy UI), image4 bear biscuit for the short clear highlight vocabulary ONLY. Do not reproduce any original room. Design: a wide pale honey-yellow wooden picnic platform occupies the ENTIRE lower half, mostly empty; a short red-and-cream folded picnic cloth and round little berry basket sit only at extreme back-left edge; behind them two oversized chunky berry bushes with rounded slightly angular leaf clumps and just a few large red berries. Back-right a low simple wooden bench with ONE yellow cushion and one leaf-shaped hanging lantern from an orchard branch near upper right. Across rear center a cyan-blue glimpse of a little stream and low green hills. Few large objects, no tiny scattered flowers. Warm continuous medium dark-brown outline, slightly irregular rounded shapes with a few short straight cuts, flat opaque saturated areas, only 2-4 HARD-EDGED color areas per material. Wood uses just 2 broad tapered patches and sparse joins, NO realistic grain or striations. Gentle toy-stage overhead perspective, generous central-lower platform free for original pet sprite, bottom16percent low detail. Morning: pale yellow flat light patch and cyan sky; noon: clear cyan/bright green with very short shadows; sunset: peach-coral sky and amber lamp; night: dark blue sky with a few small simple star dots, amber lantern, stage remains warm and legible. Keep layout/camera/furniture shapes EXACTLY SAME in four phases, only time lighting changes. No characters, pets, animals, faces, text, letters, logos, UI, buttons, panel labels, gutters, frames. No watercolor or paper texture, no western storybook paint, no 3D or glossy render, no photographic/volumetric lighting, no blur, no dense gradients, no intricate fantasy props. Edge-to-edge opaque background art.",
+      "tool": "image_gen.imagegen",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/scenes/lake-cabin.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png"
+      ],
+      "transparent_background": false,
+      "dimensions": [
+        1586,
+        992
+      ],
+      "mode": "RGB",
+      "usage": "Opaque 2×2 phase sheet, top-left morning / top-right noon / bottom-left dusk / bottom-right night. CSS clips a phase with cover scaling; image is not repainted.",
+      "review": "后排浆果林、野餐篮与长椅；前半为宽阔暖黄木平台。 Actual generated art inspected against the original room, lake cabin, pet UI and biscuit. Large continuous outlines, broad areas and simple short highlights retain the early Flash drawing language. No embedded character, text or UI. The four panels have small model-generated geometry variations; sky and local light have limited gradients and are not original client art.",
+      "manual_pixel_edits": "None. Copied generated PNG byte for byte; no cropping, resampling, raster repainting, added filters or geometry drawing.",
+      "sha256": "2402834f1b0a44b8e45e98c3808fd517e2618b5ff83e7bc3be157d02383d892f",
+      "bytes": 1877894
+    },
+    {
+      "file": "v18-seashell-cottage.png",
+      "label": "海风贝壳屋",
+      "source": "/workspace/generated_images/exec-626adb94-4906-46cf-b766-d065250d863c.png",
+      "prompt": "Create ONE opaque four-phase background sheet for an unchanged small original Ram desktop pet, EXACTLY 2 columns by 2 rows, four EQUAL landscape panels, no gutters, no labels, no divider borders. Entire sheet target2048x1280, each panel16:10. All four panels have EXACT same scene layout, object shape and elevated camera: top-left morning, top-right noon, bottom-left sunset, bottom-right night. Study attached original early Chinese Flash browser-game art: image1 warm-brown sparse flat contour and generous central stage; image2 mildly crooked toy architecture and hard-edged color blocks; image3 only cheerful crisp UI color conventions, DO NOT reproduce the UI; image4 only sparse short icon highlights. Use clean flat Flash vector-like illustration output PNG, continuous medium dark-brown or darker local color outlines, slightly asymmetric shapes, few short angular cuts, only 2-4 large HARD-EDGED opaque color areas per material, simple depth from overlap. No photoreal wood grain, no intricate props, no dense details. Central lower half must be a broad spacious empty ground plane for pet, bottom16percent low detail. No characters, animals, pets, faces, words, letters, labels, logos, UI, buttons or frame. No watercolor, paper grain, western storybook paint, 3D, photographic light, volumetric glow, blur, bokeh, dense gradient shading. Edge-to-edge opaque picture. Design a NEW SEASIDE SHELL COTTAGE VERANDA, breezy cheerful original coastal setting. Broad pale warm-sand/cream tiled floor in lower half with only a few oversized uneven tile joins. At extreme back left a little curved turquoise cottage wall and a BIG oval shell-shaped open window showing sea, a thin simple blue curtain hangs to ONE side. A tiny low round coral-pink table sits only at back-left edge with one oversize conch shell. Back-right a short bleached honey-yellow wood railing, ONE terracotta pot with three wide green leaves, and a small round frosted-blue glass lantern hanging from an upper corner beam. Through middle-upper open veranda clear cyan ocean, two broad wave bands and a distant rounded pale island. Upper corners framed by simple uneven wood roof. Few large silhouettes with whimsical early Chinese browser-game toy-stage perspective. Do NOT create a modern white beach resort or western cottage. Morning pale lemon sky/short hard-edged window light; noon strong cyan sky and saturated turquoise sea; dusk coral/peach sky with sea lavender-blue and warm lantern; night dark navy sky and sea with small crescent moon and few simple star dots, lantern on, cream ground still readable. All phases EXACTLY SAME furniture positions and ground geometry; only lighting and sky changes.",
+      "tool": "image_gen.imagegen",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/scenes/lake-cabin.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png"
+      ],
+      "transparent_background": false,
+      "dimensions": [
+        1586,
+        992
+      ],
+      "mode": "RGB",
+      "usage": "Opaque 2×2 phase sheet, top-left morning / top-right noon / bottom-left dusk / bottom-right night. CSS clips a phase with cover scaling; image is not repainted.",
+      "review": "贝壳窗、海螺与海景布置在后方；奶油色地面在中央下方留白。 Actual generated art inspected against the original room, lake cabin, pet UI and biscuit. Large continuous outlines, broad areas and simple short highlights retain the early Flash drawing language. No embedded character, text or UI. The four panels have small model-generated geometry variations; sky and local light have limited gradients and are not original client art.",
+      "manual_pixel_edits": "None. Copied generated PNG byte for byte; no cropping, resampling, raster repainting, added filters or geometry drawing.",
+      "sha256": "881a6933b388966bb7e5968ad6df09f8cdfc5f23aa980f2bc84dae83d35741b5",
+      "bytes": 1793603
+    },
+    {
+      "file": "v18-sky-observatory.png",
+      "label": "晴空观星阁",
+      "source": "/workspace/generated_images/exec-baeccd1c-5c64-4ade-aaa7-bf1e3fa82e79.png",
+      "prompt": "Create ONE opaque four-phase background sheet for an unchanged small original Ram desktop pet, EXACTLY 2 columns by 2 rows, four EQUAL landscape panels, no gutters, no labels, no divider borders. Entire sheet target2048x1280, each panel16:10. All four panels have EXACT same scene layout, object shape and elevated camera: top-left morning, top-right noon, bottom-left sunset, bottom-right night. Study attached original early Chinese Flash browser-game art: image1 warm-brown sparse flat contour and generous central stage; image2 mildly crooked toy architecture and hard-edged color blocks; image3 only cheerful crisp UI color conventions, DO NOT reproduce the UI; image4 only sparse short icon highlights. Use clean flat Flash vector-like illustration output PNG, continuous medium dark-brown or darker local color outlines, slightly asymmetric shapes, few short angular cuts, only 2-4 large HARD-EDGED opaque color areas per material, simple depth from overlap. No photoreal wood grain, no intricate props, no dense details. Central lower half must be a broad spacious empty ground plane for pet, bottom16percent low detail. No characters, animals, pets, faces, words, letters, labels, logos, UI, buttons or frame. No watercolor, paper grain, western storybook paint, 3D, photographic light, volumetric glow, blur, bokeh, dense gradient shading. Edge-to-edge opaque picture. Design a NEW CLOUD-TOP STAR READING LOFT, a friendly small rounded observatory in early Chinese children's browser-game style. Back upper-left a large round slightly crooked blue-framed OPEN WINDOW with simple double timber arch, showing sky and 2-3 broad rounded clouds below a far green hill. A short chunky teal telescope angled upward sits ONLY at far back-right beside the window, with 3 simple rounded legs, no complex brass gears. At far back-left a tiny low warm-yellow bookshelf contains only THREE oversized colorful books and one small blank yellow star-shaped ornament; ONE leaf-shaped amber ceiling lamp hangs upper right. A broad pale apricot/lavender wooden platform fills entire lower half, no carpet, center completely clear; just 3 large long floor joins, no fine grain. Rounded walls in clean pale cyan and cream, a little deep-blue roof beam at upper corners. This is a simple playful toy observatory, not fantasy wizard tavern, not western storybook. Morning cyan-blue outside and ONE pale-yellow hard light shape; noon bright blue and broad white clouds; dusk peach pink sky and warm amber lamp; night navy outside with a few clear simple stars and crescent moon, soft blue-purple wall COLORS rendered as flat hard-edged shapes, warm lamp, floor remains light enough for yellow blue pink or red pet. Same camera, architectural proportions and furniture in all four phases. No map, writing, constellations lines, diagrams, tiny stars inside, letters or numerals.",
+      "tool": "image_gen.imagegen",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/scenes/lake-cabin.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png"
+      ],
+      "transparent_background": false,
+      "dimensions": [
+        1586,
+        992
+      ],
+      "mode": "RGB",
+      "usage": "Opaque 2×2 phase sheet, top-left morning / top-right noon / bottom-left dusk / bottom-right night. CSS clips a phase with cover scaling; image is not repainted.",
+      "review": "蓝色圆窗、短书架和简化望远镜在后排；前方留出杏色地板。 Actual generated art inspected against the original room, lake cabin, pet UI and biscuit. Large continuous outlines, broad areas and simple short highlights retain the early Flash drawing language. No embedded character, text or UI. The four panels have small model-generated geometry variations; sky and local light have limited gradients and are not original client art.",
+      "manual_pixel_edits": "None. Copied generated PNG byte for byte; no cropping, resampling, raster repainting, added filters or geometry drawing.",
+      "sha256": "6f4b0690d52d989d383b5d4cc989f97663e032d1fe95e2d626ba917387533eca",
+      "bytes": 1706085
+    }
+  ]
+}

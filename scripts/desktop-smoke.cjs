@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -191,6 +191,7 @@ async function verifyBackground(page, selector, suffix) {
   await page.mouse.move(-20,-20);await page.evaluate(()=>document.activeElement?.blur());await page.screenshot({path:path.join(artifacts,'v6-native-compact.png'),omitBackground:true});
   await verifyPetLife(page);console.log('PASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application');
   await verifyRecolorPotion(page);console.log('PASS real colour potion shop purchase/use/relaunch, finite animation and retained pet identity/inventory');
+  await verifyRoomIteration(page);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();
   await page.evaluate(()=>window.desktop.minimize());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());

@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -53,6 +53,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
     'dist/assets/original/scenes/ramu-home.png', 'dist/assets/original/scenes/lake-cabin.png', 'dist/assets/original/scenes/original-earthen-home.png',
     'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
     'dist/assets/generated/v6-starlight-greenhouse.png', 'dist/assets/generated/v6-creek-treehouse.png',
+    'dist/assets/generated/v18-berry-picnic.png', 'dist/assets/generated/v18-seashell-cottage.png', 'dist/assets/generated/v18-sky-observatory.png',
     'dist/icons/ramu.png', 'dist/icons/tray.png', 'dist/icons/ramu.ico',
     'dist/icons/ramu.icns', 'dist/icons/tray-mac.png', 'dist/icons/tray-mac@2x.png',
     'dist/assets/generated/v9-petting-hand.png', 'dist/assets/generated/v9-study-book.png', 'dist/assets/generated/v12-dizzy-star.png', 'dist/assets/generated/v12-turning-page.png',
@@ -250,6 +251,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   console.log('PASS: four shipped original god-power evolutions, deliberate selection and persistent form after reload');
   await verifyPetLife(page);console.log('PASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application');
   await verifyRecolorPotion(page);console.log('PASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies');
+  await verifyRoomIteration(page);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());

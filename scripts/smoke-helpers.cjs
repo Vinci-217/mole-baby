@@ -205,4 +205,41 @@ async function verifyPetLife(page){
   await toDesktop(page);await page.reload();await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('31');await expect(page.getByRole('checkbox',{name:'自然小动作',exact:true})).not.toBeChecked();await toDesktop(page);
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife };
+async function verifyRoomIteration(page){
+  await enterHome(page);const close=page.getByRole('button',{name:'关闭面板',exact:true});if(await close.isVisible())await close.click();
+  await page.getByRole('button',{name:'布置小屋',exact:true}).click();
+  const decor=page.getByRole('dialog',{name:'布置小屋',exact:true}),gallery=decor.getByRole('group',{name:'选择小屋背景',exact:true});
+  await expect(gallery).toBeInViewport();await expect(gallery.getByRole('button')).toHaveCount(9);
+  const previous=await gallery.locator('[aria-pressed=true]').getAttribute('aria-label');
+  for(const [id,label] of [['berry-picnic','浆果野餐地'],['seashell-cottage','海风贝壳屋'],['sky-observatory','晴空观星阁']]){
+    await gallery.getByRole('button',{name:label,exact:true}).click();await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background',id);
+    for(const [phase,label] of [['morning','早晨'],['noon','白天'],['dusk','傍晚'],['night','夜晚']]){
+      await decor.getByRole('button',{name:`预览${label}`,exact:true}).click();await expect(page.locator('.cottage-scene')).toHaveAttribute('data-phase',phase);
+      await page.locator('.time-scene-art img').evaluate(n=>n.decode());
+    }
+  }
+  console.log('PASS: nine scene choices and three original-style four-phase backgrounds render in the actual application');
+  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1'))),before=await save();
+  const remaining=Math.max(0,before.lastRewardAt+10000-Date.now());if(remaining)await page.waitForTimeout(remaining+50);
+  await roomTab(page,'游戏');await page.getByRole('button',{name:'开始寻宝',exact:true}).click();
+  let game=page.getByTestId('treasure-game');await game.getByTestId('treasure-start').click();
+  const first=await game.locator('[data-target-id]').first().getAttribute('data-target-id');await game.locator(`[data-treasure-id="${first}"]`).click();
+  await game.getByRole('button',{name:'退出游戏，本局不领取奖励',exact:true}).click();
+  expect((await save()).coins).toBe(before.coins);expect((await save()).completedGames).toBe(before.completedGames);
+  await page.getByRole('button',{name:'开始寻宝',exact:true}).click();game=page.getByTestId('treasure-game');await game.getByTestId('treasure-start').click();
+  await game.locator('.treasure-scene-art img').evaluate(n=>n.decode());
+  const targets=await game.locator('[data-target-id]').evaluateAll(nodes=>nodes.map(n=>n.dataset.targetId));
+  for(const id of targets)await game.locator(`[data-treasure-id="${id}"]`).click();
+  await expect(game).toHaveAttribute('data-phase','collected');expect((await save()).coins).toBe(before.coins);
+  await game.getByRole('button',{name:'收好宝物',exact:true}).evaluate(n=>{n.click();n.click();});
+  await expect(game).toHaveAttribute('data-phase','finished');const after=await save();
+  expect(after.coins-before.coins).toBe(24);expect(after.completedGames-before.completedGames).toBe(1);expect(after.inventory.juice-before.inventory.juice).toBe(1);
+  await expect(game.locator('.treasure-receipt')).toContainText('+24');
+  const memory=await page.evaluate(()=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));return JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${pet.createdAt}`));});
+  expect(memory.events.filter(e=>e.kind==='game').at(-1).detail).toContain('在晴空观星阁完成了《小屋寻宝》');
+  await game.getByRole('button',{name:'完成',exact:true}).click();await roomTab(page,'布置');
+  await gallery.getByRole('button',{name:previous,exact:true}).click();await decor.getByRole('button',{name:'跟随时间',exact:true}).click();await toDesktop(page);
+  console.log('PASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory');
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration };
