@@ -48,7 +48,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   requireFile(archive);
   const paths = new Set(asar.listPackage(archive).map(item => item.replace(/\\/g, '/').replace(/^\//, '')));
   for (const filename of [
-    'package.json', 'electron/main.cjs', 'electron/mac-settings.cjs', 'electron/Mac 打开说明.html', 'electron/preload.cjs', 'electron/deepseek.cjs', 'electron/speech.cjs', 'dist/index.html', 'dist/favicon.png',
+    'package.json', 'electron/main.cjs', 'electron/mac-settings.cjs', 'electron/Mac 打开说明.html', 'electron/preload.cjs', 'electron/tray-icon.cjs', 'electron/deepseek.cjs', 'electron/speech.cjs', 'dist/index.html', 'dist/favicon.png',
     'dist/assets/classic/middle-neutral.png', 'dist/assets/classic/middle-mask.png',
     'dist/assets/original/scenes/ramu-home.png', 'dist/assets/original/scenes/lake-cabin.png', 'dist/assets/original/scenes/original-earthen-home.png',
     'dist/assets/generated/morning-study.png', 'dist/assets/original/ui/button-orange.png',
@@ -90,6 +90,18 @@ async function verifyApplication({ executable, archive, screenshot }) {
   });
   page = await desktop.firstWindow();
   assert.equal(await desktop.evaluate(({ app }) => app.getName()), '拉姆', 'Packaged application display name');
+  if(process.platform==='darwin') {
+    const icon=await desktop.evaluate(({app,nativeImage})=>{
+      const path=require('node:path');
+      const {createTrayIcon}=require(path.join(app.getAppPath(),'electron/tray-icon.cjs'));
+      const image=createTrayIcon(nativeImage,process.platform,name=>path.join(app.getAppPath(),'dist/icons',name));
+      return {empty:image.isEmpty(),template:image.isTemplateImage(),size:image.getSize(),scales:image.getScaleFactors()};
+    });
+    assert.equal(icon.empty,false);assert.equal(icon.template,true);assert.deepEqual(icon.size,{width:18,height:18});
+    assert.ok(icon.scales.includes(1)&&icon.scales.includes(2),'Mac menu bar must retain both standard and Retina representations');
+    console.log('PASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations');
+  }
+
   page.setDefaultTimeout(15000);
   const rendererErrors = [];
   page.on('pageerror', error => rendererErrors.push(error.message));
@@ -129,7 +141,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
   for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
   console.log('PASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence');
-  await verifyStageSettings(page);console.log('PASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories');
+  await verifyStageSettings(page,desktop);console.log('PASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories');
   await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
   console.log('PASS: local thoughtful speech and clickable chat continuity in the shipped native window');
   const speech = await page.evaluate(() => window.companionSpeech.getAvailability());

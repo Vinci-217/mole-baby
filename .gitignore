@@ -80,3 +80,5 @@ logs/
 __pycache__/
 
 !artifacts/v17-attention.png
+
+!artifacts/v171-mac-menu-preview.png

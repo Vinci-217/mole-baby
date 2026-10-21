@@ -29,4 +29,17 @@ function canAnimateDesktop(state) {
   return state.visible && state.petMode && state.petCanMove && !state.panel && !state.dragging && !state.interacting;
 }
 
-module.exports = { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop };
+/** Short random steps around the user's placement; never pull a pet to the floor. */
+function nearbyWanderTarget(bounds, area, anchor = bounds, random = Math.random) {
+  const start = fitPetBounds(bounds, area);
+  const saved = fitPetBounds(anchor, area);
+  const home = Math.abs(start.x - saved.x) <= 48 ? saved.x : start.x;
+  const left = Math.max(area.x, home - 48);
+  const right = Math.min(area.x + area.width - start.width, home + 48);
+  const distance = 12 + Math.round(random() * 16);
+  let direction = random() < 0.5 ? -1 : 1;
+  if (start.x + direction * distance < left || start.x + direction * distance > right) direction *= -1;
+  return { ...start, x: Math.round(Math.max(left, Math.min(right, start.x + direction * distance))) };
+}
+
+module.exports = { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop, nearbyWanderTarget };

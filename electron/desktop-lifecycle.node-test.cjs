@@ -50,7 +50,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32') {
     show() { this.visible = true; } hide() { this.visible = false; } focus() {} restore() {}
   }
   class FakeTray extends EventEmitter {
-    constructor() { super(); FakeTray.instance = this; }
+    constructor(image) { super(); this.image = image; FakeTray.instance = this; }
     isDestroyed() { return false; }
     setToolTip(text) { this.tooltip = text; }
     setContextMenu(menu) { this.menu = menu; }
@@ -60,7 +60,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32') {
   const display = { workArea: { x: 0, y: 0, width: 1920, height: 1040 } };
   screen.getPrimaryDisplay = screen.getDisplayMatching = () => display;
   const electron = { app, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
-    Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => value },
+    Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => ({path:value,template:false,setTemplateImage(flag){this.template=flag;}}) },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
     Notification: { isSupported: () => false } };
   const companionAI = { cancel: () => stats.aiCancelled++, dispose() {} };
@@ -99,6 +99,8 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   assert.equal(run.window.isVisible(), true);
   assert.deepEqual(run.window.getBounds(), { x: 1754, y: 792, width: 160, height: 240 });
   assert.equal(run.tray.tooltip, '拉姆 · mole-baby');
+  assert.equal(run.tray.image.template, false);
+  assert.equal(path.basename(run.tray.image.path), 'tray.png');
 });
 
 test('existing legacy named profiles are reused without moving or deleting their save', async t => {
@@ -169,6 +171,8 @@ test('seed/sleep disables autonomous movement while manual dragging remains avai
 test('macOS is menu-bar resident, never flashes before readiness, and uses native editing shortcuts', async t => {
   const run = await launch(undefined, false, 'darwin'); t.after(() => run.cleanup());
   assert.equal(run.stats.dockHidden, true);
+  assert.equal(run.tray.image.template, true, 'AppKit must tint the Mac menu-bar glyph');
+  assert.equal(path.basename(run.tray.image.path), 'tray-mac.png');
   assert.ok(run.stats.appMenu.some(item => item.role === 'editMenu'));
   run.app.emit('activate');
   assert.equal(run.window.isVisible(), false, 'early macOS activation cannot flash the room');
@@ -205,4 +209,20 @@ test('starting a drag before the edge tuck animation keeps the visible pet under
  assert.equal(run.invoke('desktop:get-state').edgeSide,'right');assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
  const before=run.window.getBounds();run.invoke('desktop:start-pet-drag');assert.equal(run.window.getBounds().x,before.x);
  run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+});
+
+
+test('autonomous walks stay near a manually placed pet without descending to the desktop floor', async t=>{
+  t.mock.timers.enable({apis:['setTimeout','setInterval','Date'],now:1_800_000_000_000});
+  const run=await launch();t.after(()=>run.cleanup());
+  run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+  run.invoke('desktop:set-edge-hiding',false);run.invoke('desktop:move-pet',-500,-350);
+  run.invoke('desktop:wander',true);const home=run.window.getBounds();
+  for(let n=0;n<30;n++){
+    t.mock.timers.tick(20000);t.mock.timers.tick(1600);
+    const position=run.window.getBounds();assert.equal(position.y,home.y);assert.ok(Math.abs(position.x-home.x)<=48);
+  }
+  run.invoke('desktop:move-pet',-300,-100);const relocated=run.window.getBounds();
+  t.mock.timers.tick(20000);t.mock.timers.tick(1600);
+  assert.equal(run.window.getBounds().y,relocated.y);assert.ok(Math.abs(run.window.getBounds().x-relocated.x)<=48);
 });

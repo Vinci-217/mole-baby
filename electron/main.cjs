@@ -4,9 +4,10 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { createCompanionAI } = require('./deepseek.cjs');
 const { createCompanionSpeech } = require('./speech.cjs');
-const { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop } = require('./desktop-geometry.cjs');
+const { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop, nearbyWanderTarget } = require('./desktop-geometry.cjs');
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
+const { createTrayIcon } = require('./tray-icon.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
@@ -48,6 +49,7 @@ let wandering = false;
 let dragging = false;
 let wanderTimer = null;
 let movementTimer = null;
+let wanderAnchor = null;
 let motion = 'idle';
 let companionPanel = false;
 let panelSide = 'right';
@@ -219,7 +221,7 @@ function scheduleWander() {
   clearTimeout(wanderTimer);
   wanderTimer = null;
   if (!canWander() || movementTimer) return;
-  wanderTimer = setTimeout(walkAlongDesktop, 8000 + Math.random() * 7000);
+  wanderTimer = setTimeout(walkAlongDesktop, 12000 + Math.random() * 6000);
 }
 
 function walkAlongDesktop() {
@@ -227,21 +229,13 @@ function walkAlongDesktop() {
   if (!canWander()) return;
   const start = mainWindow.getBounds();
   const area = screen.getDisplayMatching(start).workArea;
-  const distance = 50 + Math.round(Math.random() * 70);
-  let direction = Math.random() < 0.5 ? -1 : 1;
-  if (start.x + direction * distance < area.x
-    || start.x + direction * distance + start.width > area.x + area.width) direction *= -1;
-  const target = clampBounds({
-    ...start,
-    x: start.x + direction * distance,
-    y: area.y + area.height - start.height,
-  }, PET_SIZE);
+  if (!wanderAnchor || Math.abs(start.x - wanderAnchor.x) > 48) wanderAnchor = { ...start };
+  const target = nearbyWanderTarget(start, area, wanderAnchor);
   const travel = Math.hypot(target.x - start.x, target.y - start.y);
   if (travel < 1) { scheduleWander(); return; }
 
-  // Ease toward the bottom at a walking pace, including after the user has
-  // placed the pet higher on the screen. Never teleport or activate the window.
-  const duration = Math.max(1500, travel / 65 * 1000);
+  // Preserve the chosen height and ease only a short distance nearby.
+  const duration = 1000 + travel * 15;
   const startedAt = Date.now();
   changeMotion(target.x < start.x ? 'left' : 'right');
   movementTimer = setInterval(() => {
@@ -277,6 +271,7 @@ function startPetDrag() {
 function endPetDrag() {
   dragging = false;
   if(draggingFromEdge){const fitted=clampBounds(mainWindow.getBounds(),PET_SIZE);mainWindow.setPosition(fitted.x,fitted.y,false);draggingFromEdge=false;}
+  wanderAnchor = { ...currentPetBounds() };
   scheduleSave();
   if (!tuckIntoCorner()) scheduleWander();
   return true;
@@ -297,6 +292,7 @@ function movePet(dx, dy) {
   const target = clampBounds(desired, PET_SIZE);
   if(dragging&&draggingFromEdge){const area=screen.getDisplayMatching(current).workArea;target.x=Math.max(area.x-105,Math.min(area.x+area.width-PET_SIZE.width+105,desired.x));}
   mainWindow.setPosition(target.x, target.y, false);
+  wanderAnchor = { ...target };
   scheduleSave();
   // movePet also works without explicit drag lifecycle calls: movement delays
   // the next walk. start/end keep wandering paused during a stationary hold.
@@ -608,7 +604,7 @@ function refreshTrayMenu() {
 
 function createTray() {
   if (tray && !tray.isDestroyed()) return;
-  const image = nativeImage.createFromPath(iconPath(process.platform === 'darwin' ? 'tray-mac.png' : 'tray.png'));
+  const image = createTrayIcon(nativeImage, process.platform, iconPath);
   tray = new Tray(image);
   tray.setToolTip('拉姆 · mole-baby');
   // On macOS, either mouse button opens the native status menu. Restoring on

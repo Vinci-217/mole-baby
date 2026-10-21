@@ -33,5 +33,16 @@
     "ramu.icns": "b659f4afb8b86786bd761e96555afc1a4df4b68ea2a55c08f87c8d633bbb0651",
     "tray-mac.png": "1e43d4d317b662132a72b502e52ee2a1f8ab1105f14c8e5347780598b9c1f32f",
     "tray-mac@2x.png": "43294540649aa5ffd26fc3819b3cfe60827bf054ade079bec8718d1ecf5a7ec9"
+  },
+  "macMenuBarRendering": {
+    "mode": "macOS native template image",
+    "implementation": "electron/tray-icon.cjs calls NativeImage.setTemplateImage(true)",
+    "art": "Unchanged original two-leaf Ram alpha silhouette; PNG bytes and application icon are unchanged.",
+    "pointSize": 18,
+    "scaleFactors": [
+      1,
+      2
+    ],
+    "tint": "AppKit supplies the appearance and highlighted-state tint."
   }
 }

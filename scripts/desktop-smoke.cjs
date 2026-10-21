@@ -144,7 +144,7 @@ async function verifyBackground(page, selector, suffix) {
   for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
   console.log('PASS free left/near-right placement, exact right docking, hover/click only peek, 2–5 minute cadence and physical drag out');
 
-  await verifyStageSettings(page);console.log('PASS actual settings choose all five stages/four evolutions, persist upgrades/downgrades and preserve identity, items and memories');
+  await verifyStageSettings(page,desktop);console.log('PASS actual settings choose all five stages/four evolutions, persist upgrades/downgrades and preserve identity, items and memories');
 
   // Grow only this isolated fixture; normal adoption always starts with a seed.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=180;p.stats.hunger=50;p.stats.cleanliness=50;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));});

@@ -123,7 +123,7 @@ async function verifyEdgePeek(page,desktop,side){
   await page.mouse.up();await expect.poll(async()=>(await state()).edgeSide).toBeNull();await expect.poll(async()=>(await state()).edgePose).toBe('visible');
   const after=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());expect(after.y).toBe(targetY);await expect(character).toBeInViewport();
 }
-async function verifyStageSettings(page){
+async function verifyStageSettings(page,desktop){
   await enterHome(page);await roomTab(page,'设置');
   const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
   const memoryKey=`ramu-companion-memory-v1:${before.createdAt}`;
@@ -149,6 +149,19 @@ async function verifyStageSettings(page){
   await toDesktop(page);const character=page.getByTestId('desktop-character');await character.hover({position:{x:94,y:54}});
   await expect.poll(async()=>Number(await character.locator('canvas').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
   console.log('PASS: nearby pointer attention responds in the actual desktop window');
+  if(desktop){
+    const flags=await page.evaluate(()=>window.desktop.getState());
+    await page.mouse.move(1,239);await page.keyboard.press('Escape');
+    await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.wander(true);await window.desktop.setInteracting(false);});
+    const bounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
+    const placed=await bounds();
+    await expect.poll(()=>page.evaluate(()=>window.desktop.getState().then(s=>s.motion)),{timeout:22000}).toMatch(/^(left|right)$/);
+    await expect.poll(()=>page.evaluate(()=>window.desktop.getState().then(s=>s.motion)),{timeout:4000}).toBe('idle');
+    const moved=await bounds();expect(Math.abs(moved.x-placed.x)).toBeGreaterThanOrEqual(12);expect(Math.abs(moved.x-placed.x)).toBeLessThanOrEqual(28);expect(moved.y).toBe(placed.y);
+    await page.evaluate(async flags=>{await window.desktop.wander(flags.wandering);await window.desktop.setEdgeHiding(flags.edgeHiding);},flags);
+    console.log('PASS: autonomous wandering takes short random 12-28px steps and preserves placement height');
+  }
+
   await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();
   await toDesktop(page);await page.reload();await expect(sprite).toHaveAttribute('data-stage','0');await expect(sprite).toHaveAttribute('data-color',before.color);
   const after=await save();for(const key of ['name','color','createdAt','coins','inventory','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.evolution).toBeUndefined();
