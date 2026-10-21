@@ -2,13 +2,13 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.17.2](https://github.com/Vinci-217/mole-baby/releases/tag/v0.17.2) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.17.3](https://github.com/Vinci-217/mole-baby/releases/tag/v0.17.3) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.17.2-Setup.exe` 或 `mole-baby-0.17.2-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.17.2-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.17.2-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.17.3-Setup.exe` 或 `mole-baby-0.17.3-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.17.3-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.17.3-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -46,7 +46,7 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 
 已从原客户端配置确认 `180027` 叫 **可可果**；咕咕果补水、爽爽果清洁。另有熊熊饼干、巧克力豆、麦香牛奶、运动可乐、泡泡浴、牙膏等。原非零价格和效果有对应来源，活动零价物品采用本地商店价，详见 [用品与状态核对](research/items-states.md)。
 
-第四、第五阶段在桌面和小屋持续悬浮，原 down 图集循环一直播放；摸头时保持原飞行比例，手与角色同步浮动，不切换到比例不同的打招呼片段。
+第四、第五阶段在桌面和小屋持续悬浮；高级与四种神力形态左右移动时使用各自原版侧脸飞行动画，停下恢复正面，转向保留悬浮节奏。摸头时保持原飞行比例，手与角色同步浮动，不切换到比例不同的打招呼片段。
 
 玩球会出现原足球、摸摸有小手轻抚、专注会低头阅读，独立纸页从右向左绕书脊翻动，各成长阶段有不同锚点和身体反应。连续快速摸摸或来回摇晃会短暂头晕，显示三颗头顶环绕的星星，有前后大小与明暗变化，稍后恢复。详见 [分阶段互动设计](research/v9-interactions.md)。
 
@@ -103,6 +103,7 @@ npm run build              # TypeScript 与生产构建
 npm run test:browser       # 商店、物品、记忆、背景、音乐和完整游戏
 npm run test:companion-update # 手动单次计时、提示音与16种进化/颜色组合
 npm run test:flight-recolor # 32形态/颜色组合、实际购药、换色像素与持续悬浮
+npm run test:flight-facing  # 五种飞行形态×四色的原版侧脸、转向与持续悬浮
 npm run test:layout-stage   # 窄边距、五阶段/四神力切换与存档保留
 npm run test:reading-dizzy  # 八形态看书翻页、头顶星星绕圈及视觉截图
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包
@@ -115,7 +116,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、223 项单元与 Native 生命周期测试，以及浏览器、记忆并发和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、226 项单元与 Native 生命周期测试、20种飞行形态/颜色的浏览器渲染检查和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

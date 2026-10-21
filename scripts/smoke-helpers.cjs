@@ -150,16 +150,27 @@ async function verifyStageSettings(page,desktop){
   await expect.poll(async()=>Number(await character.locator('canvas').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
   console.log('PASS: nearby pointer attention responds in the actual desktop window');
   if(desktop){
+    await enterHome(page);await roomTab(page,'设置');
+    await settings.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
+    await settings.getByRole('button',{name:'切换为神力超级拉姆',exact:true}).click();await toDesktop(page);
+    await expect(character.locator('canvas')).toHaveAttribute('data-form','super');
+    await character.locator('.ram-flight-layer').evaluate(n=>{window.__nativeFlight=n.getAnimations()[0];});
     const flags=await page.evaluate(()=>window.desktop.getState());
     await page.mouse.move(1,239);await page.keyboard.press('Escape');
     await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.wander(true);await window.desktop.setInteracting(false);});
     const bounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
     const placed=await bounds();
-    await expect.poll(()=>page.evaluate(()=>window.desktop.getState().then(s=>s.motion)),{timeout:22000}).toMatch(/^(left|right)$/);
+    await expect.poll(()=>page.evaluate(async()=>{
+      const state=await window.desktop.getState(),sprite=document.querySelector('[data-testid="desktop-character"] .ram-sprite');
+      return (state.motion==='left'||state.motion==='right')&&sprite.querySelector('canvas').dataset.row===(state.motion==='left'?'2':'1')&&sprite.classList.contains('is-flying')&&sprite.querySelector('.ram-flight-layer').getAnimations()[0]===window.__nativeFlight;
+    }),{timeout:22000}).toBe(true);
     await expect.poll(()=>page.evaluate(()=>window.desktop.getState().then(s=>s.motion)),{timeout:4000}).toBe('idle');
+    await expect(character.locator('canvas')).toHaveAttribute('data-row','0');
+    expect(await character.locator('.ram-flight-layer').evaluate(n=>n.getAnimations()[0]===window.__nativeFlight)).toBe(true);
     const moved=await bounds();expect(Math.abs(moved.x-placed.x)).toBeGreaterThanOrEqual(12);expect(Math.abs(moved.x-placed.x)).toBeLessThanOrEqual(28);expect(moved.y).toBe(placed.y);
     await page.evaluate(async flags=>{await window.desktop.wander(flags.wandering);await window.desktop.setEdgeHiding(flags.edgeHiding);},flags);
     console.log('PASS: autonomous wandering takes short random 12-28px steps and preserves placement height');
+    console.log('PASS: super Ram follows native movement with original side-facing flight and returns to front');
   }
 
   await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();

@@ -59,6 +59,36 @@ describe('original Ram care animation contract', () => {
 
 
 describe('continuous original airborne posture',()=>{
+ it('faces movement using all eight original side poses across every airborne form',()=>{
+  for(const form of ['senior','super','water','wood','fire'])for(const [action,row] of [['walk-left',2],['walk-right',1],['running-left',2],['running-right',1]] as const){
+   const frames=new Set<number>();
+   for(let t=0;t<1000;t+=10){const pose=sampleFlyingPose(action,0,false,form,t);expect(pose.row).toBe(row);expect(pose.sheet).toBeUndefined();expect(pose.finished).toBe(false);frames.add(pose.frame);}
+   expect([...frames].sort()).toEqual([0,1,2,3,4,5,6,7]);
+  }
+ });
+ it('retains original 24fps side holds and shared phase when reversing or stopping',()=>{
+  const step=1000/24;
+  for(const form of ['senior','super','water','wood','fire']){
+   const starts=form==='super'?[1,4,6,9,11,14,16,19]:form==='senior'?[1,2,3,4,5,6,7,8]:[1,2,3,4,6,7,8,9];
+   const count=form==='super'?21:11;
+   for(let source=1;source<=count;source++){
+    const t=(source-1)*step+.1,frame=starts.filter(s=>s<=source).length-1;
+    expect(sampleFlyingPose('walk-left',0,false,form,t)).toEqual({row:2,frame,finished:false});
+    expect(sampleFlyingPose('walk-right',0,false,form,t)).toEqual({row:1,frame,finished:false});
+    const front=form==='super'?[1,5,8,12,15,19]:form==='senior'?[1,3,4,6,7,8]:[1,3,4,6,7,9];
+    expect(sampleFlyingPose('idle',0,false,form,t)).toEqual({row:0,frame:front.filter(s=>s<=source).length-1,finished:false});
+   }
+   expect(sampleFlyingPose('walk-left',0,false,form,count*step+.1).frame).toBe(0);
+  }
+ });
+ it('keeps reduced-motion facing while preserving sleep and drag poses',()=>{
+  for(const form of ['senior','super','water','wood','fire']){
+   expect(sampleFlyingPose('walk-left',800,true,form)).toEqual({row:2,frame:0,finished:false});
+   expect(sampleFlyingPose('walk-right',800,true,form)).toEqual({row:1,frame:0,finished:false});
+   for(const action of ['still','drag'])expect(sampleFlyingPose(action,800,false,form)).toEqual({row:0,frame:0,finished:false});
+   expect(sampleFlyingPose('sleep',800,true,form)).toEqual({row:8,frame:0,finished:false});
+  }
+ });
  it('ends both new curiosity gestures in every stage and never changes an airborne source registration',()=>{
   for(const action of ['look-around','watch-butterfly']){
    const duration=getRamActionDuration(action)!;expect(duration).toBeGreaterThan(0);

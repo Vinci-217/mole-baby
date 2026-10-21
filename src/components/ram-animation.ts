@@ -113,20 +113,27 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
   return sampleFlyingPose(action, elapsed, reduced, 'super');
 }
 
-/** Original down cycles: senior/elemental 11 frames, super 21, at 24 fps.
+/** Original front and side cycles: senior/elemental 11 frames, super 21, at 24 fps.
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
   if (action === 'sleep') return { row: 8, frame: 0, finished: false };
+  const direction = action === 'walk-left' || action === 'running-left' ? 2 : action === 'walk-right' || action === 'running-right' ? 1 : 0;
+  // Side rows have eight sampled source poses, with different holds from the
+  // six front poses. Keep the shared flight clock when changing direction.
+  if (direction && reduced) return { row: direction, frame: 0, finished: false };
   if (action === 'still' || action === 'drag' || reduced) {
     const duration = getRamActionDuration(action);
     return { row: 0, frame: 0, finished: duration !== null && elapsed >= duration };
   }
-  const sourceFrames = form === 'super' ? [1,5,8,12,15,19] : form === 'senior' ? [1,3,4,6,7,8] : [1,3,4,6,7,9];
+  const sourceFrames = direction
+    ? form === 'super' ? [1,4,6,9,11,14,16,19] : form === 'senior' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,6,7,8,9]
+    : form === 'super' ? [1,5,8,12,15,19] : form === 'senior' ? [1,3,4,6,7,8] : [1,3,4,6,7,9];
   const count = form === 'super' ? 21 : 11;
   const phase = Math.floor(Math.max(0,flightTime) / (1000/24)) % count + 1;
   let frame = 0;
   for (let i = 1; i < sourceFrames.length; i++) if (phase >= sourceFrames[i]) frame = i;
+  if (direction) return { row: direction, frame, finished: false };
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
   if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
