@@ -218,6 +218,6 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 
 `original/grounded` 四张 PNG 从同一原 `lamubone.swf` 的初级 down 第3帧、中级 down 第1帧提取身体、眼白、瞳孔和叶片。闭眼线复用原 happy 的 shape665；半闭眼为原眼睛的纵向压缩。原始角色未重绘，运行时呼吸、目光、眨眼和叶片微摆为桌宠动画适配，不冒充官方完整时序。固定配准、源文件哈希、图集哈希与可复现的三步导出脚本见 [grounded/README.md](public/assets/original/grounded/README.md) 和 [source.json](public/assets/original/grounded/source.json)。用品增益提示复用既有状态图标，没有新增生成素材。
 
-### v0.17.1 Mac菜单栏模板图标
+### v0.17.2 Mac菜单栏模板图标
 
 Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透明轮廓，通过 Electron `setTemplateImage(true)` 交给 macOS AppKit 自动着色，适配深浅外观和高亮状态。两张PNG、应用图标与其哈希均未改动，没有新增生成素材或重绘角色。`artifacts/v171-mac-menu-preview.png` 是用相同透明轮廓制作的界面显示方式示意，不是Mac实机截图；原生成品另检查模板标志、18pt逻辑尺寸和1x/2x档。

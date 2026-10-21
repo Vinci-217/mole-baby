@@ -92,9 +92,9 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.equal(await desktop.evaluate(({ app }) => app.getName()), '拉姆', 'Packaged application display name');
   if(process.platform==='darwin') {
     const icon=await desktop.evaluate(({app,nativeImage})=>{
-      const path=require('node:path');
-      const {createTrayIcon}=require(path.join(app.getAppPath(),'electron/tray-icon.cjs'));
-      const image=createTrayIcon(nativeImage,process.platform,name=>path.join(app.getAppPath(),'dist/icons',name));
+      const load=process.getBuiltinModule('module').createRequire(app.getAppPath()+'/package.json');
+      const {createTrayIcon}=load('./electron/tray-icon.cjs');
+      const image=createTrayIcon(nativeImage,process.platform,name=>app.getAppPath()+'/dist/icons/'+name);
       return {empty:image.isEmpty(),template:image.isTemplateImage(),size:image.getSize(),scales:image.getScaleFactors()};
     });
     assert.equal(icon.empty,false);assert.equal(icon.template,true);assert.deepEqual(icon.size,{width:18,height:18});
