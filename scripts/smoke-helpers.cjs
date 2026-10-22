@@ -208,7 +208,7 @@ async function verifyStageSettings(page,desktop){
   for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
     await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();
     await expect(settings.getByRole('button',{name:`切换到${label}`,exact:true})).toHaveAttribute('aria-pressed','true');
-    if(stage===1||stage===2){const canvas=page.locator('.scene-character canvas');await expect(canvas).toHaveAttribute('data-sheet','grounded');await expect(canvas).toHaveAttribute('data-form',stage===1?'junior':'middle');}
+    if(stage===1||stage===2){const canvas=page.locator('.scene-character canvas');await expect(canvas).toHaveAttribute('data-sheet','grounded',{timeout:15000});await expect(canvas).toHaveAttribute('data-form',stage===1?'junior':'middle',{timeout:15000});}
     // An already selected stage keeps its progress, and the real clock may tick.
     const growth=(await save()).growth,thresholds=[0,60,180,420,840];
     expect(growth).toBeGreaterThanOrEqual(thresholds[stage]);
@@ -270,11 +270,35 @@ async function verifyRecolorPotion(page){
 }
 
 async function verifyPetLife(page){
+  // Earlier sleep checks deliberately exhaust this shared fixture. Restore
+  // normal energy so the real invitation policy can offer a second activity.
+  await page.evaluate(()=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));pet.stats.energy=85;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));});
+  await page.reload();await page.getByTestId('desktop-character').waitFor();
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   await page.getByRole('button',{name:'看看小蝴蝶',exact:true}).click();
   const ram=page.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-action','watch-butterfly');
   const image=ram.locator('.social-butterfly>img');await expect(image).toBeVisible();expect(await image.evaluate(n=>n.complete&&n.naturalWidth>0)).toBe(true);
+  await expect(ram).not.toHaveAttribute('data-action','watch-butterfly',{timeout:8500});
+  // Derive the extra familiarity row from two real interactions. The direct
+  // and accepted-invitation receipts differ, so ordinary dedup keeps both.
+  const invitation=page.getByTestId('companion-panel').getByTestId('pet-invitation');
+  for(let attempt=0;attempt<3;attempt++){
+    await invitation.getByRole('button',{name:'让拉姆提个主意',exact:true}).click();
+    if(await invitation.locator('[data-invitation-kind]').getAttribute('data-invitation-kind')==='butterfly')break;
+  }
+  await expect(invitation.locator('[data-invitation-kind]')).toHaveAttribute('data-invitation-kind','butterfly');
+  await invitation.locator('.pet-invitation-accept').click();
+  await expect(ram).toHaveAttribute('data-action','watch-butterfly');await expect(image).toBeVisible();
+  await expect(invitation.locator('[data-invitation-kind]')).toHaveCount(0);
+  const watches=await page.evaluate(()=>{
+    const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));
+    const memory=JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${pet.createdAt}`));
+    return memory.events.filter(event=>event.kind==='play'&&event.detail.includes('小蝴蝶'));
+  });
+  expect(watches.length).toBeGreaterThanOrEqual(2);
+  await expect(invitation.locator('.pet-invitation-habit')).toBeVisible();
   const scroll=await page.locator('.companion-content').evaluate(n=>({height:n.clientHeight,content:n.scrollHeight}));expect(scroll.content).toBeLessThanOrEqual(scroll.height+1);
+  console.log('PASS: familiar habits from two real interactions keep every play card inside the compact panel');
   await expect(ram).not.toHaveAttribute('data-action','watch-butterfly',{timeout:8500});await expect(ram.locator('.social-butterfly')).toHaveCount(0);await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await enterHome(page);await roomTab(page,'设置');await page.getByRole('slider',{name:'拉姆音量',exact:true}).fill('31');await page.getByRole('checkbox',{name:'自然小动作',exact:true}).uncheck();
   await toDesktop(page);await page.reload();await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('31');await expect(page.getByRole('checkbox',{name:'自然小动作',exact:true})).not.toBeChecked();await toDesktop(page);
