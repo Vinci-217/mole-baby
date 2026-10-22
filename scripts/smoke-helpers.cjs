@@ -160,7 +160,15 @@ async function verifyEdgePeek(page,desktop,side,{onPose}={}){
   const point={x:box.x+exposed.x,y:box.y+exposed.y};
   const travel={x:horizontal?-direction*150:0,y:horizontal?0:-direction*150};
   const physical={x:start.x+point.x,y:start.y+point.y};
+  await page.evaluate(()=>{
+    window.__edgeInputController?.abort();window.__edgeInputController=new AbortController();
+    window.__edgeInput={sequence:0};
+    for(const type of ['pointerdown','pointermove','pointerup'])document.addEventListener(type,event=>{
+      window.__edgeInput={sequence:window.__edgeInput.sequence+1,type,x:event.screenX,y:event.screenY};
+    },{capture:true,signal:window.__edgeInputController.signal});
+  });
   const pointer=async(type,position,held=false)=>{
+    const before=await page.evaluate(()=>window.__edgeInput.sequence);
     await desktop.evaluate(({BrowserWindow},{type,position,held})=>{
       const window=BrowserWindow.getAllWindows()[0],frame=window.getBounds();
       // CDP dispatches screenX=clientX even when the native window is offset.
@@ -170,6 +178,9 @@ async function verifyEdgePeek(page,desktop,side,{onPose}={}){
         globalX:Math.round(position.x),globalY:Math.round(position.y),button:'left',
         clickCount:type==='mouseMove'?0:1,modifiers:held?['leftButtonDown']:[]});
     },{type,position,held});
+    const kind={mouseMove:'pointermove',mouseDown:'pointerdown',mouseUp:'pointerup'}[type];
+    await expect.poll(()=>page.evaluate(()=>window.__edgeInput)).toMatchObject({type:kind,x:Math.round(position.x),y:Math.round(position.y)});
+    expect(await page.evaluate(()=>window.__edgeInput.sequence)).toBeGreaterThan(before);
     await page.evaluate(()=>window.desktop.getState());
   };
   await pointer('mouseMove',physical);await pointer('mouseDown',physical,true);
@@ -178,6 +189,7 @@ async function verifyEdgePeek(page,desktop,side,{onPose}={}){
     await pointer('mouseMove',{x:physical.x+travel.x*n/8,y:physical.y+travel.y*n/8},true);
   }
   await pointer('mouseUp',{x:physical.x+travel.x,y:physical.y+travel.y});
+  await page.evaluate(()=>{window.__edgeInputController.abort();delete window.__edgeInputController;delete window.__edgeInput;});
   await expect.poll(async()=>(await state()).edgeSide).toBeNull();await expect.poll(async()=>(await state()).edgePose).toBe('visible');
   const after=await bounds(),offset=direction*(horizontal?44:50);
   expect(after.x).toBe(start.x+travel.x+(horizontal?offset:0));
