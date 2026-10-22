@@ -158,12 +158,15 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .pet-actions{left:2px;width:156px;gap:1px}
 .companion-layout .pet-actions button{width:20px;height:28px;flex:0 0 20px;padding:2px}
 .companion-layout .pet-actions button img{width:20px;height:20px}
-.companion-layout .compact-pet{transition:transform .85s cubic-bezier(.4,0,.2,1)}
-.companion-layout:not(.panel-open).edge-hidden.edge-right .compact-pet{transform:translateX(105px)}
-.companion-layout:not(.panel-open).edge-hidden.edge-left .compact-pet{transform:translateX(-105px)}
-.companion-layout:not(.panel-open).edge-peek.edge-right .compact-pet{transform:translateX(65px)}
-.companion-layout:not(.panel-open).edge-peek.edge-left .compact-pet{transform:translateX(-65px)}
-.companion-layout.edge-hidden .compact-bubble,.companion-layout.edge-hidden .compact-pet-name,.companion-layout.edge-peek .compact-bubble{opacity:0;pointer-events:none}
+.companion-layout .compact-pet{transform:translate(var(--edge-x,0px),var(--edge-y,0px));transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.companion-layout.edge-tucking .compact-pet{transition-duration:1.8s;transition-timing-function:cubic-bezier(.3,.05,.35,1)}
+/* Dock anchors place transparent window padding beyond the work area. Clip at
+   that boundary even when the physical screen extends behind a system Dock. */
+.companion-layout.is-edge-docked.edge-left{clip-path:inset(0 0 0 30px)}
+.companion-layout.is-edge-docked.edge-right{clip-path:inset(0 30px 0 0)}
+.companion-layout.is-edge-docked.edge-top{clip-path:inset(71px 0 0 0)}
+.companion-layout.is-edge-docked.edge-bottom{clip-path:inset(0 0 61px 0)}
+.companion-layout.is-edge-docked .compact-bubble,.companion-layout.is-edge-docked .compact-pet-name{opacity:0;pointer-events:none}
 .companion-layout .compact-pet-name{font-size:12px;line-height:18px}
 .companion-layout .compact-pet-name.sleeping-badge{font-size:11px}
 .companion-layout .compact-bubble{top:0;font-size:12px;line-height:1.5;max-height:66px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}

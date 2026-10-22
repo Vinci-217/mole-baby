@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -141,8 +141,8 @@ async function verifyBackground(page, selector, suffix) {
   await page.getByRole('button',{name:'取消计时',exact:true}).click();await page.mouse.move(1,239);await expect(page.getByTestId('pet-actions')).toHaveCount(0);
   console.log('PASS real pointer hover opens tools through native passthrough, leave hides tools, and the clock replaces rest without an idle bar');
 
-  for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
-  console.log('PASS free left/near-right placement, exact right docking, hover/click only peek, 2–5 minute cadence and physical drag out');
+  for(const side of ['left','right','top','bottom'])await verifyEdgePeek(page,desktop,side);
+  console.log('PASS four body-aligned edges, near-edge free placement, finite tuck, hover/click only peek, 2–5 minute cadence and physical drag out');
 
   await verifyStageSettings(page,desktop);console.log('PASS actual settings choose all five stages/four evolutions, persist upgrades/downgrades and preserve identity, items and memories');
 
@@ -170,8 +170,7 @@ async function verifyBackground(page, selector, suffix) {
   const mature=await character.boundingBox(),beforeDrag=await bounds();await page.mouse.move(mature.x+50,mature.y+55);await page.mouse.down();await page.mouse.move(mature.x+110,mature.y+75);await page.mouse.up();await expect.poll(async()=>(await bounds()).x).toBe(beforeDrag.x+60);await expect.poll(async()=>(await bounds()).y).toBe(beforeDrag.y+20);
   await page.keyboard.press('Escape');await page.evaluate(()=>window.desktop.wander(true));await expect.poll(async()=>(await state()).motion,{timeout:20000}).toMatch(/^(left|right)$/);await expect(character.locator('.ram-sprite')).toHaveClass(/action-walk-(left|right)/);
   await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();await expect.poll(async()=>(await state()).motion).toBe('idle');await page.evaluate(()=>window.desktop.wander(false));await page.getByLabel('关闭小窗').click();await page.keyboard.press('Escape');
-  await page.evaluate(async()=>{await window.desktop.setEdgeHiding(true);await window.desktop.setInteracting(false);await window.desktop.startPetDrag();});const nowBounds=await bounds();await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:rightX-nowBounds.x,dy:area.y+area.height-240-nowBounds.y});await page.evaluate(()=>window.desktop.endPetDrag());
-  await expect.poll(async()=>(await state()).edgePose,{timeout:5000}).toBe('hidden');const nextPeek=(await state()).edgeNextPeekAt-Date.now();assert.ok(nextPeek>118000&&nextPeek<=300000);await page.evaluate(()=>window.desktop.setEdgeHovered(true));await expect.poll(async()=>(await state()).edgePose).toBe('peek');await expect(page.locator('.companion-layout')).toHaveClass(/edge-peek/);await page.evaluate(()=>window.desktop.revealPet());assert.equal((await state()).edgePose,'visible');await page.evaluate(()=>window.desktop.setEdgeHiding(false));
+  await verifyEdgePeek(page,desktop,'right');await page.evaluate(()=>window.desktop.setEdgeHiding(false));
   const pinned=await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());assert.equal((await state()).alwaysOnTop,pinned);await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());
   console.log('PASS real mature dragging, timed directional walking, interaction pause, corner tuck/peek/reveal and pin state');
 
@@ -192,6 +191,7 @@ async function verifyBackground(page, selector, suffix) {
   await verifyPetLife(page);console.log('PASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application');
   await verifyRecolorPotion(page);console.log('PASS real colour potion shop purchase/use/relaunch, finite animation and retained pet identity/inventory');
   await verifyRoomIteration(page);
+  await verifyPetSpirit(page);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();
   await page.evaluate(()=>window.desktop.minimize());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());

@@ -1,12 +1,37 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { createPet } from './game';
-import { appendMessage, createMemory, forgetFact, localReply, rememberChat, setPlanStatus } from './companion-memory';
+import { appendMessage, createMemory, forgetFact, localReply, recordEvent, rememberChat, setPlanStatus } from './companion-memory';
 import { choosePresence, CULTURE, newPresenceJournal, presenceCandidates, presenceFollowUp, presenceKey, readPresenceJournal, rememberPresence, wantsQuiet } from './companion-presence';
 
 const NOW=1_800_000_000_000;
 const pet=()=>createPet('小芽','blue',NOW-86400000);
 afterEach(()=>vi.unstubAllGlobals());
 describe('thoughtful desktop companionship',()=>{
+ it('occasionally offers real interactions on the existing cadence, never from manual speech or reading',()=>{
+  const p=pet(),m=createMemory(p),journal=newPresenceJournal(p);
+  journal.history=[{id:'work-0',topic:'work',at:NOW-40*60000},{id:'growth-0-0',topic:'growth',at:NOW-20*60000}];
+  expect(choosePresence(p,m,journal,NOW)?.invitation).toBeDefined();
+  expect(choosePresence(p,m,journal,NOW,true)?.invitation).toBeUndefined();
+  expect(choosePresence(p,m,journal,NOW,false,true)?.invitation).toBeUndefined();
+  expect(choosePresence(p,m,newPresenceJournal(p),NOW)?.invitation).toBeUndefined();
+  const offered=rememberPresence(journal,choosePresence(p,m,journal,NOW)!,NOW);
+  for(let i=1;i<=5;i++){
+   offered.history.push({id:`ordinary-${i}`,topic:i%2?'work':'growth',at:NOW+i*10*60000});
+   expect(choosePresence(p,m,offered,NOW+i*10*60000)?.invitation).toBeUndefined();
+  }
+  const full={...journal,history:Array.from({length:48},(_,i)=>({id:`old-${i}`,topic:'work' as const,at:NOW-(48-i)*60000}))};
+  expect(choosePresence(p,m,full,NOW)?.invitation).toBeDefined();
+ });
+ it('keeps a chosen quiet half-hour silent while explicit speech remains available',()=>{
+  const p=pet(),m=recordEvent(createMemory(p),{kind:'companion-pause',detail:'先忙30分钟',at:NOW}),j=newPresenceJournal(p);
+  expect(choosePresence(p,m,j,NOW)).toBeNull();
+  expect(choosePresence(p,m,j,NOW,false,true)).toBeNull();
+  expect(choosePresence(p,m,j,NOW,true)?.invitation).toBeUndefined();
+  expect(choosePresence(p,m,j,NOW,true)).not.toBeNull();
+  expect(choosePresence(p,m,j,NOW+30*60000)).not.toBeNull();
+  const resumed=recordEvent(m,{kind:'companion-resume',detail:'有空啦',at:NOW});
+  expect(choosePresence(p,resumed,j,NOW)).not.toBeNull();
+ });
  it('offers book and study topics while reading, keeps silence boundaries and does not invent an actual book title',()=>{
   const p=pet();let m=createMemory(p),j=newPresenceJournal(p);
   for(let i=0;i<30;i++){const line=choosePresence(p,m,j,NOW+i*300000,false,true)!;expect(['reading','culture']).toContain(line.topic);expect(line.id.startsWith('study-')).toBe(true);j=rememberPresence(j,line,NOW+i*300000);}

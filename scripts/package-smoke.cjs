@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -140,8 +140,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const seedAfterDrag = await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(seedAfterDrag.x, seedBeforeDrag.x - 10);assert.equal(seedAfterDrag.y, seedBeforeDrag.y - 10);
   assert.equal(await page.evaluate(()=>window.desktop.getState()).then(state=>state.wandering),false,'a seed never wanders on its own');
-  for(const side of ['left','right'])await verifyEdgePeek(page,desktop,side);
-  console.log('PASS: left/near-right stays free, only the rightmost edge docks; hover/click peeks, physical drag releases, random 2–5 minute cadence');
+  for(const side of ['left','right','top','bottom'])await verifyEdgePeek(page,desktop,side);
+  console.log('PASS: four body-aligned edges, near-edge free placement and finite tuck; hover/click peeks, physical drag releases, random 2–5 minute cadence');
   await verifyStageSettings(page,desktop);console.log('PASS: settings select every stage/evolution, persist downgrade after reload and retain identity, inventory and memories');
   await expect(page.getByRole('timer')).toHaveCount(0);await verifySocialProps(page);
   console.log('PASS: local thoughtful speech and clickable chat continuity in the shipped native window');
@@ -252,6 +252,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifyPetLife(page);console.log('PASS: finite original-body butterfly play and restart-safe natural-motion/volume settings in the actual application');
   await verifyRecolorPotion(page);console.log('PASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies');
   await verifyRoomIteration(page);
+  await verifyPetSpirit(page);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());

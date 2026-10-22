@@ -127,6 +127,24 @@
 .gesture-recolor .ram-care-particles i{border:0;background:transparent;box-shadow:none;width:9%;rotate:calc(var(--care-progress)*180deg)}
 .fruit-basket .ram-flight-layer{animation:none!important;transform:none!important}
 
+/* Manual entry is finite. A seed's original pot stays upright through four
+   small hops; grown walkers use their original side frames with quiet steps. */
+.ram-sprite.ram-seed.is-edge-entering .ram-flight-layer{animation:ram-seed-edge-hop 450ms ease-in-out 4 both}
+.ram-sprite.ram-grounded.is-edge-entering:not(.is-sleeping):not(.is-dragging) .ram-flight-layer{animation:ram-edge-step 450ms ease-in-out 4 both}
+.ram-sprite.is-edge-entering:not(.ram-seed):not(.ram-grounded):not(.is-sleeping) .ram-pose-layer{animation:ram-edge-flight-body 1.8s ease-in-out both}
+@keyframes ram-seed-edge-hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-3%)}}
+@keyframes ram-edge-step{0%,100%{transform:translateY(0)}45%{transform:translateY(-1.7%)}}
+@keyframes ram-edge-flight-body{0%,100%{transform:rotate(0)}35%{transform:rotate(-1deg)}70%{transform:rotate(.6deg)}}
+/* At the upper edge the flowerpot remains concealed; only the original seed
+   body leans down into view, so its eyes remain readable without turning over. */
+.ram-seed .seed-pot-original{transition:opacity .4s ease}
+.ram-seed.is-peeking[data-peek-side=top] .seed-pot-original{opacity:0}
+.ram-sprite.action-happy:not(.ram-seed):not(.is-sleeping):not(.is-dragging) .ram-pose-layer{animation:ram-small-happy 1.8s ease-in-out both}
+.ram-sprite.action-waving:not(.ram-seed):not(.is-sleeping):not(.is-dragging) .ram-pose-layer{animation:ram-small-wave 2.1s ease-in-out both}
+@keyframes ram-small-happy{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-1.5%) rotate(-1deg)}65%{transform:translateY(-.5%) rotate(1deg)}}
+@keyframes ram-small-wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.8deg)}50%{transform:rotate(1.8deg)}75%{transform:rotate(-.8deg)}}
+@media(prefers-reduced-motion:reduce){.ram-sprite.is-edge-entering .ram-flight-layer,.ram-sprite.is-edge-entering .ram-pose-layer,.ram-sprite.action-happy .ram-pose-layer,.ram-sprite.action-waving .ram-pose-layer{animation:none!important}.ram-seed .seed-pot-original{transition:none}}
+
 .gesture-recolor .ram-care-particles i>img{position:absolute;inset:-50%;width:200%;height:200%;object-fit:contain}
 .social-butterfly{position:absolute;left:var(--butterfly-x,77%);top:var(--butterfly-y,8%);width:26%;translate:-50% -50%;transform:rotate(var(--butterfly-angle,-12deg)) scaleX(var(--butterfly-wing,1))}.social-butterfly>img{display:block;width:100%;height:auto}
 @media(prefers-reduced-motion:reduce){.ram-sprite:is(.action-watch-butterfly,.action-look-around) .ram-pose-layer{transform:none}}

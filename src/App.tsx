@@ -34,6 +34,10 @@ import {timerMemoryDetail} from './companion-moments';
 import {careGains,type CareFeedbackData} from './care-feedback';
 import type { PresenceLine } from './companion-presence';
 import { useRestReminder, validReminderMinutes, reminderTime } from './use-rest-reminder';
+import PetInvitation from './components/PetInvitation';
+import { createInvitation, companionSnoozeUntil } from './companion-invitation';
+import type { CompanionInvitation } from './companion-invitation';
+import { getPetHabits, nameResponse } from './companion-instinct';
 
 const SAVE_KEY = 'ramu-house-save-v1';
 const PREFS_KEY = 'ramu-house-preferences-v2';
@@ -82,6 +86,9 @@ export default function App() {
   const [toast, setToast] = useState('');
   const [bubble, setBubble] = useState('拉姆～ 我来陪你啦！');
   const [bubbleVisible, setBubbleVisible] = useState(false);
+  const [invitation, setInvitation] = useState<{ petId:number; at:number; offer:CompanionInvitation } | null>(null);
+  const invitationRef = useRef(invitation); invitationRef.current = invitation;
+  const suggestionSequence = useRef(0), nameSequence = useRef(0), nameCallUntil = useRef(0);
   const [game, setGame] = useState<GameKind | null>(null);
   const [reset, setReset] = useState(false);
   const [evolutionChoice, setEvolutionChoice] = useState<Evolution>('super');
@@ -109,10 +116,21 @@ export default function App() {
   const roomMedia = useRoomMedia(hasPet && !floating, voiceBusy);
   useEffect(()=>{configurePetSound({enabled:prefs.sound,volume:prefs.soundVolume,speechBusy:voiceBusy})},[prefs.sound,prefs.soundVolume,voiceBusy]);
   const currentMemory = memory?.petId === String(current.createdAt) ? memory : createMemory(current);
+  const snoozed = companionSnoozeUntil(currentMemory) > Date.now();
+  const openInvitation = invitation?.petId === current.createdAt && Date.now()-invitation.at < 5*60000 ? invitation.offer : null;
   const days = Math.max(1, Math.floor((Date.now() - current.createdAt) / 86400000) + 1);
 
   const speak = useCallback((text: string, duration = 6500) => { ambient.current = null; setBubble(text); setBubbleVisible(true); clearTimeout(timers.current.bubble); timers.current.bubble = setTimeout(() => setBubbleVisible(false), duration); }, []);
   const notify = useCallback((text: string) => { setToast(text); clearTimeout(timers.current.toast); timers.current.toast = setTimeout(() => setToast(''), 3800); }, []);
+  useEffect(() => { clearInvitation(); suggestionSequence.current=0; nameSequence.current=0; nameCallUntil.current=0; }, [pet?.createdAt]);
+  useEffect(() => { if(pet?.sleeping||prefs.quiet)clearInvitation(); }, [pet?.sleeping,prefs.quiet]);
+  useEffect(() => {
+    if (!invitation) return;
+    const expiry = setTimeout(() => {
+      if (invitationRef.current === invitation) clearInvitation();
+    }, Math.max(0, invitation.at + 5 * 60000 - Date.now()));
+    return () => clearTimeout(expiry);
+  }, [invitation]);
   useEffect(() => { if (pet && petRef.current?.createdAt === pet.createdAt && !awaitingAdoption.current) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(pet)); setSaveError(false); } catch { setSaveError(true); } } }, [pet]);
   useEffect(() => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* Pet save has its own error notice. */ } }, [prefs]);
   useEffect(() => { const timer = setInterval(() => setPet(p => p ? tick(p, Date.now()) : p), 15000); return () => clearInterval(timer); }, []);
@@ -140,17 +158,57 @@ export default function App() {
     window.desktop?.notify('拉姆 · 计时结束', text);
     setMemory(m => m ? recordEvent(m, { kind: 'reminder', detail: timerMemoryDetail(prefs.reminderMinutes) }) : m);
   });
+  const interactionBusy = current.sleeping || timer.running || voiceBusy || action !== 'idle' || Date.now() < careUntil.current || Date.now() < dizzyUntil.current;
   const tellPresence = usePresence({pet,memory:currentMemory,enabled:prefs.presence,minutes:prefs.presenceMinutes,reading:timer.running,
-    blocked:!floating||prefs.quiet||current.sleeping||panel!==null||game!==null||voiceBusy||!['idle','focus'].includes(action)||bubbleVisible||desktopState.edgeSide!==null,
-    onLine:line=>{speak(line.text,14000);ambient.current={line,at:Date.now()};}
+    blocked:!floating||prefs.quiet||snoozed||current.sleeping||panel!==null||game!==null||voiceBusy||!['idle','focus'].includes(action)||bubbleVisible||desktopState.edgeSide!==null||(desktopState.motion!==undefined&&desktopState.motion!=='idle'),
+    onLine:line=>{if(line.invitation)presentInvitation({...line.invitation,text:line.text});else{clearInvitation();speak(line.text,14000);}ambient.current={line,at:Date.now()};}
   });
-  useIdleLife({petId:pet?.createdAt,enabled:prefs.lively&&!wantsQuiet(currentMemory),blocked:!floating||prefs.quiet||current.sleeping||timer.running||panel!==null||game!==null||voiceBusy||action!=='idle'||bubbleVisible||desktopState.edgeSide!==null||(desktopState.motion!==undefined&&desktopState.motion!=='idle')||current.stats.health<35||current.stats.energy<25||current.stats.hunger<25||current.stats.thirst<25,onAction:animate});
-  function watchButterfly(){
-    if(!petRef.current||petRef.current.sleeping||Date.now()<careUntil.current||Date.now()<dizzyUntil.current)return;
+  useIdleLife({petId:pet?.createdAt,pet:pet??undefined,memory:currentMemory,enabled:prefs.lively&&!wantsQuiet(currentMemory),blocked:!floating||prefs.quiet||snoozed||current.sleeping||timer.running||panel!==null||game!==null||voiceBusy||action!=='idle'||bubbleVisible||desktopState.edgeSide!==null||(desktopState.motion!==undefined&&desktopState.motion!=='idle')||current.stats.health<35||current.stats.energy<25||current.stats.hunger<25||current.stats.thirst<25,onAction:animate});
+  function watchButterfly(invited=false){
+    if(document.hidden||!petRef.current||petRef.current.sleeping||Date.now()<careUntil.current||Date.now()<dizzyUntil.current)return false;
     animate('watch-butterfly');speak('咦，小蝴蝶！我在这里看看它，不追远啦。',10000);
-    setMemory(m=>m?recordEvent(m,{kind:'play',detail:'你陪我在原地看了一会儿小蝴蝶。'}):m);
+    setMemory(m=>m?recordEvent(m,{kind:'play',detail:invited?'你回应我的小邀请，陪我在原地看了一会儿小蝴蝶。':'你陪我在原地看了一会儿小蝴蝶。'}):m);
+    return true;
+  }
+  function clearInvitation(){ invitationRef.current=null;setInvitation(null); }
+  function presentInvitation(offer:CompanionInvitation){
+    const saved=petRef.current;if(document.hidden||!saved||saved.sleeping)return;
+    const next={petId:saved.createdAt,at:Date.now(),offer};invitationRef.current=next;setInvitation(next);speak(offer.text,14000);
+  }
+  function suggestTogether(){
+    const saved=petRef.current;if(document.hidden||!saved||interactionBusy)return;
+    const offer=createInvitation(saved,currentMemory,suggestionSequence.current++);
+    if(offer)presentInvitation(offer);else speak('现在先让我缓一缓，等有精神了再一起玩。');
+  }
+  function acceptInvitation(){
+    const pending=invitationRef.current,saved=petRef.current;
+    if(document.hidden||!pending||!saved||pending.petId!==saved.createdAt||Date.now()-pending.at>=5*60000||interactionBusy)return;
+    clearInvitation();
+    if(pending.offer.kind==='butterfly')watchButterfly(true);
+    else if(pending.offer.kind==='ball')doCare('play',undefined,'你回应我的小邀请，我们一起玩了一会儿小球。');
+    else doCare('pet',undefined,'你答应我的小邀请，轻轻摸了摸我。');
+  }
+  function deferInvitation(){
+    const pending=invitationRef.current,saved=petRef.current;
+    if(document.hidden||!pending||!saved||pending.petId!==saved.createdAt||Date.now()-pending.at>=5*60000)return;clearInvitation();ambient.current=null;
+    setMemory(m=>m?recordEvent(m,{kind:'companion-pause',detail:'你说先忙30分钟，我答应安静陪着。'}):m);
+    speak('好呀，先忙你的。这30分钟我安静陪着，想玩时再叫我。');
+  }
+  function resumeCompanion(){
+    if(document.hidden)return;
+    setMemory(m=>m?recordEvent(m,{kind:'companion-resume',detail:'你说可以恢复主动陪伴了。'}):m);
+    speak('好呀，我还是按原来的节奏陪着你。');
+  }
+  function callPetName(){
+    const saved=petRef.current;if(document.hidden||!saved||interactionBusy||Date.now()<nameCallUntil.current)return;
+    nameCallUntil.current=Date.now()+1200;
+    const response=nameResponse(saved,currentMemory,nameSequence.current++);
+    animate(response.action);speak(response.text,8500);playPetVoice('pet',prefs.sound);
+    setMemory(m=>m?recordEvent(m,{kind:'call-name',detail:`你轻轻叫了我${saved.name}，我回应了你。`}):m);
   }
   function respondToBubble() {
+    const offer=invitationRef.current;
+    if(offer&&offer.petId===current.createdAt&&Date.now()-offer.at<5*60000&&bubble===offer.offer.text){void openPanel('play');return;}
     const shared=ambient.current;
     if(shared&&shared.line.text===bubble){
       setMemory(m=>m?appendMessage(recordEvent(m,{kind:'presence',detail:`我对你说：${shared.line.text}`,at:shared.at}),'assistant',shared.line.text,shared.at):m);
@@ -188,7 +246,7 @@ export default function App() {
     dizzyUntil.current = Date.now() + 3200; touches.current = [];
     animate('dizzy'); speak('晕乎乎的……让我缓一缓，轻轻摸就好啦。', 4500); playPetVoice('shake', prefs.sound);
   }
-  function doCare(type: Action, itemId?: string) {
+  function doCare(type: Action, itemId?: string, invitationDetail?:string) {
     if(type!=='sleep'&&Date.now()<careUntil.current&&!(type==='wash'&&!itemId))return;
     if (['pet','play'].includes(type) && Date.now() < dizzyUntil.current) return;
     if (type === 'pet' && !petRef.current?.sleeping) {
@@ -200,14 +258,17 @@ export default function App() {
     if(type==='sleep'&&!saved.sleeping)return; // Sleep is autonomous; the user only wakes it.
     if (type !== 'sleep' && Date.now() < careUntil.current) return;
     const item = getItem(itemId), next = type === 'sleep' && saved.sleeping ? 'wake' : type;
-    const detail = item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined;
-    apply(care(saved, type, itemId, Date.now()), next, detail, itemId);
+    const detail = invitationDetail ?? (item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined);
+    const result=care(saved, type, itemId, Date.now());
+    if(result.ok)clearInvitation();
+    apply(result, next, detail, itemId);
+    return result.ok;
   }
   function chooseStage(next: Stage, evolution?: Evolution) {
     const saved = petRef.current; if (!saved) return;
     const result = changePetStage(saved, next, evolution);
     if (!result.ok || result.state === saved) { notify(result.message); return; }
-    clearTimeout(timers.current.animation); careUntil.current = 0; dizzyUntil.current = 0; touches.current = [];
+    clearInvitation();clearTimeout(timers.current.animation); careUntil.current = 0; dizzyUntil.current = 0; touches.current = [];
     setCareFeedback(null);clearTimeout(timers.current.feedback);setActionItemId(undefined);setActionFromColor(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
     petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
     setMemory(m => m ? recordEvent(m, { kind: 'stage-choice', detail: `你在设置里把我的形态切换为${result.state.evolution ? EVOLUTIONS.find(v => v.id === result.state.evolution)!.name : STAGES[next].name}。` }) : m);
@@ -219,6 +280,7 @@ export default function App() {
   async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false); await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false); }
   function startTimer() {
     if (!prefs.reminders) return;
+    clearInvitation();
     prepareReminderSound(); timer.start(); if (Date.now() >= careUntil.current) animate('focus');
     speak(`我翻开书陪你读一会儿，${prefs.reminderMinutes} 分钟后提醒你。`);
   }
@@ -231,7 +293,7 @@ export default function App() {
   }
   async function abandonPet() {
     const saved = petRef.current; if (!saved) return;
-    awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
+    clearInvitation();awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
     window.companionAI?.cancel(); window.companionSpeech?.cancel(); window.speechSynthesis?.cancel();
@@ -246,7 +308,7 @@ export default function App() {
   }
   function changeMemory(update: CompanionMemory | ((previous: CompanionMemory) => CompanionMemory)) {
     // A forgotten or edited fact must disappear from the currently visible bubble too.
-    ambient.current=null; clearTimeout(timers.current.bubble); setBubbleVisible(false);
+    clearInvitation();ambient.current=null; clearTimeout(timers.current.bubble); setBubbleVisible(false);
     const identity = String(current.createdAt);
     setMemory(previous => {
       const saved = petRef.current; if (!saved || String(saved.createdAt) !== identity) return previous;
@@ -264,7 +326,7 @@ export default function App() {
       const raw = JSON.parse(await file.text());
       const restored = parseSave(JSON.stringify({ ...raw, companionMemory: undefined }), Date.now());
       if (!restored) throw Error();
-      clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
+      clearInvitation();clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
       careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
       setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
@@ -287,6 +349,9 @@ export default function App() {
   }
 
   const mood = getCompanionMood(currentMemory, current);
+  const habits=getPetHabits(currentMemory);
+  const habitText=habits.food&&habits.food.count>1?`最近熟悉的味道：${habits.food.name}`:habits.drink&&habits.drink.count>1?`最近熟悉的味道：${habits.drink.name}`:habits.play&&habits.play.count>1?`最近的小默契：${habits.play.name}`:undefined;
+  const playInvitation=<PetInvitation invitation={openInvitation} busy={interactionBusy} petName={current.name} habitText={habitText} snoozed={snoozed} onAccept={acceptInvitation} onDefer={deferInvitation} onSuggest={suggestTogether} onCallName={callPetName} onResume={resumeCompanion}/>;
   const visitShop = () => { void enterHome('shop'); };
   const foodContent = <CarePocket key={`${pocketCategory}:${pocketVisit}`} pet={current} initialCategory={pocketCategory} onCare={doCare} busyItemId={actionItemId} allowShop={!floating} onVisitShop={visitShop}/>;
   const chatContent = <CompanionChat key={current.createdAt} pet={current} memory={currentMemory} onMemoryChange={changeMemory} onReply={onChatReply} compact={floating} onSpeechBusyChange={setVoiceBusy}/>;
@@ -309,8 +374,8 @@ export default function App() {
     {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>移上来互动，点击摸摸，按住拖动。</span></div>}
     <DesktopCompanion pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['status','food','play','chat'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
-      sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent}
-      onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onPresence={()=>tellPresence(true)} onCurious={watchButterfly} onPet={() => doCare('pet')}/>
+      sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent} playInvitation={playInvitation}
+      onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;
 
@@ -362,7 +427,7 @@ export default function App() {
         <p>神力形态选择后保留。身体颜色、名字和我们的回忆都会一直在。</p>
       </section>}
       {panel === 'chat' && chatContent}
-      {panel === 'play' && <div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" disabled={current.sleeping} onClick={()=>tellPresence(true)}>听拉姆说一句</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div>}
+      {panel === 'play' && <>{playInvitation}<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" disabled={current.sleeping} onClick={()=>tellPresence(true)}>听拉姆说一句</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div></>}
       {panel === 'settings' && <><section className="room-preferences"><form className="room-rename" onSubmit={e => { e.preventDefault(); if (name.trim()) { setPet(p => p ? { ...p, name: name.trim().slice(0,12) } : p); notify('名字保存好啦。'); } }}><label htmlFor="rename">拉姆的名字</label><input id="rename" aria-label="拉姆的新名字" value={name} maxLength={12} onChange={e => setName(e.target.value)}/><button className="game-button small" disabled={!name.trim()}>保存</button></form>
         {([['安静陪伴',prefs.quiet,() => setPrefs(p => ({...p,quiet:!p.quiet})),false],['互动音效',prefs.sound,() => setPrefs(p => ({...p,sound:!p.sound})),false],['桌面散步',desktopState.wandering,() => void toggleWander(),!window.desktop],['角落躲藏',desktopState.edgeHiding,() => void window.desktop?.setEdgeHiding(!desktopState.edgeHiding),!window.desktop]] as const).map(([label,checked,callback,disabled]) => <label className="room-toggle-row" key={label}><span>{label}</span><button role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={callback}>{checked ? '开启' : '关闭'}</button></label>)}
         <div className="room-backup"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={() => importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e => void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={() => setReset(true)}>送别拉姆</button></div></section><StageSettings pet={current} onChange={chooseStage}/>{extraSettings}</>}

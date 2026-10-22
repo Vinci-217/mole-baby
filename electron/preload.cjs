@@ -80,7 +80,15 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   },
   onPetModeChanged: (callback) => subscribeToState('desktop:pet-mode-changed', callback, (state) => state.petMode),
   onStateChanged: (callback) => subscribeToState('desktop:state-changed', callback, (state) => state),
-  startPetDrag: () => ipcRenderer.invoke('desktop:start-pet-drag'),
+  startPetDrag: (paintedOffset) => {
+    if (paintedOffset !== undefined && (!paintedOffset || Array.isArray(paintedOffset)
+      || typeof paintedOffset.x !== 'number' || typeof paintedOffset.y !== 'number'
+      || !Number.isFinite(paintedOffset.x) || !Number.isFinite(paintedOffset.y)
+      || Math.abs(paintedOffset.x) > 82 || Math.abs(paintedOffset.y) > 92)) {
+      return Promise.reject(new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector'));
+    }
+    return ipcRenderer.invoke('desktop:start-pet-drag', paintedOffset);
+  },
   endPetDrag: () => ipcRenderer.invoke('desktop:end-pet-drag'),
   movePet: (dx, dy) => {
     if (typeof dx !== 'number' || typeof dy !== 'number' || !Number.isFinite(dx) || !Number.isFinite(dy)) {

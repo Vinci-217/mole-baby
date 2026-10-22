@@ -269,7 +269,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
   stats.happiness = clamp(stats.happiness + 16);
   stats.energy = clamp(stats.energy - 12);
   stats.hunger = clamp(stats.hunger - 5);
-  return { state: { ...current, stats }, message: '蹦蹦跳跳！和你一起玩最开心。', ok: true };
+  return { state: { ...current, stats }, message: '小球来啦，和你一起玩一会儿真开心。', ok: true };
 }
 
 export function buyItem(state: GameState, itemId: string): CareResult {

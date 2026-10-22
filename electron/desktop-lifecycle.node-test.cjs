@@ -79,7 +79,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32') {
   const window = windows[0]; const tray = FakeTray.instance;
   const event = { sender: window.webContents, senderFrame: window.webContents.mainFrame };
   return {
-    app, window, tray, stats, handles, listeners,
+    app, window, tray, stats, handles, listeners, screen, display,
     send: (channel, ...args) => listeners.get(channel)(event, ...args),
     invoke: (channel, ...args) => handles.get(channel)(event, ...args),
     cleanup() { app.emit('before-quit'); app.emit('will-quit'); fs.rmSync(profile, { recursive: true, force: true }); },
@@ -92,6 +92,7 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   assert.equal(path.basename(run.app.userData), 'mole-baby');
   assert.equal(run.window.options.title, '拉姆');
   assert.equal(run.window.options.skipTaskbar, true);
+  assert.equal(run.window.options.enableLargerThanScreen, false);
   run.window.emit('ready-to-show');
   assert.equal(run.window.isVisible(), false, 'Electron paint readiness must not flash the large room');
   run.invoke('desktop:set-pet-mode', true);
@@ -171,6 +172,7 @@ test('seed/sleep disables autonomous movement while manual dragging remains avai
 test('macOS is menu-bar resident, never flashes before readiness, and uses native editing shortcuts', async t => {
   const run = await launch(undefined, false, 'darwin'); t.after(() => run.cleanup());
   assert.equal(run.stats.dockHidden, true);
+  assert.equal(run.window.options.enableLargerThanScreen, true, 'frameless Mac windows must be able to place their transparent top margin beyond the menu bar');
   assert.equal(run.tray.image.template, true, 'AppKit must tint the Mac menu-bar glyph');
   assert.equal(path.basename(run.tray.image.path), 'tray-mac.png');
   assert.ok(run.stats.appMenu.some(item => item.role === 'editMenu'));
@@ -193,7 +195,9 @@ test('docked pets only peek on hover, wait minutes between automatic peeks and r
  t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
  run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',5000,-200);run.invoke('desktop:end-pet-drag');
- t.mock.timers.tick(1601);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+ assert.equal(run.invoke('desktop:get-state').edgePose,'tucking');
+ t.mock.timers.tick(1799);assert.equal(run.invoke('desktop:get-state').edgePose,'tucking');
+ t.mock.timers.tick(1);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
  const due=run.invoke('desktop:get-state').edgeNextPeekAt;assert.ok(due-Date.now()>118000&&due-Date.now()<=300000);
  t.mock.timers.tick(118000);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
  t.mock.timers.tick(due-Date.now()+1);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
@@ -203,12 +207,89 @@ test('docked pets only peek on hover, wait minutes between automatic peeks and r
  run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
 });
 
-test('starting a drag before the edge tuck animation keeps the visible pet under the pointer',async t=>{
+test('all four seed docks finish entering, only peek on hover, and release by dragging',async t=>{
+ t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
- run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',5000,0);run.invoke('desktop:end-pet-drag');
- assert.equal(run.invoke('desktop:get-state').edgeSide,'right');assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
- const before=run.window.getBounds();run.invoke('desktop:start-pet-drag');assert.equal(run.window.getBounds().x,before.x);
- run.invoke('desktop:move-pet',-200,0);run.invoke('desktop:end-pet-drag');assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+ for (const [side, delta, hidden, peek, pull] of [
+   ['left',[-5000,0],{x:-82,y:0},{x:-44,y:0},[250,0]],
+   ['right',[5000,0],{x:82,y:0},{x:44,y:0},[-250,0]],
+   ['top',[0,-5000],{x:0,y:-92},{x:0,y:-50},[0,250]],
+   ['bottom',[0,5000],{x:0,y:92},{x:0,y:50},[0,-250]],
+ ]) {
+   run.invoke('desktop:move-pet',900-run.window.getBounds().x,400-run.window.getBounds().y);
+   run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',...delta);run.invoke('desktop:end-pet-drag');
+   assert.equal(run.invoke('desktop:get-state').edgeSide,side);
+   assert.equal(run.invoke('desktop:get-state').edgePose,'tucking');
+   assert.deepEqual({...run.invoke('desktop:get-state').edgeOffset},hidden);
+   const anchor=run.window.getBounds();
+   t.mock.timers.tick(1800);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+   run.invoke('desktop:set-edge-hovered',true);
+   assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
+   assert.deepEqual({...run.invoke('desktop:get-state').edgeOffset},peek);
+   assert.deepEqual(run.window.getBounds(),anchor,'hover changes the renderer pose without releasing the native anchor');
+   t.mock.timers.tick(600000);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
+   run.invoke('desktop:start-pet-drag',peek);
+   assert.equal(run.window.getBounds().x,anchor.x+peek.x);assert.equal(run.window.getBounds().y,anchor.y+peek.y);
+   run.invoke('desktop:move-pet',...pull);run.invoke('desktop:end-pet-drag');
+   assert.equal(run.invoke('desktop:get-state').edgeSide,null);assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
+   assert.deepEqual({...run.invoke('desktop:get-state').edgeOffset},{x:0,y:0});
+   t.mock.timers.tick(500000);assert.equal(run.invoke('desktop:get-state').edgeSide,null,'old peek timers cannot redock a released pet');
+ }
+});
+
+test('dragging during any entering animation uses the actual painted offset and cancels old timers',async t=>{
+ t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ for (const [side,delta,painted,pull] of [
+   ['left',[-5000,0],{x:-21,y:0},[200,0]],['right',[5000,0],{x:25,y:0},[-200,0]],
+   ['top',[0,-5000],{x:0,y:-17},[0,200]],['bottom',[0,5000],{x:0,y:32},[0,-200]],
+ ]) {
+   run.invoke('desktop:move-pet',900-run.window.getBounds().x,400-run.window.getBounds().y);
+   run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',...delta);run.invoke('desktop:end-pet-drag');
+   assert.equal(run.invoke('desktop:get-state').edgeSide,side);assert.equal(run.invoke('desktop:get-state').edgePose,'tucking');
+   t.mock.timers.tick(600);const before=run.window.getBounds();
+   run.invoke('desktop:start-pet-drag',painted);
+   assert.equal(run.window.getBounds().x,before.x+painted.x);assert.equal(run.window.getBounds().y,before.y+painted.y);
+   run.invoke('desktop:move-pet',...pull);run.invoke('desktop:end-pet-drag');
+   t.mock.timers.tick(2000);assert.equal(run.invoke('desktop:get-state').edgeSide,null);assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
+ }
+});
+
+test('hover and interaction during entry never restart or strand its finite deadline',async t=>{
+ t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ run.invoke('desktop:move-pet',5000,-200);run.invoke('desktop:end-pet-drag');
+ t.mock.timers.tick(1000);run.invoke('desktop:set-edge-hovered',true);run.invoke('desktop:set-interacting',true);
+ run.invoke('desktop:set-interacting',false);t.mock.timers.tick(799);
+ assert.equal(run.invoke('desktop:get-state').edgePose,'tucking');t.mock.timers.tick(1);
+ assert.equal(run.invoke('desktop:get-state').edgePose,'peek');assert.equal(run.invoke('desktop:get-state').edgeSide,'right');
+ run.invoke('desktop:set-edge-hovered',false);assert.equal(run.invoke('desktop:get-state').edgePose,'hidden');
+ assert.ok(run.invoke('desktop:get-state').edgeNextPeekAt>Date.now()+118000);
+});
+
+test('invalid painted drag offsets fail before changing bounds or releasing a dock',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ run.invoke('desktop:move-pet',5000,-200);run.invoke('desktop:end-pet-drag');const before=run.window.getBounds();
+ for(const bad of [null,{},[],{x:NaN,y:0},{x:0,y:Infinity},{x:83,y:0},{x:0,y:-93},{x:'0',y:0}]){
+   assert.throws(()=>run.invoke('desktop:start-pet-drag',bad),/finite bounded/);
+   assert.deepEqual(run.window.getBounds(),before);assert.equal(run.invoke('desktop:get-state').edgeSide,'right');
+ }
+ assert.equal(run.invoke('desktop:start-pet-drag'),true,'the original no-argument API remains available');
+ run.invoke('desktop:move-pet',-250,0);run.invoke('desktop:end-pet-drag');
+});
+
+test('expanded panels and monitor recovery keep content visible after an edge placement',async t=>{
+ t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
+ const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
+ run.invoke('desktop:move-pet',-5000,-5000);run.invoke('desktop:end-pet-drag');
+ run.invoke('desktop:set-companion-panel',true);let bounds=run.window.getBounds();
+ assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=1920&&bounds.y+bounds.height<=1040);
+ assert.equal(run.invoke('desktop:get-state').edgeSide,null);assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
+ run.invoke('desktop:set-companion-panel',false);run.invoke('desktop:move-pet',5000,5000);run.invoke('desktop:end-pet-drag');
+ run.display.workArea={x:-1280,y:-200,width:1280,height:800};run.screen.emit('display-removed');bounds=run.window.getBounds();
+ assert.ok(bounds.x+30>=-1280&&bounds.x+130<=0&&bounds.y+71>=-200&&bounds.y+179<=600);
+ assert.equal(run.invoke('desktop:get-state').edgeSide,null);assert.deepEqual({...run.invoke('desktop:get-state').edgeOffset},{x:0,y:0});
+ t.mock.timers.tick(2000);assert.equal(run.invoke('desktop:get-state').edgeSide,null,'display recovery cancels the old entering timer');
 });
 
 

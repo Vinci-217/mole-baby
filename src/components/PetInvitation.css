@@ -1,0 +1,23 @@
+.pet-invitation{grid-column:1/-1;min-width:0;margin:0 0 5px;color:#76512b;font-size:14px;line-height:1.55;text-align:left}
+.pet-invitation-offer{padding:12px;border:1px solid #e8c987;border-radius:11px;background:#fff8e7}
+.pet-invitation-heading{display:flex;align-items:center;gap:9px;min-width:0}
+.pet-invitation-heading>img{width:32px;height:32px;flex:0 0 32px;object-fit:contain}
+.pet-invitation-heading h4{margin:0;min-width:0;color:#a36318;font-size:15px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.pet-invitation-message{margin:9px 0 12px;color:#876438;overflow-wrap:anywhere}
+.pet-invitation-answers{display:flex;align-items:stretch;gap:7px}
+.pet-invitation-answers>button{min-width:0;min-height:36px;padding:7px 10px;border:1px solid #dfb56a;border-radius:8px;font:inherit;font-size:14px;line-height:1.5;translate:none;box-shadow:none}
+.pet-invitation-accept{flex:1;background:#ffe5aa;color:#965a18;font-weight:600}
+.pet-invitation-defer{flex:0 1 auto;background:#fffdf6;color:#9c7c51}
+.pet-invitation-accept:hover:not(:disabled){background:#ffdb8d}
+.pet-invitation-defer:hover{background:#fff2d0}
+.pet-invitation-manual{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px}
+.pet-invitation-manual>button{display:block;min-width:0;min-height:35px;padding:7px 5px;border:1px solid #e9d8b4;border-radius:8px;background:#fffcf3;color:#97703f;font:inherit;font-size:13px;line-height:1.5;box-shadow:none;translate:none}
+.pet-invitation-manual>button>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pet-invitation-manual>button:hover:not(:disabled){border-color:#dbba79;background:#fff3d5}
+.pet-invitation-habit{margin:9px 1px 0;font-size:13px;line-height:1.65;color:#9a7b50;overflow-wrap:anywhere}
+.pet-invitation-snoozed{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:8px 1px 1px;border-top:1px solid #eee1c7;font-size:13px;color:#a08660}
+.pet-invitation-snoozed>button{flex-shrink:0;min-height:30px;padding:4px 0;color:#a16b25;font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;translate:none}
+.pet-invitation button:focus-visible{outline:2px solid #208fb9;outline-offset:3px}
+.pet-invitation button:disabled{opacity:.5;cursor:default}
+.pet-invitation button:active:not(:disabled){translate:0 1px}
+@media(max-width:360px){.pet-invitation-offer{padding:10px}.pet-invitation-answers>button{padding:7px 8px}}

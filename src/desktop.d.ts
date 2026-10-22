@@ -11,8 +11,9 @@ declare global {
     motion?: 'idle' | 'left' | 'right';
     companionPanel: boolean;
     panelSide: 'left' | 'right';
-    edgeSide: 'left' | 'right' | null;
-    edgePose: 'visible' | 'hidden' | 'peek';
+    edgeSide: 'left' | 'right' | 'top' | 'bottom' | null;
+    edgePose: 'visible' | 'tucking' | 'hidden' | 'peek';
+    edgeOffset?: { x: number; y: number };
     edgeHiding: boolean;
     edgeNextPeekAt?: number | null;
   }
@@ -50,7 +51,7 @@ declare global {
       setMousePassthrough: (ignore: boolean) => void;
       onPetModeChanged: (callback: (enabled: boolean) => void) => () => void;
       onStateChanged: (callback: (state: DesktopState) => void) => () => void;
-      startPetDrag: () => Promise<boolean>;
+      startPetDrag: (paintedOffset?: { x: number; y: number }) => Promise<boolean>;
       endPetDrag: () => Promise<boolean>;
       movePet: (dx: number, dy: number) => Promise<boolean>;
       wander: (enabled: boolean) => Promise<boolean>;

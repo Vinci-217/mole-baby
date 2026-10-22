@@ -80,48 +80,111 @@ async function makeTired(page) {
   });
   await page.reload();await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');
 }
-async function verifyEdgePeek(page,desktop,side){
-  const character=page.getByTestId('desktop-character');
-  const settle=async pose=>{
-    // Native state arrives before the 850 ms CSS transition finishes. Use the
-    // painted position so forced pointer events hit the exposed strip.
-    const x=(side==='left'?-1:1)*(pose==='hidden'?105:65);
-    await expect.poll(()=>page.locator('.compact-pet').evaluate(n=>new DOMMatrix(getComputedStyle(n).transform).m41)).toBeCloseTo(x,1);
-  };
-  await page.keyboard.press('Escape');await page.mouse.move(1,239);await page.waitForTimeout(300);
-  const {area}=await desktop.evaluate(({BrowserWindow,screen})=>{const bounds=BrowserWindow.getAllWindows()[0].getBounds();return {area:screen.getDisplayMatching(bounds).workArea};});
-  const targetX=side==='left'?area.x:area.x+area.width-PET_SIZE.width,targetY=area.y+Math.min(240,area.height-240);
-  const place=async x=>{
-    await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.setInteracting(false);});
-    const current=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-    await page.evaluate(async({dx,dy})=>{await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);await window.desktop.setEdgeHiding(true);await window.desktop.endPetDrag();},{dx:x-current.x,dy:targetY-current.y});
-  };
+async function verifyEdgePeek(page,desktop,side,{onPose}={}){
+  expect(['left','right','top','bottom']).toContain(side);
+  const character=page.getByTestId('desktop-character'),sprite=character.locator('.ram-sprite');
+  const horizontal=side==='left'||side==='right',negative=side==='left'||side==='top';
+  const direction=negative?-1:1;
+  // At the top edge a moving body passes through y=5. Stay outside its
+  // horizontal range too, so this test does not intentionally request a peek.
+  const away=side==='left'?{x:155,y:5}:{x:5,y:5};
   const state=()=>page.evaluate(()=>window.desktop.getState());
-  if(side==='left'){
-    await place(targetX);await page.waitForTimeout(950);expect((await state()).edgeSide).toBeNull();await expect(character).toBeInViewport();return;
-  }
-  await place(targetX-20);await page.waitForTimeout(950);expect((await state()).edgeSide).toBeNull();
-  await place(targetX);
+  const bounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
+  const clipped=async()=>{
+    const inset=await page.locator('.companion-layout').evaluate(n=>{
+      const clip=getComputedStyle(n).clipPath;
+      if(!clip.startsWith('inset('))return clip;
+      const values=clip.match(/-?\d+(?:\.\d+)?/g).map(Number);
+      return [values[0],values[1]??values[0],values[2]??values[0],values[3]??values[1]??values[0]];
+    });
+    expect(inset).toEqual({left:[0,0,0,30],right:[0,30,0,0],top:[71,0,0,0],bottom:[0,0,61,0]}[side]);
+  };
+  const settle=async pose=>{
+    // Assert actual painted motion, rather than merely the early IPC state.
+    const amount=pose==='hidden'?(horizontal?82:92):(horizontal?44:50);
+    await expect.poll(()=>page.locator('.compact-pet').evaluate(n=>{
+      const m=new DOMMatrix(getComputedStyle(n).transform);return [m.m41,m.m42];
+    })).toEqual(horizontal?[direction*amount,0]:[0,direction*amount]);
+  };
+  await page.keyboard.press('Escape');await page.mouse.move(away.x,away.y);await page.waitForTimeout(250);
+  const area=await desktop.evaluate(({BrowserWindow,screen})=>screen.getDisplayMatching(BrowserWindow.getAllWindows()[0].getBounds()).workArea);
+  // The 100x108 body, not its transparent 160x240 frame, touches the work-area edge.
+  const target={x:area.x+Math.round((area.width-PET_SIZE.width)/2),y:area.y+Math.round((area.height-PET_SIZE.height)/2)};
+  if(side==='left')target.x=area.x-30;
+  if(side==='right')target.x=area.x+area.width-130;
+  if(side==='top')target.y=area.y-71;
+  if(side==='bottom')target.y=area.y+area.height-179;
+  const place=async point=>{
+    await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.setInteracting(false);});
+    const current=await bounds();
+    await page.evaluate(async({dx,dy})=>{
+      await window.desktop.startPetDrag();await window.desktop.movePet(dx,dy);
+      await window.desktop.setEdgeHiding(true);await window.desktop.endPetDrag();
+    },{dx:point.x-current.x,dy:point.y-current.y});
+  };
+  const near={...target};near[horizontal?'x':'y']-=direction*20;
+  await place(near);await page.mouse.move(away.x,away.y);await page.waitForTimeout(2000);
+  expect((await state()).edgeSide).toBeNull();expect((await state()).edgePose).toBe('visible');
+  await place(target);
+  await page.mouse.move(away.x,away.y);
+  await expect.poll(async()=>(await state()).edgePose).toBe('tucking');
+  expect((await state()).edgeSide).toBe(side);
+  await expect(sprite).toHaveAttribute('data-edge-entry',side);
+  if(onPose)await onPose('tucking');
   await expect.poll(async()=>(await state()).edgePose,{timeout:6000}).toBe('hidden');await settle('hidden');
-  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
-  await expect(character.locator('.ram-sprite')).toHaveClass(/is-peeking/);
-  const lean=await character.locator('.seed-body-original,.ram-artwork').first().evaluate(n=>{const m=new DOMMatrix(getComputedStyle(n).transform);return Math.atan2(m.b,m.a)*180/Math.PI;});expect(lean).toBeCloseTo(-7,1);
+  await clipped();
+  await expect(sprite).not.toHaveAttribute('data-edge-entry',side);
+  await expect(sprite).toHaveAttribute('data-action','still');
+  const hiddenBounds=await bounds();expect(hiddenBounds.x).toBe(target.x);expect(hiddenBounds.y).toBe(target.y);
+  if(onPose)await onPose('hidden');
+  const exposed=horizontal?{x:negative?90:10,y:54}:{x:50,y:negative?100:8};
+  await character.hover({position:exposed,force:true});
+  await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
+  await clipped();
+  await expect(sprite).toHaveClass(/is-peeking/);
+  await expect(sprite).toHaveAttribute('data-peek-side',side);
+  const lean=await sprite.locator('.seed-body-original,.ram-artwork').first().evaluate(n=>{
+    const m=new DOMMatrix(getComputedStyle(n).transform);return Math.atan2(m.b,m.a)*180/Math.PI;
+  });
+  expect(lean).toBeCloseTo({left:7,right:-7,top:5,bottom:-5}[side],1);
   await expect(page.getByTestId('pet-actions')).toHaveCount(0);
-  await character.click({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgeSide).toBe(side);
-  await expect.poll(async()=>(await state()).edgePose).toBe('peek');await expect(page.getByTestId('pet-actions')).toHaveCount(0);
-  await page.mouse.move(100,5);await expect.poll(async()=>(await state()).edgePose).toBe('hidden');await settle('hidden');
+  if(onPose)await onPose('peek');
+  await character.click({position:exposed,force:true});
+  expect((await state()).edgeSide).toBe(side);expect((await state()).edgePose).toBe('peek');
+  const clickedBounds=await bounds();expect(clickedBounds.x).toBe(target.x);expect(clickedBounds.y).toBe(target.y);
+  await expect(page.getByTestId('pet-actions')).toHaveCount(0);
+  await page.mouse.move(away.x,away.y);await expect.poll(async()=>(await state()).edgePose).toBe('hidden');await settle('hidden');
   const until=(await state()).edgeNextPeekAt-Date.now();expect(until).toBeGreaterThan(118000);expect(until).toBeLessThanOrEqual(300000);
-  await character.hover({position:{x:side==='left'?90:10,y:54},force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
-  const start=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-  const localX=side==='left'?12:PET_SIZE.width-12,y=125;await page.mouse.move(localX,y);await page.mouse.down();
-  // Keep physical screen coordinates stable while the native window follows the drag.
-  for(let n=1;n<=8;n++){
-    const current=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-    await page.mouse.move(start.x+localX+(side==='left'?150:-150)*n/8-current.x,y);
+  await character.hover({position:exposed,force:true});await expect.poll(async()=>(await state()).edgePose).toBe('peek');await settle('peek');
+  const start=await bounds(),box=await character.boundingBox();
+  const point={x:box.x+exposed.x,y:box.y+exposed.y};
+  const travel={x:horizontal?-direction*150:0,y:horizontal?0:-direction*150};
+  const physical={x:start.x+point.x,y:start.y+point.y};
+  const pointer=async(type,position,held=false)=>{
+    await desktop.evaluate(({BrowserWindow},{type,position,held})=>{
+      const window=BrowserWindow.getAllWindows()[0],frame=window.getBounds();
+      // CDP dispatches screenX=clientX even when the native window is offset.
+      // Electron's native input path supplies both coordinate systems, as a
+      // real pointer does, while preserving capture across moving windows.
+      window.webContents.sendInputEvent({type,x:Math.round(position.x-frame.x),y:Math.round(position.y-frame.y),
+        globalX:Math.round(position.x),globalY:Math.round(position.y),button:'left',
+        clickCount:type==='mouseMove'?0:1,modifiers:held?['leftButtonDown']:[]});
+    },{type,position,held});
     await page.evaluate(()=>window.desktop.getState());
+  };
+  await pointer('mouseMove',physical);await pointer('mouseDown',physical,true);
+  // Keep the physical pointer path stable while the native frame follows it.
+  for(let n=1;n<=8;n++){
+    await pointer('mouseMove',{x:physical.x+travel.x*n/8,y:physical.y+travel.y*n/8},true);
   }
-  await page.mouse.up();await expect.poll(async()=>(await state()).edgeSide).toBeNull();await expect.poll(async()=>(await state()).edgePose).toBe('visible');
-  const after=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());expect(after.y).toBe(targetY);await expect(character).toBeInViewport();
+  await pointer('mouseUp',{x:physical.x+travel.x,y:physical.y+travel.y});
+  await expect.poll(async()=>(await state()).edgeSide).toBeNull();await expect.poll(async()=>(await state()).edgePose).toBe('visible');
+  const after=await bounds(),offset=direction*(horizontal?44:50);
+  expect(after.x).toBe(start.x+travel.x+(horizontal?offset:0));
+  expect(after.y).toBe(start.y+travel.y+(horizontal?0:offset));
+  await expect(character).toBeInViewport();
+  await expect(page.locator('.companion-layout')).toHaveCSS('clip-path','none');
+  if(onPose)await onPose('released');
 }
 async function verifyStageSettings(page,desktop){
   await enterHome(page);await roomTab(page,'设置');
@@ -242,4 +305,39 @@ async function verifyRoomIteration(page){
   console.log('PASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory');
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration };
+async function verifyPetSpirit(page){
+  // The earlier sleep regression deliberately exhausted this same pet. Give
+  // this interaction fixture its normal energy; a tired pet correctly refuses
+  // to propose a game. All calls, deferrals and accepted actions use the UI.
+  await page.evaluate(()=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));pet.stats.energy=85;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));});
+  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+  const readMemory=()=>page.evaluate(()=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));return JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${pet.createdAt}`));});
+  const before=await save(),character=page.getByTestId('desktop-character');
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  const widget=page.getByTestId('pet-invitation');
+  await widget.getByRole('button',{name:`叫叫${before.name}`,exact:true}).click();
+  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action','look-around');
+  await expect(page.getByRole('button',{name:'回应拉姆的话',exact:true})).toContainText(before.name);
+  const called=await save();expect(called.coins).toBe(before.coins);expect(called.inventory).toEqual(before.inventory);expect(called.sleeping).toBe(false);
+  await expect(widget.getByRole('button',{name:'让拉姆提个主意',exact:true})).toBeEnabled();
+  const experiences=(await readMemory()).events.filter(e=>['play','pet'].includes(e.kind)).length;
+  await widget.getByRole('button',{name:'让拉姆提个主意',exact:true}).click();await expect(widget.locator('[data-invitation-kind]')).toBeVisible();
+  await widget.getByRole('button',{name:'我先忙30分钟',exact:true}).click();await expect(widget.locator('.pet-invitation-snoozed')).toBeVisible();
+  expect((await readMemory()).events.filter(e=>['play','pet'].includes(e.kind)).length).toBe(experiences);
+  await page.reload();await character.waitFor();await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  await expect(widget.getByRole('button',{name:'恢复主动陪伴',exact:true})).toBeVisible();await widget.getByRole('button',{name:'恢复主动陪伴',exact:true}).click();
+  await expect(widget.locator('.pet-invitation-snoozed')).toHaveCount(0);
+  await widget.getByRole('button',{name:'让拉姆提个主意',exact:true}).click();const kind=await widget.locator('[data-invitation-kind]').getAttribute('data-invitation-kind');
+  await widget.locator('.pet-invitation-accept').evaluate(n=>{n.click();n.click();});
+  const action=kind==='ball'?'play':kind==='pet'?'pet':'watch-butterfly';
+  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action',action);
+  await expect(character.locator(`[data-social-action="${action}"]`)).toBeVisible();
+  await expect(widget.locator('[data-invitation-kind]')).toHaveCount(0);
+  const events=(await readMemory()).events.filter(e=>['play','pet'].includes(e.kind));expect(events.length).toBe(experiences+1);expect(events.at(-1).detail).toContain('小邀请');
+  const after=await save();expect(after.coins).toBe(before.coins);expect(after.inventory).toEqual(before.inventory);expect(after.growth-before.growth).toBeLessThan(.1);
+  await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
+  console.log('PASS: named response, real invitation acceptance, restart-safe 30-minute defer and one actual shared interaction in the packaged application');
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit };

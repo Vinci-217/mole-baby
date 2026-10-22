@@ -4,9 +4,11 @@ import type { CompanionMemory } from './companion-memory';
 import { companionFeeling } from './companion-feeling';
 import { ITEMS } from './catalog';
 import {todaysTimers} from './companion-moments';
+import { companionSnoozeUntil, createInvitation } from './companion-invitation';
+import type { CompanionInvitation } from './companion-invitation';
 
 export type PresenceTopic='growth'|'work'|'progress'|'culture'|'life'|'memory'|'care'|'feeling'|'reading';
-export interface PresenceLine { id:string; topic:PresenceTopic; text:string }
+export interface PresenceLine { id:string; topic:PresenceTopic; text:string; invitation?:CompanionInvitation }
 export interface PresenceJournal { version:1; petId:string; history:{id:string;topic:PresenceTopic;at:number}[] }
 export const presenceKey=(pet:Pick<GameState,'createdAt'>)=>`ramu-presence-v1:${pet.createdAt}`;
 const MINUTE=60000;
@@ -44,7 +46,7 @@ export function rememberPresence(journal:PresenceJournal,line:PresenceLine,now:n
  const next={...journal,history:[...journal.history,{id:line.id,topic:line.topic,at:now}].slice(-48)};
  try{localStorage.setItem(`ramu-presence-v1:${journal.petId}`,JSON.stringify(next));}catch{/* Optional cadence cache; core memories stay independent. */}return next;
 }
-export function wantsQuiet(memory:CompanionMemory):boolean{return memory.facts.some(f=>f.kind==='boundary'&&/(?:别|不要|不想|希望|请|陪我).*(?:打扰|安静|主动说话|主动聊天)/.test(f.value));}
+export function wantsQuiet(memory:CompanionMemory):boolean{return memory.facts.some(f=>f.kind==='boundary'&&/(?:别|不要|不想|希望|请|陪我).*(?:打扰|安静|主动说话|主动聊天|主动邀请|主动互动)/.test(f.value));}
 export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date.now()):PresenceLine[]{
  const stage=getStage(pet.growth,pet.evolution),lines:PresenceLine[]=[];
  const add=(id:string,topic:PresenceTopic,text:string)=>lines.push({id,topic,text});
@@ -81,14 +83,25 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
  return lines.filter(v=>!(/不要.*(?:鸡汤|说教|大道理)/.test(boundaries)&&['progress','culture'].includes(v.topic))&&!(/(?:别|不要).*提醒.*(?:休息|喝水)/.test(boundaries)&&v.topic==='work'));
 }
 export function choosePresence(pet:GameState,memory:CompanionMemory,journal:PresenceJournal,now=Date.now(),manual=false,reading=false):PresenceLine|null{
- if(pet.sleeping||(!manual&&wantsQuiet(memory)))return null;
+ if(pet.sleeping||(!manual&&(wantsQuiet(memory)||companionSnoozeUntil(memory,now)>now)))return null;
  const recent=journal.history.filter(h=>h.at<=now&&now-h.at<3*86400000),last=recent.at(-1);
  const noLecture=memory.facts.some(f=>f.kind==='boundary'&&/不要.*(?:鸡汤|说教|大道理)/.test(f.value));
  const available:PresenceLine[]=reading?[...READING.map((text,i)=>({id:`study-${i}`,topic:'reading' as const,text})),...(!noLecture?CULTURE.map(v=>({id:`study-${v.id}`,topic:'culture' as const,text:v.text.replace('长出叶子','长大')})):[])]:presenceCandidates(pet,memory,now);
+ // An invitation shares the existing cadence instead of adding another timer.
+ // Leave two ordinary lines first, then at least three ordinary lines between
+ // offers. Counting from the last offer still works after the 48-line journal
+ // fills; modulo journal length would otherwise freeze invitations forever.
+ // Keep a full hour between automatic invitations even at 10-minute pace.
+ const lastInvitation=recent.map(h=>h.id.startsWith('invite-')).lastIndexOf(true);
+ const ordinarySince=lastInvitation<0?recent.length:recent.length-lastInvitation-1;
+ const canInvite=!manual&&!reading&&ordinarySince>=(lastInvitation<0?2:3)&&!recent.some(h=>h.id.startsWith('invite-')&&now-h.at<60*MINUTE);
+ const offer=canInvite?createInvitation(pet,memory,Math.floor(now/MINUTE),now):null;
+ if(offer)available.push({id:`invite-${offer.kind}`,topic:'life',text:offer.text,invitation:offer});
  const candidates=available.filter(line=>!recent.slice(-(reading?12:16)).some(h=>h.id===line.id)&&(reading||line.topic!==last?.topic)&&!(line.topic==='care'&&recent.some(h=>h.topic==='care'&&now-h.at<3600000)));
  if(!candidates.length)return null;
  const personal=candidates.filter(c=>['memory','feeling'].includes(c.topic));
- const choices=personal.length&&recent.length%4===0?personal:candidates;
+ const invitations=candidates.filter(c=>c.invitation);
+ const choices=invitations.length?invitations:personal.length&&recent.length%4===0?personal:candidates;
  const seed=Math.abs(Math.floor(pet.createdAt/1000)+Math.floor(now/(5*MINUTE))+recent.length*7+memory.personality.length);
  const selected=choices[seed%choices.length];
  const nickname=memory.facts.find(f=>f.kind==='nickname'&&f.at<=now&&Array.from(f.value).length<=8)?.value;

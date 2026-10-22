@@ -13,12 +13,12 @@ const CARE_ACTIONS: Record<string, { row: number; duration: number }> = {
 const CONDITIONS: Record<string, number> = { thirsty: 4, hungry: 5, sick: 6, tired: 6, dirty: 6 }
 const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   pet: { row: 3, frames: [0, 1, 2, 3, 2, 1, 0], step: 95 },
-  waving: { row: 3, frames: [0, 1, 2, 3, 2, 1, 0], step: 95 },
+  waving: { row: 3, frames: [0, 1, 2, 3, 2, 1, 0], step: 300 },
   catch: { row: 0, frames: [0, 1, 0], step: 83 },
   failed: { row: 5, frames: [0, 1, 2, 3, 4, 5, 6, 7], step: 100 },
   play: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 100 },
   reward: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 100 },
-  happy: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 100 },
+  happy: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 300 },
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 export function getRamActionDuration(action: string): number | null {
@@ -91,6 +91,9 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   const duration = getRamActionDuration(action)
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
   if (reduced) return { frame: 0, finished: false }
+  // A small original body-only sway; the independent pot never moves. Avoid
+  // racing through the large squash sequence for these spontaneous gestures.
+  if (action === 'happy' || action === 'waving') return {frame:[0,1,2,1,0][Math.min(4,Math.floor(elapsed/duration!*5))],finished:false}
   const item = getItemMotionByAction(action)
   if (item) {
     // Only the original body moves. The independently rendered pot is static.
@@ -136,7 +139,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   if (direction) return { row: direction, frame, finished: false };
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
-  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
+  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around','happy','waving'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
     return sampleRamPose(action,elapsed,reduced);
   }
   return { row: 0, frame, finished };

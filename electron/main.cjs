@@ -4,7 +4,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { createCompanionAI } = require('./deepseek.cjs');
 const { createCompanionSpeech } = require('./speech.cjs');
-const { PET_SIZE, fitPetBounds, cornerSide, cornerBounds, canAnimateDesktop, nearbyWanderTarget } = require('./desktop-geometry.cjs');
+const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget } = require('./desktop-geometry.cjs');
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
@@ -67,6 +67,7 @@ let edgeHiding = true;
 let edgeSide = null;
 let edgePose = 'visible';
 let edgeTimer = null;
+let edgeTuckUntil = null;
 let interacting = false;
 let edgeHovered = false;
 let edgeNextPeekAt = null;
@@ -82,6 +83,7 @@ function getDesktopState() {
     panelSide,
     edgeSide,
     edgePose,
+    edgeOffset: edgeOffset(edgeSide, edgePose),
     edgeHiding,
     edgeNextPeekAt,
   };
@@ -127,6 +129,7 @@ function canHideAtEdge() {
 function revealPet() {
   clearTimeout(edgeTimer);
   edgeTimer = null;
+  edgeTuckUntil = null;
   edgeHovered = false;edgeNextPeekAt=null;
   const changed = edgePose !== 'visible' || edgeSide !== null;
   edgePose = 'visible';
@@ -137,25 +140,43 @@ function revealPet() {
 
 function schedulePeek() {
   clearTimeout(edgeTimer);
+  edgeTimer = null;
   edgeNextPeekAt=null;
+  if (!edgeSide || !edgeHiding) return;
+  // Hovering or briefly interacting must never restart or strand the enter pose.
+  if (edgePose === 'tucking') {
+    edgeTimer = setTimeout(() => {
+      edgeTimer = null;
+      if (!edgeSide || !edgeHiding || edgePose !== 'tucking') return;
+      edgeTuckUntil = null;
+      edgePose = edgeHovered ? 'peek' : 'hidden';
+      schedulePeek();
+      publishState();
+    }, Math.max(0, (edgeTuckUntil ?? Date.now()) - Date.now()));
+    return;
+  }
   if (!edgeSide || !edgeHiding || edgeHovered || !canHideAtEdge()) return;
   const delay=edgeDelay(edgePose);
   if(edgePose==='hidden')edgeNextPeekAt=Date.now()+delay;
   edgeTimer = setTimeout(() => {
+    edgeTimer = null;
     edgeNextPeekAt=null;
     if (!edgeSide || !edgeHiding || edgeHovered || !canHideAtEdge()) return;
     edgePose = edgePose === 'hidden' ? 'peek' : 'hidden';
-    publishState();
     schedulePeek();
+    publishState();
   }, delay);
 }
 
 function changeEdgeHovered(hovered) {
   if(typeof hovered!=='boolean')throw new TypeError('Edge hover must be a boolean');
   if(!edgeSide||!edgeHiding||!petMode||dragging||hovered===edgeHovered)return getDesktopState();
-  edgeHovered=hovered;clearTimeout(edgeTimer);edgeNextPeekAt=null;
-  edgePose=hovered?'peek':'hidden';publishState();
+  edgeHovered=hovered;
+  if (edgePose === 'tucking') return getDesktopState();
+  clearTimeout(edgeTimer);edgeTimer=null;edgeNextPeekAt=null;
+  edgePose=hovered?'peek':'hidden';
   if(!hovered)schedulePeek();
+  publishState();
   return getDesktopState();
 }
 
@@ -169,7 +190,8 @@ function tuckIntoCorner() {
   const target = cornerBounds(bounds, area, side);
   mainWindow.setPosition(target.x, target.y, false);
   edgeSide = side;
-  edgePose = 'visible';
+  edgePose = 'tucking';
+  edgeTuckUntil = Date.now() + edgeDelay('tucking');
   publishState();
   scheduleSave();
   schedulePeek();
@@ -256,21 +278,31 @@ function walkAlongDesktop() {
   }, 33);
 }
 
-function startPetDrag() {
+function startPetDrag(paintedOffset) {
+  if (paintedOffset !== undefined && (!paintedOffset || Array.isArray(paintedOffset)
+    || typeof paintedOffset.x !== 'number' || typeof paintedOffset.y !== 'number'
+    || !Number.isFinite(paintedOffset.x) || !Number.isFinite(paintedOffset.y)
+    || Math.abs(paintedOffset.x) > 82 || Math.abs(paintedOffset.y) > 92)) {
+    throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
+  }
   if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
-  const offset=edgeSide&&edgePose!=='visible'?(edgeSide==='left'?-1:1)*(edgePose==='peek'?65:105):0;
+  const offset = edgeSide ? paintedOffset ?? edgeOffset(edgeSide, edgePose) : { x: 0, y: 0 };
   const bounds=mainWindow.getBounds();draggingFromEdge=Boolean(edgeSide);
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   dragging = true;
-  if(offset)mainWindow.setPosition(bounds.x+offset,bounds.y,false);
+  if(offset.x || offset.y)mainWindow.setPosition(bounds.x+Math.round(offset.x),bounds.y+Math.round(offset.y),false);
   stopMovement();
   return true;
 }
 
 function endPetDrag() {
   dragging = false;
-  if(draggingFromEdge){const fitted=clampBounds(mainWindow.getBounds(),PET_SIZE);mainWindow.setPosition(fitted.x,fitted.y,false);draggingFromEdge=false;}
+  if (petMode && !companionPanel) {
+    const fitted=clampBounds(mainWindow.getBounds(),PET_SIZE);
+    mainWindow.setPosition(fitted.x,fitted.y,false);
+  }
+  draggingFromEdge=false;
   wanderAnchor = { ...currentPetBounds() };
   scheduleSave();
   if (!tuckIntoCorner()) scheduleWander();
@@ -290,7 +322,12 @@ function movePet(dx, dy) {
   const current = mainWindow.getBounds();
   const desired={...current,x:current.x+Math.round(dx),y:current.y+Math.round(dy)};
   const target = clampBounds(desired, PET_SIZE);
-  if(dragging&&draggingFromEdge){const area=screen.getDisplayMatching(current).workArea;target.x=Math.max(area.x-105,Math.min(area.x+area.width-PET_SIZE.width+105,desired.x));}
+  if(dragging&&draggingFromEdge){
+    const area=screen.getDisplayMatching(current).workArea;
+    // Keep the painted body under the pointer while pulling it out of any edge.
+    target.x=Math.max(area.x-PET_PADDING.left-82,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82,desired.x));
+    target.y=Math.max(area.y-PET_PADDING.top-92,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92,desired.y));
+  }
   mainWindow.setPosition(target.x, target.y, false);
   wanderAnchor = { ...target };
   scheduleSave();
@@ -692,6 +729,9 @@ function createWindow() {
     title: '拉姆',
     icon: iconPath('ramu.png'),
     frame: false,
+    // AppKit otherwise clamps the transparent top margin below its menu bar.
+    // Our body-aware geometry keeps visible content inside the work area.
+    enableLargerThanScreen: process.platform === 'darwin',
     transparent: true,
     backgroundColor: '#00000000',
     hasShadow: false,
