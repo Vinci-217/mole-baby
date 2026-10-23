@@ -1,6 +1,18 @@
 import type { Evolution, Stage } from './game';
-export type SocialAction = 'pet' | 'play' | 'focus' | 'dizzy' | 'watch-butterfly' | 'look-around';
-export const SOCIAL_DURATIONS = { pet: 2400, play: 4200, dizzy: 3200, 'watch-butterfly':6500, 'look-around':3600 } as const;
+export type SocialAction = 'pet' | 'play' | 'focus' | 'dizzy' | 'watch-butterfly' | 'look-around' | 'wake';
+export const SOCIAL_DURATIONS = { pet: 2400, play: 4200, dizzy: 3200, 'watch-butterfly':6500, 'look-around':3600, wake:1800 } as const;
+export const BALL_CONTACTS = [1050, 3150] as const;
+const smooth = (x:number) => { const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t); };
+/** A bell with zero velocity at either end; contact, body and sound share time. */
+export function gesturePulse(time:number,centre:number,width:number):number {
+  return smooth(1-Math.abs(time-centre)/width);
+}
+export function socialEyesClosed(action:string,time:number,reduced=false):boolean {
+  if(action==='sleep')return true;
+  if(action==='pet')return reduced||time>=480&&time<1950;
+  if(action==='play')return !reduced&&time>=3620&&time<4010;
+  return action==='wake'&&time<240;
+}
 const profiles = [
   { head: 20, contactX: 88, contact: 48, bookX: 76, bookY: 87, sway: 4, lift: 0, phase: .1 },
   { head: 30, contactX: 100, contact: 58, bookX: 50, bookY: 83, sway: 2, lift: 3, phase: .3 },
@@ -8,7 +20,7 @@ const profiles = [
   { head: 22, contactX: 87, contact: 81, bookX: 49, bookY: 94, sway: 2.5, lift: .7, phase: .7 },
   { head: 18, contactX: 94, contact: 75, bookX: 49, bookY: 93, sway: 3, lift: 1, phase: .9 },
 ] as const;
-export function isSocialAction(action: string): action is SocialAction { return ['pet','play','focus','dizzy','watch-butterfly','look-around'].includes(action); }
+export function isSocialAction(action: string): action is SocialAction { return ['pet','play','focus','dizzy','watch-butterfly','look-around','wake'].includes(action); }
 /** One event clock drives prop contact and the pet reaction. Stage 0 never
  * lifts the pot; its transform is applied to the independently layered body. */
 export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: number, reduced = false, evolution?: Evolution) {
@@ -18,12 +30,22 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
   const time=reduced?0:Math.max(0,elapsed);
   const progress=action==='focus'?(time%8000)/8000:Math.min(1,time/duration);
   const enter=action==='focus'?1:Math.min(1,progress*7,(1-progress)*7);
-  const rhythm=Math.sin(progress*Math.PI*(stage===0?4:stage===1?6:stage===2?4:8));
-  const contact=action==='play'?Math.max(0,1-Math.abs((progress*2%1)-.5)*7):0;
+  const contact=action==='play'?Math.max(...BALL_CONTACTS.map(at=>gesturePulse(time,at,210))):0;
   const formFactor=evolution==='water'?.65:evolution==='fire'?1.3:evolution==='wood'?.85:1;
   const contactX=stage===4 ? evolution==='super'?82:evolution==='wood'?87:evolution==='water'?92:94 : p.contactX;
   const readingPhase=(time%8000)/8000;
   const turn=Math.max(0,Math.min(1,(readingPhase-.74)/.2));
+  const arrive=smooth(time/480),leave=smooth((2400-time)/430);
+  const strokes=arrive*leave;
+  const stroke=Math.sin((time-480)/490*Math.PI*2);
+  const ready=action==='play'?Math.max(...BALL_CONTACTS.map(at=>gesturePulse(time,at-180,175))):0;
+  const follow=action==='play'?Math.max(...BALL_CONTACTS.map(at=>gesturePulse(time,at+160,260))):0;
+  const cheer=action==='play'?gesturePulse(time,3800,360):0;
+  const wakeStretch=action==='wake'?Math.sin(progress*Math.PI)**2:0;
+  const affection=action==='pet'?smooth((time-1750)/180)*smooth((2400-time)/250):0;
+  const bodyX=reduced?0:action==='play'?(stage===0?0:(flying?3.2:5.5)*contact-1.2*ready):action==='pet'?(stage===0?0:1.6*strokes):0;
+  const bodyScaleX=reduced?1:action==='pet'?1+strokes*(flying?.018:.035):action==='play'?1+ready*.035-contact*.015-follow*.015:1-wakeStretch*.025;
+  const bodyScaleY=reduced?1:action==='pet'?1-strokes*(flying?.022:.045):action==='play'?1-ready*.055+contact*.035+follow*.02:1+wakeStretch*.04;
   const haloY=stage===0?12:stage===1?18:stage===2?4:stage===3?7:3;
   const orbit=Array.from({length:3},(_,i)=>{
     const phase=time/1250*Math.PI*2+i*Math.PI*2/3,depth=Math.sin(phase);
@@ -31,13 +53,15 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
   });
   return {
     finished:ended, opacity:ended?0:reduced?1:Math.max(0,enter),
-    bodyAngle:reduced?0:['watch-butterfly','look-around'].includes(action)?Math.sin(progress*Math.PI*2)*(flying?.7:stage===0?2:2.5)*Math.sin(progress*Math.PI):action==='dizzy'?Math.sin(time/380)*.6:action==='play'?rhythm*p.sway*contact*formFactor:action==='pet'?rhythm*(flying?.4:p.sway*.35):stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
-    bodyY:reduced||stage===0?0:action==='play'?-contact*p.lift:action==='pet'?Math.max(0,rhythm)*(flying?.35:.7):action==='focus'?1+Math.sin(time/1800)*.5:0,
+    bodyAngle:reduced?0:['watch-butterfly','look-around'].includes(action)?Math.sin(progress*Math.PI*2)*(flying?.7:stage===0?2:2.5)*Math.sin(progress*Math.PI):action==='dizzy'?Math.sin(time/380)*.6:action==='play'?(contact*(stage===0?6:flying?3.2:6.5)-follow*(flying?1.5:3))*formFactor+cheer*Math.sin(time/110)*2:action==='pet'?strokes*((stage===0?5:flying?2.6:3.5)+stroke*(flying?.8:1.5)):action==='wake'?0:stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
+    bodyY:reduced||stage===0?0:action==='play'?-contact*(flying?1.5:p.lift)-follow*(flying?.5:1.5):action==='pet'?strokes*(flying?.45:1.7):action==='wake'?-wakeStretch*(flying?1.2:2):action==='focus'?1+Math.sin(time/1800)*.5:0,
+    bodyX,bodyScaleX,bodyScaleY,contact:reduced?0:contact,affection:reduced?0:affection,
+    heartY:reduced?0:-smooth((time-1750)/650)*16,
     ballX:reduced?contactX:115-Math.sin(progress*Math.PI*2)**2*(115-contactX),
     ballY:reduced?p.contact:p.contact-Math.abs(Math.sin(progress*Math.PI*4))*(stage===0?9:stage===1?20:stage===2?14:10)*formFactor,
     ballAngle:time/(stage===0?22:12),
-    handX:reduced?(flying?65:62):(flying?65:62)+Math.sin(progress*Math.PI*(stage===0?4:6))*(flying?4:stage===0?5:9)+(1-enter)*27,
-    handY:(stage===4?15:p.head)-(1-enter)*17+(reduced?0:Math.abs(rhythm)*(flying?.7:1.5)),
+    handX:reduced?(flying?65:62):(flying?65:62)+Math.sin((time-480)/490*Math.PI*2)*(flying?3:stage===0?4:5)*strokes+(1-arrive)*27,
+    handY:(stage===4?15:p.head)+(reduced?0:-(1-arrive)*17+(1-Math.cos((time-480)/490*Math.PI*2))*1.5*strokes),
     handWidth:flying?42:53,
     butterflyX:reduced?77:59+Math.sin(progress*Math.PI*2)*25,
     butterflyY:Math.max(flying?28:20,p.head-12)+(reduced?0:Math.sin(progress*Math.PI*4)*4),

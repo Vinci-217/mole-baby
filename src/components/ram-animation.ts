@@ -1,7 +1,7 @@
-import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
+import { SOCIAL_DURATIONS, isSocialAction, socialEyesClosed } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
 
-export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' }
+export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'comfort' | 'grounded' }
 export const CARE_COLUMNS = 16
 export const CARE_ROWS = 7
 /** Each care row comes from the matching named animation in lamubone.swf. */
@@ -30,11 +30,10 @@ export function getRamActionDuration(action: string): number | null {
   const once = ONCE[action]
   return once ? once.frames.length * once.step : null
 }
-/** Sample an event clock, never a React render count. Sleeping always uses an
- * original closed-eye pose (row 6 in the old atlas was not closed-eye sleep).
- */
+/** Sample an event clock, never a React render count. Sleep closes the eyes
+ * on the same grounded body instead of using another action's silhouette. */
 export function sampleRamPose(action: string, elapsed: number, reduced = false): Pose {
-  if (action === 'sleep') return { row: 8, frame: 0, finished: false }
+  if (action === 'sleep') return { sheet:'grounded', row:0, frame:2, finished:false }
   if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
     const duration=SOCIAL_DURATIONS[action as Exclude<keyof typeof SOCIAL_DURATIONS,'focus'>];
@@ -84,7 +83,7 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
   if (action === 'sleep') return { frame: 61, finished: false }
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
-  if (action === 'pet' || action === 'play') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:reduced?0:Math.floor(elapsed/350)%2,finished:elapsed>=SOCIAL_DURATIONS[action]}
+  if (action === 'pet' || action === 'play' || action === 'wake') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:socialEyesClosed(action,elapsed,reduced)?61:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
   if (action === 'watch-butterfly' || action === 'look-around') return {frame:reduced?0:[0,1,2,1][Math.floor(elapsed/700)%4],finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
@@ -110,7 +109,7 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
 }
 
 /** Elemental atlases retain their own body/crown during every interaction.
- * Their original happy pose has fully closed eyes. During care their own
+ * Closed eyes use their own front rig, without changing its registration. During care their own
  * original flight cycle stays registered while the corresponding item moves. */
 export function sampleEvolvedPose(action: string, elapsed: number, reduced = false): Pose {
   return sampleFlyingPose(action, elapsed, reduced, 'super');
@@ -120,14 +119,15 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
-  if (action === 'sleep') return { row: 8, frame: 0, finished: false };
+  if (action === 'sleep') return { sheet:'comfort', row: 0, frame: 0, finished: false };
   const direction = action === 'walk-left' || action === 'running-left' ? 2 : action === 'walk-right' || action === 'running-right' ? 1 : 0;
   // Side rows have eight sampled source poses, with different holds from the
   // six front poses. Keep the shared flight clock when changing direction.
   if (direction && reduced) return { row: direction, frame: 0, finished: false };
   if (action === 'still' || action === 'drag' || reduced) {
     const duration = getRamActionDuration(action);
-    return { row: 0, frame: 0, finished: duration !== null && elapsed >= duration };
+    const finished=duration !== null && elapsed >= duration;
+    return { ...(reduced&&!finished&&socialEyesClosed(action,elapsed,true)?{sheet:'comfort' as const}:{}), row: 0, frame: 0, finished };
   }
   const sourceFrames = direction
     ? form === 'super' ? [1,4,6,9,11,14,16,19] : form === 'senior' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,6,7,8,9]
@@ -139,6 +139,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   if (direction) return { row: direction, frame, finished: false };
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
+  if(!finished&&socialEyesClosed(action,elapsed))return {sheet:'comfort',row:0,frame,finished:false};
   if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around','happy','waving'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
     return sampleRamPose(action,elapsed,reduced);
   }

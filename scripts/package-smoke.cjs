@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -66,6 +66,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
   for(const form of ['junior','middle'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/grounded/${form}-${layer}.png`),'Missing calm original-layer atlas');
+  for(const form of ['senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/comfort/${form}-${layer}.png`),'Missing original closed-eye flight rig');
   for (const form of ['junior', 'middle', 'senior']) for (const layer of ['neutral', 'mask']) {
     const filename = `dist/assets/original/care/${form}-${layer}.png`;
     assert.ok(paths.has(filename), `Original care animation atlas is missing: ${filename}`);
@@ -253,6 +254,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifyRecolorPotion(page);console.log('PASS: real shop colour potion costs beans, consumes one bottle, animates and persists without replacing identity or supplies');
   await verifyRoomIteration(page);
   await verifyPetSpirit(page);
+  await verifyComfortMotion(page);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());

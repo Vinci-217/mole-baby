@@ -35,7 +35,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = 'junior' | 'middle' | 'senior' | Evolution
-type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded'
+type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'comfort'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -61,6 +61,7 @@ const ACTION_NAMES: Record<string, string> = {
 function sheetSpec(form: Form, kind: SheetKind) {
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
+  if (kind === 'comfort') return { width: CELL_WIDTH * 6, height: CELL_HEIGHT, neutral: `./assets/original/comfort/${form}-neutral.png`, mask: `./assets/original/comfort/${form}-mask.png` }
   if (kind === 'care') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * CARE_ROWS, neutral: `./assets/original/care/${form}-neutral.png`, mask: `./assets/original/care/${form}-mask.png` }
   if (kind === 'item') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * 4, neutral: `./assets/original/item-motion/${form}-neutral.png`, mask: `./assets/original/item-motion/${form}-mask.png` }
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
@@ -95,7 +96,7 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
-  if (['super', 'water', 'wood', 'fire'].includes(form) && kind !== 'seed') kind = 'classic'
+  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','comfort'].includes(kind)) kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
@@ -151,13 +152,18 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const soundRef=useRef(sound);soundRef.current=sound
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
-  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; previous: HTMLCanvasElement[] | null } | null>(null)
+  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; comfort?: HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
   const key = `${form}:${color}:${fromColor??''}`
   const sheets = ready?.key === key ? ready : null
   useEffect(() => {
     let cancelled = false
-    const load=(c:PetColor)=>Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item'),...(['junior','middle'].includes(form)?[getTintedSheet(form,c,'grounded')]:[])]);
-    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([[classic,care,item,grounded],previous])=>{if(!cancelled)setReady({key,classic,care,item,grounded,previous})}).catch(()=>{if(!cancelled)errorRef.current()});
+    const load=async(c:PetColor)=>{
+      const [classic,care,item]=await Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item')]);
+      const grounded=['junior','middle'].includes(form)?await getTintedSheet(form,c,'grounded'):undefined;
+      const comfort=grounded?undefined:await getTintedSheet(form,c,'comfort');
+      return {classic,care,item,grounded,comfort};
+    };
+    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.comfort]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
     return () => { cancelled = true }
   }, [form, color, fromColor, key])
   useEffect(() => {
@@ -183,8 +189,8 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
-        const target=sheet==='grounded'?sheets.grounded!:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
-        const old=sheets.previous?.[sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
+        const target=sheet==='grounded'?sheets.grounded!:sheet==='comfort'?sheets.comfort!:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
+        const old=sheets.previous?.[sheet==='comfort'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
           context.drawImage(source,frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
           if(grounded){

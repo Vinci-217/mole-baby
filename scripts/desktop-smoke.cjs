@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -174,7 +174,7 @@ async function verifyBackground(page, selector, suffix) {
   const pinned=await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());assert.equal((await state()).alwaysOnTop,pinned);await page.evaluate(()=>window.desktop.toggleAlwaysOnTop());
   console.log('PASS real mature dragging, timed directional walking, interaction pause, corner tuck/peek/reveal and pin state');
 
-  await openActions(page);await makeTired(page);await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row','8');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame','0');await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await expect.poll(async()=>(await save()).sleeping).toBe(false);
+  await openActions(page);await makeTired(page);await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet','grounded');await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame','2');await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await expect.poll(async()=>(await save()).sleeping).toBe(false);
   await enterHome(page);await buy(page,'biscuit','熊熊饼干');await expect.poll(async()=>(await save()).coins).toBe(85);await roomTab(page,'背包');const beforeFood=await save();await(await selectPocket(page,'biscuit','熊熊饼干')).click();await expect.poll(async()=>(await save()).inventory.biscuit).toBe(0);assert.ok((await save()).stats.hunger>beforeFood.stats.hunger+10);await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action','eat-bear-biscuit');
   const foodImage=page.locator('.care-pocket .pocket-slot[data-item-id="biscuit"] > img:not(.pocket-using-icon)');await foodImage.evaluate(i=>i.decode());assert.ok((await foodImage.getAttribute('src')).includes('original/items/'));
   const beforeShortGames=(await save()).completedGames;await roomTab(page,'游戏');await page.getByRole('button',{name:'开始接果子',exact:true}).click();await page.getByTestId('fruit-game-start').click();await expect(page.locator('.fruit-dialog')).toHaveAttribute('data-phase','playing');await fullyInsideNativeWindow(page.locator('.fruit-scoreboard'),'fruit score/timer');await fullyInsideNativeWindow(page.getByTestId('game-arena'),'fruit surface');await page.screenshot({path:path.join(artifacts,'v6-native-fruit-game.png')});await page.keyboard.press('Escape');
@@ -192,6 +192,7 @@ async function verifyBackground(page, selector, suffix) {
   await verifyRecolorPotion(page);console.log('PASS real colour potion shop purchase/use/relaunch, finite animation and retained pet identity/inventory');
   await verifyRoomIteration(page);
   await verifyPetSpirit(page);
+  await verifyComfortMotion(page);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();
   await page.evaluate(()=>window.desktop.minimize());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());

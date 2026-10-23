@@ -1,6 +1,7 @@
 import {describe,it,expect} from 'vitest'
 import {groundedMotion,usesGroundedPose} from './grounded-motion'
 describe('calm original junior and middle layers',()=>{
+ it('sleeps upright with closed eyes and wakes through half-open eyes, including reduced motion',()=>{for(const form of ['junior','middle']){expect(usesGroundedPose(form,'sleep')).toBe(true);for(const reduced of [false,true])for(const t of [0,1000,1e8])expect(groundedMotion(form,'sleep',t,t,reduced)).toEqual({frame:2,eyeX:0,eyeY:0,leafAngle:0});expect([0,300,600].map(t=>groundedMotion(form,'wake',t,t).frame)).toEqual([2,1,0]);expect(groundedMotion(form,'pet',800,800,true).frame).toBe(2)}})
  it('retains a stable body for social actions without affecting care or flying forms',()=>{for(const f of ['junior','middle'])for(const a of ['idle','pet','play','focus','watch-butterfly','look-around','drag'])expect(usesGroundedPose(f,a)).toBe(true);for(const f of ['seed','senior','super','water','wood','fire'])expect(usesGroundedPose(f,'idle')).toBe(false);expect(usesGroundedPose('middle','eat-bear-biscuit')).toBe(false)})
  it('blinks through half, closed and open eyes without changing the body registration',()=>{expect([5200,5270,5320,5390,5420].map(t=>groundedMotion('junior','idle',t,t).frame)).toEqual([0,1,2,1,0]);expect(groundedMotion('middle','idle',0,4020).frame).toBe(2)})
  it('closes its eyes at the actual hand contact and reads downward',()=>{expect(groundedMotion('junior','pet',800,800).frame).toBe(2);expect(groundedMotion('middle','focus',500,500).eyeY).toBe(1.45)})

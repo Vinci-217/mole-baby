@@ -15,7 +15,7 @@ describe('original Ram care animation contract', () => {
   })
   it('holds genuine closed-eye source frames in every motion preference', () => {
     for (const reduced of [false, true]) for (const time of [0, 400, 9000, 1e9]) {
-      expect(sampleRamPose('sleep', time, reduced)).toEqual({ row: 8, frame: 0, finished: false })
+      expect(sampleRamPose('sleep', time, reduced)).toEqual({ sheet:'grounded', row:0, frame:2, finished:false })
       expect(sampleSeedPose('sleep', time, reduced)).toEqual({ frame: 61, finished: false })
     }
   })
@@ -32,7 +32,8 @@ describe('original Ram care animation contract', () => {
       for (let t = 0; t < duration; t += 20) {
         const pose = sampleSeedPose(action, t)
         expect(pose.frame).toBeGreaterThanOrEqual(0)
-        expect(pose.frame).toBeLessThanOrEqual(24)
+        if(action==='pet'||action==='wake')expect([0,61]).toContain(pose.frame)
+        else expect(pose.frame).toBeLessThanOrEqual(24)
       }
       expect(sampleSeedPose(action, duration)).toEqual({ frame: 0, finished: true })
     }
@@ -86,7 +87,7 @@ describe('continuous original airborne posture',()=>{
    expect(sampleFlyingPose('walk-left',800,true,form)).toEqual({row:2,frame:0,finished:false});
    expect(sampleFlyingPose('walk-right',800,true,form)).toEqual({row:1,frame:0,finished:false});
    for(const action of ['still','drag'])expect(sampleFlyingPose(action,800,false,form)).toEqual({row:0,frame:0,finished:false});
-   expect(sampleFlyingPose('sleep',800,true,form)).toEqual({row:8,frame:0,finished:false});
+   expect(sampleFlyingPose('sleep',800,true,form)).toEqual({sheet:'comfort',row:0,frame:0,finished:false});
   }
  });
  it('ends both new curiosity gestures in every stage and never changes an airborne source registration',()=>{
@@ -103,7 +104,19 @@ describe('continuous original airborne posture',()=>{
    const frames=new Set<number>();for(let t=0;t<2000;t+=20){const pose=sampleFlyingPose('idle',t,false,form);expect(pose.row).toBe(0);expect(pose.sheet).toBeUndefined();frames.add(pose.frame);expect(sampleFlyingPose('pet',t%2000,false,form,t).frame).toBe(pose.frame);}
    expect(frames.size).toBe(6);
    expect(sampleFlyingPose('pet',0,false,form,350).frame).toBe(sampleFlyingPose('idle',350,false,form,350).frame);
-   expect(sampleFlyingPose('idle',1000,true,form).frame).toBe(0);expect(sampleFlyingPose('sleep',1000,false,form).row).toBe(8);
+   expect(sampleFlyingPose('idle',1000,true,form).frame).toBe(0);expect(sampleFlyingPose('sleep',1000,false,form).sheet).toBe('comfort');
   }
+ });
+ it('closes airborne eyes on hand contact without restarting the original flight frame',()=>{
+  for(const form of ['senior','super','water','wood','fire'])for(const time of [500,800,1200,1700]){
+   const pet=sampleFlyingPose('pet',time,false,form,1370+time);
+   expect(pet.sheet).toBe('comfort');expect(pet.row).toBe(0);
+   expect(pet.frame).toBe(sampleFlyingPose('idle',0,false,form,1370+time).frame);
+  }
+  expect(sampleSeedPose('pet',800).frame).toBe(61);
+  expect(sampleSeedPose('play',3800).frame).toBe(61);
+  expect(sampleSeedPose('wake',0).frame).toBe(61);
+  expect(sampleSeedPose('wake',600).frame).toBe(0);
+  expect(getRamActionDuration('wake')).toBe(1800);
  });
 });
