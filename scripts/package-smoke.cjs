@@ -27,10 +27,14 @@ async function verifySocialProps(page) {
   const panel=page.getByTestId('companion-panel');
   for(const [name,kind] of [['一起玩球','play'],['摸摸拉姆','pet'],['陪我专注','focus']]) {
     await panel.getByRole('button',{name,exact:true}).click();
-    await expect(character.locator(`[data-social-action=${kind}]`)).toBeVisible();
-    await expect.poll(()=>character.locator('.ram-sprite').evaluate(n=>Number(n.style.getPropertyValue('--social-opacity'))),{timeout:10000}).toBeGreaterThan(.8);
-    const image=character.locator(kind==='play'?'.social-ball':kind==='pet'?'.social-hand':'.social-book>img').first();
-    await image.evaluate(n=>n.decode());const box=await image.boundingBox();assert.ok(box.width>20&&box.height>10);
+    if(kind==='play'&&Number(await character.locator('.ram-sprite').getAttribute('data-stage'))>0){
+      const canvas=character.locator('canvas[data-sheet=football]');await expect(canvas).toHaveAttribute('data-loaded','true');await expect.poll(async()=>Number(await canvas.getAttribute('data-source-frame')),{intervals:[50]}).toBeGreaterThan(1);
+    }else{
+      await expect(character.locator(`[data-social-action=${kind}]`)).toBeVisible();
+      await expect.poll(()=>character.locator('.ram-sprite').evaluate(n=>Number(n.style.getPropertyValue('--social-opacity'))),{timeout:10000}).toBeGreaterThan(.8);
+      const image=character.locator(kind==='play'?'.social-ball':kind==='pet'?'.social-hand':'.social-book>img').first();
+      await image.evaluate(n=>n.decode());const box=await image.boundingBox();assert.ok(box.width>20&&box.height>10);
+    }
   }
   await expect(page.getByRole('timer',{name:'专注倒计时',exact:true})).toBeVisible();
   await panel.getByRole('button',{name:'结束专注',exact:true}).click();await expect(page.getByRole('timer')).toHaveCount(0);
@@ -64,6 +68,9 @@ async function verifyApplication({ executable, archive, screenshot }) {
     'dist/assets/original/seed/pot.png', 'dist/assets/original/seed/body.png', 'dist/assets/original/seed/body-mask.png',
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
+  for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/slumber/${form}-${layer}.png`),'Missing original sleepy expression atlas');
+  assert.ok(paths.has('dist/assets/original/slumber/z.png'),'Missing original floating Z');
+  for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/football/${form}-${layer}.png`),'Missing original football performance');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
   for(const form of ['junior','middle'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/grounded/${form}-${layer}.png`),'Missing calm original-layer atlas');
   for(const form of ['senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/comfort/${form}-${layer}.png`),'Missing original closed-eye flight rig');
@@ -200,7 +207,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await page.locator('.time-scene-art img').evaluate(img => img.decode());
   assert.ok((await page.locator('.time-scene-art img').getAttribute('src')).endsWith('/assets/generated/v6-starlight-greenhouse.png'));
   await toDesktop(page); await openActions(page); await makeTired(page);
-  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
+  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-sheet','slumber');
   await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();
   await openActions(page);await expect(page.getByRole('button',{name:'开始计时',exact:true})).toBeVisible();
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-preferences-v2')).reminderMinutes),7);

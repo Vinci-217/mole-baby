@@ -7,12 +7,6 @@ const smooth = (x:number) => { const t=Math.max(0,Math.min(1,x));return t*t*(3-2
 export function gesturePulse(time:number,centre:number,width:number):number {
   return smooth(1-Math.abs(time-centre)/width);
 }
-export function socialEyesClosed(action:string,time:number,reduced=false):boolean {
-  if(action==='sleep')return true;
-  if(action==='pet')return reduced||time>=480&&time<1950;
-  if(action==='play')return !reduced&&time>=3620&&time<4010;
-  return action==='wake'&&time<240;
-}
 const profiles = [
   { head: 20, contactX: 88, contact: 48, bookX: 76, bookY: 87, sway: 4, lift: 0, phase: .1 },
   { head: 30, contactX: 100, contact: 58, bookX: 50, bookY: 83, sway: 2, lift: 3, phase: .3 },

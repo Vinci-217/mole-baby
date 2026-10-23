@@ -162,3 +162,13 @@
 .ram-grounded:not(.is-sleeping) .ram-pose-layer{animation:none}
 @keyframes ram-grounded-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,.995)}}
 @media(prefers-reduced-motion:reduce){.ram-grounded .ram-flight-layer{animation:none!important;transform:none}}
+
+/* Original football is already a complete performance. Keep one image clock
+   for ball, body and crown; do not add another idle/squash transform on top. */
+.ram-sprite.ram-classic.action-play:not(.ram-seed) .ram-flight-layer,
+.ram-sprite.ram-classic.action-play:not(.ram-seed) .ram-pose-layer{animation:none;transform:none}
+.ram-sprite .ram-classic-frame.ram-football-frame{position:absolute;left:-33.333333%;top:-61.538462%;width:166.666667%;height:184.615385%;max-width:none}
+.ram-sleep-particles{position:absolute;width:1px;height:1px;pointer-events:none;z-index:4}
+.ram-sleep-particles>img{position:absolute;left:3px;top:-2px;width:14px;height:15px;object-fit:contain;opacity:0;animation:ram-snore-rise 4.8s linear infinite;transform-origin:center}
+@keyframes ram-snore-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.95}65%{opacity:.8}100%{opacity:0;transform:translate(25px,-48px) scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.ram-sleep-particles>img{animation:none!important;opacity:.7;transform:translate(12px,-22px)}.ram-sleep-particles>img+img{display:none}}

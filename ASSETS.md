@@ -1,5 +1,7 @@
 # 拉姆陪伴素材记录
 
+v0.21.0 玩球改用原客户端完整 `football`，原身体、眼睛、叶冠与球同帧播放；见 [football/README.md](public/assets/original/football/README.md)。睡觉改用原困倦眼睑、原嘴型的小幅张合与原 Z 字，上版 comfort 开心眼线已停止用于睡觉和摸头。睡眠循环与小尺寸眼线配色是明确记录的桌宠适配，见 [slumber/README.md](public/assets/original/slumber/README.md)。实际原帧检查和网络来源见 [本版动作核对](research/v21-original-actions.md)。没有新增模型生成角色图片。
+
 v0.20.0 的飞行形态闭眼层复用原 `lamubone.swf` shape665 与各神力原 down 身体，只将导出的眼睛区域配回已有正面六帧；其余身体与叶冠保持原像素，未重画角色。睡觉、蹭手、接球和醒来的时序为桌宠适配。原文件、校验值、配准与复现步骤见 [comfort/README.md](public/assets/original/comfort/README.md)。摸头的小爱心和碰球星点复用既有图标；没有新增生成素材。
 
 已发布的 [v0.3.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.3.0) 中，角色、小屋、照料道具和界面图片采用《摩尔庄园》原页游客户端的素材导出，该版本的背景、按钮、图标和状态条没有使用图片模型重绘。v0.3.0 已在 GitHub Actions Windows 运行器完成构建、产物校验和应用启动检查，可先下载试用。

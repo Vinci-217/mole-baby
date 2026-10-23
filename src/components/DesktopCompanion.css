@@ -197,5 +197,7 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout.is-edge-docked .compact-pet-name{opacity:0!important;pointer-events:none}
 .companion-layout.is-edge-docked .ram-social{display:none}
 .companion-layout.is-pet-dragging .compact-pet{transition:none}
+.companion-layout .compact-pet:has(.ram-football-frame) .compact-pet-name,
+.companion-layout .compact-pet:has(.ram-football-frame) .compact-bubble{opacity:0;pointer-events:none}
 .companion-preview>.companion-layout.panel-open{height:490px}
 @media(max-width:600px){.companion-preview>.companion-layout.panel-open{height:735px}.companion-preview .companion-panel{height:474px;max-height:calc(100vh - 255px)}.companion-preview>.companion-layout{bottom:15px}}

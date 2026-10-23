@@ -22,6 +22,7 @@ interface Props {
   onCare: (action: Action, item?: string) => void;
   onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
+  onActionEnd?:()=>void;
   pocketCategory: ItemCategory; pocketVisit: number; chatContent: ReactNode; playInvitation?:ReactNode;
 }
 const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
@@ -141,7 +142,7 @@ export default function DesktopCompanion(p: Props) {
       <CareFeedback feedback={docked?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking}/>
+        <Ram gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking} onActionEnd={displayAction==='play'?p.onActionEnd:undefined}/>
       </button>
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
         <button aria-label="查看状态" title="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>

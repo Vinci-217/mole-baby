@@ -15,10 +15,11 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   for(const [action,button,wait] of [['play','一起玩球',1000],['pet','摸摸拉姆',700],['focus','陪我专注',450]]){
    await page.getByRole('button',{name:button,exact:true}).click();await page.clock.runFor(wait);
-   await expect(ram.locator(`[data-social-action=${action}]`)).toBeVisible();
-   const state=await ram.evaluate(n=>({opacity:Number(n.style.getPropertyValue('--social-opacity')),stage:n.dataset.stage}));assert.ok(state.opacity>.8,`${form}/${action} visible opacity`);
-   const prop=ram.locator(action==='play'?'.social-ball':action==='pet'?'.social-hand':'.social-book>img').first();const box=await prop.boundingBox();assert.ok(box.width>=20&&box.height>=10,'actual prop has visible desktop dimensions');
-   await prop.evaluate(n=>n.decode());await page.locator('.desktop-pet').screenshot({path:path.join(shots,`${form}-${action}.png`)});
+   const originalBall=action==='play'&&form!=='seed';
+   if(originalBall)await expect(ram.locator('canvas[data-sheet=football]')).toHaveAttribute('data-loaded','true');
+   else {await expect(ram.locator(`[data-social-action=${action}]`)).toBeVisible();const state=await ram.evaluate(n=>({opacity:Number(n.style.getPropertyValue('--social-opacity')),stage:n.dataset.stage}));assert.ok(state.opacity>.8,`${form}/${action} visible opacity`);}
+   const prop=ram.locator(originalBall?'.ram-football-frame':action==='play'?'.social-ball':action==='pet'?'.social-hand':'.social-book>img').first();const box=await prop.boundingBox();assert.ok(box.width>=20&&box.height>=10,'actual action has visible desktop dimensions');
+   if(!originalBall)await prop.evaluate(n=>n.decode());await page.locator('.desktop-pet').screenshot({path:path.join(shots,`${form}-${action}.png`)});
    if(action==='focus'){await page.getByRole('button',{name:'结束专注',exact:true}).click();}else await page.clock.fastForward(4500);
   }
   if(form==='seed'){await page.getByTestId('companion-panel').getByRole('tab',{name:'背包',exact:true}).click();const slots=page.locator('.pocket-slot');assert.equal(await slots.count(),16);for(const slot of await slots.all()){const b=await slot.boundingBox();assert.ok(Math.abs(b.width-b.height)<1);}await page.screenshot({path:path.join(root,'artifacts/v9-square-backpack.png')});await page.getByRole('button',{name:'关闭小窗',exact:true}).click();}

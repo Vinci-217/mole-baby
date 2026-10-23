@@ -31,7 +31,7 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
   await page.clock.fastForward(120000);assert.equal(await page.evaluate(()=>window.__alarmNotes),6);
   await page.reload();await expect(page.getByRole('timer')).toHaveCount(0);
   await openActions(page);await makeTired(page);await page.clock.fastForward(50);
-  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
+  await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-sheet','slumber');
   assert.equal(await character.locator('.seed-body-original').evaluate(node=>node.style.transform),'rotate(0deg)');
   assert.equal(await character.locator('.ram-pose-layer').evaluate(node=>getComputedStyle(node).transform),'none');
   await page.screenshot({path:path.join(root,'artifacts/v9-seed-upright.png')});
@@ -66,7 +66,7 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
     if(color==='yellow') assert.ok(pixel[0]>170&&pixel[1]>170&&pixel[2]<80);
     if(color==='pink') assert.ok(pixel[0]>pixel[1]+60&&pixel[2]>pixel[1]+60);
     assert.ok(await ram.locator('canvas').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,192,208).data.some((value,index)=>index%4===3&&value>200)));
-    await openActions(p);await makeTired(p);await expect(ram.locator('canvas')).toHaveAttribute('data-sheet','comfort');await expect(ram).toHaveAttribute('data-sleeping','true');
+    await openActions(p);await makeTired(p);await expect(ram.locator('canvas')).toHaveAttribute('data-sheet','slumber');await expect(ram).toHaveAttribute('data-sleeping','true');
     if(color==='blue'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v9-water-sleep.png')});
     await p.close();
   }

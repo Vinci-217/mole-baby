@@ -10,6 +10,7 @@ import { createPetSoundClock } from '../pet-audio'
 import { itemSoundScore, socialSoundScore } from '../pet-sound-score'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleFlyingPose } from './ram-animation'
 import { edgePeekTilt, type PetEdge } from '../edge-motion'
+import {footballSpec,footballPose,footballDuration,slumberMouth,type RamForm} from '../original-actions'
 
 interface RamProps {
   color: PetColor
@@ -34,8 +35,8 @@ interface RamProps {
   shaking?: boolean
   onActionEnd?: () => void
 }
-type Form = 'junior' | 'middle' | 'senior' | Evolution
-type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'comfort'
+type Form = RamForm
+type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'football'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -61,7 +62,8 @@ const ACTION_NAMES: Record<string, string> = {
 function sheetSpec(form: Form, kind: SheetKind) {
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
-  if (kind === 'comfort') return { width: CELL_WIDTH * 6, height: CELL_HEIGHT, neutral: `./assets/original/comfort/${form}-neutral.png`, mask: `./assets/original/comfort/${form}-mask.png` }
+  if (kind === 'slumber') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/slumber/${form}-neutral.png`, mask:`./assets/original/slumber/${form}-mask.png` }
+  if (kind === 'football') return { width:160*8,height:192*footballSpec(form)!.rows,neutral:`./assets/original/football/${form}-neutral.png`,mask:`./assets/original/football/${form}-mask.png` }
   if (kind === 'care') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * CARE_ROWS, neutral: `./assets/original/care/${form}-neutral.png`, mask: `./assets/original/care/${form}-mask.png` }
   if (kind === 'item') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * 4, neutral: `./assets/original/item-motion/${form}-neutral.png`, mask: `./assets/original/item-motion/${form}-mask.png` }
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
@@ -77,6 +79,10 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
   const key = kind === 'seed' ? 'seed' : `${kind}:${form}`
   const cached = sourceCache.get(key)
   if (cached) return cached
+  if(kind==='football'){
+    const old=[...sourceCache.keys()].filter(k=>k.startsWith('football:'))
+    if(old.length>=2)sourceCache.delete(old[0])
+  }
   const spec = sheetSpec(form, kind)
   const pending = Promise.all([loadPng(spec.neutral, spec.width, spec.height), loadPng(spec.mask, spec.width, spec.height)]).then(([neutralImage, maskImage]) => {
     const canvas = document.createElement('canvas')
@@ -96,10 +102,14 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
-  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','comfort'].includes(kind)) kind = 'classic'
+  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','football'].includes(kind)) kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
+  if(kind==='football'){
+    const old=[...tintedCache.keys()].filter(k=>k.startsWith('football:'))
+    if(old.length>=3)tintedCache.delete(old[0])
+  }
   const pending = getSource(form, kind).then(({ neutral, mask }) => {
     const canvas = document.createElement('canvas')
     canvas.width = neutral.width; canvas.height = neutral.height
@@ -152,7 +162,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const soundRef=useRef(sound);soundRef.current=sound
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
-  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; comfort?: HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
+  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; slumber: HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
   const key = `${form}:${color}:${fromColor??''}`
   const sheets = ready?.key === key ? ready : null
   useEffect(() => {
@@ -160,10 +170,10 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     const load=async(c:PetColor)=>{
       const [classic,care,item]=await Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item')]);
       const grounded=['junior','middle'].includes(form)?await getTintedSheet(form,c,'grounded'):undefined;
-      const comfort=grounded?undefined:await getTintedSheet(form,c,'comfort');
-      return {classic,care,item,grounded,comfort};
+      const slumber=await getTintedSheet(form,c,'slumber');
+      return {classic,care,item,grounded,slumber};
     };
-    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.comfort]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
+    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.slumber]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
     return () => { cancelled = true }
   }, [form, color, fromColor, key])
   useEffect(() => {
@@ -184,13 +194,13 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
-      const grounded = sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
+      const grounded = pose.sheet!=='slumber' && sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
       const sheet=grounded?'grounded':pose.sheet??'classic', frame=grounded?.frame??pose.frame, row=grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
-        const target=sheet==='grounded'?sheets.grounded!:sheet==='comfort'?sheets.comfort!:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
-        const old=sheets.previous?.[sheet==='comfort'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
+        const target=sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
+        const old=sheets.previous?.[sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
           context.drawImage(source,frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
           if(grounded){
@@ -205,7 +215,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';previous=signature
       }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
-      if (!ended && action !== 'still' && action !== 'sleep' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
+      if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; request = requestAnimationFrame(paint) }
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
@@ -215,6 +225,36 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
+/** A single original source image includes both pet and ball. The larger
+ * transparent canvas leaves the physical 100px pet/hit box unchanged. */
+function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,onError,onActionEnd}:{form:Form;color:PetColor;actionId?:number|string;sound?:boolean;startedAt:number;performanceClock:RefObject<{began:number|undefined;lastAudioElapsed?:number}>;onError:()=>void;onActionEnd?:()=>void}) {
+  const ref=useRef<HTMLCanvasElement>(null),soundRef=useRef(sound),endRef=useRef(onActionEnd),errorRef=useRef(onError)
+  soundRef.current=sound;endRef.current=onActionEnd;errorRef.current=onError
+  useEffect(()=>{
+    let cancelled=false,request=0,ended=false,source:HTMLCanvasElement|null=null,previous=-1
+    const canvas=ref.current,context=canvas?.getContext('2d'),media=window.matchMedia('(prefers-reduced-motion: reduce)')
+    if(!canvas||!context)return
+    const score=socialSoundScore('play',form)
+    score.cues=score.cues.filter(c=>c.at>(performanceClock.current.lastAudioElapsed??-1))
+    const audio=createPetSoundClock(score,()=>soundRef.current===true)
+    const paint=(now:number)=>{
+      if(cancelled||!source||document.hidden)return
+      if(performanceClock.current.began===undefined)performanceClock.current.began=now
+      const elapsed=Math.max(0,now-performanceClock.current.began),pose=footballPose(form,elapsed,media.matches)
+      if(!media.matches)audio.tick(elapsed)
+      performanceClock.current.lastAudioElapsed=elapsed
+      if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(source,pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
+      canvas.dataset.loaded='true';canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.nearBall=String(pose.nearBall)
+      if(pose.finished&&!ended){ended=true;endRef.current?.()}
+      if(!ended)request=requestAnimationFrame(paint)
+    }
+    const resume=()=>{cancelAnimationFrame(request);previous=-1;if(source)request=requestAnimationFrame(paint)}
+    getTintedSheet(form,color,'football').then(value=>{if(!cancelled){source=value;resume()}}).catch(()=>{if(!cancelled)errorRef.current()})
+    document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume)
+    return()=>{cancelled=true;cancelAnimationFrame(request);audio.stop();document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume)}
+  },[form,color,actionId,startedAt,performanceClock])
+  return <canvas ref={ref} className="ram-classic-frame ram-football-frame" width={160} height={192} data-sheet="football" data-form={form} data-color={color} data-duration={footballDuration(form)} aria-hidden="true"/>
+}
 function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, startedAt, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; sound?: boolean; startedAt:number; onActionEnd?: () => void }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const soundRef=useRef(sound);soundRef.current=sound
@@ -222,7 +262,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
   useEffect(() => {
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     let cancelled = false, request = 0, elapsed = 0, last = 0, previous = '', ended = false
-    let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null
+    let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null, slumber:HTMLCanvasElement|null=null
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const paint = (now: number) => {
       if (cancelled || !source || document.hidden) { last = 0; return }
@@ -232,18 +272,20 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       const pose = sampleSeedPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
-      const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${pose.frame}:${Math.round(mix*255)}`;
+      const sleepy=action==='sleep'||action==='wake'&&elapsed<240;
+      const activeSource=sleepy?slumber!:source;
+      const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${sleepy}:${pose.frame}:${Math.round(mix*255)}`;
       if (previous !== signature) {
         const c = ref.current?.getContext('2d')
-        if(c){c.clearRect(0,0,96,99);if(oldSource&&mix<1){c.drawImage(oldSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=mix;}c.drawImage(source,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=1;}
-        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.frame = String(pose.frame) }
+        if(c){c.clearRect(0,0,96,99);if(oldSource&&mix<1){c.drawImage(oldSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=mix;}c.drawImage(activeSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=1;}
+        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':'seed' }
         previous = signature
       }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
-      if (!ended && action !== 'still' && action !== 'sleep' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
+      if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; if (source) request = requestAnimationFrame(paint) }
-    Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null]).then(([loaded,old])=>{if(!cancelled){source=loaded;oldSource=old;resume()}}).catch(()=>{})
+    Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null,getTintedSheet('seed',color,'slumber')]).then(([loaded,old,sleep])=>{if(!cancelled){source=loaded;oldSource=old;slumber=sleep;resume()}}).catch(()=>{})
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
     return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
   }, [color, fromColor, action, actionId, itemMotion, startedAt])
@@ -262,13 +304,16 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
 }
 export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const clock=useRef({key:'',startedAt:0})
+  const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
   const eventKey=`${action}:${actionId??0}:${itemId??''}`
   if(clock.current.key!==eventKey)clock.current={key:eventKey,startedAt:performance.now()}
+  if(playClock.current.key!==eventKey)playClock.current={key:eventKey,began:undefined}
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
   const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : itemMotion ? itemMotion.action : action
   const resting = activeAction === 'sleep', key = `${form}:${color}`
+  const mouth=slumberMouth(stage===0?'seed':form)
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt)) + (peeking && !resting && !dragging ? edgePeekTilt(peekSide) : 0)
@@ -283,10 +328,10 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
     <span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : <ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={onActionEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
       </span></span>}
-    <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction}/>
-    {resting && <span className="ram-sleep-mark" aria-hidden="true">z<span>z</span></span>}
+    <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
+    {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*1.6}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
     </span>
   </span>

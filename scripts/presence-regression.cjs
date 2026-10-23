@@ -68,6 +68,6 @@ const memory=page=>page.evaluate(()=>JSON.parse(localStorage.getItem(`ramu-compa
  await p.clock.install();await p.goto(url);await adopt(p);await p.clock.pauseAt(new Date(Date.now()+1000));
  await openActions(p);await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(20000);await p.clock.fastForward(100000);await expect.poll(async()=>(await journal(p))?.history.length||0).toBe(1);assert.ok((await journal(p)).history.every(h=>h.id.startsWith('study-')));
  const studyCount=(await journal(p)).history.length;await p.getByRole('button',{name:'取消计时',exact:true}).click();await openActions(p);await makeTired(p);await p.clock.fastForward(1200000);assert.equal((await journal(p)).history.length,studyCount);
- await expect(p.getByTestId('desktop-character').locator('.seed-body-frame')).toHaveAttribute('data-frame','61');await expect(p.getByRole('timer')).toHaveCount(0);
+ await expect(p.getByTestId('desktop-character').locator('.seed-body-frame')).toHaveAttribute('data-sheet','slumber');await expect(p.getByRole('timer')).toHaveCount(0);
  console.log('PASS reading-specific study speech and quiet seed sleep, independent of the manual timer');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();server.kill('SIGTERM');});

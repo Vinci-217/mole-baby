@@ -11,8 +11,8 @@ export function paintSocialCue(canvas: HTMLCanvasElement, stage: Stage, action: 
     const p=pose.orbit[i];star.style.left=`${p.x}%`;star.style.top=`${p.y}%`;star.style.opacity=String(p.opacity);star.style.transform=`translate(-50%,-50%) scale(${p.scale}) rotate(${p.angle}deg)`;
   });
 }
-export default function SocialCue({action}:{action:string}) {
-  if(!isSocialAction(action)) return null;
+export default function SocialCue({action,originalFootball=false}:{action:string;originalFootball?:boolean}) {
+  if(!isSocialAction(action)||originalFootball) return null;
   return <span className={`ram-social social-${action}`} data-social-action={action} aria-hidden="true">
     {action==='play'&&<><img className="social-ball" src="./assets/original/items/180004.png" alt="" draggable={false}/><span className="social-ball-contact"><img src="./assets/generated/v12-dizzy-star.png" alt="" draggable={false}/></span></>}
     {action==='pet'&&<><img className="social-hand" src="./assets/generated/v9-petting-hand.png" alt="" draggable={false}/><img className="social-affection" src="./assets/original/ui/icon-happy.png" alt="" draggable={false}/></>}

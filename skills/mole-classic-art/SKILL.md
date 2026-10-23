@@ -11,6 +11,8 @@ description: 根据仓库内《摩尔庄园》早期 Flash 页游参考，为拉
 
 ## 先看图，再写提示词
 
+涉及角色动作时，先读 [原动作与动画复核](references/animation-guide.md)，检查对应的原 SWF 完整时间轴与实际录屏，再决定使用原片或生成新动作。
+
 1. 先读 `references/style-guide.md`，再实际查看至少三类参考：场景、UI、道具。任务含角色时加看原角色图。只读名称或来源清单不能代替看图。
 2. 最低参考组合：`public/assets/original/scenes/ramu-home.png`、`public/assets/original/ui/reference-pet-panel.png`、`public/assets/original/items/180017.png`。背景任务再看 `scenes/lake-cabin.png` 或 `scenes/ramu-school.png`，避免把一间房的构图误当成整个游戏的画风。
 3. 用五行记录本次参考的轮廓、形状、色面、高光与空间安排；写明本次要新设计的内容、保持不变的角色和交互留白。

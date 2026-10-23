@@ -1,5 +1,6 @@
 import type { ItemMotion } from './item-motion'
 import {BALL_CONTACTS} from './social-motion'
+import {footballContacts} from './original-actions'
 
 export type Foley = 'nibble' | 'crunch' | 'sip' | 'gulp' | 'bubble' | 'brush' | 'water' | 'cloth' | 'page' | 'ball' | 'magic' | 'voice'
 export interface SoundCue { at: number; kind: Foley; strength: number }
@@ -21,9 +22,9 @@ export function itemSoundScore(motion: ItemMotion): SoundScore {
   if (motion.gesture === 'recolor') cues.push({at: motion.duration * .61, kind: 'magic', strength: .5})
   return {cues: cues.sort((a,b) => a.at-b.at)}
 }
-export function socialSoundScore(action: string): SoundScore {
+export function socialSoundScore(action: string,form='seed'): SoundScore {
   if (action === 'focus') return {cues: [{at: 6250, kind: 'page', strength: .35}], loop: 8000}
-  if (action === 'play') return {cues: BALL_CONTACTS.map(at => ({at, kind: 'ball', strength: .6}))}
+  if (action === 'play') return {cues: (form==='seed'?BALL_CONTACTS:footballContacts(form)).map(at => ({at, kind: 'ball', strength: .5}))}
   if (action === 'pet') return {cues: [{at: 480, kind: 'voice', strength: .55}]}
   return {cues: []}
 }

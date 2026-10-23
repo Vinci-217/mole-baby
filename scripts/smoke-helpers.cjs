@@ -368,7 +368,8 @@ async function verifyPetSpirit(page){
   await widget.locator('.pet-invitation-accept').evaluate(n=>{n.click();n.click();});
   const action=kind==='ball'?'play':kind==='pet'?'pet':'watch-butterfly';
   await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action',action);
-  await expect(character.locator(`[data-social-action="${action}"]`)).toBeVisible();
+  if(action==='play'&&Number(await character.locator('.ram-sprite').getAttribute('data-stage'))>0)await expect(character.locator('canvas[data-sheet=football]')).toBeVisible();
+  else await expect(character.locator(`[data-social-action="${action}"]`)).toBeVisible();
   await expect(widget.locator('[data-invitation-kind]')).toHaveCount(0);
   const events=(await readMemory()).events.filter(e=>['play','pet'].includes(e.kind));expect(events.length).toBe(experiences+1);expect(events.at(-1).detail).toContain('小邀请');
   const after=await save();expect(after.coins).toBe(before.coins);expect(after.inventory).toEqual(before.inventory);expect(after.growth-before.growth).toBeLessThan(.1);
@@ -379,23 +380,31 @@ async function verifyPetSpirit(page){
 async function verifyComfortMotion(page) {
   const original=await page.evaluate(()=>({pet:localStorage.getItem('ramu-house-save-v1'),prefs:localStorage.getItem('ramu-house-preferences-v2')}));
   try {
-    for(const [growth,evolution,sheet,frame] of [[0,null,null,'61'],[180,null,'grounded','2'],[840,'super','comfort','0']]){
+    for(const [growth,evolution] of [[0,null],[180,null],[840,'super']]){
       await page.evaluate(({growth,evolution})=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth,sleeping:true,lastTick:Date.now(),stats:{hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:50}});delete p.awakeUntil;delete p.evolution;if(evolution)p.evolution=evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,lively:false}));},{growth,evolution});
       await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite'),canvas=ram.locator('canvas');
-      await expect(canvas).toHaveAttribute('data-loaded','true');await expect(ram).toHaveAttribute('data-sleeping','true');await expect(canvas).toHaveAttribute('data-frame',frame);if(sheet)await expect(canvas).toHaveAttribute('data-sheet',sheet);
+      await expect(canvas).toHaveAttribute('data-loaded','true');await expect(ram).toHaveAttribute('data-sleeping','true');await expect(canvas).toHaveAttribute('data-sheet','slumber');
+      const first=await canvas.getAttribute('data-frame');await expect.poll(()=>canvas.getAttribute('data-frame'),{intervals:[100],timeout:5000}).not.toBe(first);
+      await expect(ram.locator('.ram-sleep-particles>img')).toHaveCount(3);expect(await ram.locator('.ram-sleep-particles>img').first().evaluate(n=>getComputedStyle(n).animationName)).toBe('ram-snore-rise');
       if(growth===0)expect(await ram.locator('.seed-body-original').evaluate(n=>getComputedStyle(n).transform)).toBe('matrix(1, 0, 0, 1, 0, 0)');
       await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await expect(ram).toHaveAttribute('data-action','wake');await expect(ram).not.toHaveAttribute('data-action','wake',{timeout:4000});
       await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();const panel=page.getByTestId('companion-panel');
-      await panel.getByRole('button',{name:'摸摸拉姆',exact:true}).click();await expect(canvas).toHaveAttribute('data-frame',growth===0?'61':growth===180?'2':/^[0-5]$/);
-      if(growth===840)await expect(canvas).toHaveAttribute('data-sheet','comfort');
+      await panel.getByRole('button',{name:'摸摸拉姆',exact:true}).click();await expect(canvas).toHaveAttribute('data-sheet',growth===0?'seed':growth===180?'grounded':'classic');
       await expect.poll(()=>ram.evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))),{intervals:[30],timeout:2500}).toBeGreaterThan(1.5);
+      const whites=await canvas.evaluate(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let count=0;for(let i=0;i<a.length;i+=4)if(a[i]>240&&a[i+1]>240&&a[i+2]>240&&a[i+3]>200)count++;return count;});expect(whites).toBeGreaterThan(20);
       await expect(ram).not.toHaveAttribute('data-action','pet',{timeout:4000});
       await panel.getByRole('button',{name:'一起玩球',exact:true}).click();
-      await expect.poll(()=>ram.locator('.social-ball-contact').evaluate(n=>Number(getComputedStyle(n).opacity)),{intervals:[25],timeout:4000}).toBeGreaterThan(.7);
-      expect(await ram.evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle')))).toBeGreaterThan(1);
-      await expect(ram).not.toHaveAttribute('data-action','play',{timeout:5500});
+      let duration=4200;
+      if(growth===0){await expect.poll(()=>ram.locator('.social-ball-contact').evaluate(n=>Number(getComputedStyle(n).opacity)),{intervals:[25],timeout:4000}).toBeGreaterThan(.7)}
+      else {
+        await expect(canvas).toHaveAttribute('data-sheet','football');await expect(canvas).toHaveAttribute('data-loaded','true');duration=Number(await canvas.getAttribute('data-duration'));
+        await expect.poll(()=>canvas.getAttribute('data-near-ball'),{intervals:[30],timeout:5000}).toBe('true');
+        expect(await ram.locator('.ram-pose-layer').evaluate(n=>getComputedStyle(n).transform)).toBe('none');
+        const f=Number(await canvas.getAttribute('data-source-frame'));await expect.poll(async()=>Number(await canvas.getAttribute('data-source-frame')),{intervals:[50]}).toBeGreaterThan(f);
+      }
+      await expect(ram).not.toHaveAttribute('data-action','play',{timeout:duration+2500});
     }
-    console.log('PASS: upright closed-eye sleep, finite waking, original-rig affection and synchronized ball contact in the actual application');
+    console.log('PASS: original sleepy mouth cycle, rising Z particles, large-eye affection and body/ball source frames in the actual application');
   } finally {
     await page.evaluate(({pet,prefs})=>{localStorage.setItem('ramu-house-save-v1',pet);if(prefs)localStorage.setItem('ramu-house-preferences-v2',prefs);else localStorage.removeItem('ramu-house-preferences-v2');},original);
     await page.reload();await page.getByTestId('desktop-character').waitFor();

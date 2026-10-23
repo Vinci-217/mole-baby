@@ -1,7 +1,8 @@
-import { SOCIAL_DURATIONS, isSocialAction, socialEyesClosed } from '../social-motion'
+import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
+import {footballDuration,footballPose,slumberFrame} from '../original-actions'
 
-export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'comfort' | 'grounded' }
+export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'football' | 'grounded' }
 export const CARE_COLUMNS = 16
 export const CARE_ROWS = 7
 /** Each care row comes from the matching named animation in lamubone.swf. */
@@ -21,7 +22,8 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   happy: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 300 },
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
-export function getRamActionDuration(action: string): number | null {
+export function getRamActionDuration(action: string,form='junior'): number | null {
+  if(action==='play'&&form!=='seed')return footballDuration(form)??SOCIAL_DURATIONS.play
   if (isSocialAction(action) && action !== 'focus') return SOCIAL_DURATIONS[action]
   const item = getItemMotionByAction(action)
   if (item) return item.duration
@@ -32,15 +34,16 @@ export function getRamActionDuration(action: string): number | null {
 }
 /** Sample an event clock, never a React render count. Sleep closes the eyes
  * on the same grounded body instead of using another action's silhouette. */
-export function sampleRamPose(action: string, elapsed: number, reduced = false): Pose {
-  if (action === 'sleep') return { sheet:'grounded', row:0, frame:2, finished:false }
+export function sampleRamPose(action: string, elapsed: number, reduced = false,form='junior'): Pose {
+  if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false }
+  if(action==='play'){const p=footballPose(form,elapsed,reduced);return {sheet:'football',row:Math.floor(p.frame/8),frame:p.frame%8,finished:p.finished}}
   if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
     const duration=SOCIAL_DURATIONS[action as Exclude<keyof typeof SOCIAL_DURATIONS,'focus'>];
     if (elapsed>=duration) return {row:0,frame:0,finished:true};
     if (reduced) return {row:0,frame:0,finished:false};
     if(action==='watch-butterfly'||action==='look-around')return {row:0,frame:[0,1,2,3,2,1][Math.floor(elapsed/650)%6],finished:false};
-    return {row:action==='dizzy'?0:action==='play'?8:3,frame:action==='dizzy'?0:Math.floor(elapsed/220)%(action==='pet'?4:6),finished:false};
+    return {row:0,frame:action==='dizzy'?0:Math.floor(elapsed/220)%6,finished:false};
   }
   if (action === 'still' || action === 'drag') return { row: 0, frame: 0, finished: false }
   const item = getItemMotionByAction(action)
@@ -81,13 +84,13 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false):
 /** Original seed timeline has closed eyes in frames 4 and 5, and large eyes in
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
-  if (action === 'sleep') return { frame: 61, finished: false }
+  if (action === 'sleep') return { frame: slumberFrame(elapsed,reduced), finished: false }
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
-  if (action === 'pet' || action === 'play' || action === 'wake') return {frame:elapsed>=SOCIAL_DURATIONS[action]?0:socialEyesClosed(action,elapsed,reduced)?61:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
+  if (action === 'pet' || action === 'play' || action === 'wake') return {frame:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
   if (action === 'watch-butterfly' || action === 'look-around') return {frame:reduced?0:[0,1,2,1][Math.floor(elapsed/700)%4],finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
-  const duration = getRamActionDuration(action)
+  const duration = getRamActionDuration(action,'seed')
   if (duration !== null && elapsed >= duration) return { frame: 0, finished: true }
   if (reduced) return { frame: 0, finished: false }
   // A small original body-only sway; the independent pot never moves. Avoid
@@ -119,7 +122,8 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
-  if (action === 'sleep') return { sheet:'comfort', row: 0, frame: 0, finished: false };
+  if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false };
+  if(action==='play')return sampleRamPose(action,elapsed,reduced,form);
   const direction = action === 'walk-left' || action === 'running-left' ? 2 : action === 'walk-right' || action === 'running-right' ? 1 : 0;
   // Side rows have eight sampled source poses, with different holds from the
   // six front poses. Keep the shared flight clock when changing direction.
@@ -127,7 +131,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   if (action === 'still' || action === 'drag' || reduced) {
     const duration = getRamActionDuration(action);
     const finished=duration !== null && elapsed >= duration;
-    return { ...(reduced&&!finished&&socialEyesClosed(action,elapsed,true)?{sheet:'comfort' as const}:{}), row: 0, frame: 0, finished };
+    return { row: 0, frame: 0, finished };
   }
   const sourceFrames = direction
     ? form === 'super' ? [1,4,6,9,11,14,16,19] : form === 'senior' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,6,7,8,9]
@@ -139,7 +143,6 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   if (direction) return { row: direction, frame, finished: false };
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
-  if(!finished&&socialEyesClosed(action,elapsed))return {sheet:'comfort',row:0,frame,finished:false};
   if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around','happy','waving'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
     return sampleRamPose(action,elapsed,reduced);
   }

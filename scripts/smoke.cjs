@@ -110,7 +110,7 @@ async function checkFourSeedColors() {
   console.log('PASS room-only four-book shop, bean purchase guards, varied supplies and correct consumption/effects without click growth');
 
   await toDesktop(page); await openActions(page); await makeTired(page);
-  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping', 'true'); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame', '61');
+  await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping', 'true'); await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-sheet', 'slumber');
   await expect(page.getByRole('button', { name: '叫醒拉姆', exact: true })).toBeVisible(); assert.equal((await save(page)).sleeping, true);
   await enterHome(page); await roomTab(page, '游戏');
   await expect(page.getByRole('button', { name: '开始接果子', exact: true })).toBeDisabled(); await expect(page.getByRole('button', { name: '开始翻牌', exact: true })).toBeDisabled();
@@ -126,7 +126,7 @@ async function checkFourSeedColors() {
   await page.evaluate(() => localStorage.setItem('ramu-house-preferences-v2', JSON.stringify({ sound: false, quiet: true, artStyle: 'hd' })));
   await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); assert.equal(await page.locator('[data-art-style=hd]').count(), 0); assert.equal((await save(page)).name, '叶叶');
   await openActions(page);await actions.getByRole('button', { name: '玩耍', exact: true }).click(); await panel.getByRole('button', { name: '陪我专注', exact: true }).click(); await page.getByRole('button', { name: '结束专注', exact: true }).first().click();
-  await makeTired(page); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'grounded'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-frame', '2'); await page.getByRole('button', { name: '叫醒拉姆', exact: true }).click(); await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();
+  await makeTired(page); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'slumber'); await page.getByRole('button', { name: '叫醒拉姆', exact: true }).click(); await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();
   console.log('PASS sleep/wake guards, backup validation, legacy-save need migration, no generated fallback, mature closed-eye sleep and focus');
 
   await panel.getByRole('tab', { name: '背包', exact: true }).click();

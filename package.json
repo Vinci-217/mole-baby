@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -34,7 +34,8 @@
     "test:attention-care": "node scripts/attention-care-regression.cjs",
     "test:pet-spirit": "node scripts/pet-spirit-regression.cjs",
     "test:edge-motion": "node scripts/edge-motion-regression.cjs",
-    "test:comfort-motion": "node scripts/comfort-motion-regression.cjs"
+    "test:comfort-motion": "node scripts/comfort-motion-regression.cjs",
+    "test:original-actions": "node scripts/comfort-motion-regression.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

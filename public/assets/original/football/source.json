@@ -1,0 +1,42 @@
+{
+  "retrieved": "2026-10-24",
+  "sourceFiles": {
+    "lamubone.swf": {
+      "url": "http://mole.61.com/resource/NPC/lamubone.swf",
+      "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/NPC/lamubone.swf"
+    },
+    "super.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet101/skill_7.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "sha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20"
+    },
+    "water.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_2.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_2.swf",
+      "sha256": "def307887b5de28bedcef4fae30fd980e8a9537f156b77f0b4527be235857464"
+    },
+    "wood.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_4.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_4.swf",
+      "sha256": "8b2844001dd346c5bdc0f6dba8da83da15c618c0d46a12c68b011f3bdfacd926"
+    },
+    "fire.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_1.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_1.swf",
+      "sha256": "ef8b8dd20db563b6dcde2ee3b69d47707453bd147076a676b84aeec7dbd1ef94"
+    }
+  },
+  "runtime": "PNG only; no Flash runtime",
+  "adaptation": "Complete original football source frames at 24 fps; compact shared camera for pet and ball; source blank clearing frame omitted; identical frames share atlas cells without changing their holds.",
+  "sourceActions": {
+    "junior": 620,
+    "middle": 1390,
+    "senior": 1690,
+    "super": 617,
+    "water": 322,
+    "wood": 746,
+    "fire": 634
+  },
+  "review": "The original junior stands on the ball; middle juggles with leaves; senior and god-power forms head the ball. Sleep reuses sleepy eyelids from boring, not happy smile curves."
+}

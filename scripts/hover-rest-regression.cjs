@@ -29,7 +29,7 @@ const save=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1
 
  await p.evaluate(()=>{const x=JSON.parse(localStorage.getItem('ramu-house-save-v1'));x.stats.energy=20.01;x.lastTick=Date.now();delete x.awakeUntil;localStorage.setItem('ramu-house-save-v1',JSON.stringify(x));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,reminders:true,reminderMinutes:1}));});
  await p.reload();await openActions(p);await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(15000);await p.clock.runFor(100);
- await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-frame','61');
+ await expect(character.locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');await expect(character.locator('.seed-body-frame')).toHaveAttribute('data-sheet','slumber');
  await expect(p.locator('.compact-bubble')).not.toContainText('有点困啦');
  assert.equal(await character.locator('.seed-body-original').evaluate(n=>n.style.transform),'rotate(0deg)');
  await expect(p.getByRole('button',{name:'叫醒拉姆',exact:true})).toBeVisible();await p.clock.fastForward(46000);await expect(p.locator('.compact-bubble')).toContainText('计时结束');assert.equal((await save(p)).sleeping,true);

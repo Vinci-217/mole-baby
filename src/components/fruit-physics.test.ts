@@ -54,7 +54,8 @@ describe('quiet and finite Ram animation', () => {
   it('honors still and reduced motion, and keeps genuine walking separate', () => {
     expect(sampleRamPose('still', 6400)).toMatchObject({ row: 0, frame: 0 });
     expect(sampleRamPose('walk-left', 240)).toMatchObject({ row: 2, frame: 3 });
-    expect(sampleRamPose('play', 100, true)).toMatchObject({ row: 0, frame: 0 });
+    expect(sampleRamPose('play', 100, true).sheet).toBe('football');
+    expect(sampleRamPose('play', 100, true)).toEqual(sampleRamPose('play', 1200, true));
   });
 });
 

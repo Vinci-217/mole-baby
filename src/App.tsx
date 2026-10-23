@@ -14,6 +14,7 @@ import MoreGames from './components/MoreGames';
 import type { ExtraGame } from './components/MoreGames';
 import { getItemMotion } from './item-motion';
 import { getRamActionDuration } from './components/ram-animation';
+import {ramForm} from './original-actions';
 import { playPetVoice, playGameSound, configurePetSound, prepareReminderSound, playReminderSound } from './pet-audio';
 import type { GameReceipt } from './components/game-receipt';
 import CarePocket from './components/CarePocket';
@@ -228,12 +229,14 @@ export default function App() {
 
   function animate(next: string, itemId?: string, fromColor?: PetColor, feedback?:CareFeedbackData) {
     const motion = itemId ? getItemMotion(itemId) : null;
-    const duration = motion?.duration ?? getRamActionDuration(next) ?? 900;
+    const p=petRef.current;
+    const duration = motion?.duration ?? getRamActionDuration(next,p?ramForm(getStage(p.growth,p.evolution),p.evolution):'seed') ?? 900;
     setActionId(n => n + 1); setActionFromColor(fromColor); setActionItemId(itemId); setAction(motion?.action ?? next);
     careUntil.current = itemId ? Date.now() + duration + 50 : 0;
     clearTimeout(timers.current.feedback);setCareFeedback(null);
-    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined);if(feedback?.gains.length&&petRef.current?.createdAt===feedback.petId){setBubbleVisible(false);setCareFeedback(feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2050);} }, duration + 50);
+    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined);if(feedback?.gains.length&&petRef.current?.createdAt===feedback.petId){setBubbleVisible(false);setCareFeedback(feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2050);} }, duration + (next==='play'?5000:50));
   }
+  function finishPlay(){if(action==='play'){clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined)}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
     const before = petRef.current; petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
     if (result.ok) {
@@ -372,7 +375,7 @@ export default function App() {
 
   if (floating && pet) return <div className={petMode ? 'transparent-stage' : 'desktop-preview companion-preview'}>
     {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>移上来互动，点击摸摸，按住拖动。</span></div>}
-    <DesktopCompanion pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
+    <DesktopCompanion onActionEnd={finishPlay} pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['status','food','play','chat'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
       sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} chatContent={chatContent} playInvitation={playInvitation}
       onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
@@ -386,7 +389,7 @@ export default function App() {
     <TimeScene media={roomMedia}>
       <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button className="room-change-button" onClick={() => setPanel('decor')}>布置小屋</button><span className="coin-sign">{current.coins} 摩尔豆</span><button className="game-button" onClick={() => void toDesktop()}>回到桌面</button></div>}</div>
       {pet && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
-        <div className="scene-pet"><CareFeedback feedback={careFeedback?.petId===current.createdAt?careFeedback:null}/><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>
+        <div className="scene-pet"><CareFeedback feedback={careFeedback?.petId===current.createdAt?careFeedback:null}/><button type="button" className={`scene-bubble ${bubbleVisible ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!bubbleVisible} tabIndex={bubbleVisible?0:-1} disabled={!bubbleVisible} onClick={respondToBubble}><span role="status">{bubble}</span></button><button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram onActionEnd={action==='play'?finishPlay:undefined} sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>
         <nav className="classic-dock room-dock" aria-label="小屋功能">
           <button aria-label="我的拉姆" onClick={() => setPanel('status')}><UiArt name="status-health"/><b>状态</b></button>
           <button aria-label="打开背包" onClick={() => { setPocketCategory('food'); setPanel('food'); }}><UiArt name="toolbar-bag-normal"/><b>背包</b></button>

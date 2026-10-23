@@ -1,48 +1,60 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process'),{chromium,expect}=require('@playwright/test');
+const {adopt,openActions}=require('./smoke-helpers.cjs');
 const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5207';
 const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5207','--strictPort'],{cwd:root,stdio:'pipe'});
 let browser,logs='';server.stderr.on('data',s=>logs+=s);
-const forms=[['seed',0],['junior',1],['middle',2],['senior',3],['super',4],['water',4],['wood',4],['fire',4]];
-const dir=path.join(root,'artifacts/v20-motion');fs.mkdirSync(dir,{recursive:true});
+const forms=[['seed',0],['junior',1],['middle',2],['senior',3],['super',4],['water',4],['wood',4],['fire',4]],dir=path.join(root,'artifacts/v21-motion');fs.mkdirSync(dir,{recursive:true});
+const runtime=require('../public/assets/original/football/runtime.json');
 (async()=>{
  for(let i=0;i<100;i++){if(server.exitCode!==null)throw Error(logs);try{if((await fetch(url)).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});
- const p=await browser.newPage({viewport:{width:1280,height:340}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.install();await p.goto(url);await p.clock.pauseAt(new Date(Date.now()+1000));
- await p.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');const review=mountComfortReview(forms);window.renderMotion=review.render;window.endCount=review.endCount;},forms);
- const sprites=p.locator('#motion-review .ram-sprite');
- const load=async()=>{await expect.poll(async()=>{await p.clock.runFor(30);return p.locator('#motion-review canvas[data-loaded=true]').count()}).toBe(8);await p.locator('#motion-review img').evaluateAll(ns=>Promise.all(ns.map(n=>n.decode())))};
- const shot=async name=>p.screenshot({path:path.join(dir,`${name}.png`)});
- if(!process.argv.includes('--record-only')) {
+ const p=await browser.newPage({viewport:{width:1280,height:360}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.install();await p.goto(url);await p.clock.pauseAt(new Date(Date.now()+1000));
+ await p.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);},forms);
+ const sprites=p.locator('#motion-review .ram-sprite'),canvases=sprites.locator('canvas');
+ const load=async()=>{await expect.poll(async()=>{await p.clock.runFor(30);return p.locator('#motion-review canvas[data-loaded=true]').count()},{timeout:30000}).toBe(8);await p.locator('#motion-review img').evaluateAll(ns=>Promise.all(ns.map(n=>n.decode())))};
+ const shot=async name=>p.screenshot({path:path.join(dir,name+'.png')});
+ if(!process.argv.includes('--record-only')){
  for(const color of ['red','yellow','blue','pink']){
-  await p.evaluate(c=>window.renderMotion('still',c),color);await load();await p.clock.runFor(150);
-  const contours=await sprites.locator('canvas').evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return Array.from({length:c.width*c.height},(_,i)=>a[i*4+3]>150)}));
-  await p.evaluate(c=>window.renderMotion('sleep',c),color);await load();await p.clock.runFor(300);
-  assert.deepEqual(await sprites.locator('canvas').evaluateAll(ns=>ns.map(n=>[n.dataset.sheet||'seed',n.dataset.frame])),[['seed','61'],['grounded','2'],['grounded','2'],...Array(5).fill(['comfort','0'])]);
-  const sleeping=await sprites.locator('canvas').evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return Array.from({length:c.width*c.height},(_,i)=>a[i*4+3]>150)}));
-  sleeping.forEach((pixels,i)=>{const union=pixels.filter((v,j)=>v||contours[i][j]).length,diff=pixels.filter((v,j)=>v!==contours[i][j]).length;assert.ok(diff/union<.18,`${forms[i][0]} sleep must retain original contour (${diff/union})`)});
-  const seed=await sprites.first().locator('.seed-body-original').evaluate(n=>getComputedStyle(n).transform);assert.equal(seed,'matrix(1, 0, 0, 1, 0, 0)','sleep has no head lean');
-  const eyeWhites=await sprites.locator('canvas').evaluateAll(ns=>ns.slice(3).map(c=>{const a=c.getContext('2d').getImageData(48,135,96,55).data;let bright=0;for(let i=0;i<a.length;i+=4)if(a[i]>240&&a[i+1]>240&&a[i+2]>240&&a[i+3]>240)bright++;return bright}));assert.ok(eyeWhites.every(n=>n<25),'closed expressions cannot leave white eye rims');
-  await shot(`${color}-sleep`);
-  await p.evaluate(c=>window.renderMotion('wake',c),color);await load();await p.clock.runFor(650);await shot(`${color}-wake`);await p.clock.runFor(1900);assert.equal(await p.evaluate(()=>window.endCount()),8);
-  await p.evaluate(c=>window.renderMotion('pet',c),color);await load();await p.clock.runFor(700);
-  assert.deepEqual(await sprites.locator('canvas').evaluateAll(ns=>ns.map(n=>n.dataset.sheet||'seed')),['seed','grounded','grounded',...Array(5).fill('comfort')]);
-  const reactions=await sprites.evaluateAll(ns=>ns.map(n=>({angle:parseFloat(n.style.getPropertyValue('--social-angle')),scale:parseFloat(n.style.getPropertyValue('--social-scaleY'))})));
-  reactions.forEach((v,i)=>{assert.ok(v.angle>1.5,`${forms[i][0]} follows hand`);assert.ok(v.scale<1,'touch visibly compresses body')});await shot(`${color}-pet`);await p.clock.runFor(1900);assert.equal(await p.evaluate(()=>window.endCount()),8);
-  await p.evaluate(c=>window.renderMotion('play',c),color);await load();await p.clock.runFor(1000);
-  await expect.poll(async()=>{await p.clock.runFor(16);return sprites.first().evaluate(n=>Number(n.style.getPropertyValue('--social-contact')))}).toBeGreaterThan(.85);
-  for(const spark of await p.locator('.social-ball-contact').all())assert.ok(Number(await spark.evaluate(n=>getComputedStyle(n).opacity))>.85);
-  await shot(`${color}-ball-contact`);await p.clock.runFor(2700);await shot(`${color}-ball-cheer`);await p.clock.runFor(650);assert.equal(await p.evaluate(()=>window.endCount()),8);
-  await p.evaluate(c=>window.renderMotion('focus',c),color);await load();await p.clock.runFor(6500);await shot(`${color}-reading`);
+  await p.evaluate(c=>window.review.render('sleep',c),color);await load();await p.clock.fastForward(4800);await p.clock.runFor(40);
+  await expect(p.locator('.ram-sleep-particles>img')).toHaveCount(24);assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.dataset.sheet)),Array(8).fill('slumber'));
+  const closed=await canvases.evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return {alpha:Array.from(a).filter((_,i)=>i%4===3),pixels:Array.from(a)}}));
+  await shot(`${color}-sleep-closed`);await p.clock.fastForward(1600);await p.clock.runFor(20);
+  const opened=await canvases.evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return {alpha:Array.from(a).filter((_,i)=>i%4===3),pixels:Array.from(a)}}));
+  for(let i=0;i<8;i++){assert.deepEqual(opened[i].alpha,closed[i].alpha,`${forms[i][0]} mouth stays INSIDE the unchanged body`);assert.notDeepEqual(opened[i].pixels,closed[i].pixels,`${forms[i][0]} mouth visibly opens`)}
+  assert.equal(await sprites.first().locator('.seed-body-original').evaluate(n=>getComputedStyle(n).transform),'matrix(1, 0, 0, 1, 0, 0)');
+  const z=await p.locator('.ram-sleep-particles>img').first().evaluate(n=>{const a=n.getAnimations()[0];a.pause();a.currentTime=800;const from=getComputedStyle(n).transform;a.currentTime=4700;return {from,to:getComputedStyle(n).transform,opacity:Number(getComputedStyle(n).opacity)}});assert.notEqual(z.from,z.to);assert.ok(z.opacity<.1);await shot(`${color}-sleep-open`);
+  await p.evaluate(c=>window.review.render('pet',c),color);await load();await p.clock.fastForward(750);await p.clock.runFor(30);
+  assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.dataset.sheet)),['seed','grounded','grounded',...Array(5).fill('classic')]);
+  for(const canvas of await canvases.all()){const white=await canvas.evaluate(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<a.length;i+=4)if(a[i]>240&&a[i+1]>240&&a[i+2]>240&&a[i+3]>220)n++;return n});assert.ok(white>20,'affection keeps normal large white eyes')}
+  await shot(`${color}-pet`);await p.clock.fastForward(2000);await p.clock.runFor(30);assert.equal(await p.evaluate(()=>window.review.endCount()),8);
+  await p.evaluate(c=>window.review.render('play',c),color);await load();await expect(p.locator('.ram-football-frame')).toHaveCount(7);await expect(p.locator('.social-ball')).toHaveCount(1);
+  await p.clock.fastForward(700);await p.clock.runFor(30);const before=await p.locator('.ram-football-frame').evaluateAll(ns=>ns.map(n=>Number(n.dataset.sourceFrame)));
+  await p.evaluate(()=>window.review.refresh({dragging:true}));await p.clock.runFor(100);await p.evaluate(()=>window.review.refresh({dragging:false}));await load();await p.clock.runFor(70);
+  const resumed=await p.locator('.ram-football-frame').evaluateAll(ns=>ns.map(n=>Number(n.dataset.sourceFrame)));resumed.forEach((f,i)=>assert.ok(f>before[i],'a drag/re-render does not restart the source timeline'));
+  for(const target of [1600,2300,3400,5000,5900,7400,11000]){
+   const current=Number(await p.locator('.ram-football-frame').first().getAttribute('data-source-frame'))/24*1000;await p.clock.fastForward(Math.max(0,target-current));await p.clock.runFor(25);
+   if([2300,3400,5900].includes(target))await shot(`${color}-football-${target}`);
+  }
+  assert.equal(await p.evaluate(()=>window.review.endCount()),8);
+  for(const sprite of await sprites.all()){const box=await sprite.boundingBox();assert.equal(Math.round(box.width),100)}
  }
  await p.emulateMedia({reducedMotion:'reduce'});
- for(const action of ['sleep','pet','play','wake']){await p.evaluate(a=>window.renderMotion(a),action);await load();await p.clock.runFor(800);const before=await sprites.locator('canvas').evaluateAll(ns=>ns.map(n=>n.toDataURL()));await p.clock.runFor(150);assert.deepEqual(await sprites.locator('canvas').evaluateAll(ns=>ns.map(n=>n.toDataURL())),before);for(const pose of await p.locator('.ram-pose-layer').all())assert.equal(await pose.evaluate(n=>getComputedStyle(n).transform),'none');}
- assert.deepEqual(errors,[]);
- console.log('PASS 32 form/colour combinations: original closed-eye contour, upright seed sleep, hand-contact response, two ball beats, wake completion, reading and reduced motion');
+ for(const action of ['sleep','pet','play']){await p.evaluate(a=>window.review.render(a),action);await load();await p.clock.runFor(50);const a=await canvases.evaluateAll(ns=>ns.map(c=>c.toDataURL()));await p.clock.fastForward(1000);await p.clock.runFor(30);assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.toDataURL())),a)}
+ assert.deepEqual(errors,[]);console.log('PASS 32 forms/colours: mouth-only sleep breathing, rising original Z, normal-eye affection, original body/ball timeline, drag continuity and reduced motion');
+ // Actual application callbacks must finish from the source clock, before its
+ // separate loading-error watchdog, with the 100px desktop character preserved.
+ const app=await browser.newPage({viewport:{width:1180,height:820}});app.on('pageerror',e=>errors.push(e.message));await app.clock.install();await app.goto(url);await adopt(app,'红色','小芽');await app.clock.pauseAt(new Date(Date.now()+1000));
+ for(const [form,growth] of [['seed',0],['junior',60],['middle',180],['super',840]]){
+  await app.evaluate(({form,growth})=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(pet,{growth,sleeping:false,lastTick:Date.now(),stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:100}});delete pet.evolution;if(growth===840)pet.evolution=form;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,lively:false}));},{form,growth});await app.reload();const ram=app.getByTestId('desktop-character').locator('.ram-sprite');
+  await expect.poll(async()=>{await app.clock.runFor(40);return ram.locator('canvas[data-loaded=true]').count()}).toBe(1);await openActions(app);await app.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();await app.getByRole('button',{name:'一起玩球',exact:true}).click();
+  await expect.poll(async()=>{await app.clock.runFor(30);return ram.locator('canvas[data-loaded=true]').count()}).toBe(1);
+  const duration=form==='seed'?4200:runtime.forms[form].frameCount/24*1000;
+  await app.clock.fastForward(duration-80);await app.clock.runFor(250);await expect(ram).toHaveAttribute('data-action','idle');assert.equal(Math.round((await app.getByTestId('desktop-character').boundingBox()).width),100);
  }
- // A real-time browser recording, separate from the accelerated assertions.
- const videoPage=await browser.newPage({viewport:{width:1280,height:340},recordVideo:{dir,size:{width:1280,height:340}}});
- await videoPage.goto(url);await videoPage.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.playReview=mountComfortReview(forms).render;},forms);
- for(const [action,duration] of [['idle',700],['pet',2700],['play',4500],['sleep',5000],['wake',2100],['focus',8200]]){await videoPage.evaluate(a=>window.playReview(a),action);await new Promise(r=>setTimeout(r,duration))}
- const video=videoPage.video();await videoPage.close();await video.saveAs(path.join(root,'artifacts/v20-interactions.webm'));console.log('PASS actual-time interaction recording saved');
+ await app.close();assert.deepEqual(errors,[]);console.log('PASS actual seed/junior/middle/super UI finishes complete performances via source callbacks before the watchdog');
+ }
+ const videoPage=await browser.newPage({viewport:{width:1280,height:360},recordVideo:{dir,size:{width:1280,height:360}}});await videoPage.goto(url);await videoPage.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);window.review.render('idle');},forms);await expect(videoPage.locator('#motion-review canvas[data-loaded=true]')).toHaveCount(8,{timeout:30000});
+ for(const [action,duration] of [['pet',2800],['sleep',5300],['wake',2100],['play',11200]]){await videoPage.evaluate(a=>window.review.render(a),action);await expect(videoPage.locator('#motion-review canvas[data-loaded=true]')).toHaveCount(8,{timeout:30000});await new Promise(r=>setTimeout(r,duration))}
+ const video=videoPage.video();await videoPage.close();await video.saveAs(path.join(root,'artifacts/v21-original-actions.webm'));console.log('PASS actual-time original football, mouth breathing and large-eye affection recording saved');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

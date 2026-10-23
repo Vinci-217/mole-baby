@@ -101,7 +101,7 @@ async function namesAndOffers() {
     await offer().locator('.pet-invitation-accept').evaluate(button => { button.click(); button.click(); });
     await expect(ram()).toHaveAttribute('data-action', actual); await expect(offer()).toHaveCount(0);
     await page.clock.runFor(700);
-    await expect(ram().locator(choice === 'ball' ? '.social-ball' : choice === 'pet' ? '.social-hand' : '.social-butterfly>img')).toBeVisible();
+    await expect(ram().locator(choice === 'ball' ? Number(await ram().getAttribute('data-stage'))>0?'.ram-football-frame':'.social-ball' : choice === 'pet' ? '.social-hand' : '.social-butterfly>img')).toBeVisible();
     assert.equal(actualPlay(await memory()).length, actualPlay(beforeOffer).length + 1, 'acceptance performs and remembers one actual interaction');
     assert.equal((await save()).coins, before.coins); assert.deepEqual((await save()).inventory, before.inventory);
     if (growth === 0) assert.equal(await ram().locator('.seed-pot-original').evaluate(node => getComputedStyle(node).transform), 'none');

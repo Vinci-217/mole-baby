@@ -2,15 +2,15 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.20.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.20.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.21.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.21.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-**v0.20.0 · 会回应你的拉姆**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
+**v0.21.0 · 原版玩球与睡梦小呼噜**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.20.0-Setup.exe` 或 `mole-baby-0.20.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.20.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.20.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.21.0-Setup.exe` 或 `mole-baby-0.21.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.21.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.21.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -18,15 +18,17 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 
 ![悬停快捷栏与图标计时](artifacts/v11-native-timer.png)
 
-睡觉保持自己的身体和叶冠，闭眼轻轻呼吸；种子不歪头、不晃花盆，高级和神力在空中慢慢打盹。摸头会闭眼蹭手，结束浮起小爱心；玩球会蓄力、追视、接触回弹和开心眯眼，星点与碰球声跟随同一接触时间；叫醒会睁眼伸展。动作按阶段和神力形态调整，四种颜色共用原版身体配色。
+玩球接入原客户端完整 `football` 动作：幼体会爬球、踩球保持平衡，中级会用叶片颠球，高级和神力会顶球、起跳和落下。身体、眼睛、叶冠与球来自同一原帧，保持原24fps节奏；桌面约100px的宠物不变大，远距离演出使用紧凑视口跟随。
 
-[查看八种形态的实际动画录屏](artifacts/v20-interactions.webm) · [睡姿预览](artifacts/v20-sleep.png) · [摸头预览](artifacts/v20-pet.png)
+睡觉改用原困倦眼睑，嘴巴一张一合，原版 Z 字粒子持续往上飘；种子仍保持直立花盆。摸头保留熟悉的大眼睛，轻轻跟手、蹭动；不会把开心笑眼固定套在摸头脸上。睡眠嘴部循环为原素材的桌宠适配，来源和对照见 [原动作核对](research/v21-original-actions.md)。
+
+[实际动画录屏](artifacts/v21-original-actions.webm) · [GIF 预览](artifacts/v21-original-actions.gif) · [睡觉](artifacts/v21-sleep.png) · [玩球](artifacts/v21-football.png)
 
 默认开启的自然小动作每隔2–4分钟，结合阶段和真实心情张望、轻轻晃动或看看小蝴蝶；不会自己挪动花盆或改变宠物位置，也不会自动开始计时。专注、睡觉、侧边躲藏、安静模式及已保存的安静偏好会暂停自动动作。可在玩耍小窗主动邀请“看看小蝴蝶”；两列卡片保留清楚的大图标。所有阶段和四种颜色沿用原角色图集，高级与神力形态继续悬浮。
 
 欢迎词按本机时间与实际状态表达，第一次领养不冒充重逢；对话后轻轻张望，不自动出现摸头的手。能自然想起实际喂过的食物，删除对应回忆后不再提起；修正“不开心”“没完成”“不累/没有压力”等常见情绪误判。
 
-二、三阶段重新使用原身体、眼睛和叶片分层：待机轻呼吸、眨眼，摸摸闭眼回应，玩球与看书保持原身体比例；照料时身体帧顺序播放，减少反复抽动。道具使用结束后，拉姆上方显示实际增加的饱食、水分、清洁等数值，缓缓上浮淡出；满值只显示实际补充量，不增加虚构成长经验。
+二、三阶段重新使用原身体、眼睛和叶片分层：待机轻呼吸、眨眼，摸摸保留大眼睛回应，看书保持原身体比例；玩球播放各阶段原版足球动作；照料时身体帧顺序播放，减少反复抽动。道具使用结束后，拉姆上方显示实际增加的饱食、水分、清洁等数值，缓缓上浮淡出；满值只显示实际补充量，不增加虚构成长经验。
 
 ![原四色二三阶段动作](artifacts/v16-grounded-colors.png)
 
@@ -135,7 +137,7 @@ npm run test:flight-facing  # 五种飞行形态×四色的原版侧脸、转向
 npm run test:room-iteration # 九背景、三套新场景四时段、寻宝交互/奖励/回忆与两种窗口尺寸
 npm run test:layout-stage   # 窄边距、五阶段/四神力切换与存档保留
 npm run test:reading-dizzy  # 八形态看书翻页、头顶星星绕圈及视觉截图
-npm run test:comfort-motion # 32组形态/颜色的闭眼睡眠、蹭手、接球、醒来与实际动画录屏
+npm run test:original-actions # 32组形态/颜色的嘴部呼吸、ZZZ、原版足球、正常眼睛与实际录屏
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包
 npm run test:hover-rest    # 原生悬停栏、图标计时、自动休息与叫醒
 npm run test:pet-life
@@ -146,7 +148,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、267 项单元与 Native 生命周期测试、九背景与寻宝的浏览器回归、原有商店/游戏/音乐全流程和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版已通过生产构建、272 项单元与 Native 生命周期测试、九背景与寻宝的浏览器回归、原有商店/游戏/音乐全流程和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 
