@@ -233,3 +233,7 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 `generated/v18-berry-picnic.png`、`v18-seashell-cottage.png`、`v18-sky-observatory.png` 是沿用仓库美术 skill，以原小屋、神秘湖木屋、宠物面板和熊熊饼干作直接参考，通过 image_gen 生成的原创背景，不是原客户端导出。每张为1586×992不透明四时段图；原 PNG 按字节复制，完整提示词、参考、日期、尺寸、SHA256和生成差异记录见 [v18-scenes-provenance.json](public/assets/generated/v18-scenes-provenance.json) 与 [风景研究](research/v18-scenes.md)。
 
 小屋寻宝是本桌宠新增玩法，物品沿用原编号 PNG，拉姆沿用原图集及四色遮罩，配对拾取反馈为界面动画。找到的三件图案是清单线索，结算的摩尔豆与一份用品由现有本地奖励规则计算，不声称是原页游玩法或官方奖励。
+
+### v0.23 原版双页背包
+
+`original/classic-book/` 从原 `petUI.swf` 的sprite182/168与按钮147、151、155、160、167、181、30提取；原框体、十二格、静态标签、头像底板和按钮三态保持原画法，PNG按逻辑尺寸2倍输出。可变文字和旧分类说明置空，以本地数据和可访问HTML替换，角色与物品继续使用已有原素材。第六个玩耍书签复用原页边与原足球图标，没有新画角色/UI或生成插画。来源、哈希与逻辑坐标见 [source.json](public/assets/original/classic-book/source.json)、[layout.json](public/assets/original/classic-book/layout.json) 和 [研究记录](research/v23-classic-book.md)，导出脚本为 `scripts/art/export-classic-book.py`。

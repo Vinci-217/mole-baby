@@ -1,0 +1,16 @@
+{
+  "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/petUI/petUI.swf",
+  "sha256": "926da58cf54de37f65d1b9316b43c0fd1db1988536a8752672b73d0a173774ed",
+  "sourceSprite": 182,
+  "sourceButtons": {
+    "items": 147,
+    "wardrobe": 151,
+    "growth": 155,
+    "games": 160,
+    "memories": 167,
+    "heal": 181,
+    "close": 30
+  },
+  "rasterScale": 2,
+  "adaptation": "Original frame, labels, portrait background, slots and button-state graphics; mutable pet, numbers and obsolete hover captions hidden for live HTML/PNG content. No newly drawn frame."
+}

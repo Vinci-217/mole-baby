@@ -13,7 +13,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
   await page.locator('.wardrobe').getByRole('button',{name:i%2?'试戴金色羽毛':'试戴紫色魔法帽',exact:true}).click();
   await expect(page.locator('.wardrobe-mirror .ram-wear')).toBeVisible();
   await page.locator('.paper-tabs').getByRole('button',{name:'状态',exact:true}).click();
-  await page.locator('.paper-tabs').getByRole('button',{name:'衣橱',exact:true}).click();
+  await page.getByRole('button',{name:'关闭面板',exact:true}).click();await page.getByRole('button',{name:'拉姆小衣橱',exact:true}).click();
   await page.locator('.wardrobe').getByRole('button',{name:'试戴庆生小帽',exact:true}).click();
   await toDesktop(page);
  }

@@ -6,6 +6,7 @@ const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
 const { verifyMoodWardrobe, verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
+const {verifyClassicBook}=require('./classic-book-checks.cjs');
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
 const profile = path.join(cloud, 'v6-native-test-config');
@@ -151,12 +152,12 @@ async function verifyBackground(page, selector, suffix) {
   await page.reload(); await waitForClassic(page,'.desktop-character'); await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);});
   const current=await bounds(); const targetX=area.x+Math.min(350,area.width-550),targetY=area.y+Math.min(400,area.height-250); await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:targetX-current.x,dy:targetY-current.y});
   const before=await bounds(); const actions=await openActions(page); assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label'))),['查看状态','喂食','洗澡','玩耍','开始计时','和拉姆说话','进入小屋']);
-  await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await bounds()).width).toBe(500); assert.equal((await bounds()).height,490);assert.equal((await state()).petMode,true);
-  const expanded=await bounds(),side=(await state()).panelSide; assert.equal(expanded.x+(side==='left'?340:0),before.x);assert.equal(expanded.y+250,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
-  assert.deepEqual(await panel.getByRole('tab').allTextContents(),['状态','背包','玩耍','对话']); assert.equal(await panel.getByRole('button',{name:'商店',exact:true}).count(),0); assert.equal(await panel.locator('.pocket-slot').count(),16);await expect(await selectPocket(page,'biscuit','熊熊饼干')).toBeDisabled();
-  await page.screenshot({path:path.join(artifacts,'v9-native-backpack.png'),omitBackground:true}); await page.getByLabel('关闭小窗').click(); await expect.poll(() => page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
-  const rightX=area.x+area.width-160;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');assert.equal((await bounds()).x+340,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
-  console.log('PASS seven tools and desktop-only tabs, sixteen-slot bag, adjacent 332px panel, both native sides and unchanged physical pet anchor');
+  await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); const panel=page.getByTestId('companion-panel');await expect(panel).toBeVisible();await expect.poll(async()=>(await state()).panelLayout).toBe('classic');assert.equal((await state()).petMode,true);
+  const expanded=await bounds(),g=(await state()).panelGeometry;assert.equal(expanded.x+g.petX,before.x);assert.equal(expanded.y+g.petY,before.y);assert.equal(await page.locator('.cottage-scene').count(),0);
+  assert.deepEqual(await panel.getByRole('tab').allTextContents(),['用品','装扮','成长','游戏','回忆','玩耍']);assert.equal(await panel.locator('.pocket-slot').count(),12);await expect(panel.locator('[data-item-id="biscuit"]')).toHaveCount(0);
+  await page.screenshot({path:path.join(artifacts,'v23-native-backpack.png'),omitBackground:true});await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);assert.equal((await bounds()).x,before.x);assert.equal((await bounds()).y,before.y);
+  const rightX=area.x+area.width-160;await page.evaluate(dx=>window.desktop.movePet(dx,0),rightX-before.x);await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click();await expect.poll(async()=>(await state()).panelSide).toBe('left');const rightBook=await state();assert.equal((await bounds()).x+rightBook.panelGeometry.petX,rightX);await page.getByLabel('关闭小窗').click();await expect.poll(()=>page.evaluate(()=>[innerWidth,innerHeight])).toEqual([160,240]);await page.evaluate(dx=>window.desktop.movePet(dx,0),before.x-rightX);await expect(character).toBeInViewport();
+  console.log('PASS original two-page desktop inventory, twelve square slots, six tabs and unchanged physical pet anchor');
 
   await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
   await panel.getByRole('button',{name:'听拉姆说一句',exact:true}).click();
@@ -194,6 +195,7 @@ async function verifyBackground(page, selector, suffix) {
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
   await verifyMoodWardrobe(page);
+  await verifyClassicBook(page,desktop);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();
   await page.evaluate(()=>window.desktop.minimize());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());

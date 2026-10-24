@@ -28,6 +28,7 @@ async function enterHome(page) {
 }
 async function roomTab(page, label) {
   await expect(page.locator('.cottage-scene')).toBeVisible({timeout:15000});
+  if(await page.locator('.classic-room-overlay').isVisible())await page.locator('.classic-room-overlay').getByRole('button',{name:'关闭面板',exact:true}).click();
   const paperButton = page.locator('.paper-tabs').getByRole('button', { name: label, exact: true });
   if (await paperButton.isVisible()) { await paperButton.click(); return; }
   // Every room function is also reachable without an open paper dialog.
@@ -46,7 +47,7 @@ async function toDesktop(page) {
   await page.getByTestId('desktop-character').waitFor();
 }
 async function selectPocket(page, id, label) {
-  const pocket = page.locator('.care-pocket');
+  const pocket = page.locator('.classic-pet-book');
   const item = pocket.locator(`.pocket-slot[data-item-id="${id}"]`);
   if (!(await item.count())) {
     const next = pocket.getByRole('button', { name: '背包下一页', exact: true });
@@ -261,8 +262,8 @@ async function verifyRecolorPotion(page){
   const before=await save(),color=before.color==='blue'?'pink':'blue',name=color==='blue'?'蓝色换色药水':'粉色换色药水',id=`recolor-${color}`;
   expect(before.coins).toBeGreaterThanOrEqual(80);await enterHome(page);await buy(page,id,name,'药水');
   expect((await save()).coins).toBe(before.coins-80);expect((await save()).inventory[id]).toBe((before.inventory[id]??0)+1);
-  await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await page.locator('.pocket-categories').getByRole('button',{name:'药水',exact:true}).click();await(await selectPocket(page,id,name)).click();
-  await expect(page.locator('[data-item-gesture=recolor]')).toBeVisible();await expect.poll(async()=>(await save()).color).toBe(color);await expect(page.locator('[data-item-gesture=recolor]')).toHaveCount(0,{timeout:6000});
+  await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await(await selectPocket(page,id,name)).click();
+  await expect(page.getByTestId('desktop-character').locator('[data-item-gesture=recolor]')).toBeVisible();await expect.poll(async()=>(await save()).color).toBe(color);await expect(page.getByTestId('desktop-character').locator('[data-item-gesture=recolor]')).toHaveCount(0,{timeout:6000});
   await expect(page.getByTestId('care-gain')).toContainText(`变为${color==='blue'?'蓝色':'粉色'}`);await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
   console.log('PASS: successful colour-potion feedback appears after use and fades away');
   await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-color',color);
@@ -431,7 +432,7 @@ async function verifyMoodWardrobe(page) {
       await wardrobe.getByRole('button',{name:'试戴金色羽毛',exact:true}).click();
       await expect(wardrobe.locator('.wardrobe-mirror .ram-wear')).toBeVisible();
       await page.locator('.paper-tabs').getByRole('button',{name:'状态',exact:true}).click();
-      await page.locator('.paper-tabs').getByRole('button',{name:'衣橱',exact:true}).click();
+      await page.getByRole('button',{name:'关闭面板',exact:true}).click();await page.getByRole('button',{name:'拉姆小衣橱',exact:true}).click();
     }
     console.log('PASS: repeated original seed wardrobe/profile switches cancel detached animation work');
     await toDesktop(page);await expect(ram.locator('.ram-wear')).toBeVisible();await page.reload();await expect(ram.locator('.ram-wear')).toHaveAttribute('data-outfit','party-cap');

@@ -11,6 +11,8 @@ declare global {
     motion?: 'idle' | 'left' | 'right';
     companionPanel: boolean;
     panelSide: 'left' | 'right';
+    panelLayout?: 'compact' | 'classic' | 'profile';
+    panelGeometry?: {petX:number;petY:number;panelX:number;panelY:number;panelWidth:number;panelHeight:number;scale:number}|null;
     edgeSide: 'left' | 'right' | 'top' | 'bottom' | null;
     edgePose: 'visible' | 'tucking' | 'hidden' | 'peek';
     edgeOffset?: { x: number; y: number };
@@ -42,7 +44,7 @@ declare global {
       readyToShow: (hasPet: boolean) => void;
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
-      setCompanionPanel: (open: boolean) => Promise<DesktopState>;
+      setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
       setPetCanMove: (enabled: boolean) => Promise<boolean>;
       setEdgeHiding: (enabled: boolean) => Promise<boolean>;
       revealPet: () => Promise<DesktopState>;

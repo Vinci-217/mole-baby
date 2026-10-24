@@ -8,6 +8,7 @@ const { expect } = require('@playwright/test');
 const { verifyMoodWardrobe, verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
+const {verifyClassicBook}=require('./classic-book-checks.cjs');
 
 function requireFile(filename, magic) {
   const stat = fs.statSync(filename);
@@ -67,6 +68,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
     'dist/assets/original/items/180008.png', 'dist/assets/original/items/180002.png', 'dist/assets/original/items/180003.png',
     'dist/assets/original/seed/pot.png', 'dist/assets/original/seed/body.png', 'dist/assets/original/seed/body-mask.png',
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
+  for(const name of ['frame','items-normal','wardrobe-normal','growth-normal','games-normal','memories-normal','close-normal','tab-extension'])assert.ok(paths.has(`dist/assets/original/classic-book/${name}.png`),'Missing original classic pet book artwork');
+  assert.ok(paths.has('electron/classic-book-geometry.cjs'),'Missing classic book native geometry');
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/slumber/${form}-${layer}.png`),'Missing original sleepy expression atlas');
   for(const id of ['party-cap','gold-feather','wizard-cap'])assert.ok(paths.has(`dist/assets/original/wardrobe/${id}.png`),'Missing original wearable accessory');
@@ -178,13 +181,13 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await expect(panel).toBeVisible();
   const expanded = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
-  assert.equal(expanded.width, 500); assert.equal(expanded.height, 490);
+  const bookState=await page.evaluate(()=>window.desktop.getState());assert.equal(bookState.panelLayout,'classic');assert.ok(bookState.panelGeometry);assert.ok(expanded.width>=bookState.panelGeometry.panelWidth);
   assert.equal((await page.evaluate(() => window.desktop.getState())).petMode, true);
   assert.equal(await page.locator('.cottage-scene').count(), 0);
-  assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态','背包','玩耍','对话']);
-  assert.equal(await panel.locator('.pocket-slot').count(), 16);
+  assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['用品','装扮','成长','游戏','回忆','玩耍']);
+  assert.equal(await panel.locator('.pocket-slot').count(), 12);
   const slot=await panel.locator('.pocket-slot').first().boundingBox();assert.ok(Math.abs(slot.width-slot.height)<1,'every backpack cell is square');
-  await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
+  await expect(panel.locator('[data-item-id="biscuit"]')).toHaveCount(0);await panel.getByRole('button',{name:'空物品格',exact:true}).first().click();
   await panel.getByRole('button', { name: '到小屋补充', exact: false }).click();
   await expect(page.locator('.shop-book')).toBeVisible();
   if (process.platform === 'darwin') assert.equal(await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].isVisibleOnAllWorkspaces()), false);
@@ -192,9 +195,9 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).coins)).toBe(85);
   await roomTab(page, '背包'); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')).inventory.biscuit)).toBe(0);
-  await expect(page.getByRole('region',{name:'拉姆背包',exact:true})).toHaveAttribute('aria-busy','true');
+  await expect(page.locator('.care-pocket')).toHaveAttribute('aria-busy','true');
   await expect(page.getByRole('button',{name:'使用熊熊饼干',exact:true})).toBeDisabled();
-  await expect(page.locator('.care-pocket [data-selected-item]')).toHaveAttribute('data-selected-item','biscuit');
+  await expect(page.locator('.classic-pet-book [data-selected-item]')).toHaveAttribute('data-selected-item','biscuit');
   console.log('PASS: care use is locked and the consumed item remains selected');
   await expect(page.getByTestId('care-gain')).toContainText(/饱食\s*\+\d+/,{timeout:6000});await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
   console.log('PASS: actual capped food gain appears after care and fades away');
@@ -265,6 +268,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
   await verifyMoodWardrobe(page);
+  await verifyClassicBook(page,desktop);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());

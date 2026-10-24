@@ -1,0 +1,208 @@
+{
+  "sourceSprite": 182,
+  "size": [
+    1200,
+    688
+  ],
+  "rasterScale": 2,
+  "assets": {
+    "frame": {
+      "sourceSprite": 3000,
+      "rect": [
+        0.0,
+        0.0,
+        1200.0,
+        688.0
+      ]
+    },
+    "items-normal": {
+      "sourceSprite": 3001,
+      "rect": [
+        1022.0,
+        49.0,
+        1083.0,
+        109.0
+      ]
+    },
+    "items-hover": {
+      "sourceSprite": 3002,
+      "rect": [
+        1022.0,
+        49.0,
+        1083.0,
+        109.0
+      ]
+    },
+    "items-pressed": {
+      "sourceSprite": 3003,
+      "rect": [
+        1022.0,
+        49.0,
+        1083.0,
+        109.0
+      ]
+    },
+    "wardrobe-normal": {
+      "sourceSprite": 3004,
+      "rect": [
+        1022.0,
+        149.0,
+        1083.0,
+        209.0
+      ]
+    },
+    "wardrobe-hover": {
+      "sourceSprite": 3005,
+      "rect": [
+        1022.0,
+        149.0,
+        1083.0,
+        209.0
+      ]
+    },
+    "wardrobe-pressed": {
+      "sourceSprite": 3006,
+      "rect": [
+        1022.0,
+        149.0,
+        1083.0,
+        209.0
+      ]
+    },
+    "growth-normal": {
+      "sourceSprite": 3007,
+      "rect": [
+        1022.0,
+        249.0,
+        1083.0,
+        309.0
+      ]
+    },
+    "growth-hover": {
+      "sourceSprite": 3008,
+      "rect": [
+        1022.0,
+        249.0,
+        1083.0,
+        309.0
+      ]
+    },
+    "growth-pressed": {
+      "sourceSprite": 3009,
+      "rect": [
+        1022.0,
+        249.0,
+        1083.0,
+        309.0
+      ]
+    },
+    "games-normal": {
+      "sourceSprite": 3010,
+      "rect": [
+        1022.0,
+        349.0,
+        1083.0,
+        409.0
+      ]
+    },
+    "games-hover": {
+      "sourceSprite": 3011,
+      "rect": [
+        1022.0,
+        349.0,
+        1083.0,
+        409.0
+      ]
+    },
+    "games-pressed": {
+      "sourceSprite": 3012,
+      "rect": [
+        1022.0,
+        349.0,
+        1083.0,
+        409.0
+      ]
+    },
+    "memories-normal": {
+      "sourceSprite": 3013,
+      "rect": [
+        1021.0,
+        449.0,
+        1082.0,
+        509.0
+      ]
+    },
+    "memories-hover": {
+      "sourceSprite": 3014,
+      "rect": [
+        1021.0,
+        449.0,
+        1082.0,
+        509.0
+      ]
+    },
+    "memories-pressed": {
+      "sourceSprite": 3015,
+      "rect": [
+        1021.0,
+        449.0,
+        1082.0,
+        509.0
+      ]
+    },
+    "heal-normal": {
+      "sourceSprite": 3016,
+      "rect": [
+        177.5,
+        579.0,
+        339.0,
+        645.0
+      ]
+    },
+    "heal-hover": {
+      "sourceSprite": 3017,
+      "rect": [
+        175.0,
+        575.5,
+        342.5,
+        644.0
+      ]
+    },
+    "heal-pressed": {
+      "sourceSprite": 3018,
+      "rect": [
+        177.5,
+        579.0,
+        339.0,
+        645.0
+      ]
+    },
+    "close-normal": {
+      "sourceSprite": 3019,
+      "rect": [
+        448.0,
+        5.0,
+        517.5,
+        74.0
+      ]
+    },
+    "close-hover": {
+      "sourceSprite": 3020,
+      "rect": [
+        445.0,
+        3.5,
+        520.5,
+        79.5
+      ]
+    },
+    "close-pressed": {
+      "sourceSprite": 3021,
+      "rect": [
+        445.0,
+        3.5,
+        520.5,
+        79.5
+      ]
+    }
+  }
+}

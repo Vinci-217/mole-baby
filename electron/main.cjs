@@ -5,6 +5,7 @@ const { pathToFileURL } = require('node:url');
 const { createCompanionAI } = require('./deepseek.cjs');
 const { createCompanionSpeech } = require('./speech.cjs');
 const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget } = require('./desktop-geometry.cjs');
+const { classicBookBounds } = require('./classic-book-geometry.cjs');
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
@@ -53,6 +54,8 @@ let wanderAnchor = null;
 let motion = 'idle';
 let companionPanel = false;
 let panelSide = 'right';
+let panelLayout = 'compact';
+let panelGeometry = null;
 // Compatibility IPC name: this controls autonomous motion only, never manual dragging.
 let petCanMove = true;
 let mousePassthrough = false;
@@ -81,6 +84,8 @@ function getDesktopState() {
     motion,
     companionPanel,
     panelSide,
+    panelLayout,
+    panelGeometry,
     edgeSide,
     edgePose,
     edgeOffset: edgeOffset(edgeSide, edgePose),
@@ -377,14 +382,20 @@ function changeMousePassthrough(ignore) {
 function currentPetBounds() {
   const bounds = mainWindow.getBounds();
   return {
-    x: bounds.x + (companionPanel && panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
-    y: bounds.y + (companionPanel ? COMPANION_EXTENSION.y : 0),
+    x: bounds.x + (companionPanel && panelGeometry ? panelGeometry.petX : companionPanel && panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
+    y: bounds.y + (companionPanel && panelGeometry ? panelGeometry.petY : companionPanel ? COMPANION_EXTENSION.y : 0),
     ...PET_SIZE,
   };
 }
 
 function companionBounds(base) {
   const area = screen.getDisplayMatching(base).workArea;
+  if (panelLayout !== 'compact') {
+    const result = classicBookBounds(base, area, panelLayout === 'profile');
+    panelSide = result.panelSide; panelGeometry = result.geometry;
+    return result.bounds;
+  }
+  panelGeometry = null;
   const roomRight = area.x + area.width - (base.x + PET_SIZE.width);
   const roomLeft = base.x - area.x;
   panelSide = roomRight >= COMPANION_EXTENSION.x || roomRight >= roomLeft ? 'right' : 'left';
@@ -400,13 +411,16 @@ function companionBounds(base) {
   return expanded;
 }
 
-function changeCompanionPanel(open) {
+function changeCompanionPanel(open, layout = 'compact') {
   if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
-  if (!petMode || open === companionPanel) return getDesktopState();
+  if (!['compact', 'classic', 'profile'].includes(layout)) throw new TypeError('Unknown companion layout');
+  if (!petMode || (open === companionPanel && (!open || layout === panelLayout))) return getDesktopState();
   if (open) revealPet();
   stopMovement();
   const base = currentPetBounds();
+  panelLayout = open ? layout : 'compact';
   const target = open ? companionBounds(base) : clampBounds(base, PET_SIZE);
+  if (!open) panelGeometry = null;
   changingMode = true;
   companionPanel = open;
   mainWindow.setBounds(target);
@@ -541,6 +555,8 @@ function changePetMode(enabled) {
   changingMode = true;
   companionPanel = false;
   panelSide = 'right';
+  panelLayout = 'compact';
+  panelGeometry = null;
   if (enabled) {
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
     const target = clampBounds(petBounds, PET_SIZE);
@@ -711,6 +727,8 @@ function createWindow() {
   dragging = false;
   companionPanel = false;
   panelSide = 'right';
+  panelLayout = 'compact';
+  panelGeometry = null;
   petCanMove = true;
   mousePassthrough = false;
   interacting = false;

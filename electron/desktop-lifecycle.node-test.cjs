@@ -307,3 +307,20 @@ test('autonomous walks stay near a manually placed pet without descending to the
   t.mock.timers.tick(20000);t.mock.timers.tick(1600);
   assert.equal(run.window.getBounds().y,relocated.y);assert.ok(Math.abs(run.window.getBounds().x-relocated.x)<=48);
 });
+
+test('classic inventory, folded profile and compact chat preserve the native pet anchor on close',async t=>{
+  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+  for(const point of [{x:1754,y:792},{x:730,y:300},{x:-30,y:-71}]){
+    run.window.setBounds({...point,width:160,height:240});
+    for(const layout of ['classic','profile','classic']){
+      const state=run.invoke('desktop:set-companion-panel',true,layout),g=state.panelGeometry,b=run.window.getBounds();
+      assert.equal(state.panelLayout,layout);assert.equal(b.x+g.petX,point.x);assert.equal(b.y+g.petY,point.y);
+    }
+    run.invoke('desktop:set-companion-panel',false);
+    assert.deepEqual(run.window.getBounds(),{...point,width:160,height:240});
+  }
+  assert.throws(()=>run.invoke('desktop:set-companion-panel',true,'arbitrary'),/Unknown companion layout/);
+  const classic=run.invoke('desktop:set-companion-panel',true,'classic');assert.ok(classic.panelGeometry);
+  const chat=run.invoke('desktop:set-companion-panel',true);assert.equal(chat.panelLayout,'compact');assert.equal(chat.panelGeometry,null);
+  run.invoke('desktop:set-pet-mode',false);assert.equal(run.invoke('desktop:get-state').companionPanel,false);
+});

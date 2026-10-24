@@ -53,9 +53,10 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mode must be a boolean'));
     return ipcRenderer.invoke('desktop:set-pet-mode', enabled);
   },
-  setCompanionPanel: (open) => {
+  setCompanionPanel: (open, layout = 'compact') => {
     if (typeof open !== 'boolean') return Promise.reject(new TypeError('Companion panel visibility must be a boolean'));
-    return ipcRenderer.invoke('desktop:set-companion-panel', open);
+    if (!['compact', 'classic', 'profile'].includes(layout)) return Promise.reject(new TypeError('Unknown companion layout'));
+    return ipcRenderer.invoke('desktop:set-companion-panel', open, layout);
   },
   setPetCanMove: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mobility must be a boolean'));

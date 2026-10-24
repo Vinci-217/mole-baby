@@ -81,3 +81,16 @@ test('random wandering takes small steps around placement and preserves height o
     }
   }
 });
+
+const {classicBookBounds}=require('./classic-book-geometry.cjs');
+test('classic book fits all monitor edges without displacing the 100px pet',()=>{
+  for(const area of [{x:0,y:0,width:1920,height:1040},{x:-1280,y:-200,width:1280,height:720},{x:1920,y:40,width:1024,height:728},{x:0,y:0,width:800,height:600}]){
+    for(const x of [area.x-30,area.x+area.width/2,area.x+area.width-130])for(const y of [area.y-71,area.y+area.height/2,area.y+area.height-179])for(const folded of [false,true]){
+      const base={x,y,width:160,height:240},result=classicBookBounds(base,area,folded),g=result.geometry,b=result.bounds;
+      assert.equal(b.x+g.petX,base.x);assert.equal(b.y+g.petY,base.y);
+      assert.ok(b.x+g.panelX>=area.x&&b.y+g.panelY>=area.y);
+      assert.ok(b.x+g.panelX+g.panelWidth<=area.x+area.width&&b.y+g.panelY+g.panelHeight<=area.y+area.height);
+      assert.equal(g.panelWidth,Math.floor((folded?520:1100)*g.scale));
+    }
+  }
+});

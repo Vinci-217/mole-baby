@@ -14,7 +14,7 @@ const artifacts = path.join(root, 'artifacts');
 const save = page => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-house-save-v1')));
 async function say(page, text) {
   const panel = page.getByTestId('companion-panel');
-  await panel.getByRole('tab', { name: '对话', exact: true }).click();
+  if(await page.locator('.classic-pet-book').isVisible()){await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'和拉姆说话',exact:true}).click();}else await panel.getByRole('tab', { name: '对话', exact: true }).click();
   await panel.getByRole('textbox', { name: '和拉姆说话', exact: true }).fill(text);
   await panel.getByRole('button', { name: '发送消息', exact: true }).click();
 }
@@ -82,14 +82,14 @@ async function checkFourSeedColors() {
   assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label'))), ['查看状态', '喂食', '洗澡', '玩耍', '开始计时', '和拉姆说话', '进入小屋']);
   await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await panel.waitFor(); const pocket = page.locator('.care-pocket');
-  assert.equal((await panel.boundingBox()).width, 332);
-  assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['状态', '背包', '玩耍', '对话']);
+  assert.ok((await panel.boundingBox()).width>700);
+  assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['用品', '装扮', '成长', '游戏', '回忆', '玩耍']);
   assert.equal(await page.locator('.shop-book').count(), 0); assert.equal(await page.locator('.cottage-scene').count(), 0);
-  assert.equal(await pocket.locator('.pocket-slot').count(), 16); await expect(await selectPocket(page, 'biscuit', '熊熊饼干')).toBeDisabled();
-  const gridColumns = await pocket.locator('.pocket-items').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length); assert.equal(gridColumns, 4);
-  await pocket.getByRole('button', { name: '到小屋补充', exact: false }).click(); await expect(page.locator('.shop-book')).toBeVisible();
+  assert.equal(await pocket.locator('.pocket-slot').count(), 12); await expect(pocket.locator('[data-item-id="biscuit"]')).toHaveCount(0);
+  const gridColumns = await pocket.locator('.pocket-items').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length); assert.equal(gridColumns, 3);
+  await pocket.getByRole('button',{name:'空物品格',exact:true}).first().click();await panel.getByRole('button', { name: '到小屋补充', exact: false }).click(); await expect(page.locator('.shop-book')).toBeVisible();
   assert.equal(await page.locator('.companion-panel').count(), 0); await expect(page.locator('.cottage-scene')).toBeVisible();
-  console.log('PASS small draggable seed, seven ordered desktop tools, desktop-only basic tabs and four-column sixteen-slot bag');
+  console.log('PASS small draggable seed, seven ordered desktop tools, original desktop profile and three-column twelve-slot bag');
 
   await buy(page, 'biscuit', '熊熊饼干'); assert.equal((await save(page)).coins, 85);
   await buy(page, '180002', '麦香牛奶', '饮品'); assert.equal((await save(page)).coins, 75);
@@ -102,9 +102,9 @@ async function checkFourSeedColors() {
   for (const slot of await pocket.locator('.pocket-slot').all()) { const b=await slot.boundingBox(); assert.ok(Math.abs(b.width-b.height)<1,'room inventory cells are square'); }
   const beforeFood = await save(page); await (await selectPocket(page, 'biscuit', '熊熊饼干')).click();
   await expect.poll(async () => (await save(page)).inventory.biscuit).toBe(0); assert.ok((await save(page)).stats.hunger > beforeFood.stats.hunger + 10); await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action', 'idle');
-  await pocket.getByRole('button', { name: '饮品', exact: true }).click(); const beforeDrink = await save(page); await (await selectPocket(page, '180002', '麦香牛奶')).click();
+  const beforeDrink = await save(page); await (await selectPocket(page, '180002', '麦香牛奶')).click();
   await expect.poll(async () => (await save(page)).inventory['180002']).toBe(0); assert.ok((await save(page)).stats.thirst > beforeDrink.stats.thirst + 10); assert.ok(Math.abs((await save(page)).stats.hunger - beforeDrink.stats.hunger) < 1); await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action', 'idle');
-  await pocket.getByRole('button', { name: '清洁', exact: true }).click(); const beforeWash = await save(page); await (await selectPocket(page, '180003', '泡泡浴')).click();
+  const beforeWash = await save(page); await (await selectPocket(page, '180003', '泡泡浴')).click();
   await expect.poll(async () => (await save(page)).inventory['180003']).toBe(0); assert.ok((await save(page)).stats.cleanliness > beforeWash.stats.cleanliness + 5); await expect(page.locator('.scene-character .ram-sprite')).toHaveAttribute('data-action', 'idle');
   assert.ok((await save(page)).growth < .05, 'repeated shopping and care do not instantly grow a seed');
   console.log('PASS room-only four-book shop, bean purchase guards, varied supplies and correct consumption/effects without click growth');
@@ -129,9 +129,9 @@ async function checkFourSeedColors() {
   await makeTired(page); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'slumber'); await page.getByRole('button', { name: '叫醒拉姆', exact: true }).click(); await openActions(page);await actions.getByRole('button',{name:'查看状态',exact:true}).click();
   console.log('PASS sleep/wake guards, backup validation, legacy-save need migration, no generated fallback, mature closed-eye sleep and focus');
 
-  await panel.getByRole('tab', { name: '背包', exact: true }).click();
+  await panel.getByRole('tab', { name: '用品', exact: true }).click();
   for (const [category, id, name, action, row] of [['食物', 'biscuit', '熊熊饼干', 'eat-bear-biscuit', '0'], ['饮品', 'juice', '浆果果汁', 'drink-berry-juice', '1'], ['清洁', '180003', '泡泡浴', 'bubble-bath', '2'], ['清洁', '180024', '喜刷刷牙膏', 'brush-teeth', '2']]) {
-    await pocket.getByRole('button', { name: category, exact: true }).click(); const before = (await save(page)).inventory[id];
+    const before = (await save(page)).inventory[id];
     await (await selectPocket(page, id, name)).click(); await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action', action);
     await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-sheet', 'item'); await expect(character.locator('.ram-classic-frame')).toHaveAttribute('data-row', row);
     await expect.poll(() => character.locator('.ram-classic-frame').getAttribute('data-frame')).not.toBe('0');
