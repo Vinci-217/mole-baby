@@ -10,7 +10,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
  const forms=[['seed',0],['junior',60],['middle',180],['senior',420],['super',840],['water',840],['wood',840],['fire',840]];
  for(const [form,growth] of forms){
   await p.evaluate(({form,growth})=>{const x=JSON.parse(localStorage.getItem('ramu-house-save-v1'));x.growth=growth;delete x.evolution;if(growth===840)x.evolution=form;x.lastTick=Date.now();x.sleeping=false;x.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};localStorage.setItem('ramu-house-save-v1',JSON.stringify(x));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false}));},{form,growth});
-  await p.reload();const character=p.getByTestId('desktop-character'),ram=character.locator('.ram-sprite');await ram.locator('canvas[data-loaded=true]').waitFor();await openActions(p);
+  await p.reload();const character=p.getByTestId('desktop-character'),ram=character.locator('.ram-sprite');await ram.locator('canvas:not(.ram-wear)[data-loaded=true]').waitFor();await openActions(p);
   await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.runFor(6450);
   const turning=ram.locator('.social-book-page');await expect(turning).toBeVisible();assert.ok(Number(await turning.evaluate(n=>getComputedStyle(n).opacity))>.6);
   assert.ok((await turning.evaluate(n=>getComputedStyle(n).transform)).startsWith('matrix3d'));await turning.locator('img').evaluate(n=>n.decode());

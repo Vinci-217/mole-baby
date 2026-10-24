@@ -11,8 +11,8 @@ const runtime=require('../public/assets/original/football/runtime.json');
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});
  const p=await browser.newPage({viewport:{width:1280,height:360}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.install();await p.goto(url);await p.clock.pauseAt(new Date(Date.now()+1000));
  await p.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);},forms);
- const sprites=p.locator('#motion-review .ram-sprite'),canvases=sprites.locator('canvas');
- const load=async()=>{await expect.poll(async()=>{await p.clock.runFor(30);return p.locator('#motion-review canvas[data-loaded=true]').count()},{timeout:30000}).toBe(8);await p.locator('#motion-review img').evaluateAll(ns=>Promise.all(ns.map(n=>n.decode())))};
+ const sprites=p.locator('#motion-review .ram-sprite'),canvases=sprites.locator('canvas:not(.ram-wear)');
+ const load=async()=>{await expect.poll(async()=>{await p.clock.runFor(30);return p.locator('#motion-review canvas:not(.ram-wear)[data-loaded=true]').count()},{timeout:30000}).toBe(8);await p.locator('#motion-review img').evaluateAll(ns=>Promise.all(ns.map(n=>n.decode())))};
  const shot=async name=>p.screenshot({path:path.join(dir,name+'.png')});
  if(!process.argv.includes('--record-only')){
  for(const color of ['red','yellow','blue','pink']){
@@ -47,14 +47,14 @@ const runtime=require('../public/assets/original/football/runtime.json');
  const app=await browser.newPage({viewport:{width:1180,height:820}});app.on('pageerror',e=>errors.push(e.message));await app.clock.install();await app.goto(url);await adopt(app,'红色','小芽');await app.clock.pauseAt(new Date(Date.now()+1000));
  for(const [form,growth] of [['seed',0],['junior',60],['middle',180],['super',840]]){
   await app.evaluate(({form,growth})=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(pet,{growth,sleeping:false,lastTick:Date.now(),stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:100}});delete pet.evolution;if(growth===840)pet.evolution=form;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,lively:false}));},{form,growth});await app.reload();const ram=app.getByTestId('desktop-character').locator('.ram-sprite');
-  await expect.poll(async()=>{await app.clock.runFor(40);return ram.locator('canvas[data-loaded=true]').count()}).toBe(1);await openActions(app);await app.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();await app.getByRole('button',{name:'一起玩球',exact:true}).click();
-  await expect.poll(async()=>{await app.clock.runFor(30);return ram.locator('canvas[data-loaded=true]').count()}).toBe(1);
+  await expect.poll(async()=>{await app.clock.runFor(40);return ram.locator('canvas:not(.ram-wear)[data-loaded=true]').count()}).toBe(1);await openActions(app);await app.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();await app.getByRole('button',{name:'一起玩球',exact:true}).click();
+  await expect.poll(async()=>{await app.clock.runFor(30);return ram.locator('canvas:not(.ram-wear)[data-loaded=true]').count()}).toBe(1);
   const duration=form==='seed'?4200:runtime.forms[form].frameCount/24*1000;
   await app.clock.fastForward(duration-80);await app.clock.runFor(250);await expect(ram).toHaveAttribute('data-action','idle');assert.equal(Math.round((await app.getByTestId('desktop-character').boundingBox()).width),100);
  }
  await app.close();assert.deepEqual(errors,[]);console.log('PASS actual seed/junior/middle/super UI finishes complete performances via source callbacks before the watchdog');
  }
- const videoPage=await browser.newPage({viewport:{width:1280,height:360},recordVideo:{dir,size:{width:1280,height:360}}});await videoPage.goto(url);await videoPage.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);window.review.render('idle');},forms);await expect(videoPage.locator('#motion-review canvas[data-loaded=true]')).toHaveCount(8,{timeout:30000});
- for(const [action,duration] of [['pet',2800],['sleep',6800],['wake',2100],['play',11200]]){await videoPage.evaluate(a=>window.review.render(a),action);await expect(videoPage.locator('#motion-review canvas[data-loaded=true]')).toHaveCount(8,{timeout:30000});await new Promise(r=>setTimeout(r,duration))}
+ const videoPage=await browser.newPage({viewport:{width:1280,height:360},recordVideo:{dir,size:{width:1280,height:360}}});await videoPage.goto(url);await videoPage.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);window.review.render('idle');},forms);await expect(videoPage.locator('#motion-review canvas:not(.ram-wear)[data-loaded=true]')).toHaveCount(8,{timeout:30000});
+ for(const [action,duration] of [['pet',2800],['sleep',6800],['wake',2100],['play',11200]]){await videoPage.evaluate(a=>window.review.render(a),action);await expect(videoPage.locator('#motion-review canvas:not(.ram-wear)[data-loaded=true]')).toHaveCount(8,{timeout:30000});await new Promise(r=>setTimeout(r,duration))}
  const video=videoPage.video();await videoPage.close();await video.saveAs(path.join(root,'artifacts/v21-original-actions.webm'));console.log('PASS actual-time original football, mouth breathing and large-eye affection recording saved');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

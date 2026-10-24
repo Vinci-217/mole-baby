@@ -1,27 +1,77 @@
 {
   "retrieved": "2026-10-24",
-  "adaptation": "Names and prices are local choices, not verified official item names or server prices. Source accessories retain their original colours.",
+  "adaptation": "Original SWF2 clothing graphics and pose timelines. Front thumbnails use original icon SWFs when available. Names/prices and stage-specific compact mounting are local adaptations. Party-cap retains its previous original static accessory.",
   "items": [
     {
       "id": "party-cap",
       "sourceId": "1200008",
-      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200008.swf",
+      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200008.swf",
       "sha256": "a2a67aaa8549b4cf7f5768d33d158f3a4c70e04691062a8d49209c21b06171f3",
       "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
     },
     {
       "id": "gold-feather",
       "sourceId": "1200018",
-      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200018.swf",
-      "sha256": "19f3e9891e2a96f0f5c4a08b3b3d4f36a5c9b49bb08ba208915eba5e4703f9bc",
-      "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200018.swf",
+      "sha256": "dfece2ba0e62250d7b32774794cd999c4f720a518ea98aa8b123a1ae8013c8f1",
+      "thumbnail": "Original petcloth/icon SWF frame",
+      "originalAdditiveRig": false
     },
     {
       "id": "wizard-cap",
       "sourceId": "1200020",
-      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200020.swf",
-      "sha256": "fdc904097797d117fca05189e0d27d0ffabe0ddad069fcf60f4e984d9d5a1a4a",
-      "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200020.swf",
+      "sha256": "ddd4efb6eed2f504413f44d2af5d091d5447450c5102279813b21c5599fa51a9",
+      "thumbnail": "Original petcloth/icon SWF frame",
+      "originalAdditiveRig": true
+    },
+    {
+      "id": "star-wand",
+      "sourceId": "1200021",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200021.swf",
+      "sha256": "6bdabb6024f116c1ac37a326671a598cb6a22043e1884de0fefb12afcf1e627d",
+      "thumbnail": "Original petcloth/icon SWF frame",
+      "originalAdditiveRig": true
+    },
+    {
+      "id": "magic-book",
+      "sourceId": "1200026",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200026.swf",
+      "sha256": "c30d025ffe0bf1c284e360343e660e1a43df79ec5324527eb5b7de0ebf9f145f",
+      "thumbnail": "Original petcloth/icon SWF frame",
+      "originalAdditiveRig": false
+    },
+    {
+      "id": "rabbit-hood",
+      "sourceId": "1200033",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200033.swf",
+      "sha256": "79f857d67c0a38e0c8784fdf2bb53f1d021e397d17acc0f8650068b732f3f2c6",
+      "thumbnail": "Original petcloth/icon SWF frame",
+      "originalAdditiveRig": false
+    },
+    {
+      "id": "leaf-hood",
+      "sourceId": "1200036",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200036.swf",
+      "sha256": "bad3103a6e3ebd142eb9e6e11574e989697b117ba336fed980d88d23b65d3c57",
+      "thumbnail": "Original animated clothing: complete registered front-pose crop",
+      "originalAdditiveRig": false
+    },
+    {
+      "id": "sport-goggles",
+      "sourceId": "1200047",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200047.swf",
+      "sha256": "9e808b706c3e324c383e5ce1fc11f0051876727b2c9e2774dde633a883b641e1",
+      "thumbnail": "Original animated clothing: complete registered front-pose crop",
+      "originalAdditiveRig": true
+    },
+    {
+      "id": "warm-scarf",
+      "sourceId": "1200052",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200052.swf",
+      "sha256": "b48ff72e3f8a4c29915b696040c57b3e9db8d38a26ce4031281ccfe527aaf9bc",
+      "thumbnail": "Original animated clothing: complete registered front-pose crop",
+      "originalAdditiveRig": false
     }
   ]
 }

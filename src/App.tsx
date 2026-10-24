@@ -290,7 +290,7 @@ export default function App() {
     clearInvitation();apply(result)
     if(result.ok){
       if(kind==='buy')playGameSound('purchase',prefs.sound)
-      else if(!saved.sleeping&&Date.now()>=careUntil.current)animate('mood-content')
+      else if(!saved.sleeping&&action==='idle'&&!timer.running&&Date.now()>=careUntil.current)animate('mood-content')
       setMemory(m=>m?recordEvent(m,{kind:kind==='buy'?'buy':'dress',detail:kind==='buy'?`你为我买了${getOutfit(id)?.name}。`:id?`你给我戴上了${getOutfit(id)?.name}。`:'你把我的装扮收好，让我恢复原来的样子。'}):m)
     }
   }

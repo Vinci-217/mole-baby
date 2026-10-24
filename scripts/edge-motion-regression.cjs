@@ -62,7 +62,7 @@ async function fixture(form, growth) {
     localStorage.setItem('ramu-house-preferences-v2',JSON.stringify(prefs));
   },{form,growth});
   await page.reload();
-  await expect(page.getByTestId('desktop-character').locator('canvas[data-loaded=true]')).toBeVisible();
+  await expect(page.getByTestId('desktop-character').locator('canvas:not(.ram-wear)[data-loaded=true]')).toBeVisible();
   await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);});
 }
 async function bodyBoundary() {

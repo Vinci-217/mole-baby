@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { easeGaze, type PetGaze } from '../pet-attention'
 import type { PetColor, Stage, Evolution } from '../game'
@@ -13,7 +13,8 @@ import { edgePeekTilt, type PetEdge } from '../edge-motion'
 import {footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
 import RamWear from './RamWear'
-import {getOutfit} from '../wardrobe'
+import {outfitFrame} from '../outfit-motion'
+import {getOutfit,outfitCoversCrown} from '../wardrobe'
 import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
 
 interface RamProps {
@@ -42,7 +43,7 @@ interface RamProps {
 }
 type Form = RamForm
 type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'football' | 'emotion-joy' | 'emotion-grumpy'
-interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
+interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray; form?:string;kind?:SheetKind }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
 const COLOR_NAMES: Record<PetColor, string> = { pink: '粉红色', yellow: '黄色', blue: '天蓝色', red: '红色' }
@@ -133,7 +134,7 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
       for (let channel = 0; channel < 3; channel++) pixels.data[i + channel] = clamp(pixels.data[i + channel] + deltas[0][channel] * white + deltas[1][channel] * gray + deltas[2][channel] * dark)
     }
     context.putImageData(pixels, 0, 0)
-    wearSources.set(canvas,{neutral,mask})
+    wearSources.set(canvas,{neutral,mask,form,kind})
     return canvas
   }).catch((error: unknown) => { tintedCache.delete(key); throw error })
   // Keep old colour previews from retaining an unlimited number of large
@@ -144,20 +145,69 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
 }
 /** Clothing belongs inside the body's transform layer and uses the same source
  * frame coverage. The anchor is cached per source cell, independent of colour. */
-function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false) {
+const crownlessSheets=new WeakMap<HTMLCanvasElement,HTMLCanvasElement>()
+/** Original dress layers can hide foliage. Keep the source face and body; do
+ * not paint a second face over it or tint the accessory with body colours. */
+function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
+  if(body.closest<HTMLElement>('.ram-sprite')?.dataset.crownHidden!=='true')return sheet
+  const cached=crownlessSheets.get(sheet);if(cached)return cached
+  const source=wearSources.get(sheet);if(!source)return sheet
+  const width=source.kind==='football'?160:source.kind==='seed'?96:192,height=source.kind==='football'?192:source.kind==='seed'?99:208
+  const view=document.createElement('canvas');view.width=sheet.width;view.height=sheet.height;const ctx=view.getContext('2d');if(!ctx)return sheet
+  ctx.drawImage(sheet,0,0);const pixels=ctx.getImageData(0,0,view.width,view.height),n=source.neutral.data,m=source.mask
+  for(let sy=0;sy<view.height;sy+=height)for(let sx=0;sx<view.width;sx+=width){
+    const anchor=bodyWearAnchor(m,n,view.width,sx,sy,width,height)
+    if(!anchor){if(source.kind==='grounded'&&sx/width===4)for(let y=0;y<height;y++)for(let x=0;x<width;x++)pixels.data[((sy+y)*view.width+sx+x)*4+3]=0;continue}
+    const left=anchor.x-anchor.bodyWidth/2,right=anchor.x+anchor.bodyWidth/2,top=anchor.y+anchor.bodyHeight*.025
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+      const i=((sy+y)*view.width+sx+x)*4
+      if(m[i]+m[i+1]+m[i+2]>50)continue
+      const coloured=Math.max(n[i],n[i+1],n[i+2])-Math.min(n[i],n[i+1],n[i+2])>25
+      const outsideFace=y<top-anchor.bodyHeight*.35||x<left-anchor.bodyWidth*.1||x>right+anchor.bodyWidth*.1
+      if((coloured&&(y<top+anchor.bodyHeight*.18||x<left-anchor.bodyWidth*.04||x>right+anchor.bodyWidth*.04))||(source.kind!=='football'&&outsideFace&&y<top+anchor.bodyHeight*.9))pixels.data[i+3]=0
+    }
+  }
+  ctx.putImageData(pixels,0,0);crownlessSheets.set(sheet,view);return view
+}
+const costumeImages=new Map<string,HTMLImageElement>()
+const costumePending=new Map<string,Promise<HTMLImageElement>>()
+const costumeListeners=new WeakMap<HTMLCanvasElement,string>()
+function costumeImage(path:string,wear:HTMLCanvasElement,body:HTMLCanvasElement) {
+  const ready=costumeImages.get(path);if(ready)return ready
+  let pending=costumePending.get(path)
+  if(!pending){pending=new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Costume PNG unavailable'));im.src=path});costumePending.set(path,pending)}
+  if(costumeListeners.get(wear)!==path){costumeListeners.set(wear,path);pending.then(im=>{costumeImages.set(path,im);costumePending.delete(path);while(costumeImages.size>24)costumeImages.delete(costumeImages.keys().next().value!);if(body.isConnected&&wear.isConnected&&costumeListeners.get(wear)===path)body.dispatchEvent(new Event('ram-wardrobe-change'))}).catch(()=>{costumePending.delete(path)})}
+  return null
+}
+function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false,sourceFrame?:number) {
   if(!canvas?.isConnected)return
-  const wear=canvas.parentElement?.querySelector<HTMLImageElement>('.ram-wear'),source=wearSources.get(sheet)
+  const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear'),source=wearSources.get(sheet)
   const outfit=getOutfit(wear?.dataset.outfit)
   if(!wear||!outfit||!source)return
-  let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
-  const key=`${frame}:${row}:${width}:${height}`,seed=width===96
-  if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,seed))
-  const anchor=cache.get(key);if(!anchor){wear.style.visibility='hidden';return}
+  const kind=source.kind??'classic',form=width===96?'seed':source.form??'junior'
+  const authored=outfitFrame(outfit.id,form,kind,frame,row,source.neutral.width/width,sourceFrame)
   const scaleX=football?1.666666667:1,scaleY=football?1.846153846:1
-  const x=(anchor.x+anchor.bodyWidth*outfit.x)/width*100*scaleX-(football?33.3333333:0)
-  const y=(anchor.y+anchor.bodyHeight*outfit.y)/height*100*scaleY-(football?61.5384615:0)
-  wear.style.left=`${x}%`;wear.style.top=`${y}%`;wear.style.width=`${anchor.bodyWidth/width*100*scaleX*outfit.width}%`;wear.style.rotate=`${anchor.angle}deg`;wear.style.visibility='visible'
-  wear.dataset.anchorFrame=`${frame}:${row}`
+  const context=wear.getContext('2d');if(!context)return
+  if(authored){
+    const {sheet:spec,index}=authored,im=costumeImage(`./assets/original/wardrobe-motion/${spec.file}`,wear,canvas)
+    if(!im){wear.style.visibility='hidden';return}
+    const signature=`${spec.file}:${index}`
+    if(wear.dataset.paint!==signature){wear.width=spec.cell[0];wear.height=spec.cell[1];context.clearRect(0,0,wear.width,wear.height);const box=spec.rects[index],w=box[2]-box[0],h=box[3]-box[1];context.drawImage(im,index%spec.columns*spec.tile[0],Math.floor(index/spec.columns)*spec.tile[1],w,h,box[0],box[1],w,h);wear.dataset.paint=signature}
+    wear.style.left=`${-spec.origin[0]/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${-spec.origin[1]/height*100*scaleY-(football?61.5384615:0)}%`
+    wear.style.width=`${spec.cell[0]/width*100*scaleX}%`;wear.style.height=`${spec.cell[1]/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='original-source';wear.dataset.sourceFrame=String(sourceFrame??frame)
+  }else{
+    const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas)
+    if(!image){wear.style.visibility='hidden';return}
+    let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
+    const key=`${frame}:${row}:${width}:${height}`
+    if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,width===96))
+    const anchor=cache.get(key);if(!anchor){wear.style.visibility='hidden';return}
+    if(wear.dataset.paint!==outfit.id){wear.width=image.naturalWidth;wear.height=image.naturalHeight;context.clearRect(0,0,wear.width,wear.height);context.drawImage(image,0,0);wear.dataset.paint=outfit.id}
+    const w=anchor.bodyWidth*outfit.width,x=(anchor.x+anchor.bodyWidth*outfit.x-w/2)/width*100*scaleX-(football?33.3333333:0)
+    const y=(anchor.y+anchor.bodyHeight*outfit.y-w*image.naturalHeight/image.naturalWidth)/height*100*scaleY-(football?61.5384615:0)
+    wear.style.left=`${x}%`;wear.style.top=`${y}%`;wear.style.width=`${w/width*100*scaleX}%`;wear.style.height=`${w*image.naturalHeight/image.naturalWidth/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='head-fit'
+  }
+  wear.dataset.anchorFrame=`${frame}:${row}`;wear.dataset.loaded='true'
 }
 /** Body and accessory consume the exact same elapsed event clock. The
  * accessory is moved, not used to resize/re-register the original body. */
@@ -176,6 +226,11 @@ function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined,
   }
   for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
 }
+/** Readiness describes painted pixels, rather than the next React props. A
+ * colour/action switch can retain a canvas while its source loads. */
+function usePaintReadiness(ref:RefObject<HTMLCanvasElement|null>,key:string) {
+  useLayoutEffect(()=>{const canvas=ref.current;if(canvas){delete canvas.dataset.loaded;delete canvas.dataset.loadedColor}},[ref,key])
+}
 function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, sound, gaze, startedAt, onError, onActionEnd }: {
   form: Form; color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number;
   itemMotion?: ItemMotion;
@@ -192,6 +247,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; slumber: HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
   const key = `${form}:${color}:${fromColor??''}`
   const sheets = ready?.key === key ? ready : null
+  usePaintReadiness(canvasRef,`${key}:${action}:${actionId??0}`)
   useEffect(() => {
     let cancelled = false
     const load=async(c:PetColor)=>{
@@ -229,17 +285,17 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         const target=sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
         const old=sheets.previous?.[sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
-          context.drawImage(source,frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
+          context.drawImage(wardrobeBody(canvas,source),frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
           if(grounded){
-            if(frame===0)context.drawImage(source,3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
+            if(frame===0)context.drawImage(wardrobeBody(canvas,source),3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
             context.save();context.translate(96,110);context.rotate(grounded.leafAngle*Math.PI/180);context.translate(-96,-110)
-            context.drawImage(source,4*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.restore()
+            context.drawImage(wardrobeBody(canvas,source),4*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.restore()
           }
         }
         if(old&&mix<1){draw(old);context.globalAlpha=mix}
         draw(target);context.globalAlpha=1
         if(grounded){canvas.dataset.gazeX=grounded.eyeX.toFixed(2);canvas.dataset.gazeY=grounded.eyeY.toFixed(2)}
-        canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';previous=signature
+        canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;previous=signature
       }
       paintWear(canvas,sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,frame,row)
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
@@ -258,6 +314,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
 function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,onError,onActionEnd}:{form:Form;color:PetColor;actionId?:number|string;sound?:boolean;startedAt:number;performanceClock:RefObject<{began:number|undefined;lastAudioElapsed?:number}>;onError:()=>void;onActionEnd?:()=>void}) {
   const ref=useRef<HTMLCanvasElement>(null),soundRef=useRef(sound),endRef=useRef(onActionEnd),errorRef=useRef(onError)
   soundRef.current=sound;endRef.current=onActionEnd;errorRef.current=onError
+  usePaintReadiness(ref,`${form}:${color}:${actionId??0}`)
   useEffect(()=>{
     let cancelled=false,request=0,ended=false,source:HTMLCanvasElement|null=null,previous=-1
     const canvas=ref.current,context=canvas?.getContext('2d'),media=window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -271,9 +328,9 @@ function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,on
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=footballPose(form,elapsed,media.matches)
       if(!media.matches)audio.tick(elapsed)
       performanceClock.current.lastAudioElapsed=elapsed
-      if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(source,pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
-      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),160,192,true)
-      canvas.dataset.loaded='true';canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.nearBall=String(pose.nearBall)
+      if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(wardrobeBody(canvas,source),pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
+      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),160,192,true,pose.sourceFrame)
+      canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.nearBall=String(pose.nearBall)
       if(pose.finished&&!ended){ended=true;endRef.current?.()}
       if(!ended)request=requestAnimationFrame(paint)
     }
@@ -286,6 +343,7 @@ function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,on
 }
 function EmotionFrames({form,color,action,actionId,performanceClock,onError,onActionEnd}:{form:Form;color:PetColor;action:string;actionId?:number|string;performanceClock:RefObject<{began:number|undefined}>;onError:()=>void;onActionEnd?:()=>void}) {
   const ref=useRef<HTMLCanvasElement>(null),endRef=useRef(onActionEnd),errorRef=useRef(onError);endRef.current=onActionEnd;errorRef.current=onError
+  usePaintReadiness(ref,`${form}:${color}:${action}:${actionId??0}`)
   useEffect(()=>{
     let cancelled=false,request=0,ended=false,source:HTMLCanvasElement|null=null,previous=-1
     const canvas=ref.current,context=canvas?.getContext('2d'),media=window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -294,9 +352,9 @@ function EmotionFrames({form,color,action,actionId,performanceClock,onError,onAc
       if(cancelled||!source||!canvas.isConnected||document.hidden)return
       if(performanceClock.current.began===undefined)performanceClock.current.began=now
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=emotionPose(form,action,elapsed,media.matches)
-      if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(source,pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
-      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8))
-      canvas.dataset.loaded='true';canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame)
+      if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(wardrobeBody(canvas,source),pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
+      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),192,208,false,pose.sourceFrame)
+      canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame)
       if(pose.finished&&!ended){ended=true;endRef.current?.()}
       if(!ended)request=requestAnimationFrame(paint)
     }
@@ -311,6 +369,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
   const ref = useRef<HTMLCanvasElement>(null)
   const soundRef=useRef(sound);soundRef.current=sound
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
+  usePaintReadiness(ref,`${color}:${fromColor??''}:${action}:${actionId??0}`)
   useEffect(() => {
     const canvas=ref.current;if(!canvas)return
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
@@ -331,7 +390,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       if (previous !== signature) {
         const c = ref.current?.getContext('2d')
         if(c){c.clearRect(0,0,96,99);if(oldSource&&mix<1){c.drawImage(oldSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=mix;}c.drawImage(activeSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=1;}
-        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':'seed' }
+        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.loadedColor=color; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':'seed' }
         previous = signature
       }
       paintWear(canvas,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
@@ -378,7 +437,7 @@ export default function Ram({ color, costume, stage, evolution, action = 'idle',
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
-    role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
+    role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(costume)||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/><RamWear costume={costume}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">

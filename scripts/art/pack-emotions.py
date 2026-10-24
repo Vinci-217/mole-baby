@@ -26,7 +26,7 @@ for form,sid in ids.items():
  for action,label in [('joy','happy'),('grumpy','angry')]:
   spec=specs[label];frames=list(range(spec['start'],spec['start']+spec['count']))
   if action=='grumpy':
-   opening=frames[:min(34,spec['count']-1)];frames=opening+opening[-2::-1]
+   opening=frames[:min(8 if form=='junior' else 12,spec['count']-1)];frames=opening+[opening[-1]]*(10 if form=='junior' else 4)+opening[-2::-1]
   elif len(frames)<24:frames=frames*3
   images=[];first=None;source_frames=[]
   for f in frames:

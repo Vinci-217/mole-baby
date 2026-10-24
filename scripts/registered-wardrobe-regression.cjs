@@ -1,0 +1,47 @@
+const {chromium,expect}=require('@playwright/test'),{spawn}=require('node:child_process'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {adopt,enterHome,toDesktop}=require('./smoke-helpers.cjs');
+const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5217',dir=path.join(root,'artifacts/v24-review');fs.mkdirSync(dir,{recursive:true});
+const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'--host','127.0.0.1','--port','5217','--strictPort'],{cwd:root,stdio:'pipe'});let browser;
+const forms=[['seed',0],['junior',1],['middle',2],['senior',3],['super',4],['water',4],['wood',4],['fire',4]];
+const outfits=['party-cap','gold-feather','wizard-cap','star-wand','magic-book','rabbit-hood','leaf-hood','sport-goggles','warm-scarf'];
+(async()=>{
+ for(let i=0;i<100;i++){if(server.exitCode!==null)throw Error('Review server failed');try{if((await fetch(url)).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});const p=await browser.newPage({viewport:{width:1280,height:360}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.clock.install();await p.goto(url);await p.clock.pauseAt(new Date(Date.now()+1000));await p.evaluate(async forms=>{const{mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms)},forms);
+ const bodies=p.locator('#motion-review canvas:not(.ram-wear)'),wears=p.locator('#motion-review .ram-wear');
+ const load=async costume=>{await expect.poll(async()=>{await p.clock.runFor(20);return bodies.evaluateAll(ns=>ns.filter(n=>n.dataset.loaded==='true'&&n.dataset.loadedColor===n.dataset.color).length)},{timeout:30000}).toBe(8);if(costume)await expect.poll(async()=>{await p.clock.runFor(20);return wears.evaluateAll(ns=>ns.filter(n=>n.dataset.loaded==='true'&&getComputedStyle(n).visibility==='visible').length)},{timeout:30000}).toBe(8)};
+ const paint=async(action,color,costume)=>{await p.evaluate(({action,color,costume})=>{window.review.render(action,color);window.review.refresh({costume})},{action,color,costume});await load(costume)};
+ for(const color of ['red','yellow','blue','pink']){
+  await paint('still',color);
+  await p.evaluate(async()=>{window.baseline=await Promise.all(Array.from(document.querySelectorAll('#motion-review canvas:not(.ram-wear)'),async c=>{const form=c.dataset.form,kind=c.dataset.sheet,path=form==='seed'?'original/seed/body-mask':kind==='grounded'?`original/grounded/${form}-mask`:`classic/${form}-mask`,im=new Image();im.src=`./assets/${path}.png`;await im.decode();const m=document.createElement('canvas');m.width=c.width;m.height=c.height;m.getContext('2d').drawImage(im,Number(c.dataset.frame??0)*c.width,Number(c.dataset.row??0)*c.height,c.width,c.height,0,0,c.width,c.height);const d=m.getContext('2d').getImageData(0,0,c.width,c.height).data;let l=c.width,r=0,t=c.height,b=0;for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){const i=(y*c.width+x)*4;if(d[i]+d[i+1]+d[i+2]>90&&d[i+3]>120){l=Math.min(l,x);r=Math.max(r,x);t=Math.min(t,y);b=Math.max(b,y);}}return {width:c.width,height:c.height,data:c.getContext('2d').getImageData(0,0,c.width,c.height).data,box:[l-(r-l)*.1,t-(b-t)*.35,r+(r-l)*.1,b]}}));});
+  for(const costume of outfits){
+   await p.evaluate(costume=>window.review.refresh({costume}),costume);await load(costume);
+   const checks=await p.evaluate(()=>Array.from(document.querySelectorAll('#motion-review canvas:not(.ram-wear)'),(c,index)=>{const b=window.baseline[index],n=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let face=0,changed=0;for(let i=0;i<n.length;i+=4){const x=i/4%c.width,y=Math.floor(i/4/c.width);if(x>=b.box[0]&&x<=b.box[2]&&y>=b.box[1]&&y<=b.box[3]&&b.data[i+3]>32&&Math.max(b.data[i],b.data[i+1],b.data[i+2])-Math.min(b.data[i],b.data[i+1],b.data[i+2])<6){face++;if(n[i]!==b.data[i]||n[i+1]!==b.data[i+1]||n[i+2]!==b.data[i+2]||n[i+3]!==b.data[i+3])changed++;}}return {face,changed}}));
+   for(const [i,c] of checks.entries()){assert.ok(c.face>20);assert.equal(c.changed,0,`${costume}:${color}:${forms[i][0]} must preserve eyes, mouth and all neutral face pixels`)}
+   const tints=await wears.evaluateAll(ns=>ns.map(n=>n.toDataURL()));await p.evaluate(({costume,color,tints})=>{window.wardrobeColours??={};if(color==='red')window.wardrobeColours[costume]=tints;else if(JSON.stringify(window.wardrobeColours[costume])!==JSON.stringify(tints))throw Error('The adoption colour tinted the costume')},{costume,color,tints});
+   // Normal-form eyes sit low on the face; white crown bubbles and forehead
+   // highlights are deliberately excluded. Seed eyes sit at the top.
+   if(['wizard-cap','magic-book','rabbit-hood'].includes(costume)){
+    const overlap=await p.evaluate(()=>Array.from(document.querySelectorAll('#motion-review canvas:not(.ram-wear)'),(body,index)=>{const gear=body.parentElement.querySelector('.ram-wear'),br=body.getBoundingClientRect(),wr=gear.getBoundingClientRect(),base=window.baseline[index],w=gear.getContext('2d').getImageData(0,0,gear.width,gear.height).data;let white=0,covered=0;for(let y=0;y<body.height;y++)for(let x=0;x<body.width;x++){const i=(y*body.width+x)*4;if(x>=base.box[0]&&x<=base.box[2]&&y>=(body.dataset.form==='seed'?base.box[1]:base.box[1]+(base.box[3]-base.box[1])*.52)&&y<=base.box[3]&&base.data[i]>240&&base.data[i+1]>240&&base.data[i+2]>240&&base.data[i+3]>220){white++;const gx=Math.floor((br.x+x/body.width*br.width-wr.x)/wr.width*gear.width),gy=Math.floor((br.y+y/body.height*br.height-wr.y)/wr.height*gear.height);if(gx>=0&&gx<gear.width&&gy>=0&&gy<gear.height&&w[(gy*gear.width+gx)*4+3]>100)covered++}}return {white,covered}}));
+    for(const [i,c] of overlap.entries())assert.ok(c.covered/Math.max(1,c.white)<.035,`${costume}:${forms[i][0]} covers the original eyes (${c.covered}/${c.white})`)
+   }
+   if(color==='red')await p.screenshot({path:path.join(dir,`${costume}-still.png`)});
+  }
+ }
+ console.log('PASS 288 original costume/form/colour fits preserve face pixels and costume colours; hats and books leave original eyes visible');
+ if(!process.argv.includes('--static-only'))for(const costume of outfits.filter(id=>!process.argv.includes('--motion-rabbit')||id==='rabbit-hood'))for(const action of ['walk-left','walk-right','pet','mood-joy','mood-grumpy','eat-bear-biscuit','play','sleep']){
+  await paint(action,'blue',costume);await p.clock.runFor(action==='sleep'?2200:300);await load(costume);
+  const before=await wears.evaluateAll(ns=>ns.map(n=>n.toDataURL()+n.style.cssText));await p.clock.runFor(action==='play'?1600:action==='sleep'?900:150);
+  if(action==='play')assert.ok((await wears.evaluateAll(ns=>ns.map(n=>n.toDataURL()+n.style.cssText))).some((n,i)=>n!==before[i]),`${costume} needs a changing ${action} costume pose`);
+  assert.equal(await p.locator('#motion-review [data-fallback=true]').count(),0);await p.screenshot({path:path.join(dir,`${costume}-${action}.png`)});
+ }
+ if(!process.argv.includes('--static-only'))console.log('PASS original costume motion follows affection, joy, mild frown, food, football and sleep through all eight forms');
+ await p.emulateMedia({reducedMotion:'reduce'});await paint('idle','blue','wizard-cap');const stable=await wears.evaluateAll(ns=>ns.map(n=>n.toDataURL()));await p.clock.runFor(1500);assert.deepEqual(await wears.evaluateAll(ns=>ns.map(n=>n.toDataURL())),stable);
+ await p.close();assert.deepEqual(errors,[]);
+ const app=await browser.newPage({viewport:{width:1180,height:820}});app.on('pageerror',e=>errors.push(e.message));await app.goto(url);await adopt(app,'蓝色','小叶');await enterHome(app);await app.getByRole('button',{name:'拉姆小衣橱',exact:true}).click();
+ await app.getByRole('button',{name:'试戴粉兔帽',exact:true}).click();await expect(app.locator('.wardrobe-mirror .ram-wear')).toBeVisible();
+ await app.getByRole('button',{name:'预览开心动作',exact:true}).click();await expect(app.locator('.wardrobe-mirror .ram-sprite')).toHaveAttribute('data-action','mood-joy');assert.equal(await app.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).coins),100);assert.equal(await app.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).wearing),undefined);
+ for(const size of [{width:1180,height:820},{width:1000,height:720}]){await app.setViewportSize(size);const button=await app.locator('.wardrobe-choice .game-button').boundingBox(),paper=await app.locator('.panel-paper').boundingBox();assert.ok(button.y+button.height<=paper.y+paper.height,'purchase stays visible with all nine clothes');}
+ await app.screenshot({path:path.join(root,'artifacts/v24-wardrobe.png')});await app.getByRole('button',{name:'衣橱下一页',exact:true}).click();await expect(app.getByRole('button',{name:'试戴皇冠猫耳',exact:true})).toBeVisible();await app.getByRole('button',{name:'试戴皇冠猫耳',exact:true}).click();await app.getByRole('button',{name:'买下 · 50 摩尔豆',exact:true}).click();await app.getByRole('button',{name:'给拉姆戴上',exact:true}).click();await toDesktop(app);await app.reload();await expect(app.getByTestId('desktop-character').locator('.ram-wear')).toHaveAttribute('data-outfit','warm-scarf');assert.deepEqual(errors,[]);await app.close();
+ console.log('PASS wardrobe pagination, non-spending action previews, purchase buttons at both sizes and original outfit ownership across restart');
+})().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

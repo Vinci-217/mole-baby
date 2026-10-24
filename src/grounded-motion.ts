@@ -13,7 +13,7 @@ export function groundedMotion(form:string,action:string,elapsed:number,clock:nu
   if(action==='pet'){frame=0;eyeX=.6+Math.sin(elapsed/490*Math.PI*2)*.35;eyeY=-.8}
   if(action==='happy'){frame=elapsed>250&&elapsed<1500?(elapsed<350||elapsed>1400?1:2):0;eyeX=0;eyeY=0}
   if(action==='waving'){eyeX=Math.sin(Math.min(1,elapsed/2100)*Math.PI*2)*1.7;eyeY=-.35;frame=elapsed>900&&elapsed<1100?1:0}
-  if(action==='mood-content'){frame=elapsed>750&&elapsed<950||elapsed>1450&&elapsed<1630?1:elapsed>=950&&elapsed<=1450?2:0;eyeX=0;eyeY=.15}
+  if(action==='mood-content'){frame=elapsed>900&&elapsed<1030||elapsed>1850&&elapsed<1970?1:0;eyeX=Math.sin(elapsed/1800)*.45;eyeY=-.2}
   if(action==='focus'){eyeX=Math.sin(clock/2800)*.35;eyeY=1.45}
   if(action==='play'){
     const ball=sampleSocialMotion(form==='junior'?1:2,'play',elapsed)

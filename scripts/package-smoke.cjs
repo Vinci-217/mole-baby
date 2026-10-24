@@ -1,3 +1,4 @@
+const {verifyRegisteredWardrobe}=require('./registered-wardrobe-checks.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -72,8 +73,9 @@ async function verifyApplication({ executable, archive, screenshot }) {
   assert.ok(paths.has('electron/classic-book-geometry.cjs'),'Missing classic book native geometry');
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/slumber/${form}-${layer}.png`),'Missing original sleepy expression atlas');
-  for(const id of ['party-cap','gold-feather','wizard-cap'])assert.ok(paths.has(`dist/assets/original/wardrobe/${id}.png`),'Missing original wearable accessory');
+  for(const id of ['party-cap','gold-feather','wizard-cap','star-wand','magic-book','rabbit-hood','leaf-hood','sport-goggles','warm-scarf'])assert.ok(paths.has(`dist/assets/original/wardrobe/${id}.png`),'Missing original wearable accessory');
   for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const mood of ['joy','grumpy'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/emotions/${form}-${mood}-${layer}.png`),'Missing original emotion animation');
+  for(const outfit of Object.values(require('../public/assets/original/wardrobe-motion/runtime.json').outfits))for(const sheets of Object.values(outfit.forms))for(const sheet of Object.values(sheets))assert.ok(paths.has(`dist/assets/original/wardrobe-motion/${sheet.file}`),'Missing original animated costume atlas');
   assert.ok(paths.has('dist/assets/original/slumber/z.png'),'Missing original floating Z');
   for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/football/${form}-${layer}.png`),'Missing original football performance');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
@@ -125,7 +127,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const character = page.locator('.desktop-character');
   await expect(character).toBeVisible();
   await expect(character).toBeInViewport();
-  await expect(character.locator('canvas[data-loaded="true"]')).toBeVisible();
+  await expect(character.locator('canvas:not(.ram-wear)[data-loaded="true"]')).toBeVisible();
   assert.equal(await character.locator('[data-fallback]').count(), 0, 'The original Ram PNG must load without a fallback');
   const state = await page.evaluate(() => window.desktop.getState());
   assert.equal(state.petMode, true);
@@ -137,7 +139,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const bounds = await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getBounds());
   assert.equal(bounds.width, 160);
   assert.equal(bounds.height, 240);
-  const painted = await character.locator('canvas').evaluate(canvas =>
+  const painted = await character.locator('canvas:not(.ram-wear)').evaluate(canvas =>
     canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((value, index) => index % 4 === 3 && value > 0));
   assert.equal(painted, true, 'The original Ram canvas must contain visible pixels');
   await page.evaluate(()=>window.desktop.setEdgeHiding(false));
@@ -268,6 +270,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
   await verifyMoodWardrobe(page);
+  await verifyRegisteredWardrobe(page);
   await verifyClassicBook(page,desktop);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});

@@ -117,3 +117,7 @@ __pycache__/
 
 !artifacts/v23-classic-backpack.png
 !artifacts/v23-native-backpack.png
+
+!artifacts/v24-wardrobe.png
+!artifacts/v24-outfits.png
+!artifacts/v24-wardrobe-motion.webm

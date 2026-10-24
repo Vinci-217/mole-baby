@@ -14,7 +14,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
  fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});await pet.screenshot({path:path.join(root,'artifacts/v13-compact.png')});
  await enterHome(p);await roomTab(p,'设置');const stages=p.getByRole('region',{name:'当前成长阶段',exact:true});await stages.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
  await stages.scrollIntoViewIfNeeded();await expect(stages.getByRole('group',{name:'选择当前阶段',exact:true}).getByRole('button')).toHaveCount(5);await expect(stages.getByRole('group',{name:'选择神力形态',exact:true}).getByRole('button')).toHaveCount(4);
- for(const image of await stages.locator('canvas[data-loaded=true]').all())assert.ok(await image.evaluate(n=>n.width>0));
+ for(const image of await stages.locator('canvas:not(.ram-wear)[data-loaded=true]').all())assert.ok(await image.evaluate(n=>n.width>0));
  await expect(p.locator('.classic-toast')).toHaveCount(0,{timeout:6000});
  await stages.screenshot({path:path.join(root,'artifacts/v13-stage-settings.png')});
  await stages.getByRole('button',{name:'切换为霹雳火系拉姆',exact:true}).click();await toDesktop(p);await p.reload();await expect(p.locator('.desktop-character .ram-sprite')).toHaveAttribute('data-evolution','fire');await expect(p.locator('.desktop-character .ram-sprite')).toHaveAttribute('data-color','blue');

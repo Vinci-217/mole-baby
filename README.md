@@ -2,15 +2,15 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.23.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.23.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.24.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.24.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-**v0.23.0 · 原版双页拉姆背包**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
+**v0.24.0 · 原服饰动画与小衣橱**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.23.0-Setup.exe` 或 `mole-baby-0.23.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.23.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.23.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.24.0-Setup.exe` 或 `mole-baby-0.24.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.24.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.24.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -22,7 +22,11 @@ Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文�
 
 [原生桌面效果](artifacts/v23-native-backpack.png) · [布局与交互说明](research/v23-classic-book.md)
 
-这版加入了小屋里的 **衣橱**：三件原版配饰可以先试戴，再用摩尔豆购买、穿脱，重启继续保留。配饰跟随各阶段身体的实际动作和变形，不改变原四色和叶冠；镜子试戴不扣豆。玩法和后续套装的实现方式见 [装扮说明](docs/WARDROBE.md)。
+小屋 **衣橱** 现在有9件原素材装扮，新增星星魔杖、魔法书、粉兔帽、火焰羽翼、彩虹眼罩和皇冠猫耳；可以先预览开心、不高兴、吃东西和玩球，再购买。八件使用原服饰动画，庆生小帽保留原静态配饰。装扮按各阶段身体源帧适配，原眼睛和嘴独立保留，换装不打断玩球或照料。旧装扮与存档继续兼容，详见 [装扮说明](docs/WARDROBE.md)。
+
+![小衣橱](artifacts/v24-wardrobe.png)
+
+[八种形态与魔法帽](artifacts/v24-outfits.png) · [实际动画录屏](artifacts/v24-wardrobe-motion.webm) · [原客户端调查与适配范围](research/v24-original-wardrobe.md)
 
 睡觉的嘴型更小，眼睑更柔和，呼吸与嘴巴开合统一为6.4秒；小 Z 从脸侧飘出。新增开心、闷闷的、安心和困倦动作，结合实际心情、精力与保留的记忆选择。状态页点「看看我」可以关心它，不改数值；自发小动作继续每2–4分钟、尊重安静与忙碌。
 

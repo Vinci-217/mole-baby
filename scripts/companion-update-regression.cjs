@@ -59,14 +59,14 @@ server.stdout.on('data', data => logs += data); server.stderr.on('data', data =>
     await toDesktop(p);await p.reload();
     const ram=p.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-stage','4');await expect(ram).toHaveAttribute('data-color',color);
     await expect(ram.locator('.ram-classic-frame[data-loaded=true]')).toHaveAttribute('data-form',form,{timeout:15000});assert.equal(await ram.getAttribute('data-fallback'),null);
-    const pixel=await ram.locator('canvas').evaluate(canvas=>Array.from(canvas.getContext('2d').getImageData(90,170,1,1).data));
+    const pixel=await ram.locator('canvas:not(.ram-wear)').evaluate(canvas=>Array.from(canvas.getContext('2d').getImageData(90,170,1,1).data));
     assert.ok(pixel[3]>200);
     if(color==='red') assert.ok(pixel[0]>pixel[2]+80);
     if(color==='blue') assert.ok(pixel[2]>pixel[0]+80);
     if(color==='yellow') assert.ok(pixel[0]>170&&pixel[1]>170&&pixel[2]<80);
     if(color==='pink') assert.ok(pixel[0]>pixel[1]+60&&pixel[2]>pixel[1]+60);
-    assert.ok(await ram.locator('canvas').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,192,208).data.some((value,index)=>index%4===3&&value>200)));
-    await openActions(p);await makeTired(p);await expect(ram.locator('canvas')).toHaveAttribute('data-sheet','slumber');await expect(ram).toHaveAttribute('data-sleeping','true');
+    assert.ok(await ram.locator('canvas:not(.ram-wear)').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,192,208).data.some((value,index)=>index%4===3&&value>200)));
+    await openActions(p);await makeTired(p);await expect(ram.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-sheet','slumber');await expect(ram).toHaveAttribute('data-sleeping','true');
     if(color==='blue'&&form==='water') await p.screenshot({path:path.join(root,'artifacts/v9-water-sleep.png')});
     await p.close();
   }

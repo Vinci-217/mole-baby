@@ -27,7 +27,7 @@ async function fixture(form, growth, color = 'red', extra = {}) {
     localStorage.setItem('ramu-house-preferences-v2', JSON.stringify({ sound: false, quiet: false, presence: false, lively: false, reminders: true, reminderMinutes: 1 }));
   }, { form, growth, color, extra });
   await page.reload();
-  await expect.poll(async () => { await page.clock.runFor(40); return ram().locator('canvas').getAttribute('data-loaded'); }).toBe('true');
+  await expect.poll(async () => { await page.clock.runFor(40); return ram().locator('canvas:not(.ram-wear)').getAttribute('data-loaded'); }).toBe('true');
 }
 async function suggest(kind) {
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -88,8 +88,8 @@ async function namesAndOffers() {
     await spirit().getByRole('button', { name: `叫叫${before.name}`, exact: true }).click();
     await expect(ram()).toHaveAttribute('data-action', 'look-around');
     await expect(page.locator('.compact-bubble')).toContainText(before.name);
-    await expect(ram()).toHaveAttribute('data-color', color); await expect(ram().locator('canvas')).toHaveAttribute('data-form', form);
-    if (growth >= 420) { await expect(ram()).toHaveClass(/is-flying/); await expect(ram().locator('canvas')).toHaveAttribute('data-row', '0'); }
+    await expect(ram()).toHaveAttribute('data-color', color); await expect(ram().locator('canvas:not(.ram-wear)')).toHaveAttribute('data-form', form);
+    if (growth >= 420) { await expect(ram()).toHaveClass(/is-flying/); await expect(ram().locator('canvas:not(.ram-wear)')).toHaveAttribute('data-row', '0'); }
     if (growth === 0) assert.equal(await ram().locator('.seed-pot-original').evaluate(node => getComputedStyle(node).transform), 'none');
     assert.equal((await memory()).events.filter(event => event.kind === 'call-name').length, calls + 1);
     if (form === 'middle' && color === 'blue') await checkPanelFits('v19-name-response.png');
@@ -105,7 +105,7 @@ async function namesAndOffers() {
     assert.equal(actualPlay(await memory()).length, actualPlay(beforeOffer).length + 1, 'acceptance performs and remembers one actual interaction');
     assert.equal((await save()).coins, before.coins); assert.deepEqual((await save()).inventory, before.inventory);
     if (growth === 0) assert.equal(await ram().locator('.seed-pot-original').evaluate(node => getComputedStyle(node).transform), 'none');
-    if (growth >= 420) { await expect(ram()).toHaveClass(/is-flying/); await expect(ram().locator('canvas')).toHaveAttribute('data-row', '0'); }
+    if (growth >= 420) { await expect(ram()).toHaveClass(/is-flying/); await expect(ram().locator('canvas:not(.ram-wear)')).toHaveAttribute('data-row', '0'); }
     await advance(); await expect(ram()).toHaveAttribute('data-action', 'idle');
     assert.equal(await page.getByRole('timer').count(), 0, 'calling or inviting does not start focus');
   }

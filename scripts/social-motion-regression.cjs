@@ -11,7 +11,7 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
  const ram=page.getByTestId('desktop-character').locator('.ram-sprite');const shots=path.join(root,'artifacts/v9-motion-review');fs.mkdirSync(shots,{recursive:true});
  for(const [form,growth] of cases){
   await page.evaluate(({form,growth})=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=growth;p.lastTick=Date.now();p.sleeping=false;p.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};delete p.evolution;if(growth===840)p.evolution=form;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,reminders:true,reminderMinutes:40}));},{form,growth});
-  await page.reload();await ram.locator('canvas[data-loaded=true]').waitFor({timeout:15000});
+  await page.reload();await ram.locator('canvas:not(.ram-wear)[data-loaded=true]').waitFor({timeout:15000});
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   for(const [action,button,wait] of [['play','一起玩球',1000],['pet','摸摸拉姆',700],['focus','陪我专注',450]]){
    await page.getByRole('button',{name:button,exact:true}).click();await page.clock.runFor(wait);

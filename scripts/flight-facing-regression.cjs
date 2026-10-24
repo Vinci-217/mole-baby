@@ -15,7 +15,7 @@ const forms=['senior','super','water','wood','fire'],colors=['red','yellow','blu
   document.getElementById('root').style.display='none';const host=document.createElement('div');host.id='flight-review';host.style.cssText='width:100px;margin:30px;background:#f1f4e8';document.body.appendChild(host);const root=createRoot(host);
   window.renderFlight=props=>flushSync(()=>root.render(React.createElement(Ram,{...props,stage:props.form==='senior'?3:4,evolution:props.form==='senior'?undefined:props.form,sound:false})));
  });
- const ram=page.locator('#flight-review .ram-sprite'),canvas=ram.locator('canvas'),dir=path.join(root,'artifacts/v173-facing');fs.mkdirSync(dir,{recursive:true});
+ const ram=page.locator('#flight-review .ram-sprite'),canvas=ram.locator('canvas:not(.ram-wear)'),dir=path.join(root,'artifacts/v173-facing');fs.mkdirSync(dir,{recursive:true});
  const paint=async props=>{await page.evaluate(p=>window.renderFlight(p),props);await expect.poll(async()=>{await page.clock.runFor(40);return canvas.getAttribute('data-loaded')}).toBe('true');await page.clock.runFor(80);};
  for(const form of forms)for(const color of colors){
   await paint({form,color,action:'idle'});await expect(canvas).toHaveAttribute('data-form',form);

@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -38,7 +38,9 @@
     "test:original-actions": "node scripts/comfort-motion-regression.cjs",
     "test:mood-wardrobe": "node scripts/mood-wardrobe-regression.cjs",
     "test:wardrobe-lifecycle": "npm run build && node scripts/wardrobe-lifecycle-regression.cjs",
-    "test:classic-book": "npm run build && node scripts/classic-book-regression.cjs"
+    "test:classic-book": "npm run build && node scripts/classic-book-regression.cjs",
+    "test:registered-wardrobe": "node scripts/registered-wardrobe-regression.cjs",
+    "review:wardrobe": "node scripts/record-wardrobe-review.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

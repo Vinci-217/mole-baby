@@ -223,13 +223,13 @@ async function verifyStageSettings(page,desktop){
   await expect(sprite).toHaveAttribute('data-stage','4');await expect(sprite).toHaveAttribute('data-evolution','water');await expect(sprite).toHaveAttribute('data-color',before.color);
   await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();
   await toDesktop(page);const character=page.getByTestId('desktop-character');await character.hover({position:{x:94,y:54}});
-  await expect.poll(async()=>Number(await character.locator('canvas').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
+  await expect.poll(async()=>Number(await character.locator('canvas:not(.ram-wear)').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
   console.log('PASS: nearby pointer attention responds in the actual desktop window');
   if(desktop){
     await enterHome(page);await roomTab(page,'设置');
     await settings.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
     await settings.getByRole('button',{name:'切换为神力超级拉姆',exact:true}).click();await toDesktop(page);
-    await expect(character.locator('canvas')).toHaveAttribute('data-form','super');
+    await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-form','super');
     await character.locator('.ram-flight-layer').evaluate(n=>{window.__nativeFlight=n.getAnimations()[0];});
     const flags=await page.evaluate(()=>window.desktop.getState());
     await page.mouse.move(1,239);await page.keyboard.press('Escape');
@@ -241,7 +241,7 @@ async function verifyStageSettings(page,desktop){
       return (state.motion==='left'||state.motion==='right')&&sprite.querySelector('canvas').dataset.row===(state.motion==='left'?'2':'1')&&sprite.classList.contains('is-flying')&&sprite.querySelector('.ram-flight-layer').getAnimations()[0]===window.__nativeFlight;
     }),{timeout:22000}).toBe(true);
     await expect.poll(()=>page.evaluate(()=>window.desktop.getState().then(s=>s.motion)),{timeout:4000}).toBe('idle');
-    await expect(character.locator('canvas')).toHaveAttribute('data-row','0');
+    await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-row','0');
     expect(await character.locator('.ram-flight-layer').evaluate(n=>n.getAnimations()[0]===window.__nativeFlight)).toBe(true);
     const moved=await bounds();expect(Math.abs(moved.x-placed.x)).toBeGreaterThanOrEqual(12);expect(Math.abs(moved.x-placed.x)).toBeLessThanOrEqual(28);expect(moved.y).toBe(placed.y);
     await page.evaluate(async flags=>{await window.desktop.wander(flags.wandering);await window.desktop.setEdgeHiding(flags.edgeHiding);},flags);
@@ -383,7 +383,7 @@ async function verifyComfortMotion(page) {
   try {
     for(const [growth,evolution] of [[0,null],[180,null],[840,'super']]){
       await page.evaluate(({growth,evolution})=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth,sleeping:true,lastTick:Date.now(),stats:{hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:50}});delete p.awakeUntil;delete p.evolution;if(evolution)p.evolution=evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,lively:false}));},{growth,evolution});
-      await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite'),canvas=ram.locator('canvas');
+      await page.reload();const ram=page.getByTestId('desktop-character').locator('.ram-sprite'),canvas=ram.locator('canvas:not(.ram-wear)');
       await expect(canvas).toHaveAttribute('data-loaded','true');await expect(ram).toHaveAttribute('data-sleeping','true');await expect(canvas).toHaveAttribute('data-sheet','slumber');
       const first=await canvas.getAttribute('data-frame');await expect.poll(()=>canvas.getAttribute('data-frame'),{intervals:[100],timeout:5000}).not.toBe(first);
       await expect(ram.locator('.ram-sleep-particles>img')).toHaveCount(3);expect(await ram.locator('.ram-sleep-particles>img').first().evaluate(n=>getComputedStyle(n).animationName)).toBe('ram-snore-rise');
@@ -442,7 +442,7 @@ async function verifyMoodWardrobe(page) {
       const mood=page.getByRole('button',{name:'回应拉姆的心情',exact:true});await expect(mood).toBeVisible();
       const bounds=await mood.boundingBox(),panel=await page.getByTestId('companion-panel').boundingBox();expect(bounds.y+bounds.height).toBeLessThanOrEqual(panel.y+panel.height);
       await mood.click();await expect(ram).toHaveAttribute('data-action',action);await expect(ram.locator('.ram-wear')).toBeVisible();
-      if(growth===180){const canvas=ram.locator('canvas');await expect(canvas).toHaveAttribute('data-loaded','true');const first=await canvas.getAttribute('data-source-frame');await expect.poll(()=>canvas.getAttribute('data-source-frame'),{intervals:[60]}).not.toBe(first)}
+      if(growth===180){const canvas=ram.locator('canvas:not(.ram-wear)');await expect(canvas).toHaveAttribute('data-loaded','true');const first=await canvas.getAttribute('data-source-frame');await expect.poll(()=>canvas.getAttribute('data-source-frame'),{intervals:[60]}).not.toBe(first)}
       await expect(ram).toHaveAttribute('data-action','idle',{timeout:9000});await expect(ram).toHaveAttribute('data-sleeping','false');
       const pet=await save();expect(pet.coins).toBe(170);expect(pet.wearing).toBe('party-cap');expect(pet.name).toBe(identity.name);expect(pet.color).toBe(identity.color);expect(pet.inventory).toEqual(identity.inventory);
       await page.getByRole('button',{name:'关闭小窗',exact:true}).click();

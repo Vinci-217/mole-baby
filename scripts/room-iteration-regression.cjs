@@ -98,7 +98,7 @@ async function reviewTreasure(page, background) {
   await expect(game.locator('.treasure-scene')).toHaveAttribute('data-scene-phase', expectedPhase);
   await inspectSheet(page, expectedPhase, '.treasure-scene-sheet');
   await game.getByTestId('treasure-start').click(); await expect(game).toHaveAttribute('data-phase', 'playing');
-  await game.locator('canvas[data-loaded=true]').waitFor();
+  await game.locator('canvas:not(.ram-wear)[data-loaded=true]').waitFor();
   await expect(game.locator('.ram-sprite')).toHaveAttribute('data-stage', '0');
   await expect(game.locator('.ram-sprite')).toHaveAttribute('data-color', 'pink');
   const targets = await game.locator('[data-target-id]').evaluateAll(nodes => nodes.map(node => node.dataset.targetId));

@@ -237,3 +237,7 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 ### v0.23 原版双页背包
 
 `original/classic-book/` 从原 `petUI.swf` 的sprite182/168与按钮147、151、155、160、167、181、30提取；原框体、十二格、静态标签、头像底板和按钮三态保持原画法，PNG按逻辑尺寸2倍输出。可变文字和旧分类说明置空，以本地数据和可访问HTML替换，角色与物品继续使用已有原素材。第六个玩耍书签复用原页边与原足球图标，没有新画角色/UI或生成插画。来源、哈希与逻辑坐标见 [source.json](public/assets/original/classic-book/source.json)、[layout.json](public/assets/original/classic-book/layout.json) 和 [研究记录](research/v23-classic-book.md)，导出脚本为 `scripts/art/export-classic-book.py`。
+
+### v0.24 原服饰动画
+
+`original/wardrobe-motion/` 从原 `petcloth/swf2` 的8件服饰导出，按身体源帧采样并独立播放；`original/wardrobe/` 的商品图沿用原图标或原服饰正面图形，紫色魔法帽恢复完整星星。源提交、逐文件URL/SHA256见 [wardrobe/source.json](public/assets/original/wardrobe/source.json)，360张透明图集校验见 [wardrobe-motion/checksums.json](public/assets/original/wardrobe-motion/checksums.json)，导出方式与明确的桌宠适配见 [README](public/assets/original/wardrobe-motion/README.md) 和 [研究记录](research/v24-original-wardrobe.md)。没有新画或生成角色、眼睛和嘴。原心情图集字节保留，仅缩短生气的源帧范围；种子待机和短眨眼节奏为桌宠适配。

@@ -173,5 +173,5 @@
 @keyframes ram-snore-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.85}55%{opacity:.65}100%{opacity:0;transform:translate(23px,-50px) scale(1.2)}}
 @media(prefers-reduced-motion:reduce){.ram-sleep-particles>img{animation:none!important;opacity:.7;transform:translate(12px,-22px)}.ram-sleep-particles>img+img{display:none}}
 
-.ram-wear{position:absolute;object-fit:contain;visibility:hidden;translate:-50% -100%;transform-origin:50% 100%;pointer-events:none;z-index:2}
+.ram-wear{position:absolute;object-fit:contain;visibility:hidden;translate:none;transform-origin:50% 100%;pointer-events:none;z-index:2}
 .ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-flight-layer,.ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-pose-layer{animation:none;transform:none}

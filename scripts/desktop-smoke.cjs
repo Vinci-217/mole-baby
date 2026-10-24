@@ -1,3 +1,4 @@
+const {verifyRegisteredWardrobe}=require('./registered-wardrobe-checks.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -44,10 +45,10 @@ async function waitForClassic(page, selector) {
   const character = page.locator(selector);
   await expect(character).toBeVisible();
   await expect(character).toBeInViewport();
-  await expect.poll(async () => character.locator('canvas[data-loaded="true"], .ram-sprite[data-fallback]').count(), { timeout: 20000 }).toBeGreaterThan(0);
+  await expect.poll(async () => character.locator('canvas:not(.ram-wear)[data-loaded="true"], .ram-sprite[data-fallback]').count(), { timeout: 20000 }).toBeGreaterThan(0);
   assert.equal(await character.locator('.ram-sprite[data-fallback]').count(), 0, `${selector}: classic PNGs must not silently fall back to illustrations`);
-  await expect(character.locator('canvas[data-loaded="true"]')).toBeVisible();
-  const painted = await character.locator('canvas').evaluate(canvas => {
+  await expect(character.locator('canvas:not(.ram-wear)[data-loaded="true"]')).toBeVisible();
+  const painted = await character.locator('canvas:not(.ram-wear)').evaluate(canvas => {
     const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
     return pixels.some((value, index) => index % 4 === 3 && value > 0);
   });
@@ -195,6 +196,7 @@ async function verifyBackground(page, selector, suffix) {
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
   await verifyMoodWardrobe(page);
+  await verifyRegisteredWardrobe(page);
   await verifyClassicBook(page,desktop);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();

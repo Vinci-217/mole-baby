@@ -114,7 +114,7 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
     return { frame: Math.min(24, Math.floor(elapsed / 42)), finished: false }
   }
   const phase = elapsed % 9000
-  return { frame: phase < 6000 ? 0 : Math.min(60, Math.floor((phase - 6000) / 42)), finished: false }
+  return { frame: phase < 7600 ? 0 : [0,1,2,1,0][Math.min(4,Math.floor((phase-7600)/280))], finished: false }
 }
 
 /** Elemental atlases retain their own body/crown during every interaction.
