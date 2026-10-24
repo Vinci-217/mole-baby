@@ -1,0 +1,63 @@
+{
+  "version": "0.26.1",
+  "tag": "main",
+  "sourceSha": "218660cfcb94c89f91a63834105ce80c634e467f",
+  "buildResult": "success",
+  "platforms": {
+    "windows": "success",
+    "mac": "success"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40121528882",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.26.1-mac-arm64.dmg",
+      "sha256": "d15945fd3bab9b15f8e733c26603eba5993423a9a2c1a3dafa5e7122fc7ad659"
+    },
+    {
+      "file": "mole-baby-0.26.1-mac-arm64.zip",
+      "sha256": "94e7602aaddf0328f0bc9bf7efffc007a849ad60fb984c5073f02b5b72a3f4c1"
+    },
+    {
+      "file": "mole-baby-0.26.1-mac-x64.dmg",
+      "sha256": "3567dc9742b09be58bb03ee71c642c1df1a21a147da77a1f09988a87620ebf53"
+    },
+    {
+      "file": "mole-baby-0.26.1-mac-x64.zip",
+      "sha256": "bdaae30c0cc87616f9c0b855f1a9df3f4f4fbbd066fd1e03d7fb759535a0c291"
+    },
+    {
+      "file": "mole-baby-0.26.1-x64.zip",
+      "sha256": "45faac6d0eae1c69ec2c2c1203606dd51aa3c9d23f4723a577ba904cc7e1f253"
+    },
+    {
+      "file": "mole-baby-0.26.1-Setup.exe",
+      "sha256": "d875baaa4c434a0f34ad94297b410dbb0af2eb558adde89af225ac6836248eee"
+    }
+  ],
+  "verificationLog": "PASS: complete original pet/outfit payload; retired AI and speech backends absent\nPASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue\nPASS physical edge left\nPASS physical edge right\nPASS physical edge top\nPASS physical edge bottom\nPASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through\nPASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards\nPASS: packaged win32/x64 compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services\nPASS: SHA256SUMS.txt generated for checked downloads\n",
+  "macTrust": {
+    "arm64": {
+      "architecture": "arm64",
+      "sourceSha": "218660cfcb94c89f91a63834105ce80c634e467f",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "218660cfcb94c89f91a63834105ce80c634e467f",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "macVerificationLogs": {
+    "arm64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=arm64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=arm64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=arm64 electron=35.7.5 appOutDir=release/mac-arm64\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac-arm64\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac-arm64/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=arm64 file=release/mole-baby-0.26.1-mac-arm64.zip\n  • building        target=DMG arch=arm64 file=release/mole-baby-0.26.1-mac-arm64.dmg\n  • downloaded      label=dmgbuild-bundle-arm64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.26.1-mac-arm64.dmg.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.26.1-mac-arm64.zip.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS arm64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: complete original pet/outfit payload; retired AI and speech backends absent\nPASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations\nPASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue\nPASS physical edge left\nPASS physical edge right\nPASS physical edge top\nPASS physical edge bottom\nPASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through\nPASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards\nPASS: packaged darwin/arm64 compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services\nPASS: SHA256SUMS-mac-arm64.txt generated for checked downloads\n",
+    "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=x64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=x64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=x64 electron=35.7.5 appOutDir=release/mac\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=x64 file=release/mole-baby-0.26.1-mac-x64.zip\n  • building        target=DMG arch=x64 file=release/mole-baby-0.26.1-mac-x64.dmg\n  • downloaded      label=dmgbuild-bundle-x86_64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.26.1-mac-x64.zip.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.26.1-mac-x64.dmg.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS x64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: complete original pet/outfit payload; retired AI and speech backends absent\nPASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations\nPASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue\nPASS physical edge left\nPASS physical edge right\nPASS physical edge top\nPASS physical edge bottom\nPASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through\nPASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards\nPASS: packaged darwin/x64 compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services\nPASS: SHA256SUMS-mac-x64.txt generated for checked downloads\n"
+  },
+  "recordedAt": "2026-10-24T18:43:21.334Z"
+}
