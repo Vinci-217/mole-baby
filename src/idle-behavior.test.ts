@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { chooseIdleBehavior, idleCandidates, idleDelay, IDLE_ACTIONS } from './idle-behavior'
 import type { IdleAction } from './idle-behavior'
-import { appendMessage, clearMemory, createMemory, recordCare } from './companion-memory'
+import {  createMemory, recordCare } from './companion-memory'
 import { createPet, STAGES } from './game'
 import type { Evolution, Stage } from './game'
 import { getRamActionDuration, sampleFlyingPose, sampleSeedPose } from './components/ram-animation'
@@ -57,12 +57,7 @@ describe('stage-aware spontaneous original gestures', () => {
         previous = next.action
       }
     }
-    const concerned = appendMessage(memory, 'user', '我今天很难过', NOW - 60_000)
-    expect(idleCandidates(pet, concerned, NOW).map(entry => entry.action)).toEqual(calm)
-    // Forgetting is immediate; an old mood is never kept in a hidden profile.
-    expect(idleCandidates(pet, clearMemory(concerned), NOW)).toHaveLength(6)
-    expect(idleCandidates(pet, concerned, NOW + 3 * 3_600_000)).toHaveLength(6)
-    expect(idleCandidates(pet, { ...concerned, petId: 'other' }, NOW)).toHaveLength(6)
+
   })
 
   it('respects stable temperament and recent real care while leaving all source data unchanged', () => {

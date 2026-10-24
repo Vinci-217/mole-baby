@@ -1,0 +1,5 @@
+const {spawn}=require('node:child_process'),path=require('node:path'),{chromium}=require('@playwright/test');
+const {adopt}=require('./smoke-helpers.cjs'),{verifyCompactCare}=require('./compact-care-checks.cjs');
+const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5226';let browser;
+const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'preview','--host','127.0.0.1','--port','5226','--strictPort'],{cwd:root,stdio:'ignore'});
+(async()=>{for(let i=0;i<100;i++){try{if((await fetch(url)).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});const page=await browser.newPage({viewport:{width:1180,height:820}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);await adopt(page,'蓝色','小叶');await verifyCompactCare(page);require('node:assert/strict').deepEqual(errors,[]);console.log('PASS production compact desktop interaction and room surfaces without renderer errors')})().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill()});

@@ -83,8 +83,8 @@ async function musicStore<T>(mode: IDBTransactionMode, operation: (store: IDBObj
 }
 
 /** Room-only music. Blobs stay in IndexedDB; leaving the room always pauses.
- * Pass speechBusy while recording/talking to soften the music underneath it. */
-export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaController {
+ * Background music has independent volume and enable settings. */
+export function useRoomMedia(inRoom: boolean): RoomMediaController {
   const [settings, setSettings] = useState(loadPreferences);
   const localPhase = useLocalScenePhase();
   // Preview is transient. Stored preferences always follow the real local time.
@@ -163,13 +163,13 @@ export function useRoomMedia(inRoom: boolean, speechBusy = false): RoomMediaCont
   }, [inRoom, resumeMusic]);
   useEffect(() => {
     const adjust = () => {
-      if (audio.current) audio.current.volume = settings.volume * (speechBusy || window.speechSynthesis?.speaking ? .2 : 1);
+      if (audio.current) audio.current.volume = settings.volume;
     };
     adjust();
     if (!inRoom) return;
     const timer = window.setInterval(adjust, 150);
     return () => window.clearInterval(timer);
-  }, [settings.volume, speechBusy, inRoom, source, customLoaded]);
+  }, [settings.volume, inRoom, source, customLoaded]);
   const importMusic = useCallback(async (file: File) => {
     if (!file.size || file.size > 20 * 1024 * 1024) throw new Error('请选择 20 MB 以内的音频文件。');
     if (!file.type.startsWith('audio/') && !/\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(file.name)) throw new Error('请选择 MP3、WAV、OGG 等音频文件。');

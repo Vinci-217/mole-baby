@@ -1,7 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {createPet,parseSave,changePetStage} from './game'
 import {OUTFITS,buyOutfit,wearOutfit,normalizeWardrobe} from './wardrobe'
-import {buildMessages,createMemory} from './companion-memory'
 const NOW=Date.UTC(2026,9,24,8)
 const pet=()=>createPet('小叶','blue',NOW)
 describe('a real owned wardrobe',()=>{
@@ -32,11 +31,5 @@ describe('a real owned wardrobe',()=>{
     expect(loaded.wardrobe).toEqual(['party-cap']);expect(loaded.wearing).toBeUndefined();expect(loaded.coins).toBe(100)
     expect(pet().wearing).toBeUndefined()
   })
-  it('grounds chat in actual wearing rather than assuming a purchase was put on',()=>{
-    const bought=buyOutfit(pet(),'party-cap').state
-    const context=(p:ReturnType<typeof pet>)=>JSON.parse(buildMessages(p,createMemory(p),'我戴了什么？',NOW)[0].content.split('<pet_data>')[1].split('</pet_data>')[0])
-    expect(context(bought).outfit).toBeNull()
-    const dressed=wearOutfit(bought,'party-cap').state
-    expect(context(dressed).outfit).toBe('庆生小帽');expect(context(wearOutfit(dressed).state).outfit).toBeNull()
-  })
+
 })

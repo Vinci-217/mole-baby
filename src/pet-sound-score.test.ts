@@ -14,10 +14,10 @@ describe('visible contact and quiet foley',()=>{
  })
  it('distinguishes crisp biscuits, juice, milk, bath, brushing and colour-change accents',()=>{
   const kinds=(id:string)=>itemSoundScore(getItemMotion(id)).cues.map(c=>c.kind)
-  expect(kinds('biscuit')).toContain('crunch');expect(kinds('juice')).toContain('sip');expect(kinds('180002')).toContain('gulp')
-  expect(kinds('180003')).toEqual(expect.arrayContaining(['water','bubble']));expect(kinds('180024').every(k=>k==='brush')).toBe(true)
+  expect(kinds('biscuit')).toContain('crunch');expect(kinds('juice')).toContain('gulp');expect(kinds('180002')).toContain('gulp')
+  expect(kinds('180003')).toEqual(expect.arrayContaining(['water','bubble']));expect(kinds('180024')).toEqual(expect.arrayContaining(['brush','clean']))
   expect(kinds('recolor-blue')).toEqual(expect.arrayContaining(['gulp','magic']))
-  expect(new Set(itemSoundScore(getItemMotion('180024')).cues.map(c=>c.at)).size).toBe(12)
+  expect(new Set(itemSoundScore(getItemMotion('180024')).cues.filter(c=>c.kind==='brush').map(c=>c.at)).size).toBe(12)
  })
  it('places two ball sounds on the actual contacts and only one page turn per reading loop',()=>{
   expect(socialSoundScore('play').cues.map(c=>c.at)).toEqual([1050,3150])

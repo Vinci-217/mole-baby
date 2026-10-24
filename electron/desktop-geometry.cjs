@@ -55,17 +55,25 @@ function canAnimateDesktop(state) {
   return state.visible && state.petMode && state.petCanMove && !state.panel && !state.dragging && !state.interacting;
 }
 
-/** Short random steps around the user's placement; never pull a pet to the floor. */
-function nearbyWanderTarget(bounds, area, anchor = bounds, random = Math.random) {
-  const start = fitPetBounds(bounds, area);
-  const saved = fitPetBounds(anchor, area);
-  const home = Math.abs(start.x - saved.x) <= 48 ? saved.x : start.x;
-  const left = Math.max(area.x - PET_PADDING.left, home - 48);
-  const right = Math.min(area.x + area.width - start.width + PET_PADDING.right, home + 48);
-  const distance = 12 + Math.round(random() * 16);
-  let direction = random() < 0.5 ? -1 : 1;
-  if (start.x + direction * distance < left || start.x + direction * distance > right) direction *= -1;
-  return { ...start, x: Math.round(Math.max(left, Math.min(right, start.x + direction * distance))) };
+/** Deliberate roaming in a wider, bounded area around the last manual placement. */
+function nearbyWanderTarget(bounds,area,anchor=bounds,random=Math.random){
+ const start=fitPetBounds(bounds,area),home=fitPetBounds(anchor,area);
+ const distance=28+Math.round(random()*36),angle=random()*Math.PI*2;
+ const x=Math.max(home.x-150,Math.min(home.x+150,start.x+Math.cos(angle)*distance));
+ const y=Math.max(home.y-100,Math.min(home.y+100,start.y+Math.sin(angle)*distance*.65));
+ return fitPetBounds({...start,x,y},area);
 }
 
 module.exports = { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget };
+
+/** A 216px pocket follows the pet without changing its physical anchor. */
+function compactPanelBounds(base, area) {
+  const width=212,height=216,gap=20,margin=4;
+  const right=base.x+PET_PADDING.left+100+gap,left=base.x+PET_PADDING.left-width-gap;
+  const side=right+width<=area.x+area.width-margin?'right':'left';
+  const x=Math.round(Math.max(area.x+margin,Math.min(side==='right'?right:left,area.x+area.width-width-margin)));
+  const y=Math.round(Math.max(area.y+margin,Math.min(base.y+PET_PADDING.top-54,area.y+area.height-height-margin)));
+  const hostX=Math.min(base.x,x),hostY=Math.min(base.y,y);
+  return {bounds:{x:hostX,y:hostY,width:Math.max(base.x+PET_SIZE.width,x+width)-hostX,height:Math.max(base.y+PET_SIZE.height,y+height)-hostY},panelSide:side,geometry:{petX:base.x-hostX,petY:base.y-hostY,panelX:x-hostX,panelY:y-hostY,panelWidth:width,panelHeight:height,scale:1}};
+}
+module.exports.compactPanelBounds=compactPanelBounds;

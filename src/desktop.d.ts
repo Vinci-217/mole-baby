@@ -1,11 +1,10 @@
 export {};
 declare global {
-  interface CompanionAISettings {
-    configured: boolean;
-    protection: 'os-encrypted' | 'local-file';
-  }
   interface DesktopState {
     petMode: boolean;
+    petOffset?:{x:number;y:number};
+    mouseThrough?:boolean;
+    mousePassthrough?:boolean;
     alwaysOnTop: boolean;
     wandering: boolean;
     motion?: 'idle' | 'left' | 'right';
@@ -20,28 +19,19 @@ declare global {
     edgeNextPeekAt?: number | null;
   }
   interface Window {
-    companionSpeech?: {
-      getAvailability: () => Promise<{ available: boolean; language?: string; reason?: string; method?: 'system-dictation' }>;
-      listen: () => Promise<string>;
-      cancel: () => void;
-    };
-    companionAI?: {
-      getSettings: () => Promise<CompanionAISettings>;
-      setKey: (key: string) => Promise<CompanionAISettings>;
-      clearKey: () => Promise<CompanionAISettings>;
-      chat: (messages: { role: 'system' | 'user' | 'assistant'; content: string }[]) => Promise<string>;
-      cancel: () => void;
-    };
     desktop?: {
       isElectron: boolean;
       platform: string;
-      openMacSettings: (kind:'security'|'dictation')=>Promise<boolean>;
+      openMacSettings: (kind:'security')=>Promise<boolean>;
       openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;
       minimize: () => void;
       close: () => void;
       hideToTray: () => void;
       readyToShow: (hasPet: boolean) => void;
+      preparePetDrag:()=>Promise<boolean>;
+      dragPetToCursor:()=>Promise<boolean>;
+      setMouseThrough:(enabled:boolean)=>Promise<boolean>;
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;

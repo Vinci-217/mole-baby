@@ -1,79 +1,21 @@
-import { useState } from 'react';
-import { COLORS, ITEMS, getStage, getItem } from '../game';
-import type { Action, GameState, ItemCategory, PetItem } from '../game';
+import {useEffect,useState} from 'react';
+import {ITEMS,getStage,getItem,COLORS} from '../game';
+import type {Action,GameState,ItemCategory,PetItem} from '../game';
 import './CarePocket.css';
-
-const PAGE_SIZE = 16;
-const categories: { id: ItemCategory; name: string; icon: string }[] = [
-  { id: 'food', name: '食物', icon: '180001' }, { id: 'drink', name: '饮品', icon: '180002' },
-  { id: 'clean', name: '清洁', icon: '180003' }, { id: 'medicine', name: '药水', icon: '180005' },
-];
-
-/** Group equal values so the selected item's effect fits in one readable line. */
-export function itemEffectLine(item: PetItem): string {
-  if (item.changesColor) return `变为${COLORS.find(c=>c.id===item.changesColor)!.name} · 保留成长与回忆`;
-  if (item.category === 'medicine' && item.health >= 100) return '恢复健康 · 四项照料 +20';
-  const labels = { hunger: '饱食', thirst: '水分', cleanliness: '清洁', happiness: '心情', health: '健康' } as const;
-  const groups = new Map<number, string[]>();
-  for (const key of Object.keys(labels) as (keyof typeof labels)[]) {
-    if (item[key] > 0) groups.set(item[key], [...(groups.get(item[key]) ?? []), labels[key]]);
-  }
-  return Array.from(groups, ([amount, names]) => `${names.join('、')} +${amount}`).join(' · ');
-}
-
-export interface CarePocketProps {
-  pet: GameState;
-  initialCategory?: ItemCategory;
-  onCare: (action: Action, id?: string) => void;
-  /** Retained for callers of the old component. Purchases belong to ShopBook. */
-  onBuy?: (id: string) => void;
-  allowShop?: boolean;
-  onVisitShop?: () => void;
-  busy?: boolean;
-  busyItemId?:string;
-}
-
-export default function CarePocket({ pet, initialCategory = 'food', onCare, allowShop = false, onVisitShop, busy = false, busyItemId }: CarePocketProps) {
-  busy=busy||Boolean(busyItemId);
-  const busyItem=getItem(busyItemId);
-  const [category, setCategory] = useState<ItemCategory>(initialCategory);
-  const [page, setPage] = useState(0);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const stage = getStage(pet.growth, pet.evolution);
-  const items = ITEMS.filter(item => item.category === category);
-  const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-  const visible = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  const selected = visible.find(item => item.id === selectedId)
-    ?? visible.find(item => (pet.inventory[item.id] ?? 0) > 0) ?? visible[0];
-  const count = selected ? pet.inventory[selected.id] ?? 0 : 0;
-  const locked = selected ? stage < selected.minStage : false;
-  const sameColor = selected?.changesColor === pet.color;
-  const action: Action = category === 'food' ? 'feed' : category === 'drink' ? 'drink' : category === 'clean' ? 'wash' : 'use';
-  const busyLabel=busyItem?.category==='food'?'正在吃…':busyItem?.category==='drink'?'正在喝…':'正在照料…';
-  const buttonLabel = pet.sleeping ? '先叫醒拉姆' : busy ? busyLabel : locked ? `${['种子期', '初级', '中级', '高级'][selected.minStage]}可用`
-    : !count ? '背包里没有' : sameColor ? '已经是这个颜色' : category === 'food' ? '喂一份' : category === 'drink' ? '喝一份' : '用一份';
-
-  function changeCategory(next: ItemCategory) { setCategory(next); setPage(0); setSelectedId(null); }
-  function turnPage(next: number) { setPage(Math.max(0, Math.min(pages - 1, next))); setSelectedId(null); }
-
-  return <section className="care-pocket" aria-label="拉姆背包" aria-busy={busy}>
-    <header className="pocket-heading"><b>我的背包</b><span>{pet.coins} 摩尔豆</span></header>
-    <nav className="pocket-categories" aria-label="物品分类">{categories.map(c => <button type="button" key={c.id} aria-pressed={category === c.id} onClick={() => changeCategory(c.id)}><img alt="" src={`./assets/original/items/${c.icon}.png`} draggable={false}/><span>{c.name}</span></button>)}</nav>
-    <div className="pocket-items" aria-label={`${categories.find(c => c.id === category)!.name}十六格`}>
-      {Array.from({ length: PAGE_SIZE }, (_, index) => {
-        const item = visible[index];
-        if (!item) return <div className="pocket-slot pocket-slot-blank" key={`blank-${index}`} aria-hidden="true"/>;
-        const amount = pet.inventory[item.id] ?? 0;
-        return <button type="button" className={`pocket-slot${amount ? '' : ' pocket-slot-empty'}${item.id===busyItemId?' is-using':''}`} data-using={item.id===busyItemId||undefined} key={item.id} data-item-id={item.id} data-count={amount} aria-label={`选择${item.name}，背包${amount}份`} aria-pressed={selected?.id === item.id} title={`${item.name} × ${amount}`} onClick={() => setSelectedId(item.id)}>
-          <img src={item.image} alt="" draggable={false}/>{item.id===busyItemId&&<img className="pocket-using-icon" src="./assets/original/ui/icon-clock.png" alt="正在使用"/>}<span className="pocket-slot-count">×{amount}</span>
-        </button>;
-      })}
-    </div>
-    <nav className="pocket-pages" aria-label="背包翻页"><button type="button" aria-label="背包上一页" disabled={page === 0} onClick={() => turnPage(page - 1)}>‹</button><span>{page + 1} / {pages}</span><button type="button" aria-label="背包下一页" disabled={page + 1 >= pages} onClick={() => turnPage(page + 1)}>›</button></nav>
-    {selected && <div className="pocket-selection" data-selected-item={selected.id}>
-      <img src={selected.image} alt="" draggable={false}/><div><b>{selected.name}</b><p title={itemEffectLine(selected)}>{itemEffectLine(selected)}</p></div>
-      <button type="button" className="pocket-use" aria-label={`使用${selected.name}`} disabled={!count || pet.sleeping || locked || busy || sameColor} onClick={() => {setSelectedId(selected.id);onCare(action, selected.id);}}>{buttonLabel}</button>
-    </div>}
-    {onVisitShop && <button type="button" className="pocket-visit-shop" onClick={onVisitShop}>{allowShop ? '去商店补充' : '到小屋补充'} <span aria-hidden="true">›</span></button>}
-  </section>;
+export function itemEffectLine(item:PetItem){if(item.changesColor)return `变为${COLORS.find(c=>c.id===item.changesColor)!.name}`;return ([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康']] as const).filter(([key])=>item[key]>0).map(([key,label])=>`${label} +${item[key]}`).join(' · ')}
+export interface CarePocketProps{pet:GameState;initialCategory?:ItemCategory;visit?:number;onCare:(action:Action,id?:string)=>void;onVisitShop?:()=>void;busy?:boolean;busyItemId?:string;compact?:boolean;onClose?:()=>void}
+const categories=[['food','食物'],['drink','饮品'],['clean','清洁'],['medicine','药水']] as const;
+export default function CarePocket({pet,initialCategory='food',visit,onCare,onVisitShop,busy: _busy=false,busyItemId,compact=false,onClose}:CarePocketProps){
+ const[category,setCategory]=useState(initialCategory),[page,setPage]=useState(0);
+ const[slots,setSlots]=useState(()=>ITEMS.filter(item=>item.category===initialCategory&&(pet.inventory[item.id]??0)>0).map(item=>item.id));
+ useEffect(()=>{setSlots(ITEMS.filter(item=>item.category===category&&(pet.inventory[item.id]??0)>0).map(item=>item.id));setPage(0)},[category,visit,pet.createdAt]);
+ useEffect(()=>{setCategory(initialCategory);setPage(0)},[initialCategory,visit]);
+ const owned=slots.map(id=>getItem(id)!).filter(item=>item&&item.category===category),pages=Math.max(1,Math.ceil(owned.length/16)),currentPage=Math.min(page,pages-1),visible=owned.slice(currentPage*16,currentPage*16+16),stage=getStage(pet.growth,pet.evolution);
+ return <section className={`care-pocket ${compact?'pocket-compact':''}`} aria-label="拉姆用品背包" aria-busy={Boolean(busyItemId)}>
+  <header className="pocket-heading"><b>背包</b><select aria-label="物品分类" value={category} onChange={e=>{setCategory(e.target.value as ItemCategory);setPage(0)}}>{categories.map(([id,label])=><option key={id} value={id}>{label}</option>)}</select>{onClose?<button className="pocket-close" aria-label="关闭小窗" onClick={onClose}>×</button>:<span>{pet.coins} 豆</span>}</header>
+  <div className="pocket-items" aria-label="用品十六格">{Array.from({length:16},(_,index)=>{const item=visible[index];if(!item)return <div key={`empty-${index}`} className="pocket-slot pocket-slot-blank" aria-hidden="true"/>;
+   const count=pet.inventory[item.id]??0,reason=!count?'已经用完':pet.sleeping?'先叫醒拉姆':stage<item.minStage?'长大一点再用':item.changesColor===pet.color?'已经是这个颜色':undefined;
+   return <button className="pocket-slot" key={item.id} data-item-id={item.id} data-count={count} disabled={Boolean(reason)} aria-label={`使用${item.name}，剩余${count}份`} title={`${item.name} ×${count}\n${reason??itemEffectLine(item)}`} onClick={()=>onCare(item.category==='food'?'feed':item.category==='drink'?'drink':item.category==='clean'?'wash':'use',item.id)}><img src={item.image} alt="" draggable={false}/><span className="pocket-slot-count">{count}</span>{item.id===busyItemId&&<i className="pocket-using" aria-label="正在使用"/>}</button>})}</div>
+  <footer className="pocket-pages"><button aria-label="背包上一页" disabled={currentPage===0} onClick={()=>setPage(currentPage-1)}>‹</button><span>{currentPage+1}/{pages}</span><button aria-label="背包下一页" disabled={currentPage+1>=pages} onClick={()=>setPage(currentPage+1)}>›</button>{pet.sleeping?<button className="pocket-link" onClick={()=>onCare('sleep')}>叫醒</button>:onVisitShop&&<button className="pocket-link" onClick={onVisitShop}>{owned.length?'去补充':'小屋买用品'}</button>}</footer>
+ </section>
 }

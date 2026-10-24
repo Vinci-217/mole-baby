@@ -1,5 +1,5 @@
 const fs=require('node:fs'),path=require('node:path');
-const SETTINGS={security:'x-apple.systempreferences:com.apple.preference.security?General',dictation:'x-apple.systempreferences:com.apple.preference.keyboard?Dictation'};
+const SETTINGS={security:'x-apple.systempreferences:com.apple.preference.security?General'};
 function createMacHelp({platform,shell,guidePath,guideDirectory}){
   return {
     async openSettings(kind){

@@ -121,3 +121,8 @@ __pycache__/
 !artifacts/v24-wardrobe.png
 !artifacts/v24-outfits.png
 !artifacts/v24-wardrobe-motion.webm
+
+!artifacts/v25-compact-pocket.png
+!artifacts/v25-native-pocket.png
+!artifacts/v25-room-profile.png
+!artifacts/v25-interaction-sounds.wav

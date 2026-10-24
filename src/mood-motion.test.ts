@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {createPet} from './game'
-import {createMemory,appendMessage,clearMemory,getCompanionMood} from './companion-memory'
+import {createMemory,getCompanionMood} from './companion-memory'
 import {moodResponse} from './mood-companion'
 import {emotionSpec,emotionDuration,emotionPose} from './mood-motion'
 import {idleCandidates} from './idle-behavior'
@@ -13,12 +13,11 @@ describe('live mood has its own finite expression',()=>{
     expect(getCompanionMood(memory,low,NOW).id).toBe('downcast');expect(moodResponse(low,memory,NOW).action).toBe('mood-grumpy')
     expect(getCompanionMood(memory,tired,NOW).id).toBe('drowsy');expect(moodResponse(tired,memory,NOW).action).toBe('mood-dozy')
     expect(moodResponse(bright,memory,NOW).action).toBe('mood-joy')
-    const concerned=appendMessage(memory,'user','我今天很难过',NOW)
-    expect(moodResponse(p,concerned,NOW).action).toBe('mood-content');expect(moodResponse(p,clearMemory(concerned),NOW).line).not.toContain('不想说话')
+
   })
   it('does not celebrate while tired/downcast or turn another person’s sadness into anger',()=>{
     for(const [stats,expected] of [[{...p.stats,happiness:35},'mood-grumpy'],[{...p.stats,energy:30},'mood-dozy']] as const){const actions=idleCandidates({...p,stats},memory,NOW).map(c=>c.action);expect(actions).toContain(expected);expect(actions).not.toContain('mood-joy');expect(actions).not.toContain('happy')}
-    const concerned=appendMessage(memory,'user','压力好大',NOW);expect(idleCandidates(p,concerned,NOW).map(c=>c.action)).not.toContain('mood-grumpy')
+
   })
   it('samples genuine per-stage source clips at 24fps and omits the junior screaming section',()=>{
     for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const action of ['mood-joy','mood-grumpy']){

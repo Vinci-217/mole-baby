@@ -1,11 +1,8 @@
-const { app, BrowserWindow, ipcMain, Notification, screen, safeStorage, Tray, Menu, nativeImage, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, screen, Tray, Menu, nativeImage, shell } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { createCompanionAI } = require('./deepseek.cjs');
-const { createCompanionSpeech } = require('./speech.cjs');
-const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget } = require('./desktop-geometry.cjs');
-const { classicBookBounds } = require('./classic-book-geometry.cjs');
+const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget, compactPanelBounds } = require('./desktop-geometry.cjs');
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
@@ -13,11 +10,6 @@ const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join
 
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
-const COMPANION_SIZE = { width: 500, height: 490 };
-const COMPANION_EXTENSION = {
-  x: COMPANION_SIZE.width - PET_SIZE.width,
-  y: COMPANION_SIZE.height - PET_SIZE.height,
-};
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
 const INDEX_PATH = path.join(__dirname, '..', 'dist', 'index.html');
 
@@ -59,8 +51,6 @@ let panelGeometry = null;
 // Compatibility IPC name: this controls autonomous motion only, never manual dragging.
 let petCanMove = true;
 let mousePassthrough = false;
-let companionAI = null;
-let companionSpeech = null;
 let tray = null;
 let quitting = false;
 let rendererReady = false;
@@ -75,10 +65,14 @@ let interacting = false;
 let edgeHovered = false;
 let edgeNextPeekAt = null;
 let draggingFromEdge = false;
+let petOffset={x:0,y:0};
+let pointerPress=null,cursorDrag=null,dragPoll=null;
+let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
 
 function getDesktopState() {
   return {
     petMode,
+    petOffset,mouseThrough,mousePassthrough,
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
     motion,
@@ -193,7 +187,7 @@ function tuckIntoCorner() {
   if (!side) return false;
   stopMovement();
   const target = cornerBounds(bounds, area, side);
-  mainWindow.setPosition(target.x, target.y, false);
+  placePetAt(target);
   edgeSide = side;
   edgePose = 'tucking';
   edgeTuckUntil = Date.now() + edgeDelay('tucking');
@@ -238,8 +232,7 @@ function walkToCorner() {
     if (!canHideAtEdge()) { stopMovement(); return; }
     const progress = Math.min(1, (Date.now() - startedAt) / duration);
     const eased = progress * progress * (3 - 2 * progress);
-    mainWindow.setPosition(Math.round(start.x + (target.x - start.x) * eased),
-      Math.round(start.y + (target.y - start.y) * eased), false);
+    placePetAt({...PET_SIZE,x:Math.round(start.x+(target.x-start.x)*eased),y:Math.round(start.y+(target.y-start.y)*eased)});
     if (progress === 1) { stopMovement(); tuckIntoCorner(); }
   }, 33);
 }
@@ -254,9 +247,9 @@ function scheduleWander() {
 function walkAlongDesktop() {
   wanderTimer = null;
   if (!canWander()) return;
-  const start = mainWindow.getBounds();
+  const start = currentPetBounds();
   const area = screen.getDisplayMatching(start).workArea;
-  if (!wanderAnchor || Math.abs(start.x - wanderAnchor.x) > 48) wanderAnchor = { ...start };
+  if (!wanderAnchor) wanderAnchor = { ...start };
   const target = nearbyWanderTarget(start, area, wanderAnchor);
   const travel = Math.hypot(target.x - start.x, target.y - start.y);
   if (travel < 1) { scheduleWander(); return; }
@@ -271,8 +264,8 @@ function walkAlongDesktop() {
     const eased = progress * progress * (3 - 2 * progress);
     const x = Math.round(start.x + (target.x - start.x) * eased);
     const y = Math.round(start.y + (target.y - start.y) * eased);
-    const current = mainWindow.getBounds();
-    if (x !== current.x || y !== current.y) mainWindow.setPosition(x, y, false);
+    const current = currentPetBounds();
+    if (x !== current.x || y !== current.y) placePetAt({...PET_SIZE,x,y});
     if (progress === 1) {
       clearInterval(movementTimer);
       movementTimer = null;
@@ -283,35 +276,44 @@ function walkAlongDesktop() {
   }, 33);
 }
 
-function startPetDrag(paintedOffset) {
-  if (paintedOffset !== undefined && (!paintedOffset || Array.isArray(paintedOffset)
-    || typeof paintedOffset.x !== 'number' || typeof paintedOffset.y !== 'number'
-    || !Number.isFinite(paintedOffset.x) || !Number.isFinite(paintedOffset.y)
-    || Math.abs(paintedOffset.x) > 82 || Math.abs(paintedOffset.y) > 92)) {
-    throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
-  }
-  if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
-  const offset = edgeSide ? paintedOffset ?? edgeOffset(edgeSide, edgePose) : { x: 0, y: 0 };
-  const bounds=mainWindow.getBounds();draggingFromEdge=Boolean(edgeSide);
-  revealPet();
-  if (companionPanel) changeCompanionPanel(false);
-  dragging = true;
-  if(offset.x || offset.y)mainWindow.setPosition(bounds.x+Math.round(offset.x),bounds.y+Math.round(offset.y),false);
-  stopMovement();
+/** Keep a virtual pet anchor even if Windows clamps the transparent frame.
+ * The renderer offsets the body by the actual OS displacement, so every edge
+ * remains reachable without asking the OS to put a window above its bounds. */
+function placePetAt(target){
+  const previous=currentPetBounds();if(!companionPanel&&previous.x===Math.round(target.x)&&previous.y===Math.round(target.y))return;
+  changingMode=true;mainWindow.setPosition(Math.round(target.x),Math.round(target.y),false);changingMode=false;
+  const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
+  petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
+}
+function preparePetDrag(){
+  if(!petMode||mouseThrough)return false;
+  pointerPress={point:screen.getCursorScreenPoint(),base:currentPetBounds()};return true;
+}
+function startPetDrag(paintedOffset){
+  if(paintedOffset!==undefined&&(!paintedOffset||Array.isArray(paintedOffset)||typeof paintedOffset.x!=='number'||typeof paintedOffset.y!=='number'||!Number.isFinite(paintedOffset.x)||!Number.isFinite(paintedOffset.y)||Math.abs(paintedOffset.x)>82||Math.abs(paintedOffset.y)>92))throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
+  if(!petMode||mouseThrough)return false;
+  const offset=paintedOffset??(edgeSide?edgeOffset(edgeSide,edgePose):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
+  if(companionPanel)changeCompanionPanel(false);
+  const base=currentPetBounds();revealPet();dragging=true;stopMovement();
+  const painted={...base,x:base.x+Math.round(offset.x),y:base.y+Math.round(offset.y)};placePetAt(painted);
+  if(pointerPress){cursorDrag={point:pointerPress.point,base:painted};clearInterval(dragPoll);dragPoll=setInterval(dragPetToCursor,16);dragPetToCursor();}
   return true;
 }
-
-function endPetDrag() {
-  dragging = false;
-  if (petMode && !companionPanel) {
-    const fitted=clampBounds(mainWindow.getBounds(),PET_SIZE);
-    mainWindow.setPosition(fitted.x,fitted.y,false);
-  }
-  draggingFromEdge=false;
-  wanderAnchor = { ...currentPetBounds() };
-  scheduleSave();
-  if (!tuckIntoCorner()) scheduleWander();
-  return true;
+function dragPetToCursor(){
+  if(!dragging||!cursorDrag||!mainWindow||mainWindow.isDestroyed())return false;
+  const point=screen.getCursorScreenPoint(),desired={...PET_SIZE,x:cursorDrag.base.x+point.x-cursorDrag.point.x,y:cursorDrag.base.y+point.y-cursorDrag.point.y};
+  const area=screen.getDisplayNearestPoint?screen.getDisplayNearestPoint(point).workArea:screen.getDisplayMatching(desired).workArea;
+  const target=fitPetBounds(desired,area);
+  if(draggingFromEdge){target.x=Math.max(area.x-PET_PADDING.left-82,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82,desired.x));target.y=Math.max(area.y-PET_PADDING.top-92,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92,desired.y));}
+  placePetAt(target);return true;
+}
+function endPetDrag(){
+  const clickOnly=pointerPress&&!dragging;
+  dragPetToCursor();clearInterval(dragPoll);dragPoll=null;pointerPress=null;cursorDrag=null;
+  if(clickOnly)return true;
+  dragging=false;
+  if(petMode&&!companionPanel)placePetAt(clampBounds(currentPetBounds(),PET_SIZE));
+  draggingFromEdge=false;interacting=false;wanderAnchor={...currentPetBounds()};scheduleSave();if(!tuckIntoCorner())scheduleWander();return true;
 }
 
 function movePet(dx, dy) {
@@ -324,7 +326,7 @@ function movePet(dx, dy) {
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   stopMovement();
-  const current = mainWindow.getBounds();
+  const current = currentPetBounds();
   const desired={...current,x:current.x+Math.round(dx),y:current.y+Math.round(dy)};
   const target = clampBounds(desired, PET_SIZE);
   if(dragging&&draggingFromEdge){
@@ -333,7 +335,7 @@ function movePet(dx, dy) {
     target.x=Math.max(area.x-PET_PADDING.left-82,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82,desired.x));
     target.y=Math.max(area.y-PET_PADDING.top-92,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92,desired.y));
   }
-  mainWindow.setPosition(target.x, target.y, false);
+  placePetAt(target);
   wanderAnchor = { ...target };
   scheduleSave();
   // movePet also works without explicit drag lifecycle calls: movement delays
@@ -368,7 +370,7 @@ function changePetCanMove(enabled) {
 
 function changeMousePassthrough(ignore) {
   if (typeof ignore !== 'boolean') throw new TypeError('Mouse passthrough must be a boolean');
-  const enabled = petMode && ignore;
+  const enabled = petMode && (mouseThrough||ignore);
   if (enabled === mousePassthrough) return;
   // Forward mouse movement so the renderer can make the pet interactive again
   // when the cursor returns from transparent pixels. X11 forwarding differs
@@ -379,38 +381,24 @@ function changeMousePassthrough(ignore) {
   }
 }
 
-function currentPetBounds() {
-  const bounds = mainWindow.getBounds();
-  return {
-    x: bounds.x + (companionPanel && panelGeometry ? panelGeometry.petX : companionPanel && panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
-    y: bounds.y + (companionPanel && panelGeometry ? panelGeometry.petY : companionPanel ? COMPANION_EXTENSION.y : 0),
-    ...PET_SIZE,
-  };
+function changeAlwaysOnTop(enabled,petOnly=false){
+ if(typeof enabled!=='boolean')throw new TypeError('Always-on-top must be a boolean');
+ if(petMode||petOnly)petAlwaysOnTop=enabled;else normalAlwaysOnTop=enabled;
+ if(!petOnly||petMode)mainWindow.setAlwaysOnTop(enabled,'floating');refreshTrayMenu();scheduleSave();publishState();return enabled;
 }
-
-function companionBounds(base) {
-  const area = screen.getDisplayMatching(base).workArea;
-  if (panelLayout !== 'compact') {
-    const result = classicBookBounds(base, area, panelLayout === 'profile');
-    panelSide = result.panelSide; panelGeometry = result.geometry;
-    return result.bounds;
-  }
-  panelGeometry = null;
-  const roomRight = area.x + area.width - (base.x + PET_SIZE.width);
-  const roomLeft = base.x - area.x;
-  panelSide = roomRight >= COMPANION_EXTENSION.x || roomRight >= roomLeft ? 'right' : 'left';
-  const expanded = {
-    x: base.x - (panelSide === 'left' ? COMPANION_EXTENSION.x : 0),
-    y: base.y - COMPANION_EXTENSION.y,
-    ...COMPANION_SIZE,
-  };
-  // Most positions need no adjustment. Near an edge, keep the complete panel
-  // in the work area and derive the corresponding base bounds from that frame.
-  expanded.x = Math.round(Math.max(area.x, Math.min(expanded.x, area.x + area.width - expanded.width)));
-  expanded.y = Math.round(Math.max(area.y, Math.min(expanded.y, area.y + area.height - expanded.height)));
-  return expanded;
+function changeMouseThrough(enabled){
+ if(typeof enabled!=='boolean')throw new TypeError('Mouse through must be a boolean');
+ mouseThrough=enabled;
+ if(enabled&&companionPanel)changeCompanionPanel(false);
+ if(enabled){clearInterval(dragPoll);dragPoll=null;cursorDrag=null;pointerPress=null;dragging=false;interacting=false;stopMovement();}
+ changeMousePassthrough(false);refreshTrayMenu();scheduleSave();publishState();return enabled;
 }
-
+function currentPetBounds(){
+ const b=mainWindow.getBounds();return {...PET_SIZE,x:b.x+(companionPanel&&panelGeometry?panelGeometry.petX:petOffset.x),y:b.y+(companionPanel&&panelGeometry?panelGeometry.petY:petOffset.y)};
+}
+function companionBounds(base){
+ const result=compactPanelBounds(base,screen.getDisplayMatching(base).workArea);panelSide=result.panelSide;panelGeometry=result.geometry;return result.bounds;
+}
 function changeCompanionPanel(open, layout = 'compact') {
   if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
   if (!['compact', 'classic', 'profile'].includes(layout)) throw new TypeError('Unknown companion layout');
@@ -418,12 +406,15 @@ function changeCompanionPanel(open, layout = 'compact') {
   if (open) revealPet();
   stopMovement();
   const base = currentPetBounds();
-  panelLayout = open ? layout : 'compact';
+  panelLayout = 'compact';
   const target = open ? companionBounds(base) : clampBounds(base, PET_SIZE);
   if (!open) panelGeometry = null;
   changingMode = true;
   companionPanel = open;
   mainWindow.setBounds(target);
+  const actual=mainWindow.getBounds();
+  if(open&&panelGeometry){panelGeometry={...panelGeometry,petX:base.x-actual.x,petY:base.y-actual.y,panelX:panelGeometry.panelX+target.x-actual.x,panelY:panelGeometry.panelY+target.y-actual.y};}
+  else petOffset={x:base.x-actual.x,y:base.y-actual.y};
   changingMode = false;
   rememberBounds();
   publishState();
@@ -453,7 +444,7 @@ function loadWindowState() {
       y: state.petBounds.y + state.petBounds.height - PET_SIZE.height,
       ...PET_SIZE,
     } : null;
-    normalAlwaysOnTop = state.normalAlwaysOnTop === true;
+    normalAlwaysOnTop = state.normalAlwaysOnTop === true;petAlwaysOnTop=state.petAlwaysOnTop!==false;mouseThrough=state.mouseThrough===true;
     wanderPreference = state.wandering !== false;
     edgeHiding = state.edgeHiding !== false;
   } catch {
@@ -474,7 +465,7 @@ function saveWindowState() {
   try {
     const filename = settingsPath();
     fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ normalBounds, petBounds, normalAlwaysOnTop, wandering: wanderPreference, edgeHiding }));
+    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ normalBounds, petBounds, normalAlwaysOnTop,petAlwaysOnTop,mouseThrough, wandering: wanderPreference, edgeHiding }));
     fs.renameSync(`${filename}.tmp`, filename);
   } catch (error) {
     console.warn('Unable to save window position:', error.code || error.name);
@@ -564,10 +555,11 @@ function changePetMode(enabled) {
     applyMinimum(target, true);
     mainWindow.setResizable(false);
     mainWindow.setBounds(target);
-    mainWindow.setAlwaysOnTop(true, 'floating');
+    const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};
+    mainWindow.setAlwaysOnTop(petAlwaysOnTop, 'floating');
     petBounds = target;
   } else {
-    petMode = false;
+    petMode = false;petOffset={x:0,y:0};
     const target = clampBounds(normalBounds, NORMAL_SIZE);
     mainWindow.setResizable(true);
     applyMinimum(target, false);
@@ -579,6 +571,7 @@ function changePetMode(enabled) {
   if (process.platform === 'darwin') {
     mainWindow.setVisibleOnAllWorkspaces(enabled, { visibleOnFullScreen: enabled, skipTransformProcessType: true });
   }
+  changeMousePassthrough(false);
   publishState(true);
   saveWindowState();
   scheduleWander();
@@ -592,9 +585,7 @@ function iconPath(filename) {
 
 function hideToTray() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  companionAI?.cancel();
-  companionSpeech?.cancel();
-  dragging = false;
+  dragging = false;clearInterval(dragPoll);dragPoll=null;pointerPress=null;cursorDrag=null;
   stopMovement();
   revealPet();
   changeMousePassthrough(false);
@@ -629,10 +620,13 @@ function markRendererReady(adopted) {
 function refreshTrayMenu() {
   if (!tray || tray.isDestroyed()) return;
   const movable = hasPet && petCanMove;
+  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,mainWindow.isAlwaysOnTop()]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
     { type: 'separator' },
+    { label: '拉姆置顶',type:'checkbox',checked:petMode?mainWindow.isAlwaysOnTop():petAlwaysOnTop,click:item=>changeAlwaysOnTop(item.checked,true)},
+    { label: '鼠标穿透',type:'checkbox',checked:mouseThrough,click:item=>changeMouseThrough(item.checked)},
     { label: '散步', type: 'checkbox', checked: wandering, enabled: movable, click: item => {
       if (!mainWindow.isVisible()) showFromTray();
       changeWandering(item.checked);
@@ -647,7 +641,6 @@ function refreshTrayMenu() {
     { label: '暂停躲藏', type: 'checkbox', checked: !edgeHiding, click: item => changeEdgeHiding(!item.checked) },
     ...(process.platform==='darwin'?[{label:'Mac 使用帮助',submenu:[
       {label:'打开隐私与安全',click:()=>{void macHelp.openSettings('security').catch(()=>{});}},
-      {label:'打开听写设置',click:()=>{void macHelp.openSettings('dictation').catch(()=>{});}},
       {label:'首次打开说明',click:()=>{void macHelp.openGuide().catch(()=>{});}},
     ]}]:[]),
     { type: 'separator' },
@@ -658,7 +651,7 @@ function refreshTrayMenu() {
 function createTray() {
   if (tray && !tray.isDestroyed()) return;
   const image = createTrayIcon(nativeImage, process.platform, iconPath);
-  tray = new Tray(image);
+  tray = new Tray(image);trayMenuKey='';
   tray.setToolTip('拉姆 · mole-baby');
   // On macOS, either mouse button opens the native status menu. Restoring on
   // click as well would open the pet while the user is trying to select Exit.
@@ -670,34 +663,14 @@ function createTray() {
 }
 
 function registerIPC() {
-  handle('companion-ai:get-settings', () => companionAI.getSettings());
-  handle('companion-ai:set-key', (key) => companionAI.setKey(key));
-  handle('companion-ai:clear-key', () => companionAI.clearKey());
-  handle('companion-ai:chat', (messages) => companionAI.chat(messages));
-  listen('companion-ai:cancel', () => companionAI.cancel());
-  handle('companion-speech:get-availability', () => companionSpeech.getAvailability());
-  handle('companion-speech:listen', () => {
-    // A renderer may finish its availability probe after the user has closed
-    // the window to tray. Checking at the microphone boundary prevents that
-    // stale continuation from starting a recording in a hidden window.
-    if (!mainWindow || mainWindow.isDestroyed() || !mainWindow.isVisible() || mainWindow.isMinimized()) {
-      throw new Error('请先从托盘打开拉姆，再开始语音输入。');
-    }
-    return companionSpeech.listen();
-  });
-  listen('companion-speech:cancel', () => companionSpeech.cancel());
   listen('desktop:minimize', hideToTray);
   listen('desktop:close', hideToTray);
   listen('desktop:hide-to-tray', hideToTray);
   listen('desktop:ready-to-show', markRendererReady);
-  handle('desktop:toggle-always-on-top', () => {
-    const enabled = !mainWindow.isAlwaysOnTop();
-    mainWindow.setAlwaysOnTop(enabled, 'floating');
-    if (!petMode) normalAlwaysOnTop = enabled;
-    scheduleSave();
-    publishState();
-    return enabled;
-  });
+  handle('desktop:toggle-always-on-top',()=>changeAlwaysOnTop(!mainWindow.isAlwaysOnTop()));
+  handle('desktop:set-mouse-through',changeMouseThrough);
+  handle('desktop:prepare-pet-drag',preparePetDrag);
+  handle('desktop:drag-pet-to-cursor',dragPetToCursor);
   handle('desktop:set-pet-mode', changePetMode);
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
@@ -757,6 +730,7 @@ function createWindow() {
     skipTaskbar: true,
     autoHideMenuBar: true,
     alwaysOnTop: normalAlwaysOnTop,
+    thickFrame: process.platform !== 'win32',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -777,9 +751,10 @@ function createWindow() {
   window.on('blur', () => { if (dragging) endPetDrag(); });
   window.on('close', event => {
     if (!quitting) { event.preventDefault(); hideToTray(); return; }
-    companionAI.cancel(); companionSpeech.cancel(); saveWindowState();
+    saveWindowState();
   });
   window.on('closed', () => {
+    clearInterval(dragPoll);pointerPress=null;cursorDrag=null;
     stopMovement();
     clearTimeout(edgeTimer);
     clearTimeout(saveTimer);
@@ -789,9 +764,9 @@ function createWindow() {
     if (!window.isDestroyed()) publishState(true);
   });
   window.webContents.on('preload-error', (_event, _filename, error) => { console.error('Desktop preload failed:', error.name, error.message); });
-  window.webContents.on('render-process-gone', () => { companionAI.cancel(); companionSpeech.cancel(); });
+  window.webContents.on('render-process-gone', () => { });
   window.webContents.on('did-start-navigation', (_event, _url, isInPlace, isMainFrame) => {
-    if (isMainFrame && !isInPlace) { companionAI.cancel(); companionSpeech.cancel(); }
+    if (isMainFrame && !isInPlace) { }
   });
   window.webContents.on('will-navigate', (event, target) => {
     if (!isOurURL(target)) event.preventDefault();
@@ -830,8 +805,11 @@ if (!app.requestSingleInstanceLock()) {
         { role: 'windowMenu' },
       ]));
     }
-    companionAI = createCompanionAI({ userDataPath: app.getPath('userData'), safeStorage });
-    companionSpeech = createCompanionSpeech();
+
+    // This release removes chat and API storage. Leave pet saves untouched.
+    for(const directory of new Set([...legacyProfiles,app.getPath('userData')])){
+      try{fs.rmSync(path.join(directory,'companion-ai-key.json'),{force:true});}catch(error){console.warn('Unable to remove retired API key:',error.code||error.name);}
+    }
     loadWindowState();
     registerIPC();
     createWindow();
@@ -862,8 +840,8 @@ if (!app.requestSingleInstanceLock()) {
     app.quit();
   });
   app.on('before-quit', () => {
-    quitting = true;
-    companionAI?.dispose(); companionSpeech?.dispose(); stopMovement(); clearTimeout(edgeTimer); saveWindowState();
+    quitting = true;clearInterval(dragPoll);
+    stopMovement(); clearTimeout(edgeTimer); saveWindowState();
   });
   app.on('will-quit', () => { if (tray && !tray.isDestroyed()) tray.destroy(); });
   app.on('window-all-closed', () => { if (quitting) app.quit(); });

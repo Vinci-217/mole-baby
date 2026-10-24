@@ -241,3 +241,7 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 ### v0.24 原服饰动画
 
 `original/wardrobe-motion/` 从原 `petcloth/swf2` 的8件服饰导出，按身体源帧采样并独立播放；`original/wardrobe/` 的商品图沿用原图标或原服饰正面图形，紫色魔法帽恢复完整星星。源提交、逐文件URL/SHA256见 [wardrobe/source.json](public/assets/original/wardrobe/source.json)，360张透明图集校验见 [wardrobe-motion/checksums.json](public/assets/original/wardrobe-motion/checksums.json)，导出方式与明确的桌宠适配见 [README](public/assets/original/wardrobe-motion/README.md) 和 [研究记录](research/v24-original-wardrobe.md)。没有新画或生成角色、眼睛和嘴。原心情图集字节保留，仅缩短生气的源帧范围；种子待机和短眨眼节奏为桌宠适配。
+
+### v0.25 小背包与交互短音效
+
+新背包和小屋面板使用HTML/CSS重排交互控件，角色、服饰、用品与背景保留既有来源，没有新增或重画角色插画。吧唧、咕嘟、洗净、灵光与蹦跳由`pet-audio.ts`的Web Audio振荡器/滤波噪声合成，按`pet-sound-score.ts`动作时钟播放，不是原游戏音频。`artifacts/v25-interaction-sounds.wav`为同一渲染函数的离线试听导出。验证与范围见 [v25说明](research/v25-compact-desktop.md)。

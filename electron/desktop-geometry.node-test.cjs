@@ -66,31 +66,17 @@ test('seed, sleep, panel, held pet and tray-hidden windows cannot autonomously w
 });
 
 
-test('random wandering takes small steps around placement and preserves height over many walks', () => {
-  let seed=83;const random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
-  for(const area of [{x:0,y:0,width:1920,height:1040},{x:-1600,y:-300,width:1600,height:900},{x:10,y:20,width:180,height:250}]){
-    for(const anchor of [fitPetBounds({x:area.x+200,y:area.y+30},area),fitPetBounds({x:area.x+area.width-160,y:area.y+80},area)]){
-      let current=anchor;const seen=new Set();
-      for(let n=0;n<500;n++){
-        const next=nearbyWanderTarget(current,area,anchor,random);
-        assert.ok(Math.abs(next.x-current.x)<=28);assert.ok(Math.abs(next.x-anchor.x)<=48);
-        assert.equal(next.y,anchor.y);assert.ok(next.x+30>=area.x&&next.x+130<=area.x+area.width);
-        seen.add(next.x);current=next;
-      }
-      assert.ok(seen.size>3,'positions are varied rather than following one fixed route');
-    }
-  }
+test('two-dimensional roaming stays within the saved placement area and work area',()=>{
+ let seed=83;const random=()=>{seed=seed*16807%2147483647;return seed/2147483647};
+ const area={x:0,y:0,width:1920,height:1040},anchor={x:800,y:300,width:160,height:240};let current=anchor;const ys=new Set(),xs=new Set();
+ for(let i=0;i<500;i++){const next=nearbyWanderTarget(current,area,anchor,random);assert.ok(Math.hypot(next.x-current.x,next.y-current.y)<=66);assert.ok(Math.abs(next.x-anchor.x)<=150);assert.ok(Math.abs(next.y-anchor.y)<=100);ys.add(next.y);xs.add(next.x);current=next;}
+ assert.ok(ys.size>20&&xs.size>20);
 });
-
-const {classicBookBounds}=require('./classic-book-geometry.cjs');
-test('classic book fits all monitor edges without displacing the 100px pet',()=>{
-  for(const area of [{x:0,y:0,width:1920,height:1040},{x:-1280,y:-200,width:1280,height:720},{x:1920,y:40,width:1024,height:728},{x:0,y:0,width:800,height:600}]){
-    for(const x of [area.x-30,area.x+area.width/2,area.x+area.width-130])for(const y of [area.y-71,area.y+area.height/2,area.y+area.height-179])for(const folded of [false,true]){
-      const base={x,y,width:160,height:240},result=classicBookBounds(base,area,folded),g=result.geometry,b=result.bounds;
-      assert.equal(b.x+g.petX,base.x);assert.equal(b.y+g.petY,base.y);
-      assert.ok(b.x+g.panelX>=area.x&&b.y+g.panelY>=area.y);
-      assert.ok(b.x+g.panelX+g.panelWidth<=area.x+area.width&&b.y+g.panelY+g.panelHeight<=area.y+area.height);
-      assert.equal(g.panelWidth,Math.floor((folded?520:1100)*g.scale));
-    }
-  }
+const {compactPanelBounds}=require('./desktop-geometry.cjs');
+test('216px care pocket fits each work-area corner without displacing the pet',()=>{
+ for(const area of [{x:0,y:0,width:1920,height:1040},{x:-1280,y:-200,width:1280,height:720},{x:1920,y:40,width:1024,height:728}])for(const x of [area.x-30,area.x+area.width-130,area.x+300])for(const y of [area.y-71,area.y+area.height-179,area.y+200]){
+  const base={x,y,width:160,height:240},result=compactPanelBounds(base,area),g=result.geometry,b=result.bounds;
+  assert.equal(b.x+g.petX,x);assert.equal(b.y+g.petY,y);assert.equal(g.panelWidth,212);assert.equal(g.panelHeight,216);
+  assert.ok(b.x+g.panelX>=area.x&&b.y+g.panelY>=area.y);assert.ok(b.x+g.panelX+g.panelWidth<=area.x+area.width&&b.y+g.panelY+g.panelHeight<=area.y+area.height);
+ }
 });

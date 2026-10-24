@@ -56,28 +56,7 @@ export function getPetHabits(memory: CompanionMemory, now = Date.now()): PetHabi
 }
 
 /** Pet-directed questions only. A user's own likes keep their existing reply. */
-export function petHabitReply(pet: GameState, memory: CompanionMemory, text: string, now = Date.now()): string | null {
-  if (memory.petId !== String(pet.createdAt) || /(?:我|主人)(?:最近|最|很|比较|特别)?(?:喜欢|爱)(?:吃|喝|玩)?/.test(text)) return null;
-  const drink = /(?:你|拉姆).*(?:喜欢|爱|常|熟悉).*(?:喝|饮品|饮料)/.test(text);
-  const recallCare = /你.*(?:记得|记不记得).*(?:喂过|喂了|给你吃)/.test(text) || /我.*(?:喂过?你|给你(?:吃|喂)).*(?:什么|哪些)/.test(text);
-  const food = /(?:你|拉姆).*(?:喜欢|爱|常|熟悉).*(?:吃|食物|零食)/.test(text) || recallCare;
-  const play = /(?:你|拉姆).*(?:喜欢|爱|常|熟悉).*(?:玩|游戏|活动|互动)/.test(text);
-  if (!food && !drink && !play) return null;
-  const habits = getPetHabits(memory, now);
-  if (play) {
-    const activity = habits.play;
-    if (!activity) return '最近一起玩过什么，我还没有想起来呢。玩球、看小蝴蝶，你想先试哪一个？';
-    const action = activity.id === 'ball' ? '玩球' : activity.id === 'butterfly' ? '看小蝴蝶' : `玩「${activity.name}」`;
-    if (activity.id === 'pet') return `最近你${activity.count > 1 ? '常常' : ''}轻轻摸摸我，这件小事我记着呢。你愿意时，再摸摸我吧。`;
-    return `最近我们${activity.count > 1 ? '常常' : '一起'}${action}，这件小事我记着呢。下次还想和你一起玩。`;
-  }
-  const item = drink ? habits.drink : habits.food ?? (recallCare ? habits.drink : null);
-  if (!item) return drink ? '最近喝过什么，我还没想起来呢。先一起尝尝，熟悉的味道要慢慢发现。' : '最近吃过什么，我还没想起来呢。先一起尝尝，熟悉的味道要慢慢发现。';
-  const verb = drink || (!habits.food && habits.drink) ? '喝' : '吃';
-  return item.count > 1 ? `最近你常给我${verb}${item.name}，已经是熟悉的味道啦。我们也可以慢慢尝尝别的。` : `最近你给我${verb}过${item.name}，这份照料我记着呢。我们也可以慢慢尝尝别的。`;
-}
 
-/** A name call is an immediate local response, not a command to wake or feed. */
 export function nameResponse(pet: GameState, memory: CompanionMemory, sequence = 0, now = Date.now()): { text: string; action: string } {
   const own = memory.petId === String(pet.createdAt);
   const nickname = own ? memory.facts.filter(fact => fact.kind === 'nickname' && fact.at <= now).sort((a, b) => b.at - a.at)[0]?.value : undefined;

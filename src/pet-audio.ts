@@ -3,9 +3,9 @@ import type { Foley, SoundScore } from './pet-sound-score'
 export type PetVoice = 'pet' | 'lift' | 'shake' | 'drop' | 'catch' | 'feed' | 'drink' | 'wash' | 'sleep' | 'wake' | 'sick'
 let lastVoiceAt = -Infinity, lastEffectAt = -Infinity
 let lastKind: PetVoice | null = null, context: AudioContext | null = null
-let settings = {enabled: true, volume: .45, speechBusy: false}
+let settings = {enabled: true, volume: .45}
 const channels = new Set<GainNode>()
-const canPlay = (enabled = true) => enabled && settings.enabled && settings.volume > 0 && !settings.speechBusy && !document.hidden && !window.speechSynthesis?.speaking
+const canPlay = (enabled = true) => enabled && settings.enabled && settings.volume > 0 && !document.hidden
 const level = () => canPlay() ? settings.volume : 0
 function syncChannels() { for (const channel of channels) channel.gain.setValueAtTime(level(), channel.context.currentTime) }
 export function configurePetSound(next: typeof settings) {
@@ -42,10 +42,19 @@ export function renderFoley(audio: BaseAudioContext, kind: Foley, at: number, st
   const n=(length:number,pitch:number,target:number,gain:number)=>note(audio,at,length,pitch,target,gain*strength,output)
   const noise=(length:number,pitch:number,gain:number)=>rustle(audio,at,length,pitch,gain*strength,output)
   switch(kind){
+    case 'smack':
+      // A soft lip contact followed by a low, wet mouth resonance.
+      noise(.045,1350,.08);n(.075,270,105,.09);note(audio,at+.095,.065,220,135,.06*strength,output);break
+    case 'clean':
+      note(audio,at,.15,880,890,.045*strength,output);note(audio,at+.095,.23,1320,1330,.035*strength,output);break
+    case 'sparkle':
+      [1047,1568,2093].forEach((pitch,i)=>note(audio,at+i*.065,.22,pitch,pitch,.035*strength,output));break
+    case 'boing':
+      n(.17,160,58,.1);note(audio,at+.035,.13,290,125,.035*strength,output);break
     case 'nibble':noise(.065,1050,.035);n(.08,190,130,.022);break
     case 'crunch':noise(.09,2100,.065);n(.07,170,105,.025);break
     case 'sip':noise(.075,780,.021);n(.12,330,185,.04);break
-    case 'gulp':n(.15,255,125,.065);n(.08,440,230,.012);break
+    case 'gulp':n(.13,310,100,.09);note(audio,at+.14,.15,265,110,.07*strength,output);noise(.14,650,.025);break
     case 'bubble':n(.08,420,970,.035);break
     case 'brush':noise(.065,2450,.045);break
     case 'water':noise(.24,1600,.04);n(.09,780,340,.015);break
@@ -75,7 +84,7 @@ export function createPetSoundClock(score: SoundScore, enabled: boolean | (()=>b
 function oneShot(play:(audio:AudioContext,output:GainNode)=>void) {
   try{const audio=audioContext();void audio.resume().catch(()=>{});const output=channel(audio);play(audio,output);setTimeout(()=>dispose(output),1200)}catch{/* Sound never blocks care. */}
 }
-/** Speech (including native speech) takes priority over every pet effect. */
+/** Pet chirps and care foley; no recording, speech or network service. */
 export function playPetVoice(kind: PetVoice, enabled: boolean) {
   const now=performance.now()
   if(!canPlay(enabled)||now-lastVoiceAt<(lastKind===kind?700:180))return
@@ -109,3 +118,6 @@ export function playReminderSound(enabled: boolean) {
     [659.25,783.99,1046.5,659.25,783.99,1046.5].forEach((pitch,i)=>note(audio,audio.currentTime+i*.23+(i>2?.18:0),.38,pitch,pitch,.075,audio.destination))
   }).catch(()=>{})}catch{/* The visual completion notification still appears. */}
 }
+
+export function preparePetSound(enabled:boolean){if(enabled&&settings.enabled)try{void audioContext().resume().catch(()=>{})}catch{}}
+export function playInteractionPreview(kind:Foley,enabled:boolean){if(!canPlay(enabled))return;oneShot((audio,output)=>{const at=audio.currentTime;renderFoley(audio,kind,at,.85,output);if(kind==='smack')renderFoley(audio,kind,at+.28,.75,output)})}
