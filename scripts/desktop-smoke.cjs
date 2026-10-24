@@ -1,3 +1,4 @@
+const{verifyLivelyCompanion}=require('./lively-companion-checks.cjs');
 const {verifyCompactCare}=require('./compact-care-checks.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -110,6 +111,6 @@ async function verifyBackground(page, selector, suffix) {
   page.setDefaultTimeout(15000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});
-  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);assert.deepEqual(errors,[]);
+  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyLivelyCompanion(page);assert.deepEqual(errors,[]);
   console.log('PASS native compact desktop regression');await quitDesktop();
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await quitDesktop().catch(()=>{});if(windowManager)try{process.kill(-windowManager.pid,'SIGTERM')}catch{}virtualDisplay?.kill('SIGTERM')});

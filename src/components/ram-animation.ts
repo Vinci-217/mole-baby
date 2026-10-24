@@ -2,6 +2,7 @@ import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
 import {footballDuration,footballPose,slumberFrame} from '../original-actions'
 import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
+import {isPastime,pastimeBody} from '../pet-pastimes'
 
 export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'football' | 'grounded' }
 export const CARE_COLUMNS = 16
@@ -24,6 +25,7 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 export function getRamActionDuration(action: string,form='junior'): number | null {
+  if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:action==='balance'?8000:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
   if(isMoodAction(action))return emotionDuration(action,form)??3600
   if(action==='play'&&form!=='seed')return footballDuration(form)??SOCIAL_DURATIONS.play
   if (isSocialAction(action) && action !== 'focus') return SOCIAL_DURATIONS[action]
@@ -37,6 +39,7 @@ export function getRamActionDuration(action: string,form='junior'): number | nul
 /** Sample an event clock, never a React render count. Sleep closes the eyes
  * on the same grounded body instead of using another action's silhouette. */
 export function sampleRamPose(action: string, elapsed: number, reduced = false,form='junior'): Pose {
+  if(isPastime(action))return {...sampleRamPose(pastimeBody(action),elapsed,reduced,form),finished:elapsed>=(getRamActionDuration(action,form)??0)}
   if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false }
   if(isEmotionClip(action))return {row:0,frame:0,finished:elapsed>=(emotionDuration(action,form)??0)}
   if(action==='play'){const p=footballPose(form,elapsed,reduced);return {sheet:'football',row:Math.floor(p.frame/8),frame:p.frame%8,finished:p.finished}}
@@ -89,6 +92,7 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
 /** Original seed timeline has closed eyes in frames 4 and 5, and large eyes in
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
+  if(isPastime(action))return {...sampleSeedPose(pastimeBody(action),elapsed,reduced),finished:elapsed>=(getRamActionDuration(action,'seed')??0)}
   if (action === 'sleep') return { frame: slumberFrame(elapsed,reduced), finished: false }
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   if (action === 'pet' || action === 'play' || action === 'wake') return {frame:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
@@ -128,6 +132,7 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
+  if(isPastime(action))return {...sampleFlyingPose(pastimeBody(action),elapsed,reduced,form,flightTime),finished:elapsed>=(getRamActionDuration(action,form)??0)};
   if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false };
   if(action==='mood-dozy')return sampleRamPose(action,elapsed,reduced,form);
   if(action==='mood-content'&&elapsed>950&&elapsed<1500&&!reduced)return {sheet:'slumber',row:0,frame:0,finished:false};

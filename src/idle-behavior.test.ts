@@ -8,13 +8,14 @@ import { getRamActionDuration, sampleFlyingPose, sampleSeedPose } from './compon
 import { groundedMotion, usesGroundedPose } from './grounded-motion'
 import { socialSoundScore } from './pet-sound-score'
 import {ramForm} from './original-actions'
+import {isPastime} from './pet-pastimes'
 import {isEmotionClip} from './mood-motion'
 
 const NOW = Date.UTC(2026, 9, 22, 9)
 function petAt(stage: Stage) {
   return { ...createPet('团团', 'red', NOW - 86_400_000), growth: STAGES[stage].threshold, ...(stage === 4 ? { evolution: 'super' as const } : {}) }
 }
-function sequence(stage: Stage, count = 80) {
+function sequence(stage: Stage, count = 240) {
   const pet = petAt(stage), memory = { ...createMemory(pet), personality: '喜欢留意小细节，语气轻快' }
   let previous: IdleAction | undefined
   return Array.from({ length: count }, (_, index) => {
@@ -29,11 +30,11 @@ describe('stage-aware spontaneous original gestures', () => {
   it('varies every stage without successive repeats, walks, user props or indefinite actions', () => {
     const stages = ([0, 1, 2, 3, 4] as Stage[]).map(stage => sequence(stage))
     for (const [stage,entries] of stages.entries()) {
-      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS.filter(action=>!['mood-dozy','mood-grumpy'].includes(action))))
+      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS.filter(action=>!['mood-dozy','mood-grumpy'].includes(action)&&(stage>=2||action!=='spell'))))
       for (const entry of entries) {
         expect(entry.duration).toBe(getRamActionDuration(entry.action,ramForm(stage as Stage,stage===4?'super':undefined)))
         expect(entry.duration).toBeGreaterThan(0)
-        expect(entry.duration).toBeLessThanOrEqual(6500)
+        expect(entry.duration).toBeLessThanOrEqual(18000)
         expect(socialSoundScore(entry.action).cues).toEqual([])
       }
     }
@@ -94,7 +95,7 @@ describe('stage-aware spontaneous original gestures', () => {
   })
 
   it('uses bounded original seed/grounded expressions and completes them instead of moving the pot', () => {
-    for (const action of IDLE_ACTIONS) {
+    for (const action of IDLE_ACTIONS.filter(action=>!isPastime(action))) {
       const duration = getRamActionDuration(action,'seed')!
       const frames = new Set(Array.from({ length: 20 }, (_, i) => sampleSeedPose(action, i * duration / 20).frame))
       expect(frames.size).toBeGreaterThan(1)
@@ -111,7 +112,7 @@ describe('stage-aware spontaneous original gestures', () => {
 
   it('keeps the same continuous original flight frame under every spontaneous gesture', () => {
     for (const form of ['senior', 'super', 'water', 'wood', 'fire'] as Array<'senior' | Evolution>) {
-      for (const action of IDLE_ACTIONS.filter(action=>!action.startsWith('mood-'))) {
+      for (const action of IDLE_ACTIONS.filter(action=>!action.startsWith('mood-')&&!isPastime(action))) {
         const duration = getRamActionDuration(action,form)!
         for (const flightTime of [137, 420, 951, 1500]) {
           const pose = sampleFlyingPose(action, duration / 2, false, form, flightTime)

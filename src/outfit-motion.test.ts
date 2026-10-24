@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest'
-import {outfitFrame,hasAuthoredOutfit} from './outfit-motion'
+import {outfitFrame,hasAuthoredOutfit,footballOutfitRig} from './outfit-motion'
 import {OUTFITS,outfitCoversCrown} from './wardrobe'
 import {emotionSpec} from './mood-motion'
 import {bodyWearAnchor} from './wear-anchor'
@@ -32,4 +32,9 @@ describe('original wardrobe source registration',()=>{
   for(let y=0;y<20;y++)for(let x=55;x<79;x++){const i=(y*80+x)*4;neutral.set([255,255,255,255],i)}
   const anchor=bodyWearAnchor(mask,neutral,80,0,0,80,60)!;expect(anchor.angle).toBe(0);expect(anchor.y).toBeLessThan(20)
  })
+})
+
+it('uses original anatomical axes while the football body turns, with finite anchors for every source frame',()=>{
+ for(const form of ['junior','middle','senior','super','water','wood','fire'])for(let frame=1;;frame++){const pose=footballOutfitRig(form,frame);if(!pose)break;expect([pose.x,pose.y,pose.scale,pose.angle].every(Number.isFinite)).toBe(true);expect(pose.scale).toBeGreaterThan(.1);expect(pose.scale).toBeLessThan(1);expect(Math.abs(pose.angle)).toBeLessThanOrEqual(180)}
+ expect(footballOutfitRig('junior',200)!.angle).toBeLessThan(-70);expect(footballOutfitRig('junior',1)!.angle).toBeCloseTo(0,0);expect(footballOutfitRig('seed',1)).toBeNull()
 })

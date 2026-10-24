@@ -82,3 +82,10 @@ it('changes body colour only after the sip and finishes the blend before the bot
 it('plays the body timeline forward once while props keep their individual beats',()=>{
  for(const item of ITEMS){const motion=getItemMotion(item.id);let previous=0;for(let t=0;t<motion.duration;t+=16){const frame=sampleItemMotion(motion,t).bodyFrame;expect(frame,`${item.id} at ${t}ms`).toBeGreaterThanOrEqual(previous);previous=frame}}
 });
+
+
+// Small mouths settle shut before/after care; tool and sound contacts share beats.
+it('settles the small mouth outside contact and opens before each lip contact',async()=>{
+ const {sampleGentleMouth}=await import('./item-motion')
+ for(const id of ['biscuit','juice','180002','recolor-blue']){const motion=getItemMotion(id);expect(sampleGentleMouth(motion,0)).toBe(0);expect(sampleGentleMouth(motion,motion.duration)).toBe(0);expect(sampleGentleMouth(motion,motion.duration*.95)).toBe(0);expect(sampleGentleMouth(motion,motion.duration*.5,true)).toBe(0);for(let i=0;i<motion.beats;i++){const open=motion.duration*(.14+.68*(i+.25)/motion.beats),contact=motion.duration*(.14+.68*(i+.5)/motion.beats);expect(sampleGentleMouth(motion,open)).toBe(7);expect(sampleGentleMouth(motion,contact)).toBe(0)}}
+})

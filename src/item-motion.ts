@@ -1,4 +1,5 @@
 import { getItem } from './catalog'
+import gentle from '../public/assets/original/gentle-care/source.json'
 
 export type ItemGesture = 'nibble' | 'pour-beans' | 'crunch' | 'peel' | 'slice' | 'spoon' | 'stretch' | 'glow' | 'sip' | 'gulp' | 'fizz' | 'squeeze' | 'bath' | 'scrub' | 'face-wash' | 'brush' | 'rinse' | 'medicine' | 'recolor'
 export interface ItemMotion {
@@ -83,6 +84,10 @@ const MOUTH_ANCHORS: Record<string, readonly (readonly [number, number])[]> = {
   'senior:drink': [[90,183],[90,183],[90,183],[93,183],[90,183],[89,183],[89,183],[93,183],[90,183],[89,183],[89,183],[93,183],[90,183],[89,183],[89,183],[93,183]],
 }
 export function getItemMouthAnchor(form: string | undefined, motion: ItemMotion, frame: number): readonly [number, number] {
+  if(motion.body!=='wash'&&form&&Object.hasOwn(gentle.forms,form)){
+    const p=gentle.forms[form as keyof typeof gentle.forms].mouthPoint
+    return form==='seed'?[26.56+p[0]*.5,17.31+p[1]*.476]:[p[0],p[1]]
+  }
   if (form === 'seed') return [50, 48]
   const anchor = MOUTH_ANCHORS[`${form}:${motion.body}`]?.[frame]
   if (anchor) return [anchor[0] / 192 * 100, anchor[1] / 208 * 100]
@@ -104,6 +109,14 @@ export interface ItemMotionPose {
   finished: boolean
 }
 const clamp = (n: number, min = 0, max = 1) => Math.max(min, Math.min(max, n))
+/** Small original mouth opens on each item's own contact beat; the face stays registered. */
+export function sampleGentleMouth(motion:ItemMotion,elapsed:number,reduced=false):number {
+  if(reduced||elapsed<0||elapsed>=motion.duration)return 0
+  const progress=elapsed/motion.duration
+  if(progress<.14||progress>.82)return 0
+  const activity=(progress-.14)/.68,wave=Math.max(0,Math.sin(activity*motion.beats*Math.PI*2))
+  return Math.round(wave*wave*7)
+}
 
 /** One elapsed clock drives both body and prop, so hidden windows cannot leave
  * a brushing tool moving after the face has returned to idle. Coordinates are

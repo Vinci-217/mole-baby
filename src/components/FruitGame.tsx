@@ -33,6 +33,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
   const replayRef = useRef<HTMLButtonElement>(null);
   const heldKeys = useRef(new Set<string>());
   const awarded = useRef(false);
+  const lastWarning = useRef(4);
   const completeRef = useRef(onComplete);
   const closeRef = useRef(onClose);
   completeRef.current = onComplete;
@@ -81,7 +82,10 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
       previousTime = now;
       const direction = Number(heldKeys.current.has('ArrowRight')) - Number(heldKeys.current.has('ArrowLeft'));
       const next = advanceFruitGame(model.current, delta, direction, stage, evolution);
-      if(next.score>model.current.score)playGameSound('catch',sound);
+      if(next.score>model.current.score)playGameSound(next.score%3===0?'combo':'catch',sound);
+      else if(next.missed>model.current.missed)playGameSound('miss',sound);
+      const remaining=Math.ceil(GAME_SECONDS-next.elapsed);
+      if(remaining>0&&remaining<=3&&remaining<lastWarning.current){lastWarning.current=remaining;playGameSound('countdown',sound)}
       model.current = next; setFrame(next);
       if (next.elapsed >= GAME_SECONDS) {
         heldKeys.current.clear(); setPhase('finished');
@@ -96,6 +100,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
 
   const startGame = () => {
     if (stage === 0) return;
+    lastWarning.current=4;playGameSound('start',sound);
     model.current = initialFruitModel(); awarded.current = false; heldKeys.current.clear();
     setFrame(initialFruitModel()); setReceipt(null); setPhase('playing');
   };

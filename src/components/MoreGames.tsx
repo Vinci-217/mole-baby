@@ -47,6 +47,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
   const boardRef = useRef(board);
   const lastTap = useRef(-Infinity);
   const completed = useRef(false);
+  const lastWarning=useRef(4);
   const manualPause = useRef(false);
   const phaseRef = useRef(phase); phaseRef.current = phase;
   const pausedRef = useRef(paused || hidden); pausedRef.current = paused || hidden;
@@ -62,6 +63,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
     setReceipt(callbacks.current.onComplete(finalScore) ?? null);
   }
   function start() {
+    lastWarning.current=4;playGameSound('start',sound);
     elapsedRef.current = 0; lastFrame.current = null; setElapsed(0); manualPause.current = false; setPaused(false);
     completed.current = false; setReceipt(null); setFeedback({ message: '', at: 0 });
     judgmentsRef.current = RHYTHM_BEATS.map(() => null); setJudgments(judgmentsRef.current); lastTap.current = -Infinity;
@@ -74,7 +76,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
     if (phaseRef.current !== 'playing' || pausedRef.current) return;
     const hit = rhythmHit(elapsedRef.current, judgmentsRef.current, lastTap.current);
     lastTap.current = elapsedRef.current;
-    if (!hit) { setFeedback({ message: '跟着果子的节奏来～', at: elapsedRef.current }); return; }
+    if (!hit) { playGameSound('miss',sound);setFeedback({ message: '跟着果子的节奏来～', at: elapsedRef.current }); return; }
     playGameSound(hit.judgment==='perfect'?'perfect':'catch',sound);
     const next = [...judgmentsRef.current]; next[hit.index] = hit.judgment;
     judgmentsRef.current = next; setJudgments(next);
@@ -84,7 +86,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
     if (phaseRef.current !== 'playing' || pausedRef.current) return;
     const index = orchardClaim(fruitsRef.current, claimedRef.current, elapsedRef.current, slot);
     if (index < 0) return;
-    playGameSound('catch',sound);
+    playGameSound((claimedRef.current.size+1)%3===0?'combo':'catch',sound);
     const next = new Set(claimedRef.current); next.add(index); claimedRef.current = next; setClaimed(next);
     setFeedback({ message: '+1 采到啦！', at: elapsedRef.current });
   }
@@ -139,13 +141,15 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
       lastFrame.current = now;
       elapsedRef.current += delta;
       setElapsed(elapsedRef.current);
+      const remaining=Math.ceil(((kind==='rhythm'?RHYTHM_DURATION:ORCHARD_DURATION)-elapsedRef.current)/1000);
+      if(kind!=='puzzle'&&remaining>0&&remaining<=3&&remaining<lastWarning.current){lastWarning.current=remaining;playGameSound('countdown',sound)}
       if (kind === 'rhythm') {
         let changed = false;
         const next = judgmentsRef.current.map((judgment, index) => {
           if (judgment === null && elapsedRef.current > RHYTHM_BEATS[index] + 180) { changed = true; return 'miss' as const; }
           return judgment;
         });
-        if (changed) { judgmentsRef.current = next; setJudgments(next); }
+        if (changed) { playGameSound('miss',sound);judgmentsRef.current = next; setJudgments(next); }
         if (elapsedRef.current >= RHYTHM_DURATION) { finish(rhythmScore(judgmentsRef.current)); return; }
       } else if (kind === 'orchard' && elapsedRef.current >= ORCHARD_DURATION) {
         finish(orchardScore(claimedRef.current.size)); return;
@@ -156,10 +160,10 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
     return () => { cancelAnimationFrame(frame); lastFrame.current = null; };
     // All changing game values live in session refs so no animation clock restarts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, kind]);
+  }, [phase, kind,sound]);
 
   function togglePause() {
-    const next = !paused; manualPause.current = next; pausedRef.current = next || hidden; lastFrame.current = null; setPaused(next);
+    const next = !paused;playGameSound(next?'pause':'resume',sound); manualPause.current = next; pausedRef.current = next || hidden; lastFrame.current = null; setPaused(next);
   }
 
   if (phase === 'closed') return null;

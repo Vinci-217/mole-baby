@@ -1,7 +1,7 @@
 import {sampleSocialMotion} from './social-motion'
 
 export function usesGroundedPose(form:string,action:string):boolean {
-  return ['junior','middle'].includes(form)&&['idle','waiting','pet','focus','watch-butterfly','look-around','happy','waving','dizzy','wake','drag','still','mood-content'].includes(action)
+  return ['junior','middle'].includes(form)&&['idle','waiting','pet','focus','watch-butterfly','look-around','happy','waving','dizzy','wake','drag','still','mood-content','balance'].includes(action)
 }
 /** Original layers, continuous small movement; no looping squash or happy jump. */
 export function groundedMotion(form:string,action:string,elapsed:number,clock:number,reduced=false,gaze={x:0,y:0}) {
@@ -14,6 +14,7 @@ export function groundedMotion(form:string,action:string,elapsed:number,clock:nu
   if(action==='happy'){frame=elapsed>250&&elapsed<1500?(elapsed<350||elapsed>1400?1:2):0;eyeX=0;eyeY=0}
   if(action==='waving'){eyeX=Math.sin(Math.min(1,elapsed/2100)*Math.PI*2)*1.7;eyeY=-.35;frame=elapsed>900&&elapsed<1100?1:0}
   if(action==='mood-content'){frame=elapsed>900&&elapsed<1030||elapsed>1850&&elapsed<1970?1:0;eyeX=Math.sin(elapsed/1800)*.45;eyeY=-.2}
+  if(action==='balance'){frame=0;eyeX=Math.sin(elapsed/1200)*.5;eyeY=-1.3}
   if(action==='focus'){eyeX=Math.sin(clock/2800)*.35;eyeY=1.45}
   if(action==='play'){
     const ball=sampleSocialMotion(form==='junior'?1:2,'play',elapsed)

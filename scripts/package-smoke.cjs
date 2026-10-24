@@ -1,3 +1,4 @@
+const{verifyLivelyCompanion}=require('./lively-companion-checks.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{_electron,expect}=require('@playwright/test'),asar=require('@electron/asar');
 const{adopt,openActions}=require('./smoke-helpers.cjs'),{verifyCompactCare}=require('./compact-care-checks.cjs'),{version}=require('../package.json');
 const root=path.resolve(__dirname,'..');
@@ -6,9 +7,10 @@ async function verifyApplication({executable,archive,screenshot}){
  let desktop,profile,page;const errors=[];
  try{
   requireFile(archive);const paths=new Set(asar.listPackage(archive).map(p=>p.replace(/\\/g,'/').replace(/^\//,'')));
-  for(const p of['package.json','electron/main.cjs','electron/preload.cjs','electron/desktop-geometry.cjs','electron/Mac 打开说明.html','dist/index.html','dist/favicon.png','dist/icons/tray.png','dist/icons/tray-mac.png','dist/icons/tray-mac@2x.png','dist/assets/original/seed/body.png','dist/assets/original/seed/pot.png','dist/assets/generated/v15-butterfly.png'])assert.ok(paths.has(p),p);
+  for(const p of['package.json','electron/main.cjs','electron/preload.cjs','electron/desktop-geometry.cjs','electron/Mac 打开说明.html','dist/index.html','dist/favicon.png','dist/icons/tray.png','dist/icons/tray-mac.png','dist/icons/tray-mac@2x.png','dist/assets/original/seed/body.png','dist/assets/original/seed/pot.png','dist/assets/generated/v15-butterfly.png','dist/assets/original/football/head-poses.json'])assert.ok(paths.has(p),p);
   for(const form of['junior','middle','senior','super','water','wood','fire'])for(const layer of['neutral','mask'])assert.ok(paths.has(`dist/assets/classic/${form}-${layer}.png`));
   for(const outfit of Object.values(require('../public/assets/original/wardrobe-motion/runtime.json').outfits))for(const kinds of Object.values(outfit.forms))for(const sheet of Object.values(kinds))assert.ok(paths.has(`dist/assets/original/wardrobe-motion/${sheet.file}`));
+  for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/gentle-care/${form}-${layer}.png`));
   for(const retired of['electron/deepseek.cjs','electron/speech.cjs'])assert.ok(!paths.has(retired),'Retired conversation backend must not be packaged');
   assert.equal(JSON.parse(asar.extractFile(archive,'package.json')).version,version);console.log('PASS: complete original pet/outfit payload; retired AI and speech backends absent');
   profile=fs.mkdtempSync(path.join(os.tmpdir(),'mole-package-'));fs.writeFileSync(path.join(profile,'companion-ai-key.json'),'retired-test-key');
@@ -19,7 +21,7 @@ async function verifyApplication({executable,archive,screenshot}){
    assert.equal(await desktop.evaluate(({app})=>app.dock.isVisible()),false);
    const tray=await desktop.evaluate(({app,nativeImage})=>{const load=process.getBuiltinModule('module').createRequire(app.getAppPath()+'/package.json'),{createTrayIcon}=load('./electron/tray-icon.cjs');const icon=createTrayIcon(nativeImage,process.platform,name=>app.getAppPath()+'/dist/icons/'+name);return{template:icon.isTemplateImage(),size:icon.getSize(),scales:icon.getScaleFactors()}});assert.equal(tray.template,true);assert.equal(tray.size.width,18);assert.ok(tray.scales.includes(1)&&tray.scales.includes(2));console.log('PASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations');
   }
-  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);assert.deepEqual(errors,[]);
+  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyLivelyCompanion(page);assert.deepEqual(errors,[]);
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await page.waitForTimeout(220);await page.screenshot({path:path.join(root,'artifacts',screenshot),omitBackground:true});await page.getByRole('button',{name:'关闭小窗',exact:true}).click();console.log(`PASS: packaged ${process.platform}/${process.arch} compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services`);
  }catch(error){if(page&&!page.isClosed()){console.error('Renderer diagnostics:',await page.evaluate(()=>({url:location.href,ready:document.readyState,desktop:typeof window.desktop,body:document.body.innerText.slice(0,1800)})).catch(()=>null));await page.screenshot({path:path.join(root,'artifacts',screenshot)}).catch(()=>{});}throw error}

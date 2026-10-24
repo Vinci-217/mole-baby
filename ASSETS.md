@@ -245,3 +245,12 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 ### v0.25 小背包与交互短音效
 
 新背包和小屋面板使用HTML/CSS重排交互控件，角色、服饰、用品与背景保留既有来源，没有新增或重画角色插画。吧唧、咕嘟、洗净、灵光与蹦跳由`pet-audio.ts`的Web Audio振荡器/滤波噪声合成，按`pet-sound-score.ts`动作时钟播放，不是原游戏音频。`artifacts/v25-interaction-sounds.wav`为同一渲染函数的离线试听导出。验证与范围见 [v25说明](research/v25-compact-desktop.md)。
+
+
+### v0.26温和照料与服饰重新注册
+
+`public/assets/original/gentle-care/`以既有原 down 身体、原眼睛/瞳孔和缩小的嘴形743重新导出，沿原身体遮罩保持四色；睡眠缩小原35/1726眼睑与原嘴形。它们是明确的桌宠适配，并非官方独立动画。来源和原文件SHA256见各目录source.json，PNG校验见checksums.json。没有生成或绘制新角色脸。服饰继续使用原swf2，只改中性校准及动作注册，来源不变；脚本见scripts/art/export-slumber.py（--awake导出温和照料）与export-registered-outfits.py。小日常复用既有原服饰、足球与已记录的书/星星道具。
+
+`artifacts/v26-game-effects.wav`是本项目Web Audio事件音效合成器的离线试听，不是官方录音；由scripts/review-game-audio.cjs生成并检查静音、非静音与峰值。
+
+`public/assets/original/football/head-poses.json`由相同原SWF显示列表的眼睛符号与局部Y轴提取，经现有足球相机映射。闭眼/遮挡帧为身体空间插值；是服饰挂接的桌面适配，不是官方骨骼导出。脚本为scripts/art/export-football-heads.py，不从画面白色像素推测朝向。

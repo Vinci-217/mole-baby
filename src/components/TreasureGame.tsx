@@ -47,6 +47,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
   }
   closeRef.current = close;
   function start() {
+    playGameSound('start',sound);
     setRound(createTreasureRound()); foundRef.current = []; setFound([]); hinted.current = []; setHintedId(null);
     setReceipt(null); setFeedback('慢慢找，我陪着你。'); claimed.current = false;
     manualPause.current = false; pausedRef.current = document.hidden; setPaused(false); modeRef.current = 'playing'; setMode('playing');
@@ -56,15 +57,16 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
     if (modeRef.current !== 'playing' || pausedRef.current || document.hidden) return;
     if (foundRef.current.includes(id)) return;
     const next = findTreasure(round, foundRef.current, id);
-    if (!next) { setFeedback('这件不在清单上，再看看旁边吧。'); return; }
+    if (!next) { playGameSound('miss',sound);setFeedback('这件不在清单上，再看看旁边吧。'); return; }
     foundRef.current = next; setFound(next); if (hintedId === id) setHintedId(null);
-    playGameSound('catch', sound); setReaction(previous => ({ action: 'catch', id: previous.id + 1 }));
+    playGameSound(next.length===round.targets.length?'combo':'catch', sound); setReaction(previous => ({ action: 'catch', id: previous.id + 1 }));
     setFeedback(`找到${round.objects.find(object => object.id === id)!.name}啦！`);
     if (next.length === round.targets.length) { modeRef.current = 'collected'; setMode('collected'); setFeedback('都找到啦！这份小小的默契，收好。'); }
   }
   function hint() {
     if (modeRef.current !== 'playing' || pausedRef.current || document.hidden || hintedId) return;
     const id = treasureHint(round, foundRef.current); if (!id) return;
+    playGameSound('hint',sound);
     setHintedId(id); if (!hinted.current.includes(id)) hinted.current = [...hinted.current, id];
     setReaction(previous => ({ action: 'look-around', id: previous.id + 1 })); setFeedback('看看轻轻发光的地方～');
   }
@@ -74,7 +76,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
     setReceipt(callbacks.current.onComplete(treasureScore(round, foundRef.current, hinted.current)));
     setReaction(previous => ({ action: 'happy', id: previous.id + 1 }));
   }
-  function togglePause() { const next = !paused; manualPause.current = next; pausedRef.current = next || document.hidden; setPaused(next); }
+  function togglePause() { const next = !paused;playGameSound(next?'pause':'resume',sound); manualPause.current = next; pausedRef.current = next || document.hidden; setPaused(next); }
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;

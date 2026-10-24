@@ -56,9 +56,15 @@ export function saveMemory(pet: GameState, memory: CompanionMemory): boolean {
 export function recordEvent(memory: CompanionMemory, event: { kind: string; detail: string; at?: number }): CompanionMemory {
   const at = stamp(event.at ?? Date.now()), kind = clean(event.kind, 30), detail = clean(event.detail, 160);
   if (!kind || !detail) return memory;
+  // Keep a day's first completed pastime; repeated idle performances should
+  // not push the owner's meals and shared experiences out of the diary.
+  if(kind.startsWith('self-')&&memory.events.some(e=>e.kind===kind&&dayKey(e.at)===dayKey(at)))return memory;
   const previous = memory.events.at(-1);
   if (previous?.kind === kind && previous.detail === detail && at >= previous.at && at - previous.at < 60_000) return memory;
-  return { ...memory, events: [...memory.events, { id: uid(kind, detail, at), kind, detail, at }].slice(-MEMORY_LIMITS.events) };
+  const events=[...memory.events,{id:uid(kind,detail,at),kind,detail,at}];
+  const automatic=events.filter(e=>/^(self-|outing-|check-in$)/.test(e.kind));
+  const discarded=new Set(automatic.slice(0,Math.max(0,automatic.length-40)).map(e=>e.id));
+  return {...memory,events:events.filter(e=>!discarded.has(e.id)).slice(-MEMORY_LIMITS.events)};
 }
 export function recordCare(memory: CompanionMemory, action: string, detail?: string, now = Date.now()): CompanionMemory {
   const labels: Record<string, string> = { pet: '你轻轻摸了摸我', feed: '你给我喂了食物', drink: '你给我倒了饮品', wash: '你帮我洗了澡', sleep: '你照顾了我的作息', play: '我们一起玩了一会儿', game: '我们一起完成了小游戏', buy: '你为我买了用品' };
@@ -79,7 +85,7 @@ export function getDiary(memory: CompanionMemory): DiaryDay[] {
 }
 export function getCompanionMood(memory: CompanionMemory, pet: GameState, now = Date.now()): CompanionMood {
   // One point per real companion day and a few different care categories; clicks cannot farm affection.
-  const actual = [...memory.events.filter(e => !['reminder','auto-sleep','auto-wake'].includes(e.kind) && e.at <= now).map(e => ({ at: e.at, kind: e.kind }))];
+  const actual = [...memory.events.filter(e => ['adoption','pet','feed','drink','wash','play','game','buy','dress','call-name','mood-check','rename'].includes(e.kind) && e.at <= now).map(e => ({ at: e.at, kind: e.kind }))];
   const days = new Set(actual.map(e => dayKey(e.at))).size;
   const kinds = new Set(actual.map(e => e.kind)).size;
   const affection = Math.min(100, days * 2 + Math.min(8, kinds));

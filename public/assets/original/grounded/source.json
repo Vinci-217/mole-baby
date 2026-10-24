@@ -69,9 +69,9 @@
     "no independent ground shadow; original body shading retained"
   ],
   "files": {
-    "middle-neutral.png": "93d80cb888a00993ab46b45483bb7e36abcc96efa5667d1d14eade50a9e4e533",
-    "junior-neutral.png": "e41efc175e09a2b78b214c303c7274c8db2b04e4f24649abd46ebc81d14a0191",
-    "middle-mask.png": "567ffa16b694f2b9afc97a52004682e72e769995a23956ff26f6f034605ee77d",
-    "junior-mask.png": "d0eb5a277e7b761415394319cec764e3649db5f66e62e90d25d5b90cd1c54e04"
+    "middle-neutral.png": "95e9629992712147a0a62b84cadab96863c066d0044ec6980a803b4a5326c8e1",
+    "junior-neutral.png": "dfbcaaae1cec5db43167276cf52d4d11886a74cbeb43f2aa86962b06bd157194",
+    "middle-mask.png": "9b54d8413e933ace32c7fe895488f0939cbb640f2dee580d33298c1b83cb6f8e",
+    "junior-mask.png": "c41a190a9da45e7b8646f6a83c34e5c395f738c6df8333208addb25b980e8c4b"
   }
 }

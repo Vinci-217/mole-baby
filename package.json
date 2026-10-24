@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.25.1",
+  "version": "0.26.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -19,7 +19,7 @@
     "dist:mac:arm64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --arm64 && node scripts/notarize-mac-dmg.cjs arm64",
     "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --x64 && node scripts/notarize-mac-dmg.cjs x64",
     "test:registered-wardrobe": "node scripts/registered-wardrobe-regression.cjs",
-    "review:wardrobe": "node scripts/record-wardrobe-review.cjs",
+    "review:wardrobe": "node scripts/record-lively-review.cjs",
     "test:browser": "npm run build && node scripts/compact-care-regression.cjs"
   },
   "dependencies": {

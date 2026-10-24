@@ -2,7 +2,7 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.25.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.25.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 v0.26.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.26.0) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 小小的桌面陪伴
 
@@ -30,9 +30,15 @@
 
 四种颜色、五个成长阶段和四种最高形态保留；9件装扮使用原服饰素材并按阶段适配。小屋里的商店用摩尔豆购买用品，小游戏奖励和慢成长规则继续保留。角色与服饰来源见 [ASSETS.md](ASSETS.md) 和 [装扮说明](docs/WARDROBE.md)。
 
+## 拉姆自己的小日子
+
+小屋每日签到可领取1000摩尔豆。拉姆会自己翻书、玩球、顶书练平衡，中级以后还会练习魔法变装；出游有归期，可以随时叫回来，经历会进入回忆。自然活动与出游均可在设置关闭，专注计时和安静偏好优先。
+
+[本版画面、实际录屏与实现范围](research/v26-lively-pet.md)
+
 ## 安装
 
-Windows运行 `mole-baby-0.25.1-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.26.0-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 

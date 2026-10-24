@@ -1,0 +1,218 @@
+{
+  "description": "Original normal body, original eyes/pupils and a small source mouth743. Gentle desktop care adaptation, not an official standalone clip.",
+  "eyes": "original down eyes and pupils",
+  "mouth": 743,
+  "eyeSpanRatio": 0.52,
+  "mouthSpanRatio": 0.09,
+  "eyeInk": [
+    91,
+    56,
+    39
+  ],
+  "mouthInk": [
+    88,
+    36,
+    28
+  ],
+  "forms": {
+    "seed": {
+      "cell": [
+        96,
+        99
+      ],
+      "columns": 8,
+      "sourceSprite": 39,
+      "scale": 0.5068493150684932,
+      "translation": [
+        12.0,
+        1.7260273972602675
+      ],
+      "mouthPoint": [
+        46.81792237442923,
+        34.50947834509478
+      ],
+      "snorePoint": [
+        93.58333333333334,
+        34.50947834509478
+      ]
+    },
+    "junior": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 936,
+      "scale": 0.9806451612903225,
+      "translation": [
+        9.193548387096783,
+        26.516129032258064
+      ],
+      "mouthPoint": [
+        49.47916666666667,
+        64.37344913151364
+      ],
+      "snorePoint": [
+        93.0625,
+        64.37344913151364
+      ]
+    },
+    "middle": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 1532,
+      "scale": 0.6815642458100558,
+      "translation": [
+        25.36871508379889,
+        27.189944134078218
+      ],
+      "mouthPoint": [
+        51.9058426443203,
+        75.00268586162441
+      ],
+      "snorePoint": [
+        87.85416666666666,
+        75.00268586162441
+      ]
+    },
+    "senior": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 1777,
+      "scale": 0.6855345911949685,
+      "translation": [
+        19.547169811320757,
+        23.616352201257882
+      ],
+      "mouthPoint": [
+        46.24279350104821,
+        90.61895258829222
+      ],
+      "snorePoint": [
+        79.52083333333334,
+        90.61895258829222
+      ]
+    },
+    "super": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 940,
+      "scale": 0.5279503105590062,
+      "translation": [
+        20.434782608695656,
+        10.66459627329192
+      ],
+      "mouthPoint": [
+        47.6271350931677,
+        87.61944577161968
+      ],
+      "snorePoint": [
+        74.3125,
+        87.61944577161968
+      ]
+    },
+    "water": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 538,
+      "scale": 0.7672955974842768,
+      "translation": [
+        5.144654088050302,
+        3.3836477987421176
+      ],
+      "mouthPoint": [
+        47.63823375262054,
+        86.10304789550072
+      ],
+      "snorePoint": [
+        84.20833333333334,
+        86.10304789550072
+      ]
+    },
+    "wood": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 1029,
+      "scale": 0.660377358490566,
+      "translation": [
+        -6.566037735849051,
+        8.69811320754718
+      ],
+      "mouthPoint": [
+        46.79638364779875,
+        87.04644412191581
+      ],
+      "snorePoint": [
+        79.0,
+        87.04644412191581
+      ]
+    },
+    "fire": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 898,
+      "scale": 0.7612903225806451,
+      "translation": [
+        25.819354838709685,
+        13.948387096774212
+      ],
+      "mouthPoint": [
+        39.02217741935485,
+        86.12903225806451
+      ],
+      "snorePoint": [
+        85.25,
+        86.12903225806451
+      ]
+    }
+  },
+  "sourceFiles": {
+    "lamubone.swf": {
+      "url": "http://mole.61.com/resource/NPC/lamubone.swf",
+      "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/NPC/lamubone.swf"
+    },
+    "super.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet101/skill_7.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "sha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20"
+    },
+    "water.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_2.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_2.swf",
+      "sha256": "def307887b5de28bedcef4fae30fd980e8a9537f156b77f0b4527be235857464"
+    },
+    "wood.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_4.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_4.swf",
+      "sha256": "8b2844001dd346c5bdc0f6dba8da83da15c618c0d46a12c68b011f3bdfacd926"
+    },
+    "fire.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_1.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_1.swf",
+      "sha256": "ef8b8dd20db563b6dcde2ee3b69d47707453bd147076a676b84aeec7dbd1ef94"
+    }
+  },
+  "z": {
+    "sourceSprite": 761,
+    "shape": 760
+  }
+}

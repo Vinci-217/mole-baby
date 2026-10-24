@@ -4,9 +4,10 @@ import { getStage } from './game'
 import {ramForm} from './original-actions'
 import type { GameState } from './game'
 import { getRamActionDuration } from './components/ram-animation'
+import {PASTIMES} from './pet-pastimes'
 
-/** Original, finite gestures only: never a walk, user hand, ball or focus book. */
-export const IDLE_ACTIONS = ['look-around', 'watch-butterfly', 'happy', 'waving','mood-joy','mood-content','mood-dozy','mood-grumpy'] as const
+/** Finite gestures and self-directed pastimes; no automatic user hand or focus timer. */
+export const IDLE_ACTIONS = ['look-around', 'watch-butterfly', 'happy', 'waving','mood-joy','mood-content','mood-dozy','mood-grumpy',...PASTIMES] as const
 export type IdleAction = typeof IDLE_ACTIONS[number]
 export interface IdleBehavior { action: IdleAction; duration: number }
 interface Candidate { action: IdleAction; weight: number }
@@ -27,7 +28,7 @@ export function idleDelay(petId: number, sequence: number): number {
 /** Re-evaluate live stats and surviving memories at the moment of the gesture.
  * Concern is a quieter expression, never a claim to see the user's screen. */
 export function idleCandidates(pet: GameState, memory?: CompanionMemory, now = Date.now()): Candidate[] {
-  if (pet.sleeping || pet.stats.health <= 35 || pet.stats.hunger < 30 || pet.stats.thirst < 30 || pet.stats.cleanliness < 30 || pet.stats.energy < 25) return []
+  if (pet.sleeping || pet.outing || pet.stats.health <= 35 || pet.stats.hunger < 30 || pet.stats.thirst < 30 || pet.stats.cleanliness < 30 || pet.stats.energy < 30) return []
   const ownMemory = memory?.petId === String(pet.createdAt) ? memory : undefined
   const concerned = ownMemory && getCompanionMood(ownMemory, pet, now).id === 'concerned'
   if(pet.stats.happiness<40)return [{action:'mood-grumpy',weight:5},{action:'mood-content',weight:3},{action:'look-around',weight:2}]
@@ -38,7 +39,9 @@ export function idleCandidates(pet: GameState, memory?: CompanionMemory, now = D
   if (ownMemory && /好奇|故事/.test(ownMemory.personality)) weights[1] += 3
   if (ownMemory && getCompanionMood(ownMemory, pet, now).id === 'cheerful') weights[2] += 4
   return [...IDLE_ACTIONS.slice(0,4).map((action, index) => ({ action, weight: weights[index] })),
-    {action:'mood-joy' as const,weight:pet.stats.happiness>=80?7:3},{action:'mood-content' as const,weight:4}]
+    {action:'mood-joy' as const,weight:pet.stats.happiness>=80?7:3},{action:'mood-content' as const,weight:4},
+    {action:'read-alone' as const,weight:5},{action:'play-alone' as const,weight:pet.stats.happiness>=70?5:2},
+    {action:'balance' as const,weight:3},...(getStage(pet.growth,pet.evolution)>=2?[{action:'spell' as const,weight:3}]:[])]
 }
 
 /** A deterministic weighted draw makes each pet varied and testable; the last

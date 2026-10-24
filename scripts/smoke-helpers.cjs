@@ -33,7 +33,7 @@ async function roomTab(page, label) {
   if (await paperButton.isVisible()) { await paperButton.click(); return; }
   // Every room function is also reachable without an open paper dialog.
   const dock = page.locator('.classic-dock');
-  const aliases = { 状态: ['状态', '我的拉姆'], 背包: ['背包', '打开背包', '食物口袋'], 商店: ['商店', '进入商店', '拉姆商店'], 游戏: ['游戏', '游乐时光'], 成长: ['成长', '成长手册'], 对话: ['对话', '和拉姆说话'], 设置: ['设置', '陪伴设置'] };
+  const aliases = { 状态: ['状态', '我的拉姆'], 背包: ['背包', '打开背包', '食物口袋'], 商店: ['商店', '进入商店', '拉姆商店'], 游戏: ['游戏', '游乐时光'], 成长: ['成长', '成长手册'], 衣橱: ['衣橱', '拉姆小衣橱'], 回忆: ['回忆', '照料回忆'], 布置: ['布置', '布置小屋'], 设置: ['设置', '陪伴设置'] };
   for (const name of aliases[label] || [label]) {
     const button = dock.getByRole('button', { name, exact: true });
     if (await button.isVisible()) { await button.click(); return; }

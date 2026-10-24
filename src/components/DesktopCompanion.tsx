@@ -4,6 +4,7 @@ import type { Action, GameState, Stage, ItemCategory, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {isMoodAction} from '../mood-motion';
+import {isPastime} from '../pet-pastimes';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CareFeedback from './CareFeedback';
@@ -23,6 +24,7 @@ interface Props {
   onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
   onActionEnd?:()=>void;
+  onRecall:()=>void;
   pocketCategory: ItemCategory; pocketVisit: number; playInvitation?:ReactNode;
 }
 const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
@@ -72,7 +74,8 @@ export default function DesktopCompanion(p: Props) {
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null); }, [tools, dragging, p.panel,docked]);
+  const selfBusy=isPastime(p.action)||Boolean(p.pet.outing);
+  useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null || selfBusy); }, [tools, dragging, p.panel,docked,selfBusy]);
   useEffect(()=>{if(p.desktopState.mouseThrough){setTools(false);if(p.panel)p.onPanel(null)}},[p.desktopState.mouseThrough,p.panel]);
   useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
   useEffect(() => () => { void window.desktop?.setInteracting(false); }, []);
@@ -143,12 +146,13 @@ export default function DesktopCompanion(p: Props) {
   const layoutStyle = { '--classic-pet-x': `${bookGeometry?.petX??p.desktopState.petOffset?.x??0}px`, '--classic-pet-y': `${bookGeometry?.petY??p.desktopState.petOffset?.y??0}px`, '--edge-x': `${paintedOffset.x}px`, '--edge-y': `${paintedOffset.y}px`, '--pocket-x':`${bookGeometry?.panelX??160}px`,'--pocket-y':`${bookGeometry?.panelY??20}px`,...(!p.native ? { transform: `translate(${offset.x}px,${offset.y}px)` } : {}) } as CSSProperties;
   const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
-    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('food'); }}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('food'); }}>
       <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)?p.onActionEnd:undefined}/>
+        <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)||isPastime(displayAction)?p.onActionEnd:undefined}/>
       </button>
+      {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
                 <button aria-label="喂食" title="吃" onClick={() => show('food')}><Icon path={icons.food}/></button>
         <button aria-label="玩耍" title="玩耍" onClick={() => show('play')}><Icon path={icons.play}/></button>

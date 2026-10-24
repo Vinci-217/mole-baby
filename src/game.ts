@@ -2,6 +2,10 @@ import { ITEMS, getItem } from './catalog';
 import {normalizeWardrobe} from './wardrobe';
 import type {OutfitId} from './wardrobe';
 import type { PetItem } from './catalog';
+import {normalizeCheckIn} from './daily-check-in';
+import type {DailyCheckIn} from './daily-check-in';
+import {normalizeOuting} from './pet-pastimes';
+import type {PetOuting} from './pet-pastimes';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
 
@@ -43,6 +47,9 @@ export interface GameState {
   awakeUntil?: number;
   completedGames: number;
   lastRewardAt: number;
+  checkIn?: DailyCheckIn;
+  outing?: PetOuting;
+  lastOutingAt?: number;
 }
 
 export interface CareResult {
@@ -302,7 +309,7 @@ export function getPetCondition(state: GameState): PetCondition {
   if (state.stats.hunger < 30) return { id: 'hungry', label: '肚子饿了', action: 'hungry', description: '从背包挑一份食物，空背包可以去商店补充。' };
   if (state.stats.thirst < 30) return { id: 'thirsty', label: '口渴了', action: 'thirsty', description: '需要喝一点麦香牛奶、果汁或其他饮品。' };
   if (state.stats.cleanliness < 30) return { id: 'dirty', label: '需要清洁', action: 'dirty', description: '使用泡泡浴、洗面奶或沐浴露清洁一下吧。' };
-  if (state.stats.happiness < 30) return { id: 'sad', label: '有点难过', action: 'sad', description: '摸摸它、聊聊天，或者一起玩一会儿。' };
+  if (state.stats.happiness < 30) return { id: 'sad', label: '有点难过', action: 'sad', description: '摸摸它，或者一起玩一会儿。' };
   if (state.stats.energy < 25) return { id: 'tired', label: '有点困了', action: 'tired', description: '困了会自己闭眼休息，睡着后可以轻轻叫醒。' };
   return { id: 'healthy', label: '状态很好', action: 'idle', description: '吃得饱、喝得足，正在安心地陪伴你。' };
 }
@@ -371,6 +378,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       inventory[item.id] = count;
     }
     for (const item of ITEMS) inventory[item.id] ??= 0;
+    const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
     return tick({
       version: 1,
       name: value.name.trim(),
@@ -387,6 +395,9 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       ...(isIntegerIn(value.awakeUntil,0,now+WAKE_GRACE_MS)?{awakeUntil:value.awakeUntil}:{}),
       completedGames: value.completedGames,
       lastRewardAt: value.lastRewardAt,
+      ...(normalizeCheckIn(value.checkIn,now)?{checkIn:normalizeCheckIn(value.checkIn,now)}:{}),
+      ...(importedOuting?{outing:importedOuting}:{}),
+      ...(isIntegerIn(value.lastOutingAt,value.createdAt,now+300000)?{lastOutingAt:value.lastOutingAt}:{}),
     }, now);
   } catch {
     return null;

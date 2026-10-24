@@ -53,7 +53,7 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
   [
     '摩尔城堡、淘淘乐街……这些名字一念，就有小时候的感觉呢。',
     '小拉姆也有自己的小日子：吃饱、洗干净，再陪你发一会儿呆。',
-    '想听你讲小时候在庄园里最喜欢做的事。我会认真听。',
+    '小时候在庄园里忙来忙去，现在也可以一起慢慢过日子。',
     stage===0?'小花盆里也有好多新鲜事。你忙你的，我在这里陪着。':'咕噜？我把身子轻轻一晃，就当和你打过招呼啦。',
   ].forEach((text,i)=>add(`ram-life-${i}`,'life',text));
  GROWTH[stage].forEach((text,i)=>add(`growth-${stage}-${i}`,'growth',text));
@@ -70,6 +70,10 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
  if(facts.some(f=>f.kind==='plan'&&f.status==='done'))add('memory-done','memory','你标记完成的那件事，我记着呢。为自己走过的这一步开心一下吧。');
  if(memory.events.some(e=>['feed','drink','wash','play'].includes(e.kind)&&e.at<=now&&now-e.at<7*86400000))add('memory-care','memory','你照顾我的那些小事，我记着呢。也想把一点温暖留给你。');
  const completed=todaysTimers(memory,now);
+ const adventure=memory.events.filter(e=>e.kind==='outing-return'&&e.at<=now&&now-e.at<2*86400000).at(-1);
+ if(adventure)add('memory-latest-outing','memory',adventure.detail);
+ const reading=memory.events.some(e=>e.kind==='self-read-alone'&&e.at<=now&&now-e.at<86400000);
+ if(reading)add('memory-own-book','memory','刚才自己翻的那几页书，我还想再琢磨一下。你也按自己的节奏来呀。');
  if(completed.count)add('memory-timer-today','memory',`今天我们一起等完了${completed.count}段计时。我把这${completed.minutes}分钟的小约定记住啦。`);
  const lastUser=memory.messages.filter(m=>m.role==='user'&&m.at<=now&&now-m.at<2*60*MINUTE).at(-1);
  if(companionFeeling(lastUser?.content??'')==='low')add('feeling-tired','feeling','听你说最近不太轻松，不用急着把自己撑好。我陪着你，想说话时就叫我。');

@@ -33,6 +33,7 @@ export default function MemoryGame({ onComplete, onClose, sound=false }: { onCom
   const locked = useRef(false);
   const startedAt = useRef(0);
   const completed = useRef(false);
+  const lastWarning=useRef(4);
   const flipTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const callbacks = useRef({ onComplete, onClose }); callbacks.current = { onComplete, onClose };
 
@@ -66,15 +67,17 @@ export default function MemoryGame({ onComplete, onClose, sound=false }: { onCom
     if (!['preview', 'playing', 'celebrating'].includes(phase)) return;
     const timer = setInterval(() => {
       const elapsed = (performance.now() - startedAt.current) / 1000;
+      const remaining=Math.ceil(45-elapsed);if(remaining>0&&remaining<=3&&remaining<lastWarning.current){lastWarning.current=remaining;playGameSound('countdown',sound)}
       setSeconds(Math.max(0, Math.ceil(45 - elapsed)));
       setPreviewSeconds(Math.max(0, Math.ceil(3 - elapsed)));
       if (elapsed >= 45 || (phase === 'celebrating' && elapsed >= 10)) finish();
       else if (phase === 'preview' && elapsed >= 3) setPhase('playing');
     }, 100);
     return () => clearInterval(timer);
-  }, [phase]);
+  }, [phase,sound]);
 
   function start() {
+    lastWarning.current=4;playGameSound('start',sound);
     clearTimeout(flipTimer.current);
     const cards = shuffle(); boardRef.current = cards; setBoard(cards);
     selectedRef.current = []; setSelected([]); pairsRef.current = 0; setPairs(0);
@@ -97,7 +100,7 @@ export default function MemoryGame({ onComplete, onClose, sound=false }: { onCom
         else setPhase('celebrating');
       }
     } else {
-      playGameSound('flip',sound);
+      playGameSound('mismatch',sound);
       locked.current = true;
       flipTimer.current = setTimeout(() => { selectedRef.current = []; setSelected([]); locked.current = false; }, 720);
     }

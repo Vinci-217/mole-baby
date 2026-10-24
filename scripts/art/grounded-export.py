@@ -61,14 +61,14 @@ def variant(kind,probe):
    depth=int(p.get('depth'))
    if kind=='leaves' or kind=='open' and depth in info['pupilDepths'] or kind=='closed' and depth in (*info['eyeDepths'],*info['pupilDepths']) or kind=='pupils' and depth not in info['pupilDepths']:hide(p)
    if kind=='half' and depth in (*info['eyeDepths'],*info['pupilDepths']):
-    index=0 if depth in (info['eyeDepths'][0],info['pupilDepths'][0]) else 1;cy=info['eyes'][index]['cy'];m=p.find('matrix');m.set('hasScale','true');m.set('scaleY',str(float(m.get('scaleY','1'))*.22));m.set('translateY',str(round(cy+(float(m.get('translateY','0'))-cy)*.22)));m.set('nScaleBits','31');m.set('nTranslateBits','31')
+    index=0 if depth in (info['eyeDepths'][0],info['pupilDepths'][0]) else 1;cy=info['eyes'][index]['cy'];m=p.find('matrix');m.set('hasScale','true');m.set('scaleY',str(float(m.get('scaleY','1'))*.55));m.set('translateY',str(round(cy+(float(m.get('translateY','0'))-cy)*.55)));m.set('nScaleBits','31');m.set('nTranslateBits','31')
   if kind=='leaves' and form=='junior':
    for p in tags:
     if p.get('type','').startswith('Place'):hide(p)
   if kind=='closed':
    # Original happy's closed eye shape 665, positioned at the current eyes.
    for i,eye in enumerate(info['eyes']):
-    scale=eye['width']*.85/334;p=E.Element('item',type='PlaceObject2Tag',characterId='665',depth=str(20+i),forceWriteAsLong='false',placeFlagHasCharacter='true',placeFlagHasClipActions='false',placeFlagHasClipDepth='false',placeFlagHasColorTransform='false',placeFlagHasMatrix='true',placeFlagHasName='false',placeFlagHasRatio='false',placeFlagMove='false')
+    scale=eye['width']*.62/334;p=E.Element('item',type='PlaceObject2Tag',characterId='665',depth=str(20+i),forceWriteAsLong='false',placeFlagHasCharacter='true',placeFlagHasClipActions='false',placeFlagHasClipDepth='false',placeFlagHasColorTransform='false',placeFlagHasMatrix='true',placeFlagHasName='false',placeFlagHasRatio='false',placeFlagMove='false')
     E.SubElement(p,'matrix',type='MATRIX',hasRotate='false',hasScale='true',nRotateBits='0',nScaleBits='31',nTranslateBits='31',scaleX=str(scale),scaleY=str(scale),translateX=str(round(eye['cx']+206*scale)),translateY=str(round(eye['cy']+15.5*scale)))
     tags.insert(len(tags)-1,p)
  if probe:
