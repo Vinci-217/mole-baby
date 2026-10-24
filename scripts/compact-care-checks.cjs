@@ -26,7 +26,7 @@ async function verifyCompactCare(page,desktop){
   await page.evaluate(()=>window.desktop.setEdgeHiding(true));const area=await desktop.evaluate(({screen})=>screen.getPrimaryDisplay().workArea);
   for(const side of ['left','right','top','bottom']){
    await page.evaluate(async()=>{await window.desktop.revealPet();await window.desktop.setInteracting(false);});const state=await page.evaluate(()=>window.desktop.getState());
-   await page.evaluate(async()=>{await window.desktop.setEdgeHiding(false);await window.desktop.movePet(-500,-200);await window.desktop.setEdgeHiding(true)});
+   const resetWindow=await nativeBounds(),resetState=await page.evaluate(()=>window.desktop.getState());await page.evaluate(async({area,resetWindow,resetState})=>{await window.desktop.setEdgeHiding(false);await window.desktop.movePet(area.x+(area.width-160)/2-resetWindow.x-(resetState.petOffset?.x??0),area.y+(area.height-240)/2-resetWindow.y-(resetState.petOffset?.y??0));await window.desktop.setEdgeHiding(true)},{area,resetWindow,resetState});
    const body=await screenPet(),a={x:body.x+50,y:body.y+54},b={...a};if(side==='left')b.x=area.x;if(side==='right')b.x=area.x+area.width-1;if(side==='top')b.y=area.y;if(side==='bottom')b.y=area.y+area.height-1;
    await dragNative(page,desktop,a,b,4);await warpPointer(desktop,{x:area.x+area.width/2,y:area.y+area.height/2});await page.mouse.move(-20,-20);await expect.poll(async()=>(await page.evaluate(()=>window.desktop.getState())).edgeSide).toBe(side);await expect.poll(async()=>(await page.evaluate(()=>window.desktop.getState())).edgePose).toBe('hidden');
    const win=await nativeBounds(),local=await page.evaluate(({win,area})=>{

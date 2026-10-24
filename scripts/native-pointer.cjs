@@ -6,7 +6,7 @@ async function warpPointer(desktop,point){
  const p=process.platform==='win32'?await desktop.evaluate(({screen},p)=>screen.dipToScreenPoint(p),point):point;
  if(process.platform==='win32'){
   const script=`Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class MouseWarp { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y); }'; [MouseWarp]::SetCursorPos(${Math.round(p.x)},${Math.round(p.y)}) | Out-Null`;
-  execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{stdio:'pipe',timeout:20000});
+  execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{stdio:'pipe',timeout:20000,windowsHide:true});
  }else if(process.platform==='darwin'){
   if(!macBinary){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-pointer-'));macBinary=path.join(dir,'warp');const source=path.join(dir,'warp.c');fs.writeFileSync(source,'#include <ApplicationServices/ApplicationServices.h>\n#include <stdlib.h>\nint main(int n,char**v){if(n!=3)return 1;CGWarpMouseCursorPosition(CGPointMake(atof(v[1]),atof(v[2])));return 0;}');execFileSync('clang',[source,'-framework','ApplicationServices','-o',macBinary],{stdio:'pipe',timeout:30000});}
   execFileSync(macBinary,[String(p.x),String(p.y)],{stdio:'pipe'});

@@ -31,6 +31,7 @@ test('all four body edges dock only on contact, preserving the other coordinate'
   }
   assert.equal(cornerSide({ x: -30, y: -71 }, area), 'left', 'exact corner ties use a deterministic side');
   assert.equal(cornerSide({ x: -29, y: -71 }, area), 'top', 'the closer body edge wins');
+  for(const[x,y,expected]of[[-30,-71,'left'],[1790,-71,'right'],[-30,861,'left'],[1790,861,'right']])assert.equal(cornerSide({x,y},area),expected,'corner ties have a stable horizontal preference');
 });
 
 test('a small work area keeps the native frame size and contains the body', () => {
