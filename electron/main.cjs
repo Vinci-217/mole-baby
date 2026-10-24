@@ -788,6 +788,7 @@ function createWindow() {
   window.webContents.on('did-finish-load', () => {
     if (!window.isDestroyed()) publishState(true);
   });
+  window.webContents.on('preload-error', (_event, _filename, error) => { console.error('Desktop preload failed:', error.name, error.message); });
   window.webContents.on('render-process-gone', () => { companionAI.cancel(); companionSpeech.cancel(); });
   window.webContents.on('did-start-navigation', (_event, _url, isInPlace, isMainFrame) => {
     if (isMainFrame && !isInPlace) { companionAI.cancel(); companionSpeech.cancel(); }

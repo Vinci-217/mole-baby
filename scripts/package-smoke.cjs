@@ -122,7 +122,10 @@ async function verifyApplication({ executable, archive, screenshot }) {
   const rendererErrors = [];
   page.on('pageerror', error => rendererErrors.push(error.message));
   assert.ok(page.url().startsWith('file:'), `Expected the packaged renderer: ${page.url()}`);
-  await page.waitForFunction(() => window.desktop?.isElectron === true);
+  // A hidden/occluded Windows window can suspend animation-frame polling.
+  // Probe the preload bridge with a timer before interacting with the window.
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForFunction(() => window.desktop?.isElectron === true, undefined, { polling: 100, timeout: 30000 });
   await adopt(page, '红色', '红豆');
   const character = page.locator('.desktop-character');
   await expect(character).toBeVisible();
@@ -287,6 +290,9 @@ async function verifyApplication({ executable, archive, screenshot }) {
     if (page && !page.isClosed()) {
       console.error('Renderer loading diagnostics:', await page.evaluate(() => ({
         visibility: document.visibilityState,
+        readyState: document.readyState,
+        url: location.href,
+        bridges: { desktop: typeof window.desktop, isElectron: window.desktop?.isElectron, ai: typeof window.companionAI, speech: typeof window.companionSpeech },
         action: document.querySelector('.ram-sprite')?.getAttribute('data-action'),
         bubble: document.querySelector('.compact-bubble')?.textContent,
         desktop: document.querySelectorAll('.desktop-character').length,
