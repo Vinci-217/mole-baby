@@ -1,0 +1,27 @@
+{
+  "retrieved": "2026-10-24",
+  "adaptation": "Names and prices are local choices, not verified official item names or server prices. Source accessories retain their original colours.",
+  "items": [
+    {
+      "id": "party-cap",
+      "sourceId": "1200008",
+      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200008.swf",
+      "sha256": "a2a67aaa8549b4cf7f5768d33d158f3a4c70e04691062a8d49209c21b06171f3",
+      "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
+    },
+    {
+      "id": "gold-feather",
+      "sourceId": "1200018",
+      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200018.swf",
+      "sha256": "19f3e9891e2a96f0f5c4a08b3b3d4f36a5c9b49bb08ba208915eba5e4703f9bc",
+      "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
+    },
+    {
+      "id": "wizard-cap",
+      "sourceId": "1200020",
+      "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf/cloth/1200020.swf",
+      "sha256": "fdc904097797d117fca05189e0d27d0ffabe0ddad069fcf60f4e984d9d5a1a4a",
+      "extraction": "Complete original sprite 2, zoom 8, transparent PNG, trimmed to sprite bounds; no stage cropping."
+    }
+  ]
+}

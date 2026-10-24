@@ -201,3 +201,5 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .compact-pet:has(.ram-football-frame) .compact-bubble{opacity:0;pointer-events:none}
 .companion-preview>.companion-layout.panel-open{height:490px}
 @media(max-width:600px){.companion-preview>.companion-layout.panel-open{height:735px}.companion-preview .companion-panel{height:474px;max-height:calc(100vh - 255px)}.companion-preview>.companion-layout{bottom:15px}}
+
+.compact-mood{display:flex;align-items:center;width:100%;gap:7px;padding:5px 7px;border:0;border-radius:10px;background:#f4f7dc;color:#795d34;font:inherit;text-align:left;cursor:pointer;margin:5px 0}.compact-mood>img{width:22px;height:22px;object-fit:contain}.compact-mood span{font-size:14px}.compact-mood b{font-size:13px;font-weight:normal;margin-left:auto;color:#8b6e43}.compact-mood:disabled{opacity:.65;cursor:default}

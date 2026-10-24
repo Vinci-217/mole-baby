@@ -411,4 +411,39 @@ async function verifyComfortMotion(page) {
   }
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion };
+async function verifyMoodWardrobe(page) {
+  const original=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage).filter(([key])=>key==='ramu-house-save-v1'||key==='ramu-house-preferences-v2'||key.includes('companion'))));
+  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+  try {
+    await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{coins:200,growth:0,sleeping:false,wardrobe:[],lastTick:Date.now(),stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:90}});delete p.wearing;delete p.evolution;for(const key of Object.keys(localStorage))if(key.includes('companion'))localStorage.removeItem(key);localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,presence:false,lively:false}));});
+    await page.reload();const identity=await save(),character=page.getByTestId('desktop-character'),ram=character.locator('.ram-sprite');
+    await expect(page.getByRole('button',{name:'拉姆小衣橱',exact:true})).toHaveCount(0);
+    await enterHome(page);await page.getByRole('button',{name:'拉姆小衣橱',exact:true}).click();const wardrobe=page.locator('.wardrobe');
+    await wardrobe.getByRole('button',{name:'试戴庆生小帽',exact:true}).click();await expect(wardrobe.locator('.wardrobe-mirror .ram-wear')).toBeVisible();
+    expect((await save()).coins).toBe(200);expect((await save()).wardrobe??[]).toEqual([]);expect((await save()).wearing).toBeUndefined();await expect(page.locator('.scene-character .ram-wear')).toHaveCount(0);
+    await wardrobe.getByRole('button',{name:'买下 · 30 摩尔豆',exact:true}).evaluate(button=>{button.click();button.click()});
+    expect((await save()).coins).toBe(170);expect((await save()).wardrobe).toEqual(['party-cap']);
+    await wardrobe.getByRole('button',{name:'给拉姆戴上',exact:true}).click();await expect(page.locator('.scene-character .ram-wear')).toHaveAttribute('data-outfit','party-cap');
+    await toDesktop(page);await expect(ram.locator('.ram-wear')).toBeVisible();await page.reload();await expect(ram.locator('.ram-wear')).toHaveAttribute('data-outfit','party-cap');
+    for(const [growth,evolution,happiness,energy,action] of [[0,null,90,90,'mood-joy'],[180,null,35,90,'mood-grumpy'],[840,'fire',90,30,'mood-dozy'],[420,null,70,90,'mood-content']]){
+      await page.evaluate(({growth,evolution,happiness,energy})=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=growth;p.stats.happiness=happiness;p.stats.energy=energy;p.sleeping=false;p.lastTick=Date.now();delete p.evolution;if(evolution)p.evolution=evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));},{growth,evolution,happiness,energy});
+      await page.reload();await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'查看状态',exact:true}).click();
+      const mood=page.getByRole('button',{name:'回应拉姆的心情',exact:true});await expect(mood).toBeVisible();
+      const bounds=await mood.boundingBox(),panel=await page.getByTestId('companion-panel').boundingBox();expect(bounds.y+bounds.height).toBeLessThanOrEqual(panel.y+panel.height);
+      await mood.click();await expect(ram).toHaveAttribute('data-action',action);await expect(ram.locator('.ram-wear')).toBeVisible();
+      if(growth===180){const canvas=ram.locator('canvas');await expect(canvas).toHaveAttribute('data-loaded','true');const first=await canvas.getAttribute('data-source-frame');await expect.poll(()=>canvas.getAttribute('data-source-frame'),{intervals:[60]}).not.toBe(first)}
+      await expect(ram).toHaveAttribute('data-action','idle',{timeout:9000});await expect(ram).toHaveAttribute('data-sleeping','false');
+      const pet=await save();expect(pet.coins).toBe(170);expect(pet.wearing).toBe('party-cap');expect(pet.name).toBe(identity.name);expect(pet.color).toBe(identity.color);expect(pet.inventory).toEqual(identity.inventory);
+      await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
+    }
+    await enterHome(page);await page.getByRole('button',{name:'拉姆小衣橱',exact:true}).click();await wardrobe.getByRole('button',{name:'试戴金色羽毛',exact:true}).click();await wardrobe.getByRole('button',{name:'买下 · 45 摩尔豆',exact:true}).click();await wardrobe.getByRole('button',{name:'给拉姆戴上',exact:true}).click();await expect(page.locator('.scene-character .ram-wear')).toHaveAttribute('data-outfit','gold-feather');
+    await wardrobe.getByRole('button',{name:'收好装扮',exact:true}).click();await expect(page.locator('.scene-character .ram-wear')).toHaveCount(0);await expect(wardrobe.locator('.ram-wear')).toHaveCount(0);
+    const end=await save();expect(end.coins).toBe(125);expect(end.wardrobe).toEqual(['party-cap','gold-feather']);expect(end.wearing).toBeUndefined();await toDesktop(page);
+    console.log('PASS: wardrobe preview never spends, purchases charge once, worn original accessories persist and real moods respond without fake care rewards');
+  } finally {
+    await page.evaluate(values=>{for(const key of Object.keys(localStorage))if(key==='ramu-house-save-v1'||key==='ramu-house-preferences-v2'||key.includes('companion'))localStorage.removeItem(key);for(const [key,value] of Object.entries(values))localStorage.setItem(key,value);},original);
+    await page.reload();await page.getByTestId('desktop-character').waitFor();
+  }
+}
+
+module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };

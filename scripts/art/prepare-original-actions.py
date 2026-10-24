@@ -6,7 +6,7 @@ Requires JPEXS 26.3; see original/football/README.md for exact source hashes.
 from pathlib import Path
 import argparse,copy,json,subprocess,concurrent.futures
 import xml.etree.ElementTree as E
-p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--actions',default='football,boring,happy');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
 IDS={'ordinary': [('junior','936'),('middle','1532'),('senior','1777')],'super':[('super','940')],'water':[('water','538')],'wood':[('wood','1029')],'fire':[('fire','898')]}
 def export(form):
  r=E.parse(a.ordinary_xml if form=='ordinary' else a.sources/f'{form}.xml');ns={n.get('spriteId') or n.get('shapeId'):n for n in r.getroot().find('tags') if n.get('spriteId') or n.get('shapeId')};cache={}
@@ -25,7 +25,7 @@ def export(form):
  specs={}
  for name,sid in IDS[form]:
   node=ns[sid];old=list(node.find('subTags'));node.remove(node.find('subTags'));tags=E.SubElement(node,'subTags');start=1;specs[name]={}
-  for action in ['football','boring','happy']:
+  for action in a.actions.split(','):
    i=next(i for i,v in enumerate(old) if v.get('type')=='FrameLabelTag' and v.get('name')==action);place=copy.deepcopy(next(v for v in old[i+1:] if v.get('characterId')));count=length(place.get('characterId'));specs[name][action]={'start':start,'count':count,'child':place.get('characterId')}
    E.SubElement(tags,'item',type='RemoveObject2Tag',depth='1',forceWriteAsLong='false');tags.append(place)
    for _ in range(count):E.SubElement(tags,'item',type='ShowFrameTag',forceWriteAsLong='false')

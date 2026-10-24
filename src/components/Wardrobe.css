@@ -1,0 +1,14 @@
+.wardrobe{display:grid;grid-template-columns:220px 1fr;gap:25px;align-items:start;color:#76512c}
+.wardrobe-preview{display:flex;flex-direction:column;align-items:center;gap:12px;padding:15px 10px;border-radius:25px;background:#fff8df}
+.wardrobe-preview h3,.wardrobe-choice h3{margin:0;font-size:21px}
+.wardrobe-mirror{width:160px;height:195px;display:flex;align-items:center;justify-content:center;border:3px solid #f6ce6e;border-radius:80px 80px 35px 35px;background:#eaf7ee}
+.wardrobe-mirror>.ram-sprite{width:115px}
+.wardrobe-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:340px;width:100%;margin-inline:auto}
+.wardrobe-grid>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;aspect-ratio:1;background:#fffef9;border:2px solid #edcf91;border-radius:18px;color:#79572e;font:inherit;cursor:pointer}
+.wardrobe-grid>button[aria-pressed=true]{border-color:#e9a12c;background:#fff5cf;box-shadow:0 0 0 2px #ffe3a4}
+.wardrobe-grid img{width:62px;height:62px;object-fit:contain}
+.wardrobe-grid b{font-size:17px}.wardrobe-grid span{font-size:15px;color:#937349}
+.wardrobe-choice{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:12px}.wardrobe-choice p{margin:0;font-size:16px}
+@media(max-width:700px){.wardrobe{grid-template-columns:1fr}.wardrobe-preview{padding:12px}.wardrobe-mirror{height:150px}.wardrobe-grid{gap:8px}.wardrobe-grid b{font-size:15px}.wardrobe-grid img{width:50px;height:50px}}
+
+.wardrobe-preview h3{max-width:100%;overflow-wrap:anywhere;text-align:center}

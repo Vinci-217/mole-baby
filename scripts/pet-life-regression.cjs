@@ -23,7 +23,7 @@ const save=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1
  await p.clock.install();await p.goto(url);await adopt(p,'蓝色','小芽');await p.clock.pauseAt(new Date(Date.now()+1000));
  await p.clock.fastForward(16000);await p.clock.runFor(40);assert.equal(await p.evaluate(()=>window.__audioCreated),0,'no startup audio/context or automatic focus');
  const before=await save(p);const memories=await p.evaluate(()=>localStorage.getItem(`ramu-companion-memory-v1:${JSON.parse(localStorage.getItem('ramu-house-save-v1')).createdAt}`));
- await p.clock.fastForward(245000);await p.clock.runFor(80);const ram=p.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-action',/^(look-around|watch-butterfly|happy|waving)$/);
+ await p.clock.fastForward(245000);await p.clock.runFor(80);const ram=p.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram).toHaveAttribute('data-action',/^(look-around|watch-butterfly|happy|waving|mood-joy|mood-content)$/);
  const pot=await ram.locator('.seed-pot-original').evaluate(n=>getComputedStyle(n).transform);assert.equal(pot,'none');
  await p.clock.runFor(6600);await expect(ram).toHaveAttribute('data-action','idle');assert.equal((await save(p)).coins,before.coins);assert.deepEqual((await save(p)).inventory,before.inventory);assert.equal(await p.evaluate(()=>localStorage.getItem(`ramu-companion-memory-v1:${JSON.parse(localStorage.getItem('ramu-house-save-v1')).createdAt}`)),memories,'passive motion cannot farm memories or affection');
  await openActions(p);await p.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();await p.getByRole('button',{name:'看看小蝴蝶',exact:true}).click();await p.clock.runFor(1200);

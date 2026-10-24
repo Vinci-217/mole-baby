@@ -27,13 +27,17 @@ export function footballContacts(form:string):number[] {
 /** A small original mouth shape opens, pauses, then closes during each breath. */
 export function slumberFrame(elapsed:number,reduced=false):number {
   if(reduced)return 0
-  const phase=Math.max(0,elapsed)%4800
-  if(phase<650||phase>=2850)return 0
-  if(phase<1550)return Math.min(6,Math.floor((phase-650)/150)+1)
-  if(phase<1850)return 6
-  return Math.max(0,6-Math.floor((phase-1850)/145))
+  const phase=Math.max(0,elapsed)%6400
+  if(phase<1100||phase>=4400)return 0
+  const breath=Math.sin((phase-1100)/3300*Math.PI)
+  return Math.round(breath*breath*7)
 }
 export function slumberMouth(form:RamForm):readonly number[] {
   const point=slumber.forms[form].mouthPoint
+  return form==='seed'?[26.56+point[0]*.5,17.31+point[1]*.476]:point
+}
+
+export function slumberEmitter(form:RamForm):readonly number[] {
+  const point=slumber.forms[form].snorePoint
   return form==='seed'?[26.56+point[0]*.5,17.31+point[1]*.476]:point
 }

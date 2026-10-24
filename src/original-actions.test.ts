@@ -38,8 +38,8 @@ describe('complete original performances in the desktop viewport',()=>{
   }
  })
  it('breathes through an original sleepy-eye mouth cycle and keeps affection on the normal face',()=>{
-  expect(slumber.eyes).toEqual({seed:35,other:1726});expect(slumber.mouth).toBe(743)
-  expect([0,1550,2850,4800,6350].map(t=>slumberFrame(t))).toEqual([0,6,0,0,6])
+  expect(slumber.eyes).toEqual({seed:35,junior:753,other:1726});expect(slumber.mouth).toBe(743)
+  expect([0,2750,4400,6400,9150].map(t=>slumberFrame(t))).toEqual([0,7,0,0,7])
   for(const t of [0,900,1600,4700,1e9]){expect(slumberFrame(t,true)).toBe(0);expect(sampleRamPose('sleep',t).sheet).toBe('slumber')}
   for(const form of ['senior','super','water','wood','fire'])for(const t of [500,1000,1700])expect(sampleFlyingPose('pet',t,false,form).sheet).toBeUndefined()
  })

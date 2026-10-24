@@ -4,7 +4,7 @@ const path = require('node:path');
 const { execFileSync, spawn } = require('node:child_process');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyMoodWardrobe, verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 
 const root = path.resolve(__dirname, '..');
 const cloud = '/workspace/.ramu-env';
@@ -193,6 +193,7 @@ async function verifyBackground(page, selector, suffix) {
   await verifyRoomIteration(page);
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
+  await verifyMoodWardrobe(page);
   // A window close/minimize hides the live app. Only an explicit quit ends it.
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());await expect(character).toBeVisible();
   await page.evaluate(()=>window.desktop.minimize());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());

@@ -1,11 +1,12 @@
 import { getCompanionMood } from './companion-memory'
 import type { CompanionMemory } from './companion-memory'
 import { getStage } from './game'
+import {ramForm} from './original-actions'
 import type { GameState } from './game'
 import { getRamActionDuration } from './components/ram-animation'
 
 /** Original, finite gestures only: never a walk, user hand, ball or focus book. */
-export const IDLE_ACTIONS = ['look-around', 'watch-butterfly', 'happy', 'waving'] as const
+export const IDLE_ACTIONS = ['look-around', 'watch-butterfly', 'happy', 'waving','mood-joy','mood-content','mood-dozy','mood-grumpy'] as const
 export type IdleAction = typeof IDLE_ACTIONS[number]
 export interface IdleBehavior { action: IdleAction; duration: number }
 interface Candidate { action: IdleAction; weight: number }
@@ -29,14 +30,15 @@ export function idleCandidates(pet: GameState, memory?: CompanionMemory, now = D
   if (pet.sleeping || pet.stats.health <= 35 || pet.stats.hunger < 30 || pet.stats.thirst < 30 || pet.stats.cleanliness < 30 || pet.stats.energy < 25) return []
   const ownMemory = memory?.petId === String(pet.createdAt) ? memory : undefined
   const concerned = ownMemory && getCompanionMood(ownMemory, pet, now).id === 'concerned'
-  if (concerned || pet.stats.happiness < 45 || pet.stats.energy < 45) return [
-    { action: 'look-around', weight: 6 }, { action: 'watch-butterfly', weight: 2 },
-  ]
+  if(pet.stats.happiness<40)return [{action:'mood-grumpy',weight:5},{action:'mood-content',weight:3},{action:'look-around',weight:2}]
+  if(pet.stats.energy<45)return [{action:'mood-dozy',weight:6},{action:'mood-content',weight:3},{action:'look-around',weight:2}]
+  if(concerned)return [{action:'mood-content',weight:6},{action:'look-around',weight:3}]
   const weights: number[] = [...stageWeights[getStage(pet.growth, pet.evolution)]]
   if (ownMemory && /慢热|安静/.test(ownMemory.personality)) { weights[0] += 3; weights[2] = 1; weights[3] = 1 }
   if (ownMemory && /好奇|故事/.test(ownMemory.personality)) weights[1] += 3
   if (ownMemory && getCompanionMood(ownMemory, pet, now).id === 'cheerful') weights[2] += 4
-  return IDLE_ACTIONS.map((action, index) => ({ action, weight: weights[index] }))
+  return [...IDLE_ACTIONS.slice(0,4).map((action, index) => ({ action, weight: weights[index] })),
+    {action:'mood-joy' as const,weight:pet.stats.happiness>=80?7:3},{action:'mood-content' as const,weight:4}]
 }
 
 /** A deterministic weighted draw makes each pet varied and testable; the last
@@ -51,7 +53,7 @@ export function chooseIdleBehavior(pet: GameState, memory: CompanionMemory | und
   let draw = ((hash ^ hash >>> 15) >>> 0) / 0x1_0000_0000 * total
   for (const candidate of candidates) {
     draw -= candidate.weight
-    if (draw < 0) return { action: candidate.action, duration: getRamActionDuration(candidate.action)! }
+    if (draw < 0) return { action: candidate.action, duration: getRamActionDuration(candidate.action, ramForm(getStage(pet.growth,pet.evolution),pet.evolution))! }
   }
   return null
 }

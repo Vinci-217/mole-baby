@@ -4,6 +4,7 @@ import { STAGES, getPetCondition } from '../game';
 import type { Action, GameState, Stage, ItemCategory, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
+import {isMoodAction} from '../mood-motion';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CarePocket from './CarePocket';
@@ -13,6 +14,7 @@ import { edgeEntryAction, edgeTargetOffset, paintedEdgeOffset, type EdgeVector }
 
 export type CompanionPanel = 'status' | 'food' | 'play' | 'chat';
 interface Props {
+  moodLabel:string;moodBusy:boolean;onMood:()=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
@@ -142,7 +144,7 @@ export default function DesktopCompanion(p: Props) {
       <CareFeedback feedback={docked?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="回应拉姆的话" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '查看拉姆状态'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('status')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" title={docked ? '移上来探探头，按住拖出来' : '移上来互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking} onActionEnd={displayAction==='play'?p.onActionEnd:undefined}/>
+        <Ram costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={tilt} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)?p.onActionEnd:undefined}/>
       </button>
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
         <button aria-label="查看状态" title="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>
@@ -159,7 +161,7 @@ export default function DesktopCompanion(p: Props) {
       <header><strong>{p.pet.name}<span> · {STAGES[p.stage].name}</span></strong><button aria-label="关闭小窗" onClick={() => p.onPanel(null)}>×</button></header>
       <nav className="companion-tabs" aria-label="日常照料">{(Object.keys(labels) as CompanionPanel[]).map(tab => <button key={tab} role="tab" aria-selected={p.panel === tab} onClick={() => show(tab)}>{labels[tab]}</button>)}</nav>
       <div className="companion-content">
-        {p.panel === 'status' && <><div className="compact-profile"><div><Ram color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={condition.action} sleeping={p.pet.sleeping}/></div><p><b>{p.pet.name}</b><span>{condition.label}</span></p><small>{p.pet.coins} 豆</small></div><div className="compact-stats">{([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div><p className="compact-condition" role="status">{condition.description}</p>{p.pet.sleeping && <button className="compact-button" onClick={() => p.onCare('sleep')}>轻轻叫醒</button>}</>}
+        {p.panel === 'status' && <><div className="compact-profile"><div><Ram costume={p.pet.wearing} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={condition.action} sleeping={p.pet.sleeping}/></div><p><b>{p.pet.name}</b><span>{condition.label}</span></p><small>{p.pet.coins} 豆</small></div><button className="compact-mood" aria-label="回应拉姆的心情" disabled={p.moodBusy} onClick={p.onMood}><Icon path="ui/icon-happy"/><span>{p.moodLabel}</span><b>看看我</b></button><div className="compact-stats">{([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).map(([id, text]) => <label key={id}><span>{text}</span><progress max={100} value={p.pet.stats[id]}/><b>{Math.round(p.pet.stats[id])}</b></label>)}</div><p className="compact-condition" role="status">{condition.description}</p>{p.pet.sleeping && <button className="compact-button" onClick={() => p.onCare('sleep')}>轻轻叫醒</button>}</>}
         {p.panel === 'food' && <CarePocket key={`${p.pocketCategory}:${p.pocketVisit}`} pet={p.pet} initialCategory={p.pocketCategory} busyItemId={p.itemId} onCare={p.onCare} onVisitShop={p.onShop}/>}
         {p.panel === 'play' && <div className="desktop-play">{p.playInvitation}<button disabled={p.pet.sleeping} onClick={() => p.onCare('play')}><Icon path="items/180004"/>一起玩球</button><button disabled={p.pet.sleeping} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button><button disabled={!p.reminders} onClick={p.onFocus}><Icon path="ui/icon-clock"/>{p.timerRunning ? '结束专注' : '陪我专注'}</button><button disabled={p.pet.sleeping} onClick={p.onPresence}><Icon path="ui/toolbar-talk-normal"/>听拉姆说一句</button><button disabled={p.pet.sleeping} onClick={p.onCurious}><img alt="" draggable={false} src="./assets/generated/v15-butterfly.png"/>看看小蝴蝶</button><button className="desktop-play-home" onClick={p.onHome}>去小屋玩小游戏 ›</button></div>}
         {p.panel === 'chat' && p.chatContent}

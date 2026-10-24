@@ -10,10 +10,15 @@ import { createPetSoundClock } from '../pet-audio'
 import { itemSoundScore, socialSoundScore } from '../pet-sound-score'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleFlyingPose } from './ram-animation'
 import { edgePeekTilt, type PetEdge } from '../edge-motion'
-import {footballSpec,footballPose,footballDuration,slumberMouth,type RamForm} from '../original-actions'
+import {footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
+import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
+import RamWear from './RamWear'
+import {getOutfit} from '../wardrobe'
+import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
 
 interface RamProps {
   color: PetColor
+  costume?: string
   stage: Stage
   evolution?: Evolution
   action?: string
@@ -36,7 +41,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = RamForm
-type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'football'
+type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'football' | 'emotion-joy' | 'emotion-grumpy'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -47,7 +52,10 @@ const COLOR_OFFSETS: Record<PetColor, readonly number[]> = {
 }
 const sourceCache = new Map<string, Promise<SheetSource>>()
 const tintedCache = new Map<string, Promise<HTMLCanvasElement>>()
+const wearSources=new WeakMap<HTMLCanvasElement,SheetSource>()
+const wearAnchors=new WeakMap<SheetSource,Map<string,WearAnchor|null>>()
 const ACTION_NAMES: Record<string, string> = {
+  'mood-joy':'开心地舒展开身体','mood-grumpy':'有点闷闷的，轻轻皱起眉头','mood-content':'安心地眯眯眼','mood-dozy':'困倦地打个小哈欠',
   'watch-butterfly':'好奇地看着小蝴蝶', 'look-around':'轻轻转身张望',
   idle: '正在陪伴你', 'walk-right': '向右走', 'running-right': '向右走',
   'walk-left': '向左走', 'running-left': '向左走', pet: '被小手轻轻摸摸',
@@ -64,6 +72,7 @@ function sheetSpec(form: Form, kind: SheetKind) {
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
   if (kind === 'slumber') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/slumber/${form}-neutral.png`, mask:`./assets/original/slumber/${form}-mask.png` }
   if (kind === 'football') return { width:160*8,height:192*footballSpec(form)!.rows,neutral:`./assets/original/football/${form}-neutral.png`,mask:`./assets/original/football/${form}-mask.png` }
+  if(kind==='emotion-joy'||kind==='emotion-grumpy'){const emotion=kind.slice(8) as 'joy'|'grumpy';return {width:192*8,height:208*emotionSpec(form,emotion)!.rows,neutral:`./assets/original/emotions/${form}-${emotion}-neutral.png`,mask:`./assets/original/emotions/${form}-${emotion}-mask.png`}}
   if (kind === 'care') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * CARE_ROWS, neutral: `./assets/original/care/${form}-neutral.png`, mask: `./assets/original/care/${form}-mask.png` }
   if (kind === 'item') return { width: CELL_WIDTH * CARE_COLUMNS, height: CELL_HEIGHT * 4, neutral: `./assets/original/item-motion/${form}-neutral.png`, mask: `./assets/original/item-motion/${form}-mask.png` }
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
@@ -79,8 +88,8 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
   const key = kind === 'seed' ? 'seed' : `${kind}:${form}`
   const cached = sourceCache.get(key)
   if (cached) return cached
-  if(kind==='football'){
-    const old=[...sourceCache.keys()].filter(k=>k.startsWith('football:'))
+  if(kind==='football'||kind.startsWith('emotion-')){
+    const old=[...sourceCache.keys()].filter(k=>k.startsWith('football:')||k.startsWith('emotion-'))
     if(old.length>=2)sourceCache.delete(old[0])
   }
   const spec = sheetSpec(form, kind)
@@ -102,12 +111,12 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
-  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','football'].includes(kind)) kind = 'classic'
+  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','football'].includes(kind)&&!kind.startsWith('emotion-')) kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
-  if(kind==='football'){
-    const old=[...tintedCache.keys()].filter(k=>k.startsWith('football:'))
+  if(kind==='football'||kind.startsWith('emotion-')){
+    const old=[...tintedCache.keys()].filter(k=>k.startsWith('football:')||k.startsWith('emotion-'))
     if(old.length>=3)tintedCache.delete(old[0])
   }
   const pending = getSource(form, kind).then(({ neutral, mask }) => {
@@ -124,6 +133,7 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
       for (let channel = 0; channel < 3; channel++) pixels.data[i + channel] = clamp(pixels.data[i + channel] + deltas[0][channel] * white + deltas[1][channel] * gray + deltas[2][channel] * dark)
     }
     context.putImageData(pixels, 0, 0)
+    wearSources.set(canvas,{neutral,mask})
     return canvas
   }).catch((error: unknown) => { tintedCache.delete(key); throw error })
   // Keep old colour previews from retaining an unlimited number of large
@@ -131,6 +141,22 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
   if (tintedCache.size >= 18) tintedCache.delete(tintedCache.keys().next().value!)
   tintedCache.set(key, pending)
   return pending
+}
+/** Clothing belongs inside the body's transform layer and uses the same source
+ * frame coverage. The anchor is cached per source cell, independent of colour. */
+function paintWear(canvas:HTMLCanvasElement,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false) {
+  const wear=canvas.parentElement?.querySelector<HTMLImageElement>('.ram-wear'),source=wearSources.get(sheet)
+  const outfit=getOutfit(wear?.dataset.outfit)
+  if(!wear||!outfit||!source)return
+  let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
+  const key=`${frame}:${row}:${width}:${height}`,seed=width===96
+  if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,seed))
+  const anchor=cache.get(key);if(!anchor){wear.style.visibility='hidden';return}
+  const scaleX=football?1.666666667:1,scaleY=football?1.846153846:1
+  const x=(anchor.x+anchor.bodyWidth*outfit.x)/width*100*scaleX-(football?33.3333333:0)
+  const y=(anchor.y+anchor.bodyHeight*outfit.y)/height*100*scaleY-(football?61.5384615:0)
+  wear.style.left=`${x}%`;wear.style.top=`${y}%`;wear.style.width=`${anchor.bodyWidth/width*100*scaleX*outfit.width}%`;wear.style.rotate=`${anchor.angle}deg`;wear.style.visibility='visible'
+  wear.dataset.anchorFrame=`${frame}:${row}`
 }
 /** Body and accessory consume the exact same elapsed event clock. The
  * accessory is moved, not used to resize/re-register the original body. */
@@ -214,14 +240,15 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         if(grounded){canvas.dataset.gazeX=grounded.eyeX.toFixed(2);canvas.dataset.gazeY=grounded.eyeY.toFixed(2)}
         canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';previous=signature
       }
+      paintWear(canvas,sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,frame,row)
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; request = requestAnimationFrame(paint) }
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
     observer.observe(canvas); resume()
-    document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
-    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
+    document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
+    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume) }
   }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
@@ -244,22 +271,47 @@ function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,on
       if(!media.matches)audio.tick(elapsed)
       performanceClock.current.lastAudioElapsed=elapsed
       if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(source,pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
+      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),160,192,true)
       canvas.dataset.loaded='true';canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.nearBall=String(pose.nearBall)
       if(pose.finished&&!ended){ended=true;endRef.current?.()}
       if(!ended)request=requestAnimationFrame(paint)
     }
     const resume=()=>{cancelAnimationFrame(request);previous=-1;if(source)request=requestAnimationFrame(paint)}
     getTintedSheet(form,color,'football').then(value=>{if(!cancelled){source=value;resume()}}).catch(()=>{if(!cancelled)errorRef.current()})
-    document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume)
-    return()=>{cancelled=true;cancelAnimationFrame(request);audio.stop();document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume)}
+    document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume);canvas.addEventListener('ram-wardrobe-change',resume)
+    return()=>{cancelled=true;cancelAnimationFrame(request);audio.stop();document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume);canvas.removeEventListener('ram-wardrobe-change',resume)}
   },[form,color,actionId,startedAt,performanceClock])
   return <canvas ref={ref} className="ram-classic-frame ram-football-frame" width={160} height={192} data-sheet="football" data-form={form} data-color={color} data-duration={footballDuration(form)} aria-hidden="true"/>
+}
+function EmotionFrames({form,color,action,actionId,performanceClock,onError,onActionEnd}:{form:Form;color:PetColor;action:string;actionId?:number|string;performanceClock:RefObject<{began:number|undefined}>;onError:()=>void;onActionEnd?:()=>void}) {
+  const ref=useRef<HTMLCanvasElement>(null),endRef=useRef(onActionEnd),errorRef=useRef(onError);endRef.current=onActionEnd;errorRef.current=onError
+  useEffect(()=>{
+    let cancelled=false,request=0,ended=false,source:HTMLCanvasElement|null=null,previous=-1
+    const canvas=ref.current,context=canvas?.getContext('2d'),media=window.matchMedia('(prefers-reduced-motion: reduce)')
+    if(!canvas||!context)return
+    const paint=(now:number)=>{
+      if(cancelled||!source||document.hidden)return
+      if(performanceClock.current.began===undefined)performanceClock.current.began=now
+      const elapsed=Math.max(0,now-performanceClock.current.began),pose=emotionPose(form,action,elapsed,media.matches)
+      if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(source,pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
+      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8))
+      canvas.dataset.loaded='true';canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame)
+      if(pose.finished&&!ended){ended=true;endRef.current?.()}
+      if(!ended)request=requestAnimationFrame(paint)
+    }
+    const resume=()=>{cancelAnimationFrame(request);previous=-1;if(source)request=requestAnimationFrame(paint)}
+    getTintedSheet(form,color,action==='mood-joy'?'emotion-joy':'emotion-grumpy').then(value=>{if(!cancelled){source=value;resume()}}).catch(()=>{if(!cancelled)errorRef.current()})
+    document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume);canvas.addEventListener('ram-wardrobe-change',resume)
+    return()=>{cancelled=true;cancelAnimationFrame(request);document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume);canvas.removeEventListener('ram-wardrobe-change',resume)}
+  },[form,color,action,actionId,performanceClock])
+  return <canvas ref={ref} className="ram-classic-frame ram-emotion-frame" width={192} height={208} data-sheet={action} data-form={form} data-color={color} data-duration={emotionDuration(action,form)} aria-hidden="true"/>
 }
 function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, startedAt, onActionEnd }: { color: PetColor; fromColor?: PetColor; action: string; actionId?: string | number; itemMotion?: ItemMotion; sound?: boolean; startedAt:number; onActionEnd?: () => void }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const soundRef=useRef(sound);soundRef.current=sound
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   useEffect(() => {
+    const canvas=ref.current;if(!canvas)return
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     let cancelled = false, request = 0, elapsed = 0, last = 0, previous = '', ended = false
     let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null, slumber:HTMLCanvasElement|null=null
@@ -272,7 +324,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       const pose = sampleSeedPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
-      const sleepy=action==='sleep'||action==='wake'&&elapsed<240;
+      const sleepy=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&(media.matches||elapsed>450&&elapsed<3300);
       const activeSource=sleepy?slumber!:source;
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${sleepy}:${pose.frame}:${Math.round(mix*255)}`;
       if (previous !== signature) {
@@ -281,13 +333,14 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
         if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':'seed' }
         previous = signature
       }
+      paintWear(ref.current!,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; if (source) request = requestAnimationFrame(paint) }
     Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null,getTintedSheet('seed',color,'slumber')]).then(([loaded,old,sleep])=>{if(!cancelled){source=loaded;oldSource=old;slumber=sleep;resume()}}).catch(()=>{})
-    document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume)
-    return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume) }
+    document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
+    return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume) }
   }, [color, fromColor, action, actionId, itemMotion, startedAt])
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
@@ -302,7 +355,7 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
   </span>
 }
-export default function Ram({ color, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+export default function Ram({ color, costume, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const clock=useRef({key:'',startedAt:0})
   const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
   const eventKey=`${action}:${actionId??0}:${itemId??''}`
@@ -313,7 +366,7 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
   const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : itemMotion ? itemMotion.action : action
   const resting = activeAction === 'sleep', key = `${form}:${color}`
-  const mouth=slumberMouth(stage===0?'seed':form)
+  const mouth=slumberEmitter(stage===0?'seed':form)
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt)) + (peeking && !resting && !dragging ? edgePeekTilt(peekSide) : 0)
@@ -326,12 +379,12 @@ export default function Ram({ color, stage, evolution, action = 'idle', sleeping
   return <span className={`ram-sprite ram-classic action-${activeAction} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-pose-layer"><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd}/><RamWear costume={costume}/></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-pose-layer">
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={onActionEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={onActionEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={onActionEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={onActionEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={costume}/>
       </span></span>}
     <SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
-    {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*1.6}s`}}/>)}</span>}
+    {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*6.4/3}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
     </span>
   </span>

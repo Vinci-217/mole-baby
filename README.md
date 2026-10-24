@@ -2,21 +2,27 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.21.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.21.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.22.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.22.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-**v0.21.0 · 原版玩球与睡梦小呼噜**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
+**v0.22.0 · 小衣橱与心情小动作**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.21.0-Setup.exe` 或 `mole-baby-0.21.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.21.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.21.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.22.0-Setup.exe` 或 `mole-baby-0.22.0-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.22.0-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.22.0-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
 Windows ZIP 完整解压后运行 `拉姆.exe`。附件包含 SHA256 校验文件，旧存档与本机设置继续保留。
 
 ![悬停快捷栏与图标计时](artifacts/v11-native-timer.png)
+
+这版加入了小屋里的 **衣橱**：三件原版配饰可以先试戴，再用摩尔豆购买、穿脱，重启继续保留。配饰跟随各阶段身体的实际动作和变形，不改变原四色和叶冠；镜子试戴不扣豆。玩法和后续套装的实现方式见 [装扮说明](docs/WARDROBE.md)。
+
+睡觉的嘴型更小，眼睑更柔和，呼吸与嘴巴开合统一为6.4秒；小 Z 从脸侧飘出。新增开心、闷闷的、安心和困倦动作，结合实际心情、精力与保留的记忆选择。状态页点「看看我」可以关心它，不改数值；自发小动作继续每2–4分钟、尊重安静与忙碌。
+
+[衣橱界面](artifacts/v22-wardrobe.png) · [睡眠与心情 GIF](artifacts/v22-moods-wardrobe.gif) · [实际录屏](artifacts/v22-moods-wardrobe.webm)
 
 玩球接入原客户端完整 `football` 动作：幼体会爬球、踩球保持平衡，中级会用叶片颠球，高级和神力会顶球、起跳和落下。身体、眼睛、叶冠与球来自同一原帧，保持原24fps节奏；桌面约100px的宠物不变大，远距离演出使用紧凑视口跟随。
 
@@ -137,6 +143,7 @@ npm run test:flight-facing  # 五种飞行形态×四色的原版侧脸、转向
 npm run test:room-iteration # 九背景、三套新场景四时段、寻宝交互/奖励/回忆与两种窗口尺寸
 npm run test:layout-stage   # 窄边距、五阶段/四神力切换与存档保留
 npm run test:reading-dizzy  # 八形态看书翻页、头顶星星绕圈及视觉截图
+npm run test:mood-wardrobe   # 四色八形态心情、96组配饰与实际购买/保存/回应
 npm run test:original-actions # 32组形态/颜色的嘴部呼吸、ZZZ、原版足球、正常眼睛与实际录屏
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包
 npm run test:hover-rest    # 原生悬停栏、图标计时、自动休息与叫醒
@@ -148,7 +155,7 @@ npm run test:memory        # 对话并发、遗忘和录音取消
 npm run test:desktop:cloud # Linux 隔离档案真实 Electron 回归
 ```
 
-本版已通过生产构建、272 项单元与 Native 生命周期测试、九背景与寻宝的浏览器回归、原有商店/游戏/音乐全流程和真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
+本版验证包括生产构建、285 项单元与 Native 生命周期测试、四色八形态心情与96组配饰适配、实际衣橱购买/保存/心情回应、原有原版足球与真实 Electron 桌面回归。Windows 与两种 Mac 原生成品验证由对应版本的 GitHub Actions 记录提供。
 
 浏览器测试使用独立端口 5174，记忆测试使用 5188，可设 `CHROMIUM_PATH`。Linux 原生测试使用独立档案、Xorg 和窗口管理器；云端测试参数不关闭 Windows 成品的 renderer sandbox。
 

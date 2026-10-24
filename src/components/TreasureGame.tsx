@@ -12,11 +12,12 @@ import './TreasureGame.css';
 
 interface Props {
   background: RoomBackground; phase: ScenePhase; color: PetColor; stage: Stage; evolution?: Evolution;
+  costume?:string;
   sound?: boolean; onClose: () => void; onComplete: (score: number) => GameReceipt;
 }
 type RoundPhase = 'ready' | 'playing' | 'collected' | 'finished' | 'closed';
 
-export default function TreasureGame({ background, phase, color, stage, evolution, sound = false, onClose, onComplete }: Props) {
+export default function TreasureGame({ background, phase, color, stage, evolution, costume, sound = false, onClose, onComplete }: Props) {
   const [round, setRound] = useState(createTreasureRound);
   const [mode, setMode] = useState<RoundPhase>('ready');
   const [found, setFound] = useState<string[]>([]);
@@ -105,7 +106,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
     <div className={`treasure-scene ${background.phaseSheet ? 'has-phase-art' : ''} ${stopped ? 'is-paused' : ''}`} data-scene-phase={phase} style={sceneStyle}>
       <div className="treasure-scene-art" aria-hidden="true"><img className={background.phaseSheet ? 'treasure-scene-sheet' : 'treasure-scene-image'} src={background.src} alt=""/></div>
       {mode !== 'ready' && round.objects.map(item => <button type="button" key={item.id} className={`treasure-object ${found.includes(item.id) ? 'is-found' : ''} ${hintedId === item.id ? 'is-hinted' : ''}`} style={{ left: `${item.x}%`, top: `${item.y}%` }} aria-label={`寻找${item.name}`} data-treasure-id={item.id} disabled={!looking || stopped || found.includes(item.id)} onClick={() => pick(item.id)}><img src={item.image} alt=""/>{found.includes(item.id) && <span className="treasure-pickup" aria-hidden="true">✧</span>}</button>)}
-      <div className="treasure-ram"><Ram color={color} stage={stage} evolution={evolution} action={stopped ? 'still' : reaction.action} actionId={reaction.id} sound={sound && !stopped} onActionEnd={() => setReaction(previous => ({ ...previous, action: 'idle' }))}/></div>
+      <div className="treasure-ram"><Ram costume={costume} color={color} stage={stage} evolution={evolution} action={stopped ? 'still' : reaction.action} actionId={reaction.id} sound={sound && !stopped} onActionEnd={() => setReaction(previous => ({ ...previous, action: 'idle' }))}/></div>
       {mode === 'ready' && <div className="treasure-intro"><h3>一起找找小宝物</h3><p>照着清单，找到藏在小屋里的三样用品。</p><span>不用赶时间，拉姆陪你慢慢找。</span></div>}
       {looking && stopped && <div className="treasure-pause-cover"><h3>{hidden ? '等你回来' : '歇一小会儿'}</h3>{!hidden && <button ref={primary} type="button" className="treasure-button" onClick={togglePause}>继续寻宝</button>}</div>}
       {mode === 'collected' && <div className="treasure-collected"><b>我们找齐啦！</b><span>{found.length} / {round.targets.length}</span></div>}

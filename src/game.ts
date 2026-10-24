@@ -1,4 +1,6 @@
 import { ITEMS, getItem } from './catalog';
+import {normalizeWardrobe} from './wardrobe';
+import type {OutfitId} from './wardrobe';
 import type { PetItem } from './catalog';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
@@ -32,6 +34,8 @@ export interface GameState {
   growth: number;
   evolution?: Evolution;
   coins: number;
+  wardrobe?: OutfitId[];
+  wearing?: OutfitId;
   stats: PetStats;
   inventory: Record<string, number>;
   sleeping: boolean;
@@ -376,6 +380,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       growth: value.growth,
       ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,
+      ...normalizeWardrobe(value.wardrobe,value.wearing),
       stats: { hunger, thirst, happiness, cleanliness, health, energy },
       inventory,
       sleeping: value.sleeping,

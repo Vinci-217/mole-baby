@@ -52,12 +52,12 @@
 .ram-pose-layer{display:block;width:100%;height:100%;transform-origin:50% 85%}
 .ram-sprite.action-idle:not(.is-dragging) .ram-pose-layer,
 .ram-sprite.action-waiting:not(.is-dragging) .ram-pose-layer{animation:ram-breathe 5.8s ease-in-out infinite}
-.ram-sprite.is-sleeping .ram-pose-layer{animation:ram-sleep-breathe 4.4s ease-in-out infinite}
+.ram-sprite.is-sleeping .ram-pose-layer{animation:ram-sleep-breathe 6.4s ease-in-out infinite}
 .ram-sprite.is-sleeping .ram-sleep-mark{animation:ram-sleep-cloud 4.4s ease-in-out infinite}
 .ram-sprite.is-dragging:not(.ram-seed) .ram-pose-layer{transform:scale(.985,1.025)}
 @keyframes ram-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.006,.993)}}
-@keyframes ram-sleep-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,.978)}}
-@keyframes ram-sleep-cloud{0%,100%{opacity:.45;translate:0 0}55%{opacity:.95;translate:1px -2px}}
+@keyframes ram-sleep-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.005,.994)}}
+@keyframes ram-sleep-cloud{0%,100%{opacity:.45;translate:0 0}55%{opacity:.85;translate:1px -2px}}
 @media(prefers-reduced-motion:reduce){.ram-sprite .ram-pose-layer,.ram-sprite .ram-sleep-mark{animation:none!important;transform:none}}
 
 /* Accessories use percentage coordinates in the unchanged original viewport.
@@ -111,8 +111,8 @@
 .social-book{left:var(--social-bookx,50%);top:var(--social-booky,90%);width:49%;line-height:0;perspective:120px}
 .social-book>img{display:block;width:100%}.social-book-page{position:absolute;left:50%;top:12%;width:43%;height:65%;transform:rotateY(var(--social-page,0deg));transform-origin:left center;opacity:var(--social-pageOpacity,0);transform-style:preserve-3d}.social-book-page>img{position:absolute;left:-25%;top:-12%;width:165%;height:125%;object-fit:fill;backface-visibility:visible}
 .ram-sprite:is(.action-pet,.action-play,.action-wake,.action-focus,.action-dizzy,.action-watch-butterfly,.action-look-around) .ram-pose-layer{transform:translate(var(--social-x,0%),var(--social-lift,0%)) rotate(var(--social-angle,0deg)) scale(var(--social-scaleX,1),var(--social-scaleY,1)) perspective(200px) rotateX(var(--social-readTilt,0deg))}
-.ram-seed.is-sleeping .ram-pose-layer{animation:ram-seed-sleep 4.8s ease-in-out infinite}
-@keyframes ram-seed-sleep{0%,100%{transform:scale(1)}50%{transform:scale(1.009,.986)}}
+.ram-seed.is-sleeping .ram-pose-layer{animation:ram-seed-sleep 6.4s ease-in-out infinite}
+@keyframes ram-seed-sleep{0%,100%{transform:scale(1)}50%{transform:scale(1.004,.993)}}
 .social-ball-contact{position:absolute;left:calc(var(--social-bx,100%) - 10%);top:var(--social-by,75%);width:12%;height:12%;translate:-50% -50%;opacity:var(--social-contact,0);transform:scale(calc(.6 + var(--social-contact,0)*.4))}
 .social-ball-contact>img{display:block;width:100%;height:100%;object-fit:contain}
 .social-affection{position:absolute;left:77%;top:18%;width:20%;height:20%;object-fit:contain;opacity:var(--social-affection,0);translate:0 var(--social-heartY,0%)}
@@ -125,7 +125,7 @@
 .ram-sprite.is-flying .ram-flight-layer{animation:ram-fly 3.2s ease-in-out infinite}
 .ram-sprite.is-flying .ram-pose-layer{animation:none}
 .ram-sprite.is-flying.is-sleeping .ram-flight-layer{animation:ram-sleep-fly 6.4s ease-in-out infinite}
-.ram-sprite.is-flying.is-sleeping .ram-pose-layer{animation:ram-sleep-breathe 4.4s ease-in-out infinite;transform-origin:50% 72%}
+.ram-sprite.is-flying.is-sleeping .ram-pose-layer{animation:ram-sleep-breathe 6.4s ease-in-out infinite;transform-origin:50% 72%}
 @keyframes ram-sleep-fly{0%,100%{transform:translateY(-4%)}50%{transform:translateY(-6%)}}
 .ram-sprite.is-peeking .ram-artwork,.ram-sprite.is-peeking .seed-body-original{transition:transform .4s cubic-bezier(.2,.8,.25,1)}
 @keyframes ram-fly{0%,100%{transform:translateY(-3%) rotate(-.4deg)}50%{transform:translateY(-7%) rotate(.4deg)}}
@@ -169,6 +169,9 @@
 .ram-sprite.ram-classic.action-play:not(.ram-seed) .ram-pose-layer{animation:none;transform:none}
 .ram-sprite .ram-classic-frame.ram-football-frame{position:absolute;left:-33.333333%;top:-61.538462%;width:166.666667%;height:184.615385%;max-width:none}
 .ram-sleep-particles{position:absolute;width:1px;height:1px;pointer-events:none;z-index:4}
-.ram-sleep-particles>img{position:absolute;left:3px;top:-2px;width:14px;height:15px;object-fit:contain;opacity:0;animation:ram-snore-rise 4.8s linear infinite;transform-origin:center}
-@keyframes ram-snore-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.95}65%{opacity:.8}100%{opacity:0;transform:translate(25px,-48px) scale(1.15)}}
+.ram-sleep-particles>img{position:absolute;left:3px;top:-5px;width:9px;height:10px;object-fit:contain;opacity:0;animation:ram-snore-rise 6.4s linear infinite;transform-origin:center;filter:brightness(.68)}
+@keyframes ram-snore-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.85}55%{opacity:.65}100%{opacity:0;transform:translate(23px,-50px) scale(1.2)}}
 @media(prefers-reduced-motion:reduce){.ram-sleep-particles>img{animation:none!important;opacity:.7;transform:translate(12px,-22px)}.ram-sleep-particles>img+img{display:none}}
+
+.ram-wear{position:absolute;object-fit:contain;visibility:hidden;translate:-50% -100%;transform-origin:50% 100%;pointer-events:none;z-index:2}
+.ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-flight-layer,.ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-pose-layer{animation:none;transform:none}

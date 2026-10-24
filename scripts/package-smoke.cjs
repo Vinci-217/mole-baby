@@ -5,7 +5,7 @@ const path = require('node:path');
 const asar = require('@electron/asar');
 const { _electron } = require('playwright');
 const { expect } = require('@playwright/test');
-const { verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
+const { verifyMoodWardrobe, verifyComfortMotion, verifyPetSpirit, verifyRoomIteration, verifyEdgePeek, verifyStageSettings, verifyRecolorPotion, verifyPetLife, makeTired, adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy } = require('./smoke-helpers.cjs');
 const root = path.resolve(__dirname, '..');
 const { version } = require('../package.json');
 
@@ -69,6 +69,8 @@ async function verifyApplication({ executable, archive, screenshot }) {
   ]) assert.ok(paths.has(filename), `Required application payload is missing: ${filename}`);
   assert.ok(paths.has('dist/assets/generated/v15-butterfly.png'),'Missing curiosity prop');
   for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/slumber/${form}-${layer}.png`),'Missing original sleepy expression atlas');
+  for(const id of ['party-cap','gold-feather','wizard-cap'])assert.ok(paths.has(`dist/assets/original/wardrobe/${id}.png`),'Missing original wearable accessory');
+  for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const mood of ['joy','grumpy'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/emotions/${form}-${mood}-${layer}.png`),'Missing original emotion animation');
   assert.ok(paths.has('dist/assets/original/slumber/z.png'),'Missing original floating Z');
   for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/football/${form}-${layer}.png`),'Missing original football performance');
   for(const color of ['red','yellow','blue','pink'])assert.ok(paths.has(`dist/assets/generated/recolor-${color}.png`),'Missing colour potion icon');
@@ -262,6 +264,7 @@ async function verifyApplication({ executable, archive, screenshot }) {
   await verifyRoomIteration(page);
   await verifyPetSpirit(page);
   await verifyComfortMotion(page);
+  await verifyMoodWardrobe(page);
   fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
   await page.screenshot({path:path.join(root,'artifacts',screenshot)});
   await desktop.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0].close());

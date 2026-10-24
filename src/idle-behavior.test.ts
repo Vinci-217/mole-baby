@@ -7,6 +7,8 @@ import type { Evolution, Stage } from './game'
 import { getRamActionDuration, sampleFlyingPose, sampleSeedPose } from './components/ram-animation'
 import { groundedMotion, usesGroundedPose } from './grounded-motion'
 import { socialSoundScore } from './pet-sound-score'
+import {ramForm} from './original-actions'
+import {isEmotionClip} from './mood-motion'
 
 const NOW = Date.UTC(2026, 9, 22, 9)
 function petAt(stage: Stage) {
@@ -26,10 +28,10 @@ function sequence(stage: Stage, count = 80) {
 describe('stage-aware spontaneous original gestures', () => {
   it('varies every stage without successive repeats, walks, user props or indefinite actions', () => {
     const stages = ([0, 1, 2, 3, 4] as Stage[]).map(stage => sequence(stage))
-    for (const entries of stages) {
-      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS))
+    for (const [stage,entries] of stages.entries()) {
+      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS.filter(action=>!['mood-dozy','mood-grumpy'].includes(action))))
       for (const entry of entries) {
-        expect(entry.duration).toBe(getRamActionDuration(entry.action))
+        expect(entry.duration).toBe(getRamActionDuration(entry.action,ramForm(stage as Stage,stage===4?'super':undefined)))
         expect(entry.duration).toBeGreaterThan(0)
         expect(entry.duration).toBeLessThanOrEqual(6500)
         expect(socialSoundScore(entry.action).cues).toEqual([])
@@ -41,15 +43,16 @@ describe('stage-aware spontaneous original gestures', () => {
 
   it('uses calmer preferences for low happiness, low energy or actual recent concern', () => {
     const pet = petAt(2), memory = createMemory(pet)
-    const calm = ['look-around', 'watch-butterfly']
+    const calm = ['mood-content','look-around']
     for (const stats of [{ ...pet.stats, happiness: 35 }, { ...pet.stats, energy: 30 }]) {
       const candidates = idleCandidates({ ...pet, stats }, memory, NOW)
-      expect(candidates.map(entry => entry.action)).toEqual(calm)
+      const expected=stats.happiness<40?['mood-grumpy',...calm]:['mood-dozy',...calm]
+      expect(candidates.map(entry => entry.action)).toEqual(expected)
       expect(candidates[0].weight).toBeGreaterThan(candidates[1].weight)
       let previous: IdleAction | undefined
       for (let i = 0; i < 20; i++) {
         const next = chooseIdleBehavior({ ...pet, stats }, memory, i, previous, NOW)!
-        expect(calm).toContain(next.action)
+        expect(expected).toContain(next.action)
         expect(next.action).not.toBe(previous)
         previous = next.action
       }
@@ -57,9 +60,9 @@ describe('stage-aware spontaneous original gestures', () => {
     const concerned = appendMessage(memory, 'user', '我今天很难过', NOW - 60_000)
     expect(idleCandidates(pet, concerned, NOW).map(entry => entry.action)).toEqual(calm)
     // Forgetting is immediate; an old mood is never kept in a hidden profile.
-    expect(idleCandidates(pet, clearMemory(concerned), NOW)).toHaveLength(4)
-    expect(idleCandidates(pet, concerned, NOW + 3 * 3_600_000)).toHaveLength(4)
-    expect(idleCandidates(pet, { ...concerned, petId: 'other' }, NOW)).toHaveLength(4)
+    expect(idleCandidates(pet, clearMemory(concerned), NOW)).toHaveLength(6)
+    expect(idleCandidates(pet, concerned, NOW + 3 * 3_600_000)).toHaveLength(6)
+    expect(idleCandidates(pet, { ...concerned, petId: 'other' }, NOW)).toHaveLength(6)
   })
 
   it('respects stable temperament and recent real care while leaving all source data unchanged', () => {
@@ -97,12 +100,12 @@ describe('stage-aware spontaneous original gestures', () => {
 
   it('uses bounded original seed/grounded expressions and completes them instead of moving the pot', () => {
     for (const action of IDLE_ACTIONS) {
-      const duration = getRamActionDuration(action)!
+      const duration = getRamActionDuration(action,'seed')!
       const frames = new Set(Array.from({ length: 20 }, (_, i) => sampleSeedPose(action, i * duration / 20).frame))
       expect(frames.size).toBeGreaterThan(1)
-      expect(Math.max(...frames)).toBeLessThanOrEqual(2)
+      expect(Math.max(...frames)).toBeLessThanOrEqual(action.startsWith('mood-')?7:2)
       expect(sampleSeedPose(action, duration).finished).toBe(true)
-      for (const form of ['junior', 'middle']) expect(usesGroundedPose(form, action)).toBe(true)
+      for (const form of ['junior', 'middle']) expect(usesGroundedPose(form, action)).toBe(!isEmotionClip(action)&&action!=='mood-dozy')
     }
     expect(groundedMotion('junior', 'happy', 800, 800).frame).toBe(2)
     const left = groundedMotion('middle', 'waving', 500, 500), right = groundedMotion('middle', 'waving', 1500, 1500)
@@ -113,8 +116,8 @@ describe('stage-aware spontaneous original gestures', () => {
 
   it('keeps the same continuous original flight frame under every spontaneous gesture', () => {
     for (const form of ['senior', 'super', 'water', 'wood', 'fire'] as Array<'senior' | Evolution>) {
-      for (const action of IDLE_ACTIONS) {
-        const duration = getRamActionDuration(action)!
+      for (const action of IDLE_ACTIONS.filter(action=>!action.startsWith('mood-'))) {
+        const duration = getRamActionDuration(action,form)!
         for (const flightTime of [137, 420, 951, 1500]) {
           const pose = sampleFlyingPose(action, duration / 2, false, form, flightTime)
           const idle = sampleFlyingPose('idle', duration / 2, false, form, flightTime)
