@@ -1,6 +1,6 @@
 {
   "version": "0.26.0",
-  "tag": "main",
+  "tag": "v0.26.0",
   "sourceSha": "612afbe4bd67c712e450cf2aaf8df4b0f268bbcd",
   "buildResult": "failure",
   "platforms": {
@@ -8,7 +8,7 @@
     "mac": "failure"
   },
   "releaseResult": "skipped",
-  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40121208820",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40121208388",
   "releaseUrl": null,
   "downloads": [],
   "verificationLog": null,
@@ -20,5 +20,5 @@
     "arm64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n",
     "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n"
   },
-  "recordedAt": "2026-10-24T18:34:28.277Z"
+  "recordedAt": "2026-10-24T18:34:30.093Z"
 }
