@@ -2,15 +2,15 @@
 
 小小一只拉姆，留在 Windows 和 macOS 桌面陪你工作、生活。选择粉、黄、蓝、红四色之一，为它起名，从盆栽种子慢慢养大。
 
-[下载 Windows / Mac v0.22.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.22.0) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 Windows / Mac v0.22.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.22.1) · [桌面版构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
-**v0.22.0 · 小衣橱与心情小动作**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
+**v0.22.1 · 小衣橱与心情小动作**。发布流程分别在 Windows、Apple芯片Mac和Intel Mac构建、运行成品验证，通过后发布安装包、ZIP和校验文件。
 
 | 电脑 | 下载文件 |
 | --- | --- |
-| Windows x64 | `mole-baby-0.22.0-Setup.exe` 或 `mole-baby-0.22.0-x64.zip` |
-| Mac Apple 芯片（M 系列） | `mole-baby-0.22.0-mac-arm64.dmg` |
-| Mac Intel | `mole-baby-0.22.0-mac-x64.dmg` |
+| Windows x64 | `mole-baby-0.22.1-Setup.exe` 或 `mole-baby-0.22.1-x64.zip` |
+| Mac Apple 芯片（M 系列） | `mole-baby-0.22.1-mac-arm64.dmg` |
+| Mac Intel | `mole-baby-0.22.1-mac-x64.dmg` |
 
 Mac 最低系统要求 macOS 12，打开 DMG 后将“拉姆”拖到 Applications，再从应用程序打开。也提供各架构 ZIP。Mac 签名与公证状态以各版本发布页顶部为准；本地签名版本首次被系统拦截时，可在“系统设置 → 隐私与安全”确认本次应用并选择“仍要打开”。无需关闭系统安全保护。安装盘内附「Mac 打开说明.html」，应用尚未运行时也能查看并点击打开系统设置；应用内的小屋设置和菜单栏同样提供 Mac 帮助入口。详情见 [Mac 使用说明](docs/MACOS.md) 和 [签名、公证说明](docs/MACOS-SIGNING.md)。
 
@@ -143,6 +143,7 @@ npm run test:flight-facing  # 五种飞行形态×四色的原版侧脸、转向
 npm run test:room-iteration # 九背景、三套新场景四时段、寻宝交互/奖励/回忆与两种窗口尺寸
 npm run test:layout-stage   # 窄边距、五阶段/四神力切换与存档保留
 npm run test:reading-dizzy  # 八形态看书翻页、头顶星星绕圈及视觉截图
+npm run test:wardrobe-lifecycle # 生产版反复切换衣橱/状态/桌面，检查动画收尾
 npm run test:mood-wardrobe   # 四色八形态心情、96组配饰与实际购买/保存/回应
 npm run test:original-actions # 32组形态/颜色的嘴部呼吸、ZZZ、原版足球、正常眼睛与实际录屏
 npm run test:social         # 八种形态的球/手/书实画面与正方形背包

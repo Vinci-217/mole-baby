@@ -424,6 +424,16 @@ async function verifyMoodWardrobe(page) {
     await wardrobe.getByRole('button',{name:'买下 · 30 摩尔豆',exact:true}).evaluate(button=>{button.click();button.click()});
     expect((await save()).coins).toBe(170);expect((await save()).wardrobe).toEqual(['party-cap']);
     await wardrobe.getByRole('button',{name:'给拉姆戴上',exact:true}).click();await expect(page.locator('.scene-character .ram-wear')).toHaveAttribute('data-outfit','party-cap');
+    // Cached sources may still have a queued animation frame while React clears
+    // the seed ref before passive cleanup. Exercise that transition in shipping
+    // React/Electron, not only the development renderer.
+    for(let i=0;i<6;i++){
+      await wardrobe.getByRole('button',{name:'试戴金色羽毛',exact:true}).click();
+      await expect(wardrobe.locator('.wardrobe-mirror .ram-wear')).toBeVisible();
+      await page.locator('.paper-tabs').getByRole('button',{name:'状态',exact:true}).click();
+      await page.locator('.paper-tabs').getByRole('button',{name:'衣橱',exact:true}).click();
+    }
+    console.log('PASS: repeated original seed wardrobe/profile switches cancel detached animation work');
     await toDesktop(page);await expect(ram.locator('.ram-wear')).toBeVisible();await page.reload();await expect(ram.locator('.ram-wear')).toHaveAttribute('data-outfit','party-cap');
     for(const [growth,evolution,happiness,energy,action] of [[0,null,90,90,'mood-joy'],[180,null,35,90,'mood-grumpy'],[840,'fire',90,30,'mood-dozy'],[420,null,70,90,'mood-content']]){
       await page.evaluate(({growth,evolution,happiness,energy})=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=growth;p.stats.happiness=happiness;p.stats.energy=energy;p.sleeping=false;p.lastTick=Date.now();delete p.evolution;if(evolution)p.evolution=evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));},{growth,evolution,happiness,energy});

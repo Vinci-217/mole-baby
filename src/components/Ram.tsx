@@ -144,7 +144,8 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
 }
 /** Clothing belongs inside the body's transform layer and uses the same source
  * frame coverage. The anchor is cached per source cell, independent of colour. */
-function paintWear(canvas:HTMLCanvasElement,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false) {
+function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false) {
+  if(!canvas?.isConnected)return
   const wear=canvas.parentElement?.querySelector<HTMLImageElement>('.ram-wear'),source=wearSources.get(sheet)
   const outfit=getOutfit(wear?.dataset.outfit)
   if(!wear||!outfit||!source)return
@@ -209,7 +210,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
     const paint = (now: number) => {
-      if (stopped || document.hidden || !inView) { last = 0; return }
+      if (stopped || !canvas.isConnected || document.hidden || !inView) { last = 0; return }
       const delta=last&&now-last<250?now-last:0
       elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       flightClock.current+=delta
@@ -265,7 +266,7 @@ function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,on
     score.cues=score.cues.filter(c=>c.at>(performanceClock.current.lastAudioElapsed??-1))
     const audio=createPetSoundClock(score,()=>soundRef.current===true)
     const paint=(now:number)=>{
-      if(cancelled||!source||document.hidden)return
+      if(cancelled||!source||!canvas.isConnected||document.hidden)return
       if(performanceClock.current.began===undefined)performanceClock.current.began=now
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=footballPose(form,elapsed,media.matches)
       if(!media.matches)audio.tick(elapsed)
@@ -290,7 +291,7 @@ function EmotionFrames({form,color,action,actionId,performanceClock,onError,onAc
     const canvas=ref.current,context=canvas?.getContext('2d'),media=window.matchMedia('(prefers-reduced-motion: reduce)')
     if(!canvas||!context)return
     const paint=(now:number)=>{
-      if(cancelled||!source||document.hidden)return
+      if(cancelled||!source||!canvas.isConnected||document.hidden)return
       if(performanceClock.current.began===undefined)performanceClock.current.began=now
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=emotionPose(form,action,elapsed,media.matches)
       if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(source,pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
@@ -317,7 +318,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
     let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null, slumber:HTMLCanvasElement|null=null
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const paint = (now: number) => {
-      if (cancelled || !source || document.hidden) { last = 0; return }
+      if (cancelled || !source || ref.current!==canvas || !canvas.isConnected || document.hidden) { last = 0; return }
       const delta=last&&now-last<250?now-last:0
       elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       last = now
@@ -333,7 +334,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
         if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':'seed' }
         previous = signature
       }
-      paintWear(ref.current!,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
+      paintWear(canvas,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
