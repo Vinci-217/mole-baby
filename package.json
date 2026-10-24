@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.26.0",
+  "version": "0.26.1",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -14,7 +14,7 @@
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
     "dist:win:portable": "npm run build && electron-builder --win zip --x64",
-    "test:desktop:cloud": "node scripts/desktop-smoke.cjs",
+    "test:desktop:cloud": "npm run build && node scripts/desktop-smoke.cjs",
     "dist:mac": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip && node scripts/notarize-mac-dmg.cjs",
     "dist:mac:arm64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --arm64 && node scripts/notarize-mac-dmg.cjs arm64",
     "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --x64 && node scripts/notarize-mac-dmg.cjs x64",

@@ -159,7 +159,7 @@ function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
   // Football foliage participates in the source performance and can cross the
   // face. Cropping a flattened crown there would leave holes in the body.
   if(source.kind==='football')return sheet
-  const width=source.kind==='football'?160:source.kind==='seed'||source.form==='seed'?96:192,height=source.kind==='football'?192:source.kind==='seed'||source.form==='seed'?99:208
+  const width=source.kind==='seed'||source.form==='seed'?96:192,height=source.kind==='seed'||source.form==='seed'?99:208
   const view=document.createElement('canvas');view.width=sheet.width;view.height=sheet.height;const ctx=view.getContext('2d');if(!ctx)return sheet
   ctx.drawImage(sheet,0,0);const pixels=ctx.getImageData(0,0,view.width,view.height),n=source.neutral.data,m=source.mask
   for(let sy=0;sy<view.height;sy+=height)for(let sx=0;sx<view.width;sx+=width){
@@ -171,7 +171,7 @@ function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
       if(m[i]+m[i+1]+m[i+2]>50)continue
       const coloured=Math.max(n[i],n[i+1],n[i+2])-Math.min(n[i],n[i+1],n[i+2])>25
       const outsideFace=y<top-anchor.bodyHeight*.35||x<left-anchor.bodyWidth*.1||x>right+anchor.bodyWidth*.1
-      if((coloured&&(y<top+anchor.bodyHeight*.18||x<left-anchor.bodyWidth*.04||x>right+anchor.bodyWidth*.04))||(source.kind!=='football'&&outsideFace&&y<top+anchor.bodyHeight*.9))pixels.data[i+3]=0
+      if((coloured&&(y<top+anchor.bodyHeight*.18||x<left-anchor.bodyWidth*.04||x>right+anchor.bodyWidth*.04))||(outsideFace&&y<top+anchor.bodyHeight*.9))pixels.data[i+3]=0
     }
   }
   ctx.putImageData(pixels,0,0);crownlessSheets.set(sheet,view);return view
