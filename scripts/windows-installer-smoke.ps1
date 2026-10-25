@@ -10,6 +10,7 @@ public static class InstallerUI {
  [DllImport("user32.dll")] public static extern bool EnumChildWindows(IntPtr parent,EnumProc p,IntPtr arg);
  [DllImport("user32.dll",CharSet=CharSet.Unicode)] public static extern int GetClassName(IntPtr h,StringBuilder s,int n);
  [DllImport("user32.dll",EntryPoint="SendMessageW",CharSet=CharSet.Unicode)] public static extern IntPtr SetText(IntPtr h,uint m,IntPtr w,string text);
+ [DllImport("user32.dll",EntryPoint="SendMessageTimeoutW",CharSet=CharSet.Unicode)] public static extern IntPtr ReadControlText(IntPtr h,uint m,IntPtr w,StringBuilder text,uint flags,uint timeout,out UIntPtr result);
  [DllImport("user32.dll")] public static extern IntPtr GetDlgItem(IntPtr h,int id);
  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
  [DllImport("user32.dll")] public static extern bool IsWindowEnabled(IntPtr h);
@@ -18,7 +19,8 @@ public static class InstallerUI {
  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h,out uint pid);
  [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h,uint m,IntPtr w,IntPtr l);
  public static string Text(IntPtr h){var s=new StringBuilder(1024);GetWindowText(h,s,1024);return s.ToString();}
- public static IntPtr DirectoryEdit(IntPtr parent){IntPtr found=IntPtr.Zero;EnumChildWindows(parent,(h,p)=>{var cls=new StringBuilder(64);GetClassName(h,cls,64);if(IsWindowVisible(h)&&cls.ToString()=="Edit"&&System.IO.Path.IsPathRooted(Text(h))){found=h;return false;}return true;},IntPtr.Zero);return found;}
+ public static string ControlText(IntPtr h){var s=new StringBuilder(1024);UIntPtr result;ReadControlText(h,0xD,new IntPtr(1024),s,2,1000,out result);return s.ToString();}
+ public static IntPtr DirectoryEdit(IntPtr parent){IntPtr found=IntPtr.Zero;EnumChildWindows(parent,(h,p)=>{var cls=new StringBuilder(64);GetClassName(h,cls,64);if(IsWindowVisible(h)&&cls.ToString()=="Edit"&&System.IO.Path.IsPathRooted(ControlText(h))){found=h;return false;}return true;},IntPtr.Zero);return found;}
  public static IntPtr Find(int pid){IntPtr found=IntPtr.Zero;EnumWindows((h,p)=>{uint owner;GetWindowThreadProcessId(h,out owner);if(owner==pid&&IsWindowVisible(h)&&GetDlgItem(h,1)!=IntPtr.Zero){found=h;return false;}return true;},IntPtr.Zero);return found;}
 }
 '@
@@ -47,7 +49,7 @@ try {
       $edit=[InstallerUI]::DirectoryEdit($dialog)
       if($edit -eq [IntPtr]::Zero){throw 'Installer directory page has no visible path field'}
       [InstallerUI]::SetText($edit,0xC,[IntPtr]::Zero,$install) | Out-Null
-      if([InstallerUI]::Text($edit) -ne $install){throw 'Installer did not accept the isolated target path'}
+      if([InstallerUI]::ControlText($edit) -ne $install){throw 'Installer did not accept the isolated target path'}
       $pathConfirmed=$true
       Write-Output "Installer target confirmed in directory page: $install"
       Start-Sleep -Milliseconds 100
