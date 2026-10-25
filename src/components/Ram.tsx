@@ -25,6 +25,8 @@ import {getOutfit,outfitCoversCrown} from '../wardrobe'
 import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
 import {isPastime,pastimeBody,spellCostume,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
+import dizzySource from '../../public/assets/original/dizzy/source.json'
+import {dizzyEyes} from '../dizzy-motion'
 
 interface RamProps {
   color: PetColor
@@ -52,7 +54,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = RamForm
-type SheetKind = 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy'
+type SheetKind = 'dizzy' | 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray; form?:string;kind?:SheetKind }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -79,6 +81,7 @@ const ACTION_NAMES: Record<string, string> = {
   peek: '从角落探出头看你', hide: '在角落安静地陪伴',
 }
 function sheetSpec(form: Form, kind: SheetKind) {
+  if(kind==='dizzy')return {width:(form==='seed'?96:192)*2,height:form==='seed'?99:208,neutral:`./assets/original/dizzy/${form}-neutral.png`,mask:`./assets/original/dizzy/${form}-mask.png`}
   if(kind==='gentle')return {width:(form==='seed'?96:CELL_WIDTH)*8,height:form==='seed'?99:CELL_HEIGHT,neutral:`./assets/original/gentle-care/${form}-neutral.png`,mask:`./assets/original/gentle-care/${form}-mask.png`}
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
@@ -447,6 +450,28 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
   }, [color, fromColor, action, actionId, itemMotion, startedAt])
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
+/** Only source pupils move; the eye whites, body and outfit keep one registration. */
+function DizzyFrames({form,color,startedAt,onError}:{form:Form;color:PetColor;startedAt:number;onError?:()=>void}){
+ const ref=useRef<HTMLCanvasElement>(null),w=form==='seed'?96:192,h=form==='seed'?99:208
+ usePaintReadiness(ref,`${form}:${color}:dizzy`)
+ useEffect(()=>{
+  let cancelled=false,request=0;const canvas=ref.current,ctx=canvas?.getContext('2d'),media=matchMedia('(prefers-reduced-motion: reduce)');if(!canvas||!ctx)return
+  let sheet:HTMLCanvasElement|null=null
+  const paint=(now:number)=>{
+   if(cancelled||!canvas.isConnected||!sheet||document.hidden)return
+   const elapsed=Math.max(0,now-startedAt),pose=dizzyEyes(elapsed,media.matches,dizzySource.forms[form].orbit)
+   const body=wardrobeBody(canvas,sheet);ctx.clearRect(0,0,w,h);ctx.drawImage(body,0,0,w,h,0,0,w,h);ctx.drawImage(body,w,0,w,h,pose.x,pose.y,w,h)
+   paintWear(canvas,sheet,0,0,w,h);paintSocialCue(canvas,form==='seed'?0:form==='junior'?1:form==='middle'?2:form==='senior'?3:4,'dizzy',elapsed,media.matches)
+   canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.sheet='dizzy';canvas.dataset.pupilX=pose.x.toFixed(3);canvas.dataset.pupilY=pose.y.toFixed(3)
+   if(!pose.finished&&!media.matches)request=requestAnimationFrame(paint)
+  }
+  const resume=()=>{cancelAnimationFrame(request);request=requestAnimationFrame(paint)}
+  getTintedSheet(form,color,'dizzy').then(source=>{if(!cancelled){sheet=source;resume()}}).catch(()=>onError?.())
+  canvas.addEventListener('ram-wardrobe-change',resume);document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume)
+  return()=>{cancelled=true;cancelAnimationFrame(request);canvas.removeEventListener('ram-wardrobe-change',resume);document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume)}
+ },[form,color,startedAt,w,h,onError])
+ return <canvas ref={ref} className={form==='seed'?'seed-body-frame':'ram-classic-frame'} width={w} height={h} data-form={form} data-color={color} aria-hidden="true"/>
+}
 function ItemCue({ motion }: { motion: ItemMotion }) {
   return <span className={`ram-item-cue care-routine-${motion.body}`} style={{ color: motion.accent }} aria-hidden="true" data-item-id={motion.itemId} data-item-gesture={motion.gesture} data-care-routine={motion.body}>
     {motion.body==='eat'&&<><span className="care-food-plate care-prop-sheet"/>{[0,1,2,3].map(i=><img key={i} className="care-food-bite" src={motion.image} alt="" draggable={false}/>)}<span className="care-food-plate care-food-rim care-prop-sheet"/></>}
@@ -495,9 +520,9 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/><RamWear costume={wearing}/></span></span></span></>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
+        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
     {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*6.4/3}s`}}/>)}</span>}

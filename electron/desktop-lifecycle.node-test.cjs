@@ -48,7 +48,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     setPosition(x, y) { this.bounds.x = options.clamp?Math.max(0,x):x; this.bounds.y = options.clamp?Math.max(0,y):y; }
     setAlwaysOnTop(value) { this.top = value; }
     setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
-    setMinimumSize() {} setResizable() {} setIgnoreMouseEvents() {} setMenu() {}
+    setMinimumSize(w,h) {this.minimum=[w,h]} setMaximumSize(w,h) {this.maximum=[w,h]} setResizable(value) {this.resizeChanges??=[];this.resizeChanges.push(value)} setIgnoreMouseEvents() {} setMenu() {}
     show() { this.visible = true; } hide() { this.visible = false; } focus() {} restore() {}
   }
   class FakeTray extends EventEmitter {
@@ -97,7 +97,7 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   run.send('desktop:ready-to-show', true);
   assert.equal(run.window.isVisible(), true);
   assert.deepEqual(run.window.getBounds(), { x: 1754, y: 792, width: 160, height: 240 });
-  assert.equal(run.tray.tooltip, '拉姆 · mole-baby');
+  assert.equal(run.tray.tooltip, '', 'Windows must not show a native horizontal tray tooltip');
   assert.equal(run.tray.image.template, false);
   assert.equal(path.basename(run.tray.image.path), 'tray.png');
 });
@@ -208,12 +208,8 @@ test('docked pets only peek on hover, wait minutes between automatic peeks and r
 test('all four seed docks finish entering, only peek on hover, and release by dragging',async t=>{
  t.mock.timers.enable({apis:['setTimeout','Date'],now:1_800_000_000_000});
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);
- for (const [side, delta, hidden, peek, pull] of [
-   ['left',[-5000,0],{x:-82,y:0},{x:-44,y:0},[250,0]],
-   ['right',[5000,0],{x:82,y:0},{x:44,y:0},[-250,0]],
-   ['top',[0,-5000],{x:0,y:-92},{x:0,y:-50},[0,250]],
-   ['bottom',[0,5000],{x:0,y:92},{x:0,y:50},[0,-250]],
- ]) {
+ for(const[side,delta,pull]of[['left',[-5000,0],[250,0]],['right',[5000,0],[-250,0]],['top',[0,-5000],[0,250]],['bottom',[0,5000],[0,-250]]]){
+   const hidden=require('./desktop-geometry.cjs').edgeOffset(side,'hidden','seed'),peek=require('./desktop-geometry.cjs').edgeOffset(side,'peek','seed');
    run.invoke('desktop:move-pet',900-run.window.getBounds().x,400-run.window.getBounds().y);
    run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',...delta);run.invoke('desktop:set-interacting',true);run.invoke('desktop:end-pet-drag');
    assert.equal(run.invoke('desktop:get-state').edgeSide,side);
@@ -227,7 +223,7 @@ test('all four seed docks finish entering, only peek on hover, and release by dr
    assert.deepEqual(run.window.getBounds(),anchor,'hover changes the renderer pose without releasing the native anchor');
    t.mock.timers.tick(600000);assert.equal(run.invoke('desktop:get-state').edgePose,'peek');
    run.invoke('desktop:start-pet-drag',peek);
-   assert.equal(run.window.getBounds().x,anchor.x+peek.x);assert.equal(run.window.getBounds().y,anchor.y+peek.y);
+   assert.equal(run.window.getBounds().x,anchor.x+Math.round(peek.x));assert.equal(run.window.getBounds().y,anchor.y+Math.round(peek.y));
    run.invoke('desktop:move-pet',...pull);run.invoke('desktop:end-pet-drag');
    assert.equal(run.invoke('desktop:get-state').edgeSide,null);assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
    assert.deepEqual({...run.invoke('desktop:get-state').edgeOffset},{x:0,y:0});
@@ -320,3 +316,7 @@ test('tray pin and explicit mouse-through survive automatic hit tests and restar
 test('upgrade removes retired API credentials without registering AI or speech endpoints',async t=>{
  const run=await launch(undefined,false,'win32',{key:true});t.after(()=>run.cleanup());assert.equal(fs.existsSync(path.join(run.app.userData,'companion-ai-key.json')),false);assert.equal([...run.handles.keys()].some(k=>/companion-(ai|speech)/.test(k)),false);
 });
+
+test('Windows keeps its frameless resize style stable through room, pocket and pet changes',async t=>{const run=await launch();t.after(()=>run.cleanup());for(let i=0;i<8;i++){run.invoke('desktop:set-pet-mode',true);assert.deepEqual(run.window.minimum,[160,240]);assert.deepEqual(run.window.maximum,[160,240]);run.invoke('desktop:set-companion-panel',true);assert.deepEqual(run.window.maximum,[run.window.bounds.width,run.window.bounds.height]);run.invoke('desktop:set-companion-panel',false);run.invoke('desktop:set-pet-mode',false);assert.deepEqual(run.window.maximum,[0,0]);}assert.deepEqual(run.window.resizeChanges??[],[]);assert.equal(run.window.options.frame,false);assert.equal(run.window.options.thickFrame,false)})
+
+test('every appearance uses its calibrated exposure on four native edge states',async t=>{const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);for(const form of Object.keys(require('./edge-visibility.json').forms)){run.invoke('desktop:set-pet-appearance',form);for(const[side,dx,dy]of[['left',-5000,0],['right',5000,0],['top',0,-5000],['bottom',0,5000]]){run.invoke('desktop:reveal-pet');run.invoke('desktop:move-pet',900-run.window.bounds.x,400-run.window.bounds.y);run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',dx,dy);run.invoke('desktop:end-pet-drag');const state=run.invoke('desktop:get-state');assert.equal(state.edgeSide,side);assert.deepEqual({...state.edgeOffset},require('./desktop-geometry.cjs').edgeOffset(side,'hidden',form));}}assert.throws(()=>run.invoke('desktop:set-pet-appearance','unknown'),/Unknown pet appearance/)})

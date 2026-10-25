@@ -58,6 +58,7 @@ let hasPet = false;
 let wanderPreference = true;
 let edgeHiding = true;
 let edgeSide = null;
+let petAppearance='seed';
 let edgePose = 'visible';
 let edgeTimer = null;
 let edgeTuckUntil = null;
@@ -83,7 +84,7 @@ function getDesktopState() {
     panelGeometry,
     edgeSide,
     edgePose,
-    edgeOffset: edgeOffset(edgeSide, edgePose),
+    edgeOffset: edgeOffset(edgeSide, edgePose,petAppearance),
     edgeHiding,
     edgeNextPeekAt,
   };
@@ -293,7 +294,7 @@ function preparePetDrag(){
 function startPetDrag(paintedOffset){
   if(paintedOffset!==undefined&&(!paintedOffset||Array.isArray(paintedOffset)||typeof paintedOffset.x!=='number'||typeof paintedOffset.y!=='number'||!Number.isFinite(paintedOffset.x)||!Number.isFinite(paintedOffset.y)||Math.abs(paintedOffset.x)>82||Math.abs(paintedOffset.y)>92))throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
   if(!petMode||mouseThrough)return false;
-  const offset=paintedOffset??(edgeSide?edgeOffset(edgeSide,edgePose):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
+  const offset=paintedOffset??(edgeSide?edgeOffset(edgeSide,edgePose,petAppearance):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
   if(companionPanel)changeCompanionPanel(false);
   const base=currentPetBounds();revealPet();dragging=true;stopMovement();
   const painted={...base,x:base.x+Math.round(offset.x),y:base.y+Math.round(offset.y)};placePetAt(painted);
@@ -412,6 +413,7 @@ function changeCompanionPanel(open, layout = 'compact') {
   if (!open) panelGeometry = null;
   changingMode = true;
   companionPanel = open;
+  if(process.platform==='win32')applyMinimum(target,petMode);
   mainWindow.setBounds(target);
   const actual=mainWindow.getBounds();
   if(open&&panelGeometry){panelGeometry={...panelGeometry,petX:base.x-actual.x,petY:base.y-actual.y,panelX:panelGeometry.panelX+target.x-actual.x,panelY:panelGeometry.panelY+target.y-actual.y};}
@@ -501,7 +503,14 @@ function clampBounds(bounds, fallbackSize) {
 function applyMinimum(bounds, isPet) {
   const area = screen.getDisplayMatching(bounds).workArea;
   const size = isPet ? PET_SIZE : NORMAL_MINIMUM;
-  mainWindow.setMinimumSize(Math.min(size.width, area.width), Math.min(size.height, area.height));
+  if(process.platform==='win32'){
+    // Keep the original frameless style for the lifetime of the HWND. Toggling
+    // CanResize lets Chromium restore native caption bits on some Windows builds.
+    mainWindow.setMaximumSize(0,0);
+    const fixed=isPet?bounds:size;
+    mainWindow.setMinimumSize(Math.min(fixed.width,area.width),Math.min(fixed.height,area.height));
+    if(isPet)mainWindow.setMaximumSize(bounds.width,bounds.height);
+  }else mainWindow.setMinimumSize(Math.min(size.width,area.width),Math.min(size.height,area.height));
 }
 
 function isOurURL(url) {
@@ -554,7 +563,7 @@ function changePetMode(enabled) {
     const target = clampBounds(petBounds, PET_SIZE);
     petMode = true;
     applyMinimum(target, true);
-    mainWindow.setResizable(false);
+    if(process.platform!=='win32')mainWindow.setResizable(false);
     mainWindow.setBounds(target);
     const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};
     mainWindow.setAlwaysOnTop(petAlwaysOnTop, 'floating');
@@ -562,7 +571,7 @@ function changePetMode(enabled) {
   } else {
     petMode = false;petOffset={x:0,y:0};
     const target = clampBounds(normalBounds, NORMAL_SIZE);
-    mainWindow.setResizable(true);
+    if(process.platform!=='win32')mainWindow.setResizable(true);
     applyMinimum(target, false);
     mainWindow.setBounds(target);
     mainWindow.setAlwaysOnTop(normalAlwaysOnTop, 'floating');
@@ -653,7 +662,7 @@ function createTray() {
   if (tray && !tray.isDestroyed()) return;
   const image = createTrayIcon(nativeImage, process.platform, iconPath);
   tray = new Tray(image);trayMenuKey='';
-  tray.setToolTip('拉姆 · mole-baby');
+  tray.setToolTip(process.platform==='win32'?'':'拉姆');
   // On macOS, either mouse button opens the native status menu. Restoring on
   // click as well would open the pet while the user is trying to select Exit.
   if (process.platform !== 'darwin') {
@@ -675,6 +684,7 @@ function registerIPC() {
   handle('desktop:set-pet-mode', changePetMode);
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
+  handle('desktop:set-pet-appearance',form=>{if(typeof form!=='string'||!Object.hasOwn(require('./edge-visibility.json').forms,form))throw new TypeError('Unknown pet appearance');petAppearance=form;publishState();return getDesktopState()});
   handle('desktop:set-edge-hiding', changeEdgeHiding);
   handle('desktop:set-edge-hovered', changeEdgeHovered);
   handle('desktop:open-mac-settings', kind=>macHelp.openSettings(kind));
@@ -719,6 +729,7 @@ function createWindow() {
     minWidth: Math.min(NORMAL_MINIMUM.width, area.width),
     minHeight: Math.min(NORMAL_MINIMUM.height, area.height),
     title: '拉姆',
+    resizable: true,
     icon: iconPath('ramu.png'),
     frame: false,
     // AppKit otherwise clamps the transparent top margin below its menu bar.

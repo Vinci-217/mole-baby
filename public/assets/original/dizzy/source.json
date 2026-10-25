@@ -1,0 +1,209 @@
+{
+  "description": "Unchanged original down body/eye whites and a separate original pupil layer. Smooth orbital eye motion is a desktop adaptation, not an official dizzy clip.",
+  "columns": 2,
+  "forms": {
+    "seed": {
+      "cell": [
+        96,
+        99
+      ],
+      "sourceSprite": 39,
+      "pupilBounds": [
+        31,
+        11,
+        60,
+        23
+      ],
+      "orbit": [
+        1.35,
+        1.05
+      ],
+      "scale": 0.5068493150684932,
+      "translation": [
+        12.0,
+        1.7260273972602675
+      ]
+    },
+    "junior": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 936,
+      "pupilBounds": [
+        71,
+        97,
+        120,
+        118
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.9806451612903225,
+      "translation": [
+        9.193548387096783,
+        26.516129032258064
+      ]
+    },
+    "middle": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 1532,
+      "pupilBounds": [
+        82,
+        127,
+        118,
+        141
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.6815642458100558,
+      "translation": [
+        25.36871508379889,
+        27.189944134078218
+      ]
+    },
+    "senior": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 1777,
+      "pupilBounds": [
+        67,
+        154,
+        111,
+        171
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.6855345911949685,
+      "translation": [
+        19.547169811320757,
+        23.616352201257882
+      ]
+    },
+    "super": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 940,
+      "pupilBounds": [
+        75,
+        155,
+        109,
+        169
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.5279503105590062,
+      "translation": [
+        20.434782608695656,
+        10.66459627329192
+      ]
+    },
+    "water": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 538,
+      "pupilBounds": [
+        68,
+        140,
+        117,
+        160
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.7672955974842768,
+      "translation": [
+        5.144654088050302,
+        3.3836477987421176
+      ]
+    },
+    "wood": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 1029,
+      "pupilBounds": [
+        69,
+        148,
+        112,
+        164
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.660377358490566,
+      "translation": [
+        -6.566037735849051,
+        8.69811320754718
+      ]
+    },
+    "fire": {
+      "cell": [
+        192,
+        208
+      ],
+      "sourceSprite": 898,
+      "pupilBounds": [
+        42,
+        142,
+        92,
+        166
+      ],
+      "orbit": [
+        2.7,
+        2.1
+      ],
+      "scale": 0.7612903225806451,
+      "translation": [
+        25.819354838709685,
+        13.948387096774212
+      ]
+    }
+  },
+  "sourceFiles": {
+    "lamubone.swf": {
+      "url": "http://mole.61.com/resource/NPC/lamubone.swf",
+      "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/NPC/lamubone.swf"
+    },
+    "super.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet101/skill_7.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "sha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20"
+    },
+    "water.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_2.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_2.swf",
+      "sha256": "def307887b5de28bedcef4fae30fd980e8a9537f156b77f0b4527be235857464"
+    },
+    "wood.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_4.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_4.swf",
+      "sha256": "8b2844001dd346c5bdc0f6dba8da83da15c618c0d46a12c68b011f3bdfacd926"
+    },
+    "fire.swf": {
+      "url": "http://mole.61.com/resource/petcloth/swf2/pet5/skill_1.swf",
+      "archive": "https://raw.githubusercontent.com/Miigon/RecMoleRes/master/root/resource/petcloth/swf2/pet5/skill_1.swf",
+      "sha256": "ef8b8dd20db563b6dcde2ee3b69d47707453bd147076a676b84aeec7dbd1ef94"
+    }
+  }
+}

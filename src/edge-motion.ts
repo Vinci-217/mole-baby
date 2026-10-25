@@ -1,3 +1,4 @@
+import visibility from '../electron/edge-visibility.json';
 import type { Stage } from './game';
 
 export type PetEdge = 'left' | 'right' | 'top' | 'bottom';
@@ -5,10 +6,11 @@ export type EdgePose = 'visible' | 'tucking' | 'hidden' | 'peek';
 export interface EdgeVector { x: number; y: number }
 
 /** Native state supplies targets; transitions interpolate these in the renderer. */
-export function edgeTargetOffset(side: PetEdge | null, pose: EdgePose, supplied?: EdgeVector): EdgeVector {
+export function edgeTargetOffset(side: PetEdge | null, pose: EdgePose, supplied?: EdgeVector,form:string='junior'): EdgeVector {
   if (!side || pose === 'visible') return { x: 0, y: 0 };
   const horizontal = side === 'left' || side === 'right';
-  const amount = horizontal ? pose === 'peek' ? 44 : 82 : pose === 'peek' ? 50 : 92;
+  const profile=visibility.forms[form as keyof typeof visibility.forms]??visibility.forms.junior;
+  const amount=profile[pose==='peek'?'peek':'hidden'][side];
   const direction = side === 'left' || side === 'top' ? -1 : 1;
   const fallback = { x: horizontal ? amount * direction : 0, y: horizontal ? 0 : amount * direction };
   if (!supplied || !Number.isFinite(supplied.x) || !Number.isFinite(supplied.y)) return fallback;

@@ -4,7 +4,7 @@ export interface OutfitSheet {cell:number[];tile:number[];rects:number[][];bodyC
 interface OutfitSource {sourceId:string;additiveRig:boolean;forms:Record<string,Record<string,OutfitSheet>>}
 const sources=data.outfits as unknown as Record<string,OutfitSource>;
 export function outfitFrame(id:string,form:string,kind:string,frame:number,row:number,columns:number,sourceFrame?:number) {
-  if(kind==='gentle')return outfitFrame(id,form,form==='seed'?'seed':'slumber',0,0,8)
+  if(kind==='gentle'||kind==='dizzy')return outfitFrame(id,form,form==='seed'?'seed':'slumber',0,0,8)
   const sheet=sources[id]?.forms[form]?.[kind==='item'?'item-motion':kind];
   if(!sheet)return null;
   const key=String((kind==='football'||kind.startsWith('emotion-'))&&sourceFrame!==undefined?sourceFrame:row*columns+frame);

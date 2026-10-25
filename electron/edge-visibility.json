@@ -1,0 +1,170 @@
+{
+  "visibleRatio": 0.3,
+  "viewport": [
+    100,
+    108
+  ],
+  "source": "Original body colour masks; seed uses the union with its independent flowerpot.",
+  "forms": {
+    "seed": {
+      "body": [
+        32.81,
+        17.31,
+        71.352,
+        95.19
+      ],
+      "hidden": {
+        "left": 59.789,
+        "right": 55.627,
+        "top": 71.826,
+        "bottom": 67.326
+      },
+      "peek": {
+        "left": 35.873,
+        "right": 33.377,
+        "top": 43.096,
+        "bottom": 40.396
+      }
+    },
+    "junior": {
+      "body": [
+        9.896,
+        24.404,
+        89.062,
+        79.962
+      ],
+      "hidden": {
+        "left": 65.312,
+        "right": 66.354,
+        "top": 63.294,
+        "bottom": 66.929
+      },
+      "peek": {
+        "left": 39.188,
+        "right": 39.812,
+        "top": 37.977,
+        "bottom": 40.157
+      }
+    },
+    "middle": {
+      "body": [
+        20.312,
+        43.615,
+        83.854,
+        88.788
+      ],
+      "hidden": {
+        "left": 64.792,
+        "right": 60.625,
+        "top": 75.237,
+        "bottom": 50.833
+      },
+      "peek": {
+        "left": 38.875,
+        "right": 36.375,
+        "top": 45.142,
+        "bottom": 30.5
+      }
+    },
+    "senior": {
+      "body": [
+        18.75,
+        53.481,
+        76.042,
+        101.25
+      ],
+      "hidden": {
+        "left": 58.854,
+        "right": 64.062,
+        "top": 86.919,
+        "bottom": 40.188
+      },
+      "peek": {
+        "left": 35.312,
+        "right": 38.438,
+        "top": 52.152,
+        "bottom": 24.113
+      }
+    },
+    "super": {
+      "body": [
+        26.042,
+        60.231,
+        70.312,
+        97.096
+      ],
+      "hidden": {
+        "left": 57.031,
+        "right": 60.677,
+        "top": 86.037,
+        "bottom": 36.71
+      },
+      "peek": {
+        "left": 34.219,
+        "right": 36.406,
+        "top": 51.622,
+        "bottom": 22.026
+      }
+    },
+    "water": {
+      "body": [
+        16.667,
+        48.808,
+        80.208,
+        96.577
+      ],
+      "hidden": {
+        "left": 61.146,
+        "right": 64.271,
+        "top": 82.246,
+        "bottom": 44.862
+      },
+      "peek": {
+        "left": 36.688,
+        "right": 38.563,
+        "top": 49.348,
+        "bottom": 26.917
+      }
+    },
+    "wood": {
+      "body": [
+        20.312,
+        56.596,
+        75.0,
+        97.615
+      ],
+      "hidden": {
+        "left": 58.594,
+        "right": 63.281,
+        "top": 85.31,
+        "bottom": 39.098
+      },
+      "peek": {
+        "left": 35.156,
+        "right": 37.969,
+        "top": 51.186,
+        "bottom": 23.459
+      }
+    },
+    "fire": {
+      "body": [
+        19.792,
+        48.288,
+        81.25,
+        97.096
+      ],
+      "hidden": {
+        "left": 62.812,
+        "right": 61.771,
+        "top": 82.454,
+        "bottom": 45.069
+      },
+      "peek": {
+        "left": 37.688,
+        "right": 37.063,
+        "top": 49.472,
+        "bottom": 27.042
+      }
+    }
+  }
+}

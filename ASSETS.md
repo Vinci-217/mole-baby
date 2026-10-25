@@ -1,5 +1,7 @@
 # 拉姆素材记录
 
+v0.28.0 从原SWF分离正常身体/眼白和原瞳孔，供眩晕时的眼内绕圈使用。见 [分层说明](public/assets/original/dizzy/README.md)；没有新画眼睛或角色。边缘露出比例用原身体遮罩校准，见 [本轮检查](research/v28-edge-eyes.md)。
+
 v0.27.0 新增小网、空餐盘和奶瓶，参考原道具画法由图片模型生成，非官方原素材；见 [生成记录](public/assets/generated/v27-care-props.source.json)。原角色/眼睛/小嘴/服饰继续独立播放，没有重画拉姆。实际尺寸动作和坐标、音效同步说明见 [本轮复核](research/v27-elastic-care.md)。
 
 v0.22.0 新增原 `happy/angry` 时间轴的心情适配、三件完整原配饰与本地衣橱。来源分别见 [emotions](public/assets/original/emotions/README.md)、[wardrobe](public/assets/original/wardrobe/README.md)；没有生成新角色。衣橱名称/价格是本地设计，睡眠与皱眉剪辑也明确为适配；见 [本轮复核](research/v22-moods-wardrobe.md)。

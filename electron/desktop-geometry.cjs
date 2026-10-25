@@ -40,15 +40,11 @@ function cornerBounds(bounds, area, side) {
 }
 
 /** Renderer target translation; native bounds remain anchored to the body edge. */
-function edgeOffset(side, pose) {
-  if (pose === 'visible' || !['tucking', 'hidden', 'peek'].includes(pose)) return { x: 0, y: 0 };
-  const horizontal = pose === 'peek' ? 44 : 82;
-  const vertical = pose === 'peek' ? 50 : 92;
-  if (side === 'left') return { x: -horizontal, y: 0 };
-  if (side === 'right') return { x: horizontal, y: 0 };
-  if (side === 'top') return { x: 0, y: -vertical };
-  if (side === 'bottom') return { x: 0, y: vertical };
-  return { x: 0, y: 0 };
+function edgeOffset(side,pose,form='junior') {
+ if(pose==='visible'||!['tucking','hidden','peek'].includes(pose))return{x:0,y:0};
+ const profile=require('./edge-visibility.json').forms[form]??require('./edge-visibility.json').forms.junior;
+ const amount=profile[pose==='peek'?'peek':'hidden'][side];if(!Number.isFinite(amount))return{x:0,y:0};
+ return {x:side==='left'?-amount:side==='right'?amount:0,y:side==='top'?-amount:side==='bottom'?amount:0};
 }
 
 function canAnimateDesktop(state) {

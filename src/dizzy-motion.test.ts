@@ -1,0 +1,3 @@
+import{it,expect}from'vitest'
+import{dizzyEyes,DIZZY_DURATION}from'./dizzy-motion'
+it('orbits only the original pupils smoothly and settles at both ends',()=>{expect(dizzyEyes(0).x).toBe(0);expect(dizzyEyes(0).y).toBe(0);const points=[];let previous=dizzyEyes(0);for(let t=16;t<DIZZY_DURATION;t+=16){const p=dizzyEyes(t);expect(Math.abs(p.x)).toBeLessThanOrEqual(2.7);expect(Math.abs(p.y)).toBeLessThanOrEqual(2.1);expect(Math.abs(p.x-previous.x)).toBeLessThan(.4);points.push(p);previous=p}expect(points.some(p=>p.x>2)).toBe(true);expect(points.some(p=>p.x<-2)).toBe(true);expect(dizzyEyes(DIZZY_DURATION)).toEqual({x:0,y:0,finished:true});expect(dizzyEyes(900,true)).toEqual({x:0,y:0,finished:false})})

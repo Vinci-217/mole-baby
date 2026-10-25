@@ -102,7 +102,7 @@ async function verifyEdgePeek(page,desktop,side,{onPose}={}){
   };
   const settle=async pose=>{
     // Assert actual painted motion, rather than merely the early IPC state.
-    const amount=pose==='hidden'?(horizontal?82:92):(horizontal?44:50);
+    const offset=(await state()).edgeOffset;const amount=Math.abs(horizontal?offset.x:offset.y);
     await expect.poll(()=>page.locator('.compact-pet').evaluate(n=>{
       const m=new DOMMatrix(getComputedStyle(n).transform);return [m.m41,m.m42];
     })).toEqual(horizontal?[direction*amount,0]:[0,direction*amount]);

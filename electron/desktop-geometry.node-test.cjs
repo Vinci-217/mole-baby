@@ -43,12 +43,9 @@ test('a small work area keeps the native frame size and contains the body', () =
 });
 
 test('edge poses expose finite directional translations on all four sides', () => {
-  for (const [side, hidden, peek] of [
-    ['left', { x: -82, y: 0 }, { x: -44, y: 0 }],
-    ['right', { x: 82, y: 0 }, { x: 44, y: 0 }],
-    ['top', { x: 0, y: -92 }, { x: 0, y: -50 }],
-    ['bottom', { x: 0, y: 92 }, { x: 0, y: 50 }],
-  ]) {
+  for(const side of ['left','right','top','bottom']){
+    const {hidden:h,peek:p}=require('./edge-visibility.json').forms.junior;const sign=['left','top'].includes(side)?-1:1,horizontal=['left','right'].includes(side);
+    const hidden={x:horizontal?sign*h[side]:0,y:horizontal?0:sign*h[side]},peek={x:horizontal?sign*p[side]:0,y:horizontal?0:sign*p[side]};
     assert.deepEqual(edgeOffset(side, 'visible'), { x: 0, y: 0 });
     assert.deepEqual(edgeOffset(side, 'tucking'), hidden);
     assert.deepEqual(edgeOffset(side, 'hidden'), hidden);

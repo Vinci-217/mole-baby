@@ -36,6 +36,7 @@ declare global {
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
+      setPetAppearance:(form:string)=>Promise<DesktopState>;
       setPetCanMove: (enabled: boolean) => Promise<boolean>;
       setEdgeHiding: (enabled: boolean) => Promise<boolean>;
       revealPet: () => Promise<DesktopState>;
