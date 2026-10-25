@@ -1,0 +1,37 @@
+const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http=require('node:http'),assert=require('node:assert/strict'),{spawn,execFileSync}=require('node:child_process'),asar=require('@electron/asar'),YAML=require('yaml');
+const root=path.resolve(__dirname,'..'),temporary=fs.mkdtempSync(path.join(os.tmpdir(),'mole-real-update-')),profile=path.join(temporary,'profile'),install=path.join(temporary,'MoleBabyUpdateFixture'),fixture=path.join(root,'artifacts/update-fixture-app'),config=path.join(root,'artifacts/update-fixture-builder.cjs');
+let server,log;
+function run(command,args,options={}){return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd:root,stdio:['ignore',log,log],windowsHide:true,...options});child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(Error(`Fixture command exited ${code}: ${command}`)))})}
+function powershell(script){return execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{encoding:'utf8',timeout:60000,windowsHide:true})}
+const quote=value=>"'"+value.replaceAll("'","''")+"'";
+(async()=>{
+ assert.equal(process.platform,'win32');fs.mkdirSync(profile,{recursive:true});fs.mkdirSync(fixture,{recursive:true});log=fs.openSync(path.join(root,'artifacts/windows-update-fixture.log'),'a');
+ const payload={name:'小更新',color:'blue',growth:180,coins:1234,memories:['我们一起读过书。']},save=path.join(profile,'pet-save.json');fs.writeFileSync(save,JSON.stringify(payload));
+ const outputs={};server=http.createServer((req,res)=>{const name=decodeURIComponent(new URL(req.url,'http://localhost').pathname).slice(1),file=outputs[name];if(!file){res.writeHead(404);res.end();return}const stat=fs.statSync(file);res.writeHead(200,{'content-length':stat.size,'content-type':name.endsWith('.yml')?'application/x-yaml':'application/octet-stream'});fs.createReadStream(file).pipe(res)});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const feed=`http://127.0.0.1:${server.address().port}/`;
+ const source=`const{app,BrowserWindow}=require('electron'),fs=require('node:fs'),path=require('node:path');const{createUpdates}=require('../../electron/updates.cjs');const version=require('../../package.json').version;const profile=${JSON.stringify(profile)},feed=${JSON.stringify(feed)};app.setPath('userData',profile);let updates;app.whenReady().then(()=>{fs.appendFileSync(path.join(profile,'launches.jsonl'),JSON.stringify({version,pid:process.pid})+'\\n');const window=new BrowserWindow({width:320,height:180,show:true});window.loadURL('data:text/html,<p>Updating test companion</p>');updates=createUpdates({version,platform:'win32',arch:'x64',configFile:path.join(profile,'updates.json'),cacheDirectory:path.join(profile,'downloads'),installed:true,isBusy:()=>false,engineFactory:()=>new(require('electron-updater').NsisUpdater)({provider:'generic',url:feed}),prepareInstall:async()=>{const pet=JSON.parse(fs.readFileSync(path.join(profile,'pet-save.json')));if(pet.coins!==1234)return false;fs.writeFileSync(path.join(profile,'checkpoint.json'),JSON.stringify({saved:true,version}));window.webContents.session.flushStorageData();return true},onChange:state=>fs.writeFileSync(path.join(profile,'state.json'),JSON.stringify(state)),openPath:async()=>''});updates.start()});app.on('window-all-closed',()=>app.quit());app.on('will-quit',()=>updates?.dispose());`;
+ fs.writeFileSync(path.join(fixture,'main.cjs'),source);
+ fs.writeFileSync(config,`const{build}=require('../package.json');module.exports={...build,appId:'com.molebaby.updatefixture',productName:'MoleBabyUpdateFixture',directories:{output:process.env.MOLE_FIXTURE_OUTPUT},files:['artifacts/update-fixture-app/**/*','electron/updates.cjs','package.json'],extraMetadata:{name:'mole-baby-update-fixture',main:'artifacts/update-fixture-app/main.cjs',version:process.env.MOLE_FIXTURE_VERSION},publish:[{provider:'generic',url:${JSON.stringify(feed)}}],win:{...build.win,artifactName:'fixture-'+process.env.MOLE_FIXTURE_VERSION+'-x64.'+'\${ext}'},nsis:{...build.nsis,createDesktopShortcut:false,createStartMenuShortcut:false,artifactName:'fixture-'+process.env.MOLE_FIXTURE_VERSION+'-Setup.exe'}};`);
+ const builder=path.join(root,'node_modules/electron-builder/cli.js');
+ for(const version of ['1.0.0','1.0.1']){
+  const output=path.join(temporary,version);await run(process.execPath,[builder,'--win','nsis','--x64','--publish','never','--config',config],{env:{...process.env,MOLE_FIXTURE_OUTPUT:output,MOLE_FIXTURE_VERSION:version}});
+  assert.equal(JSON.parse(asar.extractFile(path.join(output,'win-unpacked/resources/app.asar'),'package.json')).version,version);
+  const exe=path.join(output,`fixture-${version}-Setup.exe`);assert.ok(fs.statSync(exe).size>1_000_000);
+  if(version==='1.0.1'){const meta=YAML.parse(fs.readFileSync(path.join(output,'latest.yml'),'utf8'));assert.equal(meta.version,version);outputs['latest.yml']=path.join(output,'latest.yml');for(const file of meta.files)outputs[file.url]=path.join(output,file.url)}
+  console.log(`PASS: packaged real NSIS updater fixture ${version}`);
+ }
+ // Bake the same profile/feed into both binaries. Explorer launches do not
+ // inherit a test shell's environment, just like real per-user updates.
+ await run(path.join(temporary,'1.0.0/fixture-1.0.0-Setup.exe'),['/S','/currentuser',`/D=${install}`]);
+ const initial=spawn(path.join(install,'MoleBabyUpdateFixture.exe'),[],{cwd:install,stdio:['ignore',log,log],windowsHide:true});initial.on('error',error=>{console.error(error)});
+ const deadline=Date.now()+180000;let launches=[];
+ while(Date.now()<deadline){try{launches=fs.readFileSync(path.join(profile,'launches.jsonl'),'utf8').trim().split('\n').map(JSON.parse)}catch{}if(launches.some(v=>v.version==='1.0.1'))break;await new Promise(r=>setTimeout(r,300))}
+ assert.ok(launches.some(v=>v.version==='1.0.0'),'initial installed fixture must run');assert.ok(launches.some(v=>v.version==='1.0.1'),`new installed version did not relaunch: ${fs.existsSync(path.join(profile,'state.json'))?fs.readFileSync(path.join(profile,'state.json'),'utf8'):'no update state'}`);
+ assert.deepEqual(JSON.parse(fs.readFileSync(save,'utf8')),payload);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(profile,'checkpoint.json'),'utf8')),{saved:true,version:'1.0.0'});
+ const installed=JSON.parse(asar.extractFile(path.join(install,'resources/app.asar'),'package.json'));assert.equal(installed.version,'1.0.1');
+ console.log('PASS: real Windows 1.0.0 → 1.0.1 update checked, downloaded, silently installed and relaunched; pre-install checkpoint and companion data preserved');
+})().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{
+ try{powershell(`Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -and $_.Path.StartsWith(${quote(install)},[StringComparison]::OrdinalIgnoreCase)} | Stop-Process -Force -ErrorAction SilentlyContinue`)}catch{}
+ const uninstaller=path.join(install,'Uninstall MoleBabyUpdateFixture.exe');if(fs.existsSync(uninstaller))try{await run(uninstaller,['/S',`_?=${install}`])}catch{}
+ if(server)await new Promise(resolve=>server.close(resolve));if(log)fs.closeSync(log);
+ fs.rmSync(temporary,{recursive:true,force:true,maxRetries:4,retryDelay:300});
+});

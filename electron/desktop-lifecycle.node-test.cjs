@@ -69,6 +69,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const localRequire = name => name === 'electron' ? electron : name.startsWith('./') ? require(path.join(__dirname,name)) : require(name);
   const runtimeProcess = Object.create(process);
   Object.defineProperty(runtimeProcess, 'platform', { value: platform });
+  Object.defineProperty(runtimeProcess,'env',{value:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1'}});
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
     require: localRequire, __dirname, console, URL, Date, process: runtimeProcess,
     setTimeout, clearTimeout, setInterval, clearInterval,

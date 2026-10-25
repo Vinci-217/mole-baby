@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Notification, screen, Tray, Menu, nativeImage, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, screen, Tray, Menu, nativeImage, shell, net, autoUpdater:nativeAutoUpdater } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -8,6 +8,9 @@ const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
+const {createUpdates}=require('./updates.cjs');
+const applicationMetadata=require('../package.json');
+let updates=null,updateRendererBusy=true,updateCheckpoint=null;
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
@@ -612,6 +615,7 @@ function showFromTray(home = false) {
   if (mainWindow.isMinimized()) mainWindow.restore();
   mainWindow.show();
   mainWindow.focus();
+  updates?.wake();
   scheduleWander();
 }
 
@@ -630,7 +634,7 @@ function markRendererReady(adopted) {
 function refreshTrayMenu() {
   if (!tray || tray.isDestroyed()) return;
   const movable = hasPet && petCanMove;
-  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,mainWindow.isAlwaysOnTop()]);if(key===trayMenuKey)return;trayMenuKey=key;
+  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
@@ -654,10 +658,33 @@ function refreshTrayMenu() {
       {label:'首次打开说明',click:()=>{void macHelp.openGuide().catch(()=>{});}},
     ]}]:[]),
     { type: 'separator' },
+    ...(updates?[{label:updateMenuLabel(),enabled:!['disabled','checking','downloading','installing'].includes(updates.getState().status),click:()=>{const state=updates.getState();void(state.status==='ready'?updates.install(true):state.status==='available'?updates.download():updates.check(true))}}]:[]),
     { label: '退出拉姆', click: () => { quitting = true; app.quit(); } },
   ]));
 }
 
+function updateMenuLabel(){
+ const u=updates.getState();return u.status==='checking'?'正在检查更新…':u.status==='downloading'?`正在下载更新 ${u.percent}%`:u.status==='installing'?'正在更新…':u.status==='ready'?(u.automaticInstall?'更新并重启拉姆':'打开更新安装包'):u.status==='available'?'下载新版本':'检查更新';
+}
+function prepareUpdateInstall(){
+ if(!mainWindow||mainWindow.isDestroyed()||!rendererReady||updateCheckpoint)return Promise.resolve(false);
+ return new Promise(resolve=>{const id=require('node:crypto').randomUUID();const timer=setTimeout(()=>{updateCheckpoint=null;resolve(false)},5000);updateCheckpoint={id,timer,resolve};mainWindow.webContents.send('updates:prepare',id)});
+}
+function startUpdates(){
+ updates=createUpdates({
+  version:applicationMetadata.version,platform:process.platform,arch:process.arch==='arm64'||app.runningUnderARM64Translation?'arm64':'x64',
+  configFile:path.join(app.getPath('userData'),'updates.json'),cacheDirectory:path.join(app.getPath('userData'),'update-downloads'),
+  disabled:!app.isPackaged||process.env.MOLE_BABY_DISABLE_UPDATES==='1',
+  installed:process.platform==='win32'&&fs.existsSync(path.join(path.dirname(process.execPath),'Uninstall 拉姆.exe')),
+  macSigned:applicationMetadata.macUpdateSigned===true,
+  fetch:(url,options)=>net.fetch(url,options),openPath:file=>shell.openPath(file),
+  engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL({provider:'generic',url:'https://github.com/Vinci-217/mole-baby/releases/latest/download/'});return engine},
+  prepareInstall:prepareUpdateInstall,isBusy:()=>updateRendererBusy||!hasPet||!petMode||companionPanel||dragging||interacting,
+  onChange:state=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('updates:state',state);refreshTrayMenu()},
+  onReady:()=>{if(Notification.isSupported())try{new Notification({title:'拉姆有新版本啦',body:'更新已下载，可以在托盘或小屋设置里查看。',silent:true}).show()}catch{}},
+ });
+ updates.start();refreshTrayMenu();
+}
 function createTray() {
   if (tray && !tray.isDestroyed()) return;
   const image = createTrayIcon(nativeImage, process.platform, iconPath);
@@ -677,6 +704,13 @@ function registerIPC() {
   listen('desktop:close', hideToTray);
   listen('desktop:hide-to-tray', hideToTray);
   listen('desktop:ready-to-show', markRendererReady);
+  handle('updates:get-state',()=>updates?.getState()??null);
+  handle('updates:check',()=>updates?.check(true)??false);
+  handle('updates:download',()=>updates?.download()??false);
+  handle('updates:install',()=>updates?.install(true)??false);
+  handle('updates:set-enabled',enabled=>updates?.setEnabled(enabled)??null);
+  listen('updates:busy',busy=>{if(typeof busy!=='boolean')return;updateRendererBusy=busy});
+  listen('updates:prepared',(id,ok)=>{const checkpoint=updateCheckpoint;if(!checkpoint||id!==checkpoint.id||typeof ok!=='boolean')return;clearTimeout(checkpoint.timer);updateCheckpoint=null;let saved=ok;try{if(ok){saveWindowState();mainWindow.webContents.session.flushStorageData()}}catch{saved=false}checkpoint.resolve(saved)});
   handle('desktop:toggle-always-on-top',()=>changeAlwaysOnTop(!mainWindow.isAlwaysOnTop()));
   handle('desktop:set-mouse-through',changeMouseThrough);
   handle('desktop:prepare-pet-drag',preparePetDrag);
@@ -823,6 +857,7 @@ if (!app.requestSingleInstanceLock()) {
       try{fs.rmSync(path.join(directory,'companion-ai-key.json'),{force:true});}catch(error){console.warn('Unable to remove retired API key:',error.code||error.name);}
     }
     loadWindowState();
+    startUpdates();
     registerIPC();
     createWindow();
     createTray();
@@ -851,10 +886,12 @@ if (!app.requestSingleInstanceLock()) {
     console.error('Unable to start the pet application:', error.message);
     app.quit();
   });
+  nativeAutoUpdater?.on('before-quit-for-update',()=>{quitting=true;saveWindowState();try{mainWindow?.webContents.session.flushStorageData()}catch{}});
   app.on('before-quit', () => {
     quitting = true;clearInterval(dragPoll);
+    try{mainWindow?.webContents.session.flushStorageData()}catch{}
     stopMovement(); clearTimeout(edgeTimer); saveWindowState();
   });
-  app.on('will-quit', () => { if (tray && !tray.isDestroyed()) tray.destroy(); });
+  app.on('will-quit', () => { updates?.dispose();if(updateCheckpoint){clearTimeout(updateCheckpoint.timer);updateCheckpoint.resolve(false);updateCheckpoint=null} if (tray && !tray.isDestroyed()) tray.destroy(); });
   app.on('window-all-closed', () => { if (quitting) app.quit(); });
 }

@@ -1,3 +1,4 @@
+const{verifyUpdateSurface}=require('./update-surface-checks.cjs');
 const{verifyV28}=require('./v28-companion-checks.cjs');
 const{verifyElasticCare}=require('./elastic-care-checks.cjs');
 const{verifyLivelyCompanion}=require('./lively-companion-checks.cjs');
@@ -87,7 +88,7 @@ async function verifyBackground(page, selector, suffix) {
   fs.mkdirSync(profile, { recursive: true });
   fs.mkdirSync(artifacts, { recursive: true });
   assert.ok(fs.existsSync(path.join(root, 'dist/index.html')), 'Run npm run build before the desktop smoke test');
-  const env = { ...process.env, ELECTRON_DEV: '0', XDG_CONFIG_HOME: profile, XDG_CACHE_HOME: path.join(cloud, 'cache') };
+  const env = { ...process.env, ELECTRON_DEV: '0', MOLE_BABY_DISABLE_UPDATES:'1', XDG_CONFIG_HOME: profile, XDG_CACHE_HOME: path.join(cloud, 'cache') };
   const args = [root];
   if (process.platform === 'linux') {
     env.DISPLAY = ':98';
@@ -113,6 +114,6 @@ async function verifyBackground(page, selector, suffix) {
   page.setDefaultTimeout(15000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});
-  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyElasticCare(page,desktop);await verifyLivelyCompanion(page);await verifyV28(page,desktop);assert.deepEqual(errors,[]);
+  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyElasticCare(page,desktop);await verifyLivelyCompanion(page);await verifyV28(page,desktop);await verifyUpdateSurface(page,desktop);assert.deepEqual(errors,[]);
   console.log('PASS native compact desktop regression');await quitDesktop();
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await quitDesktop().catch(()=>{});if(windowManager)try{process.kill(-windowManager.pid,'SIGTERM')}catch{}virtualDisplay?.kill('SIGTERM')});

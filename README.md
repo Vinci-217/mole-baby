@@ -2,7 +2,7 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.28.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.28.0) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 v0.29.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.0) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 小小的桌面陪伴
 
@@ -38,9 +38,15 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 [本版画面、实际录屏与实现范围](research/v27-elastic-care.md) · [上版日常活动](research/v26-lively-pet.md)
 
+## 自动更新
+
+Windows安装版启动后自动检查GitHub正式版，后台下载并校验；桌宠空闲时保存后更新、重启，正在游戏或专注时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
+
+首次需要手动安装v0.29.0一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
+
 ## 安装
 
-Windows运行 `mole-baby-0.28.0-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.29.0-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 

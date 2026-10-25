@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$Installer)
 $ErrorActionPreference = 'Stop'
+$env:MOLE_BABY_DISABLE_UPDATES='1'
 Add-Type @'
 using System;
 using System.Text;

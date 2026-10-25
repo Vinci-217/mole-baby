@@ -1,3 +1,4 @@
+import UpdateSettings from './components/UpdateSettings';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
 import { COLORS, FOODS, STAGES, EVOLUTIONS, GROWTH_MAX, evolvePet, changePetStage, GROWTH_STAGE_HOURS, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
@@ -113,6 +114,8 @@ export default function App() {
   const pastimeRun=useRef<{petId:number;kind:Pastime}|null>(null);
   const importInput = useRef<HTMLInputElement>(null);
 
+  const updateSnapshot=useRef<()=>boolean>(()=>false);
+  useEffect(()=>window.desktop?.updates?.onPrepare(()=>updateSnapshot.current()),[]);
   const adoptionFocus = useRef<HTMLInputElement>(null);
   const hasPet = pet !== null;
   const current = pet ?? createPet('小拉姆', color);
@@ -125,6 +128,7 @@ export default function App() {
   const roomMedia = useRoomMedia(hasPet && !floating);
   useEffect(()=>{configurePetSound({enabled:prefs.sound,volume:prefs.soundVolume})},[prefs.sound,prefs.soundVolume]);
   const currentMemory = memory?.petId === String(current.createdAt) ? memory : createMemory(current);
+  updateSnapshot.current=()=>{try{const saved=petRef.current;if(awaitingAdoption.current)return false;if(saved){localStorage.setItem(SAVE_KEY,JSON.stringify(saved));if(currentMemory.petId===String(saved.createdAt)&&!saveMemory(saved,currentMemory))return false}localStorage.setItem(PREFS_KEY,JSON.stringify(prefs));return true}catch{return false}};
   const snoozed = companionSnoozeUntil(currentMemory) > Date.now();
   const openInvitation = invitation?.petId === current.createdAt && Date.now()-invitation.at < 5*60000 ? invitation.offer : null;
   const days = Math.max(1, Math.floor((Date.now() - current.createdAt) / 86400000) + 1);
@@ -430,7 +434,8 @@ export default function App() {
   const playInvitation=<PetInvitation invitation={openInvitation} busy={interactionBusy} petName={current.name} habitText={habitText} snoozed={snoozed} onAccept={acceptInvitation} onDefer={deferInvitation} onSuggest={suggestTogether} onCallName={callPetName} onResume={resumeCompanion}/>;
   const visitShop = () => { void enterHome('shop'); };
   const pocket=<CarePocket pet={current} initialCategory={pocketCategory} visit={pocketVisit} compact={floating} onCare={doCare} onVisitShop={visitShop} busyItemId={actionItemId} onClose={floating?()=>void openPanel(null):undefined}/>;
-  const extraSettings = <><RoomSettings media={roomMedia}/><MacHelp/><div className="life-settings">
+  useEffect(()=>{window.desktop?.updates?.setBusy(!pet||!floating||panel==='food'||panel==='play'||game!==null||timer.running||action!=='idle'||saveError||memorySaveError)},[pet?.createdAt,floating,panel,game,timer.running,action,saveError,memorySaveError]);
+  const extraSettings = <><RoomSettings media={roomMedia}/><MacHelp/><UpdateSettings/><div className="life-settings">
     <label><span>允许短暂出游</span><input type="checkbox" aria-label="允许短暂出游" checked={prefs.outings} onChange={e=>setPrefs(p=>({...p,outings:e.target.checked}))}/></label>
     <label><span>自然小动作</span><input type="checkbox" aria-label="自然小动作" checked={prefs.lively} onChange={e=>setPrefs(p=>({...p,lively:e.target.checked}))}/></label>
     <label><span>拉姆音量</span><input type="range" min={0} max={100} step={1} aria-label="拉姆音量" value={Math.round(prefs.soundVolume*100)} onChange={e=>setPrefs(p=>({...p,soundVolume:Number(e.target.value)/100}))}/></label>

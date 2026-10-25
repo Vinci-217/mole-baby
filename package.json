@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -9,7 +9,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run && node --test electron/mac-settings.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs scripts/mac-signing.node-test.cjs",
+    "test": "vitest run && node --test electron/updates.node-test.cjs scripts/update-metadata.node-test.cjs electron/mac-settings.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs scripts/mac-signing.node-test.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
@@ -23,9 +23,11 @@
     "test:browser": "npm run build && node scripts/compact-care-regression.cjs"
   },
   "dependencies": {
+    "electron-updater": "^6.8.11",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "semver": "^7.8.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.0",
@@ -40,7 +42,8 @@
     "typescript": "~5.7.3",
     "vite": "^6.1.0",
     "vitest": "^3.0.5",
-    "wait-on": "^8.0.2"
+    "wait-on": "^8.0.2",
+    "yaml": "^2.9.1"
   },
   "build": {
     "appId": "com.molebaby.ramuhouse",
@@ -66,7 +69,8 @@
       "artifactName": "mole-baby-${version}-Setup.${ext}",
       "installerIcon": "public/icons/ramu.ico",
       "uninstallerIcon": "public/icons/ramu.ico",
-      "include": "electron/installer.nsh"
+      "include": "electron/installer.nsh",
+      "deleteAppDataOnUninstall": false
     },
     "mac": {
       "target": [
@@ -102,6 +106,14 @@
         "width": 580,
         "height": 400
       }
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Vinci-217",
+        "repo": "mole-baby",
+        "releaseType": "release"
+      }
+    ]
   }
 }
