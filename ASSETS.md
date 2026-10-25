@@ -1,5 +1,7 @@
 # 拉姆素材记录
 
+v0.27.0 新增小网、空餐盘和奶瓶，参考原道具画法由图片模型生成，非官方原素材；见 [生成记录](public/assets/generated/v27-care-props.source.json)。原角色/眼睛/小嘴/服饰继续独立播放，没有重画拉姆。实际尺寸动作和坐标、音效同步说明见 [本轮复核](research/v27-elastic-care.md)。
+
 v0.22.0 新增原 `happy/angry` 时间轴的心情适配、三件完整原配饰与本地衣橱。来源分别见 [emotions](public/assets/original/emotions/README.md)、[wardrobe](public/assets/original/wardrobe/README.md)；没有生成新角色。衣橱名称/价格是本地设计，睡眠与皱眉剪辑也明确为适配；见 [本轮复核](research/v22-moods-wardrobe.md)。
 
 v0.21.0 玩球改用原客户端完整 `football`，原身体、眼睛、叶冠与球同帧播放；见 [football/README.md](public/assets/original/football/README.md)。睡觉改用原困倦眼睑、原嘴型的小幅张合与原 Z 字，上版 comfort 开心眼线已停止用于睡觉和摸头。睡眠循环与小尺寸眼线配色是明确记录的桌宠适配，见 [slumber/README.md](public/assets/original/slumber/README.md)。实际原帧检查和网络来源见 [本版动作核对](research/v21-original-actions.md)。没有新增模型生成角色图片。

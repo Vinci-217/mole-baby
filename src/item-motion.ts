@@ -56,10 +56,13 @@ const FALLBACK: Recipe = ['eat', 'nibble', 1800, 3, 0, '#f4dcb0']
 const motions = new Map<string, ItemMotion>()
 for (const [id, recipe] of Object.entries(RECIPES)) {
   const item = getItem(id)!
-  const [action, gesture, duration, beats, tilt, accent] = recipe
+  const [action, gesture, , , tilt, accent] = recipe
   const body = item.category === 'food' ? 'eat' : item.category === 'drink' ? 'drink' : item.category === 'clean' ? 'wash' : 'medical'
-  const verb = gesture === 'brush' ? '正在刷牙' : gesture === 'face-wash' ? '正在洗脸' : gesture === 'bath' ? '正在泡泡浴' : gesture === 'scrub' ? '正在擦洗身体' : gesture === 'rinse' ? '正在清爽地冲洗' : body === 'eat' ? '正在吃' : body === 'drink' ? '正在喝' : '正在使用'
-  const motion: ItemMotion = { action, duration, label: ['brush', 'face-wash', 'bath', 'scrub', 'rinse'].includes(gesture) ? verb : `${verb}${item.name}`, itemId: item.id, image: item.image, gesture, body, beats, tilt, accent, adaptation: true }
+  const duration=body==='eat'?4600:body==='drink'?4000:body==='wash'?3600:2800
+  const beats=body==='eat'?4:body==='drink'?3:body==='wash'?5:2
+  const verb=body==='eat'?'正在吃':body==='drink'?'正在喝':body==='wash'?'泡泡洗洗，马上就干净啦':'正在使用'
+  const motion:ItemMotion={action,duration,label:body==='wash'?verb:`${verb}${item.name}`,itemId:item.id,image:item.image,gesture,body,beats,tilt,accent,adaptation:true}
+
   motions.set(item.id, motion); motions.set(item.sourceId, motion)
 }
 const byAction = new Map([...motions.values()].map(motion => [motion.action, motion]))
@@ -84,7 +87,7 @@ const MOUTH_ANCHORS: Record<string, readonly (readonly [number, number])[]> = {
   'senior:drink': [[90,183],[90,183],[90,183],[93,183],[90,183],[89,183],[89,183],[93,183],[90,183],[89,183],[89,183],[93,183],[90,183],[89,183],[89,183],[93,183]],
 }
 export function getItemMouthAnchor(form: string | undefined, motion: ItemMotion, frame: number): readonly [number, number] {
-  if(motion.body!=='wash'&&form&&Object.hasOwn(gentle.forms,form)){
+  if(form&&Object.hasOwn(gentle.forms,form)){
     const p=gentle.forms[form as keyof typeof gentle.forms].mouthPoint
     return form==='seed'?[26.56+p[0]*.5,17.31+p[1]*.476]:[p[0],p[1]]
   }
@@ -109,51 +112,50 @@ export interface ItemMotionPose {
   finished: boolean
 }
 const clamp = (n: number, min = 0, max = 1) => Math.max(min, Math.min(max, n))
-/** Small original mouth opens on each item's own contact beat; the face stays registered. */
-export function sampleGentleMouth(motion:ItemMotion,elapsed:number,reduced=false):number {
-  if(reduced||elapsed<0||elapsed>=motion.duration)return 0
-  const progress=elapsed/motion.duration
-  if(progress<.14||progress>.82)return 0
-  const activity=(progress-.14)/.68,wave=Math.max(0,Math.sin(activity*motion.beats*Math.PI*2))
-  return Math.round(wave*wave*7)
+/** Actual mouth contacts also drive foley and the final food approach. */
+export function careContactFractions(motion:ItemMotion):number[]{
+ return motion.body==='eat'?[.43,.55,.67,.79]:motion.body==='drink'?[.32,.50,.68]:motion.body==='wash'?[.25,.36,.47,.58,.69]:[.31,.65]
 }
-
-/** One elapsed clock drives both body and prop, so hidden windows cannot leave
- * a brushing tool moving after the face has returned to idle. Coordinates are
- * percentages of the unchanged 192×208 body viewport, relative to its mouth.
- */
-export function sampleItemMotion(motion: ItemMotion, elapsed: number, reduced = false): ItemMotionPose {
-  const progress = clamp(elapsed / motion.duration), finished = elapsed >= motion.duration
-  const activity = clamp((progress - .14) / .68)
-  const cycle = activity * motion.beats, wave = Math.sin(cycle * Math.PI * 2), bite = Math.max(0, Math.sin(cycle * Math.PI))
-  const approach = clamp(progress / .16), depart = clamp((progress - .86) / .14)
-  let x = (1 - approach) * 28 + depart * 18, y = (1 - approach) * 10 + depart * 12
-  let angle = motion.tilt, scaleX = 1, scaleY = 1
-  switch (motion.gesture) {
-    case 'nibble': x += wave * 2.1; y += bite * -2; scaleX = 1 - activity * .3; scaleY = scaleX; break
-    case 'pour-beans': x += 15 + wave; y += 5; angle -= bite * 16; break
-    case 'crunch': x += wave * 3.2; y -= bite * 3; angle += wave * 7; scaleX = 1 - activity * .4; scaleY = scaleX; break
-    case 'peel': x += wave * 1.8; angle += Math.sin(activity * Math.PI * 2) * 22; y -= bite * 2.6; scaleX = 1 - activity * .32; scaleY = scaleX; break
-    case 'slice': x += wave * 4; y -= bite * 1.8; scaleX = 1 - activity * .48; break
-    case 'spoon': x += Math.cos(cycle * Math.PI * 2) * 3; y += Math.abs(wave) * 4 - 2; angle += wave * 12; scaleX = 1 - activity * .3; scaleY = scaleX; break
-    case 'stretch': x += wave * 2; scaleX = 1 + bite * .18 - activity * .35; scaleY = 1 - bite * .12 - activity * .25; break
-    case 'glow': angle += wave * 16; scaleX = 1 + bite * .09 - activity * .3; scaleY = scaleX; break
-    case 'sip': x += wave * .8; y += wave * .65; angle += bite * 9; break
-    case 'gulp': x -= 1.2; y += wave * 1.2; angle -= bite * 24; break
-    case 'fizz': x += wave * .9; angle -= bite * 32; y -= bite * 1.5; break
-    case 'squeeze': scaleX = 1 - bite * .22; scaleY = 1 + bite * .12; y -= bite * 2; angle += wave * 5; break
-    case 'bath': x = 28; y = 4 + wave * 1.4; angle += wave * 5; break
-    case 'scrub': x = Math.cos(cycle * Math.PI * 2) * 10; y = Math.sin(cycle * Math.PI * 2) * 6 + 6; angle += wave * 20; break
-    case 'face-wash': x = wave * 8; y = Math.cos(cycle * Math.PI * 2) * 4 - 7; angle += wave * 10; break
-    case 'brush': x = wave * 5.5; y = Math.sin(cycle * Math.PI * 4) * 1.1; angle += wave * 6; break
-    case 'rinse': x = Math.cos(cycle * Math.PI * 2) * 15; y = Math.sin(cycle * Math.PI * 2) * 10 - 4; angle += wave * 14; break
-    case 'medicine': case 'recolor': x -= 1; y -= bite * 1.2; angle -= bite * 24; break
-  }
-  // Play the reviewed original body clip forward once. Tool beats stay separate;
-  // rewinding the whole face at every bite used to make it pump and stutter.
-  const bodyFrame = Math.min(15, Math.floor(activity * 16))
-  if (reduced) return { progress, activity: .5, x: motion.gesture === 'bath' ? 28 : 0, y: motion.gesture === 'face-wash' ? -7 : 0, angle: motion.tilt, scaleX: 1, scaleY: 1, opacity: finished ? 0 : 1, bodyFrame: motion.body === 'wash' ? 5 : 0, finished }
-  return { progress, activity, x, y, angle, scaleX, scaleY, opacity: finished ? 0 : Math.min(1, approach * 3) * (1 - depart), bodyFrame, finished }
+export function sampleGentleMouth(motion:ItemMotion,elapsed:number,reduced=false):number {
+ if(reduced||motion.body==='wash'||elapsed<0||elapsed>=motion.duration)return 0
+ const p=elapsed/motion.duration
+ // Open just before contact; close around the bite / nipple, then swallow.
+ const wave=Math.max(0,...careContactFractions(motion).map(at=>Math.sin(Math.PI*clamp((p-(at-.055))/.055))*(p<at?1:0)))
+ return Math.round(wave*7)
+}
+export function sampleItemMotion(motion:ItemMotion,elapsed:number,reduced=false):ItemMotionPose {
+ const progress=clamp(elapsed/motion.duration),finished=elapsed>=motion.duration,activity=clamp((progress-.18)/.65)
+ const enter=clamp(progress/.14),exit=clamp((progress-.86)/.14)
+ const beat=Math.max(0,...careContactFractions(motion).map(at=>Math.max(0,1-Math.abs(progress-at)/.05)))
+ const fixed=motion.body==='drink'||motion.body==='medical'
+ return {progress,finished,activity,bodyFrame:Math.min(15,Math.floor(activity*16)),
+  x:reduced?0:fixed?(1-enter)*27+exit*40:0,y:reduced?0:fixed?(1-enter)*18+exit*14:0,
+  angle:reduced?0:fixed?-24-beat*4+exit*125:0,scaleX:1,scaleY:1,
+  opacity:finished?0:reduced?1:Math.min(1,enter*3)*(1-exit)}
+}
+export interface CarePiece {x:number;y:number;angle:number;scale:number;opacity:number}
+/** Food falls into one plate, rests, then travels to the registered tiny mouth.
+ * The four drawn bites represent ONE consumed inventory portion. */
+export function sampleCareRoutine(motion:ItemMotion,elapsed:number,mouth:readonly[number,number],seed=false,reduced=false){
+ const pose=sampleItemMotion(motion,elapsed,reduced),p=reduced?.5:pose.progress
+ const smooth=(v:number)=>{const t=clamp(v);return t*t*(3-2*t)}
+ const trayX=seed?78:Math.min(88,mouth[0]+15),trayY=seed?76:Math.min(94,mouth[1]+17)
+ const pieces:CarePiece[]=careContactFractions(motion).map((at,i)=>{
+   const start=.10+i*.035,land=start+.15,feed=at-.075,travel=smooth((p-feed)/.075)
+   const drop=clamp((p-start)/.15),x=trayX+(i-1.5)*6,y=trayY-5-Math.sin(i)*1.5
+   return {x:x+(mouth[0]-x)*travel,y:p<land?-42+(y+42)*drop*drop:y+(mouth[1]-y)*travel-Math.sin(travel*Math.PI)*10,
+     angle:reduced?0:(1-drop)*(i%2?45:-45)+travel*(i%2?18:-18),scale:reduced?.7:.78*(1-smooth((p-(at-.018))/.035)),
+     opacity:pose.finished?0:reduced?i===0?1:0:p<start||p>at+.017?0:1}
+ })
+ return {...pose,trayX,trayY,trayOpacity:pose.finished?0:reduced?1:smooth(p/.11)*(1-smooth((p-.87)/.13)),
+   trayLift:reduced?0:(1-smooth(p/.11))*14,
+   bottleX:mouth[0]+pose.x,bottleY:mouth[1]+pose.y,bottleAngle:pose.angle,
+   // Drain the drawn milk during the three visible swallowing beats.
+   milk:reduced?1:1-smooth((p-.22)/.54),pieces,
+   cleanOpacity:pose.finished?0:reduced?1:smooth(p/.18)*(1-smooth((p-.76)/.17)),
+   rinse:reduced?0:smooth((p-.59)/.12)*(1-smooth((p-.80)/.09)),
+   sparkle:pose.finished?0:reduced?0:smooth((p-.79)/.07)*(1-smooth((p-.94)/.06)),
+ }
 }
 
 /** State is saved immediately; only the original body tint blends after sipping. */

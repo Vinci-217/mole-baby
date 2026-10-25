@@ -5,11 +5,12 @@ export function usesGroundedPose(form:string,action:string):boolean {
 }
 /** Original layers, continuous small movement; no looping squash or happy jump. */
 export function groundedMotion(form:string,action:string,elapsed:number,clock:number,reduced=false,gaze={x:0,y:0}) {
-  if(reduced||action==='still'||action==='drag')return {frame:0,eyeX:0,eyeY:0,leafAngle:0}
+  if(reduced||action==='still')return {frame:0,eyeX:0,eyeY:0,leafAngle:0}
   const phase=(clock+(form==='middle'?1300:0))%5700
   let frame=phase>=5260&&phase<5410?(phase<5295||phase>=5375?1:2):0
   let eyeX=Math.sin(clock/3100)*.65+gaze.x*1.8,eyeY=Math.sin(clock/4200)*.2+gaze.y*1.1
   // Affection keeps the familiar large eyes and looks up toward the hand.
+  if(action==='drag'){frame=phase>5300&&phase<5410?1:0;eyeX=Math.sin(elapsed/700)*1.1;eyeY=-.6}
   if(action==='pet'){frame=0;eyeX=.6+Math.sin(elapsed/490*Math.PI*2)*.35;eyeY=-.8}
   if(action==='happy'){frame=elapsed>250&&elapsed<1500?(elapsed<350||elapsed>1400?1:2):0;eyeX=0;eyeY=0}
   if(action==='waving'){eyeX=Math.sin(Math.min(1,elapsed/2100)*Math.PI*2)*1.7;eyeY=-.35;frame=elapsed>900&&elapsed<1100?1:0}

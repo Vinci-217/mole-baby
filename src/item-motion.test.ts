@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ITEMS } from './catalog'
-import { getItemMotion, getItemMotionByAction, sampleItemMotion, colorBlend } from './item-motion'
+import { getItemMotion, getItemMotionByAction, sampleItemMotion, sampleCareRoutine,careContactFractions,sampleGentleMouth,colorBlend } from './item-motion'
 import { getRamActionDuration, sampleRamPose, sampleSeedPose } from './components/ram-animation'
 
 describe('item-specific care animation contract', () => {
@@ -46,23 +46,19 @@ describe('item-specific care animation contract', () => {
       }
     }
   })
-  it('brushes with repeated short mouth strokes, separately from face wash and bath', () => {
-    const brush = getItemMotion('180024'), bath = getItemMotion('180003'), face = getItemMotion('180009')
-    expect(brush.gesture).toBe('brush')
-    const samples = Array.from({ length: 60 }, (_, i) => sampleItemMotion(brush, brush.duration * (.16 + i * .01)))
-    expect(Math.max(...samples.map(p => p.x)) - Math.min(...samples.map(p => p.x))).toBeGreaterThan(9)
-    expect(samples.every(p => Math.abs(p.y) < 2)).toBe(true)
-    expect(new Set([brush.action, bath.action, face.action]).size).toBe(3)
-    expect(sampleItemMotion(bath, 1200).x).toBe(sampleItemMotion(bath, 2000).x)
-    expect(sampleItemMotion(face, 1200).x).not.toBe(sampleItemMotion(face, 2000).x)
+  it('shares one clean routine and one bottle routine while retaining inventory identities',()=>{
+    for(const category of ['food','drink','clean'] as const){const motions=ITEMS.filter(i=>i.category===category).map(i=>getItemMotion(i.id)),first=motions[0];for(const motion of motions){expect(motion.duration).toBe(first.duration);expect(careContactFractions(motion)).toEqual(careContactFractions(first));for(const t of [0,500,1500,2500])expect(sampleItemMotion(motion,t)).toEqual(sampleItemMotion(first,t))}}
   })
-  it('distinguishes milk tilting, juice sipping, cola fizz and squeezed fruit', () => {
-    const drinks = ['180002', 'juice', '180014', '180028'].map(getItemMotion)
-    expect(new Set(drinks.map(m => m.gesture)).size).toBe(4)
-    const angles = drinks.map(m => Math.min(...Array.from({ length: 50 }, (_, i) => sampleItemMotion(m, m.duration * (.16 + i * .01)).angle)))
-    expect(Math.abs(angles[0])).toBeGreaterThan(Math.abs(angles[1]) + 20)
-    const squeezed = getItemMotion('180028')
-    expect(Math.min(...Array.from({ length: 50 }, (_, i) => sampleItemMotion(squeezed, squeezed.duration * (.16 + i * .01)).scaleX))).toBeLessThan(.8)
+  it('lands all four bites on a plate before guiding each into the mouth on its audio contact',()=>{
+    const m=getItemMotion('biscuit'),mouth=[50,63] as const
+    const rain=sampleCareRoutine(m,m.duration*.15,mouth),rest=sampleCareRoutine(m,m.duration*.32,mouth)
+    expect(rain.pieces[0].y).toBeLessThan(rest.pieces[0].y);expect(rest.pieces.every(p=>p.opacity===1)).toBe(true)
+    for(const [i,at]of careContactFractions(m).entries()){const p=sampleCareRoutine(m,m.duration*at,mouth).pieces[i];expect(p.x).toBeCloseTo(mouth[0]);expect(p.y).toBeCloseTo(mouth[1]);expect(p.scale).toBeLessThan(.4)}
+    expect(sampleCareRoutine(m,m.duration,mouth).pieces.every(p=>p.opacity===0)).toBe(true)
+  })
+  it('drains a shared bottle while sucking and tosses it only after the last swallow',()=>{
+    const m=getItemMotion('juice'),mouth=[50,63]as const,full=sampleCareRoutine(m,400,mouth),sip=sampleCareRoutine(m,2800,mouth),toss=sampleCareRoutine(m,3800,mouth)
+    expect(full.milk).toBe(1);expect(sip.milk).toBeLessThan(.1);expect(sip.bottleX).toBe(mouth[0]);expect(toss.bottleX).toBeGreaterThan(mouth[0]+20);expect(toss.bottleAngle).toBeGreaterThan(sip.bottleAngle+40)
   })
   it('retains item identity in reduced motion without moving its tool', () => {
     for (const item of ITEMS) {
@@ -84,8 +80,9 @@ it('plays the body timeline forward once while props keep their individual beats
 });
 
 
-// Small mouths settle shut before/after care; tool and sound contacts share beats.
-it('settles the small mouth outside contact and opens before each lip contact',async()=>{
- const {sampleGentleMouth}=await import('./item-motion')
- for(const id of ['biscuit','juice','180002','recolor-blue']){const motion=getItemMotion(id);expect(sampleGentleMouth(motion,0)).toBe(0);expect(sampleGentleMouth(motion,motion.duration)).toBe(0);expect(sampleGentleMouth(motion,motion.duration*.95)).toBe(0);expect(sampleGentleMouth(motion,motion.duration*.5,true)).toBe(0);for(let i=0;i<motion.beats;i++){const open=motion.duration*(.14+.68*(i+.25)/motion.beats),contact=motion.duration*(.14+.68*(i+.5)/motion.beats);expect(sampleGentleMouth(motion,open)).toBe(7);expect(sampleGentleMouth(motion,contact)).toBe(0)}}
+it('opens the original tiny mouth just before the same contacts used by food and drinking',()=>{
+ for(const id of ['biscuit','juice','180002','recolor-blue']){const motion=getItemMotion(id);for(const t of [0,motion.duration,motion.duration*.95])expect(sampleGentleMouth(motion,t)).toBe(0);expect(sampleGentleMouth(motion,motion.duration*.5,true)).toBe(0);for(const at of careContactFractions(motion)){expect(sampleGentleMouth(motion,motion.duration*(at-.0275))).toBe(7);expect(sampleGentleMouth(motion,motion.duration*at)).toBe(0)}}
+})
+it('keeps reduced-motion plates, bites and bottles stationary until completion',()=>{
+ for(const id of ['biscuit','juice','180003']){const m=getItemMotion(id),a=sampleCareRoutine(m,0,[50,63],false,true),b=sampleCareRoutine(m,m.duration-1,[50,63],false,true);expect(a.pieces).toEqual(b.pieces);expect(a.trayX).toBe(b.trayX);expect(a.bottleX).toBe(b.bottleX);expect(a.bottleAngle).toBe(b.bottleAngle)}
 })

@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-25",
+  "tool": "image_gen.imagegen",
+  "file": "v27-care-props.png",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "transparent": true,
+  "referencePaths": [
+    "public/assets/original/items/180017.png",
+    "public/assets/original/ui/icon-bottle.png",
+    "public/assets/original/item-motion/bath-tub.png"
+  ],
+  "prompt": "Create a transparent PNG sprite sheet to extend the three supplied early Chinese Flash game reference images. The references supply only the simple dark brown outline, bright flat color blocks, playful toy shapes and short hard highlights. Draw THREE NEW isolated prop illustrations in a single horizontal row, equally spaced within three equal square cells, each fully inside its cell with 12% padding. LEFT cell: a butterfly net, straight upright wooden handle from bottom centre to a small golden oval hoop near top centre, pale cyan translucent mesh pouch drooping down from hoop; hoop clearly readable at tiny icon size, no butterfly. MIDDLE cell: an EMPTY shallow oval cream ceramic food plate, seen a little from above, golden yellow rim and single thin terracotta contour, broad empty cream interior, no utensils or food. RIGHT cell: an upright squat baby feeding bottle with soft rounded silicone nipple pointing UP, yellow collar, pale cyan transparent body and off-white milk, two simple warm-brown measurement ticks, no numbers. Match the supplied original pet inventory props: clean 2D Flash illustration, only 2–4 flat color levels per material, slightly irregular cute contour, tiny hard-edge highlights. NO characters, eyes, mouths, hands, text, watermarks, floor, backdrop, painted checkerboard, cast shadow or 3D render. True alpha transparency. Overall wide sheet, 3:1 aspect ratio. The three props must not overlap; each prop centred in its equal cell.",
+  "changes": "Generated PNG used unchanged. Three 724×724 cells sampled with CSS backgrounds; grip/hoop/nipple registered to the image. Original pet artwork is separate.",
+  "purpose": [
+    "butterfly net",
+    "food plate",
+    "feeding bottle"
+  ],
+  "review": {
+    "contour": "Continuous dark brown / orange contours, no texture",
+    "shape": "Three simple toy props, distinct small silhouettes",
+    "color": "Cream, amber yellow and cyan in broad color blocks",
+    "highlight": "Short hard white highlights",
+    "space": "Independent transparent cells, no character or UI painted in"
+  }
+}

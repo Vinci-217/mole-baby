@@ -45,10 +45,20 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
     const phase=time/1250*Math.PI*2+i*Math.PI*2/3,depth=Math.sin(phase);
     return {x:50+Math.cos(phase)*(stage===0?22:stage===1?27:34),y:haloY+depth*3,scale:.8+(depth+1)*.16,opacity:.65+(depth+1)*.175,angle:Math.sin(phase)*16};
   });
+  const netPulse=gesturePulse(time,1700,600)-gesturePulse(time,3900,700)*.9
+  const netAngle=reduced?12:12+netPulse*43
+  const netX=(stage===0?78:82)+(stage===0?0:netPulse),netY=stage===0?62:p.contact+12,netWidth=stage===0?58:62
+  // Hoop registration comes from the new PNG: grip (38%,90%), hoop (38%,16%).
+  const radians=netAngle*Math.PI/180,hoopX=netX+netWidth*.74*Math.sin(radians),hoopY=netY-netWidth*.74*Math.cos(radians)*192/208
+  const points=[[0,12,-12],[1050,5,-4],[1550,2,-2],[1850,16,-18],[2800,-12,-6],[3750,-3,-2],[4100,-16,-18],[4900,5,-8],[5600,9,-5],[6500,25,-22]]
+  const segment=Math.max(0,points.findIndex((v,i)=>i<points.length-1&&time>=v[0]&&time<points[i+1][0]))
+  const first=points[segment],next=points[segment+1],blend=smooth((time-first[0])/(next[0]-first[0]))
+  const butterflyX=reduced?94:Math.max(28,Math.min(115,hoopX+first[1]+(next[1]-first[1])*blend))
+  const butterflyY=reduced?22:Math.max(-8,hoopY+first[2]+(next[2]-first[2])*blend)
   return {
     finished:ended, opacity:ended?0:reduced?1:Math.max(0,enter),
-    bodyAngle:reduced?0:['watch-butterfly','look-around'].includes(action)?Math.sin(progress*Math.PI*2)*(flying?.7:stage===0?2:2.5)*Math.sin(progress*Math.PI):action==='dizzy'?Math.sin(time/380)*.6:action==='play'?(contact*(stage===0?6:flying?3.2:6.5)-follow*(flying?1.5:3))*formFactor+cheer*Math.sin(time/110)*2:action==='pet'?strokes*((stage===0?5:flying?2.6:3.5)+stroke*(flying?.8:1.5)):action==='wake'?0:stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
-    bodyY:reduced||stage===0?0:action==='play'?-contact*(flying?1.5:p.lift)-follow*(flying?.5:1.5):action==='pet'?strokes*(flying?.45:1.7):action==='wake'?-wakeStretch*(flying?1.2:2):action==='focus'?1+Math.sin(time/1800)*.5:0,
+    bodyAngle:reduced?0:action==='watch-butterfly'?netPulse*(flying?2:stage===0?4:5):action==='look-around'?Math.sin(progress*Math.PI*2)*(flying?.7:stage===0?2:2.5)*Math.sin(progress*Math.PI):action==='dizzy'?Math.sin(time/380)*.6:action==='play'?(contact*(stage===0?6:flying?3.2:6.5)-follow*(flying?1.5:3))*formFactor+cheer*Math.sin(time/110)*2:action==='pet'?strokes*((stage===0?5:flying?2.6:3.5)+stroke*(flying?.8:1.5)):action==='wake'?0:stage===0?2+Math.sin(time/1600):Math.sin(time/1400)*1.1,
+    bodyY:reduced||stage===0?0:action==='watch-butterfly'?-Math.abs(netPulse)*(flying?1.2:2):action==='play'?-contact*(flying?1.5:p.lift)-follow*(flying?.5:1.5):action==='pet'?strokes*(flying?.45:1.7):action==='wake'?-wakeStretch*(flying?1.2:2):action==='focus'?1+Math.sin(time/1800)*.5:0,
     bodyX,bodyScaleX,bodyScaleY,contact:reduced?0:contact,affection:reduced?0:affection,
     heartY:reduced?0:-smooth((time-1750)/650)*16,
     ballX:reduced?contactX:115-Math.sin(progress*Math.PI*2)**2*(115-contactX),
@@ -57,8 +67,8 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
     handX:reduced?(flying?65:62):(flying?65:62)+Math.sin((time-480)/490*Math.PI*2)*(flying?3:stage===0?4:5)*strokes+(1-arrive)*27,
     handY:(stage===4?15:p.head)+(reduced?0:-(1-arrive)*17+(1-Math.cos((time-480)/490*Math.PI*2))*1.5*strokes),
     handWidth:flying?42:53,
-    butterflyX:reduced?77:59+Math.sin(progress*Math.PI*2)*25,
-    butterflyY:Math.max(flying?28:20,p.head-12)+(reduced?0:Math.sin(progress*Math.PI*4)*4),
+    netX,netY,netAngle,netWidth,hoopX,hoopY,
+    butterflyX,butterflyY,
     butterflyAngle:reduced?-12:Math.cos(progress*Math.PI*2)*18,
     butterflyWing:reduced?1:.42+Math.abs(Math.sin(time/85))*.58,
     bookX:p.bookX, bookY:p.bookY,

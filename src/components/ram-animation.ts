@@ -142,7 +142,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   // Side rows have eight sampled source poses, with different holds from the
   // six front poses. Keep the shared flight clock when changing direction.
   if (direction && reduced) return { row: direction, frame: 0, finished: false };
-  if (action === 'still' || action === 'drag' || reduced) {
+  if (action === 'still' || reduced) {
     const duration = getRamActionDuration(action);
     const finished=duration !== null && elapsed >= duration;
     return { row: 0, frame: 0, finished };
@@ -157,7 +157,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   if (direction) return { row: direction, frame, finished: false };
   const duration = getRamActionDuration(action);
   const finished = duration !== null && elapsed >= duration;
-  if (form === 'senior' && !['idle','waiting','pet','play','focus','dizzy','wake','watch-butterfly','look-around','happy','waving','mood-content'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
+  if (form === 'senior' && !['idle','waiting','drag','pet','play','focus','dizzy','wake','watch-butterfly','look-around','happy','waving','mood-content'].includes(action) && getItemMotionByAction(action)?.gesture !== 'recolor') {
     return sampleRamPose(action,elapsed,reduced);
   }
   return { row: 0, frame, finished };

@@ -2,6 +2,7 @@ export {};
 declare global {
   interface DesktopState {
     petMode: boolean;
+    dragPoint?:{x:number;y:number;at:number};
     petOffset?:{x:number;y:number};
     mouseThrough?:boolean;
     mousePassthrough?:boolean;

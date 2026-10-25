@@ -54,7 +54,7 @@
 .ram-sprite.action-waiting:not(.is-dragging) .ram-pose-layer{animation:ram-breathe 5.8s ease-in-out infinite}
 .ram-sprite.is-sleeping .ram-pose-layer{animation:ram-sleep-breathe 6.4s ease-in-out infinite}
 .ram-sprite.is-sleeping .ram-sleep-mark{animation:ram-sleep-cloud 4.4s ease-in-out infinite}
-.ram-sprite.is-dragging:not(.ram-seed) .ram-pose-layer{transform:scale(.985,1.025)}
+
 @keyframes ram-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.006,.993)}}
 @keyframes ram-sleep-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.005,.994)}}
 @keyframes ram-sleep-cloud{0%,100%{opacity:.45;translate:0 0}55%{opacity:.85;translate:1px -2px}}
@@ -67,42 +67,6 @@
 .ram-sprite[data-stage="2"]{--care-mouth-y:66%}
 .ram-sprite[data-stage="3"]{--care-mouth-y:81%}
 .ram-item-cue{position:absolute;inset:0;display:block;pointer-events:none;line-height:0;z-index:3;opacity:var(--care-opacity)}
-.ram-care-item,.ram-care-brush,.ram-care-peel{position:absolute;left:calc(var(--care-mouth-x) + var(--care-x));top:calc(var(--care-mouth-y) + var(--care-y));width:27%;height:27%;object-fit:contain;translate:-50% -45%;transform:rotate(var(--care-angle)) scale(var(--care-scale-x),var(--care-scale-y));transform-origin:30% 50%;filter:drop-shadow(0 1px 0 #46321a22)}
-.gesture-slice .ram-care-item{width:32%;height:27%;transform-origin:left center}
-.gesture-spoon .ram-care-item{width:30%;height:29%}
-.gesture-sip .ram-care-item{translate:-25% -10%;transform-origin:25% 5%}
-.gesture-gulp .ram-care-item,.gesture-fizz .ram-care-item,.gesture-medicine .ram-care-item{translate:-10% -10%;transform-origin:20% 5%;width:25%;height:31%}
-.gesture-squeeze .ram-care-item{width:23%;height:25%}
-.gesture-bath .ram-care-item{width:24%;height:24%;top:calc(var(--care-mouth-y) - 6% + var(--care-y))}
-.ram-care-tub{position:absolute;left:14%;top:calc(var(--care-mouth-y) + 8%);width:72%;height:29%;object-fit:fill;z-index:2}
-.ram-seed .ram-care-tub{left:68%;top:65%;width:28%;height:20%}
-.gesture-scrub .ram-care-item,.gesture-face-wash .ram-care-item{width:22%;height:23%}
-.gesture-brush .ram-care-toothpaste{left:24%;top:calc(var(--care-mouth-y) + 17%);width:18%;height:22%;translate:-50% -30%;transform:rotate(-18deg)}
-.ram-care-brush{left:calc(var(--care-mouth-x) + 11% + var(--care-x));width:45%;height:20%;translate:-35% -25%;transform-origin:24% 50%;z-index:2}
-.ram-care-particles{position:absolute;inset:0;translate:calc(var(--care-mouth-x) - 50%) var(--care-lift);z-index:3}
-.ram-care-particles i{position:absolute;left:44%;top:calc(var(--care-mouth-y) - 1%);width:5%;aspect-ratio:1;border:1px solid #b5d7dd;background:#faffffd9;border-radius:50%;translate:var(--care-wave) 0;box-shadow:inset 1px 1px 0 #fff}
-.ram-care-particles i:nth-child(2){left:53%;top:calc(var(--care-mouth-y) + 3%);width:6%}
-.ram-care-particles i:nth-child(3){left:36%;top:calc(var(--care-mouth-y) + 6%);width:4%}
-.ram-care-particles i:nth-child(4){left:62%;top:calc(var(--care-mouth-y) - 5%);width:3%}
-.ram-care-particles i:nth-child(5){left:55%;top:calc(var(--care-mouth-y) - 11%);width:4%}
-.ram-care-particles i:nth-child(6){left:29%;top:calc(var(--care-mouth-y) - 5%);width:3%}
-.gesture-bath .ram-care-particles i{top:calc(var(--care-mouth-y) + 8%);width:8%}
-.gesture-bath .ram-care-particles i:nth-child(even){top:calc(var(--care-mouth-y) + 3%);width:11%}
-.gesture-brush .ram-care-particles{translate:0 0}
-.gesture-brush .ram-care-particles i{width:4%;top:calc(var(--care-mouth-y) + 1%)}
-.gesture-brush .ram-care-particles i:nth-child(even){top:calc(var(--care-mouth-y) - 2%);width:5%}
-.gesture-face-wash .ram-care-particles{translate:0 -6%}
-.gesture-fizz .ram-care-particles i{left:64%;width:3%;background:#fff4d4;border-color:#c7a372}
-.gesture-fizz .ram-care-particles i:nth-child(2){left:70%;top:calc(var(--care-mouth-y) - 5%);width:2%}
-.gesture-crunch .ram-care-particles i{background:currentColor;border:0;border-radius:25%;width:3%;box-shadow:none;top:calc(var(--care-mouth-y) + 10%)}
-.gesture-pour-beans .ram-care-item{width:25%;height:28%;transform-origin:15% 5%}
-.gesture-pour-beans .ram-care-particles{translate:calc(var(--care-mouth-x) - 50%) 0}
-.gesture-pour-beans .ram-care-particles i{left:50%;top:calc(var(--care-mouth-y) + 1%);width:4%;height:3%;aspect-ratio:auto;background:currentColor;border:0;box-shadow:none;translate:var(--care-wave) var(--care-wave)}
-.gesture-pour-beans .ram-care-particles i:nth-child(2){left:56%;top:calc(var(--care-mouth-y) - 3%);width:3%;height:2%}
-.gesture-pour-beans .ram-care-particles i:nth-child(3){left:61%;top:calc(var(--care-mouth-y) - 5%);width:3%;height:2%}
-.gesture-medicine .ram-care-particles i,.gesture-glow .ram-care-particles i{background:currentColor;border-color:#fff8;box-shadow:0 0 5px currentColor}
-.ram-care-soft-puff{position:absolute;left:40%;top:calc(var(--care-mouth-y) + 6%);width:18%;height:8%;border-radius:50%;background:#fff9;filter:blur(2px);opacity:var(--care-activity);translate:0 var(--care-lift)}
-.ram-care-peel{left:30%;top:calc(var(--care-mouth-y) + 17%);width:14%;height:14%;clip-path:inset(48% 0 0);opacity:var(--care-activity);transform:rotate(-35deg);translate:0 var(--care-wave)}
 @media(prefers-reduced-motion:reduce){.ram-item-cue *{transition:none!important;animation:none!important}}
 .ram-social{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:var(--social-opacity,1)}
 .social-ball,.social-hand,.social-book{position:absolute;display:block;object-fit:contain;translate:-50% -50%}
@@ -131,8 +95,6 @@
 @keyframes ram-fly{0%,100%{transform:translateY(-3%) rotate(-.4deg)}50%{transform:translateY(-7%) rotate(.4deg)}}
 @media(prefers-reduced-motion:reduce){.ram-sprite.is-flying .ram-flight-layer{animation:none;transform:translateY(-5%)}}
 
-.gesture-recolor .ram-care-item{translate:-10% -10%;transform-origin:20% 5%;width:25%;height:31%}
-.gesture-recolor .ram-care-particles i{border:0;background:transparent;box-shadow:none;width:9%;rotate:calc(var(--care-progress)*180deg)}
 .fruit-basket .ram-flight-layer{animation:none!important;transform:none!important}
 
 /* Manual entry is finite. A seed's original pot stays upright through four
@@ -153,7 +115,6 @@
 @keyframes ram-small-wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.8deg)}50%{transform:rotate(1.8deg)}75%{transform:rotate(-.8deg)}}
 @media(prefers-reduced-motion:reduce){.ram-sprite.is-edge-entering .ram-flight-layer,.ram-sprite.is-edge-entering .ram-pose-layer,.ram-sprite.action-happy .ram-pose-layer,.ram-sprite.action-waving .ram-pose-layer{animation:none!important}.ram-seed .seed-pot-original{transition:none}}
 
-.gesture-recolor .ram-care-particles i>img{position:absolute;inset:-50%;width:200%;height:200%;object-fit:contain}
 .social-butterfly{position:absolute;left:var(--butterfly-x,77%);top:var(--butterfly-y,8%);width:26%;translate:-50% -50%;transform:rotate(var(--butterfly-angle,-12deg)) scaleX(var(--butterfly-wing,1))}.social-butterfly>img{display:block;width:100%;height:auto}
 @media(prefers-reduced-motion:reduce){.ram-sprite:is(.action-watch-butterfly,.action-look-around) .ram-pose-layer{transform:none}}
 
@@ -192,3 +153,31 @@
 
 .ram-sprite.is-gentle-eating:not(.is-dragging) .ram-pose-layer{transform:scale(calc(1 + var(--care-jaw,0)*.006),calc(1 - var(--care-jaw,0)*.012))}
 .ram-pose-layer.using-reading-book>.ram-wear{opacity:0}
+
+/* Only the body and its registered outfit stretch. The seed pot and native
+   grab point stay exact, and release retains the damped spring. */
+.ram-elastic-layer{display:block;position:relative;width:100%;height:100%;transform-origin:var(--pull-grip,50% 40%);transform:translate(var(--pull-x,0%),var(--pull-y,0%)) rotate(var(--pull-angle,0deg)) scale(var(--pull-sx,1),var(--pull-sy,1))}
+.ram-sprite.is-dragging .ram-pose-layer{animation:none!important}
+@media(prefers-reduced-motion:reduce){.ram-elastic-layer{transform:none!important}}
+
+.care-prop-sheet{display:block;background-image:url('/assets/generated/v27-care-props.png');background-size:300% 100%;background-repeat:no-repeat;aspect-ratio:1}
+.care-food-plate{position:absolute;left:var(--tray-x,65%);top:calc(var(--tray-y,80%) + var(--tray-lift,0%));width:46%;translate:-50% -50%;background-position:50% 50%;opacity:var(--tray-opacity,0)}
+.care-food-rim{clip-path:inset(63% 0 0);z-index:3}
+.care-food-bite{position:absolute;width:20%;height:20%;object-fit:contain;opacity:0;z-index:2}
+.care-drink-bottle{position:absolute;left:var(--bottle-x,50%);top:var(--bottle-y,60%);width:34%;aspect-ratio:1;transform-origin:50% 12%;transform:translate(-50%,-12%) rotate(var(--bottle-angle,-24deg));isolation:isolate}
+.care-bottle-full,.care-bottle-empty{position:absolute;inset:0;background-position:100% 50%}
+.care-bottle-empty{clip-path:inset(0 0 calc(12% + 62% - var(--bottle-empty,0%)) 0);filter:opacity(.65) saturate(.5)}
+.care-bottle-full{clip-path:inset(calc(12% + var(--bottle-empty,0%)) 0 0)}
+.care-bottle-label{position:absolute;left:41%;top:63%;width:21%;height:21%;object-fit:contain}
+.care-medicine-bottle{position:absolute;left:var(--bottle-x,50%);top:var(--bottle-y,60%);width:27%;height:30%;object-fit:contain;transform-origin:30% 10%;transform:translate(-30%,-10%) rotate(var(--bottle-angle,-24deg))}
+.care-clean-foam{position:absolute;left:calc(var(--care-mouth-x,50%) - 25%);top:calc(var(--care-mouth-y,60%) - 5%);width:50%;height:25%;opacity:var(--clean-opacity,0)}
+.care-clean-bubble{position:absolute;left:0;top:30%;width:25%;aspect-ratio:1;border-radius:50%;background:#f5ffffe8;border:1px solid #8fd3dc;box-shadow:inset 1px 1px #fff}
+.care-clean-bubble:nth-child(2){left:20%;top:0;width:29%}.care-clean-bubble:nth-child(3){left:42%;top:35%}.care-clean-bubble:nth-child(4){left:61%;top:3%;width:32%}.care-clean-bubble:nth-child(5){left:78%;top:41%;width:23%}.care-clean-bubble:nth-child(6){left:31%;top:64%;width:23%}.care-clean-bubble:nth-child(7){left:13%;top:-40%;width:15%}.care-clean-bubble:nth-child(8){left:75%;top:-60%;width:17%}
+.care-clean-product{position:absolute;left:78%;top:70%;width:23%;height:28%;object-fit:contain;opacity:var(--clean-opacity,0);rotate:-12deg}
+.care-clean-rinse{position:absolute;left:25%;top:25%;width:55%;height:55%;opacity:var(--clean-rinse,0)}
+.care-clean-rinse i{position:absolute;left:10%;top:10%;height:30%;width:2%;background:#a8eafa;border-radius:100%;rotate:12deg}.care-clean-rinse i:nth-child(2){left:30%;top:40%}.care-clean-rinse i:nth-child(3){left:50%;top:5%}.care-clean-rinse i:nth-child(4){left:70%;top:34%}.care-clean-rinse i:nth-child(5){left:90%;top:9%}
+.care-finish-sparkle{position:absolute;inset:0;opacity:var(--care-sparkle,0)}.care-finish-sparkle img{position:absolute;left:28%;top:35%;width:12%;height:12%;object-fit:contain}.care-finish-sparkle img:nth-child(2){left:74%;top:50%;width:8%}.care-finish-sparkle img:nth-child(3){left:64%;top:19%;width:10%}
+
+.social-butterfly-net{position:absolute;left:var(--net-x,67%);top:var(--net-y,60%);width:var(--net-width,70%);background-position:0% 50%;transform-origin:38% 90%;transform:translate(-38%,-90%) rotate(var(--net-angle,12deg))}
+
+.ram-seed .care-clean-foam{top:calc(var(--care-mouth-y,32%) + 10%)}

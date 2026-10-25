@@ -12,17 +12,18 @@ describe('visible contact and quiet foley',()=>{
    expect(score.loop).toBeUndefined()
   }
  })
- it('distinguishes crisp biscuits, juice, milk, bath, brushing and colour-change accents',()=>{
+ it('uses shared category contacts plus clean and colour-change completion accents',()=>{
   const kinds=(id:string)=>itemSoundScore(getItemMotion(id)).cues.map(c=>c.kind)
-  expect(kinds('biscuit')).toContain('crunch');expect(kinds('juice')).toContain('gulp');expect(kinds('180002')).toContain('gulp')
-  expect(kinds('180003')).toEqual(expect.arrayContaining(['water','bubble']));expect(kinds('180024')).toEqual(expect.arrayContaining(['brush','clean']))
+  expect(kinds('biscuit')).toContain('smack');expect(kinds('juice')).toContain('gulp');expect(kinds('180002')).toContain('gulp')
+  expect(kinds('180003')).toEqual(expect.arrayContaining(['water','bubble']));expect(kinds('180024')).toEqual(expect.arrayContaining(['bubble','clean']))
   expect(kinds('recolor-blue')).toEqual(expect.arrayContaining(['gulp','magic']))
-  expect(new Set(itemSoundScore(getItemMotion('180024')).cues.filter(c=>c.kind==='brush').map(c=>c.at)).size).toBe(12)
+  expect(new Set(itemSoundScore(getItemMotion('180024')).cues.filter(c=>c.kind==='bubble').map(c=>c.at)).size).toBe(5)
  })
  it('places two ball sounds on the actual contacts and only one page turn per reading loop',()=>{
+  expect(socialSoundScore('watch-butterfly').cues.map(c=>c.at)).toEqual([1700,3900,5000])
   expect(socialSoundScore('play').cues.map(c=>c.at)).toEqual([1050,3150])
   const book=socialSoundScore('focus');expect(book.loop).toBe(8000);expect(book.cues).toHaveLength(1)
   expect(book.cues[0].at/8000).toBeGreaterThan(.74);expect(book.cues[0].at/8000).toBeLessThan(.94)
-  for(const action of ['sleep','idle','look-around','watch-butterfly','drag'])expect(socialSoundScore(action).cues).toEqual([])
+  for(const action of ['sleep','idle','look-around','drag'])expect(socialSoundScore(action).cues).toEqual([])
  })
 })

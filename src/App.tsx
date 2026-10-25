@@ -35,7 +35,7 @@ import { presenceKey, welcomeLine, wantsQuiet } from './companion-presence';
 import { useIdleLife } from './use-idle-life';
 import CareFeedback from './components/CareFeedback';
 import {timerMemoryDetail} from './companion-moments';
-import {careGains,type CareFeedbackData} from './care-feedback';
+import {careGains,mergeCareFeedback,type CareFeedbackData} from './care-feedback';
 import type { PresenceLine } from './companion-presence';
 import { useRestReminder, validReminderMinutes, reminderTime } from './use-rest-reminder';
 import PetInvitation from './components/PetInvitation';
@@ -85,6 +85,8 @@ export default function App() {
   const [actionItemId, setActionItemId] = useState<string | undefined>();
   const [actionFromColor,setActionFromColor]=useState<PetColor|undefined>();
   const [careFeedback,setCareFeedback]=useState<CareFeedbackData|null>(null);
+  const pendingCareFeedback=useRef<CareFeedbackData|null>(null);
+  const lastTug=useRef(0);
   const [action, setAction] = useState('idle');
   const [petMode, setPetMode] = useState(false);
   const [preview, setPreview] = useState(() => !window.desktop && readSave() !== null);
@@ -218,8 +220,8 @@ export default function App() {
   }
   function watchButterfly(invited=false){
     if(document.hidden||!petRef.current||petRef.current.sleeping||Date.now()<careUntil.current||Date.now()<dizzyUntil.current)return false;
-    animate('watch-butterfly');speak('咦，小蝴蝶！我在这里看看它，不追远啦。',10000);
-    setMemory(m=>m?recordEvent(m,{kind:'play',detail:invited?'你回应我的小邀请，陪我在原地看了一会儿小蝴蝶。':'你陪我在原地看了一会儿小蝴蝶。'}):m);
+    animate('watch-butterfly');speak('看我的小网！……哎呀，它又绕回来逗我啦。',10000);
+    setMemory(m=>m?recordEvent(m,{kind:'play',detail:invited?'你回应我的小邀请，陪我挥着小网，和蝴蝶玩了一会儿。':'你陪我挥着小网，和蝴蝶玩了一会儿。'}):m);
     return true;
   }
   function clearInvitation(){ invitationRef.current=null;setInvitation(null); }
@@ -273,6 +275,18 @@ export default function App() {
     setMemory(m=>m?recordEvent(m,{kind:pet.sleeping?'auto-sleep':'auto-wake',detail:pet.sleeping?'我困了，自己闭上眼休息。':'我恢复了精力，自然醒来。'}):m);
   },[pet?.createdAt,pet?.sleeping,prefs.quiet,prefs.sound,timer.running,speak]);
 
+  function finishCareFeedback(){
+    const receipt=pendingCareFeedback.current;pendingCareFeedback.current=null;
+    if(!receipt||petRef.current?.createdAt!==receipt.petId||!receipt.gains.length)return;
+    clearTimeout(timers.current.feedback);setBubbleVisible(false);setCareFeedback(receipt);
+    timers.current.feedback=setTimeout(()=>setCareFeedback(null),2300);
+  }
+  function tugReaction(){
+    if(!petRef.current||petRef.current.sleeping||Date.now()-lastTug.current<6000)return;
+    lastTug.current=Date.now();
+    playPetVoice('lift',prefs.sound);
+    if(prefs.presence&&!prefs.quiet){const lines=['花盆也要带好，哼……再抱一小会儿。','才、才不是想让你抱呢。轻一点嘛。','叶子要乱啦！……放下以后还要陪我哦。','我自己会飞的……不过让你抱一会儿也行。','嘿，我可是会魔法的！……好吧，再抱一下。'];speak(lines[stage],4500)}
+  }
   function animate(next: string, itemId?: string, fromColor?: PetColor, feedback?:CareFeedbackData) {
     if(!isPastime(next))pastimeRun.current=null;
     const motion = itemId ? getItemMotion(itemId) : null;
@@ -280,9 +294,9 @@ export default function App() {
     const duration = motion?.duration ?? getRamActionDuration(next,p?ramForm(getStage(p.growth,p.evolution),p.evolution):'seed') ?? 900;
     setActionId(n => n + 1); setActionFromColor(fromColor); setActionItemId(itemId); setAction(motion?.action ?? next);
     careUntil.current = itemId ? Date.now() + duration + 50 : 0;
-    clearTimeout(timers.current.feedback);setCareFeedback(null);
-    if(feedback?.gains.length){setBubbleVisible(false);setCareFeedback(feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2050);}
-    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, duration + (next==='play'||next==='play-alone'||isEmotionClip(next)?5000:50));
+    if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
+    else if(!itemId)finishCareFeedback();
+    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, duration + (next==='play'||next==='play-alone'||isEmotionClip(next)?5000:50));
   }
   function finishPerformance(){if(action==='play'||isMoodAction(action)||isPastime(action)){finishPastime();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined)}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
@@ -324,7 +338,7 @@ export default function App() {
     pastimeRun.current=null;
     if(saved.outing){result.state=finishOuting(result.state);setMemory(m=>m?recordEvent(m,{kind:'outing-recall',detail:'你调整了我的成长形态，我先回到你身边。'}):m)}
     clearInvitation();clearTimeout(timers.current.animation); careUntil.current = 0; dizzyUntil.current = 0; touches.current = [];
-    setCareFeedback(null);clearTimeout(timers.current.feedback);setActionItemId(undefined);setActionFromColor(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
+    pendingCareFeedback.current=null;setCareFeedback(null);clearTimeout(timers.current.feedback);setActionItemId(undefined);setActionFromColor(undefined); setAction(timer.running ? 'focus' : 'idle'); setActionId(n => n + 1);
     petRef.current = result.state; setPet(result.state); notify(result.message); speak(result.message);
     setMemory(m => m ? recordEvent(m, { kind: 'stage-choice', detail: `你在设置里把我的形态切换为${result.state.evolution ? EVOLUTIONS.find(v => v.id === result.state.evolution)!.name : STAGES[next].name}。` }) : m);
   }
@@ -370,7 +384,7 @@ export default function App() {
     clearInvitation();awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
-    setCareFeedback(null);clearTimeout(timers.current.feedback);setPet(null); setMemory(null); setReset(false); setPanel(null); setGame(null); timer.cancel(); setPreview(false); setName('小拉姆'); setAdoptionStep('color'); setWaitingForReopen(true); setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); careUntil.current = 0;
+    pendingCareFeedback.current=null;setCareFeedback(null);clearTimeout(timers.current.feedback);setPet(null); setMemory(null); setReset(false); setPanel(null); setGame(null); timer.cancel(); setPreview(false); setName('小拉姆'); setAdoptionStep('color'); setWaitingForReopen(true); setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); careUntil.current = 0;
     clearTimeout(timers.current.animation); clearTimeout(timers.current.bubble); setBubbleVisible(false); setToast('');
     window.desktop?.readyToShow(false); window.desktop?.hideToTray();
     await window.desktop?.setPetCanMove(false); await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false);
@@ -389,7 +403,7 @@ export default function App() {
       if (!restored) throw Error();
       clearInvitation();clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
       careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
-      setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
+      pendingCareFeedback.current=null;setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
       petRef.current = restored; setPet(restored);
       setMemory(raw.companionMemory ? parseMemory(raw.companionMemory, restored) : loadMemory(restored));
@@ -435,7 +449,7 @@ export default function App() {
     <DesktopCompanion pocketContent={pocket} moodBusy={interactionBusy} moodLabel={mood.label} onMood={respondMood} onActionEnd={finishPerformance} pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={bubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['food','play'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
       sound={prefs.sound} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} playInvitation={playInvitation}
-      onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
+      onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onShop={visitShop} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;
 

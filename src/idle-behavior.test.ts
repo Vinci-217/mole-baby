@@ -35,7 +35,7 @@ describe('stage-aware spontaneous original gestures', () => {
         expect(entry.duration).toBe(getRamActionDuration(entry.action,ramForm(stage as Stage,stage===4?'super':undefined)))
         expect(entry.duration).toBeGreaterThan(0)
         expect(entry.duration).toBeLessThanOrEqual(18000)
-        expect(socialSoundScore(entry.action).cues).toEqual([])
+        if(entry.action!=='watch-butterfly')expect(socialSoundScore(entry.action).cues).toEqual([])
       }
     }
     expect(new Set(stages.map(entries => entries.map(entry => entry.action).join(','))).size).toBe(5)

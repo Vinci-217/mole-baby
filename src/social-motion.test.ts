@@ -22,10 +22,11 @@ describe('stage-specific prop and body choreography',()=>{
     expect(contact.bodyScaleY).toBeLessThan(.96);expect(stroke.bodyAngle).toBeGreaterThan(3);
     expect(thanks.affection).toBeGreaterThan(.8);expect(thanks.heartY).toBeLessThan(0);
   });
-  it('keeps butterfly curiosity gentle, bounded and still with reduced motion',()=>{
+  it('swings a net twice while the butterfly dodges, with stage-specific gentle reactions',()=>{
     for(const stage of [0,1,2,3,4] as Stage[])for(let t=0;t<6500;t+=80){
-      const p=sampleSocialMotion(stage,'watch-butterfly',t);expect(p.butterflyX).toBeGreaterThanOrEqual(34);expect(p.butterflyX).toBeLessThanOrEqual(84);expect(p.butterflyY).toBeGreaterThanOrEqual(16);expect(Math.abs(p.bodyAngle)).toBeLessThanOrEqual(stage>=3?.7:2.5);if(stage===0)expect(p.bodyY).toBe(0);
+      const p=sampleSocialMotion(stage,'watch-butterfly',t);expect(p.butterflyX).toBeGreaterThanOrEqual(28);expect(p.butterflyX).toBeLessThanOrEqual(128);expect(p.butterflyY).toBeGreaterThanOrEqual(-8);expect(Math.abs(p.bodyAngle)).toBeLessThanOrEqual(stage>=3?2:stage===0?4:5);if(stage===0)expect(p.bodyY).toBe(0);
     }
+    for(const stage of [0,1,2,3,4]as Stage[]){const near=sampleSocialMotion(stage,'watch-butterfly',1550),dodge=sampleSocialMotion(stage,'watch-butterfly',1850);expect(Math.hypot(near.butterflyX-near.hoopX,near.butterflyY-near.hoopY)).toBeLessThan(4);expect(Math.hypot(dodge.butterflyX-dodge.hoopX,dodge.butterflyY-dodge.hoopY)).toBeGreaterThan(16)}
     expect(sampleSocialMotion(4,'watch-butterfly',0,true)).toEqual(sampleSocialMotion(4,'watch-butterfly',1000,true));
   });
   it('orbits three stars horizontally above each head with depth instead of spinning a flat triangle',()=>{

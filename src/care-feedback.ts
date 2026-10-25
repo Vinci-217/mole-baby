@@ -14,3 +14,12 @@ export function careGains(before:GameState,after:GameState,itemId:string):CareGa
     return item[key]>0&&amount>0?[{key,label,amount,image:`./assets/original/ui/${icon}.png`}]:[]
   })
 }
+
+/** Rapid single clicks commit inventory immediately. If the current care clip
+ * is replaced, collect its receipt into the next completion, once per pet. */
+export function mergeCareFeedback(previous:CareFeedbackData|null,next:CareFeedbackData):CareFeedbackData {
+ if(!previous||previous.petId!==next.petId)return next
+ const gains=previous.gains.map(g=>({...g}))
+ for(const gain of next.gains){const existing=gains.find(g=>g.key===gain.key);if(existing&&existing.amount!==undefined&&gain.amount!==undefined)existing.amount+=gain.amount;else if(existing)Object.assign(existing,gain);else gains.push({...gain})}
+ return {...next,gains}
+}

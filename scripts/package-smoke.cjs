@@ -1,3 +1,4 @@
+const{verifyElasticCare}=require('./elastic-care-checks.cjs');
 const{verifyLivelyCompanion}=require('./lively-companion-checks.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{_electron,expect}=require('@playwright/test'),asar=require('@electron/asar');
 const{adopt,openActions}=require('./smoke-helpers.cjs'),{verifyCompactCare}=require('./compact-care-checks.cjs'),{version}=require('../package.json');
@@ -21,7 +22,7 @@ async function verifyApplication({executable,archive,screenshot}){
    assert.equal(await desktop.evaluate(({app})=>app.dock.isVisible()),false);
    const tray=await desktop.evaluate(({app,nativeImage})=>{const load=process.getBuiltinModule('module').createRequire(app.getAppPath()+'/package.json'),{createTrayIcon}=load('./electron/tray-icon.cjs');const icon=createTrayIcon(nativeImage,process.platform,name=>app.getAppPath()+'/dist/icons/'+name);return{template:icon.isTemplateImage(),size:icon.getSize(),scales:icon.getScaleFactors()}});assert.equal(tray.template,true);assert.equal(tray.size.width,18);assert.ok(tray.scales.includes(1)&&tray.scales.includes(2));console.log('PASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations');
   }
-  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyLivelyCompanion(page);assert.deepEqual(errors,[]);
+  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyElasticCare(page,desktop);await verifyLivelyCompanion(page);assert.deepEqual(errors,[]);
   await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].close());await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible())).toBe(false);await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await page.waitForTimeout(220);await page.screenshot({path:path.join(root,'artifacts',screenshot),omitBackground:true});await page.getByRole('button',{name:'关闭小窗',exact:true}).click();console.log(`PASS: packaged ${process.platform}/${process.arch} compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services`);
  }catch(error){if(page&&!page.isClosed()){console.error('Renderer diagnostics:',await page.evaluate(()=>({url:location.href,ready:document.readyState,desktop:typeof window.desktop,body:document.body.innerText.slice(0,1800)})).catch(()=>null));await page.screenshot({path:path.join(root,'artifacts',screenshot)}).catch(()=>{});}throw error}

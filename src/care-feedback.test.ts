@@ -9,3 +9,8 @@ describe('actual care gains',()=>{
  it('omits full or unchanged stats and never attaches gains to another pet',()=>{const {before,result}=use('biscuit',{hunger:100});expect(careGains(before,result.state,'biscuit')).toEqual([]);expect(careGains(before,{...result.state,createdAt:now+1},'biscuit')).toEqual([]);expect(careGains(before,result.state,'missing')).toEqual([])})
  it('announces the consumed potion colour without a fake numeric reward',()=>{const {before,result}=use('recolor-blue');expect(result.ok).toBe(true);expect(careGains(before,result.state,'recolor-blue')).toEqual([expect.objectContaining({key:'color',label:'变为蓝色'})]);expect(careGains(result.state,result.state,'recolor-blue')).toEqual([])})
 })
+
+it('merges interrupted care receipts once, totals actual gains and never crosses pet identity',async()=>{
+ const{mergeCareFeedback}=await import('./care-feedback'),one={id:1,petId:42,gains:[{key:'hunger',label:'饱食',amount:10,image:'food.png'}]},two={id:2,petId:42,gains:[{key:'hunger',label:'饱食',amount:3,image:'food.png'},{key:'thirst',label:'水分',amount:5,image:'water.png'}]};
+ expect(mergeCareFeedback(one,two).gains.map(g=>g.amount)).toEqual([13,5]);expect(one.gains[0].amount).toBe(10);expect(mergeCareFeedback(one,{...two,petId:99})).toEqual({...two,petId:99});
+})

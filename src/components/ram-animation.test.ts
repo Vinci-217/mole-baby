@@ -87,7 +87,8 @@ describe('continuous original airborne posture',()=>{
   for(const form of ['senior','super','water','wood','fire']){
    expect(sampleFlyingPose('walk-left',800,true,form)).toEqual({row:2,frame:0,finished:false});
    expect(sampleFlyingPose('walk-right',800,true,form)).toEqual({row:1,frame:0,finished:false});
-   for(const action of ['still','drag'])expect(sampleFlyingPose(action,800,false,form)).toEqual({row:0,frame:0,finished:false});
+   for(const action of ['still'])expect(sampleFlyingPose(action,800,false,form)).toEqual({row:0,frame:0,finished:false});
+   expect(sampleFlyingPose('drag',800,true,form)).toEqual({row:0,frame:0,finished:false});expect(sampleFlyingPose('drag',800,false,form)).toEqual(sampleFlyingPose('idle',800,false,form));
    expect(sampleFlyingPose('sleep',800,true,form)).toEqual({sheet:'slumber',row:0,frame:0,finished:false});
   }
  });

@@ -73,6 +73,7 @@ function getDesktopState() {
   return {
     petMode,
     petOffset,mouseThrough,mousePassthrough,
+    ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
     motion,

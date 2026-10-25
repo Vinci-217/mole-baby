@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { easeGaze, type PetGaze } from '../pet-attention'
 import type { PetColor, Stage, Evolution } from '../game'
-import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, sampleGentleMouth, colorBlend, type ItemMotion } from '../item-motion'
+import { getItemMotion, getItemMotionByAction, getItemMouthAnchor, sampleItemMotion, sampleCareRoutine, sampleGentleMouth, colorBlend, type ItemMotion } from '../item-motion'
 import { groundedMotion, usesGroundedPose } from '../grounded-motion'
 import './Ram.css'
 import SocialCue, { paintSocialCue } from './SocialCue'
@@ -13,7 +13,14 @@ import { edgePeekTilt, type PetEdge } from '../edge-motion'
 import {footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
 import RamWear from './RamWear'
-import {outfitFrame,footballOutfitRig} from '../outfit-motion'
+import type {footballOutfitRig} from '../outfit-motion'
+let outfitMotion:typeof import('../outfit-motion')|undefined
+let outfitLoading:Promise<void>|undefined
+const outfitWaiters=new Set<HTMLCanvasElement>()
+function requestOutfitMotion(body:HTMLCanvasElement){
+  outfitWaiters.add(body)
+  outfitLoading??=import('../outfit-motion').then(module=>{outfitMotion=module;for(const canvas of outfitWaiters)if(canvas.isConnected)canvas.dispatchEvent(new Event('ram-wardrobe-change'));outfitWaiters.clear()}).catch(()=>{outfitLoading=undefined;outfitWaiters.clear()})
+}
 import {getOutfit,outfitCoversCrown} from '../wardrobe'
 import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
 import {isPastime,pastimeBody,spellCostume,PASTIME_LABELS} from '../pet-pastimes'
@@ -199,6 +206,8 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
   const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear'),source=wearSources.get(sheet)
   const outfit=getOutfit(wear?.dataset.outfit)
   if(!wear||!outfit||!source)return
+  if(!outfitMotion){wear.style.visibility='hidden';requestOutfitMotion(canvas);return}
+  const {outfitFrame,footballOutfitRig}=outfitMotion
   const kind=source.kind??'classic',form=width===96?'seed':source.form??'junior'
   if(football&&['magic-book','star-wand'].includes(outfit.id)){
     const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas),context=wear.getContext('2d');if(!image||!context){wear.style.visibility='hidden';return}
@@ -244,15 +253,18 @@ function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined,
   if (!root) return
   const pose = sampleItemMotion(motion, elapsed, reduced)
   const anchor = getItemMouthAnchor(canvas.dataset.form, motion, pose.bodyFrame)
-  const vars: Record<string, string> = {
-    '--care-mouth-x': `${anchor[0]}%`, '--care-mouth-y': `${anchor[1]}%`,
-    '--care-x': `${pose.x}%`, '--care-y': `${pose.y}%`, '--care-angle': `${pose.angle}deg`,
-    '--care-scale-x': String(pose.scaleX), '--care-scale-y': String(pose.scaleY), '--care-opacity': String(pose.opacity),
-    '--care-progress': String(pose.progress), '--care-activity': String(pose.activity),
-    '--care-lift': `${pose.activity * -12}%`, '--care-wave': `${Math.sin(pose.activity * motion.beats * Math.PI * 2) * 2}%`,
-    '--care-jaw':String(sampleGentleMouth(motion,elapsed,reduced)/7),
+  const routine=sampleCareRoutine(motion,elapsed,anchor,canvas.dataset.form==='seed',reduced)
+  const vars:Record<string,string>={
+    '--care-mouth-x':`${anchor[0]}%`,'--care-mouth-y':`${anchor[1]}%`,
+    '--care-opacity':String(pose.opacity),'--care-jaw':String(sampleGentleMouth(motion,elapsed,reduced)/7),
+    '--tray-x':`${routine.trayX}%`,'--tray-y':`${routine.trayY}%`,'--tray-opacity':String(routine.trayOpacity),'--tray-lift':`${routine.trayLift}%`,
+    '--bottle-x':`${routine.bottleX}%`,'--bottle-y':`${routine.bottleY}%`,'--bottle-angle':`${routine.bottleAngle}deg`,'--bottle-empty':`${(1-routine.milk)*62}%`,
+    '--clean-opacity':String(routine.cleanOpacity),'--clean-rinse':String(routine.rinse),'--care-sparkle':String(routine.sparkle),
   }
-  for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
+  for(const [name,value] of Object.entries(vars))root.style.setProperty(name,value)
+  root.querySelectorAll<HTMLElement>('.care-food-bite').forEach((element,i)=>{const p=routine.pieces[i];if(!p)return;element.style.left=`${p.x}%`;element.style.top=`${p.y}%`;element.style.opacity=String(p.opacity);element.style.transform=`translate(-50%,-50%) rotate(${p.angle}deg) scale(${p.scale})`})
+  root.querySelectorAll<HTMLElement>('.care-clean-bubble').forEach((element,i)=>{const t=reduced?0:elapsed/900+i*1.2;element.style.translate=`${Math.sin(t)*3}% ${Math.cos(t)*7}%`})
+
 }
 /** Readiness describes painted pixels, rather than the next React props. A
  * colour/action switch can retain a canvas while its source loads. */
@@ -307,8 +319,8 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
       const grounded = pose.sheet!=='slumber' && sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
-      const gentle=itemMotion&&itemMotion.body!=='wash';
-      const sheet=gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=gentle?sampleGentleMouth(itemMotion,elapsed,media.matches):grounded?.frame??pose.frame, row=gentle||grounded?0:pose.row
+      const gentle=Boolean(itemMotion);
+      const sheet=gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=gentle||grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
@@ -411,8 +423,8 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       const delta=last&&now-last<250?now-last:0
       elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       last = now
-      const isGentle=itemMotion&&itemMotion.body!=='wash';
-      const pose = isGentle?{...sampleSeedPose(action,elapsed,media.matches),frame:sampleGentleMouth(itemMotion,elapsed,media.matches)}:sampleSeedPose(action, elapsed, media.matches)
+      const isGentle=Boolean(itemMotion);
+      const pose = isGentle?{...sampleSeedPose(action,elapsed,media.matches),frame:sampleGentleMouth(itemMotion!,elapsed,media.matches)}:sampleSeedPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
       const sleepy=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&(media.matches||elapsed>450&&elapsed<3300);
@@ -436,14 +448,12 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
   return <canvas ref={ref} width={96} height={99} className="seed-body-frame" aria-hidden="true" data-form="seed" data-color={color}/>
 }
 function ItemCue({ motion }: { motion: ItemMotion }) {
-  const clean = motion.body === 'wash'
-  return <span className={`ram-item-cue gesture-${motion.gesture}`} style={{ color: motion.accent }} aria-hidden="true" data-item-id={motion.itemId} data-item-gesture={motion.gesture}>
-    {motion.gesture === 'bath' && <img className="ram-care-tub" src="./assets/original/item-motion/bath-tub.png" alt="" draggable={false}/>}
-    <img className={`ram-care-item ${motion.gesture === 'brush' ? 'ram-care-toothpaste' : ''}`} src={motion.image} alt="" draggable={false}/>
-    {motion.gesture === 'brush' && <img className="ram-care-brush" src="./assets/original/item-motion/toothbrush-generated.png" alt="" draggable={false}/>}
-    {(clean || motion.gesture === 'fizz' || motion.gesture === 'medicine' || motion.gesture === 'recolor' || motion.gesture === 'glow' || motion.gesture === 'crunch' || motion.gesture === 'pour-beans') && <span className="ram-care-particles">{Array.from({ length: clean ? 6 : 3 }, (_, index) => <i key={index}>{motion.gesture==='recolor'&&<img src="./assets/generated/v12-dizzy-star.png" alt="" draggable={false}/>}</i>)}</span>}
-    {motion.gesture === 'stretch' && <span className="ram-care-soft-puff"/>}
-    {motion.gesture === 'peel' && <img className="ram-care-peel" src={motion.image} alt="" draggable={false}/>}
+  return <span className={`ram-item-cue care-routine-${motion.body}`} style={{ color: motion.accent }} aria-hidden="true" data-item-id={motion.itemId} data-item-gesture={motion.gesture} data-care-routine={motion.body}>
+    {motion.body==='eat'&&<><span className="care-food-plate care-prop-sheet"/>{[0,1,2,3].map(i=><img key={i} className="care-food-bite" src={motion.image} alt="" draggable={false}/>)}<span className="care-food-plate care-food-rim care-prop-sheet"/></>}
+    {motion.body==='drink'&&<span className="care-drink-bottle"><span className="care-prop-sheet care-bottle-full"/><span className="care-prop-sheet care-bottle-empty"/><img className="care-bottle-label" src={motion.image} alt="" draggable={false}/></span>}
+    {motion.body==='wash'&&<><span className="care-clean-foam">{[0,1,2,3,4,5,6,7].map(i=><i className="care-clean-bubble" key={i}/>)}</span><span className="care-clean-rinse">{[0,1,2,3,4].map(i=><i key={i}/>)}</span><img className="care-clean-product" src={motion.image} alt="" draggable={false}/></>}
+    {motion.body==='medical'&&<img className="care-medicine-bottle" src={motion.image} alt="" draggable={false}/>}
+    <span className="care-finish-sparkle">{[0,1,2].map(i=><img key={i} src="./assets/generated/v12-dizzy-star.png" alt="" draggable={false}/>)}</span>
   </span>
 }
 export default function Ram({ color, costume, companionId=0, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
@@ -482,13 +492,13 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   // the native window offset and drag-out placement stay unchanged.
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
-  return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion&&itemMotion.body!=='wash'?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
+  return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/><RamWear costume={wearing}/></span></span></>
-      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}><SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/><RamWear costume={wearing}/></span></span></span></>
+      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
-      </span></span>}
+      </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
     {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*6.4/3}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
