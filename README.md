@@ -2,7 +2,7 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.27.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.27.0) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 v0.27.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.27.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 小小的桌面陪伴
 
@@ -38,7 +38,7 @@
 
 ## 安装
 
-Windows运行 `mole-baby-0.27.0-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.27.1-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 

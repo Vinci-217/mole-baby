@@ -7,6 +7,9 @@ using System.Runtime.InteropServices;
 public static class InstallerUI {
  public delegate bool EnumProc(IntPtr h, IntPtr p);
  [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc p,IntPtr arg);
+ [DllImport("user32.dll")] public static extern bool EnumChildWindows(IntPtr parent,EnumProc p,IntPtr arg);
+ [DllImport("user32.dll",CharSet=CharSet.Unicode)] public static extern int GetClassName(IntPtr h,StringBuilder s,int n);
+ [DllImport("user32.dll",EntryPoint="SendMessageW",CharSet=CharSet.Unicode)] public static extern IntPtr SetText(IntPtr h,uint m,IntPtr w,string text);
  [DllImport("user32.dll")] public static extern IntPtr GetDlgItem(IntPtr h,int id);
  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
  [DllImport("user32.dll")] public static extern bool IsWindowEnabled(IntPtr h);
@@ -15,11 +18,14 @@ public static class InstallerUI {
  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h,out uint pid);
  [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h,uint m,IntPtr w,IntPtr l);
  public static string Text(IntPtr h){var s=new StringBuilder(1024);GetWindowText(h,s,1024);return s.ToString();}
+ public static IntPtr DirectoryEdit(IntPtr parent){IntPtr found=IntPtr.Zero;EnumChildWindows(parent,(h,p)=>{var cls=new StringBuilder(64);GetClassName(h,cls,64);if(IsWindowVisible(h)&&cls.ToString()=="Edit"&&System.IO.Path.IsPathRooted(Text(h))){found=h;return false;}return true;},IntPtr.Zero);return found;}
  public static IntPtr Find(int pid){IntPtr found=IntPtr.Zero;EnumWindows((h,p)=>{uint owner;GetWindowThreadProcessId(h,out owner);if(owner==pid&&IsWindowVisible(h)&&GetDlgItem(h,1)!=IntPtr.Zero){found=h;return false;}return true;},IntPtr.Zero);return found;}
 }
 '@
 $folder = Join-Path $env:RUNNER_TEMP ('mole-finish-'+[guid]::NewGuid().ToString('N'))
-$install = Join-Path $folder '拉姆'
+# electron-builder uses the ASCII package name as APP_FILENAME when the
+# product name is Chinese. Its directory pre-hook appends that name if absent.
+$install = Join-Path $folder 'mole-baby'
 New-Item -ItemType Directory -Path $folder -Force | Out-Null
 $installerProcess = $null
 try {
@@ -28,6 +34,7 @@ try {
  $finish = [IntPtr]::Zero
  $dialog = [IntPtr]::Zero
  $lastClick = [DateTime]::MinValue
+ $pathConfirmed = $false
  while([DateTime]::UtcNow -lt $deadline) {
   $dialog = [InstallerUI]::Find($installerProcess.Id)
   if($dialog -ne [IntPtr]::Zero){
@@ -36,6 +43,15 @@ try {
    if([InstallerUI]::IsWindowVisible($button) -and [InstallerUI]::IsWindowEnabled($button)){
     if($label -match 'Finish|完成'){$finish=$button;break}
     if($label -match 'Next|Install|下一步|安装' -and ([DateTime]::UtcNow-$lastClick).TotalSeconds -gt 1){
+     if($label -match 'Install|安装' -and !$pathConfirmed){
+      $edit=[InstallerUI]::DirectoryEdit($dialog)
+      if($edit -eq [IntPtr]::Zero){throw 'Installer directory page has no visible path field'}
+      [InstallerUI]::SetText($edit,0xC,[IntPtr]::Zero,$install) | Out-Null
+      if([InstallerUI]::Text($edit) -ne $install){throw 'Installer did not accept the isolated target path'}
+      $pathConfirmed=$true
+      Write-Output "Installer target confirmed in directory page: $install"
+      Start-Sleep -Milliseconds 100
+     }
      Write-Output "Installer page: $label"
      [InstallerUI]::SetForegroundWindow($dialog) | Out-Null
      [InstallerUI]::PostMessage($button,0xF5,[IntPtr]::Zero,[IntPtr]::Zero) | Out-Null
@@ -46,6 +62,7 @@ try {
   Start-Sleep -Milliseconds 100
  }
  if($finish -eq [IntPtr]::Zero){throw 'Installer never reached its real Finish page'}
+ if(!$pathConfirmed){throw 'Installer skipped the explicit directory-page path check'}
  if(!(Test-Path (Join-Path $install '拉姆.exe'))){throw 'Installer did not install in the isolated test folder'}
  # Leave the standard, default-checked Run checkbox enabled. A real button
  # message runs the same custom MUI callback as a mouse click on Finish.
