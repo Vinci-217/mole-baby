@@ -4,9 +4,17 @@
 
 ## 本轮重点预览（未发布）
 
-先看这三项：中级水平拖动、安静睡觉、闭眼享受摸摸。下面的“真实拖拽”来自应用实际的拖动钩子，检查了最终画面中身体上下边界的位置。
+恢复初级与中级的左右转身：朝右拉向右，换向时经过正面转到左侧，松手回正。初级保留原动作的弹性，**只有中级去掉额外的上下弹跳**；用户仍可以用鼠标上下移动宠物。以下GIF来自实际应用的拖动代码。
 
-![真实拖拽：初级和中级只左右移动，松手不抬升](artifacts/animation-gallery/drag.gif)
+![初级与中级：左右转身、多帧拉扯与松手回正](artifacts/animation-gallery/drag-young.gif)
+
+初级75帧、中级80帧，分别覆盖正面、左右斜侧和左右侧面。角色来自原页游素材；中级新增的横向形变帧属于桌宠适配，保持身体的纵向位置。
+
+![逐帧对照：每个朝向抽取八帧](artifacts/v33-drag-sequences.png)
+
+![五阶段实际拖拽与松手衔接](artifacts/animation-gallery/drag.gif)
+
+下方睡眠与摸摸为前一轮方案，本轮只修订拖拽。
 
 ![安静睡觉：体型与叶冠不扭曲，闭眼和小嘴呼吸](artifacts/animation-gallery/sleep.gif)
 
@@ -124,9 +132,9 @@
 
 ![皇冠猫耳 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-warm-scarf.gif)
 
-### 原帧交互方案与来源对照
+### 原帧交互方案与来源对照（历史研究）
 
-这些是独立的动作研究：左右拖动用固定侧向姿态，关闭原步行动作里的跳起；追蝶保留原217帧追虫的身体与叶片。角色来自原素材，道具和交互编排属于桌宠适配。
+下面两组拖拽是上一轮的固定姿态研究，已由本页开头的多朝向、多帧方案替换。保留用于对照。追蝶保留原217帧追虫的身体与叶片；道具和交互编排属于桌宠适配。
 
 ![初中级拿起前与水平拖动](artifacts/v30-preview/move.gif)
 
@@ -195,13 +203,13 @@
 
 ![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
 
-[本轮修订、空间测量与验证](research/v32-animation-and-size.md) · [原素材来源](research/v30-motion-previews.md)
+[本轮拖拽修订与验证](research/v33-directional-drag.md) · [前一轮动作与空间测量](research/v32-animation-and-size.md) · [原素材来源](research/v30-motion-previews.md)
 
 ## 体积精简（本地预览构建）
 
-运行图片由82.51 MB降到49.03 MB，逐张核对全部透明度和可见像素一致。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；Windows/macOS最终安装包大小待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
+继续使用无损WebP构建，逐张核对透明度和可见像素一致。加入本轮拖拽帧后，710张运行图片约84.97 MB → 50.66 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。前一轮同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含本轮新增帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
 
-[测量明细与验证范围](research/v32-animation-and-size.md)
+[上轮测量明细与验证范围](research/v32-animation-and-size.md)
 
 
 ---

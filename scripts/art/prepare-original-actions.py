@@ -23,7 +23,7 @@ def export(form):
   # through the air with a manually lifted pet; keep intrinsic body shading.
   for node in ns.values():
    for child in node.findall('subTags/item'):
-    if child.get('characterId') not in {'41','89','333'}:continue
+    if child.get('characterId') not in {'41','65','66','67','68','69','89','333'}:continue
     child.set('placeFlagHasColorTransform','true');old=child.find('colorTransform')
     if old is not None:child.remove(old)
     E.SubElement(child,'colorTransform',type='CXFORMWITHALPHA',hasAddTerms='false',hasMultTerms='true',nbits='10',redMultTerm='256',greenMultTerm='256',blueMultTerm='256',alphaMultTerm='0',redAddTerm='0',greenAddTerm='0',blueAddTerm='0',alphaAddTerm='0')

@@ -6,7 +6,7 @@ describe('elastic visual dragging with an unchanged native grab point',()=>{
   const strains=[]
   for(const stage of [0,1,2,3,4]as Stage[]){const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},stage)
    for(let i=1;i<=18;i++){pullElasticDrag(s,{x:i*10,y:i*2,at:1000+i*16},stage);stepElasticDrag(s,16)}
-   expect(s.x).toBeLessThan(-1);if(stage===1||stage===2)expect(s.y).toBe(0);else expect(s.y).toBeLessThan(0);expect(s.stretch).toBeGreaterThan(0);strains.push(s.stretch)
+   expect(s.x).toBeLessThan(-1);if(stage===2)expect(s.y).toBe(0);else expect(s.y).toBeLessThan(0);expect(s.stretch).toBeGreaterThan(0);strains.push(s.stretch)
    const before=s.x;releaseElasticDrag(s);stepElasticDrag(s,16);expect(Math.abs(s.x-before)).toBeLessThan(2)
    for(let i=0;i<180;i++)stepElasticDrag(s,16)
    expect(Math.abs(s.x)).toBeLessThan(.001);expect(Math.abs(s.angle)).toBeLessThan(.001);expect(Math.abs(s.stretch)).toBeLessThan(.001)

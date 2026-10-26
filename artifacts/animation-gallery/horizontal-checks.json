@@ -38,6 +38,7 @@
       "label": "真实拖动与松手"
     }
   ],
-  "verticalTolerance": 0.05,
+  "middleVerticalTolerance": 0.6,
+  "directionalViews": true,
   "errors": []
 }
