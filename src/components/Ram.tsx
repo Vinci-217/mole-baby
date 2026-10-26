@@ -322,9 +322,6 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
       const grounded = pose.sheet!=='slumber' && sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
-      // The original middle-form foliage follows its own slower spring. Read
-      // inline data only; do not measure layout or move the eyes independently.
-      if(grounded&&form==='middle'&&!media.matches)grounded.leafAngle+=Number(canvas.closest<HTMLElement>('.ram-sprite')?.style.getPropertyValue('--pull-leaf')||0)
       const gentle=Boolean(itemMotion);
       const sheet=gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=gentle||grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`

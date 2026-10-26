@@ -2,17 +2,17 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.29.2](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.2) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 直接下载与安装
 
 | 你的电脑 | 推荐安装包 |
 | --- | --- |
-| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-Setup.exe) |
-| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-mac-arm64.dmg) |
-| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-mac-x64.dmg) |
+| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-Setup.exe) |
+| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-arm64.dmg) |
+| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-x64.dmg) |
 
-无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.2)放在发布页最上方。
+无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)放在发布页最上方。
 
 ## 小小的桌面陪伴
 
@@ -26,15 +26,7 @@
 
 ## 拖动、四边躲藏与托盘
 
-种子可以手动拖动，不会自行散步；其他清醒形态每12–18秒在最后放置点附近随机移动，活动范围约左右150px、上下100px，每步约28–64px，避免跑遍屏幕。用户拖动会重设活动中心。
-
-抓住拉姆时会轻轻压缩，左右拉动时身体慢半拍，换方向先收一下再展开；松手后弹回、轻晃几次再停稳。初级身体最软，中级叶片会晚一点跟上，高级和超拉保留悬空惯性。种子只摆动小身体，花盆保持端正，装扮随身体一起变化。
-
-以下动图展示五个阶段的拉扯和回弹，圆点代表抓住的位置：
-
-![五阶段拉扯与Q弹回弹演示](artifacts/v29-bouncy-pull.gif)
-
-[观看清晰视频](artifacts/v29-bouncy-pull.webm) · 轻轻反抗与持续摇晃后的头晕分开呈现；眩晕时原瞳孔在眼白内绕圈，恢复时慢慢复位。系统开启减少动态效果时会关闭拉伸和回弹。
+种子可以手动拖动，不会自行散步；其他清醒形态每12–18秒在最后放置点附近随机移动，活动范围约左右150px、上下100px，每步约28–64px，避免跑遍屏幕。用户拖动会重设活动中心。左右拉动时，各阶段有不同的身体惯性、拉伸和松手回弹；种子的花盆保持端正，只晃动身体。轻轻反抗与持续摇晃后的头晕分开呈现。眩晕时原瞳孔会在眼白内绕圈，恢复时慢慢复位。
 
 Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留时出现横条。窗口切换保持同一无边框样式。
 
@@ -58,13 +50,13 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 ## 自动更新
 
-默认开启「启动时自动更新」：Windows和Mac每次启动约8秒后检查GitHub正式版，有新版才下载；Windows安装版在桌宠空闲时保存后更新、重启，正在游戏或专注时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
+Windows安装版启动后自动检查GitHub正式版，后台下载并校验；桌宠空闲时保存后更新、重启，正在游戏或专注时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
 
-首次需要手动安装v0.29.1或更新版本一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口，**安装仍需手动完成**；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
+首次需要手动安装v0.29.1一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
 
 ## 安装
 
-Windows运行 `mole-baby-0.29.2-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.29.1-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 
