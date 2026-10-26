@@ -2,6 +2,36 @@
 
 > **动画研究预览，尚未发布。** 本分支效果等待用户审阅；当前正式版为 [v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)。未经用户明确确认，不推送新版本到自动更新渠道。
 
+## 本轮动作预览（待确认）
+
+角色采用原版完整动作帧；手动拖拽、手掌、网与蝴蝶的编排是桌宠适配。当前只做预览，尚未接入正式版本；你认可的足球素材与播放代码未修改。
+
+**初级 / 中级：原版左右移动与手动拖拽对照**
+
+左边是原版侧向移动，右边是拖起来、换方向、松手归位。保留原来的侧脸、身体和叶片变化，鼠标抓取点会约束被提起的位置。
+
+![初级中级移动与手动拖拽对照](artifacts/v30-preview/move.gif)
+
+**五阶段手动拖拽**
+
+![五阶段原帧拖拽预览](artifacts/v30-preview/drag.gif)
+
+**追蝴蝶：原著追虫动作与桌宠适配对照**
+
+中级原版217帧追虫动作作为身体参考；蝴蝶绕网、躲开，拉姆回头继续追看。没有新增捕捉奖励或游戏数值。
+
+![原著追虫与追蝴蝶适配对照](artifacts/v30-preview/butterfly.gif)
+
+**摸摸：五阶段回应**
+
+手掌接近、轻抚、离开，角色用原版开心动作回应。种子只摆动身体，花盆保持端正；高级和神力形态保留原来的空中动作。
+
+![五阶段摸摸原帧预览](artifacts/v30-preview/pet.gif)
+
+[参考来源、适配范围和验证](research/v30-motion-previews.md) · [清晰移动视频](artifacts/v30-preview/move.webm) · [追蝶视频](artifacts/v30-preview/butterfly.webm) · [摸摸视频](artifacts/v30-preview/pet.webm)
+
+---
+
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
 [下载正式版 v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)

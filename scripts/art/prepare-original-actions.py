@@ -6,10 +6,27 @@ Requires JPEXS 26.3; see original/football/README.md for exact source hashes.
 from pathlib import Path
 import argparse,copy,json,subprocess,concurrent.futures
 import xml.etree.ElementTree as E
-p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--actions',default='football,boring,happy');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--actions',default='football,boring,happy');p.add_argument('--forms',default='ordinary,super,water,wood,fire');p.add_argument('--omit-middle-insect',action='store_true');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
 IDS={'ordinary': [('junior','936'),('middle','1532'),('senior','1777')],'super':[('super','940')],'water':[('water','538')],'wood':[('wood','1029')],'fire':[('fire','898')]}
 def export(form):
  r=E.parse(a.ordinary_xml if form=='ordinary' else a.sources/f'{form}.xml');ns={n.get('spriteId') or n.get('shapeId'):n for n in r.getroot().find('tags') if n.get('spriteId') or n.get('shapeId')};cache={}
+ if form=='ordinary' and a.omit_middle_insect:
+  # 1506 is the ENTIRE moving crown, not just the insect. Only sprite1481
+  # contains the fly (1480/1477). Preserve every leaf and morph placement.
+  for child in ns['1481'].find('subTags'):
+   if not child.get('type','').startswith('Place'):continue
+   child.set('placeFlagHasColorTransform','true');old=child.find('colorTransform')
+   if old is not None:child.remove(old)
+   E.SubElement(child,'colorTransform',type='CXFORMWITHALPHA',hasAddTerms='false',hasMultTerms='true',nbits='10',redMultTerm='256',greenMultTerm='256',blueMultTerm='256',alphaMultTerm='0',redAddTerm='0',greenAddTerm='0',blueAddTerm='0',alphaAddTerm='0')
+ if form=='ordinary' and a.omit_middle_insect:
+  # Original ground ellipses are independent shapes. They should not travel
+  # through the air with a manually lifted pet; keep intrinsic body shading.
+  for node in ns.values():
+   for child in node.findall('subTags/item'):
+    if child.get('characterId') not in {'41','89','333'}:continue
+    child.set('placeFlagHasColorTransform','true');old=child.find('colorTransform')
+    if old is not None:child.remove(old)
+    E.SubElement(child,'colorTransform',type='CXFORMWITHALPHA',hasAddTerms='false',hasMultTerms='true',nbits='10',redMultTerm='256',greenMultTerm='256',blueMultTerm='256',alphaMultTerm='0',redAddTerm='0',greenAddTerm='0',blueAddTerm='0',alphaAddTerm='0')
  def length(sid):
   if sid in cache:return cache[sid]
   n=ns.get(sid)
@@ -47,4 +64,6 @@ def export(form):
    subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-xml2swf',str(xml),str(swf)],stdout=log,stderr=log,check=True)
    subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-selectid',','.join(sid for _,sid in IDS[form]),'-zoom','4','-ignorebackground','-export','sprite',str(dest),str(swf)],stdout=log,stderr=log,check=True)
   print(form,'probe' if probe else 'neutral','exported',flush=True)
-with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(export,IDS))
+requested=a.forms.split(',')
+if any(form not in IDS for form in requested):raise ValueError('Unknown form')
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(export,requested))

@@ -1,0 +1,11 @@
+{
+  "sourceSHA256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "fps": 24,
+  "frames": {
+    "move": 154,
+    "drag": 154,
+    "butterfly": 245,
+    "pet": 135
+  },
+  "errors": []
+}

@@ -157,3 +157,13 @@ __pycache__/
 !artifacts/v29-bouncy-pull.gif
 !artifacts/v29-bouncy-pull.webm
 !artifacts/v29-source-spring-poses.png
+
+!artifacts/v30-source/
+artifacts/v30-source/*
+!artifacts/v30-source/*.png
+!artifacts/v30-source/manifest.json
+!artifacts/v30-preview/
+artifacts/v30-preview/*
+!artifacts/v30-preview/*.gif
+!artifacts/v30-preview/*.webm
+!artifacts/v30-preview/recording-checks.json
