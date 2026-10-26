@@ -4,15 +4,17 @@
 
 ## 本轮重点预览（未发布）
 
-加强中级的黏糯拉扯感：身体跟着拖拽力度横向拉长，换向时先压缩、再展开，松手后衰减回弹。眼睛和小嘴的比例受到保护，**不增加上下弹跳**；初级继续保留上一轮的原动作。以下GIF均来自实际应用的拖动代码。
+按最新要求，**拖拽时中级直接使用初级的身体、脸部和动作，只增加原版叶片**。两者共用75帧身体序列、同一个播放时钟和同一套拖动响应。下方截取实际拖拽与回弹片段，逐帧检查身体像素、当前帧和拉扯变换一致。
 
-![中级拉扯特写：横向拉伸、换向压缩、松手回弹（放大1.44倍观察）](artifacts/animation-gallery/middle-elastic.gif)
+![同一身体、同一动作：中级只多出叶片（实际拖拽及回弹片段）](artifacts/animation-gallery/drag-shared-body.gif)
 
-![初级与中级：左右转身、多帧拉扯与松手回正](artifacts/animation-gallery/drag-young.gif)
+![完整过程：拖拽前后仍各自使用原待机形态](artifacts/animation-gallery/drag-young.gif)
 
-初级75帧、中级110帧，分别覆盖正面、左右斜侧和左右侧面。中级每个朝向提供22档压缩到拉伸的形变，根据弹簧状态取帧，停手后会回到原形，不空转循环。角色来自原页游素材，横向形变和拖拽交互属于桌宠适配。用户仍可手动上下移动宠物。
+![中级完整过程特写（放大1.44倍观察）](artifacts/animation-gallery/middle-elastic.gif)
 
-![逐帧对照：中级从压缩逐步拉长，每个朝向抽取八帧](artifacts/v34-middle-elastic-sequence.png)
+初级和中级均为五种朝向、每朝向15帧。原初级身体和表情逐像素保留，中级原叶片贴在身体后方，不挡住身体和眼睛。原素材的组合及叶片贴合属于桌宠适配；本轮修改范围为拖拽与松手衔接。
+
+![身体帧对照：每个方向上排初级、下排中级](artifacts/v35-shared-body.png)
 
 ![五阶段实际拖拽与松手衔接](artifacts/animation-gallery/drag.gif)
 
@@ -205,11 +207,11 @@
 
 ![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
 
-[本轮中级弹性修订与验证](research/v34-middle-elastic-drag.md) · [前一轮转身修订](research/v33-directional-drag.md) · [原素材来源](research/v30-motion-previews.md)
+[本轮共用身体的实现与验证](research/v35-shared-drag-body.md) · [此前独立形变研究](research/v34-middle-elastic-drag.md) · [原素材来源](research/v30-motion-previews.md)
 
 ## 体积精简（本地预览构建）
 
-继续使用无损WebP构建，逐张核对透明度和可见像素一致。加入本轮拖拽帧后，710张运行图片约85.64 MB → 51.10 MB，本轮图片约增加0.44 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。此前同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含新增拖拽帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
+继续使用无损WebP构建，逐张核对透明度和可见像素一致。当前710张运行图片约84.40 MB → 50.04 MB，较上一轮图片减少约1.06 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。此前同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含新增拖拽帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
 
 [此前测量明细与验证范围](research/v32-animation-and-size.md)
 

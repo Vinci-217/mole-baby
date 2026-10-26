@@ -5,20 +5,19 @@ describe('directional dragging is a moving character rather than a translated st
  it('turns through original front, diagonal and side views in both forms',()=>{
   for(const form of ['junior','middle'] as const){
    expect([-1,-.4,0,.4,1].map(view=>sampleDragPose(form,view,0).direction)).toEqual(['left','leftdown','down','rightdown','right'])
-   for(const view of [-1,1]){const frames=new Set(Array.from({length:64},(_,i)=>sampleDragPose(form,view,i*4,false,-.12+i*.01).index));expect(frames.size).toBeGreaterThanOrEqual(15)}
+   for(const view of [-1,1]){const frames=new Set(Array.from({length:64},(_,i)=>sampleDragPose(form,view,i*4).index));expect(frames.size).toBeGreaterThanOrEqual(15)}
   }
  })
- it('keeps middle vertical registration across all newly authored frames',()=>{
-  const spec=dragSpec('middle'),top=spec.poses.map(p=>p.body[1]),bottom=spec.poses.map(p=>p.body[3]);expect(Math.max(...top)-Math.min(...top)).toBeLessThanOrEqual(1);expect(Math.max(...bottom)-Math.min(...bottom)).toBeLessThanOrEqual(1)
-  for(const clip of Object.values(spec.clips)){
-   const widths=clip.frameMap.map(index=>spec.poses[index].body[2]-spec.poses[index].body[0]);expect(Math.max(...widths)-Math.min(...widths)).toBeGreaterThan(12)
+ it('shares the exact body frame and phase in every view, not a second approximation',()=>{
+  for(const view of [-1,-.4,0,.4,1])for(let distance=0;distance<500;distance+=3){
+   const junior=sampleDragPose('junior',view,distance),middle=sampleDragPose('middle',view,distance)
+   for(const key of ['index','row','frame','direction','phase','sourceFrame','body'] as const)expect(middle[key]).toEqual(junior[key])
   }
  })
- it('middle has distinct squeezed, relaxed and stretched shapes even after turning has stopped',()=>{
-  const squeezed=sampleDragPose('middle',0,0,false,-.1),neutral=sampleDragPose('middle',0,0,false,0),stretched=sampleDragPose('middle',0,0,false,.24)
-  const width=(p:typeof neutral)=>p.body[2]-p.body[0]
-  expect(width(squeezed)).toBeLessThan(width(neutral)-3);expect(width(stretched)).toBeGreaterThan(width(neutral)+8)
-  expect(sampleDragPose('middle',1,0,true,.25)).toEqual(sampleDragPose('middle',-1,0,true,-.1))
+ it('keeps all fifteen original body frames in each direction for both forms',()=>{
+  expect(dragSpec('middle').bodyFrom).toBe('junior');expect(dragSpec('middle').clips).toEqual(dragSpec('junior').clips)
+  expect(dragSpec('middle').frameCount).toBe(75)
+  for(const clip of Object.values(dragSpec('middle').clips))expect(clip.frameCount).toBe(15)
  })
  it('responds to slow left/right dragging without requiring the shake threshold',()=>{
   const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},2)
@@ -27,8 +26,11 @@ describe('directional dragging is a moving character rather than a translated st
   for(let i=1;i<=30;i++){pullElasticDrag(s,{x:50-i*2,y:0,at:1400+i*16},2);stepElasticDrag(s,16)}
   expect(s.view).toBeLessThan(-.66);releaseElasticDrag(s);for(let i=0;i<160;i++)stepElasticDrag(s,16);expect(Math.abs(s.view)).toBeLessThan(.001)
  })
- it('retains junior elasticity while only the middle form suppresses vertical inertia',()=>{
-  for(const stage of [1,2] as const){const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},stage);for(let i=1;i<=15;i++){pullElasticDrag(s,{x:i*5,y:i*2,at:1000+i*16},stage);stepElasticDrag(s,16)}if(stage===1)expect(Math.abs(s.y)).toBeGreaterThan(.1);else expect(s.y).toBe(0)}
+ it('preserves the original body poses across extension and squeezing',()=>{
+  const spec=dragSpec('middle')
+  for(const clip of Object.values(spec.clips)){
+   const widths=clip.frameMap.map(i=>spec.poses[i].body[2]-spec.poses[i].body[0]);expect(Math.max(...widths)-Math.min(...widths)).toBeGreaterThan(12)
+  }
  })
  it('holds a front pose for reduced motion instead of removing the pet',()=>{
   for(const form of ['junior','middle'] as const)expect(sampleDragPose(form,1,900,true)).toEqual(sampleDragPose(form,-1,0,true))

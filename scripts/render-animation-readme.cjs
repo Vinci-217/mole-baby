@@ -8,17 +8,19 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  const {groups,coverage}=await p.evaluate(async()=>{const m=await import('/scripts/animation-gallery-fixture.tsx');return{groups:m.GALLERY,coverage:m.GALLERY_COVERAGE}});
  const dir=path.join(root,'artifacts/animation-gallery'),checks=JSON.parse(fs.readFileSync(path.join(dir,'checks.json'),'utf8'));checks.drag=JSON.parse(fs.readFileSync(path.join(dir,'horizontal-checks.json'),'utf8'));checks['drag-young']=JSON.parse(fs.readFileSync(path.join(dir,'young-drag-checks.json'),'utf8'));
  checks['middle-elastic']=JSON.parse(fs.readFileSync(path.join(dir,'middle-elastic-checks.json'),'utf8'));
+ checks['drag-shared-body']=JSON.parse(fs.readFileSync(path.join(dir,'shared-body-checks.json'),'utf8'));
  for(const key of Object.keys(groups)){assert.ok(checks[key],`Missing actual recording ${key}`);assert.deepEqual(checks[key].cells,JSON.parse(JSON.stringify(groups[key].cells)),`${key}: GIF was recorded against older catalogue settings`)}
  const index=new Map();for(const [key,spec]of Object.entries(checks)){assert.ok(fs.existsSync(path.join(dir,key+'.gif')),key);assert.deepEqual(spec.errors,[]);for(const cell of spec.cells)if(!index.has(cell.action))index.set(cell.action,key)}
  for(const action of coverage.actions)assert.ok(index.has(action),'Missing renderer action '+action);
  for(const item of coverage.items)assert.ok(Object.values(checks).some(group=>group.cells.some(cell=>cell.itemId===item.id&&cell.action===item.action)),'Missing item '+item.id);
  for(const outfit of coverage.outfits){const group=checks['outfit-'+outfit];assert.equal(group.cells.length,8);assert.ok(group.cells.every(c=>c.costume===outfit))}
  const media=(label,file)=>`![${label}](${file})\n\n`;
- let section='## 本轮重点预览（未发布）\n\n加强中级的黏糯拉扯感：身体跟着拖拽力度横向拉长，换向时先压缩、再展开，松手后衰减回弹。眼睛和小嘴的比例受到保护，**不增加上下弹跳**；初级继续保留上一轮的原动作。以下GIF均来自实际应用的拖动代码。\n\n';
- section+=media('中级拉扯特写：横向拉伸、换向压缩、松手回弹（放大1.44倍观察）','artifacts/animation-gallery/middle-elastic.gif');
- section+=media('初级与中级：左右转身、多帧拉扯与松手回正','artifacts/animation-gallery/drag-young.gif');
- section+='初级75帧、中级110帧，分别覆盖正面、左右斜侧和左右侧面。中级每个朝向提供22档压缩到拉伸的形变，根据弹簧状态取帧，停手后会回到原形，不空转循环。角色来自原页游素材，横向形变和拖拽交互属于桌宠适配。用户仍可手动上下移动宠物。\n\n';
- section+=media('逐帧对照：中级从压缩逐步拉长，每个朝向抽取八帧','artifacts/v34-middle-elastic-sequence.png');
+ let section='## 本轮重点预览（未发布）\n\n按最新要求，**拖拽时中级直接使用初级的身体、脸部和动作，只增加原版叶片**。两者共用75帧身体序列、同一个播放时钟和同一套拖动响应。下方截取实际拖拽与回弹片段，逐帧检查身体像素、当前帧和拉扯变换一致。\n\n';
+ section+=media('同一身体、同一动作：中级只多出叶片（实际拖拽及回弹片段）','artifacts/animation-gallery/drag-shared-body.gif');
+ section+=media('完整过程：拖拽前后仍各自使用原待机形态','artifacts/animation-gallery/drag-young.gif');
+ section+=media('中级完整过程特写（放大1.44倍观察）','artifacts/animation-gallery/middle-elastic.gif');
+ section+='初级和中级均为五种朝向、每朝向15帧。原初级身体和表情逐像素保留，中级原叶片贴在身体后方，不挡住身体和眼睛。原素材的组合及叶片贴合属于桌宠适配；本轮修改范围为拖拽与松手衔接。\n\n';
+ section+=media('身体帧对照：每个方向上排初级、下排中级','artifacts/v35-shared-body.png');
  section+=media('五阶段实际拖拽与松手衔接','artifacts/animation-gallery/drag.gif');
  section+='下方睡眠与摸摸为前一轮方案，本轮只修订拖拽。\n\n';
  section+=media('安静睡觉：体型与叶冠不扭曲，闭眼和小嘴呼吸','artifacts/animation-gallery/sleep.gif');
@@ -34,8 +36,8 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  section+='\n### 其余已有动图（历史方案 / 原素材参考）\n\n以下保留在仓库中的动图全部列出，用于对照；它们不是本轮已认可的效果。\n\n';
  const current=new Set(Object.keys(checks).map(k=>'artifacts/animation-gallery/'+k+'.gif').concat(['artifacts/v30-preview/move.gif','artifacts/v30-preview/drag.gif','artifacts/v30-preview/pet.gif','artifacts/v30-preview/butterfly.gif']));
  for(const file of execFileSync('git',['ls-files','*.gif'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean))if(!current.has(file))section+=media('历史 / 原素材：'+path.basename(file),file);
- section+='[本轮中级弹性修订与验证](research/v34-middle-elastic-drag.md) · [前一轮转身修订](research/v33-directional-drag.md) · [原素材来源](research/v30-motion-previews.md)\n\n';
- section+='## 体积精简（本地预览构建）\n\n继续使用无损WebP构建，逐张核对透明度和可见像素一致。加入本轮拖拽帧后，710张运行图片约85.64 MB → 51.10 MB，本轮图片约增加0.44 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。此前同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含新增拖拽帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。\n\n[此前测量明细与验证范围](research/v32-animation-and-size.md)\n\n';
+ section+='[本轮共用身体的实现与验证](research/v35-shared-drag-body.md) · [此前独立形变研究](research/v34-middle-elastic-drag.md) · [原素材来源](research/v30-motion-previews.md)\n\n';
+ section+='## 体积精简（本地预览构建）\n\n继续使用无损WebP构建，逐张核对透明度和可见像素一致。当前710张运行图片约84.40 MB → 50.04 MB，较上一轮图片减少约1.06 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。此前同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含新增拖拽帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。\n\n[此前测量明细与验证范围](research/v32-animation-and-size.md)\n\n';
  const readmeFile=path.join(root,'README.md'),old=fs.readFileSync(readmeFile,'utf8'),start=old.indexOf('## 本轮'),end=old.indexOf('\n---\n\n一只住在',start);assert.ok(start>=0&&end>start);fs.writeFileSync(readmeFile,old.slice(0,start)+section+old.slice(end));
- fs.writeFileSync(path.join(dir,'checks.json'),JSON.stringify(checks,null,2)+'\n');fs.writeFileSync(path.join(dir,'catalogue-coverage.json'),JSON.stringify({actions:coverage.actions,items:coverage.items,outfits:coverage.outfits,missing:[]},null,2)+'\n');console.log(`PASS README: ${coverage.actions.length} action names, ${coverage.items.length} items, ${coverage.outfits.length} outfits, ${Object.keys(groups).length} gallery GIFs + 3 actual drag GIFs; all existing tracked GIFs included, no collapsed galleries`);
+ fs.writeFileSync(path.join(dir,'checks.json'),JSON.stringify(checks,null,2)+'\n');fs.writeFileSync(path.join(dir,'catalogue-coverage.json'),JSON.stringify({actions:coverage.actions,items:coverage.items,outfits:coverage.outfits,missing:[]},null,2)+'\n');console.log(`PASS README: ${coverage.actions.length} action names, ${coverage.items.length} items, ${coverage.outfits.length} outfits, ${Object.keys(groups).length} gallery GIFs + 4 actual drag GIFs; all existing tracked GIFs included, no collapsed galleries`);
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

@@ -182,11 +182,5 @@
 
 .ram-seed .care-clean-foam{top:calc(var(--care-mouth-y,32%) + 10%)}
 
-/* Only the middle form has horizontal inertia only. No nested breath,
-   pivot rotation, walking bounce or release squash may move its body up/down. */
-.ram-grounded[data-stage="2"]:is(.is-dragging,[data-pull-phase=release]) .ram-artwork,
-.ram-grounded[data-stage="2"]:is(.is-dragging,[data-pull-phase=release]) .ram-flight-layer,
-.ram-grounded[data-stage="2"]:is(.is-dragging,[data-pull-phase=release]) .ram-pose-layer{animation:none!important;transform:none!important;transition:none!important}
-.ram-grounded[data-stage="2"]:is(.is-dragging,[data-pull-phase=release]) .ram-elastic-layer{transform:translateX(var(--pull-x,0%));transform-origin:center}
 .ram-sprite.is-sleeping .ram-flight-layer,.ram-sprite.is-sleeping .ram-pose-layer{animation:none!important;transform:none!important}
 .ram-sprite.is-flying.is-sleeping .ram-flight-layer{transform:translateY(-5%)!important}

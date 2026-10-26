@@ -1,6 +1,6 @@
 # 初级与中级左右拖拽修订 · 未发布
 
-> 本页记录上一轮的75/80帧方案。中级已继续改为110帧、由拉扯力度和回弹驱动，见[v34弹性修订](v34-middle-elastic-drag.md)。[上一轮固定版本的实际GIF](https://raw.githubusercontent.com/Vinci-217/mole-baby/95b041a1c6a85af470a73fe17c357a8c29fb647c/artifacts/animation-gallery/drag-young.gif)保留用于对照。
+> 本页记录早期75/80帧方案。当前按用户澄清，共用初级身体和动作、中级只增加叶片，见[v35修订](v35-shared-drag-body.md)；中间的[v34独立形变](v34-middle-elastic-drag.md)作为历史研究保留。[本页原版本GIF](https://raw.githubusercontent.com/Vinci-217/mole-baby/95b041a1c6a85af470a73fe17c357a8c29fb647c/artifacts/animation-gallery/drag-young.gif)可用于对照。
 
 用户只要求中级不额外上下弹跳。上轮把初级和中级都改成固定侧向姿态，造成左右拖动缺少转身和身体动作。本轮恢复两者的方向变化，只限制中级的附加纵向运动。手动上下拖动原生桌面窗口的能力保留。
 

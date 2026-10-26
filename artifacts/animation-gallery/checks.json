@@ -2876,14 +2876,14 @@
         "label": "真实拖动与松手"
       }
     ],
-    "middleVerticalTolerance": 0.6,
+    "sharedBody": true,
     "directionalViews": true,
-    "material": {
-      "widthChangeCss": 9.895836353302002,
-      "strainRange": [
-        -0.1,
-        0.2
-      ]
+    "comparison": {
+      "framesCompared": 102,
+      "bodyPixelDifferences": 0,
+      "samePhase": true,
+      "sameTransform": true,
+      "onlyAddedFoliage": true
     },
     "errors": []
   },
@@ -2909,14 +2909,14 @@
         "label": "真实拖动与松手"
       }
     ],
-    "middleVerticalTolerance": 0.6,
+    "sharedBody": true,
     "directionalViews": true,
-    "material": {
-      "widthChangeCss": 9.895836353302002,
-      "strainRange": [
-        -0.1,
-        0.2
-      ]
+    "comparison": {
+      "framesCompared": 102,
+      "bodyPixelDifferences": 0,
+      "samePhase": true,
+      "sameTransform": true,
+      "onlyAddedFoliage": true
     },
     "errors": []
   },
@@ -2936,15 +2936,45 @@
         "label": "真实拖动与松手"
       }
     ],
-    "middleVerticalTolerance": 0.864,
+    "sharedBody": true,
     "directionalViews": true,
-    "material": {
-      "widthChangeCss": 15.000001589457185,
-      "strainRange": [
-        -0.1,
-        0.2
-      ]
-    },
     "errors": []
+  },
+  "drag-shared-body": {
+    "frames": 102,
+    "fps": 24,
+    "duration": 4250,
+    "dimensions": [
+      640,
+      300
+    ],
+    "cells": [
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      }
+    ],
+    "sharedBody": true,
+    "directionalViews": true,
+    "comparison": {
+      "framesCompared": 102,
+      "bodyPixelDifferences": 0,
+      "samePhase": true,
+      "sameTransform": true,
+      "onlyAddedFoliage": true
+    },
+    "errors": [],
+    "sourceFrames": [
+      18,
+      119
+    ]
   }
 }

@@ -318,7 +318,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
     const paint = (now: number) => {
       if (stopped || !canvas.isConnected || document.hidden || !inView) { last = 0; return }
-      const delta=last&&now-last<250?now-last:0
+      const delta=last&&now-last<250?Math.max(0,now-last):0
       elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       flightClock.current+=delta
       eyePosition.current=media.matches?{x:0,y:0}:easeGaze(eyePosition.current,gazeRef.current?.current??{x:0,y:0},delta)
@@ -333,7 +333,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       // inline data only; do not measure layout or move the eyes independently.
       if(grounded&&form==='middle'&&!media.matches)grounded.leafAngle+=Number(canvas.closest<HTMLElement>('.ram-sprite')?.style.getPropertyValue('--pull-leaf')||0)
       const root=canvas.closest<HTMLElement>('.ram-sprite');
-      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches,Number(root?.style.getPropertyValue('--drag-strain')||0)):null;
+      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches):null;
       const gentle=Boolean(itemMotion),affection=action==='pet'&&(media.matches||elapsed>=180&&elapsed<2200);
       const sheet=drag?'drag':affection?'affection':gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=drag?drag.frame:affection?affectionFrame(elapsed,media.matches):gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=drag?drag.row:affection||gentle||grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
@@ -356,18 +356,24 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       }
       paintWear(canvas,drag?sheets.classic:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,drag?drag.wearFrame:frame,drag?drag.wearRow:row)
       if(drag){
-        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);canvas.dataset.dragStrain=String(drag.strain);
+        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);
         const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear');
         if(wear?.dataset.loaded==='true'&&wear.style.visibility==='visible'){const [ox0,oy0,ox1,oy1]=drag.wearBody,[nx0,ny0,nx1,ny1]=drag.body,sx=(nx1-nx0)/(ox1-ox0),sy=(ny1-ny0)/(oy1-oy0);wear.style.left=`${(nx0+(parseFloat(wear.style.left)*192/100-ox0)*sx)/192*100}%`;wear.style.top=`${(ny0+(parseFloat(wear.style.top)*208/100-oy0)*sy)/208*100}%`;wear.style.width=`${parseFloat(wear.style.width)*sx}%`;wear.style.height=`${parseFloat(wear.style.height)*sy}%`;wear.dataset.registration='drag-source'}
-      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase;delete canvas.dataset.dragStrain}
+      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase}
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
+    const sprite=canvas.closest<HTMLElement>('.ram-sprite')
+    const syncDrag=()=>{
+      if(action!=='drag'&&!(['idle','waiting'].includes(action)&&sprite?.dataset.pullPhase==='release'))return
+      cancelAnimationFrame(request);request=0;paint(performance.now())
+    }
+    sprite?.addEventListener('ram-drag-motion',syncDrag)
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; request = requestAnimationFrame(paint) }
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
-    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume) }
+    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume);sprite?.removeEventListener('ram-drag-motion',syncDrag) }
   }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }
@@ -539,7 +545,7 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
     role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
-      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage===2?0:dragging&&stage===1?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
+      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>

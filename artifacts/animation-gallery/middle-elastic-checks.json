@@ -14,14 +14,7 @@
       "label": "真实拖动与松手"
     }
   ],
-  "middleVerticalTolerance": 0.864,
+  "sharedBody": true,
   "directionalViews": true,
-  "material": {
-    "widthChangeCss": 15.000001589457185,
-    "strainRange": [
-      -0.1,
-      0.2
-    ]
-  },
   "errors": []
 }

@@ -1,0 +1,37 @@
+{
+  "frames": 102,
+  "fps": 24,
+  "duration": 4250,
+  "dimensions": [
+    640,
+    300
+  ],
+  "cells": [
+    {
+      "form": "junior",
+      "stage": 1,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    },
+    {
+      "form": "middle",
+      "stage": 2,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    }
+  ],
+  "sharedBody": true,
+  "directionalViews": true,
+  "comparison": {
+    "framesCompared": 102,
+    "bodyPixelDifferences": 0,
+    "samePhase": true,
+    "sameTransform": true,
+    "onlyAddedFoliage": true
+  },
+  "errors": [],
+  "sourceFrames": [
+    18,
+    119
+  ]
+}
