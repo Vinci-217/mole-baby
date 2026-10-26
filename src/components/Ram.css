@@ -184,3 +184,10 @@
 
 .ram-sprite.is-sleeping .ram-flight-layer,.ram-sprite.is-sleeping .ram-pose-layer{animation:none!important;transform:none!important}
 .ram-sprite.is-flying.is-sleeping .ram-flight-layer{transform:translateY(-5%)!important}
+
+/* The original middle grounded sequence supplies all compression. Never add
+   a second vertical bounce, rotation or whole-picture squash while held. */
+.ram-grounded[data-stage="2"][data-grounded-drag] .ram-artwork,
+.ram-grounded[data-stage="2"][data-grounded-drag] .ram-flight-layer,
+.ram-grounded[data-stage="2"][data-grounded-drag] .ram-pose-layer{animation:none!important;transform:none!important;transition:none!important}
+.ram-grounded[data-stage="2"][data-grounded-drag] .ram-elastic-layer{transform:translateX(var(--pull-x,0%));transform-origin:center}

@@ -1,6 +1,6 @@
 # 中级黏糯拉扯与回弹 · 未发布
 
-> 本页为上一轮独立中级形变的历史研究，已按用户澄清由[v35：共用初级身体，只增加叶片](v35-shared-drag-body.md)替换。[上一轮固定版本GIF](https://raw.githubusercontent.com/Vinci-217/mole-baby/6f7582a5b462297f402c237d5740798122b0e217/artifacts/animation-gallery/middle-elastic.gif)保留用于对照。
+> 本页为历史研究；当前方案见[v36：保留中级原版造型，移除拖动腾空段](v36-original-grounded-drag.md)。跨阶段拼接身体与叶片的方案已被否定。
 
 用户希望中级也有初级那种柔软、被拉扯的感觉，同时继续避免额外的上下弹跳。上一轮中级主要切换原侧脸，形变仅约1.8%，换向时没有明显的挤压，松手时形变帧也没跟随弹簧回弹。
 

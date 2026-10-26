@@ -177,9 +177,16 @@ artifacts/animation-gallery/*
 !artifacts/animation-gallery/young-drag-checks.json
 !artifacts/animation-gallery/middle-elastic-checks.json
 !artifacts/animation-gallery/shared-body-checks.json
+!artifacts/animation-gallery/middle-nojump-checks.json
 !artifacts/v33-drag-sequences.png
 !artifacts/v34-middle-elastic-sequence.png
 !artifacts/asset-size-report.json
 !artifacts/animation-gallery/catalogue-coverage.json
 
 !artifacts/v35-shared-body.png
+
+!artifacts/v36-nojump/
+artifacts/v36-nojump/*
+!artifacts/v36-nojump/*.png
+!artifacts/v36-nojump/*.gif
+!artifacts/v36-nojump/*.zip

@@ -4,17 +4,21 @@
 
 ## 本轮重点预览（未发布）
 
-按最新要求，**拖拽时中级直接使用初级的身体、脸部和动作，只增加原版叶片**。两者共用75帧身体序列、同一个播放时钟和同一套拖动响应。下方截取实际拖拽与回弹片段，逐帧检查身体像素、当前帧和拉扯变换一致。
+**保留中级自己的原版身体、脸和叶片，只去掉拖拽时的腾空跳跃。** 先根据原版贴地关键姿态生成PNG帧序列，再接入逐帧播放。身体底部保持在同一位置，保留轻微压缩和左右转身。
 
-![同一身体、同一动作：中级只多出叶片（实际拖拽及回弹片段）](artifacts/animation-gallery/drag-shared-body.gif)
+![应用实录：中级原版贴地动作，拖拽不腾空](artifacts/animation-gallery/middle-nojump.gif)
 
-![完整过程：拖拽前后仍各自使用原待机形态](artifacts/animation-gallery/drag-young.gif)
+### 原版动作与生成方案对照
 
-![中级完整过程特写（放大1.44倍观察）](artifacts/animation-gallery/middle-elastic.gif)
+左侧是原版完整行走动作，包含腾空；右侧是本轮生成的贴地帧循环。身体和叶片来自同一套中级素材，眼睛使用原始矢量轮廓及原动作矩阵补间。它是原素材的桌宠适配，未称为官方拖拽动作。
 
-初级和中级均为五种朝向、每朝向15帧。原初级身体和表情逐像素保留，中级原叶片贴在身体后方，不挡住身体和眼睛。原素材的组合及叶片贴合属于桌宠适配；本轮修改范围为拖拽与松手衔接。
+![左：原版行走；右：保留贴地姿态的生成序列](artifacts/v36-nojump/original-vs-grounded.gif)
 
-![身体帧对照：每个方向上排初级、下排中级](artifacts/v35-shared-body.png)
+[下载PNG逐帧序列：五方向 × 17帧，红色预览](artifacts/v36-nojump/frames-red.zip)
+
+![生成的帧序列：每个方向抽取九帧，完整85帧见下载](artifacts/v36-nojump/frames.png)
+
+![初级与中级完整拖拽过程](artifacts/animation-gallery/drag-young.gif)
 
 ![五阶段实际拖拽与松手衔接](artifacts/animation-gallery/drag.gif)
 
@@ -199,6 +203,10 @@
 
 以下保留在仓库中的动图全部列出，用于对照；它们不是本轮已认可的效果。
 
+![历史 / 原素材：drag-shared-body.gif](artifacts/animation-gallery/drag-shared-body.gif)
+
+![历史 / 原素材：middle-elastic.gif](artifacts/animation-gallery/middle-elastic.gif)
+
 ![历史 / 原素材：v21-original-actions.gif](artifacts/v21-original-actions.gif)
 
 ![历史 / 原素材：v22-moods-wardrobe.gif](artifacts/v22-moods-wardrobe.gif)
@@ -207,11 +215,11 @@
 
 ![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
 
-[本轮共用身体的实现与验证](research/v35-shared-drag-body.md) · [此前独立形变研究](research/v34-middle-elastic-drag.md) · [原素材来源](research/v30-motion-previews.md)
+[本轮原版贴地序列、来源与验证](research/v36-original-grounded-drag.md) · [此前拼接方案（未采用）](research/v35-shared-drag-body.md) · [原素材来源](research/v30-motion-previews.md)
 
 ## 体积精简（本地预览构建）
 
-继续使用无损WebP构建，逐张核对透明度和可见像素一致。当前710张运行图片约84.40 MB → 50.04 MB，较上一轮图片减少约1.06 MB。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。此前同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；该目录数值未包含新增拖拽帧，Windows/macOS最终安装包大小也待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
+710张图片 84.58 MB → 50.17 MB，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。
 
 [此前测量明细与验证范围](research/v32-animation-and-size.md)
 

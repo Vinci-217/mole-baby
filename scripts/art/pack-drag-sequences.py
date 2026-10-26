@@ -1,15 +1,15 @@
-"""Shared original junior drag body; middle adds only its original leaf crown.
-Body/face pixels and phase order are identical for the two stages.
+"""Pack original junior motion and authored original-middle grounded frames.
+Middle body/foliage stay from one original rig; no cross-stage composites.
 """
 import argparse,json,hashlib
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
 from scipy import ndimage
-p=argparse.ArgumentParser();p.add_argument('--work',type=Path,required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--contact',type=Path);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--work',type=Path,required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--contact',type=Path);p.add_argument('--middle-frames',type=Path,required=True);a=p.parse_args()
 out=a.repo/'public/assets/original/drag';out.mkdir(parents=True,exist_ok=True)
 W,H,COLS=192,208,8;views=['left','leftdown','down','rightdown','right']
-data={'cell':[W,H],'columns':COLS,'fps':24,'sourceSHA256':'01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf','adaptation':'Both forms share the complete original junior body cycle. Middle adds an original middle crown, attached behind the unchanged body. This is a desktop adaptation, not an official middle drag clip.','forms':{}}
+data={'cell':[W,H],'columns':COLS,'fps':24,'sourceSHA256':'01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf','adaptation':'Junior retains its original motion. Middle uses original grounded poses 1/5 with authored whole-rig inbetweens, original vector facial symbols, no airborne frames and a fixed baseline. Not an official drag clip.','forms':{}}
 def box(m):
  y,x=np.where(m);return None if not len(x) else [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
 def coverage(n,q):
@@ -27,8 +27,8 @@ def write_form(form,frames,poses,clips):
   atlas=Image.new('RGBA',(W*COLS,H*rows))
   for i,pair in enumerate(frames):atlas.paste(pair[k],(i%COLS*W,i//COLS*H))
   atlas.save(out/f'{form}-{kind}.png',optimize=True)
- data['forms'][form]={'rows':rows,'frameCount':len(frames),'bodyFrom':'junior','clips':clips,'poses':poses}
- print(form,len(frames),'shared-body directional frames',flush=True)
+ data['forms'][form]={'rows':rows,'frameCount':len(frames),'bodyFrom':form,'clips':clips,'poses':poses}
+ print(form,len(frames),'directional frames',flush=True)
 specs=json.loads((a.work/'clips.json').read_text());nd=next((a.work/'frames').glob('DefineSprite_936_*'));pd=next((a.work/'ordinary-probe-frames').glob('DefineSprite_936_*'))
 classic=np.array(Image.open(a.repo/'public/assets/classic/junior-mask.png').convert('RGBA'));tb=bodybox(classic[:H,:W]);cx=(tb[0]+tb[2])/2
 frames=[];poses=[];clips={}
@@ -45,30 +45,19 @@ for view in views:
   poses.append({'view':view,'sourceFrame':i+1,'body':bodybox(np.array(parts[1])),**wardrobe(classic,view,i,count)});mapping.append(len(frames));frames.append(parts)
  clips[view]={'frameCount':count,'frameMap':mapping}
 write_form('junior',frames,poses,clips)
-# Use the original crown for each view; never use/repaint a middle face.
-mid_neutral=next((a.work/'frames').glob('DefineSprite_1532_*'));mid_classic=np.array(Image.open(a.repo/'public/assets/classic/middle-mask.png').convert('RGBA'))
-mid_frames=[];mid_poses=[]
+# The art sequence is generated and reviewed before packaging it for playback.
+authored=json.loads((a.middle_frames/'source.json').read_text());mid_classic=np.array(Image.open(a.repo/'public/assets/classic/middle-mask.png').convert('RGBA'))
+mid_frames=[];mid_poses=[];mid_clips={}
 for view in views:
- spec=specs['middle'][view];clip=clips[view]
- for i,index in enumerate(clip['frameMap']):
-  source=spec['start'];n=np.array(Image.open(mid_neutral/f'{source}.png').convert('RGBA'));rgb=n[:,:,:3].astype(int)
-  green=(rgb[:,:,1]>rgb[:,:,0]+8)&(rgb[:,:,1]>rgb[:,:,2]+8)&(n[:,:,3]>8)
-  assert green.any(),f'Missing original crown: {view}'
-  l,t,r,b=box(green);leaf=n.copy();leaf[~green]=0;leaf=Image.fromarray(leaf).crop((l,t,r,b))
-  # The stem is the bottom of the narrow central band. Root it inside the
-  # upper body and paint the body last, preserving every original face pixel.
-  ys,xs=np.where(green);central=np.abs(xs-(l+r)/2)<(r-l)*.1;root_y=int(ys[central].max()) if central.any() else b-1;bottom=central&(ys>=root_y-2);root_x=float(xs[bottom].mean()) if bottom.any() else (l+r)/2
-  jn=np.array(frames[index][0]);jm=np.array(frames[index][1]);body=(jm[:,:,:3].sum(2)>90)&(jm[:,:,3]>100);bb=poses[index]['body'];neck_x=(bb[0]+bb[2])/2;yy,xx=np.where(body&(np.abs(np.indices(body.shape)[1]-neck_x)<3));neck_y=int(yy.min())+10
-  scale=min(120/(r-l),(neck_y-2)/max(1,root_y-t));dx=neck_x-(root_x-l)*scale;dy=neck_y-(root_y-t)*scale
-  crown=np.array(leaf.transform((W,H),Image.Transform.AFFINE,(1/scale,0,-dx/scale,0,1/scale,-dy/scale),Image.Resampling.BICUBIC))
-  assert not (crown[:,[0,-1],3]>32).any() and not (crown[0,:,3]>32).any(),f'{view}/{i}: crown clipped'
-  occupied=jn[:,:,3]>0;crown[occupied]=0
-  combined=np.array(Image.alpha_composite(Image.fromarray(crown),Image.fromarray(jn)));mask=jm.copy();mask[~occupied,:3]=0;mask[:,:,3]=combined[:,:,3]
-  assert np.array_equal(combined[occupied],jn[occupied]),f'{view}/{i}: original body changed'
-  assert np.array_equal(mask[occupied],jm[occupied]),f'{view}/{i}: body tint changed'
-  assert bodybox(mask)==poses[index]['body']
-  mid_frames.append((Image.fromarray(combined),Image.fromarray(mask)));mid_poses.append({**poses[index],**wardrobe(mid_classic,view,i,clip['frameCount']),'crownSourceFrame':source,'crownRoot':[neck_x,neck_y]})
-write_form('middle',mid_frames,mid_poses,clips)
+ mapping=[];count=authored['framesPerView']
+ for i in range(count):
+  pair=[Image.open(a.middle_frames/f'{view}-{i:02d}-{kind}.png').convert('RGBA') for kind in ['neutral','mask']]
+  pose=authored['forms'][view]['poses'][i]
+  mid_poses.append({'view':view,'sourceFrame':1,'compression':pose['compression'],'body':pose['body'],**wardrobe(mid_classic,view,0,1)})
+  mapping.append(len(mid_frames));mid_frames.append(pair)
+ mid_clips[view]={'frameCount':count,'frameMap':mapping}
+write_form('middle',mid_frames,mid_poses,mid_clips);data['forms']['middle']['sampling']='compression'
+(out/'source.json').write_text(json.dumps(authored,ensure_ascii=False,indent=2)+'\n')
 (out/'runtime.json').write_text(json.dumps(data,separators=(',',':'))+'\n');(out/'checksums.json').write_text(json.dumps({f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in out.glob('*.png')},indent=2)+'\n')
 if a.contact:
  contact=Image.new('RGB',(864,1320),'#f7f2e6');draw=ImageDraw.Draw(contact)

@@ -1,0 +1,986 @@
+{
+  "method": "Original middle grounded poses 1 and 5: body and foliage plate inbetweening with original vector eyes, pupils and highlight interpolated using their authored placement matrices; airborne frames excluded. One uniform scale/translation registers each view.",
+  "framesPerView": 17,
+  "cell": [
+    192,
+    208
+  ],
+  "sourceSHA256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "forms": {
+    "left": {
+      "sourceKeyframes": [
+        33,
+        37
+      ],
+      "sourceAirborneExcluded": [
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ],
+      "scale": 0.4621212121212121,
+      "translation": [
+        -38.17424242424241,
+        -140.9318181818182
+      ],
+      "poses": [
+        {
+          "body": [
+            39,
+            85,
+            161,
+            171
+          ],
+          "compression": 0.0,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            161,
+            171
+          ],
+          "compression": 0.125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            161,
+            171
+          ],
+          "compression": 0.1875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.25,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.3125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            89,
+            162,
+            171
+          ],
+          "compression": 0.375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            90,
+            162,
+            171
+          ],
+          "compression": 0.4375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            90,
+            162,
+            171
+          ],
+          "compression": 0.5,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            91,
+            163,
+            171
+          ],
+          "compression": 0.5625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            91,
+            163,
+            171
+          ],
+          "compression": 0.625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            92,
+            163,
+            171
+          ],
+          "compression": 0.6875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.75,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.8125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            94,
+            163,
+            171
+          ],
+          "compression": 0.875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            94,
+            164,
+            171
+          ],
+          "compression": 0.9375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            95,
+            164,
+            171
+          ],
+          "compression": 1.0,
+          "registrationShiftY": 0
+        }
+      ]
+    },
+    "leftdown": {
+      "sourceKeyframes": [
+        17,
+        21
+      ],
+      "sourceAirborneExcluded": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "scale": 0.4357142857142857,
+      "translation": [
+        -31.150000000000006,
+        -123.54285714285714
+      ],
+      "poses": [
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            161,
+            171
+          ],
+          "compression": 0.125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            161,
+            171
+          ],
+          "compression": 0.1875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.25,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.3125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            89,
+            162,
+            171
+          ],
+          "compression": 0.375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            89,
+            162,
+            171
+          ],
+          "compression": 0.4375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            90,
+            162,
+            171
+          ],
+          "compression": 0.5,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            90,
+            162,
+            171
+          ],
+          "compression": 0.5625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            91,
+            163,
+            171
+          ],
+          "compression": 0.625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            91,
+            163,
+            171
+          ],
+          "compression": 0.6875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            92,
+            163,
+            171
+          ],
+          "compression": 0.75,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.8125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            94,
+            163,
+            171
+          ],
+          "compression": 0.9375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            94,
+            164,
+            171
+          ],
+          "compression": 1.0,
+          "registrationShiftY": 0
+        }
+      ]
+    },
+    "down": {
+      "sourceKeyframes": [
+        1,
+        5
+      ],
+      "sourceAirborneExcluded": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "scale": 0.4552238805970149,
+      "translation": [
+        -35.656716417910445,
+        -137.64179104477608
+      ],
+      "poses": [
+        {
+          "body": [
+            39,
+            85,
+            161,
+            171
+          ],
+          "compression": 0.0,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            162,
+            171
+          ],
+          "compression": 0.125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            87,
+            162,
+            171
+          ],
+          "compression": 0.1875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.25,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.3125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            89,
+            162,
+            171
+          ],
+          "compression": 0.375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            90,
+            162,
+            171
+          ],
+          "compression": 0.4375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            90,
+            163,
+            171
+          ],
+          "compression": 0.5,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            91,
+            163,
+            171
+          ],
+          "compression": 0.5625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            92,
+            163,
+            171
+          ],
+          "compression": 0.625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            36,
+            92,
+            163,
+            171
+          ],
+          "compression": 0.6875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.75,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            93,
+            163,
+            171
+          ],
+          "compression": 0.8125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            35,
+            94,
+            164,
+            171
+          ],
+          "compression": 0.875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            95,
+            164,
+            171
+          ],
+          "compression": 0.9375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            95,
+            164,
+            171
+          ],
+          "compression": 1.0,
+          "registrationShiftY": 0
+        }
+      ]
+    },
+    "rightdown": {
+      "sourceKeyframes": [
+        49,
+        53
+      ],
+      "sourceAirborneExcluded": [
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64
+      ],
+      "scale": 0.4357142857142857,
+      "translation": [
+        -32.02142857142857,
+        -117.00714285714287
+      ],
+      "poses": [
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            86,
+            161,
+            171
+          ],
+          "compression": 0.0625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            87,
+            162,
+            171
+          ],
+          "compression": 0.125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            39,
+            87,
+            162,
+            171
+          ],
+          "compression": 0.1875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            88,
+            162,
+            171
+          ],
+          "compression": 0.25,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            88,
+            163,
+            171
+          ],
+          "compression": 0.3125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            89,
+            163,
+            171
+          ],
+          "compression": 0.375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            89,
+            163,
+            171
+          ],
+          "compression": 0.4375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            90,
+            164,
+            171
+          ],
+          "compression": 0.5,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            38,
+            90,
+            164,
+            171
+          ],
+          "compression": 0.5625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            91,
+            164,
+            171
+          ],
+          "compression": 0.625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            92,
+            165,
+            171
+          ],
+          "compression": 0.6875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            92,
+            165,
+            171
+          ],
+          "compression": 0.75,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            93,
+            166,
+            171
+          ],
+          "compression": 0.8125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            93,
+            166,
+            171
+          ],
+          "compression": 0.875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            94,
+            166,
+            171
+          ],
+          "compression": 0.9375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            37,
+            94,
+            167,
+            171
+          ],
+          "compression": 1.0,
+          "registrationShiftY": 0
+        }
+      ]
+    },
+    "right": {
+      "sourceKeyframes": [
+        65,
+        69
+      ],
+      "sourceAirborneExcluded": [
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "scale": 0.4621212121212121,
+      "translation": [
+        -43.98484848484847,
+        -135.38636363636363
+      ],
+      "poses": [
+        {
+          "body": [
+            34,
+            85,
+            156,
+            171
+          ],
+          "compression": 0.0,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            86,
+            156,
+            171
+          ],
+          "compression": 0.0625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            87,
+            157,
+            171
+          ],
+          "compression": 0.125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            34,
+            87,
+            157,
+            171
+          ],
+          "compression": 0.1875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            88,
+            157,
+            171
+          ],
+          "compression": 0.25,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            89,
+            158,
+            171
+          ],
+          "compression": 0.3125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            89,
+            158,
+            171
+          ],
+          "compression": 0.375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            90,
+            158,
+            171
+          ],
+          "compression": 0.4375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            90,
+            159,
+            171
+          ],
+          "compression": 0.5,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            33,
+            91,
+            159,
+            171
+          ],
+          "compression": 0.5625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            91,
+            159,
+            171
+          ],
+          "compression": 0.625,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            92,
+            160,
+            171
+          ],
+          "compression": 0.6875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            93,
+            160,
+            171
+          ],
+          "compression": 0.75,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            93,
+            160,
+            171
+          ],
+          "compression": 0.8125,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            94,
+            161,
+            171
+          ],
+          "compression": 0.875,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            32,
+            94,
+            161,
+            171
+          ],
+          "compression": 0.9375,
+          "registrationShiftY": 0
+        },
+        {
+          "body": [
+            31,
+            95,
+            161,
+            171
+          ],
+          "compression": 1.0,
+          "registrationShiftY": 0
+        }
+      ]
+    }
+  }
+}

@@ -2876,14 +2876,15 @@
         "label": "真实拖动与松手"
       }
     ],
-    "sharedBody": true,
     "directionalViews": true,
-    "comparison": {
-      "framesCompared": 102,
-      "bodyPixelDifferences": 0,
-      "samePhase": true,
-      "sameTransform": true,
-      "onlyAddedFoliage": true
+    "grounded": {
+      "footMotionCss": 0,
+      "compressionRange": [
+        0,
+        0.9375
+      ],
+      "originalMiddle": true,
+      "airborne": false
     },
     "errors": []
   },
@@ -2909,18 +2910,19 @@
         "label": "真实拖动与松手"
       }
     ],
-    "sharedBody": true,
     "directionalViews": true,
-    "comparison": {
-      "framesCompared": 102,
-      "bodyPixelDifferences": 0,
-      "samePhase": true,
-      "sameTransform": true,
-      "onlyAddedFoliage": true
+    "grounded": {
+      "footMotionCss": 0,
+      "compressionRange": [
+        0,
+        0.9375
+      ],
+      "originalMiddle": true,
+      "airborne": false
     },
     "errors": []
   },
-  "middle-elastic": {
+  "middle-nojump": {
     "frames": 154,
     "fps": 24,
     "duration": 6416.666666666667,
@@ -2936,45 +2938,16 @@
         "label": "真实拖动与松手"
       }
     ],
-    "sharedBody": true,
     "directionalViews": true,
-    "errors": []
-  },
-  "drag-shared-body": {
-    "frames": 102,
-    "fps": 24,
-    "duration": 4250,
-    "dimensions": [
-      640,
-      300
-    ],
-    "cells": [
-      {
-        "form": "junior",
-        "stage": 1,
-        "action": "drag",
-        "label": "真实拖动与松手"
-      },
-      {
-        "form": "middle",
-        "stage": 2,
-        "action": "drag",
-        "label": "真实拖动与松手"
-      }
-    ],
-    "sharedBody": true,
-    "directionalViews": true,
-    "comparison": {
-      "framesCompared": 102,
-      "bodyPixelDifferences": 0,
-      "samePhase": true,
-      "sameTransform": true,
-      "onlyAddedFoliage": true
+    "grounded": {
+      "footMotionCss": 0,
+      "compressionRange": [
+        0,
+        0.9375
+      ],
+      "originalMiddle": true,
+      "airborne": false
     },
-    "errors": [],
-    "sourceFrames": [
-      18,
-      119
-    ]
+    "errors": []
   }
 }

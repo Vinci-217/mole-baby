@@ -20,14 +20,15 @@
       "label": "真实拖动与松手"
     }
   ],
-  "sharedBody": true,
   "directionalViews": true,
-  "comparison": {
-    "framesCompared": 102,
-    "bodyPixelDifferences": 0,
-    "samePhase": true,
-    "sameTransform": true,
-    "onlyAddedFoliage": true
+  "grounded": {
+    "footMotionCss": 0,
+    "compressionRange": [
+      0,
+      0.9375
+    ],
+    "originalMiddle": true,
+    "airborne": false
   },
   "errors": []
 }

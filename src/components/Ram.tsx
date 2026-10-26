@@ -333,7 +333,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       // inline data only; do not measure layout or move the eyes independently.
       if(grounded&&form==='middle'&&!media.matches)grounded.leafAngle+=Number(canvas.closest<HTMLElement>('.ram-sprite')?.style.getPropertyValue('--pull-leaf')||0)
       const root=canvas.closest<HTMLElement>('.ram-sprite');
-      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches):null;
+      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches,Number(root?.style.getPropertyValue('--drag-compression')||0)):null;
       const gentle=Boolean(itemMotion),affection=action==='pet'&&(media.matches||elapsed>=180&&elapsed<2200);
       const sheet=drag?'drag':affection?'affection':gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=drag?drag.frame:affection?affectionFrame(elapsed,media.matches):gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=drag?drag.row:affection||gentle||grounded?0:pose.row
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
@@ -356,10 +356,10 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       }
       paintWear(canvas,drag?sheets.classic:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,drag?drag.wearFrame:frame,drag?drag.wearRow:row)
       if(drag){
-        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);
+        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);canvas.dataset.dragCompression=String('compression' in drag?drag.compression:0);if(root)root.dataset.groundedDrag='true';
         const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear');
         if(wear?.dataset.loaded==='true'&&wear.style.visibility==='visible'){const [ox0,oy0,ox1,oy1]=drag.wearBody,[nx0,ny0,nx1,ny1]=drag.body,sx=(nx1-nx0)/(ox1-ox0),sy=(ny1-ny0)/(oy1-oy0);wear.style.left=`${(nx0+(parseFloat(wear.style.left)*192/100-ox0)*sx)/192*100}%`;wear.style.top=`${(ny0+(parseFloat(wear.style.top)*208/100-oy0)*sy)/208*100}%`;wear.style.width=`${parseFloat(wear.style.width)*sx}%`;wear.style.height=`${parseFloat(wear.style.height)*sy}%`;wear.dataset.registration='drag-source'}
-      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase}
+      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase;delete canvas.dataset.dragCompression;if(root)delete root.dataset.groundedDrag}
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
@@ -373,7 +373,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
-    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume);sprite?.removeEventListener('ram-drag-motion',syncDrag) }
+    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume);sprite?.removeEventListener('ram-drag-motion',syncDrag);if(sprite)delete sprite.dataset.groundedDrag }
   }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }

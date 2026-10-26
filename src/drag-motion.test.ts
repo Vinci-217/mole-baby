@@ -6,7 +6,7 @@ describe('elastic visual dragging with an unchanged native grab point',()=>{
   const strains=[]
   for(const stage of [0,1,2,3,4]as Stage[]){const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},stage)
    for(let i=1;i<=18;i++){pullElasticDrag(s,{x:i*10,y:i*2,at:1000+i*16},stage);stepElasticDrag(s,16)}
-   expect(s.x).toBeLessThan(-1);expect(s.y).toBeLessThan(0);expect(s.stretch).toBeGreaterThan(0);strains.push(s.stretch)
+   expect(s.x).toBeLessThan(-1);if(stage===2)expect(s.y).toBe(0);else expect(s.y).toBeLessThan(0);expect(s.stretch).toBeGreaterThan(0);strains.push(s.stretch)
    const before=s.x;releaseElasticDrag(s);stepElasticDrag(s,16);expect(Math.abs(s.x-before)).toBeLessThan(2)
    for(let i=0;i<180;i++)stepElasticDrag(s,16)
    expect(Math.abs(s.x)).toBeLessThan(.001);expect(Math.abs(s.angle)).toBeLessThan(.001);expect(Math.abs(s.stretch)).toBeLessThan(.001)
@@ -41,16 +41,12 @@ describe('elastic visual dragging with an unchanged native grab point',()=>{
   for(let i=9;i<=36;i++){pullElasticDrag(s,{x:180-i*8,y:0,at:1400+i*16},2);stepElasticDrag(s,16)}
   expect(s.fringe).toBeGreaterThan(1);expect(s.x).toBeGreaterThan(1)
  })
- it('uses one complete drag response for junior and middle, through dragging, turns and release',()=>{
-  const junior=createElasticDrag(),middle=createElasticDrag()
-  for(let i=0;i<90;i++){
-   const point={x:Math.sin(i/8)*65,y:Math.cos(i/11)*18,at:1000+i*24}
-   expect(pullElasticDrag(junior,point,1)).toBe(pullElasticDrag(middle,point,2))
-   stepElasticDrag(junior,24);stepElasticDrag(middle,24)
-   expect({...middle,stage:1}).toEqual(junior)
-  }
-  releaseElasticDrag(junior);releaseElasticDrag(middle)
-  for(let i=0;i<180;i++){stepElasticDrag(junior,16);stepElasticDrag(middle,16);expect({...middle,stage:1}).toEqual(junior)}
+ it('plays original grounded compression smoothly without vertical movement or a frozen pose',()=>{
+  const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},2);const poses:number[]=[]
+  for(let i=1;i<=75;i++){pullElasticDrag(s,{x:i*3,y:i,at:1000+i*32},2);stepElasticDrag(s,32);poses.push(s.compression);expect(s.y).toBe(0)}
+  expect(Math.max(...poses)).toBeGreaterThan(.6);expect(Math.min(...poses)).toBeGreaterThanOrEqual(0);expect(Math.max(...poses)).toBeLessThanOrEqual(1)
+  const before=s.compression;releaseElasticDrag(s);stepElasticDrag(s,16);expect(Math.abs(s.compression-before)).toBeLessThan(.2)
+  for(let i=0;i<150;i++)stepElasticDrag(s,16);expect(s.compression).toBeLessThan(.001);expect(s.y).toBe(0)
  })
  it('rejects duplicate timestamps and bounds extreme deltas, stalls and reduced motion',()=>{
   const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:10},2);pullElasticDrag(s,{x:100000,y:-100000,at:10},2);expect(s.targetX).toBe(0)
