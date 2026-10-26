@@ -1,5 +1,6 @@
 /** Inventory-driven, always-visible README GIFs. No publishing side effects. */
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{spawn,execFileSync}=require('node:child_process'),{chromium}=require('@playwright/test');
+const releaseMode=process.argv.includes('--release'),releaseVersion=require('../package.json').version;
 const root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5241';let browser;
 const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5241','--strictPort'],{cwd:root,stdio:'ignore',env:{...process.env,MOLE_REVIEW_FREEZE:'1'}});
 (async()=>{
@@ -43,6 +44,7 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  const reportFile=path.join(root,'dist/asset-size-report.json'),report=fs.existsSync(reportFile)?JSON.parse(fs.readFileSync(reportFile,'utf8')):null;
  const imageSize=report?`${report.count}张图片 ${(report.before/1e6).toFixed(2)} MB → ${(report.after/1e6).toFixed(2)} MB`:'图片在构建时转换为无损WebP';
  section+='## 体积精简（本地预览构建）\n\n'+imageSize+'，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。\n\n[此前测量明细与验证范围](research/v32-animation-and-size.md)\n\n';
- const readmeFile=path.join(root,'README.md'),old=fs.readFileSync(readmeFile,'utf8'),start=old.indexOf('## 本轮'),end=old.indexOf('\n---\n\n一只住在',start);assert.ok(start>=0&&end>start);fs.writeFileSync(readmeFile,old.slice(0,start)+section+old.slice(end));
+ if(releaseMode)section=section.replace('## 本轮重点预览（未发布）',`## 本轮更新 · v${releaseVersion}`).replace('均未发布到正式版。','来源与自制适配分别标注。');
+ const readmeFile=path.join(root,'README.md'),old=fs.readFileSync(readmeFile,'utf8'),start=old.indexOf('## 本轮'),end=old.indexOf('\n---\n\n一只住在',start);assert.ok(start>=0&&end>start);let intro=old.slice(0,start);if(releaseMode)intro=intro.replace(/^>.*$/m,`> **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。v${releaseVersion} 的动画与玩法见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。`);fs.writeFileSync(readmeFile,intro+section+old.slice(end));
  fs.writeFileSync(path.join(dir,'checks.json'),JSON.stringify(checks,null,2)+'\n');fs.writeFileSync(path.join(dir,'catalogue-coverage.json'),JSON.stringify({actions:coverage.actions,items:coverage.items,outfits:coverage.outfits,missing:[]},null,2)+'\n');console.log(`PASS README: ${coverage.actions.length} action names, ${coverage.items.length} items, ${coverage.outfits.length} outfits, ${Object.keys(groups).length} gallery GIFs + ${Object.keys(checks).length-Object.keys(groups).length} actual drag GIFs; all existing tracked GIFs included, no collapsed galleries`);
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

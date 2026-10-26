@@ -1,6 +1,6 @@
 # 动画 skill 的迭代记录
 
-## v38 · 2026-10-26 · 预览，等待审阅
+## v38 · 2026-10-26 · 用户确认进入v0.29.2发布
 
 本轮参考实际查看了原`ramu-home.png`、`reference-pet-panel.png`、`180017.png`和`middle-red-idle.png`，以及原初级五方向身体序列。
 
