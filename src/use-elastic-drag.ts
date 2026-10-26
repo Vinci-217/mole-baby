@@ -1,6 +1,6 @@
 import {useEffect,useRef,type RefObject} from 'react'
 import type {Stage} from './game'
-import {createElasticDrag,pullElasticDrag,releaseElasticDrag,stepElasticDrag,type DragPoint} from './drag-motion'
+import {createElasticDrag,pullElasticDrag,releaseElasticDrag,stepElasticDrag,elasticDragEnergy,type DragPoint} from './drag-motion'
 export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,native:boolean,onReaction:(reaction:'turn'|'dizzy')=>void){
  const state=useRef(createElasticDrag()),latest=useRef({stage,onReaction});latest.current={stage,onReaction}
  const grip=useRef({x:50,y:40}),wake=useRef<()=>void>(()=>{})
@@ -13,11 +13,12 @@ export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,nati
    raf=0
    stepElasticDrag(state.current,now-previous,media.matches);previous=now
    const sprite=root.current?.querySelector<HTMLElement>('.ram-sprite'),s=state.current
-   if(sprite){sprite.style.setProperty('--pull-x',`${s.x.toFixed(3)}%`);sprite.style.setProperty('--pull-y',`${s.y.toFixed(3)}%`);sprite.style.setProperty('--pull-angle',`${s.angle.toFixed(3)}deg`);sprite.style.setProperty('--pull-sx',String(1+s.stretch));sprite.style.setProperty('--pull-sy',String(1-s.stretch*.48));sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`)}
+   const moving=elasticDragEnergy(s)>.002
+   if(sprite){sprite.style.setProperty('--pull-x',`${s.x.toFixed(3)}%`);sprite.style.setProperty('--pull-y',`${s.y.toFixed(3)}%`);sprite.style.setProperty('--pull-angle',`${s.angle.toFixed(3)}deg`);sprite.style.setProperty('--pull-sx',String(1+s.stretch));sprite.style.setProperty('--pull-sy',String(1/(1+s.stretch)));sprite.style.setProperty('--pull-skew',`${s.skew.toFixed(3)}deg`);sprite.style.setProperty('--pull-leaf',s.fringe.toFixed(3));sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`);sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'}
    // A moving native window changes local pointer coordinates. Read the real
    // desktop cursor instead, without touching the window's drag geometry.
    if(native&&s.held&&!polling&&now-lastPoll>=32){polling=true;lastPoll=now;void window.desktop?.getState().then(d=>{if(!stopped&&state.current.held&&d.dragPoint)sample(d.dragPoint)}).catch(()=>{}).finally(()=>{polling=false})}
-   if(s.held||Math.abs(s.x)+Math.abs(s.y)+Math.abs(s.angle)+Math.abs(s.stretch)+Math.abs(s.vx)+Math.abs(s.vy)+Math.abs(s.va)+Math.abs(s.vs)>.002)raf=requestAnimationFrame(paint)
+   if(s.held||moving)raf=requestAnimationFrame(paint)
   };wake.current=()=>{if(!stopped&&!raf){previous=performance.now();raf=requestAnimationFrame(paint)}};wake.current()
   return()=>{stopped=true;cancelAnimationFrame(raf);releaseElasticDrag(state.current);wake.current=()=>{}}
  },[root,native])

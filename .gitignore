@@ -153,3 +153,6 @@ __pycache__/
 !artifacts/v28-edge-right.png
 !artifacts/v28-edge-top.png
 !artifacts/v28-edge-bottom.png
+
+!artifacts/v29-bouncy-pull.gif
+!artifacts/v29-bouncy-pull.webm
