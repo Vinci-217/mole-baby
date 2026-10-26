@@ -6,7 +6,9 @@ async function verifyCompactCare(page,desktop){
  const nativeBounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
  const screenPet=async()=>{const r=await character.boundingBox();if(!desktop)return r;const b=await nativeBounds();return{...r,x:r.x+b.x,y:r.y+b.y}};
  await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:180,coins:500,sleeping:false,wardrobe:['wizard-cap'],wearing:'wizard-cap',lastTick:Date.now(),stats:{hunger:20,thirst:20,cleanliness:20,happiness:85,health:100,energy:90}});p.inventory.biscuit=5;p.inventory.juice=5;p.inventory['180003']=1;p.inventory['180024']=1;delete p.evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:true,soundVolume:.45,lively:false,presence:false}));localStorage.setItem('ramu-companion-memory-v1:'+p.createdAt,JSON.stringify({version:1,petId:String(p.createdAt),events:[{kind:'feed',detail:'你用可可果照料了我。',at:Date.now()}],messages:[{role:'user',content:'retired private conversation',at:Date.now()}],facts:[]}))});
- await page.reload();await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true');
+ // Cold packaged image decoding competes with CI's first window/compositor.
+ // Wait for actual painted pixels; page's action timeout does not apply to expect.
+ await page.reload();await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:15000});
  if(desktop){await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);await window.desktop.movePet(-500,-180)});}
  const base=await screenPet();await openActions(page);const tools=page.getByTestId('pet-actions');await expect(tools.getByRole('button')).toHaveCount(4);await expect(tools.getByRole('button',{name:'对话',exact:true})).toHaveCount(0);
  await tools.getByRole('button',{name:'喂食',exact:true}).click();const panel=page.getByTestId('companion-panel'),pocket=panel.locator('.care-pocket');await expect(panel).toBeVisible();

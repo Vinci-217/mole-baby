@@ -2,7 +2,17 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.29.0](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.0) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载 v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+
+## 直接下载与安装
+
+| 你的电脑 | 推荐安装包 |
+| --- | --- |
+| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-Setup.exe) |
+| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-arm64.dmg) |
+| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-x64.dmg) |
+
+无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)放在发布页最上方。
 
 ## 小小的桌面陪伴
 
@@ -28,7 +38,7 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 吃东西的吧唧、喝水的咕嘟、洗净提示、灵光和玩球蹦跳为本机合成短音效，不是背景音乐或官方录音。小屋设置有独立的「互动音效」开关、音量和五种试听；BGM仍单独控制。参见 [音效试听](artifacts/v25-interaction-sounds.wav)。
 
-**已移除自由对话、语音输入、朗读及API配置和联网服务。** 升级会删除旧API凭据和聊天记录；保留宠物成长、用品、装扮及真实照料回忆。拉姆仍会偶尔出现简短的生活提示和状态气泡，可以关闭主动陪伴，不会打开麦克风或调用对话API。
+**已移除自由对话、语音输入、朗读及API配置和对话联网服务。** 升级会删除旧API凭据和聊天记录；保留宠物成长、用品、装扮及真实照料回忆。拉姆仍会偶尔出现简短的生活提示和状态气泡，可以关闭主动陪伴，不会打开麦克风或调用对话API。
 
 四种颜色、五个成长阶段和四种最高形态保留；9件装扮使用原服饰素材并按阶段适配。小屋里的商店用摩尔豆购买用品，小游戏奖励和慢成长规则继续保留。角色与服饰来源见 [ASSETS.md](ASSETS.md) 和 [装扮说明](docs/WARDROBE.md)。
 
@@ -42,11 +52,11 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 Windows安装版启动后自动检查GitHub正式版，后台下载并校验；桌宠空闲时保存后更新、重启，正在游戏或专注时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
 
-首次需要手动安装v0.29.0一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
+首次需要手动安装v0.29.1一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
 
 ## 安装
 
-Windows运行 `mole-baby-0.29.0-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.29.1-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 
