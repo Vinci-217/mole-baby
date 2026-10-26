@@ -1,0 +1,48 @@
+{
+  "version": "0.29.2",
+  "tag": "main",
+  "sourceSha": "def2b519c707a401d706e4b82c314387a98de0f9",
+  "buildResult": "failure",
+  "platforms": {
+    "windows": "success",
+    "mac": "abandoned"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40339415750",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.29.2-mac-x64.dmg",
+      "sha256": "8604a18512947a476cdd740d0003809488d1b739e941ca145d33dac2f2ef4885"
+    },
+    {
+      "file": "mole-baby-0.29.2-mac-x64.zip",
+      "sha256": "09d9cbb9d2e5d632832127a1c5acfb5e875b13e6317d14474958597369e36a00"
+    },
+    {
+      "file": "mole-baby-0.29.2-x64.zip",
+      "sha256": "85f46de785d9254d115be187c95e693f057ef59ce0c76684db0ac0eeafe7a307"
+    },
+    {
+      "file": "mole-baby-0.29.2-Setup.exe",
+      "sha256": "7bcc1ebc4f1a7633f261cbf65df61c3a094757280acb018be8aea554e70c0c23"
+    }
+  ],
+  "verificationLog": "PASS: complete original pet/outfit payload; retired AI and speech backends absent\nPASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue\nPASS physical edge left\nPASS physical edge right\nPASS physical edge top\nPASS physical edge bottom\nPASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through\nPASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works\nPASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards\nPASS: real dizziness uses orbiting original pupils and recovers; calibrated 30 percent body exposure across eight forms and all four edges\nPASS: packaged updater settings/IPC, persisted toggle and renderer save checkpoint; disabled test contexts never contact live releases\nPASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles\nPASS: packaged win32/x64 compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services\nInstaller target confirmed in directory page: D:\\a\\_temp\\mole-finish-982e6ebdec9746c28c868d03cb2a1af6\\mole-baby\r\nInstaller page: &Install\r\nPASS: Windows installer real Finish click hides wizard in 33ms and launches installed application in 1189ms\r\nPASS: SHA256SUMS.txt generated for checked downloads\nPASS: packaged real NSIS updater fixture 1.0.0\nPASS: packaged real NSIS updater fixture 1.0.1\nPASS: real Windows 1.0.0 → 1.0.1 update checked, downloaded, silently installed and relaunched; pre-install checkpoint and companion data preserved\n",
+  "macTrust": {
+    "arm64": null,
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "def2b519c707a401d706e4b82c314387a98de0f9",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "macVerificationLogs": {
+    "arm64": null,
+    "x64": "Mac distribution mode: local\n::warning::No Apple signing credentials configured. This is a local-signature build; Gatekeeper may require Open Anyway. It is NOT Apple notarized.\n  • electron-builder  version=26.15.3 os=24.6.0\n  • loaded configuration  file=/Users/runner/work/mole-baby/mole-baby/electron-builder.mac.cjs\n  • executing @electron/rebuild  electronVersion=35.7.5 arch=x64 buildFromSource=false workspaceRoot=/Users/runner/work/mole-baby/mole-baby projectDir=./ appDir=./\n  • installing native dependencies  arch=x64\n  • completed installing native dependencies\n  • packaging       platform=darwin arch=x64 electron=35.7.5 appOutDir=release/mac\n  • downloaded      label=electron progress=100%\n  • downloaded electron zip extracted successfully  output=/Users/runner/work/mole-baby/mole-baby/release/mac\n  • searching for node modules  pm=npm searchDir=/Users/runner/work/mole-baby/mole-baby\n  • ad-hoc signing with hardenedRuntime enabled requires the com.apple.security.cs.disable-library-validation entitlement to prevent app launch failures due to library validation. See https://electron.build/code-signing for details.\n  • signing         file=release/mac/拉姆.app platform=darwin type=distribution identityName=- identityHash=none provisioningProfile=none\n  • skipped macOS notarization  reason=`notarize` options were set explicitly `false`\n  • building        target=macOS zip arch=x64 file=release/mole-baby-0.29.2-mac-x64.zip\n  • building        target=DMG arch=x64 file=release/mole-baby-0.29.2-mac-x64.dmg\n  • downloaded      label=dmgbuild-bundle-x86_64-75c8a6c.tar.gz progress=100%\n  • building block map  blockMapFile=release/mole-baby-0.29.2-mac-x64.dmg.blockmap\n  • building block map  blockMapFile=release/mole-baby-0.29.2-mac-x64.zip.blockmap\nMac DMG is locally signed; Apple notarization was not performed.\nPASS: macOS x64 DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=local\nPASS: complete original pet/outfit payload; retired AI and speech backends absent\nPASS: macOS menu-bar icon uses native template tint and 18pt/Retina representations\nPASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue\nPASS physical edge left\nPASS physical edge right\nPASS physical edge top\nPASS physical edge bottom\nPASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through\nPASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works\nPASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards\nPASS: real dizziness uses orbiting original pupils and recovers; calibrated 30 percent body exposure across eight forms and all four edges\nPASS: packaged updater settings/IPC, persisted toggle and renderer save checkpoint; disabled test contexts never contact live releases\nPASS: packaged darwin/x64 compact desktop, native cursor and four-edge interaction, tray lifecycle and no conversation services\nPASS: SHA256SUMS-mac-x64.txt generated for checked downloads\n"
+  },
+  "recordedAt": "2026-10-26T14:42:07.174Z"
+}
