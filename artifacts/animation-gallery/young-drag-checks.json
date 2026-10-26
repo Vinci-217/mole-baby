@@ -21,14 +21,12 @@
     }
   ],
   "directionalViews": true,
-  "grounded": {
-    "footMotionCss": 0,
-    "compressionRange": [
-      0,
-      0.9375
-    ],
-    "originalMiddle": true,
-    "airborne": false
+  "binding": {
+    "framesCompared": 102,
+    "bodyPixelDifferences": 0,
+    "samePhase": true,
+    "sameElasticMotion": true,
+    "sameBodyScale": true
   },
   "errors": []
 }

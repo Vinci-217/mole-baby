@@ -1,986 +1,2279 @@
 {
-  "method": "Original middle grounded poses 1 and 5: body and foliage plate inbetweening with original vector eyes, pupils and highlight interpolated using their authored placement matrices; airborne frames excluded. One uniform scale/translation registers each view.",
-  "framesPerView": 17,
+  "method": "Unchanged original junior body frames; original middle leaf texture authored into a root-pinned 17-pose bend sequence, retimed by junior deformation and bound to forehead landmarks and actual stem contacts. Fixed crown scale and cyclic follow-through; no body edits.",
   "cell": [
+    320,
+    272
+  ],
+  "origin": [
+    -64,
+    -56
+  ],
+  "bodyCell": [
     192,
     208
   ],
+  "bodyFrom": "junior",
   "sourceSHA256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
   "forms": {
-    "left": {
-      "sourceKeyframes": [
-        33,
-        37
-      ],
-      "sourceAirborneExcluded": [
-        39,
-        40,
-        41,
-        42,
-        43,
-        44,
-        45,
-        46,
-        47,
-        48
-      ],
-      "scale": 0.4621212121212121,
-      "translation": [
-        -38.17424242424241,
-        -140.9318181818182
-      ],
-      "poses": [
-        {
-          "body": [
-            39,
-            85,
-            161,
-            171
-          ],
-          "compression": 0.0,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            161,
-            171
-          ],
-          "compression": 0.125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            161,
-            171
-          ],
-          "compression": 0.1875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.25,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.3125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            89,
-            162,
-            171
-          ],
-          "compression": 0.375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            90,
-            162,
-            171
-          ],
-          "compression": 0.4375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            90,
-            162,
-            171
-          ],
-          "compression": 0.5,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            91,
-            163,
-            171
-          ],
-          "compression": 0.5625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            91,
-            163,
-            171
-          ],
-          "compression": 0.625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            92,
-            163,
-            171
-          ],
-          "compression": 0.6875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.75,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.8125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            94,
-            163,
-            171
-          ],
-          "compression": 0.875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            94,
-            164,
-            171
-          ],
-          "compression": 0.9375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            95,
-            164,
-            171
-          ],
-          "compression": 1.0,
-          "registrationShiftY": 0
-        }
-      ]
-    },
-    "leftdown": {
-      "sourceKeyframes": [
-        17,
-        21
-      ],
-      "sourceAirborneExcluded": [
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32
-      ],
-      "scale": 0.4357142857142857,
-      "translation": [
-        -31.150000000000006,
-        -123.54285714285714
-      ],
-      "poses": [
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            161,
-            171
-          ],
-          "compression": 0.125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            161,
-            171
-          ],
-          "compression": 0.1875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.25,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.3125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            89,
-            162,
-            171
-          ],
-          "compression": 0.375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            89,
-            162,
-            171
-          ],
-          "compression": 0.4375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            90,
-            162,
-            171
-          ],
-          "compression": 0.5,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            90,
-            162,
-            171
-          ],
-          "compression": 0.5625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            91,
-            163,
-            171
-          ],
-          "compression": 0.625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            91,
-            163,
-            171
-          ],
-          "compression": 0.6875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            92,
-            163,
-            171
-          ],
-          "compression": 0.75,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.8125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            94,
-            163,
-            171
-          ],
-          "compression": 0.9375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            94,
-            164,
-            171
-          ],
-          "compression": 1.0,
-          "registrationShiftY": 0
-        }
-      ]
-    },
-    "down": {
-      "sourceKeyframes": [
-        1,
-        5
-      ],
-      "sourceAirborneExcluded": [
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16
-      ],
-      "scale": 0.4552238805970149,
-      "translation": [
-        -35.656716417910445,
-        -137.64179104477608
-      ],
-      "poses": [
-        {
-          "body": [
-            39,
-            85,
-            161,
-            171
-          ],
-          "compression": 0.0,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            162,
-            171
-          ],
-          "compression": 0.125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            87,
-            162,
-            171
-          ],
-          "compression": 0.1875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.25,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.3125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            89,
-            162,
-            171
-          ],
-          "compression": 0.375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            90,
-            162,
-            171
-          ],
-          "compression": 0.4375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            90,
-            163,
-            171
-          ],
-          "compression": 0.5,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            91,
-            163,
-            171
-          ],
-          "compression": 0.5625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            92,
-            163,
-            171
-          ],
-          "compression": 0.625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            36,
-            92,
-            163,
-            171
-          ],
-          "compression": 0.6875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.75,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            93,
-            163,
-            171
-          ],
-          "compression": 0.8125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            35,
-            94,
-            164,
-            171
-          ],
-          "compression": 0.875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            95,
-            164,
-            171
-          ],
-          "compression": 0.9375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            95,
-            164,
-            171
-          ],
-          "compression": 1.0,
-          "registrationShiftY": 0
-        }
-      ]
-    },
-    "rightdown": {
-      "sourceKeyframes": [
-        49,
-        53
-      ],
-      "sourceAirborneExcluded": [
-        55,
-        56,
-        57,
-        58,
-        59,
-        60,
-        61,
-        62,
-        63,
-        64
-      ],
-      "scale": 0.4357142857142857,
-      "translation": [
-        -32.02142857142857,
-        -117.00714285714287
-      ],
-      "poses": [
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            86,
-            161,
-            171
-          ],
-          "compression": 0.0625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            87,
-            162,
-            171
-          ],
-          "compression": 0.125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            39,
-            87,
-            162,
-            171
-          ],
-          "compression": 0.1875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            88,
-            162,
-            171
-          ],
-          "compression": 0.25,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            88,
-            163,
-            171
-          ],
-          "compression": 0.3125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            89,
-            163,
-            171
-          ],
-          "compression": 0.375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            89,
-            163,
-            171
-          ],
-          "compression": 0.4375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            90,
-            164,
-            171
-          ],
-          "compression": 0.5,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            38,
-            90,
-            164,
-            171
-          ],
-          "compression": 0.5625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            91,
-            164,
-            171
-          ],
-          "compression": 0.625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            92,
-            165,
-            171
-          ],
-          "compression": 0.6875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            92,
-            165,
-            171
-          ],
-          "compression": 0.75,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            93,
-            166,
-            171
-          ],
-          "compression": 0.8125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            93,
-            166,
-            171
-          ],
-          "compression": 0.875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            94,
-            166,
-            171
-          ],
-          "compression": 0.9375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            37,
-            94,
-            167,
-            171
-          ],
-          "compression": 1.0,
-          "registrationShiftY": 0
-        }
-      ]
-    },
-    "right": {
-      "sourceKeyframes": [
-        65,
-        69
-      ],
-      "sourceAirborneExcluded": [
-        71,
-        72,
-        73,
-        74,
-        75,
-        76,
-        77,
-        78,
-        79,
-        80
-      ],
-      "scale": 0.4621212121212121,
-      "translation": [
-        -43.98484848484847,
-        -135.38636363636363
-      ],
-      "poses": [
-        {
-          "body": [
-            34,
-            85,
-            156,
-            171
-          ],
-          "compression": 0.0,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            86,
-            156,
-            171
-          ],
-          "compression": 0.0625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            87,
-            157,
-            171
-          ],
-          "compression": 0.125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            34,
-            87,
-            157,
-            171
-          ],
-          "compression": 0.1875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            88,
-            157,
-            171
-          ],
-          "compression": 0.25,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            89,
-            158,
-            171
-          ],
-          "compression": 0.3125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            89,
-            158,
-            171
-          ],
-          "compression": 0.375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            90,
-            158,
-            171
-          ],
-          "compression": 0.4375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            90,
-            159,
-            171
-          ],
-          "compression": 0.5,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            33,
-            91,
-            159,
-            171
-          ],
-          "compression": 0.5625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            91,
-            159,
-            171
-          ],
-          "compression": 0.625,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            92,
-            160,
-            171
-          ],
-          "compression": 0.6875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            93,
-            160,
-            171
-          ],
-          "compression": 0.75,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            93,
-            160,
-            171
-          ],
-          "compression": 0.8125,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            94,
-            161,
-            171
-          ],
-          "compression": 0.875,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            32,
-            94,
-            161,
-            171
-          ],
-          "compression": 0.9375,
-          "registrationShiftY": 0
-        },
-        {
-          "body": [
-            31,
-            95,
-            161,
-            171
-          ],
-          "compression": 1.0,
-          "registrationShiftY": 0
-        }
-      ]
-    }
+    "left": [
+      {
+        "view": "left",
+        "phase": 0,
+        "bodyIndex": 0,
+        "leafPhase": 0,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          95.5,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -75.66969696969696
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -186.9424242424242
+          ]
+        ],
+        "visibleFraction": 0.9900386559619387,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 1,
+        "bodyIndex": 1,
+        "leafPhase": 0,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          95.5,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -75.66969696969696
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -186.9424242424242
+          ]
+        ],
+        "visibleFraction": 0.9900386559619387,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 2,
+        "bodyIndex": 2,
+        "leafPhase": 6,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          91.28450368113734,
+          48.0
+        ],
+        "angle": -0.20308073069592467,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621183093178103,
+            0.0016379516558458962,
+            -80.71685271201163
+          ],
+          [
+            -0.0016379516558458962,
+            0.4621183093178103,
+            -186.33425116384942
+          ]
+        ],
+        "visibleFraction": 0.9909228441754917,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 3,
+        "bodyIndex": 3,
+        "leafPhase": 6,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          91.28450368113734,
+          48.0
+        ],
+        "angle": -0.2811887040405111,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46211564698867297,
+            0.0022679287066586884,
+            -81.03614691793238
+          ],
+          [
+            -0.0022679287066586884,
+            0.46211564698867297,
+            -186.09955413609495
+          ]
+        ],
+        "visibleFraction": 0.991061960309044,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 4,
+        "bodyIndex": 4,
+        "leafPhase": 11,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          90.37495692184459,
+          47.0
+        ],
+        "angle": -2.487377237613876,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46168580478245635,
+            0.020055731219626026,
+            -90.8297989216351
+          ],
+          [
+            -0.020055731219626026,
+            0.46168580478245635,
+            -180.29242030765133
+          ]
+        ],
+        "visibleFraction": 0.9901523311278658,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 5,
+        "bodyIndex": 5,
+        "leafPhase": 11,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          90.37495692184459,
+          47.0
+        ],
+        "angle": -3.3238946777044647,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46134379635018247,
+            0.02679395942334101,
+            -94.12883421708955
+          ],
+          [
+            -0.02679395942334101,
+            0.46134379635018247,
+            -177.62270349402726
+          ]
+        ],
+        "visibleFraction": 0.9904644724700092,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 6,
+        "bodyIndex": 6,
+        "leafPhase": 7,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          75.52860286028603,
+          49.0
+        ],
+        "angle": 8.801778836069479,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45667910233783904,
+            -0.0707121784439133,
+            -57.67526512476404
+          ],
+          [
+            0.0707121784439133,
+            0.45667910233783904,
+            -209.36744652418287
+          ]
+        ],
+        "visibleFraction": 0.9930186674760966,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 7,
+        "bodyIndex": 7,
+        "leafPhase": 7,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          75.52860286028603,
+          49.0
+        ],
+        "angle": 13.594194409073394,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4491748039941203,
+            -0.10861864549524589,
+            -35.62402516935312
+          ],
+          [
+            0.10861864549524589,
+            0.4491748039941203,
+            -219.5928166420498
+          ]
+        ],
+        "visibleFraction": 0.992255125284738,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 8,
+        "bodyIndex": 8,
+        "leafPhase": 10,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          69.55508742363597,
+          48.0
+        ],
+        "angle": 10.332822254137561,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45462673756779737,
+            -0.08288874580327173,
+            -56.69801780509283
+          ],
+          [
+            0.08288874580327173,
+            0.45462673756779737,
+            -213.83422482500004
+          ]
+        ],
+        "visibleFraction": 0.9906384284837324,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 9,
+        "bodyIndex": 9,
+        "leafPhase": 10,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          69.55508742363597,
+          48.0
+        ],
+        "angle": 8.341153644853947,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45723282350673433,
+            -0.06703849491477147,
+            -65.72157958858861
+          ],
+          [
+            0.06703849491477147,
+            0.45723282350673433,
+            -209.2882259872551
+          ]
+        ],
+        "visibleFraction": 0.9911151960784313,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 10,
+        "bodyIndex": 10,
+        "leafPhase": 3,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          87.17482042321879,
+          47.0
+        ],
+        "angle": 8.367515427843305,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4572019307061072,
+            -0.06724886059247587,
+            -47.98345398510858
+          ],
+          [
+            0.06724886059247587,
+            0.4572019307061072,
+            -210.35043953443795
+          ]
+        ],
+        "visibleFraction": 0.9900975243810953,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 11,
+        "bodyIndex": 11,
+        "leafPhase": 3,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          87.17482042321879,
+          47.0
+        ],
+        "angle": 8.684065130421306,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45682341601568505,
+            -0.06977378642540936,
+            -46.559579850312815
+          ],
+          [
+            0.06977378642540936,
+            0.45682341601568505,
+            -211.09323519434588
+          ]
+        ],
+        "visibleFraction": 0.990094552003602,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 12,
+        "bodyIndex": 12,
+        "leafPhase": 0,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          95.5,
+          48.0
+        ],
+        "angle": 3.083739754008377,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4614520501633711,
+            -0.02486000990345664,
+            -62.7830103455953
+          ],
+          [
+            0.02486000990345664,
+            0.4614520501633711,
+            -195.8103699712982
+          ]
+        ],
+        "visibleFraction": 0.9892984542211652,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 13,
+        "bodyIndex": 13,
+        "leafPhase": 0,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          95.5,
+          48.0
+        ],
+        "angle": 0.8810685011452506,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4620665745437083,
+            -0.00710601026047261,
+            -72.03676359456526
+          ],
+          [
+            0.00710601026047261,
+            0.4620665745437083,
+            -189.54671269850033
+          ]
+        ],
+        "visibleFraction": 0.9897626112759644,
+        "sourceLeafFrame": 33
+      },
+      {
+        "view": "left",
+        "phase": 14,
+        "bodyIndex": 14,
+        "leafPhase": 0,
+        "root": [
+          370.4,
+          508.4
+        ],
+        "targetRoot": [
+          95.5,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -75.66969696969696
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -186.9424242424242
+          ]
+        ],
+        "visibleFraction": 0.9900386559619387,
+        "sourceLeafFrame": 33
+      }
+    ],
+    "leftdown": [
+      {
+        "view": "leftdown",
+        "phase": 0,
+        "bodyIndex": 15,
+        "leafPhase": 0,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          95.0,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -8.139795918367355
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -169.62061224489796
+          ]
+        ],
+        "visibleFraction": 0.9786532454009025,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 1,
+        "bodyIndex": 16,
+        "leafPhase": 0,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          95.0,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -8.139795918367355
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -169.62061224489796
+          ]
+        ],
+        "visibleFraction": 0.9786532454009025,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 2,
+        "bodyIndex": 17,
+        "leafPhase": 11,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          101.89428872464711,
+          48.0
+        ],
+        "angle": 0.9294043961180066,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4356569630377159,
+            -0.007067484153817202,
+            2.297967345372882
+          ],
+          [
+            0.007067484153817202,
+            0.4356569630377159,
+            -171.26495648790535
+          ]
+        ],
+        "visibleFraction": 0.9853335718118404,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 3,
+        "bodyIndex": 18,
+        "leafPhase": 11,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          101.89428872464711,
+          48.0
+        ],
+        "angle": 1.286867625394163,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4356043911953364,
+            -0.009785353690618939,
+            3.667871204999898
+          ],
+          [
+            0.009785353690618939,
+            0.4356043911953364,
+            -171.88205765178438
+          ]
+        ],
+        "visibleFraction": 0.9858549686660698,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 4,
+        "bodyIndex": 19,
+        "leafPhase": 13,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          114.1498747096932,
+          48.0
+        ],
+        "angle": -1.1900637413995638,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.435620302266696,
+            0.009049366197838277,
+            6.512555430150698
+          ],
+          [
+            -0.009049366197838277,
+            0.435620302266696,
+            -167.43155728500065
+          ]
+        ],
+        "visibleFraction": 0.9834621607046558,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 5,
+        "bodyIndex": 20,
+        "leafPhase": 13,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          114.1498747096932,
+          48.0
+        ],
+        "angle": -2.1977239946704064,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4353937919458053,
+            0.016708821339729917,
+            2.7406040779556093
+          ],
+          [
+            -0.016708821339729917,
+            0.4353937919458053,
+            -165.50532263442744
+          ]
+        ],
+        "visibleFraction": 0.9823867721063982,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 6,
+        "bodyIndex": 21,
+        "leafPhase": 16,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          86.33570498851952,
+          49.0
+        ],
+        "angle": -13.023492177035232,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.42450673366308866,
+            0.09818845069663584,
+            -63.192026297954214
+          ],
+          [
+            -0.09818845069663584,
+            0.42450673366308866,
+            -139.78031134693785
+          ]
+        ],
+        "visibleFraction": 0.9840608585401196,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 7,
+        "bodyIndex": 22,
+        "leafPhase": 16,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          86.33570498851952,
+          49.0
+        ],
+        "angle": -17.032224515903113,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4166039302936766,
+            0.12762485666738926,
+            -76.02354306535884
+          ],
+          [
+            -0.12762485666738926,
+            0.4166039302936766,
+            -128.86518194212687
+          ]
+        ],
+        "visibleFraction": 0.980007270083606,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 8,
+        "bodyIndex": 23,
+        "leafPhase": 10,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          73.53439031610802,
+          49.0
+        ],
+        "angle": -16.336173218337965,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4181235867808221,
+            0.12255449788992051,
+            -86.6521552294009
+          ],
+          [
+            -0.12255449788992051,
+            0.4181235867808221,
+            -130.82441158564455
+          ]
+        ],
+        "visibleFraction": 0.9700107104605498,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 9,
+        "bodyIndex": 24,
+        "leafPhase": 10,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          73.53439031610802,
+          49.0
+        ],
+        "angle": -15.451733128679392,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.41996549616139617,
+            0.11608583380164235,
+            -83.8573410091399
+          ],
+          [
+            -0.11608583380164235,
+            0.41996549616139617,
+            -133.27559158145027
+          ]
+        ],
+        "visibleFraction": 0.9712756467439786,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 10,
+        "bodyIndex": 25,
+        "leafPhase": 6,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          87.62531091034549,
+          47.0
+        ],
+        "angle": -11.002560909329985,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4277052706762674,
+            0.08315732205435089,
+            -55.15215521493977
+          ],
+          [
+            -0.08315732205435089,
+            0.4277052706762674,
+            -146.93592638490094
+          ]
+        ],
+        "visibleFraction": 0.9735262972114367,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 11,
+        "bodyIndex": 26,
+        "leafPhase": 6,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          87.62531091034549,
+          47.0
+        ],
+        "angle": -9.427408531066147,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4298294931184923,
+            0.07136908028698562,
+            -49.76726746061178
+          ],
+          [
+            -0.07136908028698562,
+            0.4298294931184923,
+            -150.7873296864768
+          ]
+        ],
+        "visibleFraction": 0.9757907757554338,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 12,
+        "bodyIndex": 27,
+        "leafPhase": 0,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          95.0,
+          48.0
+        ],
+        "angle": -3.079071652916214,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4350852698370963,
+            0.02340398996520282,
+            -19.680188833772945
+          ],
+          [
+            -0.02340398996520282,
+            0.4350852698370963,
+            -163.76638700458784
+          ]
+        ],
+        "visibleFraction": 0.9753557792433183,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 13,
+        "bodyIndex": 28,
+        "leafPhase": 0,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          95.0,
+          48.0
+        ],
+        "angle": -0.8797347579760612,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4356629261289303,
+            0.006689811080172676,
+            -11.468912299162469
+          ],
+          [
+            -0.006689811080172676,
+            0.4356629261289303,
+            -168.01138648173145
+          ]
+        ],
+        "visibleFraction": 0.9777739190831741,
+        "sourceLeafFrame": 17
+      },
+      {
+        "view": "leftdown",
+        "phase": 14,
+        "bodyIndex": 29,
+        "leafPhase": 0,
+        "root": [
+          236.71428571428572,
+          499.45714285714286
+        ],
+        "targetRoot": [
+          95.0,
+          48.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -8.139795918367355
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -169.62061224489796
+          ]
+        ],
+        "visibleFraction": 0.9786532454009025,
+        "sourceLeafFrame": 17
+      }
+    ],
+    "down": [
+      {
+        "view": "down",
+        "phase": 0,
+        "bodyIndex": 30,
+        "leafPhase": 0,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          94.5,
+          47.0
+        ],
+        "angle": -0.00786122810524148,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4552238763122147,
+            6.245867991518136e-05,
+            -24.800243030189364
+          ],
+          [
+            -6.245867991518136e-05,
+            0.4552238763122147,
+            -183.20552420615962
+          ]
+        ],
+        "visibleFraction": 0.9961532981906255,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 1,
+        "bodyIndex": 31,
+        "leafPhase": 0,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          94.5,
+          47.0
+        ],
+        "angle": -0.002246065172926137,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45522388024723526,
+            1.7845337170042465e-05,
+            -24.777681606627098
+          ],
+          [
+            -1.7845337170042465e-05,
+            0.45522388024723526,
+            -183.2172148920299
+          ]
+        ],
+        "visibleFraction": 0.9961538461538462,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 2,
+        "bodyIndex": 32,
+        "leafPhase": 7,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          103.39480088156968,
+          48.0
+        ],
+        "angle": 3.868345326181051,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45418674564221273,
+            -0.030711260943524814,
+            -0.07041810885144173
+          ],
+          [
+            0.030711260943524814,
+            0.45418674564221273,
+            -189.74372719665857
+          ]
+        ],
+        "visibleFraction": 0.9984067207415991,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 3,
+        "bodyIndex": 33,
+        "leafPhase": 7,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          103.39480088156968,
+          48.0
+        ],
+        "angle": 5.356170451635302,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4532362198762996,
+            -0.04249365197353468,
+            6.137367532061461
+          ],
+          [
+            0.04249365197353468,
+            0.4532362198762996,
+            -192.35000108250668
+          ]
+        ],
+        "visibleFraction": 0.998409255242227,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 4,
+        "bodyIndex": 34,
+        "leafPhase": 11,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          110.59693488988347,
+          49.0
+        ],
+        "angle": 7.628162687105537,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45119533695001135,
+            -0.060428051270672425,
+            22.944236404935225
+          ],
+          [
+            0.060428051270672425,
+            0.45119533695001135,
+            -195.0166711731019
+          ]
+        ],
+        "visibleFraction": 0.9988324576765908,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 5,
+        "bodyIndex": 35,
+        "leafPhase": 11,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          110.59693488988347,
+          49.0
+        ],
+        "angle": 8.27310968144728,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45048656141923754,
+            -0.06550297280640606,
+            25.696492578669663
+          ],
+          [
+            0.06550297280640606,
+            0.45048656141923754,
+            -195.98784920370082
+          ]
+        ],
+        "visibleFraction": 0.9988317757009346,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 6,
+        "bodyIndex": 36,
+        "leafPhase": 12,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          101.94311448423112,
+          48.0
+        ],
+        "angle": -2.665791101820212,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4547312474184713,
+            0.021172484196387658,
+            -27.90410334699483
+          ],
+          [
+            -0.021172484196387658,
+            0.4547312474184713,
+            -176.42555866831466
+          ]
+        ],
+        "visibleFraction": 0.9985352277720815,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 7,
+        "bodyIndex": 37,
+        "leafPhase": 12,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          101.94311448423112,
+          48.0
+        ],
+        "angle": -6.972283248360284,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4518574952774738,
+            0.055259256485886483,
+            -44.38999725859601
+          ],
+          [
+            -0.055259256485886483,
+            0.4518574952774738,
+            -166.0414720790255
+          ]
+        ],
+        "visibleFraction": 0.9980955171403457,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 8,
+        "bodyIndex": 38,
+        "leafPhase": 11,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          96.59812059368336,
+          48.0
+        ],
+        "angle": -15.413859123454534,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4388499971901978,
+            0.12099364211382642,
+            -79.57109660851428
+          ],
+          [
+            -0.12099364211382642,
+            0.4388499971901978,
+            -142.24073767850018
+          ]
+        ],
+        "visibleFraction": 0.9954731308411215,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 9,
+        "bodyIndex": 39,
+        "leafPhase": 11,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          96.59812059368336,
+          48.0
+        ],
+        "angle": -17.9980818221,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.43294834725986364,
+            0.1406574209587173,
+            -87.96949274792287
+          ],
+          [
+            -0.1406574209587173,
+            0.43294834725986364,
+            -134.10416652970446
+          ]
+        ],
+        "visibleFraction": 0.9919496487119438,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 10,
+        "bodyIndex": 40,
+        "leafPhase": 3,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          95.78535275871462,
+          47.0
+        ],
+        "angle": -8.566421761152927,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45014533313389654,
+            0.06780826294470724,
+            -56.445623368936225
+          ],
+          [
+            -0.06780826294470724,
+            0.45014533313389654,
+            -162.887734918736
+          ]
+        ],
+        "visibleFraction": 0.9863740676993689,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 11,
+        "bodyIndex": 41,
+        "leafPhase": 3,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          95.78535275871462,
+          47.0
+        ],
+        "angle": -4.541287476381672,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4537947221088583,
+            0.03604346892225212,
+            -41.337248116753216
+          ],
+          [
+            -0.03604346892225212,
+            0.4537947221088583,
+            -173.05572860355656
+          ]
+        ],
+        "visibleFraction": 0.9931123547137323,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 12,
+        "bodyIndex": 42,
+        "leafPhase": 0,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          95.45539306716186,
+          47.0
+        ],
+        "angle": -1.0405312404896292,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.4551488137650942,
+            0.008266728133482858,
+            -27.974356113999548
+          ],
+          [
+            -0.008266728133482858,
+            0.4551488137650942,
+            -181.01804397716114
+          ]
+        ],
+        "visibleFraction": 0.9948688711516533,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 13,
+        "bodyIndex": 43,
+        "leafPhase": 0,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          95.45539306716186,
+          47.0
+        ],
+        "angle": -0.3133379628036522,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45521707329961325,
+            0.0024895064450194686,
+            -25.070506530131325
+          ],
+          [
+            -0.0024895064450194686,
+            0.45521707329961325,
+            -182.56619718146266
+          ]
+        ],
+        "visibleFraction": 0.9957210098416773,
+        "sourceLeafFrame": 1
+      },
+      {
+        "view": "down",
+        "phase": 14,
+        "bodyIndex": 44,
+        "leafPhase": 0,
+        "root": [
+          262.0,
+          505.73333333333335
+        ],
+        "targetRoot": [
+          95.45539306716186,
+          47.0
+        ],
+        "angle": -0.02246065172926137,
+        "scale": 0.4552238805970149,
+        "matrix": [
+          [
+            0.45522384561905477,
+            0.00017845336717553346,
+            -23.90350430125673
+          ],
+          [
+            -0.00017845336717553346,
+            0.45522384561905477,
+            -183.1751180755433
+          ]
+        ],
+        "visibleFraction": 0.9961511047754811,
+        "sourceLeafFrame": 1
+      }
+    ],
+    "rightdown": [
+      {
+        "view": "rightdown",
+        "phase": 0,
+        "bodyIndex": 45,
+        "leafPhase": 0,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          95.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -67.7587912087912
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -162.43873626373627
+          ]
+        ],
+        "visibleFraction": 0.9791594303577631,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 1,
+        "bodyIndex": 46,
+        "leafPhase": 0,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          95.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -67.7587912087912
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -162.43873626373627
+          ]
+        ],
+        "visibleFraction": 0.9791594303577631,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 2,
+        "bodyIndex": 47,
+        "leafPhase": 11,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          88.74412435879933,
+          48.0
+        ],
+        "angle": -1.2835711366409925,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.43560495347060035,
+            0.009760291357655262,
+            -79.21006997851316
+          ],
+          [
+            -0.009760291357655262,
+            0.43560495347060035,
+            -159.72857459739566
+          ]
+        ],
+        "visibleFraction": 0.9825758936590623,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 3,
+        "bodyIndex": 48,
+        "leafPhase": 11,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          88.74412435879933,
+          48.0
+        ],
+        "angle": -1.7772523430413742,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4355046863759677,
+            0.013513212796378982,
+            -80.99367796914646
+          ],
+          [
+            -0.013513212796378982,
+            0.4355046863759677,
+            -158.27372726704849
+          ]
+        ],
+        "visibleFraction": 0.982981010390541,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 4,
+        "bodyIndex": 49,
+        "leafPhase": 13,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          76.26190611341319,
+          48.0
+        ],
+        "angle": 0.7423117263784874,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.43567771839645936,
+            -0.005644862121050172,
+            -84.24390570339516
+          ],
+          [
+            0.005644862121050172,
+            0.43567771839645936,
+            -165.53607768428455
+          ]
+        ],
+        "visibleFraction": 0.9835502530730297,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 5,
+        "bodyIndex": 50,
+        "leafPhase": 13,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          76.26190611341319,
+          48.0
+        ],
+        "angle": 1.7873257848323392,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4355023038232682,
+            -0.01358978072435257,
+            -80.32275467301459
+          ],
+          [
+            0.01358978072435257,
+            0.4355023038232682,
+            -168.4278542751853
+          ]
+        ],
+        "visibleFraction": 0.9824941346327378,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 6,
+        "bodyIndex": 51,
+        "leafPhase": 16,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          105.4372430778146,
+          50.0
+        ],
+        "angle": 12.755920953481576,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4249606429449785,
+            -0.0962049412623941,
+            -7.106943063045165
+          ],
+          [
+            0.0962049412623941,
+            0.4249606429449785,
+            -192.2675757621168
+          ]
+        ],
+        "visibleFraction": 0.9870508845522524,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 7,
+        "bodyIndex": 52,
+        "leafPhase": 16,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          105.4372430778146,
+          50.0
+        ],
+        "angle": 16.81384000935377,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4170873487612484,
+            -0.12603603563593607,
+            10.319231923450118
+          ],
+          [
+            0.12603603563593607,
+            0.4170873487612484,
+            -199.6243899417677
+          ]
+        ],
+        "visibleFraction": 0.9830631943179748,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 8,
+        "bodyIndex": 53,
+        "leafPhase": 10,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          117.4184112301201,
+          48.0
+        ],
+        "angle": 16.247905894833032,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4183118925331991,
+            -0.12191021015814664,
+            19.839436788078203
+          ],
+          [
+            0.12191021015814664,
+            0.4183118925331991,
+            -200.67270828661682
+          ]
+        ],
+        "visibleFraction": 0.9738866034698623,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 9,
+        "bodyIndex": 54,
+        "leafPhase": 10,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          117.4184112301201,
+          48.0
+        ],
+        "angle": 15.405943688344722,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4200581351090504,
+            -0.11575017021247526,
+            16.19585528159824
+          ],
+          [
+            0.11575017021247526,
+            0.4200581351090504,
+            -199.21198649541626
+          ]
+        ],
+        "visibleFraction": 0.9746292656780418,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 10,
+        "bodyIndex": 55,
+        "leafPhase": 6,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          102.05260329591593,
+          48.0
+        ],
+        "angle": 10.712208603944708,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.42812118537333504,
+            -0.08098882274759082,
+            -19.059727907956244
+          ],
+          [
+            0.08098882274759082,
+            0.42812118537333504,
+            -190.09992719470762
+          ]
+        ],
+        "visibleFraction": 0.9766619519094767,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 11,
+        "bodyIndex": 56,
+        "leafPhase": 6,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          102.05260329591593,
+          48.0
+        ],
+        "angle": 9.03645852632752,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.43030646058151145,
+            -0.06843455820944815,
+            -25.970732013948577
+          ],
+          [
+            0.06843455820944815,
+            0.43030646058151145,
+            -186.45638766282207
+          ]
+        ],
+        "visibleFraction": 0.978595436051654,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 12,
+        "bodyIndex": 57,
+        "leafPhase": 0,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          95.5,
+          49.0
+        ],
+        "angle": 2.9281554733482253,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.43514540622397335,
+            -0.022257902364855225,
+            -56.7445612806373
+          ],
+          [
+            0.022257902364855225,
+            0.43514540622397335,
+            -170.50254135254968
+          ]
+        ],
+        "visibleFraction": 0.9769017019798542,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 13,
+        "bodyIndex": 58,
+        "leafPhase": 0,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          95.5,
+          49.0
+        ],
+        "angle": 0.8366158495280644,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.43566783728862823,
+            -0.006361943709240451,
+            -64.65413181101266
+          ],
+          [
+            0.006361943709240451,
+            0.43566783728862823,
+            -164.7999676417709
+          ]
+        ],
+        "visibleFraction": 0.9786124152321335,
+        "sourceLeafFrame": 49
+      },
+      {
+        "view": "rightdown",
+        "phase": 14,
+        "bodyIndex": 59,
+        "leafPhase": 0,
+        "root": [
+          374.6923076923077,
+          485.2692307692308
+        ],
+        "targetRoot": [
+          95.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4357142857142857,
+        "matrix": [
+          [
+            0.4357142857142857,
+            -0.0,
+            -67.7587912087912
+          ],
+          [
+            0.0,
+            0.4357142857142857,
+            -162.43873626373627
+          ]
+        ],
+        "visibleFraction": 0.9791594303577631,
+        "sourceLeafFrame": 49
+      }
+    ],
+    "right": [
+      {
+        "view": "right",
+        "phase": 0,
+        "bodyIndex": 60,
+        "leafPhase": 0,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          94.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -11.140909090909076
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -180.39696969696968
+          ]
+        ],
+        "visibleFraction": 0.9876598275349391,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 1,
+        "bodyIndex": 61,
+        "leafPhase": 0,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          94.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -11.140909090909076
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -180.39696969696968
+          ]
+        ],
+        "visibleFraction": 0.9876598275349391,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 2,
+        "bodyIndex": 62,
+        "leafPhase": 5,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          99.10750175369435,
+          48.0
+        ],
+        "angle": 0.2732561919831639,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46211595655098336,
+            -0.0022039494885306194,
+            -5.438165387753841
+          ],
+          [
+            0.0022039494885306194,
+            0.46211595655098336,
+            -181.89818368498624
+          ]
+        ],
+        "visibleFraction": 0.9908132530120481,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 3,
+        "bodyIndex": 63,
+        "leafPhase": 5,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          99.10750175369435,
+          48.0
+        ],
+        "angle": 0.3783547273613039,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621111363709523,
+            -0.0030516117586342124,
+            -5.016283943719316
+          ],
+          [
+            0.0030516117586342124,
+            0.4621111363709523,
+            -182.08956654256448
+          ]
+        ],
+        "visibleFraction": 0.9909502262443439,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 4,
+        "bodyIndex": 64,
+        "leafPhase": 11,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          99.84358786725696,
+          48.0
+        ],
+        "angle": 2.5668464425626896,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46165754341872045,
+            -0.02069606960199312,
+            4.582202392166849
+          ],
+          [
+            0.02069606960199312,
+            0.46165754341872045,
+            -185.89792606406846
+          ]
+        ],
+        "visibleFraction": 0.9914004914004914,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 5,
+        "bodyIndex": 65,
+        "leafPhase": 11,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          99.84358786725696,
+          48.0
+        ],
+        "angle": 3.3924050198896625,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46131142818042553,
+            -0.02734558323595201,
+            7.962142903538265
+          ],
+          [
+            0.02734558323595201,
+            0.46131142818042553,
+            -187.24619327650183
+          ]
+        ],
+        "visibleFraction": 0.9915514592933948,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 6,
+        "bodyIndex": 66,
+        "leafPhase": 7,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          114.54526271837727,
+          50.0
+        ],
+        "angle": -8.649900928942431,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4568649393620903,
+            0.06950138037515412,
+            -24.394547638023084
+          ],
+          [
+            -0.06950138037515412,
+            0.4568649393620903,
+            -160.8997403455814
+          ]
+        ],
+        "visibleFraction": 0.9927184466019418,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 7,
+        "bodyIndex": 67,
+        "leafPhase": 7,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          114.54526271837727,
+          50.0
+        ],
+        "angle": -13.408566075005078,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.449524351475511,
+            0.10716282995003246,
+            -41.41163281612066
+          ],
+          [
+            -0.10716282995003246,
+            0.449524351475511,
+            -148.64646514586622
+          ]
+        ],
+        "visibleFraction": 0.9913479052823315,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 8,
+        "bodyIndex": 68,
+        "leafPhase": 10,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          120.43872803555851,
+          48.0
+        ],
+        "angle": -10.228331187165931,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4547771467522691,
+            0.08205949965874419,
+            -24.25766334261081
+          ],
+          [
+            -0.08205949965874419,
+            0.4547771467522691,
+            -158.99257402583746
+          ]
+        ],
+        "visibleFraction": 0.9878759975445058,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 9,
+        "bodyIndex": 69,
+        "leafPhase": 10,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          120.43872803555851,
+          48.0
+        ],
+        "angle": -8.27306159244893,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45731217119035367,
+            0.06649505826407687,
+            -17.11098122084408
+          ],
+          [
+            -0.06649505826407687,
+            0.45731217119035367,
+            -163.8089914597236
+          ]
+        ],
+        "visibleFraction": 0.9881956155143339,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 10,
+        "bodyIndex": 70,
+        "leafPhase": 3,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          102.93271299796453,
+          48.0
+        ],
+        "angle": -8.192186441510653,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45740557585545694,
+            0.06584947887960928,
+            -34.31788295843097
+          ],
+          [
+            -0.06584947887960928,
+            0.45740557585545694,
+            -164.00293698277014
+          ]
+        ],
+        "visibleFraction": 0.9905476369092273,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 11,
+        "bodyIndex": 71,
+        "leafPhase": 3,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          102.93271299796453,
+          48.0
+        ],
+        "angle": -8.46189132110624,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.45709054021268786,
+            0.0680018583602796,
+            -35.3143069846987
+          ],
+          [
+            -0.0680018583602796,
+            0.45709054021268786,
+            -163.35451934041834
+          ]
+        ],
+        "visibleFraction": 0.9903961584633854,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 12,
+        "bodyIndex": 72,
+        "leafPhase": 0,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          94.5,
+          49.0
+        ],
+        "angle": -2.9994206455305656,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4614881355929373,
+            0.024180889134459524,
+            -22.99958116289116
+          ],
+          [
+            -0.024180889134459524,
+            0.4614881355929373,
+            -174.55495925219662
+          ]
+        ],
+        "visibleFraction": 0.9870651204281892,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 13,
+        "bodyIndex": 73,
+        "leafPhase": 0,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          94.5,
+          49.0
+        ],
+        "angle": -0.8569773272944474,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.46206952156432396,
+            0.0069117243648067275,
+            -14.560072604294518
+          ],
+          [
+            -0.0069117243648067275,
+            0.46206952156432396,
+            -178.7912903147356
+          ]
+        ],
+        "visibleFraction": 0.9873831082084014,
+        "sourceLeafFrame": 65
+      },
+      {
+        "view": "right",
+        "phase": 14,
+        "bodyIndex": 74,
+        "leafPhase": 0,
+        "root": [
+          228.6,
+          496.4
+        ],
+        "targetRoot": [
+          94.5,
+          49.0
+        ],
+        "angle": 0.0,
+        "scale": 0.4621212121212121,
+        "matrix": [
+          [
+            0.4621212121212121,
+            -0.0,
+            -11.140909090909076
+          ],
+          [
+            0.0,
+            0.4621212121212121,
+            -180.39696969696968
+          ]
+        ],
+        "visibleFraction": 0.9876598275349391,
+        "sourceLeafFrame": 65
+      }
+    ]
   }
 }

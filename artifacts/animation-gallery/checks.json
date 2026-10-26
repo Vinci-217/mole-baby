@@ -2877,14 +2877,12 @@
       }
     ],
     "directionalViews": true,
-    "grounded": {
-      "footMotionCss": 0,
-      "compressionRange": [
-        0,
-        0.9375
-      ],
-      "originalMiddle": true,
-      "airborne": false
+    "binding": {
+      "framesCompared": 102,
+      "bodyPixelDifferences": 0,
+      "samePhase": true,
+      "sameElasticMotion": true,
+      "sameBodyScale": true
     },
     "errors": []
   },
@@ -2911,18 +2909,16 @@
       }
     ],
     "directionalViews": true,
-    "grounded": {
-      "footMotionCss": 0,
-      "compressionRange": [
-        0,
-        0.9375
-      ],
-      "originalMiddle": true,
-      "airborne": false
+    "binding": {
+      "framesCompared": 102,
+      "bodyPixelDifferences": 0,
+      "samePhase": true,
+      "sameElasticMotion": true,
+      "sameBodyScale": true
     },
     "errors": []
   },
-  "middle-nojump": {
+  "middle-bound": {
     "frames": 154,
     "fps": 24,
     "duration": 6416.666666666667,
@@ -2939,15 +2935,6 @@
       }
     ],
     "directionalViews": true,
-    "grounded": {
-      "footMotionCss": 0,
-      "compressionRange": [
-        0,
-        0.9375
-      ],
-      "originalMiddle": true,
-      "airborne": false
-    },
     "errors": []
   }
 }

@@ -12,6 +12,7 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','prev
    for(const direction of [1,-1]){
     for(let i=1;i<=18;i++){await p.mouse.move(x+direction*i*4,y);await p.waitForTimeout(25)}
     await expect(ram.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-sheet','drag');await expect(ram.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-drag-view',direction===1?'right':'left');
+    if(growth===180){const bubble=p.locator('.compact-bubble'),b=await bubble.boundingBox(),c=await ram.locator('canvas:not(.ram-wear)').boundingBox();assert.ok(b.height<=28.1&&c.y>=b.y+b.height+2,'Drag reply leaves room for the bound crown')}
    }
    await p.mouse.up();
   }

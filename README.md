@@ -4,21 +4,21 @@
 
 ## 本轮重点预览（未发布）
 
-**保留中级自己的原版身体、脸和叶片，只去掉拖拽时的腾空跳跃。** 先根据原版贴地关键姿态生成PNG帧序列，再接入逐帧播放。身体底部保持在同一位置，保留轻微压缩和左右转身。
+**中级直接使用初级的75张黏滞身体原帧，仅增加跟随头顶的叶片序列。** 拖动的转身、拖尾、拉伸、挤压和松手响应共用初级。未重新绘制身体、眼睛和嘴，也未增加独立的上下跳跃。
 
-![应用实录：中级原版贴地动作，拖拽不腾空](artifacts/animation-gallery/middle-nojump.gif)
+![应用实录：左初级，右中级；身体原帧与拖拽时序相同](artifacts/animation-gallery/drag-young.gif)
 
-### 原版动作与生成方案对照
+### 先生成序列，再接入逐帧播放
 
-左侧是原版完整行走动作，包含腾空；右侧是本轮生成的贴地帧循环。身体和叶片来自同一套中级素材，眼睛使用原始矢量轮廓及原动作矩阵补间。它是原素材的桌宠适配，未称为官方拖拽动作。
+原版中级叶片纹理生成17档叶尖弯曲姿态，叶柄固定在头顶关节，随身体形变选帧并延迟回摆；合成五方向共75张PNG。叶片动画、绑定及桌面拖拽编排属于本项目适配，不称为官方完整拖拽动作。透明画布向外扩展，身体尺寸不缩小、叶片不裁切。
 
-![左：原版行走；右：保留贴地姿态的生成序列](artifacts/v36-nojump/original-vs-grounded.gif)
+![生成序列：左为初级原帧，右为相同身体加绑定叶片](artifacts/v37-bound/bound-sequence.gif)
 
-[下载PNG逐帧序列：五方向 × 17帧，红色预览](artifacts/v36-nojump/frames-red.zip)
+[下载PNG逐帧序列：五方向 × 15帧，红色预览](artifacts/v37-bound/frames-red.zip)
 
-![生成的帧序列：每个方向抽取九帧，完整85帧见下载](artifacts/v36-nojump/frames.png)
+![合成序列抽帧：完整75帧见下载](artifacts/v37-bound/frames.png)
 
-![初级与中级完整拖拽过程](artifacts/animation-gallery/drag-young.gif)
+![中级单独实录：原帧拉伸、叶片跟随和松手衔接](artifacts/animation-gallery/middle-bound.gif)
 
 ![五阶段实际拖拽与松手衔接](artifacts/animation-gallery/drag.gif)
 
@@ -207,19 +207,23 @@
 
 ![历史 / 原素材：middle-elastic.gif](artifacts/animation-gallery/middle-elastic.gif)
 
+![历史 / 原素材：middle-nojump.gif](artifacts/animation-gallery/middle-nojump.gif)
+
 ![历史 / 原素材：v21-original-actions.gif](artifacts/v21-original-actions.gif)
 
 ![历史 / 原素材：v22-moods-wardrobe.gif](artifacts/v22-moods-wardrobe.gif)
 
 ![历史 / 原素材：v29-bouncy-pull.gif](artifacts/v29-bouncy-pull.gif)
 
+![历史 / 原素材：original-vs-grounded.gif](artifacts/v36-nojump/original-vs-grounded.gif)
+
 ![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
 
-[本轮原版贴地序列、来源与验证](research/v36-original-grounded-drag.md) · [此前拼接方案（未采用）](research/v35-shared-drag-body.md) · [原素材来源](research/v30-motion-previews.md)
+[本轮逐帧绑定、来源与验证](research/v37-bound-crown-drag.md) · [此前贴地补间研究（已替换）](research/v36-original-grounded-drag.md) · [原素材来源](research/v30-motion-previews.md)
 
 ## 体积精简（本地预览构建）
 
-710张图片 84.58 MB → 50.17 MB，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。
+710张图片 84.80 MB → 50.32 MB，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。
 
 [此前测量明细与验证范围](research/v32-animation-and-size.md)
 

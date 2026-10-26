@@ -170,6 +170,8 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .compact-pet-name{font-size:12px;line-height:18px}
 .companion-layout .compact-pet-name.sleeping-badge{font-size:11px}
 .companion-layout .compact-bubble{top:0;font-size:12px;line-height:1.5;max-height:66px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+/* The bound crown extends above its body cell. Keep drag replies above it. */
+.companion-layout .compact-pet:has(.ram-sprite[data-stage="2"]:is(.is-dragging,[data-pull-phase="release"])) .compact-bubble{min-height:28px;max-height:28px;padding:4px 6px;-webkit-line-clamp:1}
 .companion-panel>header strong{font-size:14px}
 .companion-panel>header strong span{font-size:12px}
 .companion-panel .companion-tabs button{font-size:13px;padding:5px 3px}

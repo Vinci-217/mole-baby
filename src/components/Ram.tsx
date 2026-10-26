@@ -86,7 +86,7 @@ function sheetSpec(form: Form, kind: SheetKind) {
   if(kind==='gentle')return {width:(form==='seed'?96:CELL_WIDTH)*8,height:form==='seed'?99:CELL_HEIGHT,neutral:`./assets/original/gentle-care/${form}-neutral.png`,mask:`./assets/original/gentle-care/${form}-mask.png`}
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
-  if(kind==='drag'&&isDragForm(form))return {width:CELL_WIDTH*8,height:CELL_HEIGHT*dragSpec(form).rows,neutral:`./assets/original/drag/${form}-neutral.png`,mask:`./assets/original/drag/${form}-mask.png`}
+  if(kind==='drag'&&isDragForm(form))return {width:dragSpec(form).cell[0]*8,height:dragSpec(form).cell[1]*dragSpec(form).rows,neutral:`./assets/original/drag/${form}-neutral.png`,mask:`./assets/original/drag/${form}-mask.png`}
   if (kind === 'affection') return { width:CELL_WIDTH*8,height:CELL_HEIGHT,neutral:`./assets/original/affection/${form}-neutral.png`,mask:`./assets/original/affection/${form}-mask.png` }
   if (kind === 'yawn') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/yawn/${form}-neutral.png`, mask:`./assets/original/yawn/${form}-mask.png` }
   if (kind === 'slumber') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/slumber/${form}-neutral.png`, mask:`./assets/original/slumber/${form}-mask.png` }
@@ -173,7 +173,7 @@ function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
   // Football foliage participates in the source performance and can cross the
   // face. Cropping a flattened crown there would leave holes in the body.
   if(source.kind==='football')return sheet
-  const width=source.kind==='seed'||source.form==='seed'?96:192,height=source.kind==='seed'||source.form==='seed'?99:208
+  const width=source.kind==='seed'||source.form==='seed'?96:source.kind==='drag'&&isDragForm(source.form??'')?dragSpec(source.form as 'junior'|'middle').cell[0]:192,height=source.kind==='seed'||source.form==='seed'?99:source.kind==='drag'&&isDragForm(source.form??'')?dragSpec(source.form as 'junior'|'middle').cell[1]:208
   const view=document.createElement('canvas');view.width=sheet.width;view.height=sheet.height;const ctx=view.getContext('2d');if(!ctx)return sheet
   ctx.drawImage(sheet,0,0);const pixels=ctx.getImageData(0,0,view.width,view.height),n=source.neutral.data,m=source.mask
   for(let sy=0;sy<view.height;sy+=height)for(let sx=0;sx<view.width;sx+=width){
@@ -307,7 +307,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const drag=isDragForm(form)?await getTintedSheet(form,c,'drag'):undefined;
       return {classic,care,item,grounded,slumber,gentle,yawn,affection,drag};
     };
-    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.slumber,old.gentle]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
+    Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.slumber,old.gentle,old.drag]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
     return () => { cancelled = true }
   }, [form, color, fromColor, key])
   useEffect(() => {
@@ -333,16 +333,22 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       // inline data only; do not measure layout or move the eyes independently.
       if(grounded&&form==='middle'&&!media.matches)grounded.leafAngle+=Number(canvas.closest<HTMLElement>('.ram-sprite')?.style.getPropertyValue('--pull-leaf')||0)
       const root=canvas.closest<HTMLElement>('.ram-sprite');
-      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches,Number(root?.style.getPropertyValue('--drag-compression')||0)):null;
+      const drag=isDragForm(form)&&sheets.drag&&(action==='drag'||['idle','waiting'].includes(action)&&root?.dataset.pullPhase==='release')?sampleDragPose(form,Number(root?.style.getPropertyValue('--drag-view')||0),Number(root?.style.getPropertyValue('--drag-distance')||0),media.matches):null;
       const gentle=Boolean(itemMotion),affection=action==='pet'&&(media.matches||elapsed>=180&&elapsed<2200);
       const sheet=drag?'drag':affection?'affection':gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=drag?drag.frame:affection?affectionFrame(elapsed,media.matches):gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=drag?drag.row:affection||gentle||grounded?0:pose.row
+      const layout=sheet==='drag'&&isDragForm(form)?dragSpec(form):null,drawWidth=layout?.cell[0]??CELL_WIDTH,drawHeight=layout?.cell[1]??CELL_HEIGHT,origin=layout?.origin??[0,0]
+      if(canvas.width!==drawWidth||canvas.height!==drawHeight){canvas.width=drawWidth;canvas.height=drawHeight;previous=''}
+      if(origin[0]||origin[1]||drawWidth!==CELL_WIDTH||drawHeight!==CELL_HEIGHT){
+        canvas.style.position='absolute';canvas.style.left=`${origin[0]/CELL_WIDTH*100}%`;canvas.style.top=`${origin[1]/CELL_HEIGHT*100}%`;canvas.style.width=`${drawWidth/CELL_WIDTH*100}%`;canvas.style.height=`${drawHeight/CELL_HEIGHT*100}%`
+      }else for(const name of ['position','left','top','width','height'])canvas.style.removeProperty(name)
+      canvas.dataset.dragOriginX=String(origin[0]);canvas.dataset.dragOriginY=String(origin[1])
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
-        context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
+        context.clearRect(0, 0, drawWidth, drawHeight)
         const target=sheet==='drag'?sheets.drag!:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
-        const old=sheets.previous?.[sheet==='gentle'?5:sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
+        const old=sheets.previous?.[sheet==='drag'?6:sheet==='gentle'?5:sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
-          context.drawImage(wardrobeBody(canvas,source),frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
+          context.drawImage(wardrobeBody(canvas,source),frame*drawWidth,row*drawHeight,drawWidth,drawHeight,0,0,drawWidth,drawHeight)
           if(grounded&&!affection&&!drag){
             if(frame===0)context.drawImage(wardrobeBody(canvas,source),3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
             context.save();context.translate(96,110);context.rotate(grounded.leafAngle*Math.PI/180);context.translate(-96,-110)
@@ -356,10 +362,10 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       }
       paintWear(canvas,drag?sheets.classic:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,drag?drag.wearFrame:frame,drag?drag.wearRow:row)
       if(drag){
-        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);canvas.dataset.dragCompression=String('compression' in drag?drag.compression:0);if(root)root.dataset.groundedDrag='true';
+        canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);
         const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear');
         if(wear?.dataset.loaded==='true'&&wear.style.visibility==='visible'){const [ox0,oy0,ox1,oy1]=drag.wearBody,[nx0,ny0,nx1,ny1]=drag.body,sx=(nx1-nx0)/(ox1-ox0),sy=(ny1-ny0)/(oy1-oy0);wear.style.left=`${(nx0+(parseFloat(wear.style.left)*192/100-ox0)*sx)/192*100}%`;wear.style.top=`${(ny0+(parseFloat(wear.style.top)*208/100-oy0)*sy)/208*100}%`;wear.style.width=`${parseFloat(wear.style.width)*sx}%`;wear.style.height=`${parseFloat(wear.style.height)*sy}%`;wear.dataset.registration='drag-source'}
-      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase;delete canvas.dataset.dragCompression;if(root)delete root.dataset.groundedDrag}
+      }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase}
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
@@ -373,7 +379,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     const observer = new IntersectionObserver(entries => { inView = entries.some(e => e.isIntersecting); resume() })
     observer.observe(canvas); resume()
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
-    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume);sprite?.removeEventListener('ram-drag-motion',syncDrag);if(sprite)delete sprite.dataset.groundedDrag }
+    return () => { soundClock.stop();stopped = true; cancelAnimationFrame(request); observer.disconnect(); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume);sprite?.removeEventListener('ram-drag-motion',syncDrag) }
   }, [sheets, action, actionId, itemMotion, form, startedAt])
   return <canvas ref={canvasRef} className="ram-classic-frame" width={192} height={208} aria-hidden="true" data-form={form} data-color={color}/>
 }

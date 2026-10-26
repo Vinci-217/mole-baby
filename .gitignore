@@ -190,3 +190,10 @@ artifacts/v36-nojump/*
 !artifacts/v36-nojump/*.png
 !artifacts/v36-nojump/*.gif
 !artifacts/v36-nojump/*.zip
+
+!artifacts/animation-gallery/middle-bound-checks.json
+!artifacts/v37-bound/
+artifacts/v37-bound/*
+!artifacts/v37-bound/*.png
+!artifacts/v37-bound/*.gif
+!artifacts/v37-bound/*.zip

@@ -15,18 +15,17 @@ export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,nati
    const sprite=root.current?.querySelector<HTMLElement>('.ram-sprite'),s=state.current
    const moving=elasticDragEnergy(s)>.002
    if(sprite){
-    const young=latest.current.stage===1||latest.current.stage===2,horizontalOnly=latest.current.stage===2
+    const young=latest.current.stage===1||latest.current.stage===2
     sprite.style.setProperty('--pull-x',`${s.x.toFixed(3)}%`)
-    sprite.style.setProperty('--pull-y',horizontalOnly?'0%':`${s.y.toFixed(3)}%`)
-    sprite.style.setProperty('--pull-angle',`${(horizontalOnly?0:young?Math.max(-3.5,Math.min(3.5,s.angle)):s.angle).toFixed(3)}deg`)
-    sprite.style.setProperty('--pull-sx',String(horizontalOnly?1:1+s.stretch*(young ? .18 : 1)))
-    sprite.style.setProperty('--pull-sy',String(horizontalOnly?1:1/(1+s.stretch*(young ? .18 : 1))))
-    sprite.style.setProperty('--pull-skew',horizontalOnly?'0deg':`${(young?s.skew*.2:s.skew).toFixed(3)}deg`)
+    sprite.style.setProperty('--pull-y',`${s.y.toFixed(3)}%`)
+    sprite.style.setProperty('--pull-angle',`${(young?Math.max(-3.5,Math.min(3.5,s.angle)):s.angle).toFixed(3)}deg`)
+    sprite.style.setProperty('--pull-sx',String(1+s.stretch*(young ? .18 : 1)))
+    sprite.style.setProperty('--pull-sy',String(1/(1+s.stretch*(young ? .18 : 1))))
+    sprite.style.setProperty('--pull-skew',`${(young?s.skew*.2:s.skew).toFixed(3)}deg`)
     sprite.style.setProperty('--pull-leaf',s.fringe.toFixed(3))
     sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`)
     sprite.style.setProperty('--drag-view',s.view.toFixed(4))
     sprite.style.setProperty('--drag-distance',s.phaseDistance.toFixed(3))
-    sprite.style.setProperty('--drag-compression',s.compression.toFixed(4))
     sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'
     // Publish the pose after its inputs. Independent body RAF registration
     // must not leave one form sampling the previous drag frame.
