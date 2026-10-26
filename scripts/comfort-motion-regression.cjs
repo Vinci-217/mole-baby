@@ -16,17 +16,17 @@ const runtime=require('../public/assets/original/football/runtime.json');
  const shot=async name=>p.screenshot({path:path.join(dir,name+'.png')});
  if(!process.argv.includes('--record-only')){
  for(const color of ['red','yellow','blue','pink']){
-  await p.evaluate(c=>window.review.render('sleep',c),color);await load();await p.clock.fastForward(8800);await p.clock.runFor(40);
+  await p.evaluate(c=>window.review.render('sleep',c),color);await load();await p.clock.fastForward(6400);await p.clock.runFor(40);
   await expect(p.locator('.ram-sleep-particles>img')).toHaveCount(24);assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.dataset.sheet)),Array(8).fill('slumber'));
   const closed=await canvases.evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return {alpha:Array.from(a).filter((_,i)=>i%4===3),pixels:Array.from(a)}}));
   await shot(`${color}-sleep-closed`);await p.clock.fastForward(2750);await p.clock.runFor(20);
   const opened=await canvases.evaluateAll(ns=>ns.map(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return {alpha:Array.from(a).filter((_,i)=>i%4===3),pixels:Array.from(a)}}));
   for(let i=0;i<8;i++){assert.deepEqual(opened[i].alpha,closed[i].alpha,`${forms[i][0]} mouth stays INSIDE the unchanged body`);assert.notDeepEqual(opened[i].pixels,closed[i].pixels,`${forms[i][0]} mouth visibly opens`)}
-  assert.equal(await sprites.first().locator('.seed-body-original').evaluate(n=>getComputedStyle(n).transform),'matrix(1, 0, 0, 1, 0, 0)');
-  const z=await p.locator('.ram-sleep-particles>img').first().evaluate(n=>{const a=n.getAnimations()[0];a.pause();a.currentTime=3200;const from=getComputedStyle(n).transform;a.currentTime=8750;return {from,to:getComputedStyle(n).transform,opacity:Number(getComputedStyle(n).opacity)}});assert.notEqual(z.from,z.to);assert.ok(z.opacity<.1);await shot(`${color}-sleep-open`);
+  assert.ok(['none','matrix(1, 0, 0, 1, 0, 0)'].includes(await sprites.first().locator('.seed-body-original').evaluate(n=>getComputedStyle(n).transform)));
+  const z=await p.locator('.ram-sleep-particles>img').first().evaluate(n=>{const a=n.getAnimations()[0];a.pause();a.currentTime=1400;const from=getComputedStyle(n).transform;a.currentTime=6950;return {from,to:getComputedStyle(n).transform,opacity:Number(getComputedStyle(n).opacity)}});assert.notEqual(z.from,z.to);assert.ok(z.opacity<.1);await shot(`${color}-sleep-open`);
   await p.evaluate(c=>window.review.render('pet',c),color);await load();await p.clock.fastForward(750);await p.clock.runFor(30);
-  assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.dataset.sheet)),['seed','grounded','grounded',...Array(5).fill('classic')]);
-  for(const canvas of await canvases.all()){const white=await canvas.evaluate(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<a.length;i+=4)if(a[i]>240&&a[i+1]>240&&a[i+2]>240&&a[i+3]>220)n++;return n});assert.ok(white>20,'affection keeps normal large white eyes')}
+  assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.dataset.sheet)),['seed',...Array(7).fill('affection')]);
+  await expect(p.locator('#motion-review .social-hand')).toHaveCount(8);
   await shot(`${color}-pet`);await p.clock.fastForward(2000);await p.clock.runFor(30);assert.equal(await p.evaluate(()=>window.review.endCount()),8);
   await p.evaluate(c=>window.review.render('play',c),color);await load();await expect(p.locator('.ram-football-frame')).toHaveCount(7);await expect(p.locator('.social-ball')).toHaveCount(1);
   await p.clock.fastForward(700);await p.clock.runFor(30);const before=await p.locator('.ram-football-frame').evaluateAll(ns=>ns.map(n=>Number(n.dataset.sourceFrame)));
@@ -41,7 +41,7 @@ const runtime=require('../public/assets/original/football/runtime.json');
  }
  await p.emulateMedia({reducedMotion:'reduce'});
  for(const action of ['sleep','pet','play']){await p.evaluate(a=>window.review.render(a),action);await load();await p.clock.runFor(50);const a=await canvases.evaluateAll(ns=>ns.map(c=>c.toDataURL()));await p.clock.fastForward(1000);await p.clock.runFor(30);assert.deepEqual(await canvases.evaluateAll(ns=>ns.map(c=>c.toDataURL())),a)}
- assert.deepEqual(errors,[]);console.log('PASS 32 forms/colours: mouth-only sleep breathing, rising original Z, normal-eye affection, original body/ball timeline, drag continuity and reduced motion');
+ assert.deepEqual(errors,[]);console.log('PASS 32 forms/colours: mouth-only sleep breathing, rising original Z, original smiling-eye affection, original body/ball timeline, drag continuity and reduced motion');
  // Actual application callbacks must finish from the source clock, before its
  // separate loading-error watchdog, with the 100px desktop character preserved.
  const app=await browser.newPage({viewport:{width:1180,height:820}});app.on('pageerror',e=>errors.push(e.message));await app.clock.install();await app.goto(url);await adopt(app,'红色','小芽');await app.clock.pauseAt(new Date(Date.now()+1000));
@@ -57,5 +57,5 @@ const runtime=require('../public/assets/original/football/runtime.json');
  if(process.argv.includes('--checks-only'))return;
  const videoPage=await browser.newPage({viewport:{width:1280,height:360},recordVideo:{dir,size:{width:1280,height:360}}});await videoPage.goto(url);await videoPage.evaluate(async forms=>{const {mountComfortReview}=await import('/scripts/comfort-review-fixture.tsx');window.review=mountComfortReview(forms);window.review.render('idle');},forms);await expect(videoPage.locator('#motion-review canvas:not(.ram-wear)[data-loaded=true]')).toHaveCount(8,{timeout:30000});
  for(const [action,duration] of [['pet',2800],['sleep',6800],['wake',2100],['play',11200]]){await videoPage.evaluate(a=>window.review.render(a),action);await expect(videoPage.locator('#motion-review canvas:not(.ram-wear)[data-loaded=true]')).toHaveCount(8,{timeout:30000});await new Promise(r=>setTimeout(r,duration))}
- const video=videoPage.video();await videoPage.close();await video.saveAs(path.join(root,'artifacts/v21-original-actions.webm'));console.log('PASS actual-time original football, mouth breathing and large-eye affection recording saved');
+ const video=videoPage.video();await videoPage.close();await video.saveAs(path.join(root,'artifacts/v21-original-actions.webm'));console.log('PASS actual-time original football, mouth breathing and smiling-eye affection recording saved');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

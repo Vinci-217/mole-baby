@@ -12,31 +12,31 @@
         "form": "seed",
         "stage": 0,
         "action": "sleep",
-        "label": "哈欠 → 安睡 → ZZZ"
+        "label": "闭眼安睡 · ZZZ"
       },
       {
         "form": "junior",
         "stage": 1,
         "action": "sleep",
-        "label": "哈欠 → 安睡 → ZZZ"
+        "label": "闭眼安睡 · ZZZ"
       },
       {
         "form": "middle",
         "stage": 2,
         "action": "sleep",
-        "label": "哈欠 → 安睡 → ZZZ"
+        "label": "闭眼安睡 · ZZZ"
       },
       {
         "form": "senior",
         "stage": 3,
         "action": "sleep",
-        "label": "哈欠 → 安睡 → ZZZ"
+        "label": "闭眼安睡 · ZZZ"
       },
       {
         "form": "super",
         "stage": 4,
         "action": "sleep",
-        "label": "哈欠 → 安睡 → ZZZ"
+        "label": "闭眼安睡 · ZZZ"
       },
       {
         "form": "seed",
@@ -72,31 +72,31 @@
         "form": "seed",
         "stage": 0,
         "action": "mood-dozy",
-        "label": "困倦打哈欠"
+        "label": "困倦眯眼"
       },
       {
         "form": "junior",
         "stage": 1,
         "action": "mood-dozy",
-        "label": "困倦打哈欠"
+        "label": "困倦眯眼"
       },
       {
         "form": "middle",
         "stage": 2,
         "action": "mood-dozy",
-        "label": "困倦打哈欠"
+        "label": "困倦眯眼"
       },
       {
         "form": "senior",
         "stage": 3,
         "action": "mood-dozy",
-        "label": "困倦打哈欠"
+        "label": "困倦眯眼"
       },
       {
         "form": "super",
         "stage": 4,
         "action": "mood-dozy",
-        "label": "困倦打哈欠"
+        "label": "困倦眯眼"
       }
     ],
     "errors": []
@@ -1724,6 +1724,1159 @@
         "label": "粉"
       }
     ],
+    "errors": []
+  },
+  "football": {
+    "frames": 269,
+    "fps": 24,
+    "duration": 11200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "play",
+        "label": "完整足球"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "play",
+        "label": "完整足球"
+      }
+    ],
+    "errors": []
+  },
+  "remaining-1": {
+    "frames": 159,
+    "fps": 24,
+    "duration": 6600,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "eat",
+        "label": "吃东西"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "eat",
+        "label": "吃东西"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat",
+        "label": "吃东西"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "eat",
+        "label": "吃东西"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "eat",
+        "label": "吃东西"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "feed",
+        "label": "吃东西"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "feed",
+        "label": "吃东西"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "feed",
+        "label": "吃东西"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "feed",
+        "label": "吃东西"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "feed",
+        "label": "吃东西"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "drink",
+        "label": "喝水"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "drink",
+        "label": "喝水"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink",
+        "label": "喝水"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "drink",
+        "label": "喝水"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "drink",
+        "label": "喝水"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "wash",
+        "label": "清洁"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "wash",
+        "label": "清洁"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "wash",
+        "label": "清洁"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "wash",
+        "label": "清洁"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "wash",
+        "label": "清洁"
+      }
+    ],
+    "errors": []
+  },
+  "remaining-2": {
+    "frames": 159,
+    "fps": 24,
+    "duration": 6600,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "use",
+        "label": "使用用品"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "use",
+        "label": "使用用品"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "use",
+        "label": "使用用品"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "use",
+        "label": "使用用品"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "use",
+        "label": "使用用品"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "medical",
+        "label": "照料"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "medical",
+        "label": "照料"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "medical",
+        "label": "照料"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "medical",
+        "label": "照料"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "medical",
+        "label": "照料"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "still",
+        "label": "安静站好"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "still",
+        "label": "安静站好"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "still",
+        "label": "安静站好"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "still",
+        "label": "安静站好"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "still",
+        "label": "安静站好"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "running-left",
+        "label": "向左小跑"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "running-left",
+        "label": "向左小跑"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "running-left",
+        "label": "向左小跑"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "running-left",
+        "label": "向左小跑"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "running-left",
+        "label": "向左小跑"
+      }
+    ],
+    "errors": []
+  },
+  "remaining-3": {
+    "frames": 159,
+    "fps": 24,
+    "duration": 6600,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "running-right",
+        "label": "向右小跑"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "running-right",
+        "label": "向右小跑"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "running-right",
+        "label": "向右小跑"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "running-right",
+        "label": "向右小跑"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "running-right",
+        "label": "向右小跑"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "running",
+        "label": "活动一下"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "running",
+        "label": "活动一下"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "running",
+        "label": "活动一下"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "running",
+        "label": "活动一下"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "running",
+        "label": "活动一下"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "peek",
+        "label": "探看"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "peek",
+        "label": "探看"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "peek",
+        "label": "探看"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "peek",
+        "label": "探看"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "peek",
+        "label": "探看"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "hide",
+        "label": "藏好"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "hide",
+        "label": "藏好"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "hide",
+        "label": "藏好"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "hide",
+        "label": "藏好"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "hide",
+        "label": "藏好"
+      }
+    ],
+    "errors": []
+  },
+  "remaining-4": {
+    "frames": 159,
+    "fps": 24,
+    "duration": 6600,
+    "dimensions": [
+      700,
+      219
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "review",
+        "label": "回应一下"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "review",
+        "label": "回应一下"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "review",
+        "label": "回应一下"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "review",
+        "label": "回应一下"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "review",
+        "label": "回应一下"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-party-cap": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-gold-feather": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "gold-feather",
+        "action": "pet",
+        "label": "金色羽毛"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-wizard-cap": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "wizard-cap",
+        "action": "pet",
+        "label": "紫色魔法帽"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-star-wand": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "star-wand",
+        "action": "pet",
+        "label": "星星魔杖"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-magic-book": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-rabbit-hood": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "rabbit-hood",
+        "action": "pet",
+        "label": "粉兔帽"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-leaf-hood": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "leaf-hood",
+        "action": "pet",
+        "label": "火焰羽翼"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-sport-goggles": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "sport-goggles",
+        "action": "pet",
+        "label": "彩虹眼罩"
+      }
+    ],
+    "errors": []
+  },
+  "outfit-warm-scarf": {
+    "frames": 77,
+    "fps": 24,
+    "duration": 3200,
+    "dimensions": [
+      560,
+      383
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      }
+    ],
+    "errors": []
+  },
+  "drag": {
+    "frames": 154,
+    "fps": 24,
+    "duration": 6416.666666666667,
+    "dimensions": [
+      760,
+      300
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "drag",
+        "label": "真实拖动与松手"
+      }
+    ],
+    "verticalTolerance": 0.05,
     "errors": []
   }
 }

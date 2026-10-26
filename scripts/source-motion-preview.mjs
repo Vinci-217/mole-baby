@@ -28,14 +28,21 @@ export function dragPose(meta,form,t,adapted){
  let result=sourcePose(meta,form,action,elapsed);
  if(!motion.held){result= t>=3500&&t<3500+spec.clips.down.frameCount/meta.fps*1000?sourcePose(meta,form,'down',t-3500,{loop:false}):sourcePose(meta,form,'down',spec.canonical/meta.fps*1000,{loop:false})}
  const horizontalOnly=adapted&&['junior','middle'].includes(form);
- if(horizontalOnly&&!motion.held)result=sourcePose(meta,form,'down',spec.canonical/meta.fps*1000,{loop:false});
+ // The walking timeline itself changes body height. A held pet uses one
+ // registered side pose, not a walking cycle with its vertical offset hidden.
+ if(horizontalOnly)result=sourcePose(meta,form,motion.held?action:'down',0,{loop:false});
  const lift=adapted&&!horizontalOnly?-13*ease((t-700)/180)*ease((3500-t)/180):0;
  const velocity=(travel(t+8).x-travel(t-8).x)/16,strength=clamp(Math.abs(velocity)*8);
  const lag=adapted&&motion.held?-Math.sign(velocity)*3.5*strength:0;
  const release=adapted&&!horizontalOnly&&t>=3500?Math.sin((t-3500)/1000*Math.PI*4)*Math.exp(-(t-3500)/210)*4:0;
- return {...result,action,x:motion.x+lag,y:lift+release,angle:adapted&&motion.held?-Math.sign(velocity)*1.8*strength:0,motion};
+ return {...result,action,x:motion.x+lag,y:lift+release,angle:adapted&&motion.held&&!horizontalOnly?-Math.sign(velocity)*1.8*strength:0,motion};
 }
 export function affectionPose(meta,form,t){
+ if(meta.forms[form].clips.affection){
+  const elapsed=t<2450?t-550:t-2450,active=elapsed>=0&&elapsed<1900;
+  const frame=Math.max(0,Math.min(7,Math.floor(Math.max(0,elapsed)/1900*8)));
+  return {...sourcePose(meta,form,active?'affection':'down',active?frame/meta.fps*1000:0,{loop:false}),active};
+ }
  // The source super/happy performance is a large laugh and wide crown roll.
  // A stroke should use its normal small-faced hovering cycle instead.
  if(form==='super')return {...sourcePose(meta,form,'down',Math.max(0,t-550)),active:t>=550&&t<3700};
@@ -49,7 +56,23 @@ async function loadImage(path){const im=new Image();im.src=path;await im.decode(
 export async function loadSourcePreview(){
  const response=await fetch(BASE+'manifest.json');if(!response.ok)throw Error('Preview source manifest missing');const meta=await response.json();
  const keys=[...Object.keys(meta.forms).map(f=>f+'-red'),'middle-boring-original','seed-red','hand-ready','hand-stroke','hand-leave','net','butterfly-0','butterfly-1','butterfly-2','butterfly-3'];
- const entries=await Promise.all(keys.map(async k=>[k,await loadImage(BASE+k+'.png')]));return {meta,images:Object.fromEntries(entries),pot:await loadImage('/assets/original/seed/pot.png')};
+ const entries=await Promise.all(keys.map(async k=>[k,await loadImage(BASE+k+'.png')]));const images=Object.fromEntries(entries);
+ const affection=await (await fetch('/assets/original/affection/source.json')).json();
+ for(const form of Object.keys(meta.forms)){
+  const [neutral,mask]=await Promise.all(['neutral','mask'].map(k=>loadImage(`/assets/original/affection/${form}-${k}.png`)));
+  const c=document.createElement('canvas');c.width=1536;c.height=208;const context=c.getContext('2d');context.drawImage(mask,0,0);const m=context.getImageData(0,0,c.width,c.height).data;context.clearRect(0,0,c.width,c.height);context.drawImage(neutral,0,0);const n=context.getImageData(0,0,c.width,c.height);
+  const ds=[255,204,153].map(b=>[255,-199,-250].map(v=>Math.max(0,Math.min(255,b+v))-b));
+  for(let i=0;i<n.data.length;i+=4)for(let k=0;k<3;k++)n.data[i+k]=Math.max(0,Math.min(255,n.data[i+k]+ds[0][k]*m[i]/255+ds[1][k]*m[i+1]/255+ds[2][k]*m[i+2]/255));context.putImageData(n,0,0);
+  const atlas=document.createElement('canvas');atlas.width=256*8;atlas.height=256;const a=atlas.getContext('2d'),poses=[];
+  for(let frame=0;frame<8;frame++){
+   a.drawImage(c,frame*192,0,192,208,frame*256+32,24,192,208);
+   const pixels=context.getImageData(frame*192,0,192,208).data;let top=208,bottom=0,left=192,right=0,hx=96;
+   for(let y=0;y<208;y++)for(let x=0;x<192;x++)if(pixels[(y*192+x)*4+3]>100){if(y<top){top=y;hx=x}left=Math.min(left,x);right=Math.max(right,x+1);bottom=Math.max(bottom,y+1)}
+   poses.push({body:affection.forms[form].body[frame].map((v,i)=>v+(i%2?24:32)),art:[left+32,top+24,right+32,bottom+24],head:[hx+32,top+24],sourceFrame:affection.forms[form].sourceFrames[frame]});
+  }
+  images[form+'-affection-red']=atlas;meta.forms[form].clips.affection={kind:'affection',frameCount:8,frameMap:[0,1,2,3,4,5,6,7],poses};
+ }
+ return {meta,images,pot:await loadImage('/assets/original/seed/pot.png')};
 }
 
 export function createSourceMotionPreview(canvas,assets,mode){
@@ -62,11 +85,11 @@ export function createSourceMotionPreview(canvas,assets,mode){
   const grip=b=>[(b[0]+b[2])/2,b[1]];
   const canonical=meta.forms[form].clips.down.poses[meta.forms[form].canonical],cg=grip(canonical.body),g=grip(result.pose.body);
   const cursor=[cx+(cg[0]-128)*scale,baseY+(cg[1]-195)*scale];
-  if(held){cx-=(g[0]-cg[0])*scale;baseY-=(g[1]-cg[1])*scale}
+  if(['junior','middle'].includes(form)&&mode!=='pet'&&mode!=='butterfly'){cx-=(g[0]-cg[0])*scale;baseY-=(result.pose.body[3]-canonical.body[3])*scale}else if(held){cx-=(g[0]-cg[0])*scale;baseY-=(g[1]-cg[1])*scale}
   const x=cx-128*scale,y=baseY-195*scale;
   const pivot=held?[x+g[0]*scale,y+g[1]*scale]:[cx,baseY];
   if(paint){ctx.save();ctx.translate(...pivot);ctx.rotate(rotation*Math.PI/180);ctx.translate(-pivot[0],-pivot[1]);
-  sprite(images[original?'middle-boring-original':form+'-red'],original?result.frame:result.cell,x,y,size*scale,size*scale);ctx.restore();}
+  sprite(images[original?'middle-boring-original':result.clip.kind==='affection'?form+'-affection-red':form+'-red'],original?result.frame:result.cell,x,y,size*scale,size*scale);ctx.restore();}
   const project=b=>[x+b[0]*scale,y+b[1]*scale,x+b[2]*scale,y+b[3]*scale];
   if(paint)trace.push({form,clip:result.action??(result.clip===meta.forms[form].clips.happy?'happy':original?'original-boring':'source'),sourceFrame:result.pose.sourceFrame,held,body:project(result.pose.body)});
   return {x,y,scale,body:project(result.pose.body),art:project(result.pose.art),head:[x+result.pose.head[0]*scale,y+result.pose.head[1]*scale],cursor,result};
@@ -86,7 +109,7 @@ export function createSourceMotionPreview(canvas,assets,mode){
  function seed(cx,baseY,scale,t,held=false){
   const x=cx-128*scale,y=baseY-222*scale;
   ctx.drawImage(assets.pot,x+68*scale,y+119*scale,119*scale,103*scale);
-  const frame=held?Math.floor(Math.max(0,t)*24/1000)%24:0;
+  const frame=held?(mode==='pet'?[0,1,2,4,4,2,1,0][Math.min(7,Math.floor(Math.max(0,t-550)/400))]:Math.floor(Math.max(0,t)*24/1000)%24):0;
   ctx.drawImage(images['seed-red'],frame%8*96,Math.floor(frame/8)*99,96,99,x+83*scale,y+60*scale,96*scale,99*scale);
   return {body:[x+88*scale,y+68*scale,x+170*scale,y+151*scale],art:[x+83*scale,y+60*scale,x+179*scale,y+159*scale],head:[cx,y+73*scale],x,y,scale};
  }
@@ -94,15 +117,15 @@ export function createSourceMotionPreview(canvas,assets,mode){
   ctx.save();ctx.globalAlpha=clamp(opacity);ctx.font='22px sans-serif';ctx.fillStyle='#ef6b7e';ctx.textAlign='center';ctx.fillText('♥',x,y);ctx.restore();
  }
  function moving(t){
-  text('原版左右移动  /  手动拖拽适配',canvas.width/2,30,18);text(travel(t).phase,canvas.width/2,56,13);
+  text('拿起之前  /  水平拖拽与松手',canvas.width/2,30,18);text(travel(t).phase,canvas.width/2,56,13);
   for(let row=0;row<2;row++){
    const form=row?'middle':'junior',baseline=191+row*180;
    for(let col=0;col<2;col++){
-    const adapted=col===1,p=dragPose(meta,form,t,adapted),cx=180+col*360+p.x;
+    const adapted=col===1,p=adapted?dragPose(meta,form,t,true):{...dragPose(meta,form,0,true),x:0,y:0,angle:0},cx=180+col*360+p.x;
     if(!adapted){ctx.fillStyle='#745b4820';ctx.beginPath();ctx.ellipse(cx,baseline+3,27,5,0,0,Math.PI*2);ctx.fill()}
     const a=body(form,p,cx,baseline+p.y,.68,p.angle,false,true,adapted&&p.motion.held);
     if(adapted&&p.motion.held){ctx.strokeStyle='#8a6846';ctx.lineWidth=1.6;ctx.fillStyle='#fff9';ctx.beginPath();ctx.arc(a.cursor[0]+p.motion.x-p.x,a.cursor[1],4,0,Math.PI*2);ctx.fill();ctx.stroke()}
-    text(`${LABELS[form]} · ${adapted?'拖动 / 松手':'原版侧向动作'}`,180+col*360,baseline+33,14);
+    text(`${LABELS[form]} · ${adapted?'拖动 / 松手':'安静站好'}`,180+col*360,baseline+33,14);
    }
   }
  }
@@ -118,7 +141,7 @@ export function createSourceMotionPreview(canvas,assets,mode){
   });
  }
  function petting(t){
-  text('摸摸 · 用原版开心动作回应你',425,30,18);text(t<550?'手伸过来，拉姆看见你了':t<1650?'摸到啦，身体和叶片一起回应':t<2450?'它还在开心地晃着呢':t<3650?'再摸一下，软软地靠过来':'好啦，继续陪你',425,57,13);
+  text('摸摸 · 闭眼享受，轻轻靠向手掌',425,30,18);text(t<550?'手伸过来，拉姆看见你了':t<1650?'摸到啦，身体和叶片一起回应':t<2450?'它还在开心地晃着呢':t<3650?'再摸一下，软软地靠过来':'好啦，继续陪你',425,57,13);
   ['seed','junior','middle','senior','super'].forEach((form,i)=>{
    const cx=85+i*170,base=218;
    let x=cx,y=base;

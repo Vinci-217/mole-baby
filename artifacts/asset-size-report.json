@@ -1,0 +1,20 @@
+{
+  "images": {
+    "count": 706,
+    "before": 82508489,
+    "after": 49030618,
+    "saved": 33477871,
+    "pixelVerification": "identical visible RGBA and all alpha values"
+  },
+  "linuxSameElectron": {
+    "electron": "35.7.5",
+    "before": 408813293,
+    "after": 303508014,
+    "beforeAsar": 121164367,
+    "afterAsar": 57919524,
+    "beforeLocales": 43062448,
+    "afterLocales": 1002012,
+    "saved": 105305279
+  },
+  "windowsMac": "Shared asset and language optimizations configured; final native installer sizes not measured on these platforms in this preview."
+}

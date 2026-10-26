@@ -1,0 +1,15 @@
+const{chromium,expect}=require('@playwright/test'),{spawn}=require('node:child_process'),path=require('node:path'),fs=require('node:fs'),assert=require('node:assert/strict');
+const{adopt,enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs'),root=path.resolve(__dirname,'..'),url='http://127.0.0.1:5240';let browser;
+const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','5240','--strictPort'],{cwd:root,stdio:'ignore'});
+(async()=>{
+ for(let i=0;i<100;i++){try{if((await fetch(url)).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}
+ browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true});const p=await browser.newPage({viewport:{width:1180,height:820}}),errors=[],failed=[];p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.status()>=400&&r.url().startsWith(url))failed.push(r.url())});
+ await p.goto(url);await p.evaluate(()=>localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({presence:false,lively:false,sound:false})));await p.reload();await adopt(p,'红色','小芽');
+ for(const [growth,evolution] of [[0,null],[60,null],[180,null],[420,null],[840,'super'],[840,'water'],[840,'wood'],[840,'fire']]){
+  await p.evaluate(({growth,evolution})=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(pet,{growth,coins:2000,sleeping:false,lastTick:Date.now(),wardrobe:['wizard-cap'],wearing:'wizard-cap',stats:{hunger:80,thirst:80,cleanliness:80,happiness:90,health:100,energy:60}});delete pet.evolution;if(evolution)pet.evolution=evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet))},{growth,evolution});await p.reload();const ram=p.getByTestId('desktop-character').locator('.ram-sprite');await expect(ram.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true');await expect(ram).not.toHaveAttribute('data-fallback','true');await expect(ram.locator('.ram-wear')).toHaveAttribute('data-loaded','true');
+  await p.getByTestId('desktop-character').click();if(growth)await expect(ram.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-sheet','affection');
+  await p.waitForTimeout(2450);await enterHome(p);await roomTab(p,'背包');await p.locator('.paper-tabs').getByRole('button',{name:'商店',exact:true}).click();await p.locator('img').evaluateAll(images=>Promise.all(images.filter(im=>im.src&&!im.src.startsWith('data:')).map(im=>im.decode())));
+  await p.getByRole('button',{name:'关闭面板',exact:true}).click();await toDesktop(p);
+ }
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);const report=JSON.parse(fs.readFileSync(root+'/dist/asset-size-report.json','utf8'));assert.ok(report.saved>20_000_000);assert.ok(report.count>600);console.log('PASS optimized production build: eight forms, normal/affection sprites, original headwear, shop/pocket images; no missing assets or page errors; exact visible RGBA/alpha verified for '+report.count+' compressed images');
+})().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

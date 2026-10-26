@@ -24,6 +24,8 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   happy: { row: 8, frames: [0, 1, 2, 3, 4, 5], step: 300 },
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
+/** Public renderer vocabulary; the README catalogue checks every entry. */
+export const RAM_ACTIONS=[...new Set([...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','balance'])]
 export function getRamActionDuration(action: string,form='junior'): number | null {
   if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:action==='balance'?8000:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
   if(isMoodAction(action))return emotionDuration(action,form)??3600

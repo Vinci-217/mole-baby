@@ -1,0 +1,190 @@
+{
+  "actions": [
+    "eat",
+    "feed",
+    "drink",
+    "wash",
+    "use",
+    "medical",
+    "thirsty",
+    "hungry",
+    "sick",
+    "tired",
+    "dirty",
+    "pet",
+    "waving",
+    "catch",
+    "failed",
+    "play",
+    "reward",
+    "happy",
+    "wake",
+    "idle",
+    "waiting",
+    "still",
+    "drag",
+    "walk-left",
+    "walk-right",
+    "running-left",
+    "running-right",
+    "running",
+    "focus",
+    "dizzy",
+    "watch-butterfly",
+    "look-around",
+    "sleep",
+    "peek",
+    "hide",
+    "review",
+    "mood-joy",
+    "mood-grumpy",
+    "mood-content",
+    "mood-dozy",
+    "read-alone",
+    "play-alone",
+    "spell",
+    "balance"
+  ],
+  "items": [
+    {
+      "id": "berry",
+      "action": "eat-cocoa"
+    },
+    {
+      "id": "biscuit",
+      "action": "eat-bear-biscuit"
+    },
+    {
+      "id": "juice",
+      "action": "drink-berry-juice"
+    },
+    {
+      "id": "180001",
+      "action": "eat-chocolate-beans"
+    },
+    {
+      "id": "180002",
+      "action": "drink-malt-milk"
+    },
+    {
+      "id": "180003",
+      "action": "bubble-bath"
+    },
+    {
+      "id": "180005",
+      "action": "take-magic-medicine"
+    },
+    {
+      "id": "180007",
+      "action": "eat-leaf-dumpling"
+    },
+    {
+      "id": "180009",
+      "action": "wash-apple-face"
+    },
+    {
+      "id": "180010",
+      "action": "eat-watermelon"
+    },
+    {
+      "id": "180014",
+      "action": "drink-sport-cola"
+    },
+    {
+      "id": "180018",
+      "action": "eat-mole-burger"
+    },
+    {
+      "id": "180019",
+      "action": "eat-crystal-cake"
+    },
+    {
+      "id": "180020",
+      "action": "eat-ham-sandwich"
+    },
+    {
+      "id": "180021",
+      "action": "drink-carrot-juice"
+    },
+    {
+      "id": "180022",
+      "action": "shower-fresh"
+    },
+    {
+      "id": "180024",
+      "action": "brush-teeth"
+    },
+    {
+      "id": "180025",
+      "action": "eat-jumping-pudding"
+    },
+    {
+      "id": "180028",
+      "action": "drink-gugu-fruit"
+    },
+    {
+      "id": "180029",
+      "action": "rinse-shuang-fruit"
+    },
+    {
+      "id": "180030",
+      "action": "eat-happy-fruit"
+    },
+    {
+      "id": "180043",
+      "action": "eat-apple-pie"
+    },
+    {
+      "id": "180044",
+      "action": "eat-strawberry-pie"
+    },
+    {
+      "id": "180045",
+      "action": "eat-ram-bun"
+    },
+    {
+      "id": "180047",
+      "action": "eat-hotdog"
+    },
+    {
+      "id": "180070",
+      "action": "eat-cloud-bread"
+    },
+    {
+      "id": "180071",
+      "action": "eat-energy-star"
+    },
+    {
+      "id": "180073",
+      "action": "drink-quality-milk"
+    },
+    {
+      "id": "recolor-red",
+      "action": "drink-color-red"
+    },
+    {
+      "id": "recolor-yellow",
+      "action": "drink-color-yellow"
+    },
+    {
+      "id": "recolor-blue",
+      "action": "drink-color-blue"
+    },
+    {
+      "id": "recolor-pink",
+      "action": "drink-color-pink"
+    }
+  ],
+  "outfits": [
+    "party-cap",
+    "gold-feather",
+    "wizard-cap",
+    "star-wand",
+    "magic-book",
+    "rabbit-hood",
+    "leaf-hood",
+    "sport-goggles",
+    "warm-scarf"
+  ],
+  "missing": []
+}

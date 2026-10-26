@@ -2,134 +2,207 @@
 
 > **动画研究预览，尚未发布。** 本分支效果等待用户审阅；当前正式版为 [v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)。未经用户明确确认，不推送新版本到自动更新渠道。
 
-## 本轮动作预览（待确认）
+## 本轮重点预览（未发布）
 
-角色采用原版完整动作帧；手动拖拽、手掌、网与蝴蝶的编排是桌宠适配。修订只保存在预览分支，尚未发布。原帧交互方案仍单独审阅；睡眠与界面修复已写入预览源码；你认可的足球素材与播放代码未修改。
+先看这三项：中级水平拖动、安静睡觉、闭眼享受摸摸。下面的“真实拖拽”来自应用实际的拖动钩子，检查了最终画面中身体上下边界的位置。
 
-**初级 / 中级：原版左右移动与手动拖拽对照**
+![真实拖拽：初级和中级只左右移动，松手不抬升](artifacts/animation-gallery/drag.gif)
 
-左边是原版侧向移动，右边是拖起来、换方向、松手归位。保留原来的侧脸、身体和叶片变化，初级、中级只沿水平方向拖动和换向，没有额外上下抬升、松手弹跳。鼠标抓取点约束身体位置。
+![安静睡觉：体型与叶冠不扭曲，闭眼和小嘴呼吸](artifacts/animation-gallery/sleep.gif)
 
-![初级中级移动与手动拖拽对照](artifacts/v30-preview/move.gif)
+![原帧摸摸方案：闭眼微笑，轻轻靠向手掌](artifacts/v30-preview/pet.gif)
 
-**五阶段手动拖拽**
+## 全部现有动画（全部展开）
 
-![五阶段原帧拖拽预览](artifacts/v30-preview/drag.gif)
+按渲染器动作清单核对，覆盖 **44 个动作名、32 种用品、9 件装扮**。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，均未发布到正式版。
 
-**追蝴蝶：原著追虫动作与桌宠适配对照**
+### 日常移动与张望
 
-中级原版217帧追虫动作作为身体参考；蝴蝶绕网、躲开，拉姆回头继续追看。没有新增捕捉奖励或游戏数值。
+![日常移动与张望](artifacts/animation-gallery/movement.gif)
 
-![原著追虫与追蝴蝶适配对照](artifacts/v30-preview/butterfly.gif)
-
-**摸摸：五阶段回应**
-
-手掌接近、轻抚、离开。种子花盆保持端正；神力超拉改用正常小脸的悬浮帧，收小幅度，不再使用大嘴大笑和大幅翻转。
-
-![五阶段摸摸原帧预览](artifacts/v30-preview/pet.gif)
-
-[本轮修复与验证](research/v31-animation-review.md) · [参考来源、适配范围和验证](research/v30-motion-previews.md) · [清晰移动视频](artifacts/v30-preview/move.webm) · [追蝶视频](artifacts/v30-preview/butterfly.webm) · [摸摸视频](artifacts/v30-preview/pet.webm)
-
-## 全部动作 GIF 目录（预览源码，未发布）
-
-下面使用实际应用的角色组件、道具、服饰和动作时钟录制，均为24fps。点击分类展开；这里展示现有动作，也方便继续指出需要重做的地方。上面的原帧拖拽、追蝶与摸摸是另行审阅的交互方案，不能当作已发版效果。
-
-<details open>
-<summary>睡前哈欠 → 安睡 → ZZZ，及醒来、困倦</summary>
-
-![睡前哈欠 → 安睡 → ZZZ，及醒来、困倦](artifacts/animation-gallery/sleep.gif)
-
-</details>
-
-<details>
-<summary>摸摸、专注翻书、挥网逗蝴蝶</summary>
-
-![摸摸、专注翻书、挥网逗蝴蝶](artifacts/animation-gallery/interaction.gif)
-
-</details>
-
-<details>
-<summary>陪伴、左右移动、张望与招呼</summary>
-
-![陪伴、左右移动、张望与招呼](artifacts/animation-gallery/movement.gif)
-
-</details>
-
-<details>
-<summary>开心、接到物品、奖励与失落</summary>
+### 开心、接到物品、奖励与失落
 
 ![开心、接到物品、奖励与失落](artifacts/animation-gallery/reactions.gif)
 
-</details>
+### 安静睡觉 · 原型眼睑和小小的呼吸
 
-<details>
-<summary>开心、闷闷不乐、安心、眩晕</summary>
+![安静睡觉 · 原型眼睑和小小的呼吸](artifacts/animation-gallery/sleep.gif)
 
-![开心、闷闷不乐、安心、眩晕](artifacts/animation-gallery/moods.gif)
+### 摸摸、翻书与逗蝴蝶 · 应用内动作
 
-</details>
+![摸摸、翻书与逗蝴蝶 · 应用内动作](artifacts/animation-gallery/interaction.gif)
 
-<details>
-<summary>饥饿、口渴、清洁、病态、疲倦与难过</summary>
+### 不同心情的回应
 
-![饥饿、口渴、清洁、病态、疲倦与难过](artifacts/animation-gallery/conditions.gif)
+![不同心情的回应](artifacts/animation-gallery/moods.gif)
 
-</details>
+### 需要照料时的小状态
 
-<details>
-<summary>自己看书、完整足球、顶书练习与魔法变装</summary>
+![需要照料时的小状态](artifacts/animation-gallery/conditions.gif)
 
-![自己看书、完整足球、顶书练习与魔法变装](artifacts/animation-gallery/pastimes.gif)
+### 自己的小日子
 
-</details>
+![自己的小日子](artifacts/animation-gallery/pastimes.gif)
 
-<details>
-<summary>左、右、上、下：走入、藏好与探头</summary>
+### 四边走入 / 藏好 / 探头 · 动作层预览
 
-![左、右、上、下：走入、藏好与探头](artifacts/animation-gallery/edges.gif)
+![四边走入 / 藏好 / 探头 · 动作层预览](artifacts/animation-gallery/edges.gif)
 
-</details>
+### 全部消耗用品 · 第一页
 
-<details>
-<summary>全部消耗用品（1/2）</summary>
+![全部消耗用品 · 第一页](artifacts/animation-gallery/items1.gif)
 
-![全部消耗用品（1/2）](artifacts/animation-gallery/items1.gif)
+### 全部消耗用品 · 第二页
 
-</details>
+![全部消耗用品 · 第二页](artifacts/animation-gallery/items2.gif)
 
-<details>
-<summary>全部消耗用品（2/2）</summary>
+### 九件装扮 · 摸摸 / 睡觉 / 看书 / 玩球
 
-![全部消耗用品（2/2）](artifacts/animation-gallery/items2.gif)
+![九件装扮 · 摸摸 / 睡觉 / 看书 / 玩球](artifacts/animation-gallery/wardrobe.gif)
 
-</details>
+### 四种最高形态 · 轻轻摸摸 / 闭眼安睡 / 左右飞行
 
-<details>
-<summary>九件装扮在不同动作中的表现</summary>
+![四种最高形态 · 轻轻摸摸 / 闭眼安睡 / 左右飞行](artifacts/animation-gallery/evolutions.gif)
 
-![九件装扮在不同动作中的表现](artifacts/animation-gallery/wardrobe.gif)
+### 四种颜色 · 安静睡眠
 
-</details>
+![四种颜色 · 安静睡眠](artifacts/animation-gallery/colours.gif)
 
-<details>
-<summary>四种最高形态：摸摸、睡眠与左右飞行</summary>
+### 完整玩球 · 全部八种形态
 
-![四种最高形态：摸摸、睡眠与左右飞行](artifacts/animation-gallery/evolutions.gif)
+![完整玩球 · 全部八种形态](artifacts/animation-gallery/football.gif)
 
-</details>
+### 其余现有动作 · 1
 
-<details>
-<summary>四种颜色、五个阶段的哈欠与安睡</summary>
+![其余现有动作 · 1](artifacts/animation-gallery/remaining-1.gif)
 
-![四种颜色、五个阶段的哈欠与安睡](artifacts/animation-gallery/colours.gif)
+### 其余现有动作 · 2
 
-</details>
+![其余现有动作 · 2](artifacts/animation-gallery/remaining-2.gif)
 
-走入/探头GIF展示动作层；实际屏幕边缘还由原生窗口控制。相同类别用品共用一套动作，图案与换色效果分别展示。没有独立动作的别名、出游机制及录制方法见[动作说明](research/v31-animation-review.md)。
+### 其余现有动作 · 3
 
-**气泡修复：** 上移避免挡脸，到时彻底移除；小屋底部重复提示框已删除。
+![其余现有动作 · 3](artifacts/animation-gallery/remaining-3.gif)
 
-![气泡与角色留出空间](artifacts/animation-gallery/speech-fixed.png)
+### 其余现有动作 · 4
+
+![其余现有动作 · 4](artifacts/animation-gallery/remaining-4.gif)
+
+### 庆生小帽 · 全部形态的摸摸回应
+
+![庆生小帽 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-party-cap.gif)
+
+### 金色羽毛 · 全部形态的摸摸回应
+
+![金色羽毛 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-gold-feather.gif)
+
+### 紫色魔法帽 · 全部形态的摸摸回应
+
+![紫色魔法帽 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-wizard-cap.gif)
+
+### 星星魔杖 · 全部形态的摸摸回应
+
+![星星魔杖 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-star-wand.gif)
+
+### 魔法书 · 全部形态的摸摸回应
+
+![魔法书 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-magic-book.gif)
+
+### 粉兔帽 · 全部形态的摸摸回应
+
+![粉兔帽 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-rabbit-hood.gif)
+
+### 火焰羽翼 · 全部形态的摸摸回应
+
+![火焰羽翼 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-leaf-hood.gif)
+
+### 彩虹眼罩 · 全部形态的摸摸回应
+
+![彩虹眼罩 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-sport-goggles.gif)
+
+### 皇冠猫耳 · 全部形态的摸摸回应
+
+![皇冠猫耳 · 全部形态的摸摸回应](artifacts/animation-gallery/outfit-warm-scarf.gif)
+
+### 原帧交互方案与来源对照
+
+这些是独立的动作研究：左右拖动用固定侧向姿态，关闭原步行动作里的跳起；追蝶保留原217帧追虫的身体与叶片。角色来自原素材，道具和交互编排属于桌宠适配。
+
+![初中级拿起前与水平拖动](artifacts/v30-preview/move.gif)
+
+![五阶段原帧拖动](artifacts/v30-preview/drag.gif)
+
+![原版追虫与追蝴蝶适配](artifacts/v30-preview/butterfly.gif)
+
+### 动作名与预览对应
+
+| 动作名 | GIF 分类 |
+| --- | --- |
+| `eat` | [remaining-1](artifacts/animation-gallery/remaining-1.gif) |
+| `feed` | [remaining-1](artifacts/animation-gallery/remaining-1.gif) |
+| `drink` | [remaining-1](artifacts/animation-gallery/remaining-1.gif) |
+| `wash` | [remaining-1](artifacts/animation-gallery/remaining-1.gif) |
+| `use` | [remaining-2](artifacts/animation-gallery/remaining-2.gif) |
+| `medical` | [remaining-2](artifacts/animation-gallery/remaining-2.gif) |
+| `thirsty` | [conditions](artifacts/animation-gallery/conditions.gif) |
+| `hungry` | [conditions](artifacts/animation-gallery/conditions.gif) |
+| `sick` | [conditions](artifacts/animation-gallery/conditions.gif) |
+| `tired` | [conditions](artifacts/animation-gallery/conditions.gif) |
+| `dirty` | [conditions](artifacts/animation-gallery/conditions.gif) |
+| `pet` | [interaction](artifacts/animation-gallery/interaction.gif) |
+| `waving` | [movement](artifacts/animation-gallery/movement.gif) |
+| `catch` | [reactions](artifacts/animation-gallery/reactions.gif) |
+| `failed` | [reactions](artifacts/animation-gallery/reactions.gif) |
+| `play` | [wardrobe](artifacts/animation-gallery/wardrobe.gif) |
+| `reward` | [reactions](artifacts/animation-gallery/reactions.gif) |
+| `happy` | [reactions](artifacts/animation-gallery/reactions.gif) |
+| `wake` | [sleep](artifacts/animation-gallery/sleep.gif) |
+| `idle` | [movement](artifacts/animation-gallery/movement.gif) |
+| `waiting` | [edges](artifacts/animation-gallery/edges.gif) |
+| `still` | [remaining-2](artifacts/animation-gallery/remaining-2.gif) |
+| `drag` | [drag](artifacts/animation-gallery/drag.gif) |
+| `walk-left` | [movement](artifacts/animation-gallery/movement.gif) |
+| `walk-right` | [movement](artifacts/animation-gallery/movement.gif) |
+| `running-left` | [remaining-2](artifacts/animation-gallery/remaining-2.gif) |
+| `running-right` | [remaining-3](artifacts/animation-gallery/remaining-3.gif) |
+| `running` | [remaining-3](artifacts/animation-gallery/remaining-3.gif) |
+| `focus` | [interaction](artifacts/animation-gallery/interaction.gif) |
+| `dizzy` | [moods](artifacts/animation-gallery/moods.gif) |
+| `watch-butterfly` | [interaction](artifacts/animation-gallery/interaction.gif) |
+| `look-around` | [movement](artifacts/animation-gallery/movement.gif) |
+| `sleep` | [sleep](artifacts/animation-gallery/sleep.gif) |
+| `peek` | [remaining-3](artifacts/animation-gallery/remaining-3.gif) |
+| `hide` | [remaining-3](artifacts/animation-gallery/remaining-3.gif) |
+| `review` | [remaining-4](artifacts/animation-gallery/remaining-4.gif) |
+| `mood-joy` | [moods](artifacts/animation-gallery/moods.gif) |
+| `mood-grumpy` | [moods](artifacts/animation-gallery/moods.gif) |
+| `mood-content` | [moods](artifacts/animation-gallery/moods.gif) |
+| `mood-dozy` | [sleep](artifacts/animation-gallery/sleep.gif) |
+| `read-alone` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
+| `play-alone` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
+| `spell` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
+| `balance` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
+
+### 其余已有动图（历史方案 / 原素材参考）
+
+以下保留在仓库中的动图全部列出，用于对照；它们不是本轮已认可的效果。
+
+![历史 / 原素材：v21-original-actions.gif](artifacts/v21-original-actions.gif)
+
+![历史 / 原素材：v22-moods-wardrobe.gif](artifacts/v22-moods-wardrobe.gif)
+
+![历史 / 原素材：v29-bouncy-pull.gif](artifacts/v29-bouncy-pull.gif)
+
+![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
+
+[本轮修订、空间测量与验证](research/v32-animation-and-size.md) · [原素材来源](research/v30-motion-previews.md)
+
+## 体积精简（本地预览构建）
+
+运行图片由82.51 MB降到49.03 MB，逐张核对全部透明度和可见像素一致。安装目录剔除重复的前端库，Electron语言资源保留中文、英文。同版本Electron的Linux目录实测约409 MB → 304 MB，减少约26%；Windows/macOS最终安装包大小待各自构建验证。预览GIF和录屏帧不进入安装目录，录屏中间帧编码后自动清理。
+
+[测量明细与验证范围](research/v32-animation-and-size.md)
+
 
 ---
 

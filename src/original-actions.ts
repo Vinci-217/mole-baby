@@ -32,16 +32,15 @@ export function slumberFrame(elapsed:number,reduced=false):number {
   const breath=Math.sin((phase-1100)/3300*Math.PI)
   return Math.round(breath*breath*7)
 }
-/** One finite yawn at sleep entry, then a quiet mouth-only breathing cycle.
- * Sleeping does not repeatedly yawn or move its pot/body registration. */
+/** Relaxed original eyelids and a quiet, small mouth; no enlarged yawn face. */
 export function sleepPose(elapsed:number,reduced=false):{sheet:'yawn'|'slumber';row:number;frame:number;finished:false} {
-  if(reduced)return {sheet:'slumber',row:0,frame:0,finished:false}
-  const t=Math.max(0,elapsed)
-  if(t<2400){
-    const open=t<350?0:t<1150?Math.sin((t-350)/800*Math.PI/2):t<1450?1:t<2250?Math.cos((t-1450)/800*Math.PI/2):0
-    return {sheet:'yawn',row:0,frame:Math.round(open*open*7),finished:false}
-  }
-  return {sheet:'slumber',row:0,frame:slumberFrame(t-2400),finished:false}
+  return {sheet:'slumber',row:0,frame:slumberFrame(elapsed,reduced),finished:false}
+}
+export function affectionFrame(elapsed:number,reduced=false):number {
+ if(reduced)return 0
+ const times=[180,300,500,800,1150,1500,1850,2100];let frame=0
+ for(let i=1;i<times.length;i++)if(elapsed>=times[i])frame=i
+ return frame
 }
 export function slumberMouth(form:RamForm):readonly number[] {
   const point=slumber.forms[form].mouthPoint

@@ -25,5 +25,5 @@ export function groundedMotion(form:string,action:string,elapsed:number,clock:nu
   if(action==='watch-butterfly'){eyeX=Math.sin(elapsed/6500*Math.PI*2)*2;eyeY=-1.1}
   if(action==='look-around'){eyeX=Math.sin(elapsed/3600*Math.PI*2)*2;eyeY=-.3}
   const reaction=action==='play'?sampleSocialMotion(form==='junior'?1:2,'play',elapsed).contact:action==='pet'?Math.sin(elapsed/490*Math.PI*2)*Math.sin(Math.min(1,elapsed/2400)*Math.PI):0
-  return {frame,eyeX:Math.max(-2.4,Math.min(2.4,eyeX)),eyeY:Math.max(-1.5,Math.min(1.5,eyeY)),leafAngle:form==='middle'?Math.sin(clock/2200)*1.15+reaction*4:0}
+  return {frame,eyeX:Math.max(-2.4,Math.min(2.4,eyeX)),eyeY:Math.max(-1.5,Math.min(1.5,eyeY)),leafAngle:action==='drag'?0:form==='middle'?Math.sin(clock/2200)*1.15+reaction*4:0}
 }

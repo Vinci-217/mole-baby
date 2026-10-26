@@ -1,23 +1,15 @@
 {
-  "description": "Original sleepy eyelids from boring, original mouth silhouette743; a desktop breathing adaptation, not an official sleep clip.",
+  "description": "Original closed-eye shapes35/1726 at natural spacing, original mouth743 kept small. Quiet desktop sleep adaptation; the body, crown and seed pot stay upright. Not a complete official sleep clip.",
   "eyes": {
     "seed": 35,
     "junior": 1726,
     "other": 1726
   },
   "mouth": 743,
-  "eyeSpanRatio": 0.52,
-  "mouthSpanRatio": 0.065,
-  "eyeInk": [
-    91,
-    56,
-    39
-  ],
-  "mouthInk": [
-    88,
-    36,
-    28
-  ],
+  "eyeSpanRatio": 0.88,
+  "mouthSpanRatio": 0.055,
+  "eyeInk": "original",
+  "mouthInk": "original",
   "forms": {
     "seed": {
       "cell": [
@@ -32,7 +24,7 @@
         1.7260273972602675
       ],
       "mouthPoint": [
-        46.81792237442923,
+        47.081906392694066,
         29.64577279645772
       ],
       "snorePoint": [
@@ -53,12 +45,12 @@
         26.516129032258064
       ],
       "mouthPoint": [
-        48.96841397849463,
-        57.772952853598014
+        49.22379032258065,
+        57.53722084367246
       ],
       "snorePoint": [
         93.0625,
-        57.772952853598014
+        57.53722084367246
       ]
     },
     "middle": {
@@ -75,11 +67,11 @@
       ],
       "mouthPoint": [
         51.9058426443203,
-        69.59604641168886
+        69.75988397077782
       ],
       "snorePoint": [
         87.85416666666666,
-        69.59604641168886
+        69.75988397077782
       ]
     },
     "senior": {
@@ -116,7 +108,7 @@
         10.66459627329192
       ],
       "mouthPoint": [
-        47.6271350931677,
+        47.4896480331263,
         82.66991161012899
       ],
       "snorePoint": [
@@ -158,7 +150,7 @@
         8.69811320754718
       ],
       "mouthPoint": [
-        46.968356918238996,
+        46.79638364779875,
         81.01415094339622
       ],
       "snorePoint": [
@@ -179,12 +171,12 @@
         13.948387096774212
       ],
       "mouthPoint": [
-        38.8239247311828,
-        79.72394540942929
+        39.02217741935485,
+        79.54094292803971
       ],
       "snorePoint": [
         85.25,
-        79.72394540942929
+        79.54094292803971
       ]
     }
   },

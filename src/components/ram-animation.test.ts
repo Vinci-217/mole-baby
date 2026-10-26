@@ -106,7 +106,7 @@ describe('continuous original airborne posture',()=>{
    const frames=new Set<number>();for(let t=0;t<2000;t+=20){const pose=sampleFlyingPose('idle',t,false,form);expect(pose.row).toBe(0);expect(pose.sheet).toBeUndefined();frames.add(pose.frame);expect(sampleFlyingPose('pet',t%2000,false,form,t).frame).toBe(pose.frame);}
    expect(frames.size).toBe(6);
    expect(sampleFlyingPose('pet',0,false,form,350).frame).toBe(sampleFlyingPose('idle',350,false,form,350).frame);
-   expect(sampleFlyingPose('idle',1000,true,form).frame).toBe(0);expect(sampleFlyingPose('sleep',1000,false,form).sheet).toBe('yawn');
+   expect(sampleFlyingPose('idle',1000,true,form).frame).toBe(0);expect(sampleFlyingPose('sleep',1000,false,form).sheet).toBe('slumber');
   }
  });
  it('keeps the original large eyes on hand contact without restarting the flight frame',()=>{

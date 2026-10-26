@@ -1,0 +1,5 @@
+/** Only disposable numeric PNG frames; never touch tracked art or user saves. */
+const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const root=path.resolve(__dirname,'..'),apply=process.argv.includes('--apply');let bytes=0,removed=0;
+function visit(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(!e.isDirectory())continue;const p=path.join(dir,e.name);if(e.name.endsWith('-frames')){const files=fs.readdirSync(p,{withFileTypes:true});if(!files.every(f=>f.isFile()&&/^\d+\.png$/.test(f.name)))continue;const relative=path.relative(root,p);if(execFileSync('git',['ls-files','--',relative],{cwd:root,encoding:'utf8'}).trim())continue;const size=files.reduce((n,f)=>n+fs.statSync(path.join(p,f.name)).size,0);bytes+=size;removed++;if(apply)fs.rmSync(p,{recursive:true,force:true});}else visit(p)}}
+visit(path.join(root,'artifacts'));console.log(JSON.stringify({applied:apply,folders:removed,bytes,MiB:Math.round(bytes/1048576*10)/10}));

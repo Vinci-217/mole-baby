@@ -173,3 +173,6 @@ artifacts/animation-gallery/*
 !artifacts/animation-gallery/*.gif
 !artifacts/animation-gallery/speech-fixed.png
 !artifacts/animation-gallery/checks.json
+!artifacts/animation-gallery/horizontal-checks.json
+!artifacts/asset-size-report.json
+!artifacts/animation-gallery/catalogue-coverage.json

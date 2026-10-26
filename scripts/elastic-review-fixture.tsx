@@ -17,7 +17,7 @@ export function mountElasticReview({bare=false,travel=false}={}){
   const root=useRef<HTMLElement>(null),[dragging,setDragging]=useState(false)
   const driver=useElasticDrag(root,stage,false,()=>{})
   useLayoutEffect(()=>{drivers[stage]=driver;refs[stage]={set:setDragging}})
-  return h('figure',{ref:root},h('div',{className:'pet'},h(Ram,{stage,color:'red',evolution:stage===4?'super':undefined,costume:bare?undefined:'wizard-cap',action:'idle',dragging}),h('i',{className:'grip'})),h('figcaption',{},['种子 · 花盆端正','初级 · 软软拉伸','中级 · 叶片轻晃','高级 · 飞行惯性','超拉 · 悬空回弹'][stage]))
+  return h('figure',{ref:root},h('div',{className:'pet'},h(Ram,{stage,color:'red',evolution:stage===4?'super':undefined,costume:bare?undefined:'wizard-cap',action:'idle',dragging}),h('i',{className:'grip'})),h('figcaption',{},['种子 · 花盆端正','初级 · 水平跟随','中级 · 不上下弹跳','高级 · 飞行惯性','超拉 · 悬空回弹'][stage]))
  }
  const root=createRoot(mount);flushSync(()=>root.render(([0,1,2,3,4]as Stage[]).map(stage=>h(Pet,{stage,key:stage}))))
  return {start(){held=true;mount.dataset.held='true';flushSync(()=>refs.forEach(r=>r.set(true)));run('begin',position.x,position.y)},sample(x:number,y=0){if(held){position={x,y};if(travel){mount.style.setProperty('--demo-x',`${x}px`);mount.style.setProperty('--demo-y',`${y}px`)}run('pull',x,y)}},release(){held=false;mount.dataset.held='false';flushSync(()=>refs.forEach(r=>r.set(false)));run('end')}}

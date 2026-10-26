@@ -20,7 +20,8 @@
     "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --x64 && node scripts/notarize-mac-dmg.cjs x64",
     "test:registered-wardrobe": "node scripts/registered-wardrobe-regression.cjs",
     "review:wardrobe": "node scripts/record-lively-review.cjs",
-    "test:browser": "npm run build && node scripts/compact-care-regression.cjs"
+    "test:browser": "npm run build && node scripts/compact-care-regression.cjs",
+    "clean:previews": "node scripts/clean-preview-frames.cjs --apply"
   },
   "dependencies": {
     "electron-updater": "^6.8.11",
@@ -30,6 +31,7 @@
     "semver": "^7.8.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@playwright/test": "^1.51.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
@@ -39,6 +41,7 @@
     "cross-env": "^7.0.3",
     "electron": "^35.0.0",
     "electron-builder": "^26.0.12",
+    "sharp": "^0.34.5",
     "typescript": "~5.7.3",
     "vite": "^6.1.0",
     "vitest": "^3.0.5",
@@ -54,7 +57,12 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "package.json"
+      "!electron/**/*.node-test.cjs",
+      "package.json",
+      "!node_modules/react/**/*",
+      "!node_modules/react-dom/**/*",
+      "!node_modules/lucide-react/**/*",
+      "!node_modules/scheduler/**/*"
     ],
     "win": {
       "target": "nsis",
@@ -114,6 +122,13 @@
         "repo": "mole-baby",
         "releaseType": "release"
       }
-    ]
+    ],
+    "electronLanguages": [
+      "en",
+      "en-US",
+      "zh-CN",
+      "zh_CN"
+    ],
+    "compression": "maximum"
   }
 }

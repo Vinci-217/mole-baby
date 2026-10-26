@@ -1,0 +1,43 @@
+{
+  "frames": 154,
+  "fps": 24,
+  "duration": 6416.666666666667,
+  "dimensions": [
+    760,
+    300
+  ],
+  "cells": [
+    {
+      "form": "seed",
+      "stage": 0,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    },
+    {
+      "form": "junior",
+      "stage": 1,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    },
+    {
+      "form": "middle",
+      "stage": 2,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    },
+    {
+      "form": "senior",
+      "stage": 3,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    },
+    {
+      "form": "super",
+      "stage": 4,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    }
+  ],
+  "verticalTolerance": 0.05,
+  "errors": []
+}
