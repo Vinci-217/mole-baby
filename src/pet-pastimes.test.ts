@@ -8,6 +8,12 @@ import {createMemory,getCompanionMood,recordEvent} from './companion-memory'
 const NOW=new Date(2026,9,24,12).getTime()
 const pet=()=>({...createPet('小叶','red',NOW-2*86400000),growth:180,lastTick:NOW})
 describe('self-directed little life',()=>{
+ it('does not invent a whirlwind lesson before learning that actual skill',()=>{
+   const places=Array.from({length:15},(_,i)=>beginOuting(pet(),i,NOW,true)!.outing!.place)
+   expect(places).not.toContain('拉姆学院 · 魔法课')
+   const educated={...pet(),education:{lessons:{wind:3},graduated:{wind:NOW}}}
+   expect(Array.from({length:15},(_,i)=>beginOuting(educated,i,NOW,true)!.outing!.place)).toContain('拉姆学院 · 魔法课')
+ })
  it('does not send seeds, sleeping pets or pets with critical needs on trips',()=>{
    expect(beginOuting({...pet(),growth:0},0,NOW,true)).toBeNull()
    expect(beginOuting({...pet(),sleeping:true},0,NOW,true)).toBeNull()

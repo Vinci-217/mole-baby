@@ -32,6 +32,14 @@ export const GALLERY:Record<string,GallerySpec>={
  colours:{title:'四种颜色 · 安静睡眠',duration:9400,cells:(['red','yellow','blue','pink'] as const).flatMap(color=>forms.map(([form,stage])=>({form,stage,color,action:'sleep',label:({red:'红',yellow:'黄',blue:'蓝',pink:'粉'})[color]})))},
 }
 GALLERY.football={title:'完整玩球 · 全部八种形态',duration:11200,columns:4,cells:[...forms,['water',4],['wood',4],['fire',4]].map(([form,stage])=>({form:form as string,stage:stage as Stage,action:'play',label:'完整足球'}))}
+for(const [id,title,actions]of [
+ ['school','语言、英文和魔术课 · 结业前的学习动作',[['school-language','练发音'],['school-english','学ABC'],['school-magic','翻书练咒语']]],
+ ['school-skills','结业后的本领 · 中文、英文与帽子变花',[['skill-language','说中文'],['skill-english','英文问候'],['skill-magic','帽子变花']]],
+ ['elemental-skills','旋风、流火、寒冰、陨石 · 新绘制的法术方案',[['skill-wind','旋风术'],['skill-fire','流火术'],['skill-ice','寒冰术'],['skill-meteor','陨石术']]],
+ ['restaurant','餐厅服务员 · 端盘、送餐、收拾',[['restaurant','餐厅打工']]],
+] as [string,string,[string,string][]][]){GALLERY[id]={title,duration:4000,cells:rows(actions).map(c=>c.stage===0?{...c,locked:true,label:'初级以后解锁'}:c)}}
+GALLERY['school-preview']={title:'新本领速览 · 原角色与新道具逐帧组合',duration:4000,columns:3,cells:[['skill-magic','帽子变花'],['skill-wind','旋风术'],['skill-fire','流火术'],['skill-ice','寒冰术'],['skill-meteor','陨石术'],['restaurant','餐厅打工']].map(([action,label])=>({form:'middle',stage:2,action,label}))}
+GALLERY['school-evolutions']={title:'四种神力形态 · 新本领与工作',duration:4000,columns:4,cells:[['super','skill-wind','神力 · 旋风术'],['water','skill-ice','水系 · 寒冰术'],['wood','restaurant','木系 · 送餐'],['fire','skill-fire','火系 · 流火术']].map(([form,action,label])=>({form,stage:4,action,label}))}
 const seen=new Set(Object.values(GALLERY).flatMap(g=>g.cells.map(c=>c.action)))
 const labels:Record<string,string>={waiting:'安静等你',still:'安静站好',drag:'被提起', 'running-left':'向左小跑','running-right':'向右小跑',running:'活动一下',peek:'探看',hide:'藏好',review:'回应一下',feed:'吃东西',eat:'吃东西',drink:'喝水',wash:'清洁',medical:'照料',use:'使用用品'}
 const remaining=RAM_ACTIONS.filter(action=>action!=='drag'&&!seen.has(action))
@@ -40,16 +48,16 @@ for(const outfit of OUTFITS)GALLERY['outfit-'+outfit.id]={title:outfit.name+' ·
 export const GALLERY_COVERAGE={actions:RAM_ACTIONS,items:ITEMS.map(item=>({id:item.id,action:getItemMotion(item.id).action})),outfits:OUTFITS.map(o=>o.id)}
 export type GalleryMode=keyof typeof GALLERY
 export function mountAnimationGallery(mode:GalleryMode){
- const spec=GALLERY[mode],columns=spec.columns??5
+ const spec=GALLERY[mode],columns=spec.columns??5,schoolMode=mode.startsWith('school')||mode==='elemental-skills'||mode==='restaurant',cellWidth=schoolMode?180:140,rowHeight=schoolMode?200:164
  document.getElementById('root')!.style.display='none'
  const mount=document.createElement('main');mount.id='animation-gallery';document.body.append(mount)
- const style=document.createElement('style');style.textContent=`html,body{background:#f7f2e6!important;margin:0!important;min-width:0!important;min-height:0!important;overflow:hidden!important}#animation-gallery{width:${columns*140}px;color:#795b39;font-family:'Noto Sans CJK SC',sans-serif}#animation-gallery h1{text-align:center;font-size:17px;font-weight:500;height:55px;line-height:55px;margin:0}#animation-gallery section{display:grid;grid-template-columns:repeat(${columns},140px)}#animation-gallery figure{margin:0;height:164px;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;gap:3px;padding:12px 0 14px}#animation-gallery .pet{width:100px;height:109px;position:relative;flex:none}#animation-gallery figcaption{font-size:10px;line-height:17px;text-align:center;white-space:nowrap}#animation-gallery .edge-clip{position:absolute;inset:0;overflow:hidden}#animation-gallery .edge-clip .ram-sprite{position:absolute;inset:0}`;document.head.append(style)
+ const style=document.createElement('style');style.textContent=`html,body{background:#f7f2e6!important;margin:0!important;min-width:0!important;min-height:0!important;overflow:hidden!important}#animation-gallery{width:${columns*cellWidth}px;color:#795b39;font-family:'Noto Sans CJK SC',sans-serif}#animation-gallery h1{text-align:center;font-size:17px;font-weight:500;height:55px;line-height:55px;margin:0}#animation-gallery section{display:grid;grid-template-columns:repeat(${columns},${cellWidth}px)}#animation-gallery figure{margin:0;height:${rowHeight}px;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;gap:3px;padding:12px 0 14px}#animation-gallery .pet{width:100px;height:${schoolMode?140:109}px;position:relative;flex:none}#animation-gallery figcaption{font-size:10px;line-height:17px;text-align:center;white-space:nowrap}#animation-gallery .edge-clip{position:absolute;inset:0;overflow:hidden}#animation-gallery .edge-clip .ram-sprite{position:absolute;inset:0}`;document.head.append(style)
  const root=createRoot(mount);let id=0
  function paint(phase='start'){
   flushSync(()=>root.render(h('div',{},h('h1',{},spec.title),h('section',{},spec.cells.map((c:Cell,i)=>h('figure',{key:i},h('div',{className:'pet'},h('div',{className:c.side?'edge-clip':undefined},c.locked?h('span',{className:'gallery-locked'},'成长后解锁'):h(Ram,{color:c.color??'red',stage:c.stage,evolution:c.stage===4?c.form as Evolution:undefined,action:c.side?(phase==='entry'?edgeEntryAction(c.stage,c.side):'waiting'):c.action,actionId:id,itemId:c.itemId,costume:c.costume,fromColor:c.fromColor,sound:false,peeking:!!c.side&&phase==='peek',peekSide:c.side,edgeEntry:c.side&&phase==='entry'?c.side:undefined}))),h('figcaption',{},`${names[c.form]} · ${c.label}`)))))))
  }
  paint();let lastPhase='start'
- return {spec,width:columns*140,height:55+Math.ceil(spec.cells.length/columns)*164,restart(){id++;lastPhase='start';paint()},tick(t:number){
+ return {spec,width:columns*cellWidth,height:55+Math.ceil(spec.cells.length/columns)*rowHeight,restart(){id++;lastPhase='start';paint()},tick(t:number){
   if(mode!=='edges')return
   const phase=t<1800?'entry':t<3500?'hidden':t<5500?'peek':'hidden'
   if(phase!==lastPhase){lastPhase=phase;id++;paint(phase)}

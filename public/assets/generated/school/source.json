@@ -1,0 +1,92 @@
+{
+  "tool": "image_gen",
+  "date": "2026-10-26",
+  "referenceImages": [
+    "public/assets/original/scenes/ramu-home.png",
+    "public/assets/original/ui/reference-pet-panel.png",
+    "public/assets/original/items/180017.png",
+    "public/assets/original/pets/middle-red-idle.png"
+  ],
+  "originalCharacterRedrawn": false,
+  "officialMooreWarriorFrames": false,
+  "note": "New spell designs following local Flash art references, not extracted or verified official Moore Warrior skill sequences. Props are drawn keyframes; temporal layout is authored.",
+  "decodedRGBA": {
+    "before": 176160768,
+    "after": 54439680,
+    "verification": "Reconstructed world frames have identical alpha and visible RGBA; theoretical atlas decode area, not measured process/GPU memory."
+  },
+  "clips": {
+    "school-language": {
+      "frames": 48,
+      "fps": 24,
+      "keyPoses": 3,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "school-english": {
+      "frames": 48,
+      "fps": 24,
+      "keyPoses": 3,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "school-magic": {
+      "frames": 48,
+      "fps": 24,
+      "keyPoses": 3,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "restaurant": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 3,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-language": {
+      "frames": 48,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-english": {
+      "frames": 48,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-magic": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 3,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-wind": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-fire": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-ice": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    },
+    "skill-meteor": {
+      "frames": 72,
+      "fps": 24,
+      "keyPoses": 4,
+      "source": "model-drawn prop keyframes; authored timing and internal follow-through; original character rendered separately"
+    }
+  },
+  "sources": {
+    "study-service-keyframes.png": "59af7fb3948d5fa7e9385a4e7a08a50bf75656363eb745e0d4b4b5e377e0972b",
+    "elemental-keyframes.png": "1125805007c96bd259b3f8913ca8ed75f1fb7af8c9dfedd737b5739fa8ff02ea",
+    "original-reference.png": "f7f1b4ab00cd1ea52cdee8e8b794acfd2437769111a3c66a7410a477c8501101",
+    "furniture-sheet.png": "1f74bea8181f8d1ac5ee4139db195e418a73aef994b923c1077e65dee0e870a1"
+  }
+}

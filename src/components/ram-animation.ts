@@ -1,3 +1,4 @@
+import {isSchoolAction,schoolBody} from '../pet-school'
 import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
 import {footballDuration,footballPose,sleepPose} from '../original-actions'
@@ -25,8 +26,9 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 /** Public renderer vocabulary; the README catalogue checks every entry. */
-export const RAM_ACTIONS=[...new Set([...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','balance'])]
+export const RAM_ACTIONS=[...new Set([...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','balance','school-language','school-english','school-magic','restaurant','skill-language','skill-english','skill-magic','skill-wind','skill-fire','skill-ice','skill-meteor'])]
 export function getRamActionDuration(action: string,form='junior'): number | null {
+  if(isSchoolAction(action))return action.startsWith('skill-')?action==='skill-language'||action==='skill-english'?2000:3000:null
   if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:action==='balance'?8000:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
   if(isMoodAction(action))return emotionDuration(action,form)??3600
   if(action==='play'&&form!=='seed')return footballDuration(form)??SOCIAL_DURATIONS.play
@@ -41,6 +43,7 @@ export function getRamActionDuration(action: string,form='junior'): number | nul
 /** Sample an event clock, never a React render count. Sleep closes the eyes
  * on the same grounded body instead of using another action's silhouette. */
 export function sampleRamPose(action: string, elapsed: number, reduced = false,form='junior'): Pose {
+  if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleRamPose(body.action,body.elapsed,reduced,form),finished:action.startsWith('skill-')&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleRamPose(pastimeBody(action),elapsed,reduced,form),finished:elapsed>=(getRamActionDuration(action,form)??0)}
   if (action === 'sleep') return sleepPose(elapsed,reduced)
   if(action==='wake'&&elapsed<240)return {sheet:'slumber',row:0,frame:0,finished:false}
@@ -95,6 +98,7 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
 /** Original seed timeline has closed eyes in frames 4 and 5, and large eyes in
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
+  if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleSeedPose(body.action,body.elapsed,reduced),finished:action.startsWith('skill-')&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleSeedPose(pastimeBody(action),elapsed,reduced),finished:elapsed>=(getRamActionDuration(action,'seed')??0)}
   if (action === 'sleep') return sleepPose(elapsed,reduced)
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
@@ -135,6 +139,7 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
+  if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleFlyingPose(body.action,body.elapsed,reduced,form,flightTime),finished:action.startsWith('skill-')&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleFlyingPose(pastimeBody(action),elapsed,reduced,form,flightTime),finished:elapsed>=(getRamActionDuration(action,form)??0)};
   if (action === 'sleep') return sleepPose(elapsed,reduced);
   if(action==='wake'&&elapsed<240)return {sheet:'slumber',row:0,frame:0,finished:false};

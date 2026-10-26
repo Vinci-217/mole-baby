@@ -1,6 +1,7 @@
 import { getStage } from './game'
 import type { GameState } from './game'
 import type { OutfitId } from './wardrobe'
+import {learned} from './pet-school'
 
 export const PASTIMES = ['read-alone','play-alone','spell','balance'] as const
 export type Pastime = typeof PASTIMES[number]
@@ -20,7 +21,7 @@ export const PASTIME_MEMORIES: Record<Pastime,string> = {
   balance:'我顶着小书练平衡，摇摇晃晃也没有放弃。',
 }
 export function mayPlay(pet: GameState): boolean {
-  return !pet.sleeping && !pet.outing && pet.stats.health>35 && pet.stats.hunger>=30 && pet.stats.thirst>=30 && pet.stats.cleanliness>=30 && pet.stats.energy>=30
+  return !pet.sleeping && !pet.outing && !pet.activity && pet.stats.health>35 && pet.stats.hunger>=30 && pet.stats.thirst>=30 && pet.stats.cleanliness>=30 && pet.stats.energy>=30
 }
 /** A local illusion uses original clothes; it never buys, unlocks or overwrites the wardrobe. */
 export function spellCostume(petId: number, now = Date.now()): OutfitId {
@@ -39,7 +40,7 @@ const PLACES=[
 export function beginOuting(pet: GameState, sequence=0, now=Date.now(), manual=false): GameState | null {
   if (!mayPlay(pet) || getStage(pet.growth,pet.evolution)===0 || !Number.isSafeInteger(now) || now<pet.lastTick) return null
   if (!manual && now-(pet.lastOutingAt??pet.createdAt)<90*MINUTE) return null
-  const choices=PLACES.filter(p=>getStage(pet.growth,pet.evolution)>=p.stage)
+  const choices=PLACES.filter(p=>getStage(pet.growth,pet.evolution)>=p.stage&&(p.place!=='拉姆学院 · 魔法课'||learned(pet,'wind')))
   const seed=Math.abs(Math.floor(pet.createdAt/1000)+Math.floor(now/86400000)+sequence),choice=choices[seed%choices.length]
   const outing:PetOuting={id:`${pet.createdAt}:${now}`,place:choice.place,startedAt:now,returnsAt:now+(2+seed%4)*MINUTE,story:choice.story}
   return {...pet,outing,lastOutingAt:now}

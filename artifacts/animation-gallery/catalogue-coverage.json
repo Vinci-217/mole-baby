@@ -43,7 +43,18 @@
     "read-alone",
     "play-alone",
     "spell",
-    "balance"
+    "balance",
+    "school-language",
+    "school-english",
+    "school-magic",
+    "restaurant",
+    "skill-language",
+    "skill-english",
+    "skill-magic",
+    "skill-wind",
+    "skill-fire",
+    "skill-ice",
+    "skill-meteor"
   ],
   "items": [
     {

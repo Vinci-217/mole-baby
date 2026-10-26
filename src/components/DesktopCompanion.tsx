@@ -6,6 +6,7 @@ import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
 import {isMoodAction} from '../mood-motion';
 import {isPastime} from '../pet-pastimes';
+import {isSchoolAction,activityName} from '../pet-school';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CareFeedback from './CareFeedback';
@@ -22,7 +23,7 @@ interface Props {
   reminderSeconds: number; reminders: boolean; timerRunning: boolean;
   onPanel: (panel: CompanionPanel | null) => void;
   onCare: (action: Action, item?: string) => void;
-  onHome: () => void; onShop: () => void; onFocus: () => void;
+  onWork:()=>void;onSchool:()=>void;onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
   onActionEnd?:()=>void; onTug?:()=>void;
   onRecall:()=>void;
@@ -149,7 +150,7 @@ export default function DesktopCompanion(p: Props) {
       <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/><button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)||isPastime(displayAction)?p.onActionEnd:undefined}/>
+        <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)||isPastime(displayAction)||isSchoolAction(displayAction)?p.onActionEnd:undefined}/>
       </button>
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
@@ -158,6 +159,7 @@ export default function DesktopCompanion(p: Props) {
         <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label="专注倒计时">{reminderTime(p.reminderSeconds)}</span>}</button>
         <button aria-label="进入小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
       </nav></>}
+      {p.pet.activity&&<span className="school-desktop-status">{activityName(p.pet.activity)}</span>}
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel&&<section className={`companion-panel panel-${p.panel}`} role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
@@ -166,7 +168,7 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onCurious}><img alt="" src="./assets/generated/v15-butterfly.png"/>和蝴蝶玩</button>
         <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.pet.sleeping?p.onCare('sleep'):p.onMood()}><Icon path="ui/status-health"/>{p.pet.sleeping?'轻轻叫醒':'回应心情'}</button>
-      </div><footer><button onClick={p.onHome}>进入小屋 ›</button></footer></>}
+      </div><footer><button disabled={p.moodBusy} onClick={p.onWork}>餐厅打工</button><button onClick={()=>p.onCare('sleep')}>{p.pet.sleeping?'叫醒':'睡一会儿'}</button><button onClick={p.onSchool}>学院</button></footer></>}
     </section>}
 
   </div>;

@@ -2936,5 +2936,478 @@
     ],
     "directionalViews": true,
     "errors": []
+  },
+  "school": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      900,
+      655
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "school-language",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "school-language",
+        "label": "练发音"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "school-language",
+        "label": "练发音"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "school-language",
+        "label": "练发音"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "school-language",
+        "label": "练发音"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "school-english",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "school-english",
+        "label": "学ABC"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "school-english",
+        "label": "学ABC"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "school-english",
+        "label": "学ABC"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "school-english",
+        "label": "学ABC"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "school-magic",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "school-magic",
+        "label": "翻书练咒语"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "school-magic",
+        "label": "翻书练咒语"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "school-magic",
+        "label": "翻书练咒语"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "school-magic",
+        "label": "翻书练咒语"
+      }
+    ],
+    "errors": []
+  },
+  "school-skills": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      900,
+      655
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-language",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-language",
+        "label": "说中文"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-language",
+        "label": "说中文"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-language",
+        "label": "说中文"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-language",
+        "label": "说中文"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-english",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-english",
+        "label": "英文问候"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-english",
+        "label": "英文问候"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-english",
+        "label": "英文问候"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-english",
+        "label": "英文问候"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-magic",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-magic",
+        "label": "帽子变花"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-magic",
+        "label": "帽子变花"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-magic",
+        "label": "帽子变花"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-magic",
+        "label": "帽子变花"
+      }
+    ],
+    "errors": []
+  },
+  "elemental-skills": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      900,
+      855
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-wind",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-wind",
+        "label": "旋风术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-wind",
+        "label": "旋风术"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-wind",
+        "label": "旋风术"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-wind",
+        "label": "旋风术"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-fire",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-fire",
+        "label": "流火术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-fire",
+        "label": "流火术"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-fire",
+        "label": "流火术"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-fire",
+        "label": "流火术"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-ice",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-ice",
+        "label": "寒冰术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-ice",
+        "label": "寒冰术"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-ice",
+        "label": "寒冰术"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-ice",
+        "label": "寒冰术"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "skill-meteor",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "skill-meteor",
+        "label": "陨石术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-meteor",
+        "label": "陨石术"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "skill-meteor",
+        "label": "陨石术"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-meteor",
+        "label": "陨石术"
+      }
+    ],
+    "errors": []
+  },
+  "restaurant": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      900,
+      255
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "restaurant",
+        "label": "初级以后解锁",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "restaurant",
+        "label": "餐厅打工"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "restaurant",
+        "label": "餐厅打工"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "restaurant",
+        "label": "餐厅打工"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "restaurant",
+        "label": "餐厅打工"
+      }
+    ],
+    "errors": []
+  },
+  "school-preview": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      540,
+      455
+    ],
+    "cells": [
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-magic",
+        "label": "帽子变花"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-wind",
+        "label": "旋风术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-fire",
+        "label": "流火术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-ice",
+        "label": "寒冰术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "skill-meteor",
+        "label": "陨石术"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "restaurant",
+        "label": "餐厅打工"
+      }
+    ],
+    "errors": []
+  },
+  "school-evolutions": {
+    "frames": 96,
+    "fps": 24,
+    "duration": 4000,
+    "dimensions": [
+      720,
+      255
+    ],
+    "cells": [
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "skill-wind",
+        "label": "神力 · 旋风术"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "skill-ice",
+        "label": "水系 · 寒冰术"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "restaurant",
+        "label": "木系 · 送餐"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "skill-fire",
+        "label": "火系 · 流火术"
+      }
+    ],
+    "errors": []
   }
 }

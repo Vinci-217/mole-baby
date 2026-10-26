@@ -15,17 +15,19 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  for(const item of coverage.items)assert.ok(Object.values(checks).some(group=>group.cells.some(cell=>cell.itemId===item.id&&cell.action===item.action)),'Missing item '+item.id);
  for(const outfit of coverage.outfits){const group=checks['outfit-'+outfit];assert.equal(group.cells.length,8);assert.ok(group.cells.every(c=>c.costume===outfit))}
  const media=(label,file)=>`![${label}](${file})\n\n`;
- let section='## 本轮重点预览（未发布）\n\n**中级直接使用初级的75张黏滞身体原帧，仅增加跟随头顶的叶片序列。** 拖动的转身、拖尾、拉伸、挤压和松手响应共用初级。未重新绘制身体、眼睛和嘴，也未增加独立的上下跳跃。\n\n';
- section+=media('应用实录：左初级，右中级；身体原帧与拖拽时序相同','artifacts/animation-gallery/drag-young.gif');
- section+='### 先生成序列，再接入逐帧播放\n\n原版中级叶片纹理生成17档叶尖弯曲姿态，叶柄固定在头顶关节，随身体形变选帧并延迟回摆；合成五方向共75张PNG。叶片动画、绑定及桌面拖拽编排属于本项目适配，不称为官方完整拖拽动作。透明画布向外扩展，身体尺寸不缩小、叶片不裁切。\n\n';
- section+=media('生成序列：左为初级原帧，右为相同身体加绑定叶片','artifacts/v37-bound/bound-sequence.gif');
- section+='[下载PNG逐帧序列：五方向 × 15帧，红色预览](artifacts/v37-bound/frames-red.zip)\n\n';
- section+=media('合成序列抽帧：完整75帧见下载','artifacts/v37-bound/frames.png');
- section+=media('中级单独实录：原帧拉伸、叶片跟随和松手衔接','artifacts/animation-gallery/middle-bound.gif');
+ let section='## 本轮重点预览（未发布）\n\n**课程、技能、餐厅打工、小屋家具，以及修订后的叶柄绑定。** 原拉姆身体与表情继续使用可核对的页游素材；新书页、餐盘、帽子和四系法术是参考原画风绘制的关键帧，再离线编排成24fps透明图集，不称为官方完整技能原帧。\n\n';
+ section+=media('应用内速览：帽子变花、旋风、流火、寒冰、陨石、餐厅服务员','artifacts/animation-gallery/school-preview.gif');
+ section+='### 课程与生活玩法\n\n语言课前只会 bibobibo，结业后才说中文；英文课解锁英文问候，魔术课解锁帽子变花及后续四系课程。每门课三节，每节2–4分钟，进度和证书随宠物存档保存。餐厅每班2分钟，完成获得180摩尔豆；中断不结算，重开不会重复领工资。玩耍中可以主动睡觉，也保留困倦后的自动入睡。\n\n';
+ section+=media('学习动作：原角色与新绘书页、发音及魔法练习','artifacts/animation-gallery/school.gif');
+ section+=media('小屋布置：家具放地面，结业证书挂墙上','artifacts/v38-school/furnished-room.png');
+ section+='[课程、技能与玩法说明](docs/COURSES.md) · [动画 skill 与原帧参考](skills/mole-classic-art/SKILL.md)\n\n';
+ section+='### 修正叶片接点\n\n上一版把外侧叶片的重叠处误作叶柄，本轮改为双叶中央接点，并通过眼部位置跟随头部。身体仍沿用初级原帧；独立叶片转动幅度收小。以下是实际应用录制，左初级、右中级。\n\n';
+ section+=media('修正后的初级和中级同步拖拽','artifacts/animation-gallery/drag-young.gif');
+ section+=media('中级单独拖拽与松手衔接','artifacts/animation-gallery/middle-bound.gif');
+ section+=media('修正接点后的合成序列：相同身体加中级叶片','artifacts/v38-school/crown/bound-sequence.gif');
+ section+='[下载75张透明PNG逐帧序列](artifacts/v38-school/crown/frames-red.zip) · [接点与轮廓抽帧图](artifacts/v38-school/crown/frames.png)\n\n';
  section+=media('五阶段实际拖拽与松手衔接','artifacts/animation-gallery/drag.gif');
- section+='下方睡眠与摸摸为前一轮方案，本轮只修订拖拽。\n\n';
- section+=media('安静睡觉：体型与叶冠不扭曲，闭眼和小嘴呼吸','artifacts/animation-gallery/sleep.gif');
- section+=media('原帧摸摸方案：闭眼微笑，轻轻靠向手掌','artifacts/v30-preview/pet.gif');
+ section+='睡眠、摸摸、足球等既有动作仍全部展示在下面。\n\n';
  section+='## 全部现有动画（全部展开）\n\n按渲染器动作清单核对，覆盖 **'+coverage.actions.length+' 个动作名、32 种用品、9 件装扮**。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，均未发布到正式版。\n\n';
  for(const [key,spec]of Object.entries(groups)){
   section+=`### ${spec.title}\n\n`+media(spec.title,'artifacts/animation-gallery/'+key+'.gif');
@@ -35,9 +37,9 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  section+='### 动作名与预览对应\n\n| 动作名 | GIF 分类 |\n| --- | --- |\n';
  for(const action of coverage.actions){const key=index.get(action);section+=`| \`${action}\` | [${key}](artifacts/animation-gallery/${key}.gif) |\n`}
  section+='\n### 其余已有动图（历史方案 / 原素材参考）\n\n以下保留在仓库中的动图全部列出，用于对照；它们不是本轮已认可的效果。\n\n';
- const current=new Set(Object.keys(checks).map(k=>'artifacts/animation-gallery/'+k+'.gif').concat(['artifacts/v30-preview/move.gif','artifacts/v30-preview/drag.gif','artifacts/v30-preview/pet.gif','artifacts/v30-preview/butterfly.gif','artifacts/v37-bound/bound-sequence.gif']));
+ const current=new Set([...section.matchAll(/!\[[^\]]*\]\(([^)]+\.gif)\)/g)].map(match=>match[1]));
  for(const file of execFileSync('git',['ls-files','*.gif'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean))if(!current.has(file))section+=media('历史 / 原素材：'+path.basename(file),file);
- section+='[本轮逐帧绑定、来源与验证](research/v37-bound-crown-drag.md) · [此前贴地补间研究（已替换）](research/v36-original-grounded-drag.md) · [原素材来源](research/v30-motion-previews.md)\n\n';
+ section+='[本轮课程与接点修订记录](research/v38-school-room.md) · [此前绑定研究（已替换）](research/v37-bound-crown-drag.md) · [原素材来源](research/v30-motion-previews.md)\n\n';
  const reportFile=path.join(root,'dist/asset-size-report.json'),report=fs.existsSync(reportFile)?JSON.parse(fs.readFileSync(reportFile,'utf8')):null;
  const imageSize=report?`${report.count}张图片 ${(report.before/1e6).toFixed(2)} MB → ${(report.after/1e6).toFixed(2)} MB`:'图片在构建时转换为无损WebP';
  section+='## 体积精简（本地预览构建）\n\n'+imageSize+'，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。\n\n[此前测量明细与验证范围](research/v32-animation-and-size.md)\n\n';

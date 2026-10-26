@@ -1,0 +1,17 @@
+{
+  "courses": [
+    "language",
+    "magic",
+    "wind"
+  ],
+  "lessons": 9,
+  "lockedSkills": true,
+  "speechGate": true,
+  "preLanguageJobFeedback": true,
+  "wallFloorConstraints": true,
+  "jobPaidOnce": 180,
+  "reopenPreservesProgress": true,
+  "manualSleepAndWake": true,
+  "errors": [],
+  "failed": []
+}

@@ -258,3 +258,8 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 `artifacts/v26-game-effects.wav`是本项目Web Audio事件音效合成器的离线试听，不是官方录音；由scripts/review-game-audio.cjs生成并检查静音、非静音与峰值。
 
 `public/assets/original/football/head-poses.json`由相同原SWF显示列表的眼睛符号与局部Y轴提取，经现有足球相机映射。闭眼/遮挡帧为身体空间插值；是服饰挂接的桌面适配，不是官方骨骼导出。脚本为scripts/art/export-football-heads.py，不从画面白色像素推测朝向。
+## v38 · 课程、餐厅与小屋摆设（预览）
+
+`public/assets/generated/school/`是本项目新绘的课程道具、餐盘、帽子变花、四系法术、家具和证书框，使用image_gen生成关键姿态，经原小屋、UI、熊熊饼干及中级拉姆参考对照后修订为较平的色面。不是官方《摩尔勇士》技能原帧。
+
+最终模型图、原角色参考板和完整精修提示词保存在`skills/mole-classic-art/references/v38/`；工具、日期、用途、源图哈希和帧数见`public/assets/generated/school/source.json`。`scripts/art/pack-school-art.py`裁分关键帧、编排时序和文字、生成24fps透明图集；没有重新绘制角色身体、眼睛或嘴。原始大图与预览GIF不进入安装目录。

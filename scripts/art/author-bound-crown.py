@@ -15,17 +15,15 @@ def box(mask):
 def coverage(n,q):
  d=n[:,:,:3].astype(float)-q[:,:,:3].astype(float);g=np.clip((d[:,:,0]+2*d[:,:,2]/3)/170,0,1);b=np.clip((d[:,:,2]+51*g)/153,0,1);w=np.clip((d[:,:,1]+51*g+102*b)/255,0,1);return np.dstack([w*255,g*255,b*255,n[:,:,3]]).round().astype('uint8')
 def body_mask(m):return (m[:,:,:3].sum(2)>90)&(m[:,:,3]>100)
-def shine(n,m):
- b=box(body_mask(m));yy,xx=np.indices(m.shape[:2]);white=(n[:,:,:3].min(2)>235)&(n[:,:,3]>200)&(m[:,:,0]<220)&(m[:,:,1]<20)&(m[:,:,2]<20)&(yy<b[1]+(b[3]-b[1])*.4)
- count,labels,stats,centres=cv2.connectedComponentsWithStats(white.astype('uint8'));candidates=[]
+def eyes(n,m):
+ white=(n[:,:,:3].min(2)>225)&(n[:,:,3]>220)&(m[:,:,:3].sum(2)<30)
+ count,labels,stats,centres=cv2.connectedComponentsWithStats(white.astype('uint8'));parts=[]
  for label in range(1,count):
-  ys,xs=np.where(labels==label)
-  if len(xs)<5:continue
-  covariance=np.cov(np.column_stack([xs,ys]).T);e,v=np.linalg.eigh(covariance)
-  if e[1]/max(e[0],.1)<5:continue
-  direction=v[:,1];angle=(math.degrees(math.atan2(direction[1],direction[0]))+90)%180-90
-  candidates.append((float(centres[label][1]),float(centres[label][0]),angle))
- return min(candidates) if candidates else None
+  x,y,w,h,area=stats[label]
+  if area>=12 and h>=5 and .45<w/h<1.6:parts.append((area,centres[label],h))
+ parts=sorted(parts,key=lambda p:p[0],reverse=True)[:2]
+ if not parts:return None
+ return np.array([np.mean([v[1][0] for v in parts]),np.mean([v[1][1] for v in parts]),np.mean([v[2] for v in parts])])
 
 def fill_cyclic(values):
  valid=[i for i,v in enumerate(values) if v is not None];assert valid,'Missing head landmarks'
@@ -36,13 +34,12 @@ def fill_cyclic(values):
 
 def stem_root(leaf,m):
  body=body_mask(m);b=box(body);ys,xs=np.where(body);hull=np.zeros(body.shape,'uint8');cv2.fillConvexPoly(hull,cv2.convexHull(np.column_stack([xs,ys]).astype('int32')),1)
- yy,xx=np.indices(body.shape);central=np.abs(xx-(b[0]+b[2])/2)<(b[2]-b[0])*.3
+ yy,xx=np.indices(body.shape);central=np.abs(xx-(b[0]+b[2])/2)<(b[2]-b[0])*.045
  contact=(leaf[:,:,3]>80)&(hull>0)&central&(yy<b[1]+(b[3]-b[1])*.45)
  if not contact.any():
   distance=cv2.distanceTransform((~body).astype('uint8'),cv2.DIST_L2,3);score=distance+np.abs(xx-(b[0]+b[2])/2)*.06;valid=(leaf[:,:,3]>80)&central;assert valid.any();minimum=score[valid].min();contact=valid&(score<=minimum+1)
  ys,xs=np.where(contact);bottom=np.percentile(ys,95);end=ys>=bottom-1;return np.array([float(np.mean(xs[end])),float(np.mean(ys[end]))])
 
-midmask=np.array(Image.open(a.repo/'public/assets/classic/middle-mask.png').convert('RGBA'))[:H,:W];mid_width=box(body_mask(midmask))[2]-box(body_mask(midmask))[0]
 def bend_leaf(image,root,amount):
  if amount==0:return image.copy()
  yy,xx=np.indices(image.shape[:2],dtype=np.float32);lb=box(image[:,:,3]>16);height=max(1,root[1]-lb[1]);width=lb[2]-lb[0];x,y=xx.copy(),yy.copy()
@@ -63,9 +60,9 @@ for view in views:
  # Anchor the original texture at its actual stem joint, then generate the
  # bend sequence. Nothing is fitted into the body's available headroom.
  leaf_frames=[bend_leaf(leaf_a,root,i/16) for i in range(17)]
- landmarks=fill_cyclic([shine(n,m) for n,m in jframes]);rest_body=box(body_mask(jframes[0][1]));rest_x=(rest_body[0]+rest_body[2])/2;offset=rest_x-landmarks[0][1];source_body=box(body_mask(am));scale=mid_width/(source_body[2]-source_body[0]);target_angles=[max(-35,min(35,float(l[2]-landmarks[0][2]))) for l in landmarks]
+ landmarks=fill_cyclic([eyes(n,m) for n,m in jframes]);source_eye=eyes(an,am);assert source_eye is not None;rest_body=box(body_mask(jframes[0][1]));source_body=box(body_mask(am));scale=(rest_body[2]-rest_body[0])/(source_body[2]-source_body[0]);target_angles=[0.]*count
  for i,(n,m) in enumerate(jframes):
-  b=box(body_mask(m));neck_x=float(np.clip(landmarks[i][1]+offset,b[0]+(b[2]-b[0])*.18,b[2]-(b[2]-b[0])*.18));yy,xx=np.where(body_mask(m)&(np.abs(np.indices((H,W))[1]-neck_x)<3));neck_y=float(yy.min()+1);target=np.array([neck_x,neck_y])
+  b=box(body_mask(m));eye_scale=landmarks[i][2]/source_eye[2];neck_x=float(np.clip(landmarks[i][0]+(root[0]-source_eye[0])*eye_scale,b[0]+(b[2]-b[0])*.15,b[2]-(b[2]-b[0])*.15));yy,xx=np.where(body_mask(m)&(np.abs(np.indices((H,W))[1]-neck_x)<2));neck_y=float(yy.min()+3);target=np.array([neck_x,neck_y]);target_angles[i]=float(np.clip((landmarks[i][0]-landmarks[(i-1)%count][0])*.35,-7,7))
   deformation=max(abs((b[2]-b[0])/(rest_body[2]-rest_body[0])-1),abs((b[3]-b[1])/(rest_body[3]-rest_body[1])-1));amount=min(1,deformation/.32);leaf_phase=round(amount*16);leaf=leaf_frames[leaf_phase]
   # Motion comes from the junior head. A short cyclic angular delay lets the
   # blades follow through while their stem remains fixed to the same skin point.
@@ -74,7 +71,7 @@ for view in views:
   bounds=[min(bounds[0],corners[:,0].min()),min(bounds[1],corners[:,1].min()),max(bounds[2],corners[:,0].max()),max(bounds[3],corners[:,1].max())]
   records.append({'view':view,'phase':i,'bodyIndex':clip['frameMap'][i],'sourceLeafFrame':source['start'],'leafPhase':leaf_phase,'root':root.tolist(),'targetRoot':target.tolist(),'angle':angle,'scale':scale,'matrix':matrix.tolist(),'neutral':n,'mask':m,'leaf':leaf})
 ox=int(math.floor(bounds[0]/8)*8-8);oy=int(math.floor(bounds[1]/8)*8-8);cw=int(math.ceil((bounds[2]-ox+8)/8)*8);ch=int(math.ceil((bounds[3]-oy+8)/8)*8)
-info={'method':'Unchanged original junior body frames; original middle leaf texture authored into a root-pinned 17-pose bend sequence, retimed by junior deformation and bound to forehead landmarks and actual stem contacts. Fixed crown scale and cyclic follow-through; no body edits.','cell':[cw,ch],'origin':[ox,oy],'bodyCell':[W,H],'bodyFrom':'junior','sourceSHA256':'01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf','forms':{}}
+info={'method':'Junior body unchanged. Crown root is the central original stem joint, not an overlapping outer blade. Per-frame eye landmarks transfer that anatomical joint to the junior head surface with 3px insertion; modest angular follow-through. Original leaf texture, authored bend poses, fixed scale.','cell':[cw,ch],'origin':[ox,oy],'bodyCell':[W,H],'bodyFrom':'junior','sourceSHA256':'01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf','forms':{}}
 finished=[];visibility=[]
 for record in records:
  n,m=record['neutral'],record['mask'];matrix=np.array(record['matrix']);matrix[:,2]-=[ox,oy];crown=cv2.warpAffine(record['leaf'],matrix,(cw,ch),flags=cv2.INTER_CUBIC)

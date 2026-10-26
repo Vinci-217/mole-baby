@@ -1,6 +1,6 @@
 ---
 name: mole-classic-art
-description: 根据仓库内《摩尔庄园》早期 Flash 页游参考，为拉姆桌宠生成协调的新场景、界面底图和道具图标，并进行视觉与应用复核。
+description: 根据《摩尔庄园》原帧和本地参考制作拉姆动作、课程与法术道具、家具及UI，保留原角色并逐帧验证接触、节奏、配色与实际播放。
 ---
 
 # 拉姆桌宠的原页游风格美术
@@ -12,6 +12,8 @@ description: 根据仓库内《摩尔庄园》早期 Flash 页游参考，为拉
 ## 先看图，再写提示词
 
 涉及角色动作时，先读 [原动作与动画复核](references/animation-guide.md)，检查对应的原 SWF 完整时间轴与实际录屏，再决定使用原片或生成新动作。
+
+本轮可直接使用[原角色与身体原帧参考板](references/v38/original-reference.png)、[课程/打工道具关键帧](references/v38/study-service-keyframes.png)、[法术关键帧候选](references/v38/elemental-keyframes.png)和[迭代记录](references/iteration-log.md)。新法术是自行绘制的候选，尚未核对到《摩尔勇士》的官方完整技能原帧，不能把游戏名称当作已经验证的素材来源。
 
 1. 先读 `references/style-guide.md`，再实际查看至少三类参考：场景、UI、道具。任务含角色时加看原角色图。只读名称或来源清单不能代替看图。
 2. 最低参考组合：`public/assets/original/scenes/ramu-home.png`、`public/assets/original/ui/reference-pet-panel.png`、`public/assets/original/items/180017.png`。背景任务再看 `scenes/lake-cabin.png` 或 `scenes/ramu-school.png`，避免把一间房的构图误当成整个游戏的画风。

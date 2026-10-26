@@ -1,0 +1,51 @@
+{
+  "productionRefinements": [
+    {
+      "file": "furniture-sheet.png",
+      "input": "first furniture candidate; original ramu-home, reference-pet-panel, bear biscuit and middle Ram references",
+      "prompt": "Revise FIRST attached sprite sheet keeping the exact 3x3 nine objects in their same cells and positions. The other images are ORIGINAL art references: room supplies flat shadow patches and warm contour treatment, UI supplies limited color/highlight logic, cookie item supplies crisp simplified silhouette, Ram reference supplies local green hues only DO NOT ADD ANY CHARACTER. The candidate has excessive western glossy storybook volume. Remove painted texture, soft gradients, soft shadows, excessive highlights, rounded 3D volume. Repaint with the very clean flat 2008 Chinese Flash game look of the original room: each material just 2 or 3 clear solid color shapes, warm dark brown moderately thin contour, slight asymmetry, one simple hard-edged shade, no tiny grain, NO realistic reflections. Simplify rug to 2 overlapping plain leaf silhouettes, cushion 3 flat petal shapes, flower lamp to 3 broad flat yellow petals. Bookcase, mushroom tea table, clock, picture and certificate keep same subjects but use sparse simple internal lines. Transparent background. Certificate has BLANK paper with only a small gold seal and red ribbon at bottom; remove decorative writing lines so app can place its own text. No readable letters, no characters, no labels, no grid lines, no white background. All silhouettes fit fully inside their rigid equal 3x3 cells with padding.",
+      "tool": "image_gen",
+      "date": "2026-10-26",
+      "transparent_background": true,
+      "use": "prop keyframes or furniture; no character redraw",
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "elemental-keyframes.png",
+      "input": "first four-element keyframe candidate; original ramu-home, bear biscuit and middle Ram references",
+      "prompt": "Edit FIRST image only, preserve its exact 4 columns x 4 rows and four chronological spell poses per row: wind, flame wave, ice crystals, meteor impact. Remaining attached images are original 2008 Chinese Flash game references for drawing language, not subjects to copy. The candidate is too glossy, too thickly outlined and too painterly. Make all effects CLEAN FLAT FLASH: broad solid mint/leaf greens, orange/yellow flames, pale-blue ice, warm brown/orange rocks; only two or three hard-edge color regions per material; thin darker-local-color contours; no gradient, no airbrush, no soft shadow or glowing halos. Reduce small debris and busy glints. Preserve every large curling silhouette and clear wind/fire/ice/meteor story, clear anticipation, emergence, peak, dissipating follow-through. One clear effect per cell with transparent padding; no silhouettes cross any equal cell edge. No characters, no text, no captions, no game UI. True transparent background. Do not turn the sprite sheet into a scene.",
+      "tool": "image_gen",
+      "date": "2026-10-26",
+      "transparent_background": true,
+      "use": "prop keyframes or furniture; no character redraw",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "file": "study-service-keyframes.png",
+      "input": "first study/service/hat keyframes and original bear biscuit item reference",
+      "prompt": "Edit FIRST image. Remove the entire brown/yellow/grey/purple background and ALL colored glow around the objects. Output true RGBA transparency with zero-opacity empty spaces. Keep exactly the same 3x3 prop animation sheet, all 9 objects in same positions, nine distinct transparent square cells. Keep book cover/pages/turned-page poses, serving tray/lid/soup/empty-bowl poses and magician hat/flower poses. Flatten the remaining objects' shading into just 2-3 clean HARD-EDGED solid colors, thin warm local darker outlines like the SECOND original Flash item reference. No gradients, no fuzzy halos, no glow, no blurred shadows. No background color or checkerboard of any sort. Do not add characters, captions, labels, borders, text or extra objects. Complete separate silhouettes, even transparent padding within each cell.",
+      "tool": "image_gen",
+      "date": "2026-10-26",
+      "transparent_background": true,
+      "use": "prop keyframes or furniture; no character redraw",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    }
+  ],
+  "references": [
+    "public/assets/original/scenes/ramu-home.png",
+    "public/assets/original/ui/reference-pet-panel.png",
+    "public/assets/original/items/180017.png",
+    "public/assets/original/pets/middle-red-idle.png"
+  ],
+  "sourceKeyframes": "Final drawn sheets kept here; PNG runtime compilation is reproducible from these sheets, model generation itself is not deterministic.",
+  "review": "Remove glossy/painterly first pass; flatten shade regions. Transparency checked from actual alpha, not RGB of invisible pixels."
+}

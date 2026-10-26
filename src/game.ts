@@ -6,6 +6,10 @@ import {normalizeCheckIn} from './daily-check-in';
 import type {DailyCheckIn} from './daily-check-in';
 import {normalizeOuting} from './pet-pastimes';
 import type {PetOuting} from './pet-pastimes';
+import {normalizeEducation,normalizeActivity,settleActivity,cancelActivity} from './pet-school';
+import type {Education,PetActivity} from './pet-school';
+import {normalizeRoom} from './room-furnishings';
+import type {RoomFurnishings} from './room-furnishings';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
 
@@ -45,11 +49,15 @@ export interface GameState {
   sleeping: boolean;
   /** Short grace period after the user wakes a tired pet; persisted across reloads. */
   awakeUntil?: number;
+  sleepUntil?: number;
   completedGames: number;
   lastRewardAt: number;
   checkIn?: DailyCheckIn;
   outing?: PetOuting;
   lastOutingAt?: number;
+  education?: Education;
+  activity?: PetActivity;
+  room?: RoomFurnishings;
 }
 
 export interface CareResult {
@@ -208,7 +216,7 @@ function advanceStats(state: GameState, now: number): GameState {
 }
 
 function settleRest(state: GameState, now: number): GameState {
-  if(state.sleeping&&state.stats.energy>=WAKE_ENERGY)return {...state,sleeping:false};
+  if(state.sleeping&&state.stats.energy>=WAKE_ENERGY&&now>=(state.sleepUntil??0))return {...state,sleeping:false};
   if(!state.sleeping&&state.stats.energy<=REST_ENERGY&&now>=(state.awakeUntil??0))return {...state,sleeping:true};
   return state;
 }
@@ -221,12 +229,12 @@ export function tick(state: GameState, now = Date.now()): GameState {
   let current=settleRest(cursor===state.lastTick?state:{...state,lastTick:cursor},cursor);
   while(cursor<now){
     const untilTransition=current.sleeping
-      ? (WAKE_ENERGY-current.stats.energy)/22*3_600_000
+      ? Math.max((WAKE_ENERGY-current.stats.energy)/22*3_600_000,(current.sleepUntil??0)-cursor)
       : Math.max((current.stats.energy-REST_ENERGY)/4*3_600_000,(current.awakeUntil??0)-cursor);
     const end=Math.min(now,cursor+Math.max(1,untilTransition));
     current=settleRest(advanceStats(current,end),end);cursor=end;
   }
-  return current;
+  return settleActivity(current,now);
 }
 
 export function care(state: GameState, action: Action, foodId?: string, now = Date.now()): CareResult {
@@ -234,7 +242,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
   if (action === 'sleep') {
     const waking=state.sleeping||current.sleeping;
     return {
-      state: { ...current, sleeping: !waking, ...(waking?{awakeUntil:now+WAKE_GRACE_MS}:{}) },
+      state: { ...cancelActivity(current), sleeping: !waking, ...(waking?{awakeUntil:now+WAKE_GRACE_MS,sleepUntil:0}:{sleepUntil:now+60_000}) },
       message: waking ? `${current.name}醒来啦，今天也想和你在一起！` : '晚安呀，睡一会儿就能恢复精力。',
       ok: true,
     };
@@ -379,6 +387,8 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
     }
     for (const item of ITEMS) inventory[item.id] ??= 0;
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
+    const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
+    const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity(value.activity,{createdAt:value.createdAt,education},now):undefined;
     return tick({
       version: 1,
       name: value.name.trim(),
@@ -393,10 +403,12 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       inventory,
       sleeping: value.sleeping,
       ...(isIntegerIn(value.awakeUntil,0,now+WAKE_GRACE_MS)?{awakeUntil:value.awakeUntil}:{}),
+      ...(isIntegerIn(value.sleepUntil,0,now+60_000)?{sleepUntil:value.sleepUntil}:{}),
       completedGames: value.completedGames,
       lastRewardAt: value.lastRewardAt,
       ...(normalizeCheckIn(value.checkIn,now)?{checkIn:normalizeCheckIn(value.checkIn,now)}:{}),
       ...(importedOuting?{outing:importedOuting}:{}),
+      ...(education?{education}:{}),...(activity?{activity}:{}),...(room?{room}:{}),
       ...(isIntegerIn(value.lastOutingAt,value.createdAt,now+300000)?{lastOutingAt:value.lastOutingAt}:{}),
     }, now);
   } catch {

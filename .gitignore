@@ -197,3 +197,14 @@ artifacts/v37-bound/*
 !artifacts/v37-bound/*.png
 !artifacts/v37-bound/*.gif
 !artifacts/v37-bound/*.zip
+
+!artifacts/v38-school/
+artifacts/v38-school/*
+!artifacts/v38-school/*.png
+!artifacts/v38-school/*.gif
+!artifacts/v38-school/*.json
+!artifacts/v38-school/crown/
+artifacts/v38-school/crown/*
+!artifacts/v38-school/crown/*.png
+!artifacts/v38-school/crown/*.gif
+!artifacts/v38-school/crown/*.zip

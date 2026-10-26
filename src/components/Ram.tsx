@@ -28,6 +28,8 @@ import {isPastime,pastimeBody,spellCostume,PASTIME_LABELS} from '../pet-pastimes
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
 import {dizzyEyes} from '../dizzy-motion'
+import RamSchool,{SCHOOL_CLIPS} from './RamSchool'
+import {isSchoolAction} from '../pet-school'
 
 interface RamProps {
   color: PetColor
@@ -519,23 +521,25 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   if(playClock.current.key!==eventKey)playClock.current={key:eventKey,began:undefined}
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const lifeAction=!sleeping&&!dragging&&!shaking&&isPastime(action)?action:undefined
+  const schoolAction=!sleeping&&!dragging&&!shaking&&isSchoolAction(action)?action:undefined
   const [illusion,setIllusion]=useState(false)
   const spellChoice=useRef({key:'',outfit:spellCostume(companionId)})
   if(spellChoice.current.key!==eventKey)spellChoice.current={key:eventKey,outfit:spellCostume(companionId)}
   const finishRef=useRef(onActionEnd);finishRef.current=onActionEnd
   useEffect(()=>{
     setIllusion(false)
+    if(schoolAction){const clip=SCHOOL_CLIPS[schoolAction];if(!clip.loop){const end=setTimeout(()=>finishRef.current?.(),clip.frames/clip.fps*1000);return()=>clearTimeout(end)}return}
     if(!lifeAction)return
     const timers:ReturnType<typeof setTimeout>[]=[]
     if(lifeAction==='spell'){timers.push(setTimeout(()=>setIllusion(true),1100),setTimeout(()=>setIllusion(false),6100))}
     if(lifeAction!=='play-alone')timers.push(setTimeout(()=>finishRef.current?.(),getRamActionDuration(lifeAction,stage===0?'seed':form)!))
     return()=>timers.forEach(clearTimeout)
-  },[eventKey,lifeAction,form,stage])
+  },[eventKey,lifeAction,schoolAction,form,stage])
   const wearing=lifeAction==='spell'&&illusion?spellChoice.current.outfit:costume
-  const sourceEnd=lifeAction&&lifeAction!=='play-alone'?undefined:onActionEnd
+  const sourceEnd=schoolAction||lifeAction&&lifeAction!=='play-alone'?undefined:onActionEnd
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
-  const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : itemMotion ? itemMotion.action : action==='balance'?'balance':pastimeBody(action)
+  const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : schoolAction?schoolAction:itemMotion ? itemMotion.action : action==='balance'?'balance':pastimeBody(action)
   const resting = activeAction === 'sleep', key = `${form}:${color}`
   const mouth=slumberEmitter(stage===0?'seed':form)
   const [failedKey, setFailedKey] = useState<string | null>(null)
@@ -554,7 +558,8 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
-    <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
+    <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={schoolAction?'idle':activeAction} originalFootball={stage>0&&activeAction==='play'}/>
+    {schoolAction&&<RamSchool key={`school:${action}:${actionId??0}`} action={schoolAction} sound={sound} startedAt={clock.current.startedAt} stage={stage}/>}
     {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${.6+i*6.4/3}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
     </span>

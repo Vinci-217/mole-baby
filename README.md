@@ -4,33 +4,39 @@
 
 ## 本轮重点预览（未发布）
 
-**中级直接使用初级的75张黏滞身体原帧，仅增加跟随头顶的叶片序列。** 拖动的转身、拖尾、拉伸、挤压和松手响应共用初级。未重新绘制身体、眼睛和嘴，也未增加独立的上下跳跃。
+**课程、技能、餐厅打工、小屋家具，以及修订后的叶柄绑定。** 原拉姆身体与表情继续使用可核对的页游素材；新书页、餐盘、帽子和四系法术是参考原画风绘制的关键帧，再离线编排成24fps透明图集，不称为官方完整技能原帧。
 
-![应用实录：左初级，右中级；身体原帧与拖拽时序相同](artifacts/animation-gallery/drag-young.gif)
+![应用内速览：帽子变花、旋风、流火、寒冰、陨石、餐厅服务员](artifacts/animation-gallery/school-preview.gif)
 
-### 先生成序列，再接入逐帧播放
+### 课程与生活玩法
 
-原版中级叶片纹理生成17档叶尖弯曲姿态，叶柄固定在头顶关节，随身体形变选帧并延迟回摆；合成五方向共75张PNG。叶片动画、绑定及桌面拖拽编排属于本项目适配，不称为官方完整拖拽动作。透明画布向外扩展，身体尺寸不缩小、叶片不裁切。
+语言课前只会 bibobibo，结业后才说中文；英文课解锁英文问候，魔术课解锁帽子变花及后续四系课程。每门课三节，每节2–4分钟，进度和证书随宠物存档保存。餐厅每班2分钟，完成获得180摩尔豆；中断不结算，重开不会重复领工资。玩耍中可以主动睡觉，也保留困倦后的自动入睡。
 
-![生成序列：左为初级原帧，右为相同身体加绑定叶片](artifacts/v37-bound/bound-sequence.gif)
+![学习动作：原角色与新绘书页、发音及魔法练习](artifacts/animation-gallery/school.gif)
 
-[下载PNG逐帧序列：五方向 × 15帧，红色预览](artifacts/v37-bound/frames-red.zip)
+![小屋布置：家具放地面，结业证书挂墙上](artifacts/v38-school/furnished-room.png)
 
-![合成序列抽帧：完整75帧见下载](artifacts/v37-bound/frames.png)
+[课程、技能与玩法说明](docs/COURSES.md) · [动画 skill 与原帧参考](skills/mole-classic-art/SKILL.md)
 
-![中级单独实录：原帧拉伸、叶片跟随和松手衔接](artifacts/animation-gallery/middle-bound.gif)
+### 修正叶片接点
+
+上一版把外侧叶片的重叠处误作叶柄，本轮改为双叶中央接点，并通过眼部位置跟随头部。身体仍沿用初级原帧；独立叶片转动幅度收小。以下是实际应用录制，左初级、右中级。
+
+![修正后的初级和中级同步拖拽](artifacts/animation-gallery/drag-young.gif)
+
+![中级单独拖拽与松手衔接](artifacts/animation-gallery/middle-bound.gif)
+
+![修正接点后的合成序列：相同身体加中级叶片](artifacts/v38-school/crown/bound-sequence.gif)
+
+[下载75张透明PNG逐帧序列](artifacts/v38-school/crown/frames-red.zip) · [接点与轮廓抽帧图](artifacts/v38-school/crown/frames.png)
 
 ![五阶段实际拖拽与松手衔接](artifacts/animation-gallery/drag.gif)
 
-下方睡眠与摸摸为前一轮方案，本轮只修订拖拽。
-
-![安静睡觉：体型与叶冠不扭曲，闭眼和小嘴呼吸](artifacts/animation-gallery/sleep.gif)
-
-![原帧摸摸方案：闭眼微笑，轻轻靠向手掌](artifacts/v30-preview/pet.gif)
+睡眠、摸摸、足球等既有动作仍全部展示在下面。
 
 ## 全部现有动画（全部展开）
 
-按渲染器动作清单核对，覆盖 **44 个动作名、32 种用品、9 件装扮**。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，均未发布到正式版。
+按渲染器动作清单核对，覆盖 **55 个动作名、32 种用品、9 件装扮**。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，均未发布到正式版。
 
 ### 日常移动与张望
 
@@ -87,6 +93,30 @@
 ### 完整玩球 · 全部八种形态
 
 ![完整玩球 · 全部八种形态](artifacts/animation-gallery/football.gif)
+
+### 语言、英文和魔术课 · 结业前的学习动作
+
+![语言、英文和魔术课 · 结业前的学习动作](artifacts/animation-gallery/school.gif)
+
+### 结业后的本领 · 中文、英文与帽子变花
+
+![结业后的本领 · 中文、英文与帽子变花](artifacts/animation-gallery/school-skills.gif)
+
+### 旋风、流火、寒冰、陨石 · 新绘制的法术方案
+
+![旋风、流火、寒冰、陨石 · 新绘制的法术方案](artifacts/animation-gallery/elemental-skills.gif)
+
+### 餐厅服务员 · 端盘、送餐、收拾
+
+![餐厅服务员 · 端盘、送餐、收拾](artifacts/animation-gallery/restaurant.gif)
+
+### 新本领速览 · 原角色与新道具逐帧组合
+
+![新本领速览 · 原角色与新道具逐帧组合](artifacts/animation-gallery/school-preview.gif)
+
+### 四种神力形态 · 新本领与工作
+
+![四种神力形态 · 新本领与工作](artifacts/animation-gallery/school-evolutions.gif)
 
 ### 其余现有动作 · 1
 
@@ -198,6 +228,17 @@
 | `play-alone` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
 | `spell` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
 | `balance` | [pastimes](artifacts/animation-gallery/pastimes.gif) |
+| `school-language` | [school](artifacts/animation-gallery/school.gif) |
+| `school-english` | [school](artifacts/animation-gallery/school.gif) |
+| `school-magic` | [school](artifacts/animation-gallery/school.gif) |
+| `restaurant` | [restaurant](artifacts/animation-gallery/restaurant.gif) |
+| `skill-language` | [school-skills](artifacts/animation-gallery/school-skills.gif) |
+| `skill-english` | [school-skills](artifacts/animation-gallery/school-skills.gif) |
+| `skill-magic` | [school-skills](artifacts/animation-gallery/school-skills.gif) |
+| `skill-wind` | [elemental-skills](artifacts/animation-gallery/elemental-skills.gif) |
+| `skill-fire` | [elemental-skills](artifacts/animation-gallery/elemental-skills.gif) |
+| `skill-ice` | [elemental-skills](artifacts/animation-gallery/elemental-skills.gif) |
+| `skill-meteor` | [elemental-skills](artifacts/animation-gallery/elemental-skills.gif) |
 
 ### 其余已有动图（历史方案 / 原素材参考）
 
@@ -215,15 +256,19 @@
 
 ![历史 / 原素材：v29-bouncy-pull.gif](artifacts/v29-bouncy-pull.gif)
 
+![历史 / 原素材：pet.gif](artifacts/v30-preview/pet.gif)
+
 ![历史 / 原素材：original-vs-grounded.gif](artifacts/v36-nojump/original-vs-grounded.gif)
+
+![历史 / 原素材：bound-sequence.gif](artifacts/v37-bound/bound-sequence.gif)
 
 ![历史 / 原素材：source-motion.gif](public/assets/original/seed/source-motion.gif)
 
-[本轮逐帧绑定、来源与验证](research/v37-bound-crown-drag.md) · [此前贴地补间研究（已替换）](research/v36-original-grounded-drag.md) · [原素材来源](research/v30-motion-previews.md)
+[本轮课程与接点修订记录](research/v38-school-room.md) · [此前绑定研究（已替换）](research/v37-bound-crown-drag.md) · [原素材来源](research/v30-motion-previews.md)
 
 ## 体积精简（本地预览构建）
 
-710张图片 84.80 MB → 50.32 MB，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。
+738张图片 90.38 MB → 55.30 MB，逐张核对透明度和可见像素一致。Java、Python、OpenCV只用于离线生成图片，不随客户端安装。预览GIF、PNG序列ZIP和原始录屏帧均不进入安装目录。此前同版本Electron的Linux目录实测约409 MB → 304 MB；该旧测量未包含后续动画素材，Windows/macOS最终安装包大小待各自构建验证。
 
 [此前测量明细与验证范围](research/v32-animation-and-size.md)
 
