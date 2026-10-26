@@ -17,11 +17,35 @@ def coverage(n,q):
  d=n[:,:,:3].astype(float)-q[:,:,:3].astype(float);g=np.clip((d[:,:,0]+2*d[:,:,2]/3)/170,0,1);b=np.clip((d[:,:,2]+51*g)/153,0,1);w=np.clip((d[:,:,1]+51*g+102*b)/255,0,1)
  m=np.dstack([w*255,g*255,b*255,n[:,:,3]]).round().astype('uint8');m[n[:,:,3]==0]=0;return m
 def bodybox(m):return box((m[:,:,:3].sum(2)>90)&(m[:,:,3]>100))
-def xflex(im,phase,tb):
+def facebox(neutral,mask,tb):
+ n=np.array(neutral);m=np.array(mask);ys,xs=np.indices((H,W))
+ # Identify the original eye whites, not the recolourable white body. Keep
+ # the whole little face nearly rigid while the outer body stretches.
+ eye=(n[:,:,0]>215)&(np.ptp(n[:,:,:3].astype(int),axis=2)<16)&(m[:,:,:3].sum(2)<35)&(n[:,:,3]>180)&(ys>tb[1]+10)&(ys<tb[3]-8)&(xs>tb[0])&(xs<tb[2])
+ return box(eye) or [int((tb[0]+tb[2])/2)-15,tb[1]+20,int((tb[0]+tb[2])/2)+15,tb[3]-10]
+def xflex(im,strain,tb,face,direction):
  pixels=np.array(im);ys,xs=np.indices((H,W),dtype=float);depth=np.clip((ys-tb[1])/max(1,tb[3]-tb[1]),0,1)
- # Sine-envelope pins the top/bottom body rows. Only source X is sampled.
- bend=np.sin(depth*np.pi)**2;leaf=np.clip((tb[1]-ys)/25,0,1);wave=np.sin(phase);shift=2.8*wave*bend+1.8*np.sin(phase-.6)*leaf
- scale=1+.018*np.sin(phase+.4)*bend;centre=(tb[0]+tb[2])/2;ix=(xs-centre-shift)/scale+centre
+ # Forward X derivatives stay positive, so the mesh cannot fold. A protected
+ # face patch retains eye/mouth proportions. There is never a Y resample.
+ face_x=np.clip(np.minimum((xs-face[0]+9)/9,(face[2]+9-xs)/9),0,1)
+ face_y=np.clip(np.minimum((ys-face[1]+8)/8,(face[3]+8-ys)/8),0,1)
+ # The leaf tips overlap the top body rows. Start the belly deformation below
+ # this collar so a big pull cannot spread those tips out of the sprite cell.
+ collar=np.clip((ys-tb[1]-9)/15,0,1)
+ belly=collar*(.5+.5*np.sin(depth*np.pi)**.7)
+ derivative=1+strain*1.35*belly*(1-.94*face_x*face_y)
+ forward=np.cumsum(derivative,axis=1);centre=int((tb[0]+tb[2])/2)
+ leaf=np.clip((tb[1]-ys)/40,0,1)
+ # The original right-facing crown is already close to the cell edge. Keep
+ # its small follow-through inward on compression as well as extension.
+ shift=-direction*(strain*26*depth**1.2+abs(strain)*8*leaf)
+ if direction==1:
+  # The neutral source itself reaches the final column after registration.
+  # Give only the crown three pixels of breathing room, fading into the neck.
+  neck=np.clip((ys-tb[1])/22,0,1);shift-=3*(1-neck*neck*(3-2*neck))
+ forward=forward-forward[:,centre:centre+1]+centre+shift
+ ix=np.empty((H,W))
+ for y in range(H):ix[y]=np.interp(xs[y],forward[y],xs[y],left=-1,right=W)
  result=np.empty_like(pixels)
  for k in range(4):result[:,:,k]=ndimage.map_coordinates(pixels[:,:,k],[ys,ix],order=1,mode='constant',cval=0).round().astype('uint8')
  return Image.fromarray(result)
@@ -31,7 +55,7 @@ for form,sid in [('junior',936),('middle',1532)]:
  classic=np.array(Image.open(a.repo/f'public/assets/classic/{form}-mask.png').convert('RGBA'));tb=bodybox(classic[:H,:W]);cx=(tb[0]+tb[2])/2
  frames=[];poses=[];clips={}
  for view in views:
-  spec=specs[form][view];count=spec['count'] if form=='junior' else 16;mapping=[]
+  spec=specs[form][view];count=spec['count'] if form=='junior' else 22;mapping=[]
   first=np.array(Image.open(nd/f"{spec['start']}.png").convert('RGBA'));firstmask=coverage(first,np.array(Image.open(pd/f"{spec['start']}.png").convert('RGBA')));initial=bodybox(firstmask)
   sx=(tb[2]-tb[0])/(initial[2]-initial[0]);sy=sx if form=='junior' else (tb[3]-tb[1])/(initial[3]-initial[1])
   for i in range(count):
@@ -41,11 +65,15 @@ for form,sid in [('junior',936),('middle',1532)]:
    labels,_=ndimage.label(n[:,:,3]>10);rgb=n[:,:,:3].astype(int);ids=np.unique(labels[(m[:,:,:3].sum(2)>60)|((rgb.max(2)-rgb.min(2)>30)&(n[:,:,3]>60))]);keep=np.isin(labels,ids[ids>0]);n[:,:,3]=np.where(keep,n[:,:,3],0);m[:,:,3]=n[:,:,3]
    dx=cx-(b[0]+b[2])/2*sx;dy=tb[1]-b[1]*sy
    parts=[Image.fromarray(layer).transform((W,H),Image.Transform.AFFINE,(1/sx,0,-dx/sx,0,1/sy,-dy/sy),Image.Resampling.BICUBIC) for layer in [n,m]]
-   if form=='middle':parts=[xflex(im,i/count*np.pi*2,tb) for im in parts]
+   strain=round(-.12+i*.02,4) if form=='middle' else 0
+   if form=='middle':
+    face=facebox(*parts,tb);direction=-1 if view.startswith('left') else 1 if view.startswith('right') else 0
+    parts=[xflex(im,strain,tb,face,direction) for im in parts]
+    assert not (np.array(parts[0])[:,[0,-1],3]>32).any(),f'{view}/{strain}: clipped leaf/body'
    actual=bodybox(np.array(parts[1]));row=2 if view.startswith('left') else 1 if view.startswith('right') else 0;wearframe=min(7,int(i/count*8)) if form=='junior' and row else 0
    old=bodybox(classic[row*H:(row+1)*H,wearframe*W:(wearframe+1)*W])
    if old is None:wearframe=0;old=bodybox(classic[row*H:(row+1)*H,:W])
-   poses.append({'view':view,'sourceFrame':i+1 if form=='junior' else 1,'body':actual,'wearBody':old,'wearFrame':wearframe,'wearRow':row});mapping.append(len(frames));frames.append(parts)
+   poses.append({'view':view,'sourceFrame':i+1 if form=='junior' else 1,'strain':strain,'body':actual,'wearBody':old,'wearFrame':wearframe,'wearRow':row});mapping.append(len(frames));frames.append(parts)
   clips[view]={'frameCount':count,'frameMap':mapping}
  rows=(len(frames)+COLS-1)//COLS
  for k,kind in enumerate(['neutral','mask']):
@@ -53,6 +81,7 @@ for form,sid in [('junior',936),('middle',1532)]:
   for i,pair in enumerate(frames):atlas.paste(pair[k],(i%COLS*W,i//COLS*H))
   atlas.save(out/f'{form}-{kind}.png',optimize=True)
  data['forms'][form]={'rows':rows,'frameCount':len(frames),'clips':clips,'poses':poses}
+ if form=='middle':data['forms'][form]['deformation']={'mode':'spring-strain','min':-.12,'step':.02,'neutral':6}
  print(form,len(frames),'directional drag frames')
 (out/'runtime.json').write_text(json.dumps(data,separators=(',',':'))+'\n')
 (out/'checksums.json').write_text(json.dumps({f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in out.glob('*.png')},indent=2)+'\n')

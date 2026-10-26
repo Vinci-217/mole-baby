@@ -1,0 +1,27 @@
+{
+  "frames": 154,
+  "fps": 24,
+  "duration": 6416.666666666667,
+  "dimensions": [
+    420,
+    300
+  ],
+  "cells": [
+    {
+      "form": "middle",
+      "stage": 2,
+      "action": "drag",
+      "label": "真实拖动与松手"
+    }
+  ],
+  "middleVerticalTolerance": 0.864,
+  "directionalViews": true,
+  "material": {
+    "widthChangeCss": 15.000001589457185,
+    "strainRange": [
+      -0.1,
+      0.2
+    ]
+  },
+  "errors": []
+}

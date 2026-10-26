@@ -14,7 +14,21 @@ export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,nati
    stepElasticDrag(state.current,now-previous,media.matches);previous=now
    const sprite=root.current?.querySelector<HTMLElement>('.ram-sprite'),s=state.current
    const moving=elasticDragEnergy(s)>.002
-   if(sprite){const horizontalOnly=latest.current.stage===2;sprite.style.setProperty('--pull-x',`${s.x.toFixed(3)}%`);sprite.style.setProperty('--pull-y',horizontalOnly?'0%':`${s.y.toFixed(3)}%`);sprite.style.setProperty('--pull-angle',`${(horizontalOnly?0:latest.current.stage===1?Math.max(-3.5,Math.min(3.5,s.angle)):s.angle).toFixed(3)}deg`);sprite.style.setProperty('--pull-sx',String(horizontalOnly?1:1+s.stretch*(latest.current.stage===1?.18:1)));sprite.style.setProperty('--pull-sy',String(horizontalOnly?1:1/(1+s.stretch*(latest.current.stage===1?.18:1))));sprite.style.setProperty('--pull-skew',horizontalOnly?'0deg':`${(latest.current.stage===1?s.skew*.2:s.skew).toFixed(3)}deg`);sprite.style.setProperty('--pull-leaf',s.fringe.toFixed(3));sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`);sprite.style.setProperty('--drag-view',s.view.toFixed(4));sprite.style.setProperty('--drag-distance',s.phaseDistance.toFixed(3));sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'}
+   if(sprite){
+    const horizontalOnly=latest.current.stage===2,junior=latest.current.stage===1
+    sprite.style.setProperty('--pull-x',`${s.x.toFixed(3)}%`)
+    sprite.style.setProperty('--pull-y',horizontalOnly?'0%':`${s.y.toFixed(3)}%`)
+    sprite.style.setProperty('--pull-angle',`${(horizontalOnly?0:junior?Math.max(-3.5,Math.min(3.5,s.angle)):s.angle).toFixed(3)}deg`)
+    sprite.style.setProperty('--pull-sx',String(horizontalOnly?1:1+s.stretch*(junior ? .18 : 1)))
+    sprite.style.setProperty('--pull-sy',String(horizontalOnly?1:1/(1+s.stretch*(junior ? .18 : 1))))
+    sprite.style.setProperty('--pull-skew',horizontalOnly?'0deg':`${(junior?s.skew*.2:s.skew).toFixed(3)}deg`)
+    sprite.style.setProperty('--pull-leaf',s.fringe.toFixed(3))
+    sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`)
+    sprite.style.setProperty('--drag-view',s.view.toFixed(4))
+    sprite.style.setProperty('--drag-distance',s.phaseDistance.toFixed(3))
+    sprite.style.setProperty('--drag-strain',s.stretch.toFixed(4))
+    sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'
+   }
    // A moving native window changes local pointer coordinates. Read the real
    // desktop cursor instead, without touching the window's drag geometry.
    if(native&&s.held&&!polling&&now-lastPoll>=32){polling=true;lastPoll=now;void window.desktop?.getState().then(d=>{if(!stopped&&state.current.held&&d.dragPoint)sample(d.dragPoint)}).catch(()=>{}).finally(()=>{polling=false})}

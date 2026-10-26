@@ -40,5 +40,12 @@
   ],
   "middleVerticalTolerance": 0.6,
   "directionalViews": true,
+  "material": {
+    "widthChangeCss": 9.895836353302002,
+    "strainRange": [
+      -0.1,
+      0.2
+    ]
+  },
   "errors": []
 }

@@ -5,12 +5,20 @@ describe('directional dragging is a moving character rather than a translated st
  it('turns through original front, diagonal and side views in both forms',()=>{
   for(const form of ['junior','middle'] as const){
    expect([-1,-.4,0,.4,1].map(view=>sampleDragPose(form,view,0).direction)).toEqual(['left','leftdown','down','rightdown','right'])
-   for(const view of [-1,1]){const frames=new Set(Array.from({length:64},(_,i)=>sampleDragPose(form,view,i*4).index));expect(frames.size).toBeGreaterThanOrEqual(15)}
+   for(const view of [-1,1]){const frames=new Set(Array.from({length:64},(_,i)=>sampleDragPose(form,view,i*4,false,-.12+i*.01).index));expect(frames.size).toBeGreaterThanOrEqual(15)}
   }
  })
  it('keeps middle vertical registration across all newly authored frames',()=>{
   const spec=dragSpec('middle'),top=spec.poses.map(p=>p.body[1]),bottom=spec.poses.map(p=>p.body[3]);expect(Math.max(...top)-Math.min(...top)).toBeLessThanOrEqual(1);expect(Math.max(...bottom)-Math.min(...bottom)).toBeLessThanOrEqual(1)
-  for(const clip of Object.values(spec.clips))expect(clip.frameCount).toBe(16)
+  for(const clip of Object.values(spec.clips)){
+   const widths=clip.frameMap.map(index=>spec.poses[index].body[2]-spec.poses[index].body[0]);expect(Math.max(...widths)-Math.min(...widths)).toBeGreaterThan(12)
+  }
+ })
+ it('middle has distinct squeezed, relaxed and stretched shapes even after turning has stopped',()=>{
+  const squeezed=sampleDragPose('middle',0,0,false,-.1),neutral=sampleDragPose('middle',0,0,false,0),stretched=sampleDragPose('middle',0,0,false,.24)
+  const width=(p:typeof neutral)=>p.body[2]-p.body[0]
+  expect(width(squeezed)).toBeLessThan(width(neutral)-3);expect(width(stretched)).toBeGreaterThan(width(neutral)+8)
+  expect(sampleDragPose('middle',1,0,true,.25)).toEqual(sampleDragPose('middle',-1,0,true,-.1))
  })
  it('responds to slow left/right dragging without requiring the shake threshold',()=>{
   const s=createElasticDrag();pullElasticDrag(s,{x:0,y:0,at:1000},2)

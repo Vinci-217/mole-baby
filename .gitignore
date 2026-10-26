@@ -175,6 +175,8 @@ artifacts/animation-gallery/*
 !artifacts/animation-gallery/checks.json
 !artifacts/animation-gallery/horizontal-checks.json
 !artifacts/animation-gallery/young-drag-checks.json
+!artifacts/animation-gallery/middle-elastic-checks.json
 !artifacts/v33-drag-sequences.png
+!artifacts/v34-middle-elastic-sequence.png
 !artifacts/asset-size-report.json
 !artifacts/animation-gallery/catalogue-coverage.json
