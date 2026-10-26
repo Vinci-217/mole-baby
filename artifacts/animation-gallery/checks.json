@@ -1,0 +1,1729 @@
+{
+  "sleep": {
+    "frames": 226,
+    "fps": 24,
+    "duration": 9400,
+    "dimensions": [
+      700,
+      547
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "sleep",
+        "label": "哈欠 → 安睡 → ZZZ"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "sleep",
+        "label": "哈欠 → 安睡 → ZZZ"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "sleep",
+        "label": "哈欠 → 安睡 → ZZZ"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "sleep",
+        "label": "哈欠 → 安睡 → ZZZ"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "sleep",
+        "label": "哈欠 → 安睡 → ZZZ"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "wake",
+        "label": "慢慢醒来"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "wake",
+        "label": "慢慢醒来"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "wake",
+        "label": "慢慢醒来"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "wake",
+        "label": "慢慢醒来"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "wake",
+        "label": "慢慢醒来"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "mood-dozy",
+        "label": "困倦打哈欠"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "mood-dozy",
+        "label": "困倦打哈欠"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "mood-dozy",
+        "label": "困倦打哈欠"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "mood-dozy",
+        "label": "困倦打哈欠"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "mood-dozy",
+        "label": "困倦打哈欠"
+      }
+    ],
+    "errors": []
+  },
+  "interaction": {
+    "frames": 197,
+    "fps": 24,
+    "duration": 8200,
+    "dimensions": [
+      700,
+      547
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "focus",
+        "label": "专注翻书"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "focus",
+        "label": "专注翻书"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "focus",
+        "label": "专注翻书"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "focus",
+        "label": "专注翻书"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "focus",
+        "label": "专注翻书"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "watch-butterfly",
+        "label": "挥网逗蝴蝶"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "watch-butterfly",
+        "label": "挥网逗蝴蝶"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "watch-butterfly",
+        "label": "挥网逗蝴蝶"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "watch-butterfly",
+        "label": "挥网逗蝴蝶"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "watch-butterfly",
+        "label": "挥网逗蝴蝶"
+      }
+    ],
+    "errors": []
+  },
+  "movement": {
+    "frames": 173,
+    "fps": 24,
+    "duration": 7200,
+    "dimensions": [
+      700,
+      875
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "idle",
+        "label": "安静陪伴"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "idle",
+        "label": "安静陪伴"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "idle",
+        "label": "安静陪伴"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "idle",
+        "label": "安静陪伴"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "idle",
+        "label": "安静陪伴"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "walk-left",
+        "label": "向左移动"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "walk-left",
+        "label": "向左移动"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "walk-left",
+        "label": "向左移动"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "walk-left",
+        "label": "向左移动"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "walk-left",
+        "label": "向左移动"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "walk-right",
+        "label": "向右移动"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "walk-right",
+        "label": "向右移动"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "walk-right",
+        "label": "向右移动"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "walk-right",
+        "label": "向右移动"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "walk-right",
+        "label": "向右移动"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "look-around",
+        "label": "转身张望"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "look-around",
+        "label": "转身张望"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "look-around",
+        "label": "转身张望"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "look-around",
+        "label": "转身张望"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "look-around",
+        "label": "转身张望"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "waving",
+        "label": "打招呼"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "waving",
+        "label": "打招呼"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "waving",
+        "label": "打招呼"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "waving",
+        "label": "打招呼"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "waving",
+        "label": "打招呼"
+      }
+    ],
+    "errors": []
+  },
+  "reactions": {
+    "frames": 154,
+    "fps": 24,
+    "duration": 6400,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "happy",
+        "label": "开心晃晃"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "happy",
+        "label": "开心晃晃"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "happy",
+        "label": "开心晃晃"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "happy",
+        "label": "开心晃晃"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "happy",
+        "label": "开心晃晃"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "catch",
+        "label": "接到了"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "catch",
+        "label": "接到了"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "catch",
+        "label": "接到了"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "catch",
+        "label": "接到了"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "catch",
+        "label": "接到了"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "reward",
+        "label": "收到奖励"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "reward",
+        "label": "收到奖励"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "reward",
+        "label": "收到奖励"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "reward",
+        "label": "收到奖励"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "reward",
+        "label": "收到奖励"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "failed",
+        "label": "没接到"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "failed",
+        "label": "没接到"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "failed",
+        "label": "没接到"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "failed",
+        "label": "没接到"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "failed",
+        "label": "没接到"
+      }
+    ],
+    "errors": []
+  },
+  "moods": {
+    "frames": 240,
+    "fps": 24,
+    "duration": 10000,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "mood-joy",
+        "label": "开心"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "mood-joy",
+        "label": "开心"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "mood-joy",
+        "label": "开心"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "mood-joy",
+        "label": "开心"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "mood-joy",
+        "label": "开心"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "mood-grumpy",
+        "label": "闷闷不乐"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "mood-grumpy",
+        "label": "闷闷不乐"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "mood-grumpy",
+        "label": "闷闷不乐"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "mood-grumpy",
+        "label": "闷闷不乐"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "mood-grumpy",
+        "label": "闷闷不乐"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "mood-content",
+        "label": "安心"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "mood-content",
+        "label": "安心"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "mood-content",
+        "label": "安心"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "mood-content",
+        "label": "安心"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "mood-content",
+        "label": "安心"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "dizzy",
+        "label": "摇晃后头晕"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "dizzy",
+        "label": "摇晃后头晕"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "dizzy",
+        "label": "摇晃后头晕"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "dizzy",
+        "label": "摇晃后头晕"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "dizzy",
+        "label": "摇晃后头晕"
+      }
+    ],
+    "errors": []
+  },
+  "conditions": {
+    "frames": 204,
+    "fps": 24,
+    "duration": 8500,
+    "dimensions": [
+      700,
+      1039
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "hungry",
+        "label": "肚子饿"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "hungry",
+        "label": "肚子饿"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "hungry",
+        "label": "肚子饿"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "hungry",
+        "label": "肚子饿"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "hungry",
+        "label": "肚子饿"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "thirsty",
+        "label": "口渴"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "thirsty",
+        "label": "口渴"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "thirsty",
+        "label": "口渴"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "thirsty",
+        "label": "口渴"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "thirsty",
+        "label": "口渴"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "dirty",
+        "label": "需要清洁"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "dirty",
+        "label": "需要清洁"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "dirty",
+        "label": "需要清洁"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "dirty",
+        "label": "需要清洁"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "dirty",
+        "label": "需要清洁"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "sick",
+        "label": "不舒服"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "sick",
+        "label": "不舒服"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "sick",
+        "label": "不舒服"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "sick",
+        "label": "不舒服"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "sick",
+        "label": "不舒服"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "tired",
+        "label": "疲倦"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "tired",
+        "label": "疲倦"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "tired",
+        "label": "疲倦"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "tired",
+        "label": "疲倦"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "tired",
+        "label": "疲倦"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "sad",
+        "label": "难过"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "sad",
+        "label": "难过"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "sad",
+        "label": "难过"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "sad",
+        "label": "难过"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "sad",
+        "label": "难过"
+      }
+    ],
+    "errors": []
+  },
+  "pastimes": {
+    "frames": 437,
+    "fps": 24,
+    "duration": 18200,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "read-alone",
+        "label": "自己看书"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "read-alone",
+        "label": "自己看书"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "read-alone",
+        "label": "自己看书"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "read-alone",
+        "label": "自己看书"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "read-alone",
+        "label": "自己看书"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "play-alone",
+        "label": "自己玩球"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "play-alone",
+        "label": "自己玩球"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "play-alone",
+        "label": "自己玩球"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "play-alone",
+        "label": "自己玩球"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "play-alone",
+        "label": "自己玩球"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "balance",
+        "label": "顶书练平衡"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "balance",
+        "label": "顶书练平衡"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "balance",
+        "label": "顶书练平衡"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "balance",
+        "label": "顶书练平衡"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "balance",
+        "label": "顶书练平衡"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "action": "spell",
+        "label": "尚未学变身术",
+        "locked": true
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "action": "spell",
+        "label": "尚未学变身术",
+        "locked": true
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "spell",
+        "label": "魔法变装"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "spell",
+        "label": "魔法变装"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "spell",
+        "label": "魔法变装"
+      }
+    ],
+    "errors": []
+  },
+  "edges": {
+    "frames": 178,
+    "fps": 24,
+    "duration": 7400,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "side": "left",
+        "action": "waiting",
+        "label": "左边"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "side": "left",
+        "action": "waiting",
+        "label": "左边"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "side": "left",
+        "action": "waiting",
+        "label": "左边"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "side": "left",
+        "action": "waiting",
+        "label": "左边"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "side": "left",
+        "action": "waiting",
+        "label": "左边"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "side": "right",
+        "action": "waiting",
+        "label": "右边"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "side": "right",
+        "action": "waiting",
+        "label": "右边"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "side": "right",
+        "action": "waiting",
+        "label": "右边"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "side": "right",
+        "action": "waiting",
+        "label": "右边"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "side": "right",
+        "action": "waiting",
+        "label": "右边"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "side": "top",
+        "action": "waiting",
+        "label": "上边"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "side": "top",
+        "action": "waiting",
+        "label": "上边"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "side": "top",
+        "action": "waiting",
+        "label": "上边"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "side": "top",
+        "action": "waiting",
+        "label": "上边"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "side": "top",
+        "action": "waiting",
+        "label": "上边"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "side": "bottom",
+        "action": "waiting",
+        "label": "下边"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "side": "bottom",
+        "action": "waiting",
+        "label": "下边"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "side": "bottom",
+        "action": "waiting",
+        "label": "下边"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "side": "bottom",
+        "action": "waiting",
+        "label": "下边"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "side": "bottom",
+        "action": "waiting",
+        "label": "下边"
+      }
+    ],
+    "errors": []
+  },
+  "items1": {
+    "frames": 125,
+    "fps": 24,
+    "duration": 5200,
+    "dimensions": [
+      560,
+      711
+    ],
+    "cells": [
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-cocoa",
+        "itemId": "berry",
+        "label": "可可果",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-bear-biscuit",
+        "itemId": "biscuit",
+        "label": "熊熊饼干",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-berry-juice",
+        "itemId": "juice",
+        "label": "浆果果汁",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-chocolate-beans",
+        "itemId": "180001",
+        "label": "巧克力豆",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-malt-milk",
+        "itemId": "180002",
+        "label": "麦香牛奶",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "bubble-bath",
+        "itemId": "180003",
+        "label": "泡泡浴",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "take-magic-medicine",
+        "itemId": "180005",
+        "label": "万能药水",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-leaf-dumpling",
+        "itemId": "180007",
+        "label": "青叶粽子",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "wash-apple-face",
+        "itemId": "180009",
+        "label": "青苹果洗面奶",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-watermelon",
+        "itemId": "180010",
+        "label": "冰镇西瓜",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-sport-cola",
+        "itemId": "180014",
+        "label": "运动可乐",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-mole-burger",
+        "itemId": "180018",
+        "label": "摩香汉堡",
+        "color": "red"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "action": "eat-crystal-cake",
+        "itemId": "180019",
+        "label": "水晶蛋糕",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-ham-sandwich",
+        "itemId": "180020",
+        "label": "火腿三明治",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-carrot-juice",
+        "itemId": "180021",
+        "label": "兔兔胡萝卜汁",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "shower-fresh",
+        "itemId": "180022",
+        "label": "清爽沐浴露",
+        "color": "red"
+      }
+    ],
+    "errors": []
+  },
+  "items2": {
+    "frames": 125,
+    "fps": 24,
+    "duration": 5200,
+    "dimensions": [
+      560,
+      711
+    ],
+    "cells": [
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "brush-teeth",
+        "itemId": "180024",
+        "label": "喜刷刷牙膏",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-jumping-pudding",
+        "itemId": "180025",
+        "label": "跳跳布丁",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-gugu-fruit",
+        "itemId": "180028",
+        "label": "咕咕果",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "rinse-shuang-fruit",
+        "itemId": "180029",
+        "label": "爽爽果",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-happy-fruit",
+        "itemId": "180030",
+        "label": "开心果",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-apple-pie",
+        "itemId": "180043",
+        "label": "苹果派",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-strawberry-pie",
+        "itemId": "180044",
+        "label": "草莓派",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-ram-bun",
+        "itemId": "180045",
+        "label": "拉姆小馒头",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-hotdog",
+        "itemId": "180047",
+        "label": "热狗",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-cloud-bread",
+        "itemId": "180070",
+        "label": "云朵面包",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "eat-energy-star",
+        "itemId": "180071",
+        "label": "拉姆能量星",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-quality-milk",
+        "itemId": "180073",
+        "label": "优质牛奶",
+        "color": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-color-red",
+        "itemId": "recolor-red",
+        "label": "红色换色药水",
+        "color": "red",
+        "fromColor": "blue"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-color-yellow",
+        "itemId": "recolor-yellow",
+        "label": "黄色换色药水",
+        "color": "yellow",
+        "fromColor": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-color-blue",
+        "itemId": "recolor-blue",
+        "label": "蓝色换色药水",
+        "color": "blue",
+        "fromColor": "red"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "action": "drink-color-pink",
+        "itemId": "recolor-pink",
+        "label": "粉色换色药水",
+        "color": "pink",
+        "fromColor": "red"
+      }
+    ],
+    "errors": []
+  },
+  "wardrobe": {
+    "frames": 348,
+    "fps": 24,
+    "duration": 14500,
+    "dimensions": [
+      420,
+      547
+    ],
+    "cells": [
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "party-cap",
+        "action": "pet",
+        "label": "庆生小帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "gold-feather",
+        "action": "sleep",
+        "label": "金色羽毛"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "wizard-cap",
+        "action": "focus",
+        "label": "紫色魔法帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "star-wand",
+        "action": "play",
+        "label": "星星魔杖"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "magic-book",
+        "action": "pet",
+        "label": "魔法书"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "rabbit-hood",
+        "action": "sleep",
+        "label": "粉兔帽"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "leaf-hood",
+        "action": "focus",
+        "label": "火焰羽翼"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "sport-goggles",
+        "action": "play",
+        "label": "彩虹眼罩"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "costume": "warm-scarf",
+        "action": "pet",
+        "label": "皇冠猫耳"
+      }
+    ],
+    "errors": []
+  },
+  "evolutions": {
+    "frames": 226,
+    "fps": 24,
+    "duration": 9400,
+    "dimensions": [
+      560,
+      711
+    ],
+    "cells": [
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "pet",
+        "label": "摸摸"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "sleep",
+        "label": "睡觉"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "sleep",
+        "label": "睡觉"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "sleep",
+        "label": "睡觉"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "sleep",
+        "label": "睡觉"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "walk-left",
+        "label": "向左飞"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "walk-left",
+        "label": "向左飞"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "walk-left",
+        "label": "向左飞"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "walk-left",
+        "label": "向左飞"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "action": "walk-right",
+        "label": "向右飞"
+      },
+      {
+        "form": "water",
+        "stage": 4,
+        "action": "walk-right",
+        "label": "向右飞"
+      },
+      {
+        "form": "wood",
+        "stage": 4,
+        "action": "walk-right",
+        "label": "向右飞"
+      },
+      {
+        "form": "fire",
+        "stage": 4,
+        "action": "walk-right",
+        "label": "向右飞"
+      }
+    ],
+    "errors": []
+  },
+  "colours": {
+    "frames": 226,
+    "fps": 24,
+    "duration": 9400,
+    "dimensions": [
+      700,
+      711
+    ],
+    "cells": [
+      {
+        "form": "seed",
+        "stage": 0,
+        "color": "red",
+        "action": "sleep",
+        "label": "红"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "color": "red",
+        "action": "sleep",
+        "label": "红"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "color": "red",
+        "action": "sleep",
+        "label": "红"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "color": "red",
+        "action": "sleep",
+        "label": "红"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "color": "red",
+        "action": "sleep",
+        "label": "红"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "color": "yellow",
+        "action": "sleep",
+        "label": "黄"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "color": "yellow",
+        "action": "sleep",
+        "label": "黄"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "color": "yellow",
+        "action": "sleep",
+        "label": "黄"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "color": "yellow",
+        "action": "sleep",
+        "label": "黄"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "color": "yellow",
+        "action": "sleep",
+        "label": "黄"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "color": "blue",
+        "action": "sleep",
+        "label": "蓝"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "color": "blue",
+        "action": "sleep",
+        "label": "蓝"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "color": "blue",
+        "action": "sleep",
+        "label": "蓝"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "color": "blue",
+        "action": "sleep",
+        "label": "蓝"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "color": "blue",
+        "action": "sleep",
+        "label": "蓝"
+      },
+      {
+        "form": "seed",
+        "stage": 0,
+        "color": "pink",
+        "action": "sleep",
+        "label": "粉"
+      },
+      {
+        "form": "junior",
+        "stage": 1,
+        "color": "pink",
+        "action": "sleep",
+        "label": "粉"
+      },
+      {
+        "form": "middle",
+        "stage": 2,
+        "color": "pink",
+        "action": "sleep",
+        "label": "粉"
+      },
+      {
+        "form": "senior",
+        "stage": 3,
+        "color": "pink",
+        "action": "sleep",
+        "label": "粉"
+      },
+      {
+        "form": "super",
+        "stage": 4,
+        "color": "pink",
+        "action": "sleep",
+        "label": "粉"
+      }
+    ],
+    "errors": []
+  }
+}

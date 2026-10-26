@@ -25,6 +25,8 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
  }
  assert.ok(allTraces.move.some(f=>f.trace.some(p=>p.clip==='left')));assert.ok(allTraces.move.some(f=>f.trace.some(p=>p.clip==='right')));
  assert.ok(allTraces.pet.some(f=>f.trace.some(p=>p.event==='stroke')));assert.ok(allTraces.butterfly.some(f=>f.trace.some(p=>p.event==='butterfly')));assert.deepEqual(errors,[]);
+ for(const form of ['junior','middle']){const ys=allTraces.move.flatMap(f=>f.trace.filter(p=>p.form===form&&p.held).map(p=>p.body[1]));assert.ok(Math.max(...ys)-Math.min(...ys)<.01,`${form} held path must not hop vertically`)}
+ assert.ok(allTraces.pet.every(f=>f.trace.filter(p=>p.form==='super').every(p=>p.clip!=='happy')),'Super affection must not use the wide-mouth laughter clip');
  fs.writeFileSync(path.join(out,'recording-checks.json'),JSON.stringify({sourceSHA256:meta.sourceSHA256,fps:24,frames:Object.fromEntries(Object.entries(allTraces).map(([k,v])=>[k,v.length])),errors},null,2)+'\n');
  console.log('PASS: original full timelines, source turns, original pupils/expressions and separate interaction props; no shipping application or release changes');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

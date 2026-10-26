@@ -574,3 +574,22 @@ body.native-pet-mode, body.native-pet-mode #root,
 }
 
 .pet-toolbelt .original-ui-art { width: 27px; height: 27px; object-fit: contain; pointer-events: none; }
+
+/* The speech belongs above the complete pet viewport. Disabled-button opacity
+   must never resurrect a dismissed bubble; App unmounts it when it expires. */
+.classic-app .scene-pet > .scene-bubble {
+  top: auto;
+  bottom: calc(100% + 35px);
+  left: 50%;
+  width: max-content;
+  min-width: 150px;
+  max-width: min(270px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 3;
+}
+.panel-feedback { margin: 6px 0 10px; color: #866344; font-size: 13px; line-height: 1.5; }
+/* Highest forms stay gently airborne while being stroked, without a second
+   wide travel/roll on top of the original front flight. */
+.ram-sprite[data-stage="4"].action-pet .ram-flight-layer { animation: ram-pet-hover 3.2s ease-in-out infinite; }
+@keyframes ram-pet-hover { 0%,100% { transform: translateY(-4.5%); } 50% { transform: translateY(-5.3%); } }

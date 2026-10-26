@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest'
-import {footballSpec,footballPose,footballDuration,footballContacts,slumberFrame,ramForm} from './original-actions'
+import {footballSpec,footballPose,footballDuration,footballContacts,slumberFrame,sleepPose,ramForm} from './original-actions'
 import {getRamActionDuration,sampleRamPose,sampleFlyingPose} from './components/ram-animation'
 import {socialSoundScore} from './pet-sound-score'
 import source from '../public/assets/original/football/manifest.json'
@@ -40,7 +40,13 @@ describe('complete original performances in the desktop viewport',()=>{
  it('breathes through an original sleepy-eye mouth cycle and keeps affection on the normal face',()=>{
   expect(slumber.eyes).toEqual({seed:35,junior:1726,other:1726});expect(slumber.mouth).toBe(743)
   expect([0,2750,4400,6400,9150].map(t=>slumberFrame(t))).toEqual([0,7,0,0,7])
-  for(const t of [0,900,1600,4700,1e9]){expect(slumberFrame(t,true)).toBe(0);expect(sampleRamPose('sleep',t).sheet).toBe('slumber')}
+  for(const t of [0,900,1600,4700,1e9]){expect(slumberFrame(t,true)).toBe(0);expect(sampleRamPose('sleep',t,true).sheet).toBe('slumber');expect(sampleRamPose('sleep',t).sheet).toBe(t<2400?'yawn':'slumber')}
   for(const form of ['senior','super','water','wood','fire'])for(const t of [500,1000,1700])expect(sampleFlyingPose('pet',t,false,form).sheet).toBeUndefined()
+ })
+ it('yawns once on entering sleep, closes its mouth and then breathes quietly',()=>{
+  expect([0,350,1150,1450,2250].map(t=>sleepPose(t).frame)).toEqual([0,0,7,7,0])
+  for(let t=0;t<2400;t+=20)expect(sleepPose(t).sheet).toBe('yawn')
+  for(const t of [2400,5000,10000,240000]){expect(sleepPose(t).sheet).toBe('slumber');expect(sleepPose(t,true).frame).toBe(0)}
+  expect(sleepPose(2400).frame).toBe(0)
  })
 })

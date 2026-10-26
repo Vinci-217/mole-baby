@@ -21,7 +21,7 @@ export function pullElasticDrag(s:ElasticDrag,point:DragPoint,stage:Stage):'turn
   if(!previous){s.vs=clamp(s.vs-p.grip,1.5);return null}
   const dt=point.at-previous.at;if(dt<4||dt>200)return null
   const dx=point.x-previous.x,dy=point.y-previous.y,speed=clamp(dx/dt*3.6,1.4),vertical=clamp(dy/dt*2.8,1.4)
-  s.targetX=-speed*p.lag;s.targetY=-vertical*(stage===0?1.4:3.2)
+  s.targetX=-speed*p.lag;s.targetY=stage===1||stage===2?0:-vertical*(stage===0?1.4:3.2)
   s.targetAngle=-speed*p.angle;s.targetStretch=Math.min(1,Math.hypot(speed,vertical)*.65)*p.stretch
   s.targetSkew=speed*p.skew;s.targetFringe=-speed*(stage===2?6:2)
   if(Math.abs(dx)<4||Math.abs(speed)<.11)return null

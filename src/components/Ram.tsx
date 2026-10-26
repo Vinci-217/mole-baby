@@ -10,7 +10,7 @@ import { createPetSoundClock } from '../pet-audio'
 import { itemSoundScore, socialSoundScore } from '../pet-sound-score'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleFlyingPose } from './ram-animation'
 import { edgePeekTilt, type PetEdge } from '../edge-motion'
-import {footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
+import {sleepPose,footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
 import RamWear from './RamWear'
 import type {footballOutfitRig} from '../outfit-motion'
@@ -54,7 +54,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = RamForm
-type SheetKind = 'dizzy' | 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy'
+type SheetKind = 'dizzy' | 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'yawn' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray; form?:string;kind?:SheetKind }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -85,6 +85,7 @@ function sheetSpec(form: Form, kind: SheetKind) {
   if(kind==='gentle')return {width:(form==='seed'?96:CELL_WIDTH)*8,height:form==='seed'?99:CELL_HEIGHT,neutral:`./assets/original/gentle-care/${form}-neutral.png`,mask:`./assets/original/gentle-care/${form}-mask.png`}
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
   if (kind === 'grounded') return { width: CELL_WIDTH * 5, height: CELL_HEIGHT, neutral: `./assets/original/grounded/${form}-neutral.png`, mask: `./assets/original/grounded/${form}-mask.png` }
+  if (kind === 'yawn') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/yawn/${form}-neutral.png`, mask:`./assets/original/yawn/${form}-mask.png` }
   if (kind === 'slumber') return { width: (form==='seed'?96:CELL_WIDTH)*8, height:form==='seed'?99:CELL_HEIGHT, neutral:`./assets/original/slumber/${form}-neutral.png`, mask:`./assets/original/slumber/${form}-mask.png` }
   if (kind === 'football') return { width:160*8,height:192*footballSpec(form)!.rows,neutral:`./assets/original/football/${form}-neutral.png`,mask:`./assets/original/football/${form}-mask.png` }
   if(kind==='emotion-joy'||kind==='emotion-grumpy'){const emotion=kind.slice(8) as 'joy'|'grumpy';return {width:192*8,height:208*emotionSpec(form,emotion)!.rows,neutral:`./assets/original/emotions/${form}-${emotion}-neutral.png`,mask:`./assets/original/emotions/${form}-${emotion}-mask.png`}}
@@ -126,7 +127,7 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
-  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','gentle','football'].includes(kind)&&!kind.startsWith('emotion-')) kind = 'classic'
+  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','yawn','gentle','football'].includes(kind)&&!kind.startsWith('emotion-')) kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
@@ -287,7 +288,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const soundRef=useRef(sound);soundRef.current=sound
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
-  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; slumber: HTMLCanvasElement; gentle:HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
+  const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; slumber: HTMLCanvasElement; yawn: HTMLCanvasElement; gentle:HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
   const key = `${form}:${color}:${fromColor??''}`
   const sheets = ready?.key === key ? ready : null
   usePaintReadiness(canvasRef,`${key}:${action}:${actionId??0}`)
@@ -298,7 +299,8 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const grounded=['junior','middle'].includes(form)?await getTintedSheet(form,c,'grounded'):undefined;
       const slumber=await getTintedSheet(form,c,'slumber');
       const gentle=await getTintedSheet(form,c,'gentle');
-      return {classic,care,item,grounded,slumber,gentle};
+      const yawn=await getTintedSheet(form,c,'yawn');
+      return {classic,care,item,grounded,slumber,gentle,yawn};
     };
     Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([current,old])=>{if(!cancelled)setReady({key,...current,previous:old?[old.classic,old.care,old.item,old.grounded,old.slumber,old.gentle]:null})}).catch(()=>{if(!cancelled)errorRef.current()});
     return () => { cancelled = true }
@@ -321,7 +323,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1
-      const grounded = pose.sheet!=='slumber' && sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
+      const grounded = pose.sheet!=='slumber' && pose.sheet!=='yawn' && sheets.grounded && usesGroundedPose(form,action) ? groundedMotion(form,action,elapsed,flightClock.current,media.matches,eyePosition.current) : null
       // The original middle-form foliage follows its own slower spring. Read
       // inline data only; do not measure layout or move the eyes independently.
       if(grounded&&form==='middle'&&!media.matches)grounded.leafAngle+=Number(canvas.closest<HTMLElement>('.ram-sprite')?.style.getPropertyValue('--pull-leaf')||0)
@@ -330,7 +332,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, CELL_WIDTH, CELL_HEIGHT)
-        const target=sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
+        const target=sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
         const old=sheets.previous?.[sheet==='gentle'?5:sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
           context.drawImage(wardrobeBody(canvas,source),frame*CELL_WIDTH,row*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT)
@@ -345,7 +347,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         if(grounded){canvas.dataset.gazeX=grounded.eyeX.toFixed(2);canvas.dataset.gazeY=grounded.eyeY.toFixed(2)}
         canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;previous=signature
       }
-      paintWear(canvas,sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,frame,row)
+      paintWear(canvas,sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,frame,row)
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
@@ -422,7 +424,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
     const canvas=ref.current;if(!canvas)return
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     let cancelled = false, request = 0, elapsed = 0, last = 0, previous = '', ended = false
-    let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null, slumber:HTMLCanvasElement|null=null,gentle:HTMLCanvasElement|null=null,oldGentle:HTMLCanvasElement|null=null
+    let source: HTMLCanvasElement | null = null, oldSource: HTMLCanvasElement | null = null, slumber:HTMLCanvasElement|null=null,yawn:HTMLCanvasElement|null=null,gentle:HTMLCanvasElement|null=null,oldGentle:HTMLCanvasElement|null=null
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const paint = (now: number) => {
       if (cancelled || !source || ref.current!==canvas || !canvas.isConnected || document.hidden) { last = 0; return }
@@ -434,12 +436,13 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
       const sleepy=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&(media.matches||elapsed>450&&elapsed<3300);
-      const activeSource=sleepy?slumber!:isGentle?gentle!:source,old=isGentle?oldGentle:oldSource;
-      const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${sleepy}:${pose.frame}:${Math.round(mix*255)}`;
+      const yawning=action==='sleep'?sleepPose(elapsed,media.matches).sheet==='yawn':action==='mood-dozy'&&elapsed>450&&elapsed<2850&&!media.matches;
+      const activeSource=sleepy?(yawning?yawn!:slumber!):isGentle?gentle!:source,old=isGentle?oldGentle:oldSource;
+      const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${sleepy}:${yawning}:${pose.frame}:${Math.round(mix*255)}`;
       if (previous !== signature) {
         const c = ref.current?.getContext('2d')
         if(c){c.clearRect(0,0,96,99);if(old&&mix<1){c.drawImage(old,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=mix;}c.drawImage(activeSource,pose.frame%8*96,Math.floor(pose.frame/8)*99,96,99,0,0,96,99);c.globalAlpha=1;}
-        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.loadedColor=color; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?'slumber':isGentle?'gentle':'seed' }
+        if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.loadedColor=color; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?(yawning?'yawn':'slumber'):isGentle?'gentle':'seed' }
         previous = signature
       }
       paintWear(canvas,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
@@ -447,7 +450,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
     const resume = () => { cancelAnimationFrame(request); last = 0; previous = ''; if (source) request = requestAnimationFrame(paint) }
-    Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null,getTintedSheet('seed',color,'slumber'),getTintedSheet('seed',color,'gentle'),fromColor?getTintedSheet('seed',fromColor,'gentle'):null]).then(([loaded,old,sleep,eat,oldEat])=>{if(!cancelled){source=loaded;oldSource=old;slumber=sleep;gentle=eat;oldGentle=oldEat;resume()}}).catch(()=>{})
+    Promise.all([getTintedSheet('junior',color,'seed'),fromColor?getTintedSheet('junior',fromColor,'seed'):null,getTintedSheet('seed',color,'slumber'),getTintedSheet('seed',color,'yawn'),getTintedSheet('seed',color,'gentle'),fromColor?getTintedSheet('seed',fromColor,'gentle'):null]).then(([loaded,old,sleep,yawnSheet,eat,oldEat])=>{if(!cancelled){source=loaded;oldSource=old;slumber=sleep;yawn=yawnSheet;gentle=eat;oldGentle=oldEat;resume()}}).catch(()=>{})
     document.addEventListener('visibilitychange', resume); media.addEventListener('change', resume);canvas.addEventListener('ram-wardrobe-change',resume)
     return () => { soundClock.stop();cancelled = true; cancelAnimationFrame(request); document.removeEventListener('visibilitychange', resume); media.removeEventListener('change', resume);canvas.removeEventListener('ram-wardrobe-change',resume) }
   }, [color, fromColor, action, actionId, itemMotion, startedAt])
@@ -524,11 +527,11 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
     role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
-      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${tilt}deg) translateY(${dragging ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
+      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-2,Math.min(2,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={activeAction} originalFootball={stage>0&&activeAction==='play'}/>
-    {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${-i*6.4/3}s`}}/>)}</span>}
+    {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${2.4+i*6.4/3}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
     </span>
   </span>

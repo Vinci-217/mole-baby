@@ -2,6 +2,9 @@ import { describe,it,expect } from 'vitest';
 import { sampleSocialMotion, SOCIAL_DURATIONS, BALL_CONTACTS } from './social-motion';
 import type { Stage } from './game';
 describe('stage-specific prop and body choreography',()=>{
+  it('keeps the highest forms almost still during petting without stretching the face',()=>{
+    for(let t=0;t<2400;t+=16){const p=sampleSocialMotion(4,'pet',t);expect(Math.abs(p.bodyX)).toBeLessThanOrEqual(.35);expect(Math.abs(p.bodyAngle)).toBeLessThanOrEqual(.65);expect(p.bodyScaleX).toBeLessThanOrEqual(1.004);expect(p.bodyScaleY).toBeGreaterThanOrEqual(.995)}
+  });
   it('anticipates, contacts and recovers on the two ball beats, without a snap or a moving seed pot',()=>{
     for(const stage of [0,1,2,3,4] as Stage[])for(const at of BALL_CONTACTS){
       const prepare=sampleSocialMotion(stage,'play',at-180),touch=sampleSocialMotion(stage,'play',at),recover=sampleSocialMotion(stage,'play',at+200);

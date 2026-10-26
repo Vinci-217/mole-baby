@@ -762,8 +762,10 @@ function createWindow() {
     ...bounds,
     minWidth: Math.min(NORMAL_MINIMUM.width, area.width),
     minHeight: Math.min(NORMAL_MINIMUM.height, area.height),
-    title: '拉姆',
-    resizable: true,
+    // Windows can expose a native caption/hover strip even on a transparent
+    // HWND. Keep its title empty and its frameless style fixed for its lifetime.
+    title: '',
+    resizable: process.platform !== 'win32',
     icon: iconPath('ramu.png'),
     frame: false,
     // AppKit otherwise clamps the transparent top margin below its menu bar.
@@ -788,6 +790,10 @@ function createWindow() {
   });
 
   const window = mainWindow;
+  window.webContents.on('page-title-updated', event => {
+    event.preventDefault();
+    if (!window.isDestroyed()) window.setTitle('');
+  });
   window.setMenu(null);
   window.on('move', scheduleSave);
   window.on('resize', scheduleSave);

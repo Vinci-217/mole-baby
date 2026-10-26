@@ -9,7 +9,7 @@ import argparse,copy,json,subprocess,concurrent.futures,hashlib
 import xml.etree.ElementTree as E
 import numpy as np
 from PIL import Image
-p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--awake',action='store_true');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True);out=a.repo/('public/assets/original/gentle-care' if a.awake else 'public/assets/original/slumber');out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--awake',action='store_true');p.add_argument('--yawn',action='store_true');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True);out=a.repo/('public/assets/original/yawn' if a.yawn else 'public/assets/original/gentle-care' if a.awake else 'public/assets/original/slumber');out.mkdir(parents=True,exist_ok=True)
 CONFIG={
  'seed':(39,37,1,[4,9],[],None),
  'junior':(936,63,3,[4,7],[5,8],64),
@@ -96,7 +96,7 @@ def export(job):
  lid=next(n for n in tags if n.get('shapeId')==str(lid_id));b=lid.find('shapeBounds');lx0,ly0,lx1,ly1=[float(b.get(k)) for k in ['Xmin','Ymin','Xmax','Ymax']];ls=(ex1-ex0)*.52/(lx1-lx0)
  sub=body.find('subTags')
  if not a.awake:sub.insert(len(sub)-1,place(lid_id,60,ls,ls,cx-(lx0+lx1)/2*ls,cy-(ly0+ly1)/2*ls))
- mouth_width=(ex1-ex0)*(.09 if a.awake else .065);mx=mouth_width/532;my=mx*.45;mouth_y=cy+eh*(.64 if a.awake else .48 if form=='seed' else .34)
+ mouth_width=(ex1-ex0)*(.13 if a.yawn else .09 if a.awake else .065);mx=mouth_width/532;my=mx*(.95 if a.yawn else .45);mouth_y=cy+eh*(.64 if a.awake else .48 if form=='seed' else .34)
  sub.remove(sub[-1])
  for frame,openness in enumerate([.02,.10,.23,.38,.55,.73,.9,1]):
   sy=my*openness;n=place(mouth_id,61,mx*(.72+.28*openness),sy,cx-266*mx*(.72+.28*openness),mouth_y-287*sy,frame>0);sub.append(n);E.SubElement(sub,'item',type='ShowFrameTag',forceWriteAsLong='false')
@@ -132,7 +132,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(
 
 def coverage(n,p):
  a=np.asarray(n);d=a[:,:,:3].astype(float)-np.asarray(p)[:,:,:3].astype(float);g=np.clip((d[:,:,0]+2*d[:,:,2]/3)/170,0,1);b=np.clip((d[:,:,2]+51*g)/153,0,1);w=np.clip((d[:,:,1]+51*g+102*b)/255,0,1);out=np.dstack([w*255,g*255,b*255,a[:,:,3]]).round().astype('uint8');out[a[:,:,3]==0]=0;return Image.fromarray(out)
-metadata={'description':('Original normal body, original eyes/pupils and a small source mouth743. Gentle desktop care adaptation, not an official standalone clip.' if a.awake else 'Original sleepy eyelids from boring, original mouth silhouette743; a desktop breathing adaptation, not an official sleep clip.'),'eyes':('original down eyes and pupils' if a.awake else {'seed':35,'junior':1726,'other':1726}),'mouth':743,'eyeSpanRatio':.52,'mouthSpanRatio':(.09 if a.awake else .065),'eyeInk':[91,56,39],'mouthInk':[88,36,28],'forms':{}}
+metadata={'description':('A finite sleep-entry yawn using source sleepy eyelids and mouth743. Desktop adaptation, not an official standalone clip.' if a.yawn else 'Original normal body, original eyes/pupils and a small source mouth743. Gentle desktop care adaptation, not an official standalone clip.' if a.awake else 'Original sleepy eyelids from boring, original mouth silhouette743; a desktop breathing adaptation, not an official sleep clip.'),'eyes':('original down eyes and pupils' if a.awake else {'seed':35,'junior':1726,'other':1726}),'mouth':743,'eyeSpanRatio':.52,'mouthSpanRatio':(.13 if a.yawn else .09 if a.awake else .065),'eyeInk':[91,56,39],'mouthInk':[88,36,28],'forms':{}}
 for form,config in CONFIG.items():
  sid=config[0];nd=next((a.work/f'{form}-neutral').glob(f'DefineSprite_{sid}*'));pd=next((a.work/f'{form}-probe').glob(f'DefineSprite_{sid}*'));images=[Image.open(nd/f'{i}.png').convert('RGBA') for i in range(1,9)];masks=[coverage(im,Image.open(pd/f'{i+1}.png').convert('RGBA')) for i,im in enumerate(images)];target=Image.open(a.repo/('public/assets/original/seed/body-mask.png' if form=='seed' else f'public/assets/classic/{form}-mask.png')).convert('RGBA');w,h=(96,99) if form=='seed' else (192,208);target=np.asarray(target.crop((0,0,w,h)));source=np.asarray(masks[0]);sy,sx=np.where((source[:,:,:3].sum(2)>90)&(source[:,:,3]>150));ty,tx=np.where((target[:,:,:3].sum(2)>90)&(target[:,:,3]>150));scale=(tx.max()-tx.min()+1)/(sx.max()-sx.min()+1);dx=(tx.max()+tx.min()+1)/2-(sx.max()+sx.min()+1)/2*scale;dy=(ty.max()+1)-(sy.max()+1)*scale
  for kind,parts in [('neutral',images),('mask',masks)]:

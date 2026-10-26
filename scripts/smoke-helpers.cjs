@@ -391,7 +391,7 @@ async function verifyComfortMotion(page) {
       await page.getByRole('button',{name:'叫醒拉姆',exact:true}).click();await expect(ram).toHaveAttribute('data-action','wake');await expect(ram).not.toHaveAttribute('data-action','wake',{timeout:4000});
       await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();const panel=page.getByTestId('companion-panel');
       await panel.getByRole('button',{name:'摸摸拉姆',exact:true}).click();await expect(canvas).toHaveAttribute('data-sheet',growth===0?'seed':growth===180?'grounded':'classic');
-      await expect.poll(()=>ram.evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))),{intervals:[30],timeout:2500}).toBeGreaterThan(1.5);
+      await expect.poll(()=>ram.evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))),{intervals:[30],timeout:2500}).toBeGreaterThan(growth>=840?.2:1.5);
       const whites=await canvas.evaluate(c=>{const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let count=0;for(let i=0;i<a.length;i+=4)if(a[i]>240&&a[i+1]>240&&a[i+2]>240&&a[i+3]>200)count++;return count;});expect(whites).toBeGreaterThan(20);
       await expect(ram).not.toHaveAttribute('data-action','pet',{timeout:4000});
       await panel.getByRole('button',{name:'一起玩球',exact:true}).click();

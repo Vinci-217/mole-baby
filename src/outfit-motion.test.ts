@@ -5,6 +5,11 @@ import {emotionSpec} from './mood-motion'
 import {bodyWearAnchor} from './wear-anchor'
 
 describe('original wardrobe source registration',()=>{
+ it('keeps every authored outfit registered on the matching body during the new sleep-entry yawn',()=>{
+  for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const outfit of OUTFITS.slice(1))for(const frame of [0,3,7]){
+   expect(outfitFrame(outfit.id,form,'yawn',frame,0,8)).toEqual(outfitFrame(outfit.id,form,form==='seed'?'seed':'slumber',0,0,8))
+  }
+ })
  it('offers nine real original items without losing the three saved identifiers',()=>{
   expect(OUTFITS).toHaveLength(9);expect(OUTFITS.slice(0,3).map(i=>i.id)).toEqual(['party-cap','gold-feather','wizard-cap'])
   for(const outfit of OUTFITS.slice(1))expect(hasAuthoredOutfit(outfit.id)).toBe(true)

@@ -4,11 +4,11 @@
 
 ## 本轮动作预览（待确认）
 
-角色采用原版完整动作帧；手动拖拽、手掌、网与蝴蝶的编排是桌宠适配。当前只做预览，尚未接入正式版本；你认可的足球素材与播放代码未修改。
+角色采用原版完整动作帧；手动拖拽、手掌、网与蝴蝶的编排是桌宠适配。修订只保存在预览分支，尚未发布。原帧交互方案仍单独审阅；睡眠与界面修复已写入预览源码；你认可的足球素材与播放代码未修改。
 
 **初级 / 中级：原版左右移动与手动拖拽对照**
 
-左边是原版侧向移动，右边是拖起来、换方向、松手归位。保留原来的侧脸、身体和叶片变化，鼠标抓取点会约束被提起的位置。
+左边是原版侧向移动，右边是拖起来、换方向、松手归位。保留原来的侧脸、身体和叶片变化，初级、中级只沿水平方向拖动和换向，没有额外上下抬升、松手弹跳。鼠标抓取点约束身体位置。
 
 ![初级中级移动与手动拖拽对照](artifacts/v30-preview/move.gif)
 
@@ -24,11 +24,112 @@
 
 **摸摸：五阶段回应**
 
-手掌接近、轻抚、离开，角色用原版开心动作回应。种子只摆动身体，花盆保持端正；高级和神力形态保留原来的空中动作。
+手掌接近、轻抚、离开。种子花盆保持端正；神力超拉改用正常小脸的悬浮帧，收小幅度，不再使用大嘴大笑和大幅翻转。
 
 ![五阶段摸摸原帧预览](artifacts/v30-preview/pet.gif)
 
-[参考来源、适配范围和验证](research/v30-motion-previews.md) · [清晰移动视频](artifacts/v30-preview/move.webm) · [追蝶视频](artifacts/v30-preview/butterfly.webm) · [摸摸视频](artifacts/v30-preview/pet.webm)
+[本轮修复与验证](research/v31-animation-review.md) · [参考来源、适配范围和验证](research/v30-motion-previews.md) · [清晰移动视频](artifacts/v30-preview/move.webm) · [追蝶视频](artifacts/v30-preview/butterfly.webm) · [摸摸视频](artifacts/v30-preview/pet.webm)
+
+## 全部动作 GIF 目录（预览源码，未发布）
+
+下面使用实际应用的角色组件、道具、服饰和动作时钟录制，均为24fps。点击分类展开；这里展示现有动作，也方便继续指出需要重做的地方。上面的原帧拖拽、追蝶与摸摸是另行审阅的交互方案，不能当作已发版效果。
+
+<details open>
+<summary>睡前哈欠 → 安睡 → ZZZ，及醒来、困倦</summary>
+
+![睡前哈欠 → 安睡 → ZZZ，及醒来、困倦](artifacts/animation-gallery/sleep.gif)
+
+</details>
+
+<details>
+<summary>摸摸、专注翻书、挥网逗蝴蝶</summary>
+
+![摸摸、专注翻书、挥网逗蝴蝶](artifacts/animation-gallery/interaction.gif)
+
+</details>
+
+<details>
+<summary>陪伴、左右移动、张望与招呼</summary>
+
+![陪伴、左右移动、张望与招呼](artifacts/animation-gallery/movement.gif)
+
+</details>
+
+<details>
+<summary>开心、接到物品、奖励与失落</summary>
+
+![开心、接到物品、奖励与失落](artifacts/animation-gallery/reactions.gif)
+
+</details>
+
+<details>
+<summary>开心、闷闷不乐、安心、眩晕</summary>
+
+![开心、闷闷不乐、安心、眩晕](artifacts/animation-gallery/moods.gif)
+
+</details>
+
+<details>
+<summary>饥饿、口渴、清洁、病态、疲倦与难过</summary>
+
+![饥饿、口渴、清洁、病态、疲倦与难过](artifacts/animation-gallery/conditions.gif)
+
+</details>
+
+<details>
+<summary>自己看书、完整足球、顶书练习与魔法变装</summary>
+
+![自己看书、完整足球、顶书练习与魔法变装](artifacts/animation-gallery/pastimes.gif)
+
+</details>
+
+<details>
+<summary>左、右、上、下：走入、藏好与探头</summary>
+
+![左、右、上、下：走入、藏好与探头](artifacts/animation-gallery/edges.gif)
+
+</details>
+
+<details>
+<summary>全部消耗用品（1/2）</summary>
+
+![全部消耗用品（1/2）](artifacts/animation-gallery/items1.gif)
+
+</details>
+
+<details>
+<summary>全部消耗用品（2/2）</summary>
+
+![全部消耗用品（2/2）](artifacts/animation-gallery/items2.gif)
+
+</details>
+
+<details>
+<summary>九件装扮在不同动作中的表现</summary>
+
+![九件装扮在不同动作中的表现](artifacts/animation-gallery/wardrobe.gif)
+
+</details>
+
+<details>
+<summary>四种最高形态：摸摸、睡眠与左右飞行</summary>
+
+![四种最高形态：摸摸、睡眠与左右飞行](artifacts/animation-gallery/evolutions.gif)
+
+</details>
+
+<details>
+<summary>四种颜色、五个阶段的哈欠与安睡</summary>
+
+![四种颜色、五个阶段的哈欠与安睡](artifacts/animation-gallery/colours.gif)
+
+</details>
+
+走入/探头GIF展示动作层；实际屏幕边缘还由原生窗口控制。相同类别用品共用一套动作，图案与换色效果分别展示。没有独立动作的别名、出游机制及录制方法见[动作说明](research/v31-animation-review.md)。
+
+**气泡修复：** 上移避免挡脸，到时彻底移除；小屋底部重复提示框已删除。
+
+![气泡与角色留出空间](artifacts/animation-gallery/speech-fixed.png)
 
 ---
 
@@ -60,16 +161,7 @@
 
 种子可以手动拖动，不会自行散步；其他清醒形态每12–18秒在最后放置点附近随机移动，活动范围约左右150px、上下100px，每步约28–64px，避免跑遍屏幕。用户拖动会重设活动中心。
 
-抓住拉姆时会轻轻压缩，左右拉动时身体慢半拍，换方向先收一下再展开；松手后弹回、轻晃几次再停稳。初级身体最软，中级叶片会晚一点跟上，高级和超拉保留悬空惯性。种子只摆动小身体，花盆保持端正，装扮随身体一起变化。
-
-**以下是尚未认可的上一轮方案，暂不发版。** [原著动作参考与重做方向](research/v29-original-motion-study.md)已单独记录；原版的动作姿态、表情和叶片需要分别适配。
-
-下面保留五个阶段的旧方案用于对照，圆点代表抓住的位置：
-
-![五阶段拉扯与Q弹回弹演示](artifacts/v29-bouncy-pull.gif)
-
-[观看清晰视频](artifacts/v29-bouncy-pull.webm) · 轻轻反抗与持续摇晃后的头晕分开呈现；眩晕时原瞳孔在眼白内绕圈，恢复时慢慢复位。系统开启减少动态效果时会关闭拉伸和回弹。
-
+当前修订方案使用原版方向帧展示左右拖动：初级、中级保持水平路径，神力超拉摸摸保持小幅悬浮。四个交互方案在本页顶部；[上轮整体拉伸方案](artifacts/v29-bouncy-pull.gif)仅保留历史对照，未被认可、未发布。
 Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留时出现横条。窗口切换保持同一无边框样式。
 
 拖到工作区任一边缘，松手后立即开始收进去：种子小跳、初中级迈步、高级与神力飞入。收进去后按各形态的真实身体宽度/高度保留约30%在外面，鼠标移上会多探出一些，拖出来才完整出来。随机探头仍为2–5分钟一次。拖动使用系统光标坐标；原生窗口被Windows限制位置时，用内部偏移保持宠物贴边，避免上下拖动累计漂移。小窗开关不改变宠物的屏幕位置。
@@ -92,9 +184,9 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 ## 自动更新
 
-默认开启「启动时自动更新」：Windows和Mac每次启动约8秒后检查GitHub正式版，有新版才下载；Windows安装版在桌宠空闲时保存后更新、重启，正在游戏或专注时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
+默认开启「启动时自动更新」：Windows和Mac每次完全启动约8秒后检查GitHub的最新公开正式版，有新版才后台下载和校验。Windows安装版在桌宠空闲、存档成功后静默安装并重启，正在游戏、专注、拖动、照料或操作小屋时先等待。小屋设置可查看版本和进度、关闭自动更新或手动重试，托盘也能检查/立即更新。无需GitHub Token。
 
-首次需要手动安装v0.29.1或更新版本一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口，**安装仍需手动完成**；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。详见[更新说明](docs/UPDATES.md)。
+首次需要手动安装v0.29.1或更新版本一次。Mac当前本地签名版自动检查、校验和下载安装包，随后提供安装入口，**安装仍需手动完成**；已配置Apple签名公证的构建支持标准自动安装。Windows便携版也会提供安装入口，安装后支持后续自动更新。关闭窗口只是收进托盘，恢复时的自动检查有5分钟间隔；在设置关闭自动更新会保存偏好。**预览分支和README提交不会触发客户端更新，本轮没有发版。**详见[逐步更新流程与平台区别](docs/UPDATES.md)。
 
 ## 安装
 

@@ -32,6 +32,17 @@ export function slumberFrame(elapsed:number,reduced=false):number {
   const breath=Math.sin((phase-1100)/3300*Math.PI)
   return Math.round(breath*breath*7)
 }
+/** One finite yawn at sleep entry, then a quiet mouth-only breathing cycle.
+ * Sleeping does not repeatedly yawn or move its pot/body registration. */
+export function sleepPose(elapsed:number,reduced=false):{sheet:'yawn'|'slumber';row:number;frame:number;finished:false} {
+  if(reduced)return {sheet:'slumber',row:0,frame:0,finished:false}
+  const t=Math.max(0,elapsed)
+  if(t<2400){
+    const open=t<350?0:t<1150?Math.sin((t-350)/800*Math.PI/2):t<1450?1:t<2250?Math.cos((t-1450)/800*Math.PI/2):0
+    return {sheet:'yawn',row:0,frame:Math.round(open*open*7),finished:false}
+  }
+  return {sheet:'slumber',row:0,frame:slumberFrame(t-2400),finished:false}
+}
 export function slumberMouth(form:RamForm):readonly number[] {
   const point=slumber.forms[form].mouthPoint
   return form==='seed'?[26.56+point[0]*.5,17.31+point[1]*.476]:point

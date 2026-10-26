@@ -1,10 +1,10 @@
 import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
-import {footballDuration,footballPose,slumberFrame} from '../original-actions'
+import {footballDuration,footballPose,sleepPose} from '../original-actions'
 import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
 import {isPastime,pastimeBody} from '../pet-pastimes'
 
-export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'football' | 'grounded' }
+export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'yawn' | 'football' | 'grounded' }
 export const CARE_COLUMNS = 16
 export const CARE_ROWS = 7
 /** Each care row comes from the matching named animation in lamubone.swf. */
@@ -40,10 +40,11 @@ export function getRamActionDuration(action: string,form='junior'): number | nul
  * on the same grounded body instead of using another action's silhouette. */
 export function sampleRamPose(action: string, elapsed: number, reduced = false,form='junior'): Pose {
   if(isPastime(action))return {...sampleRamPose(pastimeBody(action),elapsed,reduced,form),finished:elapsed>=(getRamActionDuration(action,form)??0)}
-  if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false }
+  if (action === 'sleep') return sleepPose(elapsed,reduced)
+  if(action==='wake'&&elapsed<240)return {sheet:'slumber',row:0,frame:0,finished:false}
   if(isEmotionClip(action))return {row:0,frame:0,finished:elapsed>=(emotionDuration(action,form)??0)}
   if(action==='play'){const p=footballPose(form,elapsed,reduced);return {sheet:'football',row:Math.floor(p.frame/8),frame:p.frame%8,finished:p.finished}}
-  if(action==='mood-dozy'){if(reduced&&elapsed<4300)return {sheet:'slumber',row:0,frame:0,finished:false};if(elapsed>=4300)return {row:0,frame:0,finished:true};return elapsed>450&&elapsed<3300?{sheet:'slumber',row:0,frame:slumberFrame(elapsed+600,reduced),finished:false}:{row:0,frame:0,finished:false}}
+  if(action==='mood-dozy'){if(reduced&&elapsed<4300)return {sheet:'slumber',row:0,frame:0,finished:false};if(elapsed>=4300)return {row:0,frame:0,finished:true};return elapsed>450&&elapsed<3300?sleepPose(elapsed-450,reduced):{row:0,frame:0,finished:false}}
   if(action==='mood-content')return {row:0,frame:reduced?0:elapsed>850&&elapsed<1550?1:0,finished:elapsed>=3600}
   if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
@@ -93,10 +94,10 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
   if(isPastime(action))return {...sampleSeedPose(pastimeBody(action),elapsed,reduced),finished:elapsed>=(getRamActionDuration(action,'seed')??0)}
-  if (action === 'sleep') return { frame: slumberFrame(elapsed,reduced), finished: false }
+  if (action === 'sleep') return sleepPose(elapsed,reduced)
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   if (action === 'pet' || action === 'play' || action === 'wake') return {frame:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
-  if(isMoodAction(action)){const duration=emotionDuration(action,'seed')!;return {frame:reduced||elapsed>=duration?0:action==='mood-joy'?[0,1,2,1,0][Math.min(4,Math.floor(elapsed/duration*5))]:action==='mood-grumpy'?(elapsed>600&&elapsed<2000?2:0):action==='mood-dozy'?(elapsed>450&&elapsed<3300?slumberFrame(elapsed+600,reduced):0):(elapsed>900&&elapsed<1250||elapsed>1700&&elapsed<2050?4:0),finished:elapsed>=duration}}
+  if(isMoodAction(action)){const duration=emotionDuration(action,'seed')!;return {frame:reduced||elapsed>=duration?0:action==='mood-joy'?[0,1,2,1,0][Math.min(4,Math.floor(elapsed/duration*5))]:action==='mood-grumpy'?(elapsed>600&&elapsed<2000?2:0):action==='mood-dozy'?(elapsed>450&&elapsed<3300?sleepPose(elapsed-450,reduced).frame:0):(elapsed>900&&elapsed<1250||elapsed>1700&&elapsed<2050?4:0),finished:elapsed>=duration}}
   if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
   if (action === 'watch-butterfly' || action === 'look-around') return {frame:reduced?0:[0,1,2,1][Math.floor(elapsed/700)%4],finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}
@@ -133,7 +134,8 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
   if(isPastime(action))return {...sampleFlyingPose(pastimeBody(action),elapsed,reduced,form,flightTime),finished:elapsed>=(getRamActionDuration(action,form)??0)};
-  if (action === 'sleep'||action==='wake'&&elapsed<240) return { sheet:'slumber', row:0, frame:slumberFrame(action==='wake'?0:elapsed,reduced), finished:false };
+  if (action === 'sleep') return sleepPose(elapsed,reduced);
+  if(action==='wake'&&elapsed<240)return {sheet:'slumber',row:0,frame:0,finished:false};
   if(action==='mood-dozy')return sampleRamPose(action,elapsed,reduced,form);
   if(action==='mood-content'&&elapsed>950&&elapsed<1500&&!reduced)return {sheet:'slumber',row:0,frame:0,finished:false};
   if(isEmotionClip(action))return {row:0,frame:0,finished:elapsed>=(emotionDuration(action,form)??0)};

@@ -48,6 +48,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     setPosition(x, y) { this.bounds.x = options.clamp?Math.max(0,x):x; this.bounds.y = options.clamp?Math.max(0,y):y; }
     setAlwaysOnTop(value) { this.top = value; }
     setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
+    setTitle(value) { this.title = value; }
     setMinimumSize(w,h) {this.minimum=[w,h]} setMaximumSize(w,h) {this.maximum=[w,h]} setResizable(value) {this.resizeChanges??=[];this.resizeChanges.push(value)} setIgnoreMouseEvents() {} setMenu() {}
     show() { this.visible = true; } hide() { this.visible = false; } focus() {} restore() {}
   }
@@ -89,7 +90,12 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   const run = await launch(); t.after(() => run.cleanup());
   assert.equal(run.app.name, '拉姆');
   assert.equal(path.basename(run.app.userData), 'mole-baby');
-  assert.equal(run.window.options.title, '拉姆');
+  assert.equal(run.window.options.title, '');
+  assert.equal(run.window.options.resizable, false);
+  let titlePrevented=false;
+  run.window.webContents.emit('page-title-updated',{preventDefault(){titlePrevented=true}},'拉姆 · mole-baby');
+  assert.equal(titlePrevented,true,'web page titles cannot restore a Windows caption');
+  assert.equal(run.window.title,'');
   assert.equal(run.window.options.skipTaskbar, true);
   assert.equal(run.window.options.enableLargerThanScreen, false);
   run.window.emit('ready-to-show');

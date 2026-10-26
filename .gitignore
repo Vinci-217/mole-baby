@@ -167,3 +167,9 @@ artifacts/v30-preview/*
 !artifacts/v30-preview/*.gif
 !artifacts/v30-preview/*.webm
 !artifacts/v30-preview/recording-checks.json
+
+!artifacts/animation-gallery/
+artifacts/animation-gallery/*
+!artifacts/animation-gallery/*.gif
+!artifacts/animation-gallery/speech-fixed.png
+!artifacts/animation-gallery/checks.json

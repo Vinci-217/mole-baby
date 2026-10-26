@@ -27,13 +27,18 @@ export function dragPose(meta,form,t,adapted){
  const spec=meta.forms[form];
  let result=sourcePose(meta,form,action,elapsed);
  if(!motion.held){result= t>=3500&&t<3500+spec.clips.down.frameCount/meta.fps*1000?sourcePose(meta,form,'down',t-3500,{loop:false}):sourcePose(meta,form,'down',spec.canonical/meta.fps*1000,{loop:false})}
- const lift=adapted?-13*ease((t-700)/180)*ease((3500-t)/180):0;
+ const horizontalOnly=adapted&&['junior','middle'].includes(form);
+ if(horizontalOnly&&!motion.held)result=sourcePose(meta,form,'down',spec.canonical/meta.fps*1000,{loop:false});
+ const lift=adapted&&!horizontalOnly?-13*ease((t-700)/180)*ease((3500-t)/180):0;
  const velocity=(travel(t+8).x-travel(t-8).x)/16,strength=clamp(Math.abs(velocity)*8);
  const lag=adapted&&motion.held?-Math.sign(velocity)*3.5*strength:0;
- const release=adapted&&t>=3500?Math.sin((t-3500)/1000*Math.PI*4)*Math.exp(-(t-3500)/210)*4:0;
+ const release=adapted&&!horizontalOnly&&t>=3500?Math.sin((t-3500)/1000*Math.PI*4)*Math.exp(-(t-3500)/210)*4:0;
  return {...result,action,x:motion.x+lag,y:lift+release,angle:adapted&&motion.held?-Math.sign(velocity)*1.8*strength:0,motion};
 }
 export function affectionPose(meta,form,t){
+ // The source super/happy performance is a large laugh and wide crown roll.
+ // A stroke should use its normal small-faced hovering cycle instead.
+ if(form==='super')return {...sourcePose(meta,form,'down',Math.max(0,t-550)),active:t>=550&&t<3700};
  const spec=meta.forms[form];const duration=spec.clips.happy.frameCount/meta.fps*1000;
  let since=t-550;if(duration<1900&&t>=2450)since=t-2450;
  const active=since>=0&&since<duration;
@@ -54,7 +59,7 @@ export function createSourceMotionPreview(canvas,assets,mode){
  const text=(str,x,y,size=15,color='#795b39')=>{ctx.fillStyle=color;ctx.font=`500 ${size}px "Noto Sans CJK SC",sans-serif`;ctx.textAlign='center';ctx.fillText(str,x,y)};
  const sprite=(image,index,x,y,w,h,cols=8,cell=256)=>ctx.drawImage(image,index%cols*cell,Math.floor(index/cols)*cell,cell,cell,x,y,w,h);
  function body(form,result,cx,baseY,scale=0.6,rotation=0,original=false,paint=true,held=false){
-  const grip=b=>[(b[0]+b[2])/2,b[1]+(b[3]-b[1])*.12];
+  const grip=b=>[(b[0]+b[2])/2,b[1]];
   const canonical=meta.forms[form].clips.down.poses[meta.forms[form].canonical],cg=grip(canonical.body),g=grip(result.pose.body);
   const cursor=[cx+(cg[0]-128)*scale,baseY+(cg[1]-195)*scale];
   if(held){cx-=(g[0]-cg[0])*scale;baseY-=(g[1]-cg[1])*scale}
@@ -63,7 +68,7 @@ export function createSourceMotionPreview(canvas,assets,mode){
   if(paint){ctx.save();ctx.translate(...pivot);ctx.rotate(rotation*Math.PI/180);ctx.translate(-pivot[0],-pivot[1]);
   sprite(images[original?'middle-boring-original':form+'-red'],original?result.frame:result.cell,x,y,size*scale,size*scale);ctx.restore();}
   const project=b=>[x+b[0]*scale,y+b[1]*scale,x+b[2]*scale,y+b[3]*scale];
-  if(paint)trace.push({form,clip:result.action??(result.clip===meta.forms[form].clips.happy?'happy':original?'original-boring':'source'),sourceFrame:result.pose.sourceFrame});
+  if(paint)trace.push({form,clip:result.action??(result.clip===meta.forms[form].clips.happy?'happy':original?'original-boring':'source'),sourceFrame:result.pose.sourceFrame,held,body:project(result.pose.body)});
   return {x,y,scale,body:project(result.pose.body),art:project(result.pose.art),head:[x+result.pose.head[0]*scale,y+result.pose.head[1]*scale],cursor,result};
  }
  function hand(anchor,t){
@@ -116,7 +121,14 @@ export function createSourceMotionPreview(canvas,assets,mode){
   text('摸摸 · 用原版开心动作回应你',425,30,18);text(t<550?'手伸过来，拉姆看见你了':t<1650?'摸到啦，身体和叶片一起回应':t<2450?'它还在开心地晃着呢':t<3650?'再摸一下，软软地靠过来':'好啦，继续陪你',425,57,13);
   ['seed','junior','middle','senior','super'].forEach((form,i)=>{
    const cx=85+i*170,base=218;
-   const a=form==='seed'?seed(cx,base,.6,t,t>550&&t<3700):body(form,affectionPose(meta,form,t),cx,base,.6);
+   let x=cx,y=base;
+   if(form==='super'){
+    const pose=affectionPose(meta,form,t).pose.body,rest=meta.forms.super.clips.down.poses[0].body;
+    y-=(pose[3]-rest[3])*.6;
+    x-=((pose[0]+pose[2]-rest[0]-rest[2])/2)*.6;
+    y+=Math.sin(t/1100)*.7;
+   }
+   const a=form==='seed'?seed(cx,base,.6,t,t>550&&t<3700):body(form,affectionPose(meta,form,t),x,y,.6);
    hand(a,t);
    const thanks=pulse(t,4100,600);if(thanks>0)heart(cx+20,a.art[1]-8-ease((t-3500)/1200)*16,thanks);
    text(LABELS[form],cx,266,14);

@@ -16,6 +16,7 @@ public static class FrameCheck{
 [FrameCheck]::Inspect(${handle}) | ConvertTo-Json -Compress`;
  const probe=label=>{const[style,x,y]=JSON.parse(execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{encoding:'utf8',timeout:20000,windowsHide:true}));assert.equal(style&0x00c00000,0,`${label}: native caption must remain absent`);assert.equal(style&0x00040000,0,`${label}: native thick frame must remain absent`);assert.ok(Math.abs(x)<=1&&Math.abs(y)<=1,`${label}: visible native non-client inset ${x},${y}`)};
  await page.evaluate(()=>window.desktop.setEdgeHiding(false));probe('initial pet');
+ assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getTitle()),'','Windows transparent pet must have no native title');
  for(let i=0;i<8;i++){
   await page.evaluate(()=>window.desktop.setCompanionPanel(true));if(i===0||i===7)probe('open pocket');
   await page.evaluate(()=>window.desktop.setCompanionPanel(false));
@@ -23,6 +24,9 @@ public static class FrameCheck{
   await page.evaluate(()=>window.desktop.setPetMode(true));
  }
  probe('after eight room/pocket/pet cycles');
+ await page.evaluate(()=>{document.title='拉姆 · mole-baby'});
+ await page.waitForTimeout(100);
+ assert.equal(await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getTitle()),'','A later document title must not restore the horizontal caption');
  console.log('PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles');
 }
 module.exports={verifyWindowsChrome};
