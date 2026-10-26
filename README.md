@@ -1,18 +1,20 @@
 # 拉姆 · mole-baby
 
+> **动画研究预览，尚未发布。** 本分支效果等待用户审阅；当前正式版为 [v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)。未经用户明确确认，不推送新版本到自动更新渠道。
+
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载 v0.29.2](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.2) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载正式版 v0.29.1](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 直接下载与安装
 
 | 你的电脑 | 推荐安装包 |
 | --- | --- |
-| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-Setup.exe) |
-| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-mac-arm64.dmg) |
-| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.2/mole-baby-0.29.2-mac-x64.dmg) |
+| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-Setup.exe) |
+| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-arm64.dmg) |
+| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.1/mole-baby-0.29.1-mac-x64.dmg) |
 
-无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.2)放在发布页最上方。
+无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.1)放在发布页最上方。
 
 ## 小小的桌面陪伴
 
@@ -30,7 +32,9 @@
 
 抓住拉姆时会轻轻压缩，左右拉动时身体慢半拍，换方向先收一下再展开；松手后弹回、轻晃几次再停稳。初级身体最软，中级叶片会晚一点跟上，高级和超拉保留悬空惯性。种子只摆动小身体，花盆保持端正，装扮随身体一起变化。
 
-以下动图展示五个阶段的拉扯和回弹，圆点代表抓住的位置：
+**以下是尚未认可的上一轮方案，暂不发版。** [原著动作参考与重做方向](research/v29-original-motion-study.md)已单独记录；原版的动作姿态、表情和叶片需要分别适配。
+
+下面保留五个阶段的旧方案用于对照，圆点代表抓住的位置：
 
 ![五阶段拉扯与Q弹回弹演示](artifacts/v29-bouncy-pull.gif)
 
@@ -64,7 +68,7 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 ## 安装
 
-Windows运行 `mole-baby-0.29.2-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
+Windows运行 `mole-baby-0.29.1-Setup.exe`，或完整解压ZIP后打开「拉姆.exe」。Mac选择M系列的arm64或Intel的x64版本，将应用拖入Applications；最低macOS12。Apple签名与公证状态见发布页顶部，首次打开说明见 [Mac使用指引](docs/MACOS.md)，安装盘及发布附件也提供独立HTML说明。无需关闭系统安全保护。
 
 ## 开发与检查
 
