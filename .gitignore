@@ -212,3 +212,7 @@ artifacts/v38-school/crown/*
 !artifacts/spell-preview/
 !artifacts/spell-preview/*.gif
 !artifacts/spell-preview/preview-manifest.json
+
+!artifacts/transform-preview/
+!artifacts/transform-preview/*.gif
+!artifacts/transform-preview/manifest.json

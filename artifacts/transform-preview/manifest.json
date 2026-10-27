@@ -1,0 +1,31 @@
+{
+  "preview_only": true,
+  "sheet": "skills/mole-classic-art/references/v40/transform-sheet.png",
+  "random_selection": "本 GIF 集合不包含运行时随机逻辑",
+  "animations": [
+    {
+      "file": "rabbit.gif",
+      "title": "兔子变身",
+      "model_poses": 4,
+      "gif_frames": 11,
+      "duration_ms": 2550,
+      "role": "原拉姆静态原图作为首尾；模型姿态与定时编排用于候选预览，不是官方动画。"
+    },
+    {
+      "file": "bird.gif",
+      "title": "小鸟变身",
+      "model_poses": 4,
+      "gif_frames": 11,
+      "duration_ms": 2550,
+      "role": "原拉姆静态原图作为首尾；模型姿态与定时编排用于候选预览，不是官方动画。"
+    },
+    {
+      "file": "tree.gif",
+      "title": "小树变身",
+      "model_poses": 4,
+      "gif_frames": 11,
+      "duration_ms": 2550,
+      "role": "原拉姆静态原图作为首尾；模型姿态与定时编排用于候选预览，不是官方动画。"
+    }
+  ]
+}

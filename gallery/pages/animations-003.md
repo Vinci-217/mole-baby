@@ -3,7 +3,14 @@
 
 [返回素材首页](../README.md) · [上一页](animations-002.md)
 
-本页 2 个文件，点击图片或「查看原图」可打开原文件。
+本页 3 个文件，点击图片或「查看原图」可打开原文件。
+
+### <code>artifacts/v37-bound/bound-sequence.gif</code>
+
+<a href="../../artifacts/v37-bound/bound-sequence.gif"><img src="../../artifacts/v37-bound/bound-sequence.gif" alt="artifacts/v37-bound/bound-sequence.gif" width="180"></a>
+
+[查看原图](../../artifacts/v37-bound/bound-sequence.gif)
+
 
 ### <code>artifacts/v38-school/crown/bound-sequence.gif</code>
 

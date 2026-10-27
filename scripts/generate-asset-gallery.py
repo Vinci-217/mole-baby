@@ -19,7 +19,9 @@ PAGE_SIZE = 24
 EXTENSIONS = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.icns'}
 PREVIEWABLE = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg'}
 LATEST = [
-    ('魔术 · 帽子变花', 'artifacts/spell-preview/magic.gif'),
+    ('变身魔术 · 小兔子', 'artifacts/transform-preview/rabbit.gif'),
+    ('变身魔术 · 小鸟', 'artifacts/transform-preview/bird.gif'),
+    ('变身魔术 · 小树', 'artifacts/transform-preview/tree.gif'),
     ('旋风术', 'artifacts/spell-preview/wind.gif'),
     ('流火术', 'artifacts/spell-preview/fire.gif'),
     ('寒冰术', 'artifacts/spell-preview/ice.gif'),
@@ -110,8 +112,8 @@ def main() -> None:
             path.unlink()
     rows = [MARKER, '# 拉姆动画和图片素材预览', '',
             '这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。',
-            '', '## 本次新绘：魔术和四系法术', '',
-            '当前为候选预览：拉姆是原角色静态图；魔术由 8 张新绘关键姿态编排，四系各由 4 张关键姿态编排，过渡由程序生成。参考了同系列游戏视觉，未核实《摩尔勇士》技能的完整原帧，不能视为官方动作复刻。', '']
+            '', '## 最新预览：变身魔术和四系法术', '',
+            '变身魔术是新绘的候选：原拉姆在同一位置变成小兔、小鸟或小树后恢复，关键姿态由图片模型绘制，切换和停顿由程序编排；随机触发尚未接入游戏。四系法术仍使用原角色静态图和各 4 张新绘关键姿态。参考同系列游戏视觉，未核实《摩尔勇士》完整技能原帧，不能视为官方动作复刻。', '']
     for title, path in LATEST:
         if path in paths:
             url = link(path, '../')

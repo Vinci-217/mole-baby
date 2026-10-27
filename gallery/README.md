@@ -3,15 +3,27 @@
 
 这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。
 
-## 本次新绘：魔术和四系法术
+## 最新预览：变身魔术和四系法术
 
-当前为候选预览：拉姆是原角色静态图；魔术由 8 张新绘关键姿态编排，四系各由 4 张关键姿态编排，过渡由程序生成。参考了同系列游戏视觉，未核实《摩尔勇士》技能的完整原帧，不能视为官方动作复刻。
+变身魔术是新绘的候选：原拉姆在同一位置变成小兔、小鸟或小树后恢复，关键姿态由图片模型绘制，切换和停顿由程序编排；随机触发尚未接入游戏。四系法术仍使用原角色静态图和各 4 张新绘关键姿态。参考同系列游戏视觉，未核实《摩尔勇士》完整技能原帧，不能视为官方动作复刻。
 
-### 魔术 · 帽子变花
+### 变身魔术 · 小兔子
 
-![魔术 · 帽子变花](../artifacts/spell-preview/magic.gif)
+![变身魔术 · 小兔子](../artifacts/transform-preview/rabbit.gif)
 
-[打开 GIF 原文件](../artifacts/spell-preview/magic.gif)
+[打开 GIF 原文件](../artifacts/transform-preview/rabbit.gif)
+
+### 变身魔术 · 小鸟
+
+![变身魔术 · 小鸟](../artifacts/transform-preview/bird.gif)
+
+[打开 GIF 原文件](../artifacts/transform-preview/bird.gif)
+
+### 变身魔术 · 小树
+
+![变身魔术 · 小树](../artifacts/transform-preview/tree.gif)
+
+[打开 GIF 原文件](../artifacts/transform-preview/tree.gif)
 
 ### 旋风术
 
@@ -54,9 +66,9 @@
 
 ## 全部素材分类
 
-共 940 个已跟踪图片文件。每页最多 24 项，按路径排序。
+共 944 个已跟踪图片文件。每页最多 24 项，按路径排序。
 
-### 历史动画（50）
+### 历史动画（51）
 
 项目中已跟踪的其他 GIF，包括应用内动作、历史方案与原素材。
 
@@ -68,7 +80,7 @@
 
 [第 1 页](pages/game-001.md) · [第 2 页](pages/game-002.md) · [第 3 页](pages/game-003.md) · [第 4 页](pages/game-004.md) · [第 5 页](pages/game-005.md) · [第 6 页](pages/game-006.md) · [第 7 页](pages/game-007.md) · [第 8 页](pages/game-008.md) · [第 9 页](pages/game-009.md) · [第 10 页](pages/game-010.md) · [第 11 页](pages/game-011.md) · [第 12 页](pages/game-012.md) · [第 13 页](pages/game-013.md) · [第 14 页](pages/game-014.md) · [第 15 页](pages/game-015.md) · [第 16 页](pages/game-016.md) · [第 17 页](pages/game-017.md) · [第 18 页](pages/game-018.md) · [第 19 页](pages/game-019.md) · [第 20 页](pages/game-020.md) · [第 21 页](pages/game-021.md) · [第 22 页](pages/game-022.md) · [第 23 页](pages/game-023.md) · [第 24 页](pages/game-024.md) · [第 25 页](pages/game-025.md) · [第 26 页](pages/game-026.md) · [第 27 页](pages/game-027.md) · [第 28 页](pages/game-028.md) · [第 29 页](pages/game-029.md) · [第 30 页](pages/game-030.md) · [第 31 页](pages/game-031.md) · [第 32 页](pages/game-032.md)
 
-### 设计参考和其他图片（140）
+### 设计参考和其他图片（141）
 
 设计参考板、历史预览与其他已跟踪图片；部分是精灵图，并非独立动画。
 

@@ -110,6 +110,13 @@
 [查看原图](../../artifacts/animation-gallery/wardrobe.gif)
 
 
+### <code>artifacts/spell-preview/magic.gif</code>
+
+<a href="../../artifacts/spell-preview/magic.gif"><img src="../../artifacts/spell-preview/magic.gif" alt="artifacts/spell-preview/magic.gif" width="180"></a>
+
+[查看原图](../../artifacts/spell-preview/magic.gif)
+
+
 ### <code>artifacts/v21-original-actions.gif</code>
 
 <a href="../../artifacts/v21-original-actions.gif"><img src="../../artifacts/v21-original-actions.gif" alt="artifacts/v21-original-actions.gif" width="180"></a>
@@ -164,13 +171,6 @@
 <a href="../../artifacts/v36-nojump/original-vs-grounded.gif"><img src="../../artifacts/v36-nojump/original-vs-grounded.gif" alt="artifacts/v36-nojump/original-vs-grounded.gif" width="180"></a>
 
 [查看原图](../../artifacts/v36-nojump/original-vs-grounded.gif)
-
-
-### <code>artifacts/v37-bound/bound-sequence.gif</code>
-
-<a href="../../artifacts/v37-bound/bound-sequence.gif"><img src="../../artifacts/v37-bound/bound-sequence.gif" alt="artifacts/v37-bound/bound-sequence.gif" width="180"></a>
-
-[查看原图](../../artifacts/v37-bound/bound-sequence.gif)
 
 
 [返回素材首页](../README.md) · [上一页](animations-001.md) · [下一页](animations-003.md)

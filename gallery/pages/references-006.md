@@ -3,7 +3,7 @@
 
 [返回素材首页](../README.md) · [上一页](references-005.md)
 
-本页 20 个文件，点击图片或「查看原图」可打开原文件。
+本页 21 个文件，点击图片或「查看原图」可打开原文件。
 
 ### <code>artifacts/v6-native-sidecar.png</code>
 
@@ -143,6 +143,13 @@
 <a href="../../skills/mole-classic-art/references/v39/magic-sheet.png"><img src="../../skills/mole-classic-art/references/v39/magic-sheet.png" alt="skills/mole-classic-art/references/v39/magic-sheet.png" width="180"></a>
 
 [查看原图](../../skills/mole-classic-art/references/v39/magic-sheet.png)
+
+
+### <code>skills/mole-classic-art/references/v40/transform-sheet.png</code>
+
+<a href="../../skills/mole-classic-art/references/v40/transform-sheet.png"><img src="../../skills/mole-classic-art/references/v40/transform-sheet.png" alt="skills/mole-classic-art/references/v40/transform-sheet.png" width="180"></a>
+
+[查看原图](../../skills/mole-classic-art/references/v40/transform-sheet.png)
 
 
 [返回素材首页](../README.md) · [上一页](references-005.md)
