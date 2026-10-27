@@ -1,6 +1,6 @@
 # Proportion and tiredness preview
 
-Review branch: `preview/proportion-polish`. Target release: v0.29.3. The user explicitly requested publication after the fixes and verification.
+Review branch: `preview/proportion-polish`. Target release: v0.29.4. The user explicitly requested publication after the fixes and verification.
 
 This revision reuses the existing original-game character atlases. It is a desktop
 registration/timing adaptation, not newly recovered official animation frames.
@@ -47,3 +47,5 @@ older smoke tests are preserved by the local cloud helper above.
 The release workflow builds and runs modern Windows x64, legacy Windows x64/ia32, and both Mac architectures before publishing. Windows 7/8/8.1 hardware/VM acceptance remains a separate unexecuted check; see `docs/WINDOWS.md`.
 
 Visual measurements passed 288 active cases, 128 reduced-motion cases and 16 outfit cases, with maximum registered body-width deviation 1.04px. Six 24fps clips contain 809 frames. The production Linux desktop smoke passed native cursor/four-edge checks, transparent hover and both native update-cancel dialogs. Electron 22.3.27/Node16/Chromium108 independently passed production care/settings and the CSP probe.
+
+Release CI also exposed a host-architecture leak in the Windows lifecycle test fixture on Apple Silicon. The fixture now explicitly simulates x64 Windows, with separate ia32 coverage; all 25 lifecycle tests pass with an emulated ARM64 host. The blocked v0.29.3 tag was never published; the corrected release target is v0.29.4.

@@ -277,19 +277,19 @@
 
 一只住在 Windows 或 macOS 桌面的拉姆。可以拖动、摸摸、玩球、喂养，看着它从种子慢慢长大。
 
-[下载正式版 v0.29.3](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.3) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
+[下载正式版 v0.29.4](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.4) · [构建记录](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)
 
 ## 直接下载与安装
 
 | 你的电脑 | 推荐安装包 |
 | --- | --- |
-| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.3/mole-baby-0.29.3-Setup.exe) |
-| Windows 7 SP1 / 8 / 8.1（64 位） | [下载64位兼容版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.3/mole-baby-0.29.3-legacy-x64-Setup.exe) |
-| Windows 7 SP1 / 8 / 8.1（32 位） | [下载32位兼容版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.3/mole-baby-0.29.3-legacy-ia32-Setup.exe) |
-| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.3/mole-baby-0.29.3-mac-arm64.dmg) |
-| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.3/mole-baby-0.29.3-mac-x64.dmg) |
+| Windows 10 / 11（64 位） | [下载 Windows 安装版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.4/mole-baby-0.29.4-Setup.exe) |
+| Windows 7 SP1 / 8 / 8.1（64 位） | [下载64位兼容版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.4/mole-baby-0.29.4-legacy-x64-Setup.exe) |
+| Windows 7 SP1 / 8 / 8.1（32 位） | [下载32位兼容版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.4/mole-baby-0.29.4-legacy-ia32-Setup.exe) |
+| Mac · Apple 芯片（M 系列） | [下载 Apple 芯片 Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.4/mole-baby-0.29.4-mac-arm64.dmg) |
+| Mac · Intel 芯片 | [下载 Intel Mac 版](https://github.com/Vinci-217/mole-baby/releases/download/v0.29.4/mole-baby-0.29.4-mac-x64.dmg) |
 
-无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.3)放在发布页最上方。
+无需登录 GitHub。Mac 在苹果菜单 →「关于本机」查看芯片，需要 macOS 12 或更新版本。Windows 下载后双击安装；Mac 打开 DMG 后拖入「应用程序」。[详细安装、更新与 Mac 首次打开指引](https://github.com/Vinci-217/mole-baby/releases/tag/v0.29.4)放在发布页最上方。
 
 ## 小小的桌面陪伴
 
@@ -330,7 +330,7 @@ Windows已关闭托盘和桌宠按钮的系统悬浮提示，避免鼠标停留�
 
 默认开启「启动时检查更新」：Windows和Mac每次完全启动约8秒后检查GitHub的最新公开正式版。发现新版先询问是否下载；下载校验完成后，再确认是否安装或重启。选择「稍后」、关闭提示或退出拉姆都不会自动安装。小屋设置和托盘可查看进度、关闭启动检查或再次打开确认提示。无需GitHub Token。
 
-首次需要手动安装v0.29.3或更新版本一次。Mac当前本地签名版和Windows便携版在用户确认下载、校验完成后提供安装入口，**安装仍需用户确认并手动完成**；Windows安装版和标准签名Mac版则在确认后保存宠物并更新重启。关闭窗口只是收进托盘，恢复时的检查有5分钟间隔；启动检查偏好会保存。兼容版按32/64位使用独立更新渠道。尚未升级的旧版本仍使用原有更新逻辑，首次可手动安装本版。详见[逐步更新流程与平台区别](docs/UPDATES.md)。
+首次需要手动安装v0.29.4或更新版本一次。Mac当前本地签名版和Windows便携版在用户确认下载、校验完成后提供安装入口，**安装仍需用户确认并手动完成**；Windows安装版和标准签名Mac版则在确认后保存宠物并更新重启。关闭窗口只是收进托盘，恢复时的检查有5分钟间隔；启动检查偏好会保存。兼容版按32/64位使用独立更新渠道。尚未升级的旧版本仍使用原有更新逻辑，首次可手动安装本版。详见[逐步更新流程与平台区别](docs/UPDATES.md)。
 
 ## 安装
 

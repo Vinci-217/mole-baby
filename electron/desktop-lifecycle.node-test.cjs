@@ -70,7 +70,9 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const localRequire = name => name === 'electron' ? electron : name==='../package.json'&&options.edition ? {...require('../package.json'),windowsEdition:options.edition} : name==='./updates.cjs'&&options.updateFactory ? {createUpdates:options.updateFactory} : name.startsWith('./') ? require(path.join(__dirname,name)) : require(name);
   const runtimeProcess = Object.create(process);
   Object.defineProperty(runtimeProcess, 'platform', { value: platform });
-  if(options.arch)Object.defineProperty(runtimeProcess,'arch',{value:options.arch});
+  // The simulated Windows app is x64 regardless of the host running tests
+  // (including Apple Silicon); explicit ia32 fixtures override this default.
+  Object.defineProperty(runtimeProcess,'arch',{value:options.arch??(platform==='win32'?'x64':process.arch)});
   Object.defineProperty(runtimeProcess,'env',{value:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1'}});
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
     require: localRequire, __dirname, console, URL, Date, process: runtimeProcess,
