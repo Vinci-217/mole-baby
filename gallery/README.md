@@ -80,6 +80,10 @@
 
 ## 最近更新素材
 
+- [artifacts/transform-concepts/bird.png](../artifacts/transform-concepts/bird.png)
+- [artifacts/transform-concepts/cat.png](../artifacts/transform-concepts/cat.png)
+- [artifacts/transform-concepts/rabbit.png](../artifacts/transform-concepts/rabbit.png)
+- [artifacts/transform-concepts/tree.png](../artifacts/transform-concepts/tree.png)
 - [artifacts/transform-v41/bird.gif](../artifacts/transform-v41/bird.gif)
 - [artifacts/transform-v41/rabbit.gif](../artifacts/transform-v41/rabbit.gif)
 - [artifacts/transform-v41/tree.gif](../artifacts/transform-v41/tree.gif)
@@ -88,10 +92,6 @@
 - [research/references/ramu-2008-2010/images/fire-pink-idle.png](../research/references/ramu-2008-2010/images/fire-pink-idle.png)
 - [research/references/ramu-2008-2010/images/fire-red-idle.png](../research/references/ramu-2008-2010/images/fire-red-idle.png)
 - [research/references/ramu-2008-2010/images/fire-yellow-idle.png](../research/references/ramu-2008-2010/images/fire-yellow-idle.png)
-- [research/references/ramu-2008-2010/images/junior-blue-idle.png](../research/references/ramu-2008-2010/images/junior-blue-idle.png)
-- [research/references/ramu-2008-2010/images/junior-pink-idle.png](../research/references/ramu-2008-2010/images/junior-pink-idle.png)
-- [research/references/ramu-2008-2010/images/junior-red-idle.png](../research/references/ramu-2008-2010/images/junior-red-idle.png)
-- [research/references/ramu-2008-2010/images/junior-yellow-idle.png](../research/references/ramu-2008-2010/images/junior-yellow-idle.png)
 
 ## 全部素材分类
 
