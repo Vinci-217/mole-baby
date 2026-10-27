@@ -3,7 +3,36 @@
 
 这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。
 
-## 最新预览：变身魔术和四系法术
+## 最新候选：变身后的造型
+
+先挑选变身后的造型。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。这里是新绘静态候选，烟雾动画和随机触发尚未制作。
+
+### 小兔子
+
+<a href="../artifacts/transform-concepts/rabbit.png"><img src="../artifacts/transform-concepts/rabbit.png" alt="小兔子" width="280"></a>
+
+[查看原图](../artifacts/transform-concepts/rabbit.png)
+
+### 小鸟
+
+<a href="../artifacts/transform-concepts/bird.png"><img src="../artifacts/transform-concepts/bird.png" alt="小鸟" width="280"></a>
+
+[查看原图](../artifacts/transform-concepts/bird.png)
+
+### 小树
+
+<a href="../artifacts/transform-concepts/tree.png"><img src="../artifacts/transform-concepts/tree.png" alt="小树" width="280"></a>
+
+[查看原图](../artifacts/transform-concepts/tree.png)
+
+### 小猫
+
+<a href="../artifacts/transform-concepts/cat.png"><img src="../artifacts/transform-concepts/cat.png" alt="小猫" width="280"></a>
+
+[查看原图](../artifacts/transform-concepts/cat.png)
+
+
+## 先前预览：变身魔术和四系法术
 
 变身魔术是新绘的候选：每种变身有 16 张图片模型绘制的姿态，首尾接原拉姆静帧，播放时序由程序编排；随机触发尚未接入游戏。四系法术仍使用原角色静态图和各 4 张新绘关键姿态。参考同系列游戏视觉，未核实《摩尔勇士》完整技能原帧，不能视为官方动作复刻。
 
@@ -66,7 +95,7 @@
 
 ## 全部素材分类
 
-共 984 个已跟踪图片文件。每页最多 24 项，按路径排序。
+共 988 个已跟踪图片文件。每页最多 24 项，按路径排序。
 
 ### 历史动画（55）
 

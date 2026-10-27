@@ -220,3 +220,6 @@ artifacts/v38-school/crown/*
 !artifacts/transform-v41/
 !artifacts/transform-v41/*.gif
 !artifacts/transform-v41/manifest.json
+
+!artifacts/transform-concepts/
+!artifacts/transform-concepts/*.png
