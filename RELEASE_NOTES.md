@@ -1,4 +1,4 @@
-拉姆 v0.29.4 · 老系统兼容、比例修正与更新确认
+拉姆 v0.29.5 · 老系统兼容、比例修正与更新确认
 
 - 新增 Windows 7 SP1、8、8.1 的32位和64位兼容安装包及便携包，固定使用 Electron 22.3.27。Windows 10/11的64位常规版继续使用较新运行时。兼容版的更新渠道和数据目录独立；跨版切换先从小屋设置导出、导入宠物存档。
 - 更新改为两次确认：发现新版先询问是否下载，下载校验完成后再询问是否安装。默认选择「稍后」，取消、关闭提示和退出应用均不会自动安装；设置和托盘可再次确认。
@@ -13,6 +13,6 @@
 
 本版的下载与安装均需要确认。仍在运行的旧版本会使用它原有的更新逻辑；首次升级到本版也可手动覆盖安装。v0.28.0及更早版本需要手动安装。
 
-Windows兼容版最低目标为Windows 7 SP1，XP、Vista及未装SP1的Windows7不支持。Electron22与这些老系统已停止安全维护，兼容版只加载随包提供的本地界面。实际Win7/8/8.1设备验收与现代Windows上的成品检查分别记录，详见[Windows兼容说明](https://github.com/Vinci-217/mole-baby/blob/v0.29.4/docs/WINDOWS.md)。
+Windows兼容版最低目标为Windows 7 SP1，XP、Vista及未装SP1的Windows7不支持。Electron22与这些老系统已停止安全维护，兼容版只加载随包提供的本地界面。实际Win7/8/8.1设备验收与现代Windows上的成品检查分别记录，详见[Windows兼容说明](https://github.com/Vinci-217/mole-baby/blob/v0.29.5/docs/WINDOWS.md)。
 
-[动画与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.29.4/README.md) · [更新流程](https://github.com/Vinci-217/mole-baby/blob/v0.29.4/docs/UPDATES.md)
+[动画与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.29.5/README.md) · [更新流程](https://github.com/Vinci-217/mole-baby/blob/v0.29.5/docs/UPDATES.md)

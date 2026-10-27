@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.29.4",
+  "version": "0.29.5",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -23,8 +23,8 @@
     "test:browser": "npm run build && node scripts/compact-care-regression.cjs",
     "clean:previews": "node scripts/clean-preview-frames.cjs --apply",
     "build:legacy": "tsc -b && vite build --config vite.legacy.config.ts",
-    "dist:win:legacy:x64": "npm run build:legacy && cross-env MOLE_LEGACY_ARCH=x64 electron-builder --config electron-builder.legacy.cjs --win nsis zip --x64",
-    "dist:win:legacy:ia32": "npm run build:legacy && cross-env MOLE_LEGACY_ARCH=ia32 electron-builder --config electron-builder.legacy.cjs --win nsis zip --ia32"
+    "dist:win:legacy:x64": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch x64",
+    "dist:win:legacy:ia32": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch ia32"
   },
   "dependencies": {
     "electron-updater": "^6.8.11",

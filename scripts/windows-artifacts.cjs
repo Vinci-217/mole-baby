@@ -135,7 +135,8 @@ async function verifyPortableZip(filename, unpackedDirectory, executableName, ar
   const bytes = fs.readFileSync(filename), entries = zipDirectory(bytes);
   const files = entries.filter(entry => !entry.name.endsWith('/'));
   const expected = listFiles(unpackedDirectory).sort();
-  check(JSON.stringify(files.map(entry => entry.name).sort()) === JSON.stringify(expected), 'ZIP: file list differs from the tested unpacked application');
+  const actual=files.map(entry=>entry.name).sort();
+  check(JSON.stringify(actual) === JSON.stringify(expected), `ZIP: file list differs from the tested unpacked application; missing=${JSON.stringify(expected.filter(name=>!actual.includes(name)))}; unexpected=${JSON.stringify(actual.filter(name=>!expected.includes(name)))}`);
   check(expected.includes(executableName) && expected.includes('resources/app.asar') && expected.includes('resources/app-update.yml'), 'ZIP: required application/update payload is missing');
   for (const entry of entries) {
     const content = zipEntryBytes(bytes, entry);

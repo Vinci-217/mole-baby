@@ -1,6 +1,6 @@
 # Proportion and tiredness preview
 
-Review branch: `preview/proportion-polish`. Target release: v0.29.4. The user explicitly requested publication after the fixes and verification.
+Review branch: `preview/proportion-polish`. Target release: v0.29.5. The user explicitly requested publication after the fixes and verification.
 
 This revision reuses the existing original-game character atlases. It is a desktop
 registration/timing adaptation, not newly recovered official animation frames.
@@ -48,4 +48,6 @@ The release workflow builds and runs modern Windows x64, legacy Windows x64/ia32
 
 Visual measurements passed 288 active cases, 128 reduced-motion cases and 16 outfit cases, with maximum registered body-width deviation 1.04px. Six 24fps clips contain 809 frames. The production Linux desktop smoke passed native cursor/four-edge checks, transparent hover and both native update-cancel dialogs. Electron 22.3.27/Node16/Chromium108 independently passed production care/settings and the CSP probe.
 
-Release CI also exposed a host-architecture leak in the Windows lifecycle test fixture on Apple Silicon. The fixture now explicitly simulates x64 Windows, with separate ia32 coverage; all 25 lifecycle tests pass with an emulated ARM64 host. The blocked v0.29.3 tag was never published; the corrected release target is v0.29.4.
+Release CI also exposed a host-architecture leak in the Windows lifecycle test fixture on Apple Silicon. The fixture now explicitly simulates x64 Windows, with separate ia32 coverage; all 25 lifecycle tests pass with an emulated ARM64 host. The blocked v0.29.3 tag was never published; v0.29.4 then reached actual platform packaging checks.
+
+The v0.29.4 packaging gate caught parallel NSIS/ZIP payload divergence and a legitimate welcome bubble in the Mac transparency fixture. Windows packaging now completes NSIS before archiving the same prepackaged directory; exact-file validation remains strict. The transparency check dismisses visible bubbles through the normal UI before measuring unused alpha. Publication targets v0.29.5 with 278 frontend and 92 Node tests.

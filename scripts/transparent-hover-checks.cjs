@@ -12,6 +12,10 @@ async function verifyTransparentHover(page,desktop,options={}){
  assert.ok(snapshot.save,'Adopt a pet before checking transparent hover');
  const noTitles=()=>expect(page.locator('.companion-layout [title]')).toHaveCount(0);
  async function captureClearTop(name){
+  // A real care/welcome bubble may outlive the previous smoke. Dismiss it
+  // through its normal control before measuring unused transparent space.
+  const bubble=page.getByRole('button',{name:'收起拉姆提示',exact:true});
+  if(await bubble.isVisible())await bubble.click();
   await page.mouse.move(1,1);
   await expect(page.locator('.compact-bubble.visible')).toHaveCount(0);
   await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:15000});

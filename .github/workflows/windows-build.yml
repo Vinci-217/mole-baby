@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          npx --no-install electron-builder --win nsis zip --x64 --publish never 2>&1 | tee -a artifacts/windows-smoke.log
+          node scripts/package-windows.cjs 2>&1 | tee -a artifacts/windows-smoke.log
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -147,7 +147,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          npx --no-install electron-builder --config electron-builder.legacy.cjs --win nsis zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+          node scripts/package-windows.cjs --legacy --arch ${{ matrix.arch }} 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
       - name: Verify PE architecture, ZIP payload, installer and application
         shell: bash
         run: |
