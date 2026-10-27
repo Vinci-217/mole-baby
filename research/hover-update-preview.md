@@ -1,5 +1,8 @@
 # Floating hover and consent-based update preview
 
+> Historical preview record. Final Windows/Mac package verification and publication are recorded in [v0.29.6 validation](release-0.29.6-validation.md).
+
+
 This preview continues the proportion/timing work on `preview/proportion-polish`.
 No release, version tag or update-channel publication was performed.
 
