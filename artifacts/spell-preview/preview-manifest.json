@@ -1,0 +1,52 @@
+{
+  "preview_only": true,
+  "elements_sheet": "skills/mole-classic-art/references/v39/elements-sheet-initial.png",
+  "magic_sheet": "skills/mole-classic-art/references/v39/magic-sheet.png",
+  "animations": [
+    {
+      "file": "magic.gif",
+      "title": "魔术 · 帽子变花",
+      "model_keyframes": 8,
+      "gif_frames": 26,
+      "duration_ms": 2900,
+      "pet": "public/assets/original/pets/middle-red-idle.png",
+      "note": "原角色静态图与模型生成的透明关键帧合成；淡入淡出由程序编排，并非官方逐帧或应用实录。"
+    },
+    {
+      "file": "wind.gif",
+      "title": "旋风术",
+      "model_keyframes": 4,
+      "gif_frames": 14,
+      "duration_ms": 1700,
+      "pet": "public/assets/original/pets/middle-red-idle.png",
+      "note": "原角色静态图与模型生成的透明关键帧合成；淡入淡出由程序编排，并非官方逐帧或应用实录。"
+    },
+    {
+      "file": "fire.gif",
+      "title": "流火术",
+      "model_keyframes": 4,
+      "gif_frames": 14,
+      "duration_ms": 1700,
+      "pet": "public/assets/original/pets/middle-red-idle.png",
+      "note": "原角色静态图与模型生成的透明关键帧合成；淡入淡出由程序编排，并非官方逐帧或应用实录。"
+    },
+    {
+      "file": "ice.gif",
+      "title": "寒冰术",
+      "model_keyframes": 4,
+      "gif_frames": 14,
+      "duration_ms": 1700,
+      "pet": "public/assets/original/pets/middle-red-idle.png",
+      "note": "原角色静态图与模型生成的透明关键帧合成；淡入淡出由程序编排，并非官方逐帧或应用实录。"
+    },
+    {
+      "file": "meteor.gif",
+      "title": "陨石术",
+      "model_keyframes": 4,
+      "gif_frames": 14,
+      "duration_ms": 1700,
+      "pet": "public/assets/original/pets/middle-red-idle.png",
+      "note": "原角色静态图与模型生成的透明关键帧合成；淡入淡出由程序编排，并非官方逐帧或应用实录。"
+    }
+  ]
+}

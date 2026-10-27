@@ -15,6 +15,8 @@ description: 根据《摩尔庄园》原帧和本地参考制作拉姆动作、�
 
 本轮可直接使用[原角色与身体原帧参考板](references/v38/original-reference.png)、[课程/打工道具关键帧](references/v38/study-service-keyframes.png)、[法术关键帧候选](references/v38/elemental-keyframes.png)和[迭代记录](references/iteration-log.md)。新法术是自行绘制的候选，尚未核对到《摩尔勇士》的官方完整技能原帧，不能把游戏名称当作已经验证的素材来源。
 
+制作魔术和四系法术时，先看[施法动效参考与审查](references/spell-animation-guide.md)中实际核对过的《摩尔勇士》游戏截图，区分游戏截图、拉姆原帧与新绘候选。截图可参考整体画法，不能作为已核实的技能动作；预览必须写明这一边界。
+
 1. 先读 `references/style-guide.md`，再实际查看至少三类参考：场景、UI、道具。任务含角色时加看原角色图。只读名称或来源清单不能代替看图。
 2. 最低参考组合：`public/assets/original/scenes/ramu-home.png`、`public/assets/original/ui/reference-pet-panel.png`、`public/assets/original/items/180017.png`。背景任务再看 `scenes/lake-cabin.png` 或 `scenes/ramu-school.png`，避免把一间房的构图误当成整个游戏的画风。
 3. 用五行记录本次参考的轮廓、形状、色面、高光与空间安排；写明本次要新设计的内容、保持不变的角色和交互留白。
@@ -28,6 +30,7 @@ description: 根据《摩尔庄园》原帧和本地参考制作拉姆动作、�
 - 背景不生成角色、文字、按钮、Logo 或 HUD。UI 图片只画底板与装饰，业务标签由 HTML 排版。需要新增 Logo 时单独生成图形，中文字标另排，避免乱码。
 - 先生成一张候选并检查，再决定是否修订。修订使用图片编辑工具，并提供上一张图及相关原图参考；指出具体缺陷，例如“删除连续木纹和柔光，把桌面改成三块硬边黄色色面”。
 - 若用户要求先发布当前版本再生成，先完成约定的发布与构建；准备提示词可以提前进行，实际图片生成必须等到构建完成。
+- 法术按蓄力、释放、行进、命中、消散设计连续变化的关键姿态，保存参考与提示词；实际播放时检查角色面部无遮挡、能量流向和帧间衔接。不要把静态图标的平移、放大或程序补帧写成官方逐帧动画，也不要假设截图里的界面说明就是技能效果。
 
 ## 复核与接入
 
