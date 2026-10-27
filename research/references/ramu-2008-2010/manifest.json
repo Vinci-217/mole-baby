@@ -1,0 +1,490 @@
+{
+  "retrieved": "2026-10-27",
+  "repository": "https://github.com/Miigon/RecMoleRes",
+  "revision": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "scope": "all SWF files visible in NPC/lamubone.swf, pet/avatar, petcloth/swf/cloth, petcloth/swf2 (including pet5 and pet101) at fixed revision; not all assets or all eras",
+  "date_evidence": "individual asset production/publication years not independently established",
+  "files": [
+    {
+      "archive_path": "root/resource/NPC/lamubone.swf",
+      "local_path": "raw/NPC/lamubone.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
+      "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "bytes": 556811,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/pet/avatar/pet.swf",
+      "local_path": "raw/pet/avatar/pet.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/avatar/pet.swf",
+      "sha256": "7c2d4920dd416fab79e91b2ae196447b2c21f06c2fe24f257dd5372eb734c6be",
+      "bytes": 5174,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200008.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200008.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200008.swf",
+      "sha256": "a2a67aaa8549b4cf7f5768d33d158f3a4c70e04691062a8d49209c21b06171f3",
+      "bytes": 420,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200012.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200012.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200012.swf",
+      "sha256": "31f2edf8b8bce002bb8a975997c392568af191f115b1debc32aa7631fb8173fa",
+      "bytes": 720,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200018.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200018.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200018.swf",
+      "sha256": "19f3e9891e2a96f0f5c4a08b3b3d4f36a5c9b49bb08ba208915eba5e4703f9bc",
+      "bytes": 543,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200019.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200019.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200019.swf",
+      "sha256": "a2a2f3a3156aa45caf44ff3f7ab738c4eaee3fa98cf4da710ca2bb34714756c3",
+      "bytes": 395,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200020.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200020.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200020.swf",
+      "sha256": "fdc904097797d117fca05189e0d27d0ffabe0ddad069fcf60f4e984d9d5a1a4a",
+      "bytes": 524,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200021.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200021.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200021.swf",
+      "sha256": "1fdabde4f526ebcfdf2310eebb5ac439b1e5f5aa45e8ef84eda0fe8c41893c4f",
+      "bytes": 2874,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200023.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200023.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200023.swf",
+      "sha256": "3547f49a1be111b9c88089b4022e9b6ca59be81167bf4992578e3c659e7ecad3",
+      "bytes": 593,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200024.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200024.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200024.swf",
+      "sha256": "c916988f0fa050ee69480714f431039e2ffc7b629aedca3048fb8f4027737118",
+      "bytes": 220,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200026.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200026.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200026.swf",
+      "sha256": "26e889e6afe8d5b1f00d3091edd451805f52e9ad4d974f86803827f65257992a",
+      "bytes": 1169,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200031.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200031.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200031.swf",
+      "sha256": "c31efb567487eaf83dd8b60f2cc98c158e1e40e44cdc6796c337ca8ad5986557",
+      "bytes": 502,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200045.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200045.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200045.swf",
+      "sha256": "97365a412c00be737af05c9c2596a4ceecea16b321f9b7908a0e2b3b9c80322b",
+      "bytes": 3675,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200047.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200047.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200047.swf",
+      "sha256": "4d262ae4ff9bb74ecee84620e0e056c87c7f27b1ce37b3f359c316166a5bbb9e",
+      "bytes": 3278,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200049.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200049.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200049.swf",
+      "sha256": "eedeec4e3bbd6b05f08c66fd81f478bc1ae70426550122251e39b9e973a50bf1",
+      "bytes": 3336,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf/cloth/1200078.swf",
+      "local_path": "raw/petcloth/swf/cloth/1200078.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf/cloth/1200078.swf",
+      "sha256": "62b06ec00ab070cc19ecae7afe77dd98411740c748665a620699fa68dacb4cb1",
+      "bytes": 1351,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200006.swf",
+      "local_path": "raw/petcloth/swf2/1200006.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200006.swf",
+      "sha256": "4a3e9efb2984ab4b83190d117fed85fb492c05442ea98ad4503b8a79a9d54a3f",
+      "bytes": 131600,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200009.swf",
+      "local_path": "raw/petcloth/swf2/1200009.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200009.swf",
+      "sha256": "c53e5cdd7f68f145b34139a3f25bc4f65a4916e6dc6d83b3a943d79c685c5ddb",
+      "bytes": 9362,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200018.swf",
+      "local_path": "raw/petcloth/swf2/1200018.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200018.swf",
+      "sha256": "dfece2ba0e62250d7b32774794cd999c4f720a518ea98aa8b123a1ae8013c8f1",
+      "bytes": 51168,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200020.swf",
+      "local_path": "raw/petcloth/swf2/1200020.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200020.swf",
+      "sha256": "ddd4efb6eed2f504413f44d2af5d091d5447450c5102279813b21c5599fa51a9",
+      "bytes": 33827,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200021.swf",
+      "local_path": "raw/petcloth/swf2/1200021.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200021.swf",
+      "sha256": "6bdabb6024f116c1ac37a326671a598cb6a22043e1884de0fefb12afcf1e627d",
+      "bytes": 182259,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200024.swf",
+      "local_path": "raw/petcloth/swf2/1200024.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200024.swf",
+      "sha256": "aed922cf8b95b8e72c41f68bb0649fdb26acf6be588b40761439f24e867fc32a",
+      "bytes": 99087,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200026.swf",
+      "local_path": "raw/petcloth/swf2/1200026.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200026.swf",
+      "sha256": "c30d025ffe0bf1c284e360343e660e1a43df79ec5324527eb5b7de0ebf9f145f",
+      "bytes": 47915,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200033.swf",
+      "local_path": "raw/petcloth/swf2/1200033.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200033.swf",
+      "sha256": "79f857d67c0a38e0c8784fdf2bb53f1d021e397d17acc0f8650068b732f3f2c6",
+      "bytes": 147382,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200036.swf",
+      "local_path": "raw/petcloth/swf2/1200036.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200036.swf",
+      "sha256": "bad3103a6e3ebd142eb9e6e11574e989697b117ba336fed980d88d23b65d3c57",
+      "bytes": 197891,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200040.swf",
+      "local_path": "raw/petcloth/swf2/1200040.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200040.swf",
+      "sha256": "8c8ebdc311a413509a45aa76efd75a60a378abffd92b687f3d15d677d50add2d",
+      "bytes": 140728,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200042.swf",
+      "local_path": "raw/petcloth/swf2/1200042.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200042.swf",
+      "sha256": "482a6eb19b6b21a42bfdf6898def786320b44cfc0fededc693aca565d4293520",
+      "bytes": 12781,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200043.swf",
+      "local_path": "raw/petcloth/swf2/1200043.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200043.swf",
+      "sha256": "bd2e161a58b7e0e1e556190f1e4a1306791418982f9bbed7307cc98bc3fc826a",
+      "bytes": 12157,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200047.swf",
+      "local_path": "raw/petcloth/swf2/1200047.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200047.swf",
+      "sha256": "9e808b706c3e324c383e5ce1fc11f0051876727b2c9e2774dde633a883b641e1",
+      "bytes": 210271,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200052.swf",
+      "local_path": "raw/petcloth/swf2/1200052.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200052.swf",
+      "sha256": "b48ff72e3f8a4c29915b696040c57b3e9db8d38a26ce4031281ccfe527aaf9bc",
+      "bytes": 446438,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200078.swf",
+      "local_path": "raw/petcloth/swf2/1200078.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200078.swf",
+      "sha256": "fbfe355ff8e151d0aaa392a3218721271cc3a9bcaab16d09373892db45347df0",
+      "bytes": 62820,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/1200079.swf",
+      "local_path": "raw/petcloth/swf2/1200079.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200079.swf",
+      "sha256": "72a3aac5c50d287ebaccb05f8dea524551ad8f178dbb59a95feaf895ad5c357c",
+      "bytes": 35069,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "local_path": "raw/petcloth/swf2/pet101/skill_7.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "sha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20",
+      "bytes": 189066,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/pet5/skill_1.swf",
+      "local_path": "raw/petcloth/swf2/pet5/skill_1.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/pet5/skill_1.swf",
+      "sha256": "ef8b8dd20db563b6dcde2ee3b69d47707453bd147076a676b84aeec7dbd1ef94",
+      "bytes": 209348,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/pet5/skill_2.swf",
+      "local_path": "raw/petcloth/swf2/pet5/skill_2.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/pet5/skill_2.swf",
+      "sha256": "def307887b5de28bedcef4fae30fd980e8a9537f156b77f0b4527be235857464",
+      "bytes": 173190,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    },
+    {
+      "archive_path": "root/resource/petcloth/swf2/pet5/skill_4.swf",
+      "local_path": "raw/petcloth/swf2/pet5/skill_4.swf",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/pet5/skill_4.swf",
+      "sha256": "8b2844001dd346c5bdc0f6dba8da83da15c618c0d46a12c68b011f3bdfacd926",
+      "bytes": 200967,
+      "date_range": "unknown",
+      "source": "Miigon/RecMoleRes community archive; upstream files are official-client resources per repository README; file date not independently verified"
+    }
+  ],
+  "image_reference_copies": [
+    {
+      "local_path": "images/fire-blue-idle.png",
+      "derived_from": "public/assets/original/pets/fire-blue-idle.png",
+      "sha256": "a53d420b7820f2f619fb5f09beab6779f2bfe6f9ba46eee277d9ed62dbda27ac"
+    },
+    {
+      "local_path": "images/fire-pink-idle.png",
+      "derived_from": "public/assets/original/pets/fire-pink-idle.png",
+      "sha256": "425897949e62c1951cde8295e993b3c4f82f088563d458a8b9a78aa9ff1c07c9"
+    },
+    {
+      "local_path": "images/fire-red-idle.png",
+      "derived_from": "public/assets/original/pets/fire-red-idle.png",
+      "sha256": "0dc6d57ab451e948c85a61605e16e0de340cc5b67296169270c2a5ae2edd76da"
+    },
+    {
+      "local_path": "images/fire-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/fire-yellow-idle.png",
+      "sha256": "e3649eb168b116e827208d8d48805ef82c1863e2dc80df3a23e772dc4d1ec0e0"
+    },
+    {
+      "local_path": "images/junior-blue-idle.png",
+      "derived_from": "public/assets/original/pets/junior-blue-idle.png",
+      "sha256": "94b7aecfff0de9de72d5f90274ccb2a78a72baeda46dd4591ff5d1cba95ea7db"
+    },
+    {
+      "local_path": "images/junior-pink-idle.png",
+      "derived_from": "public/assets/original/pets/junior-pink-idle.png",
+      "sha256": "351d1a0097eeebdbce14dd368c9a92fb5950528076b2addbd91de92e5aa62b96"
+    },
+    {
+      "local_path": "images/junior-red-idle.png",
+      "derived_from": "public/assets/original/pets/junior-red-idle.png",
+      "sha256": "5c3dd4aed091ade3abe47b7582311ce69fc7aa62ecfca217648b1d7449118763"
+    },
+    {
+      "local_path": "images/junior-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/junior-yellow-idle.png",
+      "sha256": "6941f85c94c5e6c4f26d2efba9a5d12ba2003126489186abcfd3ed139a37c5d9"
+    },
+    {
+      "local_path": "images/middle-blue-idle.png",
+      "derived_from": "public/assets/original/pets/middle-blue-idle.png",
+      "sha256": "484f725a0c2d7a7882ee88ec84fe17a232412078c4607ef8db8add10867db357"
+    },
+    {
+      "local_path": "images/middle-pink-idle.png",
+      "derived_from": "public/assets/original/pets/middle-pink-idle.png",
+      "sha256": "01f09838abc732ec04a8d52fc31f6eec93528066ea1f91e8cc7409cc6bce527b"
+    },
+    {
+      "local_path": "images/middle-red-idle.png",
+      "derived_from": "public/assets/original/pets/middle-red-idle.png",
+      "sha256": "e89f84e6942d369db8ae634eba351aef2d727410b3101ec990f16f61c718a838"
+    },
+    {
+      "local_path": "images/middle-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/middle-yellow-idle.png",
+      "sha256": "221c47f3dabe9f758cd62647b57cf9e53f10d297f6575e2fa1b55ab7389f3983"
+    },
+    {
+      "local_path": "images/senior-blue-idle.png",
+      "derived_from": "public/assets/original/pets/senior-blue-idle.png",
+      "sha256": "12f2e7a84efc853e2ec49915081157cb91ae1a0eaf45370d66fd10dbe7ef7611"
+    },
+    {
+      "local_path": "images/senior-pink-idle.png",
+      "derived_from": "public/assets/original/pets/senior-pink-idle.png",
+      "sha256": "4fcb770b5d8c913e72e40fd33cd1113931a3e6212bea75a18854db5a33eb74b8"
+    },
+    {
+      "local_path": "images/senior-red-idle.png",
+      "derived_from": "public/assets/original/pets/senior-red-idle.png",
+      "sha256": "f76388555bd97ba33c09602ce70fc68f6955d47f310bbe790e5d8b4efaaeadff"
+    },
+    {
+      "local_path": "images/senior-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/senior-yellow-idle.png",
+      "sha256": "1358743c58b7fed375890ef5ebaf9c925659034a65ad9ef88381dd1b4086bd9d"
+    },
+    {
+      "local_path": "images/super-blue-idle.png",
+      "derived_from": "public/assets/original/pets/super-blue-idle.png",
+      "sha256": "44cdd6a207a79d6d019537dcf53905063b6efe00b573b949a376f6bad095e9d2"
+    },
+    {
+      "local_path": "images/super-pink-idle.png",
+      "derived_from": "public/assets/original/pets/super-pink-idle.png",
+      "sha256": "22b2b541726292e2ce9826b8a1ff362a6194abc3da3856c4100157ee0a53f29a"
+    },
+    {
+      "local_path": "images/super-red-idle.png",
+      "derived_from": "public/assets/original/pets/super-red-idle.png",
+      "sha256": "050faee378172fce5980d2be4d1291174535bd7e546a92e302468f90fff2a6dd"
+    },
+    {
+      "local_path": "images/super-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/super-yellow-idle.png",
+      "sha256": "9685e0d0a81f462c5be2f0c1cc48336e51321a08e7f45d019077adefda53799d"
+    },
+    {
+      "local_path": "images/water-blue-idle.png",
+      "derived_from": "public/assets/original/pets/water-blue-idle.png",
+      "sha256": "7a3999eacc04bce794c822002f7572ff1746c01a3c0993f11415d025b88e46fd"
+    },
+    {
+      "local_path": "images/water-pink-idle.png",
+      "derived_from": "public/assets/original/pets/water-pink-idle.png",
+      "sha256": "984cbf0efb6ce786135e17fc54e0aee9d1c553876961e76c369743d1dffa660b"
+    },
+    {
+      "local_path": "images/water-red-idle.png",
+      "derived_from": "public/assets/original/pets/water-red-idle.png",
+      "sha256": "c2b2082bc9b1865121d5c51bfca14387c97963a1b637318b3ceaf65bdc8f59af"
+    },
+    {
+      "local_path": "images/water-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/water-yellow-idle.png",
+      "sha256": "7c2913073b39292810fc9473c6eba9053c14ccabd70242f159a8021be1d3f946"
+    },
+    {
+      "local_path": "images/wood-blue-idle.png",
+      "derived_from": "public/assets/original/pets/wood-blue-idle.png",
+      "sha256": "d4b7511ab0899c759287a3c1b80f865a544a671a086d6f9e5c2cf620630a1a75"
+    },
+    {
+      "local_path": "images/wood-pink-idle.png",
+      "derived_from": "public/assets/original/pets/wood-pink-idle.png",
+      "sha256": "cd1c559bf72e14c3774c148ba55cdb2695f4e798d3e47e88c7d25b9367179dcc"
+    },
+    {
+      "local_path": "images/wood-red-idle.png",
+      "derived_from": "public/assets/original/pets/wood-red-idle.png",
+      "sha256": "a73c3ec8a48cc8aea6aae0316f61050d5361eef3c3ceafd38083bebce4018c69"
+    },
+    {
+      "local_path": "images/wood-yellow-idle.png",
+      "derived_from": "public/assets/original/pets/wood-yellow-idle.png",
+      "sha256": "04dbd7d4399012c80d73ad9faa3f06573292e780d0381a44083f014c6523883c"
+    },
+    {
+      "local_path": "images/pot.png",
+      "derived_from": "public/assets/original/seed/pot.png",
+      "sha256": "4c5d208b3f05eac85e4157ed753678ed220a101ccde2624f66254226db387618"
+    },
+    {
+      "local_path": "images/body-still.png",
+      "derived_from": "public/assets/original/seed/body-still.png",
+      "sha256": "26de97033f1ab9d709f181fccc6fb712ac1854cd90781ccf5bbcbb8a2250bc30"
+    },
+    {
+      "local_path": "images/source-motion.gif",
+      "derived_from": "public/assets/original/seed/source-motion.gif",
+      "sha256": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "preview_only": true,
+  "animations": [
+    {
+      "file": "rabbit.gif",
+      "sheet": "skills/mole-classic-art/references/v41/rabbit-sheet.png",
+      "model_drawn_poses": 16,
+      "gif_frames": 18,
+      "duration_ms": 2400,
+      "description": "原拉姆静态首尾，16 张模型新绘姿态依序播放（含变回）；无程序补帧，不是官方变身动画。"
+    },
+    {
+      "file": "bird.gif",
+      "sheet": "skills/mole-classic-art/references/v41/bird-sheet.png",
+      "model_drawn_poses": 16,
+      "gif_frames": 18,
+      "duration_ms": 2400,
+      "description": "原拉姆静态首尾，16 张模型新绘姿态依序播放（含变回）；无程序补帧，不是官方变身动画。"
+    },
+    {
+      "file": "tree.gif",
+      "sheet": "skills/mole-classic-art/references/v41/tree-sheet.png",
+      "model_drawn_poses": 16,
+      "gif_frames": 18,
+      "duration_ms": 2400,
+      "description": "原拉姆静态首尾，16 张模型新绘姿态依序播放（含变回）；无程序补帧，不是官方变身动画。"
+    }
+  ]
+}

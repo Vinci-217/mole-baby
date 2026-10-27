@@ -117,6 +117,27 @@
 [查看原图](../../artifacts/spell-preview/magic.gif)
 
 
+### <code>artifacts/transform-preview/bird.gif</code>
+
+<a href="../../artifacts/transform-preview/bird.gif"><img src="../../artifacts/transform-preview/bird.gif" alt="artifacts/transform-preview/bird.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/bird.gif)
+
+
+### <code>artifacts/transform-preview/rabbit.gif</code>
+
+<a href="../../artifacts/transform-preview/rabbit.gif"><img src="../../artifacts/transform-preview/rabbit.gif" alt="artifacts/transform-preview/rabbit.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/rabbit.gif)
+
+
+### <code>artifacts/transform-preview/tree.gif</code>
+
+<a href="../../artifacts/transform-preview/tree.gif"><img src="../../artifacts/transform-preview/tree.gif" alt="artifacts/transform-preview/tree.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/tree.gif)
+
+
 ### <code>artifacts/v21-original-actions.gif</code>
 
 <a href="../../artifacts/v21-original-actions.gif"><img src="../../artifacts/v21-original-actions.gif" alt="artifacts/v21-original-actions.gif" width="180"></a>
@@ -150,27 +171,6 @@
 <a href="../../artifacts/v30-preview/drag.gif"><img src="../../artifacts/v30-preview/drag.gif" alt="artifacts/v30-preview/drag.gif" width="180"></a>
 
 [查看原图](../../artifacts/v30-preview/drag.gif)
-
-
-### <code>artifacts/v30-preview/move.gif</code>
-
-<a href="../../artifacts/v30-preview/move.gif"><img src="../../artifacts/v30-preview/move.gif" alt="artifacts/v30-preview/move.gif" width="180"></a>
-
-[查看原图](../../artifacts/v30-preview/move.gif)
-
-
-### <code>artifacts/v30-preview/pet.gif</code>
-
-<a href="../../artifacts/v30-preview/pet.gif"><img src="../../artifacts/v30-preview/pet.gif" alt="artifacts/v30-preview/pet.gif" width="180"></a>
-
-[查看原图](../../artifacts/v30-preview/pet.gif)
-
-
-### <code>artifacts/v36-nojump/original-vs-grounded.gif</code>
-
-<a href="../../artifacts/v36-nojump/original-vs-grounded.gif"><img src="../../artifacts/v36-nojump/original-vs-grounded.gif" alt="artifacts/v36-nojump/original-vs-grounded.gif" width="180"></a>
-
-[查看原图](../../artifacts/v36-nojump/original-vs-grounded.gif)
 
 
 [返回素材首页](../README.md) · [上一页](animations-001.md) · [下一页](animations-003.md)

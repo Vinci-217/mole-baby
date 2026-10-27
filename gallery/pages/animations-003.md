@@ -3,7 +3,28 @@
 
 [返回素材首页](../README.md) · [上一页](animations-002.md)
 
-本页 3 个文件，点击图片或「查看原图」可打开原文件。
+本页 7 个文件，点击图片或「查看原图」可打开原文件。
+
+### <code>artifacts/v30-preview/move.gif</code>
+
+<a href="../../artifacts/v30-preview/move.gif"><img src="../../artifacts/v30-preview/move.gif" alt="artifacts/v30-preview/move.gif" width="180"></a>
+
+[查看原图](../../artifacts/v30-preview/move.gif)
+
+
+### <code>artifacts/v30-preview/pet.gif</code>
+
+<a href="../../artifacts/v30-preview/pet.gif"><img src="../../artifacts/v30-preview/pet.gif" alt="artifacts/v30-preview/pet.gif" width="180"></a>
+
+[查看原图](../../artifacts/v30-preview/pet.gif)
+
+
+### <code>artifacts/v36-nojump/original-vs-grounded.gif</code>
+
+<a href="../../artifacts/v36-nojump/original-vs-grounded.gif"><img src="../../artifacts/v36-nojump/original-vs-grounded.gif" alt="artifacts/v36-nojump/original-vs-grounded.gif" width="180"></a>
+
+[查看原图](../../artifacts/v36-nojump/original-vs-grounded.gif)
+
 
 ### <code>artifacts/v37-bound/bound-sequence.gif</code>
 
@@ -24,6 +45,13 @@
 <a href="../../public/assets/original/seed/source-motion.gif"><img src="../../public/assets/original/seed/source-motion.gif" alt="public/assets/original/seed/source-motion.gif" width="180"></a>
 
 [查看原图](../../public/assets/original/seed/source-motion.gif)
+
+
+### <code>research/references/ramu-2008-2010/images/source-motion.gif</code>
+
+<a href="../../research/references/ramu-2008-2010/images/source-motion.gif"><img src="../../research/references/ramu-2008-2010/images/source-motion.gif" alt="research/references/ramu-2008-2010/images/source-motion.gif" width="180"></a>
+
+[查看原图](../../research/references/ramu-2008-2010/images/source-motion.gif)
 
 
 [返回素材首页](../README.md) · [上一页](animations-002.md)
