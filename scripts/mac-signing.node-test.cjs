@@ -91,12 +91,12 @@ test('release notes can claim Apple trust only with matching verified receipts f
   for(const instruction of ['mac-arm64.dmg','mac-x64.dmg','Applications','仍要打开','隐私与安全性','退出拉姆']) assert.ok(localNotes.includes(instruction), `Release must include Mac instruction: ${instruction}`);
   const guide=prepareReleaseNotes(directory,'source','change log', '9.8.7');
   assert.ok(guide.startsWith('# 下载与安装 · 拉姆 v9.8.7'));
-  for(const file of ['Setup.exe','mac-arm64.dmg','mac-x64.dmg','x64.zip','mac-arm64.zip','mac-x64.zip']){
+  for(const file of ['Setup.exe','mac-arm64.dmg','mac-x64.dmg','x64.zip','mac-arm64.zip','mac-x64.zip','legacy-x64-Setup.exe','legacy-ia32-Setup.exe','legacy-x64.zip','legacy-ia32.zip']){
     const url=`https://github.com/Vinci-217/mole-baby/releases/download/v9.8.7/mole-baby-9.8.7-${file}`;
     assert.ok(guide.includes(`](${url})`),`Missing exact downloadable link ${file}`);
   }
   assert.ok(guide.indexOf('下载 Windows 安装版')<guide.indexOf('## 本次更新'));
-  for(const instruction of ['Windows 10 / 11','关于本机','macOS 12','全部解压','Source code','无需注册或登录 GitHub','无需卸载'])assert.ok(guide.includes(instruction),`Missing installation instruction ${instruction}`);
+  for(const instruction of ['Windows 10 / 11','Windows 7 SP1 / 8 / 8.1','32 位','64 位','Electron22','停止安全维护','数据目录独立','导出','导入','legacy-x64.yml','legacy-ia32.yml','关于本机','macOS 12','全部解压','Source code','无需注册或登录 GitHub','无需卸载'])assert.ok(guide.includes(instruction),`Missing installation instruction ${instruction}`);
   assert.throws(()=>prepareReleaseNotes(directory,'source','notes','v9.8.7'),/stable version/);
 });
 

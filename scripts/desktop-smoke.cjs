@@ -1,3 +1,6 @@
+const{verifyRendererPolicy}=require('./renderer-policy-checks.cjs');
+const{verifyNativeUpdateDialog}=require('./native-update-dialog-checks.cjs');
+const{verifyTransparentHover}=require('./transparent-hover-checks.cjs');
 const{verifyUpdateSurface}=require('./update-surface-checks.cjs');
 const{verifyV28}=require('./v28-companion-checks.cjs');
 const{verifyElasticCare}=require('./elastic-care-checks.cjs');
@@ -113,7 +116,7 @@ async function verifyBackground(page, selector, suffix) {
   const page = await desktop.firstWindow();
   page.setDefaultTimeout(15000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});
-  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyElasticCare(page,desktop);await verifyLivelyCompanion(page);await verifyV28(page,desktop);await verifyUpdateSurface(page,desktop);assert.deepEqual(errors,[]);
+  await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});await verifyRendererPolicy(page);
+  await adopt(page,'蓝色','小叶');await verifyCompactCare(page,desktop);await verifyElasticCare(page,desktop);await verifyLivelyCompanion(page);await verifyV28(page,desktop);await verifyUpdateSurface(page,desktop);await verifyTransparentHover(page,desktop);await verifyNativeUpdateDialog(page,desktop);assert.deepEqual(errors,[]);
   console.log('PASS native compact desktop regression');await quitDesktop();
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await quitDesktop().catch(()=>{});if(windowManager)try{process.kill(-windowManager.pid,'SIGTERM')}catch{}virtualDisplay?.kill('SIGTERM')});

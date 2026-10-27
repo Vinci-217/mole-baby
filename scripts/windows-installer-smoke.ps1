@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Installer)
+param([Parameter(Mandatory=$true)][string]$Installer,[string]$ProductName='拉姆',[string]$InstallDirName='mole-baby')
 $ErrorActionPreference = 'Stop'
 $env:MOLE_BABY_DISABLE_UPDATES='1'
 Add-Type @'
@@ -28,7 +28,7 @@ public static class InstallerUI {
 $folder = Join-Path $env:RUNNER_TEMP ('mole-finish-'+[guid]::NewGuid().ToString('N'))
 # electron-builder uses the ASCII package name as APP_FILENAME when the
 # product name is Chinese. Its directory pre-hook appends that name if absent.
-$install = Join-Path $folder 'mole-baby'
+$install = Join-Path $folder $InstallDirName
 New-Item -ItemType Directory -Path $folder -Force | Out-Null
 $installerProcess = $null
 try {
@@ -66,7 +66,7 @@ try {
  }
  if($finish -eq [IntPtr]::Zero){throw 'Installer never reached its real Finish page'}
  if(!$pathConfirmed){throw 'Installer skipped the explicit directory-page path check'}
- if(!(Test-Path (Join-Path $install '拉姆.exe'))){throw 'Installer did not install in the isolated test folder'}
+ if(!(Test-Path (Join-Path $install "$ProductName.exe"))){throw 'Installer did not install in the isolated test folder'}
  # Leave the standard, default-checked Run checkbox enabled. A real button
  # message runs the same custom MUI callback as a mouse click on Finish.
  $watch=[Diagnostics.Stopwatch]::StartNew()
@@ -77,7 +77,7 @@ try {
  if([InstallerUI]::IsWindowVisible($dialog)){throw "Finish left the installer visible for ${hiddenMs}ms"}
  $launched=$false
  while($watch.ElapsedMilliseconds -lt 45000){
-  $pets=@(Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -eq (Join-Path $install '拉姆.exe')})
+  $pets=@(Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -eq (Join-Path $install "$ProductName.exe")})
   if(@($pets | Where-Object {$_.MainWindowHandle -ne 0 -and [InstallerUI]::IsWindowVisible($_.MainWindowHandle)}).Count -gt 0){$launched=$true;break}
   Start-Sleep -Milliseconds 100
  }
@@ -87,7 +87,7 @@ try {
  # Only processes from our unique installation directory are eligible.
  Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -and $_.Path.StartsWith($install,[StringComparison]::OrdinalIgnoreCase)} | Stop-Process -Force -ErrorAction SilentlyContinue
  if($installerProcess -and !$installerProcess.HasExited){$installerProcess | Stop-Process -Force -ErrorAction SilentlyContinue}
- $uninstaller=Join-Path $install 'Uninstall 拉姆.exe'
+ $uninstaller=Join-Path $install "Uninstall $ProductName.exe"
  if(Test-Path $uninstaller){Start-Process -FilePath $uninstaller -ArgumentList @('/S',"_?=$install") -Wait}
  Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
 }

@@ -22,9 +22,12 @@ export function checkedInToday(pet: GameState, now = Date.now()): boolean {
 /** Local calendar reward. Clock rollback never opens another claim; no missed-day debt. */
 export function claimDailyCheckIn(pet: GameState, now = Date.now()): CareResult {
   if (!Number.isSafeInteger(now) || now < pet.lastTick || checkedInToday(pet, now)) return {state:pet,ok:false,message:'今天的 1000 摩尔豆已经收好啦，明天再来。'}
-  if (pet.coins > 1_000_000_000-DAILY_BEANS) return {state:pet,ok:false,message:'豆袋快装满啦，先花掉一些再来领取。'}
+  // Settling time may finish a paid shift. Never overwrite its wage with the
+  // stale pre-tick balance, and check the daily reward's capacity afterwards.
+  const current = tick(pet,now)
+  if (current.coins > 1_000_000_000-DAILY_BEANS) return {state:current,ok:false,message:'豆袋快装满啦，先花掉一些再来领取。'}
   const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1)
-  const streak = pet.checkIn?.day === localDay(yesterday.getTime()) ? Math.min(100000,pet.checkIn.streak+1) : 1
-  const checkIn: DailyCheckIn = {day:localDay(now),claimedAt:now,streak,total:Math.min(100000,(pet.checkIn?.total??0)+1)}
-  return {state:{...tick(pet,now),coins:pet.coins+DAILY_BEANS,checkIn},ok:true,message:'签到啦！1000 摩尔豆装进小豆袋。'}
+  const streak = current.checkIn?.day === localDay(yesterday.getTime()) ? Math.min(100000,current.checkIn.streak+1) : 1
+  const checkIn: DailyCheckIn = {day:localDay(now),claimedAt:now,streak,total:Math.min(100000,(current.checkIn?.total??0)+1)}
+  return {state:{...current,coins:current.coins+DAILY_BEANS,checkIn},ok:true,message:'签到啦！1000 摩尔豆装进小豆袋。'}
 }

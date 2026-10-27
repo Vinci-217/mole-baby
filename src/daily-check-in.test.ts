@@ -1,6 +1,7 @@
 import {describe,it,expect} from 'vitest'
 import {createPet,parseSave} from './game'
 import {claimDailyCheckIn,checkedInToday,localDay} from './daily-check-in'
+import {beginActivity,JOB_MS,JOB_PAY} from './pet-school'
 
 const NOW=new Date(2026,9,24,12).getTime()
 const pet=()=>({...createPet('小叶','blue',NOW-86400000),lastTick:NOW,growth:180})
@@ -28,6 +29,21 @@ describe('daily local-calendar beans',()=>{
   it('does not consume the reward when the bean bag cannot hold all 1000',()=>{
     const full={...pet(),coins:999999500};expect(claimDailyCheckIn(full,NOW)).toMatchObject({ok:false,state:full})
     expect(claimDailyCheckIn({...full,coins:999999000},NOW).state.coins).toBe(1000000000)
+  })
+  it('preserves a due job payment when claiming the daily beans',()=>{
+    const started=beginActivity(pet(),'restaurant',undefined,NOW).state
+    const result=claimDailyCheckIn(started,NOW+JOB_MS+1)
+    expect(result.ok).toBe(true);expect(result.state.coins).toBe(pet().coins+JOB_PAY+1000)
+    expect(result.state.activity).toBeUndefined()
+    expect(claimDailyCheckIn(result.state,NOW+JOB_MS+2).state.coins).toBe(result.state.coins)
+  })
+  it('checks capacity after settling a due wage without consuming the daily claim',()=>{
+    const started=beginActivity({...pet(),coins:999998900},'restaurant',undefined,NOW).state
+    const result=claimDailyCheckIn(started,NOW+JOB_MS+1)
+    expect(result.ok).toBe(false);expect(result.state.coins).toBe(999998900+JOB_PAY)
+    expect(result.state.activity).toBeUndefined();expect(result.state.checkIn).toBeUndefined()
+    const spent={...result.state,coins:999998990}
+    expect(claimDailyCheckIn(spent,NOW+JOB_MS+2).state.coins).toBe(999999990)
   })
   it('migrates old saves and discards corrupt optional claim data without losing the pet',()=>{
     for(const checkIn of [undefined,{day:'2026-99-99',claimedAt:NOW,streak:1,total:1},{day:localDay(NOW),claimedAt:NOW,streak:-1,total:1}]){

@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.29.2",
+  "version": "0.29.3",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -9,7 +9,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run && node --test electron/updates.node-test.cjs scripts/update-metadata.node-test.cjs electron/mac-settings.node-test.cjs electron/desktop-geometry.node-test.cjs electron/desktop-lifecycle.node-test.cjs scripts/mac-signing.node-test.cjs",
+    "test": "vitest run --maxWorkers=2 && node scripts/run-node-tests.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron-builder --win nsis --x64",
@@ -21,7 +21,10 @@
     "test:registered-wardrobe": "node scripts/registered-wardrobe-regression.cjs",
     "review:wardrobe": "node scripts/record-lively-review.cjs",
     "test:browser": "npm run build && node scripts/compact-care-regression.cjs",
-    "clean:previews": "node scripts/clean-preview-frames.cjs --apply"
+    "clean:previews": "node scripts/clean-preview-frames.cjs --apply",
+    "build:legacy": "tsc -b && vite build --config vite.legacy.config.ts",
+    "dist:win:legacy:x64": "npm run build:legacy && cross-env MOLE_LEGACY_ARCH=x64 electron-builder --config electron-builder.legacy.cjs --win nsis zip --x64",
+    "dist:win:legacy:ia32": "npm run build:legacy && cross-env MOLE_LEGACY_ARCH=ia32 electron-builder --config electron-builder.legacy.cjs --win nsis zip --ia32"
   },
   "dependencies": {
     "electron-updater": "^6.8.11",

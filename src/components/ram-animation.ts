@@ -1,7 +1,7 @@
 import {isSchoolAction,schoolBody} from '../pet-school'
 import { SOCIAL_DURATIONS, isSocialAction } from '../social-motion'
 import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
-import {footballDuration,footballPose,sleepPose} from '../original-actions'
+import {footballDuration,footballPose,sleepPose,dozyPose} from '../original-actions'
 import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
 import {isPastime,pastimeBody} from '../pet-pastimes'
 
@@ -49,7 +49,7 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
   if(action==='wake'&&elapsed<240)return {sheet:'slumber',row:0,frame:0,finished:false}
   if(isEmotionClip(action))return {row:0,frame:0,finished:elapsed>=(emotionDuration(action,form)??0)}
   if(action==='play'){const p=footballPose(form,elapsed,reduced);return {sheet:'football',row:Math.floor(p.frame/8),frame:p.frame%8,finished:p.finished}}
-  if(action==='mood-dozy'){if(reduced&&elapsed<4300)return {sheet:'slumber',row:0,frame:0,finished:false};if(elapsed>=4300)return {row:0,frame:0,finished:true};return elapsed>450&&elapsed<3300?sleepPose(elapsed-450,reduced):{row:0,frame:0,finished:false}}
+  if(action==='mood-dozy')return dozyPose(elapsed,reduced,form)
   if(action==='mood-content')return {row:0,frame:reduced?0:elapsed>850&&elapsed<1550?1:0,finished:elapsed>=3600}
   if (action === 'focus') return { row: 0, frame: reduced?1:[1,2,3,2][Math.floor(elapsed/1600)%4], finished: false }
   if (isSocialAction(action)) {
@@ -103,7 +103,8 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
   if (action === 'sleep') return sleepPose(elapsed,reduced)
   if (action === 'still' || action === 'drag') return { frame: 0, finished: false }
   if (action === 'pet' || action === 'play' || action === 'wake') return {frame:0,finished:elapsed>=SOCIAL_DURATIONS[action]}
-  if(isMoodAction(action)){const duration=emotionDuration(action,'seed')!;return {frame:reduced||elapsed>=duration?0:action==='mood-joy'?[0,1,2,1,0][Math.min(4,Math.floor(elapsed/duration*5))]:action==='mood-grumpy'?(elapsed>600&&elapsed<2000?2:0):action==='mood-dozy'?(elapsed>450&&elapsed<3300?sleepPose(elapsed-450,reduced).frame:0):(elapsed>900&&elapsed<1250||elapsed>1700&&elapsed<2050?4:0),finished:elapsed>=duration}}
+  if(action==='mood-dozy')return dozyPose(elapsed,reduced,'seed')
+  if(isMoodAction(action)){const duration=emotionDuration(action,'seed')!;return {frame:reduced||elapsed>=duration?0:action==='mood-joy'?[0,1,2,1,0][Math.min(4,Math.floor(elapsed/duration*5))]:action==='mood-grumpy'?(elapsed>600&&elapsed<2000?2:0):(elapsed>900&&elapsed<1250||elapsed>1700&&elapsed<2050?4:0),finished:elapsed>=duration}}
   if (action === 'focus') return { frame: reduced?1:[0,1,2,1][Math.floor(elapsed/1600)%4], finished:false }
   if (action === 'watch-butterfly' || action === 'look-around') return {frame:reduced?0:[0,1,2,1][Math.floor(elapsed/700)%4],finished:elapsed>=SOCIAL_DURATIONS[action]}
   if (action === 'dizzy') return {frame:elapsed>=SOCIAL_DURATIONS.dizzy?0:2,finished:elapsed>=SOCIAL_DURATIONS.dizzy}

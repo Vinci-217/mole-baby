@@ -33,6 +33,33 @@ describe('persistent school and restaurant activities',()=>{
   const started=beginActivity(pet(),'restaurant',undefined,now+1).state,done=parseSave(JSON.stringify(started),now+JOB_MS+2)!
   expect(done.coins).toBe(pet().coins+JOB_PAY);expect(done.activity).toBeUndefined();expect(parseSave(JSON.stringify(done),now+JOB_MS+3)!.coins).toBe(done.coins)
  })
+ it('cancels an unfinished shift when energy causes automatic sleep',()=>{
+  const tired={...pet(),stats:{...pet().stats,energy:30.1}}
+  const started=beginActivity(tired,'restaurant',undefined,now).state
+  const asleep=tick(started,now+100_000)
+  expect(asleep.sleeping).toBe(true);expect(asleep.activity).toBeUndefined()
+  expect(tick(asleep,now+JOB_MS+1).coins).toBe(tired.coins)
+  expect(started.activity).toBeDefined();expect(started.sleeping).toBe(false)
+ })
+ it('settles before a later nap and integrates rewards identically across long and short ticks',()=>{
+  const initial={...pet(),stats:{...pet().stats,energy:50,happiness:34.95}}
+  const started=beginActivity(initial,'restaurant',undefined,now).state
+  const once=tick(started,now+6*3_600_000)
+  let many=started
+  for(let minute=1;minute<=360;minute++)many=tick(many,now+minute*60_000)
+  expect(once.coins).toBe(initial.coins+JOB_PAY);expect(many.coins).toBe(once.coins)
+  expect(once.activity).toBeUndefined();expect(many.activity).toBeUndefined()
+  expect(many.sleeping).toBe(once.sleeping);expect(many.growth).toBeCloseTo(once.growth,3)
+  // Each tick rounds needs to six decimals; accumulated minute ticks may
+  // differ below one thousandth, far below a displayed percentage point.
+  for(const key of Object.keys(once.stats) as (keyof typeof once.stats)[])expect(Math.abs(many.stats[key]-once.stats[key])).toBeLessThan(.001)
+ })
+ it('settles a due saved activity even when the stored tick is already at its deadline',()=>{
+  const started=beginActivity(pet(),'restaurant',undefined,now).state,end=started.activity!.endsAt
+  const saved={...started,lastTick:end},restored=parseSave(JSON.stringify(saved),end)!
+  expect(restored.coins).toBe(saved.coins+JOB_PAY);expect(restored.activity).toBeUndefined()
+  expect(parseSave(JSON.stringify(restored),end)!.coins).toBe(restored.coins)
+ })
  it('keeps lesson progress and certificates through save parsing',()=>{
   const p=graduate('language'),saved=parseSave(JSON.stringify(p),now+1_000_000)!
   expect(saved.education).toEqual(p.education);expect(learned(saved,'language')).toBe(true)

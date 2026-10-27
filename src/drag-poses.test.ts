@@ -1,7 +1,15 @@
 import {describe,it,expect} from 'vitest'
-import {dragSpec,sampleDragPose} from './drag-poses'
+import {dragSpec,dragRegistration,sampleDragPose} from './drag-poses'
 import {createElasticDrag,pullElasticDrag,stepElasticDrag,releaseElasticDrag} from './drag-motion'
 describe('directional dragging is a moving character rather than a translated still',()=>{
+ it('keeps middle at its resting body size and baseline when picked up',()=>{
+  const {scale,x,y}=dragRegistration('middle'),spec=dragSpec('middle'),pose=spec.poses[spec.clips.down.frameMap[0]]
+  expect(pose.body[0]*scale+x).toBeCloseTo(pose.wearBody[0],5)
+  expect(pose.body[2]*scale+x).toBeCloseTo(pose.wearBody[2],5)
+  expect(pose.body[3]*scale+y).toBeCloseTo(pose.wearBody[3],5)
+  expect(pose.body[1]*scale+y).toBeCloseTo(pose.wearBody[1],0)
+  expect(dragRegistration('junior')).toEqual({scale:1,x:0,y:0})
+ })
  it('turns through original front, diagonal and side views in both forms',()=>{
   for(const form of ['junior','middle'] as const){
    expect([-1,-.4,0,.4,1].map(view=>sampleDragPose(form,view,0).direction)).toEqual(['left','leftdown','down','rightdown','right'])

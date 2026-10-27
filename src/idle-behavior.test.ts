@@ -101,7 +101,7 @@ describe('stage-aware spontaneous original gestures', () => {
       expect(frames.size).toBeGreaterThan(1)
       expect(Math.max(...frames)).toBeLessThanOrEqual(action.startsWith('mood-')?7:2)
       expect(sampleSeedPose(action, duration).finished).toBe(true)
-      for (const form of ['junior', 'middle']) expect(usesGroundedPose(form, action)).toBe(!isEmotionClip(action)&&action!=='mood-dozy')
+      for (const form of ['junior', 'middle']) expect(usesGroundedPose(form, action)).toBe(!isEmotionClip(action))
     }
     expect(groundedMotion('junior', 'happy', 800, 800).frame).toBe(2)
     const left = groundedMotion('middle', 'waving', 500, 500), right = groundedMotion('middle', 'waving', 1500, 1500)

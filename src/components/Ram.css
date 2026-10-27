@@ -18,6 +18,13 @@
   display: block;
   transform-origin: center 77%;
 }
+/* Keep the source viewport/hit area stable. Every contact prop, leaf, outfit
+   and action shares the same stage size, anchored at the resting baseline. */
+.ram-proportion-layer{position:absolute;inset:0;display:block;transform:scale(var(--ram-scale,1));transform-origin:50% 82%}
+.ram-seed{--ram-scale:.9}
+.ram-seed>.ram-proportion-layer{transform-origin:50% 95%}
+.ram-sprite[data-stage="1"]{--ram-scale:.82}
+.ram-sprite[data-stage="2"]{--ram-scale:.94}
 .ram-sprite .ram-classic-frame,
 .ram-sprite .ram-original-static {
   display: block;

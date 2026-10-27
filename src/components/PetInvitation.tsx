@@ -47,7 +47,7 @@ export default function PetInvitation({
       </div>
     </div>}
     <div className="pet-invitation-manual">
-      <button type="button" aria-label={`叫叫${petName}`} title={`叫叫${petName}`} disabled={busy} onClick={onCallName}><span>叫叫{petName}</span></button>
+      <button type="button" aria-label={`叫叫${petName}`} disabled={busy} onClick={onCallName}><span>叫叫{petName}</span></button>
       <button type="button" disabled={busy} onClick={onSuggest}>让拉姆提个主意</button>
     </div>
     {habitText && <p className="pet-invitation-habit">{habitText}</p>}

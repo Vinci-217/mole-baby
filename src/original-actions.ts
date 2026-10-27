@@ -28,13 +28,25 @@ export function footballContacts(form:string):number[] {
 export function slumberFrame(elapsed:number,reduced=false):number {
   if(reduced)return 0
   const phase=Math.max(0,elapsed)%6400
-  if(phase<1100||phase>=4400)return 0
-  const breath=Math.sin((phase-1100)/3300*Math.PI)
+  // A brief, quiet mouth movement reads as breathing rather than a held yawn.
+  // Keep the full rest between breaths; sleep itself remains continuous.
+  if(phase<700||phase>=2100)return 0
+  const breath=Math.sin((phase-700)/1400*Math.PI)
   return Math.round(breath*breath*7)
 }
 /** Relaxed original eyelids and a quiet, small mouth; no enlarged yawn face. */
 export function sleepPose(elapsed:number,reduced=false):{sheet:'yawn'|'slumber';row:number;frame:number;finished:false} {
   return {sheet:'slumber',row:0,frame:slumberFrame(elapsed,reduced),finished:false}
+}
+/** A small seed should acknowledge tiredness once, then return to its normal
+ * face. Rendering and the action deadline share this clock. */
+export function dozyDuration(form:string):number { return form==='seed'?2400:4300 }
+export function dozyPose(elapsed:number,reduced=false,form='junior'):{sheet?:'slumber';row:number;frame:number;finished:boolean} {
+  const finished=elapsed>=dozyDuration(form)
+  if(finished)return {row:0,frame:0,finished:true}
+  const start=form==='seed'?200:450,end=form==='seed'?2300:3300
+  if(reduced)return {sheet:'slumber',row:0,frame:0,finished:false}
+  return elapsed>=start&&elapsed<end?{...sleepPose(elapsed-start),sheet:'slumber'}:{row:0,frame:0,finished:false}
 }
 export function affectionFrame(elapsed:number,reduced=false):number {
  if(reduced)return 0

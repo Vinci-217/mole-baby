@@ -217,24 +217,27 @@ function advanceStats(state: GameState, now: number): GameState {
 
 function settleRest(state: GameState, now: number): GameState {
   if(state.sleeping&&state.stats.energy>=WAKE_ENERGY&&now>=(state.sleepUntil??0))return {...state,sleeping:false};
-  if(!state.sleeping&&state.stats.energy<=REST_ENERGY&&now>=(state.awakeUntil??0))return {...state,sleeping:true};
+  if(!state.sleeping&&state.stats.energy<=REST_ENERGY&&now>=(state.awakeUntil??0))return {...cancelActivity(state),sleeping:true};
   return state;
 }
 
 /** Automatic rest follows energy, independent of the user's one-shot focus timer.
  * Split elapsed time at sleep/wake boundaries so long absences and short ticks agree. */
 export function tick(state: GameState, now = Date.now()): GameState {
-  if(!Number.isFinite(now)||now<=state.lastTick)return state;
+  if(!Number.isFinite(now)||now<state.lastTick)return state;
+  if(now===state.lastTick)return settleActivity(state,now);
   let cursor=now-Math.min(now-state.lastTick,OFFLINE_CAP_MS);
-  let current=settleRest(cursor===state.lastTick?state:{...state,lastTick:cursor},cursor);
+  let current=settleRest(settleActivity(cursor===state.lastTick?state:{...state,lastTick:cursor},cursor),cursor);
   while(cursor<now){
     const untilTransition=current.sleeping
       ? Math.max((WAKE_ENERGY-current.stats.energy)/22*3_600_000,(current.sleepUntil??0)-cursor)
       : Math.max((current.stats.energy-REST_ENERGY)/4*3_600_000,(current.awakeUntil??0)-cursor);
-    const end=Math.min(now,cursor+Math.max(1,untilTransition));
-    current=settleRest(advanceStats(current,end),end);cursor=end;
+    // Reward at the actual deadline, before a later nap or stat decay. This
+    // keeps a bulk offline tick equivalent to many ordinary timer ticks.
+    const end=Math.min(now,cursor+Math.max(1,untilTransition),current.activity?.endsAt??Infinity);
+    current=settleRest(settleActivity(advanceStats(current,end),end),end);cursor=end;
   }
-  return settleActivity(current,now);
+  return current;
 }
 
 export function care(state: GameState, action: Action, foodId?: string, now = Date.now()): CareResult {

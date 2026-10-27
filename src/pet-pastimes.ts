@@ -38,7 +38,7 @@ const PLACES=[
   {place:'拉姆学院 · 飞行课',stage:3,story:'飞行课练习了慢慢转弯。绕了一圈以后，最想停下来的地方还是你旁边。'},
 ] as const
 export function beginOuting(pet: GameState, sequence=0, now=Date.now(), manual=false): GameState | null {
-  if (!mayPlay(pet) || getStage(pet.growth,pet.evolution)===0 || !Number.isSafeInteger(now) || now<pet.lastTick) return null
+  if (!mayPlay(pet) || getStage(pet.growth,pet.evolution)===0 || !Number.isSafeInteger(now) || now<pet.lastTick || !Number.isSafeInteger(sequence)) return null
   if (!manual && now-(pet.lastOutingAt??pet.createdAt)<90*MINUTE) return null
   const choices=PLACES.filter(p=>getStage(pet.growth,pet.evolution)>=p.stage&&(p.place!=='拉姆学院 · 魔法课'||learned(pet,'wind')))
   const seed=Math.abs(Math.floor(pet.createdAt/1000)+Math.floor(now/86400000)+sequence),choice=choices[seed%choices.length]

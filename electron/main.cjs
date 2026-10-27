@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Notification, screen, Tray, Menu, nativeImage, shell, net, autoUpdater:nativeAutoUpdater } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, nativeImage, shell, net, autoUpdater:nativeAutoUpdater } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -9,8 +9,12 @@ const { createTrayIcon } = require('./tray-icon.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const {createUpdates}=require('./updates.cjs');
+const {createUpdatePrompts}=require('./update-prompts.cjs');
 const applicationMetadata=require('../package.json');
+const {windowsRuntime}=require('./windows-runtime.cjs');
+const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetadata,process.arch):null;
 let updates=null,updateRendererBusy=true,updateCheckpoint=null;
+const updatePrompts=createUpdatePrompts({getUpdates:()=>updates,showMessageBox:options=>mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()?dialog.showMessageBox(mainWindow,options):dialog.showMessageBox(options),onError:error=>console.error('Unable to show update confirmation:',error.message)});
 const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = { width: 1000, height: 720 };
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
@@ -26,12 +30,13 @@ const legacyProfiles = [
 ];
 const explicitProfile = app.commandLine?.getSwitchValue('user-data-dir');
 const stableUserDataPath = explicitProfile ? path.resolve(explicitProfile)
+  : windowsEdition?.edition==='legacy' ? path.join(app.getPath('appData'),windowsEdition.userDataName)
   : app.isPackaged
     ? legacyProfiles.find(profile => ['Local Storage', 'window-state.json', 'companion-ai-key.json']
       .some(filename => fs.existsSync(path.join(profile, filename)))) || legacyProfiles[0]
     : originalUserDataPath;
 app.setPath('userData', stableUserDataPath);
-app.setName('拉姆');
+app.setName(windowsEdition?.productName??'拉姆');
 
 let mainWindow = null;
 let rendererURL = '';
@@ -658,7 +663,7 @@ function refreshTrayMenu() {
       {label:'首次打开说明',click:()=>{void macHelp.openGuide().catch(()=>{});}},
     ]}]:[]),
     { type: 'separator' },
-    ...(updates?[{label:updateMenuLabel(),enabled:!['disabled','checking','downloading','installing'].includes(updates.getState().status),click:()=>{const state=updates.getState();void(state.status==='ready'?updates.install(true):state.status==='available'?updates.download():updates.check(true))}}]:[]),
+    ...(updates?[{label:updateMenuLabel(),enabled:!['disabled','checking','downloading','installing'].includes(updates.getState().status),click:()=>{const state=updates.getState();void(state.status==='ready'?updatePrompts.install():state.status==='available'?updatePrompts.download():updates.check(true))}}]:[]),
     { label: '退出拉姆', click: () => { quitting = true; app.quit(); } },
   ]));
 }
@@ -675,13 +680,14 @@ function startUpdates(){
   version:applicationMetadata.version,platform:process.platform,arch:process.arch==='arm64'||app.runningUnderARM64Translation?'arm64':'x64',
   configFile:path.join(app.getPath('userData'),'updates.json'),cacheDirectory:path.join(app.getPath('userData'),'update-downloads'),
   disabled:!app.isPackaged||process.env.MOLE_BABY_DISABLE_UPDATES==='1',
-  installed:process.platform==='win32'&&fs.existsSync(path.join(path.dirname(process.execPath),'Uninstall 拉姆.exe')),
+  installed:process.platform==='win32'&&fs.existsSync(path.join(path.dirname(process.execPath),windowsEdition.uninstallerName)),
   macSigned:applicationMetadata.macUpdateSigned===true,
   fetch:(url,options)=>net.fetch(url,options),openPath:file=>shell.openPath(file),
-  engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL({provider:'generic',url:'https://github.com/Vinci-217/mole-baby/releases/latest/download/'});return engine},
+  engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL({provider:'generic',url:'https://github.com/Vinci-217/mole-baby/releases/latest/download/',...(windowsEdition?.edition==='legacy'?{channel:windowsEdition.channel}:{})});return engine},
   prepareInstall:prepareUpdateInstall,isBusy:()=>updateRendererBusy||!hasPet||!petMode||companionPanel||dragging||interacting,
   onChange:state=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('updates:state',state);refreshTrayMenu()},
-  onReady:()=>{if(Notification.isSupported())try{new Notification({title:'拉姆有新版本啦',body:'更新已下载，可以在托盘或小屋设置里查看。',silent:true}).show()}catch{}},
+  onAvailable:()=>{void updatePrompts.offerDownload()},
+  onReady:()=>{void updatePrompts.offerInstall()},
  });
  updates.start();refreshTrayMenu();
 }
@@ -706,8 +712,8 @@ function registerIPC() {
   listen('desktop:ready-to-show', markRendererReady);
   handle('updates:get-state',()=>updates?.getState()??null);
   handle('updates:check',()=>updates?.check(true)??false);
-  handle('updates:download',()=>updates?.download()??false);
-  handle('updates:install',()=>updates?.install(true)??false);
+  handle('updates:download',()=>updatePrompts.download());
+  handle('updates:install',()=>updatePrompts.install());
   handle('updates:set-enabled',enabled=>updates?.setEnabled(enabled)??null);
   listen('updates:busy',busy=>{if(typeof busy!=='boolean')return;updateRendererBusy=busy});
   listen('updates:prepared',(id,ok)=>{const checkpoint=updateCheckpoint;if(!checkpoint||id!==checkpoint.id||typeof ok!=='boolean')return;clearTimeout(checkpoint.timer);updateCheckpoint=null;let saved=ok;try{if(ok){saveWindowState();mainWindow.webContents.session.flushStorageData()}}catch{saved=false}checkpoint.resolve(saved)});
@@ -898,6 +904,6 @@ if (!app.requestSingleInstanceLock()) {
     try{mainWindow?.webContents.session.flushStorageData()}catch{}
     stopMovement(); clearTimeout(edgeTimer); saveWindowState();
   });
-  app.on('will-quit', () => { updates?.dispose();if(updateCheckpoint){clearTimeout(updateCheckpoint.timer);updateCheckpoint.resolve(false);updateCheckpoint=null} if (tray && !tray.isDestroyed()) tray.destroy(); });
+  app.on('will-quit', () => { updatePrompts.dispose();updates?.dispose();if(updateCheckpoint){clearTimeout(updateCheckpoint.timer);updateCheckpoint.resolve(false);updateCheckpoint=null} if (tray && !tray.isDestroyed()) tray.destroy(); });
   app.on('window-all-closed', () => { if (quitting) app.quit(); });
 }

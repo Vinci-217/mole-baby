@@ -1,7 +1,7 @@
 import {sampleSocialMotion} from './social-motion'
 
 export function usesGroundedPose(form:string,action:string):boolean {
-  return ['junior','middle'].includes(form)&&['idle','waiting','pet','focus','watch-butterfly','look-around','happy','waving','dizzy','wake','drag','still','mood-content','balance'].includes(action)
+  return ['junior','middle'].includes(form)&&['idle','waiting','pet','focus','watch-butterfly','look-around','happy','waving','dizzy','wake','drag','still','mood-content','mood-dozy','balance'].includes(action)
 }
 /** Original layers, continuous small movement; no looping squash or happy jump. */
 export function groundedMotion(form:string,action:string,elapsed:number,clock:number,reduced=false,gaze={x:0,y:0}) {

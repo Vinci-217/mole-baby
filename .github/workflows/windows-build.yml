@@ -39,16 +39,29 @@ jobs:
           node -e 'const {version}=require("./package.json"); const ref=process.env.GITHUB_REF; if(ref.startsWith("refs/tags/") && ref !== `refs/tags/v${version}`) throw Error(`Tag ${ref} must match package.json v${version}`); console.log(`Building v${version}`);'
 
       - name: Install dependencies
-        run: npm ci
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/windows-smoke.log
 
       - name: Test game rules
-        run: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee -a artifacts/windows-smoke.log
 
       - name: Build renderer
-        run: npm run build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee -a artifacts/windows-smoke.log
 
       - name: Package installer and portable ZIP
-        run: npx --no-install electron-builder --win nsis zip --x64 --publish never
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --no-install electron-builder --win nsis zip --x64 --publish never 2>&1 | tee -a artifacts/windows-smoke.log
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -57,9 +70,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          node scripts/verify-windows-package.cjs 2>&1 | tee artifacts/windows-smoke.log
+          node scripts/verify-windows-package.cjs 2>&1 | tee -a artifacts/windows-smoke.log
 
-      - name: Verify a real automatic Windows upgrade and saved data
+      - name: Verify a confirmed Windows upgrade and saved data
         shell: bash
         run: |
           set -o pipefail
@@ -87,6 +100,80 @@ jobs:
             artifacts/windows-smoke.png
             artifacts/windows-smoke.log
             artifacts/windows-update-fixture.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+  legacy:
+    name: Build and check legacy Windows ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, ia32]
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      MOLE_LEGACY_ARCH: ${{ matrix.arch }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up build Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check release version
+        shell: bash
+        run: |
+          node -e 'const {version}=require("./package.json"); if(process.env.GITHUB_REF.startsWith("refs/tags/") && process.env.GITHUB_REF !== `refs/tags/v${version}`) throw Error("Tag/version mismatch");'
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Test shared application and compatibility contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Build shared renderer
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build:legacy 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Package isolated Electron 22 installer and portable ZIP
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --no-install electron-builder --config electron-builder.legacy.cjs --win nsis zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Verify PE architecture, ZIP payload, installer and application
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/verify-windows-package.cjs --legacy --arch ${{ matrix.arch }} --directory release/legacy-${{ matrix.arch }} 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Upload checked legacy downloads
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mole-baby-legacy-${{ matrix.arch }}
+          path: |
+            release/legacy-${{ matrix.arch }}/mole-baby-*-legacy-${{ matrix.arch }}.zip
+            release/legacy-${{ matrix.arch }}/mole-baby-*-legacy-${{ matrix.arch }}-Setup.exe
+            release/legacy-${{ matrix.arch }}/SHA256SUMS-legacy-${{ matrix.arch }}.txt
+            release/legacy-${{ matrix.arch }}/legacy-${{ matrix.arch }}.yml
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Upload legacy runtime diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: legacy-smoke-${{ matrix.arch }}
+          path: |
+            artifacts/legacy-${{ matrix.arch }}-smoke.log
+            artifacts/windows-legacy-${{ matrix.arch }}-smoke.png
+            artifacts/windows-installer-*.png
           if-no-files-found: ignore
           retention-days: 14
 
@@ -130,11 +217,20 @@ jobs:
         run: |
           node -e 'const {version}=require("./package.json"); if(process.arch !== "${{ matrix.arch }}") throw Error("Runner architecture mismatch"); if(process.env.GITHUB_REF.startsWith("refs/tags/") && process.env.GITHUB_REF !== `refs/tags/v${version}`) throw Error("Tag/version mismatch");'
       - name: Install dependencies
-        run: npm ci
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Test game and platform rules
-        run: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Build renderer
-        run: npm run build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
       - name: Package native DMG and ZIP (${{ steps.mac_signing.outputs.mode }})
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ steps.mac_signing.outputs.mode == 'notarized' && 'true' || 'false' }}
@@ -182,7 +278,7 @@ jobs:
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, mac]
+    needs: [build, legacy, mac]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -208,7 +304,7 @@ jobs:
       - name: Check artifact checksums
         working-directory: release
         run: |
-          cat SHA256SUMS.txt SHA256SUMS-mac-arm64.txt SHA256SUMS-mac-x64.txt > combined.sha256
+          cat SHA256SUMS.txt SHA256SUMS-legacy-x64.txt SHA256SUMS-legacy-ia32.txt SHA256SUMS-mac-arm64.txt SHA256SUMS-mac-x64.txt > combined.sha256
           mv combined.sha256 SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
           node ../scripts/prepare-release-notes.cjs
@@ -223,17 +319,17 @@ jobs:
         shell: bash
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/latest-mac.yml --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --clobber
             gh release edit "$RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
           gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file release/RELEASE_NOTES.md
 
   report:
     name: Save build receipt
     if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-    needs: [build, mac, release]
+    needs: [build, legacy, mac, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -265,6 +361,7 @@ jobs:
         env:
           BUILD_RESULT: ${{ needs.build.result }}
           MAC_RESULT: ${{ needs.mac.result }}
+          LEGACY_RESULT: ${{ needs.legacy.result }}
           RELEASE_RESULT: ${{ needs.release.result }}
         shell: bash
         run: |
@@ -273,26 +370,31 @@ jobs:
           const path = require('node:path');
           const env = process.env;
           const downloadsDir = path.join(env.RUNNER_TEMP, 'ramu-downloads');
-          const sumsFiles = fs.existsSync(downloadsDir) ? fs.readdirSync(downloadsDir).filter(name => /^SHA256SUMS(?:-mac-(?:arm64|x64))?\.txt$/.test(name)).sort() : [];
+          const sumsFiles = fs.existsSync(downloadsDir) ? fs.readdirSync(downloadsDir).filter(name => /^SHA256SUMS(?:-mac-(?:arm64|x64)|-legacy-(?:ia32|x64))?\.txt$/.test(name)).sort() : [];
           const downloads = sumsFiles.flatMap(name => fs.readFileSync(path.join(downloadsDir,name), 'utf8').trim().split('\n')).filter(Boolean).map(line => {
             const match = line.match(/^([a-f0-9]{64})  (mole-baby-[^/\\]+\.(?:zip|exe|dmg))$/);
             if (!match) throw new Error('Invalid build checksum entry');
             return { file: match[2], sha256: match[1] };
           });
-          if (env.BUILD_RESULT === 'success' && env.MAC_RESULT === 'success' && downloads.length !== 6) throw new Error('Expected six checked Windows/Mac downloads');
+          const allBuilt = [env.BUILD_RESULT, env.LEGACY_RESULT, env.MAC_RESULT].every(value => value === 'success');
+          if (allBuilt && (downloads.length !== 10 || new Set(downloads.map(d => d.file)).size !== 10)) throw new Error('Expected ten unique checked modern/legacy Windows and Mac downloads');
           const logPath = path.join(env.RUNNER_TEMP, 'ramu-smoke', 'windows-smoke.log');
           const verificationLog = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').slice(-12000) : null;
           const receipt = {
             version: require('./package.json').version,
             tag: env.GITHUB_REF_NAME,
             sourceSha: env.GITHUB_SHA,
-            buildResult: env.BUILD_RESULT === 'success' && env.MAC_RESULT === 'success' ? 'success' : 'failure',
-            platforms: { windows: env.BUILD_RESULT, mac: env.MAC_RESULT },
+            buildResult: allBuilt ? 'success' : 'failure',
+            platforms: { windows: env.BUILD_RESULT, legacyWindows: env.LEGACY_RESULT, mac: env.MAC_RESULT },
             releaseResult: env.RELEASE_RESULT,
             runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
             releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
             downloads,
             verificationLog,
+            legacyVerificationLogs: Object.fromEntries(['x64','ia32'].map(arch => {
+              const file = path.join(env.RUNNER_TEMP,'ramu-smoke',`legacy-${arch}-smoke.log`);
+              return [arch, fs.existsSync(file) ? fs.readFileSync(file,'utf8').slice(-16000) : null];
+            })),
             macTrust: Object.fromEntries(['arm64','x64'].map(arch => {
               const file = path.join(downloadsDir,`macos-trust-${arch}.json`);
               return [arch, fs.existsSync(file) ? JSON.parse(fs.readFileSync(file,'utf8')) : null];

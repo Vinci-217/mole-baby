@@ -21,7 +21,9 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
 
 | 你的电脑 | 推荐下载（点击这里） | 下载后的操作 |
 | --- | --- | --- |
-| **Windows 10 / 11 · 64 位** | **[⬇ 下载 Windows 安装版 .exe](${download('Setup.exe')})** | 双击 → 安装 → 完成 |
+| **Windows 10 / 11 · 64 位** | **[⬇ 下载 Windows 安装版 .exe](${download('Setup.exe')})** | 现代版，双击安装 |
+| **Windows 7 SP1 / 8 / 8.1 · 64 位** | **[⬇ 下载老系统 64 位兼容版 .exe](${download('legacy-x64-Setup.exe')})** | 兼容版，双击安装 |
+| **Windows 7 SP1 / 8 / 8.1 · 32 位**，或 32 位 Windows 10 | **[⬇ 下载老系统 32 位兼容版 .exe](${download('legacy-ia32-Setup.exe')})** | 兼容版，双击安装 |
 | **Mac · Apple 芯片**（M1、M2、M3、M4、M5 及后续 M 系列） | **[⬇ 下载 Apple 芯片 Mac 版 .dmg](${download('mac-arm64.dmg')})** | 打开 → 拖入「应用程序」 |
 | **Mac · Intel 芯片** | **[⬇ 下载 Intel Mac 版 .dmg](${download('mac-x64.dmg')})** | 打开 → 拖入「应用程序」 |
 
@@ -29,10 +31,15 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
 
 ## Windows 安装（推荐）
 
-1. 点击上表「下载 Windows 安装版」，下载文件为 **mole-baby-${version}-Setup.exe**。
-2. 双击安装包，按提示选择安装位置，点击「安装」。
-3. 安装完成后勾选「运行拉姆」，点击「完成」。第一次使用会进入领养；更新安装会保留已有拉姆。
+1. 先按 **Win + R**，输入 **winver** 查看系统版本；再到「计算机／此电脑 → 属性」查看 **32 位／64 位操作系统**。选择上表对应的安装包。
+2. Windows 10／11 的64位现代版文件是 **mole-baby-${version}-Setup.exe**；老系统64位文件是 **mole-baby-${version}-legacy-x64-Setup.exe**；32位文件是 **mole-baby-${version}-legacy-ia32-Setup.exe**。
+3. 双击安装包，按提示选择安装位置并安装；完成后勾选运行。第一次使用会进入领养，同一版本渠道的更新保留已有拉姆。
 
+如果提示「此应用无法在你的电脑上运行」，请先检查是否把64位程序放到了32位系统，或在Windows7／8上选择了现代版；下载不完整也可能造成此提示。重新下载对应安装包，可用 PowerShell 的 **Get-FileHash -Algorithm SHA256 文件名** 与附件 **SHA256SUMS.txt** 核对。安装器会在不支持的系统上给出明确提示。Windows XP、Vista及未安装SP1的Windows7不在兼容范围内。
+
+**兼容版说明：** 老系统版固定使用仍支持Windows7／8的Electron22，现代版继续使用较新运行时。Electron22及老系统已停止安全维护，兼容版只加载本地应用界面；两种版本更新渠道隔离，兼容版不会因检查更新而下载现代版。新旧系统包都需用户分别确认下载和安装。
+
+**两个版本的数据目录独立。** 在现代版和兼容版之间切换时，先从小屋设置导出宠物存档，再到另一版本导入。不会直接用旧Chromium打开新版浏览器数据目录；请保留导出的JSON备份，不要手工覆盖或删除原目录。
 启动后拉姆会出现在桌面，图标在**右下角托盘**（可能藏在「∧」里）。关闭小屋会收起窗口，从托盘菜单选择「退出拉姆」才会完全退出。
 
 ## Mac 安装与首次打开
@@ -49,17 +56,19 @@ ${verified ? '此版本已完成 Apple 公证。若提示安装包损坏，请�
 
 ## 已经安装过？
 
-**v0.28.0 及更早版本需要先手动安装这次的新版本一次，才能获得自动更新功能。** Windows 安装版以后启动会自动检查、下载，在空闲时保存并更新；${verified ? '此版 Mac 已通过 Apple 签名公证，支持标准自动更新。' : 'Mac 当前本地签名版自动检查和下载安装包，下载完成后仍需手动替换应用。'}
+**v0.28.0 及更早版本需要先手动安装这次的新版本一次，才能获得自动更新功能。** 以后启动会自动检查，发现新版先询问是否下载，安装前再次确认；${verified ? '此版 Mac 已通过 Apple 签名公证，确认后使用标准更新机制安装。' : 'Mac 当前本地签名版自动检查，经确认下载安装包后手动替换应用。'}
 
-手动更新时，先从托盘／菜单栏退出旧版，再运行新安装包或替换「应用程序」里的拉姆，**无需卸载，也不要删除存档**。小屋设置可导出存档，正常升级保留本机数据。
+同一渠道手动更新时，先从托盘／菜单栏退出旧版，再运行对应安装包或替换「应用程序」里的拉姆，**无需卸载，也不要删除存档**。小屋设置可导出存档，正常升级保留本机数据。首次切换到Windows兼容版则按上方说明导出、导入宠物。
 
 <details>
 <summary>其他附件怎么选？（便携版、备用包与源码）</summary>
 
-- **Windows 便携版**：[下载 x64.zip](${download('x64.zip')})。右键「全部解压」，在解压后的文件夹里打开「拉姆.exe」；不要直接在压缩包里运行。便携版更新会提供安装包入口，想要后续全自动更新请选择上面的安装版。
+- **Windows 现代便携版**：[下载 x64.zip](${download('x64.zip')})。
+- **Windows 老系统便携版**：[下载64位兼容版ZIP](${download('legacy-x64.zip')}) / [下载32位兼容版ZIP](${download('legacy-ia32.zip')})。
+- 所有Windows ZIP都先右键「全部解压」，在完整解压后的文件夹里打开「拉姆.exe」或「拉姆兼容版.exe」；不要直接在压缩包中运行，也不要只复制exe。便携版更新会提供对应渠道的安装包入口，想要确认后直接更新并重启请选择上面的安装版。
 - **Mac ZIP 备用包**：[Apple 芯片 ZIP](${download('mac-arm64.zip')}) / [Intel ZIP](${download('mac-x64.zip')})。解压后把应用移入「应用程序」再打开；普通用户优先下载上面的 DMG。
 - **Source code (zip / tar.gz)** 是开发者用的源码，不能直接运行；普通用户不用下载。
-- **latest.yml、latest-mac.yml、SHA256SUMS.txt、macos-trust-*.json** 供更新程序或校验使用，不是安装包。
+- **latest.yml、legacy-x64.yml、legacy-ia32.yml、latest-mac.yml、SHA256SUMS.txt、macos-trust-*.json** 供更新程序或校验使用，不是安装包。
 - 下载没有开始时，请检查网络或稍后重试，直接点击上表链接即可。
 
 </details>`;

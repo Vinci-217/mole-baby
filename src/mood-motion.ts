@@ -1,3 +1,4 @@
+import {dozyDuration} from './original-actions'
 import emotions from '../public/assets/original/emotions/runtime.json'
 export type Emotion='joy'|'grumpy'
 export function emotionSpec(form:string,emotion:Emotion) {
@@ -7,7 +8,7 @@ export function isEmotionClip(action:string):action is 'mood-joy'|'mood-grumpy' 
 export function isMoodAction(action:string) {return isEmotionClip(action)||action==='mood-content'||action==='mood-dozy'}
 export function emotionDuration(action:string,form:string):number|undefined {
   if(action==='mood-content')return 3600
-  if(action==='mood-dozy')return 4300
+  if(action==='mood-dozy')return dozyDuration(form)
   if(!isEmotionClip(action))return undefined
   if(form==='seed')return action==='mood-joy'?2200:2800
   const spec=emotionSpec(form,action==='mood-joy'?'joy':'grumpy')

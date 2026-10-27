@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest'
-import {footballSpec,footballPose,footballDuration,footballContacts,slumberFrame,sleepPose,ramForm} from './original-actions'
+import {footballSpec,footballPose,footballDuration,footballContacts,slumberFrame,sleepPose,dozyPose,dozyDuration,ramForm} from './original-actions'
 import {getRamActionDuration,sampleRamPose,sampleFlyingPose} from './components/ram-animation'
 import {socialSoundScore} from './pet-sound-score'
 import source from '../public/assets/original/football/manifest.json'
@@ -39,9 +39,24 @@ describe('complete original performances in the desktop viewport',()=>{
  })
  it('breathes through an original sleepy-eye mouth cycle and keeps affection on the normal face',()=>{
   expect(slumber.eyes).toEqual({seed:35,junior:1726,other:1726});expect(slumber.mouth).toBe(743)
-  expect([0,2750,4400,6400,9150].map(t=>slumberFrame(t))).toEqual([0,7,0,0,7])
+  expect([0,1400,2100,6400,7800].map(t=>slumberFrame(t))).toEqual([0,7,0,0,7])
   for(const t of [0,900,1600,4700,1e9]){expect(slumberFrame(t,true)).toBe(0);expect(sampleRamPose('sleep',t,true).sheet).toBe('slumber');expect(sampleRamPose('sleep',t).sheet).toBe('slumber')}
   for(const form of ['senior','super','water','wood','fire'])for(const t of [500,1000,1700])expect(sampleFlyingPose('pet',t,false,form).sheet).toBeUndefined()
+ })
+ it('closes the brief sleep mouth cycle before returning to the normal seed face',()=>{
+  const open=Array.from({length:640},(_,i)=>i*10).filter(t=>slumberFrame(t)>0)
+  expect(open.length*10).toBeLessThan(1400)
+  expect(slumberFrame(1400)).toBe(7)
+  expect(slumberFrame(2100)).toBe(0)
+  expect(dozyDuration('seed')).toBe(2400)
+  for(const reduced of [false,true]){
+   expect(dozyPose(2399,reduced,'seed').finished).toBe(false)
+   expect(dozyPose(2400,reduced,'seed')).toEqual({row:0,frame:0,finished:true})
+   expect(dozyPose(2300,reduced,'seed').frame).toBe(0)
+  }
+  expect(dozyPose(2299,false,'seed').frame).toBe(0)
+  expect(getRamActionDuration('mood-dozy','seed')).toBe(dozyDuration('seed'))
+  expect(getRamActionDuration('mood-dozy','junior')).toBe(4300)
  })
  it('keeps the original body shape and relaxed lids during sleep without the rejected large yawn',()=>{
   for(const t of [0,350,1150,1450,2250,2400,5000,10000,240000]){expect(sleepPose(t).sheet).toBe('slumber');expect(sleepPose(t,true).frame).toBe(0)}

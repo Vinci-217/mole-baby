@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {sleepPose} from '../original-actions'
+import {sleepPose,dozyPose} from '../original-actions'
 import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose, sampleFlyingPose } from './ram-animation'
 
 describe('original Ram care animation contract', () => {
@@ -37,6 +37,12 @@ describe('original Ram care animation contract', () => {
         else expect(pose.frame).toBeLessThanOrEqual(24)
       }
       expect(sampleSeedPose(action, duration)).toEqual({ frame: 0, finished: true })
+    }
+  })
+  it('keeps seed drowsy rendering on the same short timeline as its completion signal',()=>{
+    for(const reduced of [false,true])for(const time of [0,200,700,1600,2200,2300,2399,2400,5000]){
+      expect(sampleSeedPose('mood-dozy',time,reduced)).toEqual(dozyPose(time,reduced,'seed'))
+      expect(sampleRamPose('mood-dozy',time,reduced,'seed')).toEqual(dozyPose(time,reduced,'seed'))
     }
   })
   it('uses separate static drag and catch reactions without jumping rows', () => {

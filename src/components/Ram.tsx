@@ -10,7 +10,8 @@ import { createPetSoundClock } from '../pet-audio'
 import { itemSoundScore, socialSoundScore } from '../pet-sound-score'
 import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSeedPose, sampleFlyingPose } from './ram-animation'
 import { edgePeekTilt, type PetEdge } from '../edge-motion'
-import {isDragForm,dragSpec,sampleDragPose} from '../drag-poses'
+import {isDragForm,dragSpec,dragRegistration,sampleDragPose} from '../drag-poses'
+import {bodyFrameRegistration} from '../frame-registration'
 import {sleepPose,affectionFrame,footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
 import RamWear from './RamWear'
@@ -261,7 +262,9 @@ function paintItemCue(canvas: HTMLCanvasElement, motion: ItemMotion | undefined,
   const root = canvas.closest<HTMLElement>('.ram-sprite')
   if (!root) return
   const pose = sampleItemMotion(motion, elapsed, reduced)
-  const anchor = getItemMouthAnchor(canvas.dataset.form, motion, pose.bodyFrame)
+  const sourceAnchor = getItemMouthAnchor(canvas.dataset.form, motion, pose.bodyFrame)
+  const fit=bodyFrameRegistration(canvas.dataset.form??'seed','gentle')
+  const anchor:readonly [number,number]=[sourceAnchor[0]*fit.scaleX+fit.x/CELL_WIDTH*100,sourceAnchor[1]*fit.scaleY+fit.y/CELL_HEIGHT*100]
   const routine=sampleCareRoutine(motion,elapsed,anchor,canvas.dataset.form==='seed',reduced)
   const vars:Record<string,string>={
     '--care-mouth-x':`${anchor[0]}%`,'--care-mouth-y':`${anchor[1]}%`,
@@ -339,11 +342,14 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const gentle=Boolean(itemMotion),affection=action==='pet'&&(media.matches||elapsed>=180&&elapsed<2200);
       const sheet=drag?'drag':affection?'affection':gentle?'gentle':grounded?'grounded':pose.sheet??'classic', frame=drag?drag.frame:affection?affectionFrame(elapsed,media.matches):gentle?sampleGentleMouth(itemMotion!,elapsed,media.matches):grounded?.frame??pose.frame, row=drag?drag.row:affection||gentle||grounded?0:pose.row
       const layout=sheet==='drag'&&isDragForm(form)?dragSpec(form):null,drawWidth=layout?.cell[0]??CELL_WIDTH,drawHeight=layout?.cell[1]??CELL_HEIGHT,origin=layout?.origin??[0,0]
+      const dragFit=layout&&isDragForm(form)?dragRegistration(form):null
+      const registration=dragFit?{scaleX:dragFit.scale,scaleY:dragFit.scale,x:dragFit.x,y:dragFit.y}:bodyFrameRegistration(form,sheet,row)
       if(canvas.width!==drawWidth||canvas.height!==drawHeight){canvas.width=drawWidth;canvas.height=drawHeight;previous=''}
-      if(origin[0]||origin[1]||drawWidth!==CELL_WIDTH||drawHeight!==CELL_HEIGHT){
-        canvas.style.position='absolute';canvas.style.left=`${origin[0]/CELL_WIDTH*100}%`;canvas.style.top=`${origin[1]/CELL_HEIGHT*100}%`;canvas.style.width=`${drawWidth/CELL_WIDTH*100}%`;canvas.style.height=`${drawHeight/CELL_HEIGHT*100}%`
+      if(origin[0]||origin[1]||drawWidth!==CELL_WIDTH||drawHeight!==CELL_HEIGHT||registration.scaleX!==1||registration.scaleY!==1){
+        canvas.style.position='absolute';canvas.style.left=`${(origin[0]*registration.scaleX+registration.x)/CELL_WIDTH*100}%`;canvas.style.top=`${(origin[1]*registration.scaleY+registration.y)/CELL_HEIGHT*100}%`;canvas.style.width=`${drawWidth*registration.scaleX/CELL_WIDTH*100}%`;canvas.style.height=`${drawHeight*registration.scaleY/CELL_HEIGHT*100}%`
       }else for(const name of ['position','left','top','width','height'])canvas.style.removeProperty(name)
       canvas.dataset.dragOriginX=String(origin[0]);canvas.dataset.dragOriginY=String(origin[1])
+      canvas.dataset.registrationX=String(registration.scaleX);canvas.dataset.registrationY=String(registration.scaleY)
       const signature = `${sheet}:${row}:${frame}:${Math.round(mix*255)}:${grounded?`${grounded.eyeX.toFixed(2)}:${grounded.eyeY.toFixed(2)}:${grounded.leafAngle.toFixed(2)}`:''}`
       if (signature !== previous) {
         context.clearRect(0, 0, drawWidth, drawHeight)
@@ -368,6 +374,13 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear');
         if(wear?.dataset.loaded==='true'&&wear.style.visibility==='visible'){const [ox0,oy0,ox1,oy1]=drag.wearBody,[nx0,ny0,nx1,ny1]=drag.body,sx=(nx1-nx0)/(ox1-ox0),sy=(ny1-ny0)/(oy1-oy0);wear.style.left=`${(nx0+(parseFloat(wear.style.left)*192/100-ox0)*sx)/192*100}%`;wear.style.top=`${(ny0+(parseFloat(wear.style.top)*208/100-oy0)*sy)/208*100}%`;wear.style.width=`${parseFloat(wear.style.width)*sx}%`;wear.style.height=`${parseFloat(wear.style.height)*sy}%`;wear.dataset.registration='drag-source'}
       }else{delete canvas.dataset.dragView;delete canvas.dataset.dragPhase}
+      const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear')
+      if(wear?.dataset.loaded==='true'&&wear.style.visibility==='visible'){
+        wear.style.left=`${parseFloat(wear.style.left)*registration.scaleX+registration.x/CELL_WIDTH*100}%`
+        wear.style.top=`${parseFloat(wear.style.top)*registration.scaleY+registration.y/CELL_HEIGHT*100}%`
+        wear.style.width=`${parseFloat(wear.style.width)*registration.scaleX}%`
+        wear.style.height=`${parseFloat(wear.style.height)*registration.scaleY}%`
+      }
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
@@ -461,7 +474,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
       const pose = isGentle?{...sampleSeedPose(action,elapsed,media.matches),frame:sampleGentleMouth(itemMotion!,elapsed,media.matches)}:sampleSeedPose(action, elapsed, media.matches)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       if (ref.current) { paintItemCue(ref.current, itemMotion, elapsed, media.matches); paintSocialCue(ref.current, 0, action, elapsed, media.matches) }
-      const sleepy=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&(media.matches||elapsed>450&&elapsed<3300);
+      const sleepy=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&('sheet' in pose && pose.sheet==='slumber');
       const yawning=action==='sleep'?sleepPose(elapsed,media.matches).sheet==='yawn':false;
       const activeSource=sleepy?(yawning?yawn!:slumber!):isGentle?gentle!:source,old=isGentle?oldGentle:oldSource;
       const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;const signature=`${sleepy}:${yawning}:${pose.frame}:${Math.round(mix*255)}`;
@@ -541,7 +554,8 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
   const activeAction = sleeping || action === 'sleep' ? 'sleep' : shaking ? 'dizzy' : dragging ? 'drag' : schoolAction?schoolAction:itemMotion ? itemMotion.action : action==='balance'?'balance':pastimeBody(action)
   const resting = activeAction === 'sleep', key = `${form}:${color}`
-  const mouth=slumberEmitter(stage===0?'seed':form)
+  const sourceMouth=slumberEmitter(stage===0?'seed':form),sleepFit=bodyFrameRegistration(stage===0?'seed':form,'slumber')
+  const mouth=[sourceMouth[0]*sleepFit.scaleX+sleepFit.x/CELL_WIDTH*100,sourceMouth[1]*sleepFit.scaleY+sleepFit.y/CELL_HEIGHT*100]
   const [failedKey, setFailedKey] = useState<string | null>(null)
   const fallback = failedKey === key
   const tilt = Math.max(-12, Math.min(12, dragTilt)) + (peeking && !resting && !dragging ? edgePeekTilt(peekSide) : 0)
@@ -553,7 +567,7 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
-    <span className="ram-flight-layer">
+    <span className="ram-proportion-layer"><span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
         {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
@@ -562,6 +576,6 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
     {schoolAction&&<RamSchool key={`school:${action}:${actionId??0}`} action={schoolAction} sound={sound} startedAt={clock.current.startedAt} stage={stage}/>}
     {resting && <span className="ram-sleep-particles" style={{left:`${mouth[0]}%`,top:`${mouth[1]}%`}} aria-hidden="true">{[0,1,2].map(i=><img key={i} src="./assets/original/slumber/z.png" alt="" draggable={false} style={{animationDelay:`${.6+i*6.4/3}s`}}/>)}</span>}
     {itemMotion && <ItemCue key={`${itemMotion.itemId}:${actionId ?? ''}`} motion={itemMotion}/>}
-    </span>
+    </span></span>
   </span>
 }

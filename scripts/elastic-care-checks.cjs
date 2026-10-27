@@ -6,7 +6,9 @@ async function verifyElasticCare(page,desktop){
  try{
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:180,coins:2000,sleeping:false,wardrobe:['wizard-cap'],wearing:'wizard-cap',lastTick:Date.now(),stats:{hunger:15,thirst:15,cleanliness:15,happiness:90,health:60,energy:95}});delete p.evolution;delete p.outing;p.inventory.biscuit=5;p.inventory.juice=5;p.inventory['180003']=5;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,lively:false,presence:false}));});await page.reload();
   const character=page.getByTestId('desktop-character'),ram=character.locator('.ram-sprite'),save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
-  await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true');
+  // A cold Electron profile decodes and tints the full middle-form atlas here.
+  // Wait for painted pixels using the same budget as desktop waitForClassic.
+  await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:20000});
   if(desktop){await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);await window.desktop.movePet(-300,-100)});}
   await openActions(page);await page.getByRole('button',{name:'喂食',exact:true}).click();const panel=page.getByTestId('companion-panel'),pocket=panel.locator('.care-pocket');
   const before=await save();await pocket.locator('[data-item-id=biscuit]').click();await expect(ram.locator('[data-care-routine=eat]')).toBeVisible();await expect.poll(async()=>(await save()).inventory.biscuit).toBe(4);await expect(page.getByTestId('care-gain')).toHaveCount(0);await expect(ram.locator('.care-food-bite')).toHaveCount(4);
@@ -23,7 +25,7 @@ async function verifyElasticCare(page,desktop){
    // Exercise the real UI pointer path in all five growth stages. Native OS
    // geometry and cursor sampling are checked separately above / by compact care.
    for(const growth of [0,60,180,420,840]){
-    await page.evaluate(growth=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=growth;p.sleeping=false;p.lastTick=Date.now();if(growth===840)p.evolution='super';else delete p.evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))},growth);await page.reload();await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true');
+    await page.evaluate(growth=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.growth=growth;p.sleeping=false;p.lastTick=Date.now();if(growth===840)p.evolution='super';else delete p.evolution;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))},growth);await page.reload();await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:20000});
     const box=await character.boundingBox(),x=box.x+box.width*.5,y=box.y+box.height*.55;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-12,y,{steps:2});for(let i=1;i<=5;i++){await page.mouse.move(x-12-i*10,y+i*2);await page.waitForTimeout(32)}
     await expect(ram).toHaveClass(/is-dragging/);const transform=await ram.locator('.ram-elastic-layer').evaluate(n=>getComputedStyle(n).transform);assert.notEqual(transform,'matrix(1, 0, 0, 1, 0, 0)');if(growth===0)assert.equal(await ram.locator('.seed-pot-original').evaluate(n=>getComputedStyle(n).rotate),'none');
     const held=await ram.evaluate(n=>parseFloat(n.style.getPropertyValue('--pull-x')));await page.mouse.up();await expect(ram).not.toHaveClass(/is-dragging/);
@@ -33,6 +35,6 @@ async function verifyElasticCare(page,desktop){
   }
   console.log('PASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net');
   if(!desktop)console.log('PASS: real UI dragging and visible release overshoot across five stages; seed pot stays upright');
- }finally{await page.evaluate(snapshot=>{localStorage.clear();for(const[k,v]of Object.entries(snapshot))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor()}
+ }catch(error){console.error('Elastic care check failed before cleanup:',error);throw error}finally{if(!page.isClosed()){await page.evaluate(snapshot=>{localStorage.clear();for(const[k,v]of Object.entries(snapshot))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor()}}
 }
 module.exports={verifyElasticCare};

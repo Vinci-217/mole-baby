@@ -28,7 +28,7 @@ import MacHelp from './components/MacHelp';
 import StageSettings from './components/StageSettings';
 import RoomSettings from './components/RoomSettings';
 import { useRoomMedia } from './room-media';
-import { createMemory, loadMemory, parseMemory, recordCare, recordEvent, saveMemory, memoryKey, getCompanionMood } from './companion-memory';
+import { createMemory, loadMemory, recordCare, recordEvent, saveMemory, memoryKey, getCompanionMood } from './companion-memory';
 import type { CompanionMemory } from './companion-memory';
 import './companion-life.css';
 import { usePresence } from './use-presence';
@@ -50,9 +50,10 @@ import PetPastimes from './components/PetPastimes';
 import RamSchoolPanel,{RestaurantCard} from './components/RamSchoolPanel';
 import {activityAction,activityName,beginActivity,cancelActivity,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
 import {RoomFurnishingLayer,RoomFurnishingEditor} from './components/RoomFurnishings';
+import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup} from './pet-backup';
 import {buyFurniture,placeFurniture,removeFurniture,hasRoomWall} from './room-furnishings';
 
-const SAVE_KEY = 'ramu-house-save-v1';
+const SAVE_KEY = PET_SAVE_KEY;
 const PREFS_KEY = 'ramu-house-preferences-v2';
 type Panel = CompanionPanel | 'shop' | 'games' | 'growth' | 'settings' | 'decor' | 'wardrobe' | 'status' | 'memories' | 'school' | null;
 type GameKind = 'fruit' | 'memory' | 'treasure' | ExtraGame;
@@ -117,6 +118,8 @@ export default function App() {
   const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
   const pastimeRun=useRef<{petId:number;kind:Pastime}|null>(null);
   const importInput = useRef<HTMLInputElement>(null);
+  const importSequence=useRef(0);
+  useEffect(()=>()=>{importSequence.current++},[]);
 
   const updateSnapshot=useRef<()=>boolean>(()=>false);
   useEffect(()=>window.desktop?.updates?.onPrepare(()=>updateSnapshot.current()),[]);
@@ -427,6 +430,7 @@ export default function App() {
   }
   async function abandonPet() {
     const saved = petRef.current; if (!saved) return;
+    importSequence.current++;
     clearInvitation();awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
@@ -442,20 +446,21 @@ export default function App() {
   function exportSave() { if (!pet) return; const url = URL.createObjectURL(new Blob([JSON.stringify({ ...pet, companionMemory: currentMemory }, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `ramu-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); notify('存档已经导出，记得收好。'); }
   async function importSave(file?: File) {
     if (!file) return;
+    const sequence=++importSequence.current,originalPetId=petRef.current?.createdAt;
     try {
-      if (file.size > 1000000) throw Error();
-      const raw = JSON.parse(await file.text());
-      const restored = parseSave(JSON.stringify({ ...raw, companionMemory: undefined }), Date.now());
-      if (!restored) throw Error();
+      if (file.size > MAX_BACKUP_BYTES) throw Error();
+      const text=await file.text();
+      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return;
+      const {pet:restored,memory:restoredMemory}=restorePetBackup(text,localStorage);
       clearInvitation();clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
       careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
       pendingCareFeedback.current=null;setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
       petRef.current = restored; setPet(restored);
-      setMemory(raw.companionMemory ? parseMemory(raw.companionMemory, restored) : loadMemory(restored));
+      setMemory(restoredMemory);
       setName(restored.name); notify('存档已恢复，欢迎回来！');
     } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); }
-    if (importInput.current) importInput.current.value = '';
+    if (sequence===importSequence.current&&importInput.current) importInput.current.value = '';
   }
 
   function completeGame(score: number): GameReceipt {

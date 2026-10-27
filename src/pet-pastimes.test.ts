@@ -19,6 +19,9 @@ describe('self-directed little life',()=>{
    expect(beginOuting({...pet(),sleeping:true},0,NOW,true)).toBeNull()
    for(const key of ['health','hunger','thirst','cleanliness','energy'] as const)expect(beginOuting({...pet(),stats:{...pet().stats,[key]:20}},0,NOW,true)).toBeNull()
  })
+ it('rejects invalid sequence inputs instead of indexing a missing destination',()=>{
+   for(const sequence of [NaN,Infinity,-Infinity,1.5,Number.MAX_SAFE_INTEGER+1])expect(beginOuting(pet(),sequence,NOW,true)).toBeNull()
+ })
  it('persists a bounded trip, enforces the automatic cooldown and allows an immediate recall without losing inventory',()=>{
    const started=beginOuting(pet(),0,NOW)!;expect(started.outing).toBeDefined();expect(started.outing!.returnsAt-NOW).toBeGreaterThanOrEqual(120000);expect(started.outing!.returnsAt-NOW).toBeLessThanOrEqual(300000)
    const restored=parseSave(JSON.stringify(started),NOW)!;expect(restored.outing).toEqual(started.outing);expect(idleCandidates(restored)).toEqual([])

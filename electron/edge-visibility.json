@@ -4,66 +4,66 @@
     100,
     108
   ],
-  "source": "Original body colour masks; seed uses the union with its independent flowerpot.",
+  "source": "Original body colour masks; seed uses the union with its independent flowerpot. Stage sizing uses the shared visual layer: seed 0.9 around (50,102.6), junior 0.82 and middle 0.94 around (50,88.56).",
   "forms": {
     "seed": {
       "body": [
-        32.81,
-        17.31,
-        71.352,
-        95.19
+        34.529,
+        25.839,
+        69.2168,
+        95.931
       ],
       "hidden": {
-        "left": 59.789,
-        "right": 55.627,
-        "top": 71.826,
-        "bottom": 67.326
+        "left": 58.81046,
+        "right": 55.06466,
+        "top": 74.9034,
+        "bottom": 61.1334
       },
       "peek": {
-        "left": 35.873,
-        "right": 33.377,
-        "top": 43.096,
-        "bottom": 40.396
+        "left": 35.28628,
+        "right": 33.0388,
+        "top": 44.94204,
+        "bottom": 36.68004
       }
     },
     "junior": {
       "body": [
-        9.896,
-        24.404,
-        89.062,
-        79.962
+        17.11472,
+        35.95208,
+        82.03084,
+        81.50964
       ],
       "hidden": {
-        "left": 65.312,
-        "right": 66.354,
-        "top": 63.294,
-        "bottom": 66.929
+        "left": 62.556,
+        "right": 63.41044,
+        "top": 67.84237,
+        "bottom": 58.38065
       },
       "peek": {
-        "left": 39.188,
-        "right": 39.812,
-        "top": 37.977,
-        "bottom": 40.157
+        "left": 37.5336,
+        "right": 38.04626,
+        "top": 40.70542,
+        "bottom": 35.02839
       }
     },
     "middle": {
       "body": [
-        20.312,
-        43.615,
-        83.854,
-        88.788
+        22.09328,
+        46.3117,
+        81.82276,
+        88.77432
       ],
       "hidden": {
-        "left": 64.792,
-        "right": 60.625,
-        "top": 75.237,
-        "bottom": 50.833
+        "left": 63.90392,
+        "right": 59.98788,
+        "top": 76.03553,
+        "bottom": 48.94951
       },
       "peek": {
-        "left": 38.875,
-        "right": 36.375,
-        "top": 45.142,
-        "bottom": 30.5
+        "left": 38.34235,
+        "right": 35.99273,
+        "top": 45.62132,
+        "bottom": 29.36971
       }
     },
     "senior": {

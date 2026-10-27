@@ -10,7 +10,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mole-native-'));
   if (legacyName) fs.mkdirSync(path.join(profile, legacyName, 'Local Storage'), { recursive: true });
   const handles = new Map(); const listeners = new Map(); const windows = [];
-  const stats = { quit: 0 };
+  const stats = { quit: 0, dialogs: [] };
   const cursor={x:900,y:400};
   if(options.key){fs.mkdirSync(path.join(profile,'mole-baby'),{recursive:true});fs.writeFileSync(path.join(profile,'mole-baby','companion-ai-key.json'),'retired-test-key');}
   const app = new EventEmitter();
@@ -66,10 +66,11 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const electron = { app, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
     Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => ({path:value,template:false,setTemplateImage(flag){this.template=flag;}}) },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
-    Notification: { isSupported: () => false } };
-  const localRequire = name => name === 'electron' ? electron : name.startsWith('./') ? require(path.join(__dirname,name)) : require(name);
+    Notification: { isSupported: () => false }, dialog:{showMessageBox:async(...args)=>{stats.dialogs.push({parent:args.length===2?args[0]:null,options:args.at(-1)});return{response:options.dialogAnswers?.shift()??1}}} };
+  const localRequire = name => name === 'electron' ? electron : name==='../package.json'&&options.edition ? {...require('../package.json'),windowsEdition:options.edition} : name==='./updates.cjs'&&options.updateFactory ? {createUpdates:options.updateFactory} : name.startsWith('./') ? require(path.join(__dirname,name)) : require(name);
   const runtimeProcess = Object.create(process);
   Object.defineProperty(runtimeProcess, 'platform', { value: platform });
+  if(options.arch)Object.defineProperty(runtimeProcess,'arch',{value:options.arch});
   Object.defineProperty(runtimeProcess,'env',{value:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1'}});
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
     require: localRequire, __dirname, console, URL, Date, process: runtimeProcess,
@@ -327,3 +328,54 @@ test('upgrade removes retired API credentials without registering AI or speech e
 test('Windows keeps its frameless resize style stable through room, pocket and pet changes',async t=>{const run=await launch();t.after(()=>run.cleanup());for(let i=0;i<8;i++){run.invoke('desktop:set-pet-mode',true);assert.deepEqual(run.window.minimum,[160,240]);assert.deepEqual(run.window.maximum,[160,240]);run.invoke('desktop:set-companion-panel',true);assert.deepEqual(run.window.maximum,[run.window.bounds.width,run.window.bounds.height]);run.invoke('desktop:set-companion-panel',false);run.invoke('desktop:set-pet-mode',false);assert.deepEqual(run.window.maximum,[0,0]);}assert.deepEqual(run.window.resizeChanges??[],[]);assert.equal(run.window.options.frame,false);assert.equal(run.window.options.thickFrame,false)})
 
 test('every appearance uses its calibrated exposure on four native edge states',async t=>{const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-can-move',false);for(const form of Object.keys(require('./edge-visibility.json').forms)){run.invoke('desktop:set-pet-appearance',form);for(const[side,dx,dy]of[['left',-5000,0],['right',5000,0],['top',0,-5000],['bottom',0,5000]]){run.invoke('desktop:reveal-pet');run.invoke('desktop:move-pet',900-run.window.bounds.x,400-run.window.bounds.y);run.invoke('desktop:start-pet-drag');run.invoke('desktop:move-pet',dx,dy);run.invoke('desktop:end-pet-drag');const state=run.invoke('desktop:get-state');assert.equal(state.edgeSide,side);assert.deepEqual({...state.edgeOffset},require('./desktop-geometry.cjs').edgeOffset(side,'hidden',form));}}assert.throws(()=>run.invoke('desktop:set-pet-appearance','unknown'),/Unknown pet appearance/)})
+
+
+function consentFixture(){
+ let state={status:'available',version:'1.1.0',automaticInstall:true,enabled:true},options;
+ const calls={checks:[],downloads:[],installs:[]};
+ const api={getState:()=>({...state}),start(){},wake(){},dispose(){},check:async manual=>{calls.checks.push(manual);return true},setEnabled:value=>{state.enabled=value;return{...state}},download:async confirmed=>{calls.downloads.push(confirmed);return true},install:async confirmed=>{calls.installs.push(confirmed);return true}};
+ return{calls,factory:config=>{options=config;return api},state:patch=>{state={...state,...patch};options.onChange({...state})},available:()=>options.onAvailable({...state}),ready:()=>options.onReady({...state})};
+}
+
+test('actual update IPC and tray actions ask before granting download or install consent',async t=>{
+ const updates=consentFixture(),answers=[1,0,1,0];
+ const run=await launch(undefined,false,'win32',{updateFactory:updates.factory,dialogAnswers:answers});t.after(()=>run.cleanup());
+ assert.equal(await run.invoke('updates:download'),false);assert.deepEqual(updates.calls.downloads,[]);
+ assert.match(run.stats.dialogs[0].options.message,/1\.1\.0/);assert.equal(run.stats.dialogs[0].options.defaultId,1);assert.equal(run.stats.dialogs[0].options.cancelId,1);
+ assert.equal(run.stats.dialogs[0].parent,null,'a tray-only pet uses a standalone visible native prompt');
+ assert.equal(await run.invoke('updates:download'),true);assert.deepEqual(updates.calls.downloads,[true]);assert.deepEqual(updates.calls.installs,[]);
+ updates.state({status:'ready'});run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.tray.menu.find(item=>item.label==='更新并重启拉姆').click();await new Promise(r=>setImmediate(r));assert.deepEqual(updates.calls.installs,[]);
+ run.tray.menu.find(item=>item.label==='更新并重启拉姆').click();await new Promise(r=>setImmediate(r));assert.deepEqual(updates.calls.installs,[true]);
+ assert.equal(run.stats.dialogs.at(-1).parent,run.window,'a visible pet owns its native prompt');
+});
+
+test('detected and downloaded release callbacks offer one native confirmation per version',async t=>{
+ const updates=consentFixture(),answers=[1,1];
+ const run=await launch(undefined,false,'win32',{updateFactory:updates.factory,dialogAnswers:answers});t.after(()=>run.cleanup());
+ updates.available();updates.available();await new Promise(r=>setImmediate(r));assert.equal(run.stats.dialogs.length,1);assert.deepEqual(updates.calls.downloads,[]);
+ updates.available();await new Promise(r=>setImmediate(r));assert.equal(run.stats.dialogs.length,1);
+ updates.state({status:'ready'});updates.ready();updates.ready();await new Promise(r=>setImmediate(r));assert.equal(run.stats.dialogs.length,2);assert.deepEqual(updates.calls.installs,[]);
+ assert.match(run.stats.dialogs[1].options.detail,/退出时也不会自动安装/);
+ run.tray.menu.find(item=>item.label==='退出拉姆').click();assert.equal(run.stats.quit,1);assert.deepEqual(updates.calls.installs,[]);
+});
+
+test('the actual install IPC also requires a fresh native answer',async t=>{
+ const updates=consentFixture(),answers=[1,0],run=await launch(undefined,false,'win32',{updateFactory:updates.factory,dialogAnswers:answers});t.after(()=>run.cleanup());updates.state({status:'ready'});
+ assert.equal(await run.invoke('updates:install'),false);assert.deepEqual(updates.calls.installs,[]);
+ assert.equal(await run.invoke('updates:install'),true);assert.deepEqual(updates.calls.installs,[true]);assert.deepEqual(updates.calls.downloads,[]);
+});
+
+test('the tray download action cannot bypass the same confirmation as settings',async t=>{
+ const updates=consentFixture(),answers=[1,0],run=await launch(undefined,false,'win32',{updateFactory:updates.factory,dialogAnswers:answers});t.after(()=>run.cleanup());
+ run.tray.menu.find(item=>item.label==='下载新版本').click();await new Promise(r=>setImmediate(r));assert.deepEqual(updates.calls.downloads,[]);
+ run.tray.menu.find(item=>item.label==='下载新版本').click();await new Promise(r=>setImmediate(r));assert.deepEqual(updates.calls.downloads,[true]);assert.deepEqual(updates.calls.installs,[]);
+});
+
+test('legacy Windows isolates its Chromium profile and keeps architecture-specific update identity',async t=>{
+ for(const arch of ['ia32','x64']){
+  const run=await launch('mole-baby',false,'win32',{edition:'legacy',arch});t.after(()=>run.cleanup());
+  assert.equal(run.app.name,'拉姆兼容版');assert.equal(path.basename(run.app.userData),'mole-baby-legacy');
+  assert.notEqual(path.basename(run.app.userData),'mole-baby','an older Chromium must not open the modern profile');
+ }
+});
