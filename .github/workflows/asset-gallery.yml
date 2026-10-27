@@ -1,0 +1,32 @@
+name: Update asset gallery
+
+on:
+  push:
+    branches: ['preview/asset-gallery']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: asset-gallery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gallery:
+    if: github.ref == 'refs/heads/preview/asset-gallery'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 30
+      - name: Generate gallery from tracked images
+        run: python3 scripts/generate-asset-gallery.py
+      - name: Save changed index to the preview branch
+        run: |
+          git add gallery
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Update asset gallery [skip ci]'
+          git push origin HEAD:preview/asset-gallery

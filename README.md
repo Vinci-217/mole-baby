@@ -1,3 +1,5 @@
+> 🎨 **素材展示分支：** [打开动画与图片素材库](gallery/README.md)，查看最新 GIF 和全部图片。此分支用于审阅，不代表正式版本。
+
 # 拉姆 · mole-baby
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
