@@ -13,6 +13,13 @@ const {createUpdatePrompts}=require('./update-prompts.cjs');
 const applicationMetadata=require('../package.json');
 const {windowsRuntime}=require('./windows-runtime.cjs');
 const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetadata,process.arch):null;
+// The compatibility UI uses Canvas2D, not WebGL. Chromium 108's GPU/SwiftShader
+// process can crash with old/virtual drivers; use the CPU compositor instead.
+if(windowsEdition?.edition==='legacy'){
+  app.disableHardwareAcceleration();
+  app.commandLine.appendSwitch('disable-gpu');
+  app.commandLine.appendSwitch('disable-software-rasterizer');
+}
 let updates=null,updateRendererBusy=true,updateCheckpoint=null;
 const updatePrompts=createUpdatePrompts({getUpdates:()=>updates,showMessageBox:options=>mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()?dialog.showMessageBox(mainWindow,options):dialog.showMessageBox(options),onError:error=>console.error('Unable to show update confirmation:',error.message)});
 const NORMAL_SIZE = { width: 1180, height: 820 };
@@ -849,7 +856,7 @@ if (!app.requestSingleInstanceLock()) {
     showFromTray();
   });
   app.whenReady().then(() => {
-    if (process.platform === 'win32') app.setAppUserModelId('com.molebaby.ramuhouse');
+    if (process.platform === 'win32') app.setAppUserModelId(windowsEdition.appId);
     if (process.platform === 'darwin') {
       app.dock.hide();
       Menu.setApplicationMenu(Menu.buildFromTemplate([

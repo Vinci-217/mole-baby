@@ -6,7 +6,7 @@ const arch=process.env.MOLE_LEGACY_ARCH||'x64';
 const runtime=windowsRuntime({windowsEdition:'legacy'},arch);
 module.exports={
  ...build,
- appId:'com.molebaby.ramuhouse.legacy',
+ appId:runtime.appId,
  productName:runtime.productName,
  electronVersion:LEGACY_ELECTRON_VERSION,
  directories:{...build.directories,output:`release/legacy-${arch}`},

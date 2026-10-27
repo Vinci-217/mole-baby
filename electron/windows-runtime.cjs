@@ -9,6 +9,7 @@ function windowsRuntime(metadata={},arch=process.arch){
  if(!supportedArch.includes(arch))throw new Error(`Unsupported ${edition} Windows architecture: ${arch}`);
  return{
   edition,arch,productName:PRODUCT_NAMES[edition],
+  appId:edition==='legacy'?'com.molebaby.ramuhouse.legacy':'com.molebaby.ramuhouse',
   userDataName:edition==='legacy'?'mole-baby-legacy':'mole-baby',
   uninstallerName:`Uninstall ${PRODUCT_NAMES[edition]}.exe`,
   channel:edition==='legacy'?`legacy-${arch}`:'latest',

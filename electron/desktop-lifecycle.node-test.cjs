@@ -15,11 +15,12 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   if(options.key){fs.mkdirSync(path.join(profile,'mole-baby'),{recursive:true});fs.writeFileSync(path.join(profile,'mole-baby','companion-ai-key.json'),'retired-test-key');}
   const app = new EventEmitter();
   app.isPackaged = true;
-  app.commandLine = { getSwitchValue: () => customProfile ? path.join(profile, 'isolated-cli') : '' };
+  app.commandLine = { getSwitchValue: () => customProfile ? path.join(profile, 'isolated-cli') : '',appendSwitch:name=>{(stats.switches??=[]).push(name)} };
+  app.disableHardwareAcceleration=()=>{assert.equal(windows.length,0,'CPU rendering must be selected before creating a window');stats.hardwareAccelerationDisabled=true};
   app.getPath = key => key === 'appData' ? profile : app.userData || path.join(profile, '拉姆');
   app.setPath = (key, value) => { if (key === 'userData') app.userData = value; };
   app.setName = value => { app.name = value; };
-  app.setAppUserModelId = () => {};
+  app.setAppUserModelId = value => {stats.appId=value};
   app.dock = { hide() { stats.dockHidden = true; } };
   app.requestSingleInstanceLock = () => true;
   app.whenReady = () => Promise.resolve();
@@ -92,6 +93,8 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   assert.equal(run.app.name, '拉姆');
+  assert.equal(run.stats.hardwareAccelerationDisabled,undefined);
+  assert.equal(run.stats.appId,'com.molebaby.ramuhouse');
   assert.equal(path.basename(run.app.userData), 'mole-baby');
   assert.equal(run.window.options.title, '');
   assert.equal(run.window.options.resizable, false);
@@ -378,6 +381,9 @@ test('legacy Windows isolates its Chromium profile and keeps architecture-specif
  for(const arch of ['ia32','x64']){
   const run=await launch('mole-baby',false,'win32',{edition:'legacy',arch});t.after(()=>run.cleanup());
   assert.equal(run.app.name,'拉姆兼容版');assert.equal(path.basename(run.app.userData),'mole-baby-legacy');
+  assert.equal(run.stats.hardwareAccelerationDisabled,true);
+  assert.deepEqual(run.stats.switches,['disable-gpu','disable-software-rasterizer']);
+  assert.equal(run.stats.appId,'com.molebaby.ramuhouse.legacy');
   assert.notEqual(path.basename(run.app.userData),'mole-baby','an older Chromium must not open the modern profile');
  }
 });
