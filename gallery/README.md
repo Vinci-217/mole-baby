@@ -80,6 +80,10 @@
 
 ## 最近更新素材
 
+- [artifacts/transform-redraw-v43/bird.png](../artifacts/transform-redraw-v43/bird.png)
+- [artifacts/transform-redraw-v43/cat.png](../artifacts/transform-redraw-v43/cat.png)
+- [artifacts/transform-redraw-v43/rabbit.png](../artifacts/transform-redraw-v43/rabbit.png)
+- [artifacts/transform-redraw-v43/tree.png](../artifacts/transform-redraw-v43/tree.png)
 - [artifacts/transform-concepts/bird.png](../artifacts/transform-concepts/bird.png)
 - [artifacts/transform-concepts/cat.png](../artifacts/transform-concepts/cat.png)
 - [artifacts/transform-concepts/rabbit.png](../artifacts/transform-concepts/rabbit.png)
@@ -88,10 +92,6 @@
 - [artifacts/transform-v41/rabbit.gif](../artifacts/transform-v41/rabbit.gif)
 - [artifacts/transform-v41/tree.gif](../artifacts/transform-v41/tree.gif)
 - [research/references/ramu-2008-2010/images/body-still.png](../research/references/ramu-2008-2010/images/body-still.png)
-- [research/references/ramu-2008-2010/images/fire-blue-idle.png](../research/references/ramu-2008-2010/images/fire-blue-idle.png)
-- [research/references/ramu-2008-2010/images/fire-pink-idle.png](../research/references/ramu-2008-2010/images/fire-pink-idle.png)
-- [research/references/ramu-2008-2010/images/fire-red-idle.png](../research/references/ramu-2008-2010/images/fire-red-idle.png)
-- [research/references/ramu-2008-2010/images/fire-yellow-idle.png](../research/references/ramu-2008-2010/images/fire-yellow-idle.png)
 
 ## 全部素材分类
 
