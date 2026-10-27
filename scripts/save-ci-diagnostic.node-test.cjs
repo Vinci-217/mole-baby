@@ -1,0 +1,15 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const{saveDiagnostic}=require('./save-ci-diagnostic.cjs');
+test('platform diagnostics update the receipt branch while preserving the source checkout and index',t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'mole-ci-git-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const remote=path.join(root,'remote.git'),cwd=path.join(root,'source');fs.mkdirSync(cwd);
+ const git=(args,dir=cwd)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();
+ git(['init','--bare',remote]);git(['init','-b','build-reports']);git(['config','user.name','Test']);git(['config','user.email','test@example.invalid']);git(['remote','add','origin',remote]);
+ fs.writeFileSync(path.join(cwd,'existing.json'),'existing receipt');git(['add','.']);git(['commit','-m','existing receipts']);git(['push','origin','build-reports']);git(['checkout','-b','source']);
+ fs.writeFileSync(path.join(cwd,'staged.txt'),'staged user work');git(['add','staged.txt']);fs.writeFileSync(path.join(cwd,'staged.txt'),'unstaged user work');
+ const before=git(['status','--porcelain']),head=git(['rev-parse','HEAD']);fs.writeFileSync(path.join(cwd,'smoke.log'),'diagnostic\n'.repeat(10000));
+ const env={GITHUB_SHA:'a'.repeat(40),CI_DIAGNOSTIC_PLATFORM:'legacy-ia32',CI_DIAGNOSTIC_STATUS:'failure',CI_DIAGNOSTIC_LOG:'smoke.log',GITHUB_SERVER_URL:'https://github.com',GITHUB_REPOSITORY:'Vinci-217/mole-baby',GITHUB_RUN_ID:'123'};
+ const receipt=saveDiagnostic({cwd,env});assert.equal(git(['rev-parse','HEAD']),head);assert.equal(git(['status','--porcelain']).replace('?? smoke.log','').trim(),before.trim());
+ const saved=JSON.parse(git(['show',`build-reports:reports/jobs/${env.GITHUB_SHA}/legacy-ia32.json`],remote));assert.deepEqual(saved,receipt);assert.equal(saved.log.length,64000);assert.equal(git(['show','build-reports:existing.json'],remote),'existing receipt');
+ assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_PLATFORM:'../../other'}}),/Invalid/);
+});

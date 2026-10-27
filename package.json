@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.29.5",
+  "version": "0.29.6",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -132,6 +132,6 @@
       "zh-CN",
       "zh_CN"
     ],
-    "compression": "maximum"
+    "compression": "normal"
   }
 }

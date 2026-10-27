@@ -2,7 +2,7 @@ name: Desktop build
 
 on:
   push:
-    branches: [main, 'next/art-direction']
+    branches: [main, 'next/art-direction', 'preview/proportion-polish']
     tags: ['v*']
   pull_request:
     branches: [main]
@@ -23,6 +23,8 @@ jobs:
     env:
       ELECTRON_DEV: '0'
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    permissions:
+      contents: write
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -103,6 +105,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: Save platform diagnostic before other platforms finish
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        continue-on-error: true
+        env:
+          CI_DIAGNOSTIC_PLATFORM: windows
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/windows-smoke.log
+        run: node scripts/save-ci-diagnostic.cjs
+
   legacy:
     name: Build and check legacy Windows ${{ matrix.arch }}
     strategy:
@@ -115,6 +126,8 @@ jobs:
       ELECTRON_DEV: '0'
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       MOLE_LEGACY_ARCH: ${{ matrix.arch }}
+    permissions:
+      contents: write
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -177,6 +190,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: Save platform diagnostic before other platforms finish
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        continue-on-error: true
+        env:
+          CI_DIAGNOSTIC_PLATFORM: legacy-${{ matrix.arch }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/legacy-${{ matrix.arch }}-smoke.log
+        run: node scripts/save-ci-diagnostic.cjs
+
   mac:
     name: Build and check macOS ${{ matrix.arch }}
     strategy:
@@ -192,6 +214,8 @@ jobs:
     env:
       ELECTRON_DEV: '0'
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    permissions:
+      contents: write
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -275,6 +299,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: Save platform diagnostic before other platforms finish
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        continue-on-error: true
+        env:
+          CI_DIAGNOSTIC_PLATFORM: mac-${{ matrix.arch }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/mac-${{ matrix.arch }}-smoke.log
+        run: node scripts/save-ci-diagnostic.cjs
+
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v')
@@ -328,7 +361,7 @@ jobs:
 
   report:
     name: Save build receipt
-    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/proportion-polish')
     needs: [build, legacy, mac, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10

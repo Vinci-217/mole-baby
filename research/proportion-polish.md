@@ -1,6 +1,6 @@
 # Proportion and tiredness preview
 
-Review branch: `preview/proportion-polish`. Target release: v0.29.5. The user explicitly requested publication after the fixes and verification.
+Review branch: `preview/proportion-polish`. Target release: v0.29.6. The user explicitly requested publication after the fixes and verification.
 
 This revision reuses the existing original-game character atlases. It is a desktop
 registration/timing adaptation, not newly recovered official animation frames.
@@ -51,3 +51,5 @@ Visual measurements passed 288 active cases, 128 reduced-motion cases and 16 out
 Release CI also exposed a host-architecture leak in the Windows lifecycle test fixture on Apple Silicon. The fixture now explicitly simulates x64 Windows, with separate ia32 coverage; all 25 lifecycle tests pass with an emulated ARM64 host. The blocked v0.29.3 tag was never published; v0.29.4 then reached actual platform packaging checks.
 
 The v0.29.4 packaging gate caught parallel NSIS/ZIP payload divergence and a legitimate welcome bubble in the Mac transparency fixture. Windows packaging now completes NSIS before archiving the same prepackaged directory; exact-file validation remains strict. The transparency check dismisses visible bubbles through the normal UI before measuring unused alpha. Publication targets v0.29.5 with 278 frontend and 92 Node tests.
+
+v0.29.5 passed the modern Windows complete package, native title/hover/alpha, installer Finish flow, real consented NSIS upgrade, and both Mac architectures. Legacy Windows startup diagnostics were obscured by a cleanup timeout. The smoke now preserves the primary error, captures main-process/native-dialog diagnostics, and saves per-platform results immediately over Git. Normal ZIP compression replaces the costly 15-pass maximum setting; CRC/file-byte validation remains unchanged. Current Node tests: 93.
