@@ -51,6 +51,10 @@
 
 ## 最近更新素材
 
+- [artifacts/transform-preview/bird.gif](../artifacts/transform-preview/bird.gif)
+- [artifacts/transform-preview/rabbit.gif](../artifacts/transform-preview/rabbit.gif)
+- [artifacts/transform-preview/tree.gif](../artifacts/transform-preview/tree.gif)
+- [skills/mole-classic-art/references/v40/transform-sheet.png](../skills/mole-classic-art/references/v40/transform-sheet.png)
 - [artifacts/spell-preview/fire.gif](../artifacts/spell-preview/fire.gif)
 - [artifacts/spell-preview/ice.gif](../artifacts/spell-preview/ice.gif)
 - [artifacts/spell-preview/magic.gif](../artifacts/spell-preview/magic.gif)
@@ -59,10 +63,6 @@
 - [skills/mole-classic-art/references/v39/elements-sheet-initial.png](../skills/mole-classic-art/references/v39/elements-sheet-initial.png)
 - [skills/mole-classic-art/references/v39/hero-elements-with-haze.png](../skills/mole-classic-art/references/v39/hero-elements-with-haze.png)
 - [skills/mole-classic-art/references/v39/magic-sheet.png](../skills/mole-classic-art/references/v39/magic-sheet.png)
-- [artifacts/animation-gallery/drag-young.gif](../artifacts/animation-gallery/drag-young.gif)
-- [artifacts/animation-gallery/drag.gif](../artifacts/animation-gallery/drag.gif)
-- [artifacts/animation-gallery/elemental-skills.gif](../artifacts/animation-gallery/elemental-skills.gif)
-- [artifacts/animation-gallery/middle-bound.gif](../artifacts/animation-gallery/middle-bound.gif)
 
 ## 全部素材分类
 
