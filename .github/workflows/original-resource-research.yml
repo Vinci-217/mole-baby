@@ -1,0 +1,23 @@
+name: Retrieve original Ram skill resources
+on:
+  push:
+    branches: ['preview/companion-workflow']
+    paths:
+      - '.github/workflows/original-resource-research.yml'
+      - 'scripts/art/collect-original-skills.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: original-ram-resource-retrieval
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Retrieve public source assets and save bounded SWFs plus report
+        env:
+          MOLE_PUBLISH_RESOURCE_REPORT: '1'
+        run: python3 scripts/art/collect-original-skills.py
