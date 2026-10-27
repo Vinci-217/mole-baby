@@ -10,7 +10,7 @@
 
 Electron官方从23起不再支持Windows7/8/8.1，因此兼容包固定使用最后的22系版本，构建工具仍使用现代Node；构建Node不会安装到用户电脑。[官方兼容说明](https://www.electronjs.org/docs/latest/breaking-changes#removed-windows-7--8--81-support)。XP、Vista和Windows7 SP0不在支持范围内。
 
-兼容版默认使用CPU绘制Canvas2D界面，并关闭不需要的3D软件渲染路径。Chromium仍会启动显示服务；其旧GPU沙箱可能与新Windows虚拟显示驱动冲突，因此兼容版仅关闭GPU服务的沙箱，页面的sandbox和context isolation继续开启。应用身份与安装目录同样与常规版分开。
+兼容版默认使用CPU绘制Canvas2D界面，并保留显示合成需要的软件绘制后备路径。Chromium仍会启动显示服务；其旧GPU沙箱可能与新Windows虚拟显示驱动冲突，因此兼容版仅关闭GPU服务的沙箱，页面的sandbox和context isolation继续开启。应用身份与安装目录同样与常规版分开。
 
 兼容版与老系统已停止安全维护。渲染器仅加载打包的本地界面，生产CSP阻止外部脚本与远程连接，保留context isolation与sandbox；更新只访问固定发布源。这些隔离措施不能替代运行时的安全维护。
 
@@ -29,6 +29,6 @@ npm run dist:win:legacy:x64
 npm run dist:win:legacy:ia32
 ```
 
-CI在现代Windows分别构建常规x64、兼容x64与兼容ia32，检查PE架构和边界、ZIP内每个文件的CRC及与实际测试成品的一致性，启动程序并测试领养、照料、小屋、透明窗口、更新设置、存档回执及安装器完成页。全部平台通过后才发布。
+CI在最新Windows验收常规x64，在Windows Server 2022验收兼容x64与兼容ia32，避免将已停止维护的Chromium108只放在更新的Server2025驱动环境中验收。检查PE架构和边界、ZIP内每个文件的CRC及与实际测试成品的一致性，启动程序并测试领养、照料、小屋、透明窗口、更新设置、存档回执及安装器完成页。全部平台通过后才发布。
 
 本地另以Electron22.3.27 / Node16 / Chromium108运行生产页面检查领养、用品提示、照料与小屋设置，并执行阻止外部脚本的实际CSP探针。这验证旧运行时API与页面兼容性，不能代替Windows7/8/8.1实机测试。当前云环境没有这些系统的虚拟机，不能声称已完成其驱动、DWM、DPI、字体与系统补丁组合的验收。

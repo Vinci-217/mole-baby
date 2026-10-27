@@ -18,7 +18,7 @@ const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetada
 if(windowsEdition?.edition==='legacy'){
   app.disableHardwareAcceleration();
   app.commandLine.appendSwitch('disable-gpu');
-  app.commandLine.appendSwitch('disable-software-rasterizer');
+  // Keep the software renderer available for the legacy display compositor.
   // Chromium still starts a display/GPU service with acceleration disabled.
   // Its old GPU sandbox crashes on newer Windows virtual display drivers.
   // This switch affects that service only; renderer sandboxing stays enabled.

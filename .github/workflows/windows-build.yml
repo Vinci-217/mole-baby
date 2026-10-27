@@ -120,7 +120,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, ia32]
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 45
     env:
       ELECTRON_DEV: '0'
