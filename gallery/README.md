@@ -80,18 +80,18 @@
 
 ## 最近更新素材
 
-- [artifacts/transform-redraw-v43/bird.png](../artifacts/transform-redraw-v43/bird.png)
-- [artifacts/transform-redraw-v43/cat.png](../artifacts/transform-redraw-v43/cat.png)
-- [artifacts/transform-redraw-v43/rabbit.png](../artifacts/transform-redraw-v43/rabbit.png)
-- [artifacts/transform-redraw-v43/tree.png](../artifacts/transform-redraw-v43/tree.png)
-- [artifacts/transform-concepts/bird.png](../artifacts/transform-concepts/bird.png)
-- [artifacts/transform-concepts/cat.png](../artifacts/transform-concepts/cat.png)
-- [artifacts/transform-concepts/rabbit.png](../artifacts/transform-concepts/rabbit.png)
-- [artifacts/transform-concepts/tree.png](../artifacts/transform-concepts/tree.png)
-- [artifacts/transform-v41/bird.gif](../artifacts/transform-v41/bird.gif)
-- [artifacts/transform-v41/rabbit.gif](../artifacts/transform-v41/rabbit.gif)
-- [artifacts/transform-v41/tree.gif](../artifacts/transform-v41/tree.gif)
-- [research/references/ramu-2008-2010/images/body-still.png](../research/references/ramu-2008-2010/images/body-still.png)
+- [artifacts/magic-box-shared-v45/box-poses.png](../artifacts/magic-box-shared-v45/box-poses.png)
+- [artifacts/magic-box-shared-v45/forms-overview.png](../artifacts/magic-box-shared-v45/forms-overview.png)
+- [artifacts/magic-box-shared-v45/forms/fire.gif](../artifacts/magic-box-shared-v45/forms/fire.gif)
+- [artifacts/magic-box-shared-v45/forms/junior.gif](../artifacts/magic-box-shared-v45/forms/junior.gif)
+- [artifacts/magic-box-shared-v45/forms/middle.gif](../artifacts/magic-box-shared-v45/forms/middle.gif)
+- [artifacts/magic-box-shared-v45/forms/seed.gif](../artifacts/magic-box-shared-v45/forms/seed.gif)
+- [artifacts/magic-box-shared-v45/forms/senior.gif](../artifacts/magic-box-shared-v45/forms/senior.gif)
+- [artifacts/magic-box-shared-v45/forms/super.gif](../artifacts/magic-box-shared-v45/forms/super.gif)
+- [artifacts/magic-box-shared-v45/forms/water.gif](../artifacts/magic-box-shared-v45/forms/water.gif)
+- [artifacts/magic-box-shared-v45/forms/wood.gif](../artifacts/magic-box-shared-v45/forms/wood.gif)
+- [artifacts/magic-box-shared-v45/preview-100px.gif](../artifacts/magic-box-shared-v45/preview-100px.gif)
+- [artifacts/magic-box-shared-v45/preview.gif](../artifacts/magic-box-shared-v45/preview.gif)
 
 ## 全部素材分类
 
