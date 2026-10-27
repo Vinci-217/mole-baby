@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-27",
+  "tool": "image_gen.imagegen",
+  "transparent_background": true,
+  "purpose": "Shared blue-violet decorated box and independent opaque smoke. All growth forms reuse original static art and these same shared layers; full round trip preview only.",
+  "source_records": [
+    "public/assets/original/pets/source-record.json",
+    "public/assets/original/seed/source.json",
+    "skills/mole-classic-art/references/v41/original-boards-sources.md",
+    "ASSETS.md"
+  ],
+  "style_observations": [
+    "原角色保留原素材的轮廓与眼位，不重新生成各阶段。",
+    "蓝紫盒子用大色面，侧面较暗，银色线纹与眼睛留出间距。",
+    "盒子上只保留特色眼睛，没有叶冠、红色本体或其他身体结构。",
+    "烟雾以不透明浅色团块覆盖角色完整轮廓。",
+    "所有形态共用同一共用画布、遮挡时点与落点。"
+  ],
+  "calls": [
+    {
+      "operation": "draw_box",
+      "prompt": "Create a new transparent 2x2 sprite sheet containing EXACTLY FOUR complete poses of the SAME closed BLUE-VIOLET MAGIC BOX from the FIRST reference. The four equal cells show 1 eyes normally open, 2 gently half-blinking, 3 softly closed eyelids in its original white eye shapes, 4 eyes open again with a tiny glance. Keep box body, lid and decoration geometrically IDENTICAL in all four cells. Do not rotate, resize or bend the box. FIRST reference gives its exact simple ordinary closed rectangular box shape, periwinkle blue-violet lid, medium violet-blue front, deep indigo side, thin pale lavender rim, slight three-quarter view. Add tasteful visibly engraved SILVER-LAVENDER MAGIC-BOX ORNAMENT: an inset double-line border around the lid with one large four-pointed silver star inside a thin diamond at the lid's center; a few simple symmetric curled silver corner flourishes and short geometric border lines on the front and right face. Give the box the crafted look of a real stage magician's prop, but keep it flat 2D game art and simplify the number of lines so the large patterns remain visible at 100px. No photorealistic woodgrain, heavy texture, gradients, metallic rendering or glow. Ornament must be consistent across ALL four cells, no flickering patterns. The front only retains the Ram's distinctive paired adjacent WHITE OVAL eyes and black pupils from SECOND reference, low on the front, decorations do not touch or obstruct eyes. Absolutely NO green leaves, leaf symbols, red body, rounded Ram silhouette, nose, mouth, limbs, animals, ribbons, hats, smoke or extra objects. Only a normal ornate closed magic box with the original eye design. Use roughly #7A6DE6 on lid, #6556BC front, #433579 side, #D2C9F3 silver-lavender ornaments. Exactly2columns2rows equal cells, entire box centered at same scale and baseline in all four, with ample 15% transparent margins in each cell. Completely clean transparent background, no shadows, text, labels, grid lines, borders around the sheet, fake checkerboard or detached noisy pixels. Newly illustrated reusable prop animation candidate, not an official asset.",
+      "references": [
+        "skills/mole-classic-art/references/v45/blue-box-input.png",
+        "public/assets/original/pets/middle-red-idle.png"
+      ],
+      "output": "skills/mole-classic-art/references/v45/box-edit-input.png",
+      "reference_sha256": {
+        "skills/mole-classic-art/references/v45/blue-box-input.png": "1dddc095528883ed9df1cf60d0c3e509cd3b64a0c9a2bfcb9a4d86a3f641095f",
+        "public/assets/original/pets/middle-red-idle.png": "e89f84e6942d369db8ae634eba351aef2d727410b3101ec990f16f61c718a838"
+      },
+      "output_sha256": "5a391083e3fdbe176640a59bbcaba0ce8d80e5ea94a368b82d018f84c5bef9fa",
+      "output_size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "operation": "box_transparent_cutout",
+      "prompt": "Remove the ENTIRE blue-purple glowing/background haze from this 2x2 sheet and return ONLY the four CLOSED DECORATED BLUE-VIOLET BOXES on genuine alpha transparency. This is a background removal edit, do not redraw the four boxes or change ANY of their shapes, positions, silver engraved patterns, eye expressions or colors. Keep each of the four boxes exactly as it is, the closed box silhouette including all silver lid rim and corner filigree must stay intact. Every pixel OUTSIDE each box's exact hard silhouette must be COMPLETELY TRANSPARENT, including ALL blue glow, ALL dark wash, ALL drop shadow, and all haze between and behind the boxes. No colored backdrop, no gradient and no aura whatsoever. Preserve the four equal 2x2 cells and their wide transparent gutters, no outline added. Actual clean cutouts of the boxes only. Do not put a black background or draw a checkerboard. True transparent RGBA background. Do not generate a scene or change the eye expressions.",
+      "references": [
+        "skills/mole-classic-art/references/v45/box-edit-input.png"
+      ],
+      "output": "skills/mole-classic-art/references/v45/box-sheet.png",
+      "reference_sha256": {
+        "skills/mole-classic-art/references/v45/box-edit-input.png": "5a391083e3fdbe176640a59bbcaba0ce8d80e5ea94a368b82d018f84c5bef9fa"
+      },
+      "output_sha256": "901efa71162488cf1dbfb263aec0737b5fb6fcd0a106d4d2b75dc7a7dad63a51",
+      "output_size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "operation": "draw_shared_smoke",
+      "prompt": "Create a NEW transparent 4x4 sprite sheet containing EXACTLY SIXTEEN newly drawn sequential frames of a REUSABLE cartoon magic SMOKE PUFF effect ONLY. FIRST reference shows the desired cream-white smoke with pale lavender-grey edge shapes and simple Flash-game style, but NEVER include its Ram or box or their eyes or leaves or colors. SECOND reference shows the largest shapes this puff must HIDE, for coverage size only: do NOT draw any of these characters or labels. There must be NO Ram, box, face, eyes, leaves, limbs, stars, animals, props or colored subject visible in ANY of the 16 cells. Only the same smoke puff expanding to fully OPAQUE cover and then dissipating, suitable for overlaying ANY growth stage's original sprite. Effects drawn on true transparent alpha background. The full-size OPAQUE central cloud must cover a central rectangle 60% of cell width by 68% cell height, from x20% to80% and y14% to82%, without any transparent holes; silhouette lobes may extend beyond that. This is crucial to hide tall leaf crowns and square boxes alike. Clouds soft ROUND LOBES drawn as clean flat 2D shapes, cream white interiors, a few pale lavender-grey overlapping shade shapes, no translucent wispy interior, no fog texture, no realistic smoke or glow. Common smoke center at x50%,y49% of every equal cell. A fixed ground baseline at85% cell height and identical source coordinate system, NO independently normalizing poses to same visual size.\nFrame plan in reading order 4x4:\n01 two very small low side puffs, central subject area still empty;\n02 a few puffs grow near the lower sides;\n03 puffs start joining at sides and bottom, expanding upward;\n04 large puffs swell inward across central region;\n05 ONE large cloud covers most of central region;\n06 FULL opaque central cover including whole tall target rectangle, no gap;\n07 FULL opaque cover, lobes billowing, no gap;\n08 FULL opaque cover, lobes changing, no gap; actual hidden sprite swap occurs here;\n09 FULL opaque cover still maintained, no gap;\n10 full cloud begins to recede at its outer edges;\n11 central cloud starts opening a small gap low down;\n12 smoke splits into several receding lobes moving upward and outward;\n13 center mostly clear, smoke mostly at upper and side edges;\n14 a few small puff clusters remain near upper sides;\n15 only two tiny drifting puffs;\n16 a final very tiny pale puff near upper corner, nearly clear, ready for entire effect removal.\nExactly FOUR equal columns and FOUR equal rows. One effect pose per cell, wide clean transparent gutters and 10% transparent padding to all cell edges, no overlaps across grid boundaries. Draw 16 genuinely changing effect shapes, not copies or a huge uniform smoke texture. No text, frame numbers, labels, grid, background, shadow, checkerboard or detached speckled noise. This shared smoke sheet is for new fan-made animation, not official source frames.",
+      "references": [
+        "skills/mole-classic-art/references/v45/blue-box-input.png",
+        "skills/mole-classic-art/references/v41/original-form-colours.png"
+      ],
+      "output": "skills/mole-classic-art/references/v45/smoke-sheet.png",
+      "reference_sha256": {
+        "skills/mole-classic-art/references/v45/blue-box-input.png": "1dddc095528883ed9df1cf60d0c3e509cd3b64a0c9a2bfcb9a4d86a3f641095f",
+        "skills/mole-classic-art/references/v41/original-form-colours.png": "8ed179353e400c4e102c24baa3ef53e9496c3c8513eab8f83b27036a915bc0a3"
+      },
+      "output_sha256": "18c36611ce4e5d226c12512f6b8d651fa49a9e2dbc274b6a2c12a6234e34d1a9",
+      "output_size": [
+        1269,
+        1240
+      ]
+    }
+  ]
+}

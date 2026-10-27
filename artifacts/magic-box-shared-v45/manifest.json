@@ -1,0 +1,377 @@
+{
+  "preview_only": true,
+  "official_animation": false,
+  "model_drawn_cells": {
+    "box": 4,
+    "smoke": 16
+  },
+  "source_sheets": [
+    "skills/mole-classic-art/references/v45/box-sheet.png",
+    "skills/mole-classic-art/references/v45/smoke-sheet.png"
+  ],
+  "source_sha256": [
+    "901efa71162488cf1dbfb263aec0737b5fb6fcd0a106d4d2b75dc7a7dad63a51",
+    "18c36611ce4e5d226c12512f6b8d651fa49a9e2dbc274b6a2c12a6234e34d1a9"
+  ],
+  "timeline_entries": [
+    {
+      "subject": "original",
+      "smoke": null,
+      "box": 0,
+      "ms": 400
+    },
+    {
+      "subject": "original",
+      "smoke": 0,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 1,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 2,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 3,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 4,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 5,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 6,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 7,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 8,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 9,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 10,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 11,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 12,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 13,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 14,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 15,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 0,
+      "ms": 600
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 1,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 2,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 3,
+      "ms": 200
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 0,
+      "ms": 300
+    },
+    {
+      "subject": "box",
+      "smoke": 0,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 1,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 2,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 3,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 4,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 5,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 6,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 7,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 8,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 9,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 10,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 11,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 12,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 13,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 14,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 15,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": null,
+      "box": 0,
+      "ms": 400
+    }
+  ],
+  "timeline_entry_count": 39,
+  "duration_ms": 4280,
+  "hidden_swap_smoke_frame": 8,
+  "coverage_percent_at_swap": {
+    "seed-source": 100.0,
+    "junior-red": 100.0,
+    "junior-yellow": 100.0,
+    "junior-blue": 100.0,
+    "junior-pink": 100.0,
+    "middle-red": 100.0,
+    "middle-yellow": 100.0,
+    "middle-blue": 100.0,
+    "middle-pink": 100.0,
+    "senior-red": 100.0,
+    "senior-yellow": 100.0,
+    "senior-blue": 100.0,
+    "senior-pink": 100.0,
+    "super-red": 100.0,
+    "super-yellow": 100.0,
+    "super-blue": 100.0,
+    "super-pink": 100.0,
+    "water-red": 100.0,
+    "water-yellow": 100.0,
+    "water-blue": 100.0,
+    "water-pink": 100.0,
+    "wood-red": 100.0,
+    "wood-yellow": 100.0,
+    "wood-blue": 100.0,
+    "wood-pink": 100.0,
+    "fire-red": 100.0,
+    "fire-yellow": 100.0,
+    "fire-blue": 100.0,
+    "fire-pink": 100.0,
+    "box": 100.0
+  },
+  "forms": {
+    "seed": {
+      "title": "种子",
+      "source": "public/assets/original/seed/source-motion.gif",
+      "subject": "subjects/seed.png",
+      "gif_frames": 39
+    },
+    "junior": {
+      "title": "初级",
+      "source": "public/assets/original/pets/junior-red-idle.png",
+      "subject": "subjects/junior.png",
+      "gif_frames": 39
+    },
+    "middle": {
+      "title": "中级",
+      "source": "public/assets/original/pets/middle-red-idle.png",
+      "subject": "subjects/middle.png",
+      "gif_frames": 39
+    },
+    "senior": {
+      "title": "高级",
+      "source": "public/assets/original/pets/senior-red-idle.png",
+      "subject": "subjects/senior.png",
+      "gif_frames": 39
+    },
+    "super": {
+      "title": "神力超拉",
+      "source": "public/assets/original/pets/super-red-idle.png",
+      "subject": "subjects/super.png",
+      "gif_frames": 39
+    },
+    "water": {
+      "title": "水",
+      "source": "public/assets/original/pets/water-red-idle.png",
+      "subject": "subjects/water.png",
+      "gif_frames": 39
+    },
+    "wood": {
+      "title": "木",
+      "source": "public/assets/original/pets/wood-red-idle.png",
+      "subject": "subjects/wood.png",
+      "gif_frames": 39
+    },
+    "fire": {
+      "title": "火",
+      "source": "public/assets/original/pets/fire-red-idle.png",
+      "subject": "subjects/fire.png",
+      "gif_frames": 39
+    }
+  },
+  "original_source_sha256": {
+    "public/assets/original/seed/source-motion.gif": "5a41b55de176a4d3095600f590f651999e13a6f429a422cc75bc872021dd352f",
+    "public/assets/original/pets/junior-red-idle.png": "5c3dd4aed091ade3abe47b7582311ce69fc7aa62ecfca217648b1d7449118763",
+    "public/assets/original/pets/junior-yellow-idle.png": "6941f85c94c5e6c4f26d2efba9a5d12ba2003126489186abcfd3ed139a37c5d9",
+    "public/assets/original/pets/junior-blue-idle.png": "94b7aecfff0de9de72d5f90274ccb2a78a72baeda46dd4591ff5d1cba95ea7db",
+    "public/assets/original/pets/junior-pink-idle.png": "351d1a0097eeebdbce14dd368c9a92fb5950528076b2addbd91de92e5aa62b96",
+    "public/assets/original/pets/middle-red-idle.png": "e89f84e6942d369db8ae634eba351aef2d727410b3101ec990f16f61c718a838",
+    "public/assets/original/pets/middle-yellow-idle.png": "221c47f3dabe9f758cd62647b57cf9e53f10d297f6575e2fa1b55ab7389f3983",
+    "public/assets/original/pets/middle-blue-idle.png": "484f725a0c2d7a7882ee88ec84fe17a232412078c4607ef8db8add10867db357",
+    "public/assets/original/pets/middle-pink-idle.png": "01f09838abc732ec04a8d52fc31f6eec93528066ea1f91e8cc7409cc6bce527b",
+    "public/assets/original/pets/senior-red-idle.png": "f76388555bd97ba33c09602ce70fc68f6955d47f310bbe790e5d8b4efaaeadff",
+    "public/assets/original/pets/senior-yellow-idle.png": "1358743c58b7fed375890ef5ebaf9c925659034a65ad9ef88381dd1b4086bd9d",
+    "public/assets/original/pets/senior-blue-idle.png": "12f2e7a84efc853e2ec49915081157cb91ae1a0eaf45370d66fd10dbe7ef7611",
+    "public/assets/original/pets/senior-pink-idle.png": "4fcb770b5d8c913e72e40fd33cd1113931a3e6212bea75a18854db5a33eb74b8",
+    "public/assets/original/pets/super-red-idle.png": "050faee378172fce5980d2be4d1291174535bd7e546a92e302468f90fff2a6dd",
+    "public/assets/original/pets/super-yellow-idle.png": "9685e0d0a81f462c5be2f0c1cc48336e51321a08e7f45d019077adefda53799d",
+    "public/assets/original/pets/super-blue-idle.png": "44cdd6a207a79d6d019537dcf53905063b6efe00b573b949a376f6bad095e9d2",
+    "public/assets/original/pets/super-pink-idle.png": "22b2b541726292e2ce9826b8a1ff362a6194abc3da3856c4100157ee0a53f29a",
+    "public/assets/original/pets/water-red-idle.png": "c2b2082bc9b1865121d5c51bfca14387c97963a1b637318b3ceaf65bdc8f59af",
+    "public/assets/original/pets/water-yellow-idle.png": "7c2913073b39292810fc9473c6eba9053c14ccabd70242f159a8021be1d3f946",
+    "public/assets/original/pets/water-blue-idle.png": "7a3999eacc04bce794c822002f7572ff1746c01a3c0993f11415d025b88e46fd",
+    "public/assets/original/pets/water-pink-idle.png": "984cbf0efb6ce786135e17fc54e0aee9d1c553876961e76c369743d1dffa660b",
+    "public/assets/original/pets/wood-red-idle.png": "a73c3ec8a48cc8aea6aae0316f61050d5361eef3c3ceafd38083bebce4018c69",
+    "public/assets/original/pets/wood-yellow-idle.png": "04dbd7d4399012c80d73ad9faa3f06573292e780d0381a44083f014c6523883c",
+    "public/assets/original/pets/wood-blue-idle.png": "d4b7511ab0899c759287a3c1b80f865a544a671a086d6f9e5c2cf620630a1a75",
+    "public/assets/original/pets/wood-pink-idle.png": "cd1c559bf72e14c3774c148ba55cdb2695f4e798d3e47e88c7d25b9367179dcc",
+    "public/assets/original/pets/fire-red-idle.png": "0dc6d57ab451e948c85a61605e16e0de340cc5b67296169270c2a5ae2edd76da",
+    "public/assets/original/pets/fire-yellow-idle.png": "e3649eb168b116e827208d8d48805ef82c1863e2dc80df3a23e772dc4d1ec0e0",
+    "public/assets/original/pets/fire-blue-idle.png": "a53d420b7820f2f619fb5f09beab6779f2bfe6f9ba46eee277d9ed62dbda27ac",
+    "public/assets/original/pets/fire-pink-idle.png": "425897949e62c1951cde8295e993b3c4f82f088563d458a8b9a78aa9ff1c07c9"
+  },
+  "box_scale": 0.23920265780730898,
+  "smoke_scale": 0.8714893617021278,
+  "canvas": [
+    288,
+    288
+  ],
+  "smoke_extraction": "Connected components assigned to source grid cells, with 15% padding for overlapping lobes. All smoke poses share one scale and -32px vertical registration.",
+  "reuse": "All forms use the identical box PNGs and smoke PNGs. Only original subject changes. Same smoke burst reused forwards for both swaps; no reverse or interpolation.",
+  "processing": "Equal grid crops, common scale per sheet, translation and composition of original artwork only. No program-drawn characters or effects."
+}

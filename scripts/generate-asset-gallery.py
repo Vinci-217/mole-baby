@@ -19,10 +19,10 @@ PAGE_SIZE = 24
 EXTENSIONS = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.icns'}
 PREVIEWABLE = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg'}
 CONCEPTS = [
-    ('小兔子', 'artifacts/transform-redraw-v43/rabbit.png'),
-    ('小鸟', 'artifacts/transform-redraw-v43/bird.png'),
-    ('小树', 'artifacts/transform-redraw-v43/tree.png'),
-    ('小猫', 'artifacts/transform-redraw-v43/cat.png'),
+    ('完整往返 · 播放预览', 'artifacts/magic-box-shared-v45/preview.gif'),
+    ('蓝紫盒子的银色纹样', 'artifacts/magic-box-shared-v45/box-poses.png'),
+    ('完整往返的关键时点', 'artifacts/magic-box-shared-v45/sequence.png'),
+    ('各形态共用同一盒子与烟雾', 'artifacts/magic-box-shared-v45/forms-overview.png'),
 ]
 LATEST = [
     ('变身魔术 · 小兔子', 'artifacts/transform-v41/rabbit.gif'),
@@ -118,12 +118,13 @@ def main() -> None:
             path.unlink()
     rows = [MARKER, '# 拉姆动画和图片素材预览', '',
             '这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。',
-            '', '## 最新候选：变身后的造型', '',
-            '以原版红色拉姆的眼睛、身体与叶片为参考重绘的静态候选，可在[新旧对照](../research/transform-redraw-v43.md)中查看。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。烟雾动画和随机触发尚未制作。', '']
+            '', '## 最新预览：带银色纹样的蓝紫魔术盒 · 各形态共用', '',
+            '拉姆被烟雾遮住，变成带银色角花、边框与星形纹样的蓝紫魔术盒，再次冒烟后恢复原形。盒子只保留拉姆特色的眼睛。各阶段使用原版拉姆，共用 16 格烟雾和 4 格盒子表情，按 39 个时间片编排往返，尚未接入游戏。可查看[本轮说明、各形态动图与共用资源](../research/shared-magic-box-v45.md)。', '']
     for title, path in CONCEPTS:
         if path in paths:
             url = link(path, '../')
-            rows += [f'### {title}', '', f'<a href="{url}"><img src="{url}" alt="{title}" width="280"></a>', '', f'[查看原图]({url})', '']
+            width = 720 if Path(path).suffix == '.png' else 280
+            rows += [f'### {title}', '', f'<a href="{url}"><img src="{url}" alt="{title}" width="{width}"></a>', '', f'[查看原图]({url})', '']
     rows += ['', '## 先前预览：变身魔术和四系法术', '',
             '变身魔术是新绘的候选：每种变身有 16 张图片模型绘制的姿态，首尾接原拉姆静帧，播放时序由程序编排；随机触发尚未接入游戏。四系法术仍使用原角色静态图和各 4 张新绘关键姿态。参考同系列游戏视觉，未核实《摩尔勇士》完整技能原帧，不能视为官方动作复刻。', '']
     for title, path in LATEST:

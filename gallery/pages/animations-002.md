@@ -110,67 +110,67 @@
 [查看原图](../../artifacts/animation-gallery/wardrobe.gif)
 
 
-### <code>artifacts/spell-preview/magic.gif</code>
+### <code>artifacts/magic-box-shared-v45/forms/fire.gif</code>
 
-<a href="../../artifacts/spell-preview/magic.gif"><img src="../../artifacts/spell-preview/magic.gif" alt="artifacts/spell-preview/magic.gif" width="180"></a>
+<a href="../../artifacts/magic-box-shared-v45/forms/fire.gif"><img src="../../artifacts/magic-box-shared-v45/forms/fire.gif" alt="artifacts/magic-box-shared-v45/forms/fire.gif" width="180"></a>
 
-[查看原图](../../artifacts/spell-preview/magic.gif)
-
-
-### <code>artifacts/transform-preview/bird.gif</code>
-
-<a href="../../artifacts/transform-preview/bird.gif"><img src="../../artifacts/transform-preview/bird.gif" alt="artifacts/transform-preview/bird.gif" width="180"></a>
-
-[查看原图](../../artifacts/transform-preview/bird.gif)
+[查看原图](../../artifacts/magic-box-shared-v45/forms/fire.gif)
 
 
-### <code>artifacts/transform-preview/rabbit.gif</code>
+### <code>artifacts/magic-box-shared-v45/forms/junior.gif</code>
 
-<a href="../../artifacts/transform-preview/rabbit.gif"><img src="../../artifacts/transform-preview/rabbit.gif" alt="artifacts/transform-preview/rabbit.gif" width="180"></a>
+<a href="../../artifacts/magic-box-shared-v45/forms/junior.gif"><img src="../../artifacts/magic-box-shared-v45/forms/junior.gif" alt="artifacts/magic-box-shared-v45/forms/junior.gif" width="180"></a>
 
-[查看原图](../../artifacts/transform-preview/rabbit.gif)
-
-
-### <code>artifacts/transform-preview/tree.gif</code>
-
-<a href="../../artifacts/transform-preview/tree.gif"><img src="../../artifacts/transform-preview/tree.gif" alt="artifacts/transform-preview/tree.gif" width="180"></a>
-
-[查看原图](../../artifacts/transform-preview/tree.gif)
+[查看原图](../../artifacts/magic-box-shared-v45/forms/junior.gif)
 
 
-### <code>artifacts/v21-original-actions.gif</code>
+### <code>artifacts/magic-box-shared-v45/forms/middle.gif</code>
 
-<a href="../../artifacts/v21-original-actions.gif"><img src="../../artifacts/v21-original-actions.gif" alt="artifacts/v21-original-actions.gif" width="180"></a>
+<a href="../../artifacts/magic-box-shared-v45/forms/middle.gif"><img src="../../artifacts/magic-box-shared-v45/forms/middle.gif" alt="artifacts/magic-box-shared-v45/forms/middle.gif" width="180"></a>
 
-[查看原图](../../artifacts/v21-original-actions.gif)
-
-
-### <code>artifacts/v22-moods-wardrobe.gif</code>
-
-<a href="../../artifacts/v22-moods-wardrobe.gif"><img src="../../artifacts/v22-moods-wardrobe.gif" alt="artifacts/v22-moods-wardrobe.gif" width="180"></a>
-
-[查看原图](../../artifacts/v22-moods-wardrobe.gif)
+[查看原图](../../artifacts/magic-box-shared-v45/forms/middle.gif)
 
 
-### <code>artifacts/v29-bouncy-pull.gif</code>
+### <code>artifacts/magic-box-shared-v45/forms/seed.gif</code>
 
-<a href="../../artifacts/v29-bouncy-pull.gif"><img src="../../artifacts/v29-bouncy-pull.gif" alt="artifacts/v29-bouncy-pull.gif" width="180"></a>
+<a href="../../artifacts/magic-box-shared-v45/forms/seed.gif"><img src="../../artifacts/magic-box-shared-v45/forms/seed.gif" alt="artifacts/magic-box-shared-v45/forms/seed.gif" width="180"></a>
 
-[查看原图](../../artifacts/v29-bouncy-pull.gif)
-
-
-### <code>artifacts/v30-preview/butterfly.gif</code>
-
-<a href="../../artifacts/v30-preview/butterfly.gif"><img src="../../artifacts/v30-preview/butterfly.gif" alt="artifacts/v30-preview/butterfly.gif" width="180"></a>
-
-[查看原图](../../artifacts/v30-preview/butterfly.gif)
+[查看原图](../../artifacts/magic-box-shared-v45/forms/seed.gif)
 
 
-### <code>artifacts/v30-preview/drag.gif</code>
+### <code>artifacts/magic-box-shared-v45/forms/senior.gif</code>
 
-<a href="../../artifacts/v30-preview/drag.gif"><img src="../../artifacts/v30-preview/drag.gif" alt="artifacts/v30-preview/drag.gif" width="180"></a>
+<a href="../../artifacts/magic-box-shared-v45/forms/senior.gif"><img src="../../artifacts/magic-box-shared-v45/forms/senior.gif" alt="artifacts/magic-box-shared-v45/forms/senior.gif" width="180"></a>
 
-[查看原图](../../artifacts/v30-preview/drag.gif)
+[查看原图](../../artifacts/magic-box-shared-v45/forms/senior.gif)
+
+
+### <code>artifacts/magic-box-shared-v45/forms/super.gif</code>
+
+<a href="../../artifacts/magic-box-shared-v45/forms/super.gif"><img src="../../artifacts/magic-box-shared-v45/forms/super.gif" alt="artifacts/magic-box-shared-v45/forms/super.gif" width="180"></a>
+
+[查看原图](../../artifacts/magic-box-shared-v45/forms/super.gif)
+
+
+### <code>artifacts/magic-box-shared-v45/forms/water.gif</code>
+
+<a href="../../artifacts/magic-box-shared-v45/forms/water.gif"><img src="../../artifacts/magic-box-shared-v45/forms/water.gif" alt="artifacts/magic-box-shared-v45/forms/water.gif" width="180"></a>
+
+[查看原图](../../artifacts/magic-box-shared-v45/forms/water.gif)
+
+
+### <code>artifacts/magic-box-shared-v45/forms/wood.gif</code>
+
+<a href="../../artifacts/magic-box-shared-v45/forms/wood.gif"><img src="../../artifacts/magic-box-shared-v45/forms/wood.gif" alt="artifacts/magic-box-shared-v45/forms/wood.gif" width="180"></a>
+
+[查看原图](../../artifacts/magic-box-shared-v45/forms/wood.gif)
+
+
+### <code>artifacts/magic-box-shared-v45/preview-100px.gif</code>
+
+<a href="../../artifacts/magic-box-shared-v45/preview-100px.gif"><img src="../../artifacts/magic-box-shared-v45/preview-100px.gif" alt="artifacts/magic-box-shared-v45/preview-100px.gif" width="180"></a>
+
+[查看原图](../../artifacts/magic-box-shared-v45/preview-100px.gif)
 
 
 [返回素材首页](../README.md) · [上一页](animations-001.md) · [下一页](animations-003.md)

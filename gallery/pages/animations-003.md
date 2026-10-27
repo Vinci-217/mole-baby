@@ -3,7 +3,70 @@
 
 [返回素材首页](../README.md) · [上一页](animations-002.md)
 
-本页 7 个文件，点击图片或「查看原图」可打开原文件。
+本页 16 个文件，点击图片或「查看原图」可打开原文件。
+
+### <code>artifacts/spell-preview/magic.gif</code>
+
+<a href="../../artifacts/spell-preview/magic.gif"><img src="../../artifacts/spell-preview/magic.gif" alt="artifacts/spell-preview/magic.gif" width="180"></a>
+
+[查看原图](../../artifacts/spell-preview/magic.gif)
+
+
+### <code>artifacts/transform-preview/bird.gif</code>
+
+<a href="../../artifacts/transform-preview/bird.gif"><img src="../../artifacts/transform-preview/bird.gif" alt="artifacts/transform-preview/bird.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/bird.gif)
+
+
+### <code>artifacts/transform-preview/rabbit.gif</code>
+
+<a href="../../artifacts/transform-preview/rabbit.gif"><img src="../../artifacts/transform-preview/rabbit.gif" alt="artifacts/transform-preview/rabbit.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/rabbit.gif)
+
+
+### <code>artifacts/transform-preview/tree.gif</code>
+
+<a href="../../artifacts/transform-preview/tree.gif"><img src="../../artifacts/transform-preview/tree.gif" alt="artifacts/transform-preview/tree.gif" width="180"></a>
+
+[查看原图](../../artifacts/transform-preview/tree.gif)
+
+
+### <code>artifacts/v21-original-actions.gif</code>
+
+<a href="../../artifacts/v21-original-actions.gif"><img src="../../artifacts/v21-original-actions.gif" alt="artifacts/v21-original-actions.gif" width="180"></a>
+
+[查看原图](../../artifacts/v21-original-actions.gif)
+
+
+### <code>artifacts/v22-moods-wardrobe.gif</code>
+
+<a href="../../artifacts/v22-moods-wardrobe.gif"><img src="../../artifacts/v22-moods-wardrobe.gif" alt="artifacts/v22-moods-wardrobe.gif" width="180"></a>
+
+[查看原图](../../artifacts/v22-moods-wardrobe.gif)
+
+
+### <code>artifacts/v29-bouncy-pull.gif</code>
+
+<a href="../../artifacts/v29-bouncy-pull.gif"><img src="../../artifacts/v29-bouncy-pull.gif" alt="artifacts/v29-bouncy-pull.gif" width="180"></a>
+
+[查看原图](../../artifacts/v29-bouncy-pull.gif)
+
+
+### <code>artifacts/v30-preview/butterfly.gif</code>
+
+<a href="../../artifacts/v30-preview/butterfly.gif"><img src="../../artifacts/v30-preview/butterfly.gif" alt="artifacts/v30-preview/butterfly.gif" width="180"></a>
+
+[查看原图](../../artifacts/v30-preview/butterfly.gif)
+
+
+### <code>artifacts/v30-preview/drag.gif</code>
+
+<a href="../../artifacts/v30-preview/drag.gif"><img src="../../artifacts/v30-preview/drag.gif" alt="artifacts/v30-preview/drag.gif" width="180"></a>
+
+[查看原图](../../artifacts/v30-preview/drag.gif)
+
 
 ### <code>artifacts/v30-preview/move.gif</code>
 

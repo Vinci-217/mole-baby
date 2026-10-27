@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>共用蓝紫魔术盒 · 各形态往返预览</title>
+<style>
+body{font:16px system-ui,sans-serif;max-width:1000px;margin:28px auto;padding:0 20px;background:#f7f2e5;color:#403849}h1{font-size:25px}p{line-height:1.6}.views{display:flex;gap:16px;flex-wrap:wrap}.panel{padding:16px;background:white;border:1px solid #dcd6e5;border-radius:12px;text-align:center}.dark{background:#243c50;color:white}.stage{position:relative;width:256px;height:256px;margin-top:10px}.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.small{width:180px}.small .stage{width:100px;height:100px;margin:88px 40px 78px}.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:20px 0}button,select{font:inherit;padding:6px 10px}input{min-width:220px}.sheet{max-width:880px;width:100%;height:auto;display:block}a{color:#6353a2}
+</style>
+<style>body:not(.ready) .stage img{visibility:hidden}</style>
+<h1>拉姆与蓝紫魔术盒</h1>
+<p>烟雾遮住拉姆后变成带银色纹样的魔术盒，再次冒烟后恢复原形。各阶段使用同一套盒子与烟雾。</p>
+<div class="controls"><label>形态 <select id="form"></select></label><button id="play">暂停</button><label>逐帧 <input id="frame" type="range" min="1" max="39" value="1"></label><output id="label">加载中</output><label>速度 <select id="speed"><option value="1">正常</option><option value="0.5">半速</option></select></label></div>
+<div class="views"><div class="panel">浅色背景<div class="stage"><img class="base" alt="当前主体"><img class="smoke" alt="共用烟雾"></div></div><div class="panel dark">深色背景<div class="stage"><img class="base" alt="当前主体"><img class="smoke" alt="共用烟雾"></div></div><div class="panel dark small">100px 尺寸<div class="stage"><img class="base" alt="缩略主体"><img class="smoke" alt="缩略共用烟雾"></div></div></div>
+<p>原版拉姆 + 共用烟雾与盒子的新绘图层。本页为素材预览，尚未接入游戏。</p>
+<p><a href="preview.gif">完整往返动图</a> · <a href="sequence.png">关键帧序列</a> · <a href="forms-overview.png">各形态对照</a></p><img class="sheet" src="sequence.png" alt="完整往返演出的16个时点截图">
+<script>
+(async()=>{
+const data=await(await fetch('manifest.json')).json(),entries=data.timeline_entries;
+const form=document.querySelector('#form'),slider=document.querySelector('#frame'),play=document.querySelector('#play');
+for(const [value,item] of Object.entries(data.forms)){const option=new Option(item.title,value);form.add(option)}form.value='middle';slider.max=entries.length;
+const paths=[...Object.values(data.forms).map(x=>x.subject),...Array.from({length:4},(_,i)=>`shared/box/${String(i+1).padStart(2,'0')}.png`),...Array.from({length:16},(_,i)=>`shared/smoke/${String(i+1).padStart(2,'0')}.png`)];
+await Promise.all(paths.map(src=>{const img=new Image();img.src=src;return img.decode()}));
+let current=0,elapsed=0,last=0,playing=true;window.reviewVisited=[];window.reviewLoops=0;
+function show(index){current=index;const entry=entries[index],base=entry.subject==='original'?data.forms[form.value].subject:`shared/box/${String(entry.box+1).padStart(2,'0')}.png`;document.querySelectorAll('.base').forEach(img=>img.src=base);document.querySelectorAll('.smoke').forEach(img=>{img.hidden=entry.smoke===null;if(entry.smoke!==null)img.src=`shared/smoke/${String(entry.smoke+1).padStart(2,'0')}.png`});slider.value=index+1;document.querySelector('#label').value=`${String(index+1).padStart(2,'0')} / ${entries.length}`;window.reviewFrame=index+1;window.reviewEntry=entry;window.reviewVisited.push(index+1)}
+play.onclick=()=>{playing=!playing;play.textContent=playing?'暂停':'播放';last=0};
+slider.oninput=()=>{playing=false;play.textContent='播放';elapsed=0;show(Number(slider.value)-1)};
+form.onchange=()=>{elapsed=0;last=0;show(0)};
+function tick(now){if(last&&playing){elapsed+=(now-last)*Number(document.querySelector('#speed').value);while(elapsed>=entries[current].ms){elapsed-=entries[current].ms;if(current===entries.length-1)window.reviewLoops++;show((current+1)%entries.length)}}last=now;requestAnimationFrame(tick)}
+show(0);document.body.classList.add('ready');window.reviewReady=true;window.reviewData=data;requestAnimationFrame(tick);
+})().catch(error=>{document.querySelector('#label').value='加载失败：'+error.message;window.reviewError=error.message});
+</script></html>

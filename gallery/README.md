@@ -3,33 +3,33 @@
 
 这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。
 
-## 最新候选：变身后的造型
+## 最新预览：带银色纹样的蓝紫魔术盒 · 各形态共用
 
-以原版红色拉姆的眼睛、身体与叶片为参考重绘的静态候选，可在[新旧对照](../research/transform-redraw-v43.md)中查看。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。烟雾动画和随机触发尚未制作。
+拉姆被烟雾遮住，变成带银色角花、边框与星形纹样的蓝紫魔术盒，再次冒烟后恢复原形。盒子只保留拉姆特色的眼睛。各阶段使用原版拉姆，共用 16 格烟雾和 4 格盒子表情，按 39 个时间片编排往返，尚未接入游戏。可查看[本轮说明、各形态动图与共用资源](../research/shared-magic-box-v45.md)。
 
-### 小兔子
+### 完整往返 · 播放预览
 
-<a href="../artifacts/transform-redraw-v43/rabbit.png"><img src="../artifacts/transform-redraw-v43/rabbit.png" alt="小兔子" width="280"></a>
+<a href="../artifacts/magic-box-shared-v45/preview.gif"><img src="../artifacts/magic-box-shared-v45/preview.gif" alt="完整往返 · 播放预览" width="280"></a>
 
-[查看原图](../artifacts/transform-redraw-v43/rabbit.png)
+[查看原图](../artifacts/magic-box-shared-v45/preview.gif)
 
-### 小鸟
+### 蓝紫盒子的银色纹样
 
-<a href="../artifacts/transform-redraw-v43/bird.png"><img src="../artifacts/transform-redraw-v43/bird.png" alt="小鸟" width="280"></a>
+<a href="../artifacts/magic-box-shared-v45/box-poses.png"><img src="../artifacts/magic-box-shared-v45/box-poses.png" alt="蓝紫盒子的银色纹样" width="720"></a>
 
-[查看原图](../artifacts/transform-redraw-v43/bird.png)
+[查看原图](../artifacts/magic-box-shared-v45/box-poses.png)
 
-### 小树
+### 完整往返的关键时点
 
-<a href="../artifacts/transform-redraw-v43/tree.png"><img src="../artifacts/transform-redraw-v43/tree.png" alt="小树" width="280"></a>
+<a href="../artifacts/magic-box-shared-v45/sequence.png"><img src="../artifacts/magic-box-shared-v45/sequence.png" alt="完整往返的关键时点" width="720"></a>
 
-[查看原图](../artifacts/transform-redraw-v43/tree.png)
+[查看原图](../artifacts/magic-box-shared-v45/sequence.png)
 
-### 小猫
+### 各形态共用同一盒子与烟雾
 
-<a href="../artifacts/transform-redraw-v43/cat.png"><img src="../artifacts/transform-redraw-v43/cat.png" alt="小猫" width="280"></a>
+<a href="../artifacts/magic-box-shared-v45/forms-overview.png"><img src="../artifacts/magic-box-shared-v45/forms-overview.png" alt="各形态共用同一盒子与烟雾" width="720"></a>
 
-[查看原图](../artifacts/transform-redraw-v43/cat.png)
+[查看原图](../artifacts/magic-box-shared-v45/forms-overview.png)
 
 
 ## 先前预览：变身魔术和四系法术
@@ -95,9 +95,9 @@
 
 ## 全部素材分类
 
-共 992 个已跟踪图片文件。每页最多 24 项，按路径排序。
+共 1038 个已跟踪图片文件。每页最多 24 项，按路径排序。
 
-### 历史动画（55）
+### 历史动画（64）
 
 项目中已跟踪的其他 GIF，包括应用内动作、历史方案与原素材。
 
@@ -109,11 +109,11 @@
 
 [第 1 页](pages/game-001.md) · [第 2 页](pages/game-002.md) · [第 3 页](pages/game-003.md) · [第 4 页](pages/game-004.md) · [第 5 页](pages/game-005.md) · [第 6 页](pages/game-006.md) · [第 7 页](pages/game-007.md) · [第 8 页](pages/game-008.md) · [第 9 页](pages/game-009.md) · [第 10 页](pages/game-010.md) · [第 11 页](pages/game-011.md) · [第 12 页](pages/game-012.md) · [第 13 页](pages/game-013.md) · [第 14 页](pages/game-014.md) · [第 15 页](pages/game-015.md) · [第 16 页](pages/game-016.md) · [第 17 页](pages/game-017.md) · [第 18 页](pages/game-018.md) · [第 19 页](pages/game-019.md) · [第 20 页](pages/game-020.md) · [第 21 页](pages/game-021.md) · [第 22 页](pages/game-022.md) · [第 23 页](pages/game-023.md) · [第 24 页](pages/game-024.md) · [第 25 页](pages/game-025.md) · [第 26 页](pages/game-026.md) · [第 27 页](pages/game-027.md) · [第 28 页](pages/game-028.md) · [第 29 页](pages/game-029.md) · [第 30 页](pages/game-030.md) · [第 31 页](pages/game-031.md) · [第 32 页](pages/game-032.md)
 
-### 设计参考和其他图片（181）
+### 设计参考和其他图片（218）
 
 设计参考板、历史预览与其他已跟踪图片；部分是精灵图，并非独立动画。
 
-[第 1 页](pages/references-001.md) · [第 2 页](pages/references-002.md) · [第 3 页](pages/references-003.md) · [第 4 页](pages/references-004.md) · [第 5 页](pages/references-005.md) · [第 6 页](pages/references-006.md) · [第 7 页](pages/references-007.md) · [第 8 页](pages/references-008.md)
+[第 1 页](pages/references-001.md) · [第 2 页](pages/references-002.md) · [第 3 页](pages/references-003.md) · [第 4 页](pages/references-004.md) · [第 5 页](pages/references-005.md) · [第 6 页](pages/references-006.md) · [第 7 页](pages/references-007.md) · [第 8 页](pages/references-008.md) · [第 9 页](pages/references-009.md) · [第 10 页](pages/references-010.md)
 
 ## 其他说明
 
