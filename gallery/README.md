@@ -51,18 +51,18 @@
 
 ## 最近更新素材
 
-- [artifacts/transform-preview/bird.gif](../artifacts/transform-preview/bird.gif)
-- [artifacts/transform-preview/rabbit.gif](../artifacts/transform-preview/rabbit.gif)
-- [artifacts/transform-preview/tree.gif](../artifacts/transform-preview/tree.gif)
-- [skills/mole-classic-art/references/v40/transform-sheet.png](../skills/mole-classic-art/references/v40/transform-sheet.png)
-- [artifacts/spell-preview/fire.gif](../artifacts/spell-preview/fire.gif)
-- [artifacts/spell-preview/ice.gif](../artifacts/spell-preview/ice.gif)
-- [artifacts/spell-preview/magic.gif](../artifacts/spell-preview/magic.gif)
-- [artifacts/spell-preview/meteor.gif](../artifacts/spell-preview/meteor.gif)
-- [artifacts/spell-preview/wind.gif](../artifacts/spell-preview/wind.gif)
-- [skills/mole-classic-art/references/v39/elements-sheet-initial.png](../skills/mole-classic-art/references/v39/elements-sheet-initial.png)
-- [skills/mole-classic-art/references/v39/hero-elements-with-haze.png](../skills/mole-classic-art/references/v39/hero-elements-with-haze.png)
-- [skills/mole-classic-art/references/v39/magic-sheet.png](../skills/mole-classic-art/references/v39/magic-sheet.png)
+- [artifacts/transform-v41/bird.gif](../artifacts/transform-v41/bird.gif)
+- [artifacts/transform-v41/rabbit.gif](../artifacts/transform-v41/rabbit.gif)
+- [artifacts/transform-v41/tree.gif](../artifacts/transform-v41/tree.gif)
+- [research/references/ramu-2008-2010/images/body-still.png](../research/references/ramu-2008-2010/images/body-still.png)
+- [research/references/ramu-2008-2010/images/fire-blue-idle.png](../research/references/ramu-2008-2010/images/fire-blue-idle.png)
+- [research/references/ramu-2008-2010/images/fire-pink-idle.png](../research/references/ramu-2008-2010/images/fire-pink-idle.png)
+- [research/references/ramu-2008-2010/images/fire-red-idle.png](../research/references/ramu-2008-2010/images/fire-red-idle.png)
+- [research/references/ramu-2008-2010/images/fire-yellow-idle.png](../research/references/ramu-2008-2010/images/fire-yellow-idle.png)
+- [research/references/ramu-2008-2010/images/junior-blue-idle.png](../research/references/ramu-2008-2010/images/junior-blue-idle.png)
+- [research/references/ramu-2008-2010/images/junior-pink-idle.png](../research/references/ramu-2008-2010/images/junior-pink-idle.png)
+- [research/references/ramu-2008-2010/images/junior-red-idle.png](../research/references/ramu-2008-2010/images/junior-red-idle.png)
+- [research/references/ramu-2008-2010/images/junior-yellow-idle.png](../research/references/ramu-2008-2010/images/junior-yellow-idle.png)
 
 ## 全部素材分类
 
