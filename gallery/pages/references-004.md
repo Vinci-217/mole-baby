@@ -5,6 +5,34 @@
 
 本页 24 个文件，点击图片或「查看原图」可打开原文件。
 
+### <code>artifacts/v30-source/butterfly-2.png</code>
+
+<a href="../../artifacts/v30-source/butterfly-2.png"><img src="../../artifacts/v30-source/butterfly-2.png" alt="artifacts/v30-source/butterfly-2.png" width="180"></a>
+
+[查看原图](../../artifacts/v30-source/butterfly-2.png)
+
+
+### <code>artifacts/v30-source/butterfly-3.png</code>
+
+<a href="../../artifacts/v30-source/butterfly-3.png"><img src="../../artifacts/v30-source/butterfly-3.png" alt="artifacts/v30-source/butterfly-3.png" width="180"></a>
+
+[查看原图](../../artifacts/v30-source/butterfly-3.png)
+
+
+### <code>artifacts/v30-source/hand-leave.png</code>
+
+<a href="../../artifacts/v30-source/hand-leave.png"><img src="../../artifacts/v30-source/hand-leave.png" alt="artifacts/v30-source/hand-leave.png" width="180"></a>
+
+[查看原图](../../artifacts/v30-source/hand-leave.png)
+
+
+### <code>artifacts/v30-source/hand-ready.png</code>
+
+<a href="../../artifacts/v30-source/hand-ready.png"><img src="../../artifacts/v30-source/hand-ready.png" alt="artifacts/v30-source/hand-ready.png" width="180"></a>
+
+[查看原图](../../artifacts/v30-source/hand-ready.png)
+
+
 ### <code>artifacts/v30-source/hand-stroke.png</code>
 
 <a href="../../artifacts/v30-source/hand-stroke.png"><img src="../../artifacts/v30-source/hand-stroke.png" alt="artifacts/v30-source/hand-stroke.png" width="180"></a>
@@ -143,34 +171,6 @@
 <a href="../../artifacts/v35-shared-body.png"><img src="../../artifacts/v35-shared-body.png" alt="artifacts/v35-shared-body.png" width="180"></a>
 
 [查看原图](../../artifacts/v35-shared-body.png)
-
-
-### <code>artifacts/v36-nojump/frames.png</code>
-
-<a href="../../artifacts/v36-nojump/frames.png"><img src="../../artifacts/v36-nojump/frames.png" alt="artifacts/v36-nojump/frames.png" width="180"></a>
-
-[查看原图](../../artifacts/v36-nojump/frames.png)
-
-
-### <code>artifacts/v37-bound/frames.png</code>
-
-<a href="../../artifacts/v37-bound/frames.png"><img src="../../artifacts/v37-bound/frames.png" alt="artifacts/v37-bound/frames.png" width="180"></a>
-
-[查看原图](../../artifacts/v37-bound/frames.png)
-
-
-### <code>artifacts/v38-school/academy.png</code>
-
-<a href="../../artifacts/v38-school/academy.png"><img src="../../artifacts/v38-school/academy.png" alt="artifacts/v38-school/academy.png" width="180"></a>
-
-[查看原图](../../artifacts/v38-school/academy.png)
-
-
-### <code>artifacts/v38-school/crown/frames.png</code>
-
-<a href="../../artifacts/v38-school/crown/frames.png"><img src="../../artifacts/v38-school/crown/frames.png" alt="artifacts/v38-school/crown/frames.png" width="180"></a>
-
-[查看原图](../../artifacts/v38-school/crown/frames.png)
 
 
 [返回素材首页](../README.md) · [上一页](references-003.md) · [下一页](references-005.md)

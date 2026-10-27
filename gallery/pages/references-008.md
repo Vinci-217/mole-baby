@@ -3,7 +3,35 @@
 
 [返回素材首页](../README.md) · [上一页](references-007.md)
 
-本页 9 个文件，点击图片或「查看原图」可打开原文件。
+本页 13 个文件，点击图片或「查看原图」可打开原文件。
+
+### <code>skills/mole-classic-art/references/v38/furniture-sheet.png</code>
+
+<a href="../../skills/mole-classic-art/references/v38/furniture-sheet.png"><img src="../../skills/mole-classic-art/references/v38/furniture-sheet.png" alt="skills/mole-classic-art/references/v38/furniture-sheet.png" width="180"></a>
+
+[查看原图](../../skills/mole-classic-art/references/v38/furniture-sheet.png)
+
+
+### <code>skills/mole-classic-art/references/v38/original-reference.png</code>
+
+<a href="../../skills/mole-classic-art/references/v38/original-reference.png"><img src="../../skills/mole-classic-art/references/v38/original-reference.png" alt="skills/mole-classic-art/references/v38/original-reference.png" width="180"></a>
+
+[查看原图](../../skills/mole-classic-art/references/v38/original-reference.png)
+
+
+### <code>skills/mole-classic-art/references/v38/study-service-keyframes.png</code>
+
+<a href="../../skills/mole-classic-art/references/v38/study-service-keyframes.png"><img src="../../skills/mole-classic-art/references/v38/study-service-keyframes.png" alt="skills/mole-classic-art/references/v38/study-service-keyframes.png" width="180"></a>
+
+[查看原图](../../skills/mole-classic-art/references/v38/study-service-keyframes.png)
+
+
+### <code>skills/mole-classic-art/references/v39/elements-sheet-initial.png</code>
+
+<a href="../../skills/mole-classic-art/references/v39/elements-sheet-initial.png"><img src="../../skills/mole-classic-art/references/v39/elements-sheet-initial.png" alt="skills/mole-classic-art/references/v39/elements-sheet-initial.png" width="180"></a>
+
+[查看原图](../../skills/mole-classic-art/references/v39/elements-sheet-initial.png)
+
 
 ### <code>skills/mole-classic-art/references/v39/hero-elements-with-haze.png</code>
 

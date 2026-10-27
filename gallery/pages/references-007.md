@@ -5,6 +5,34 @@
 
 本页 24 个文件，点击图片或「查看原图」可打开原文件。
 
+### <code>research/references/ramu-2008-2010/images/junior-red-idle.png</code>
+
+<a href="../../research/references/ramu-2008-2010/images/junior-red-idle.png"><img src="../../research/references/ramu-2008-2010/images/junior-red-idle.png" alt="research/references/ramu-2008-2010/images/junior-red-idle.png" width="180"></a>
+
+[查看原图](../../research/references/ramu-2008-2010/images/junior-red-idle.png)
+
+
+### <code>research/references/ramu-2008-2010/images/junior-yellow-idle.png</code>
+
+<a href="../../research/references/ramu-2008-2010/images/junior-yellow-idle.png"><img src="../../research/references/ramu-2008-2010/images/junior-yellow-idle.png" alt="research/references/ramu-2008-2010/images/junior-yellow-idle.png" width="180"></a>
+
+[查看原图](../../research/references/ramu-2008-2010/images/junior-yellow-idle.png)
+
+
+### <code>research/references/ramu-2008-2010/images/middle-blue-idle.png</code>
+
+<a href="../../research/references/ramu-2008-2010/images/middle-blue-idle.png"><img src="../../research/references/ramu-2008-2010/images/middle-blue-idle.png" alt="research/references/ramu-2008-2010/images/middle-blue-idle.png" width="180"></a>
+
+[查看原图](../../research/references/ramu-2008-2010/images/middle-blue-idle.png)
+
+
+### <code>research/references/ramu-2008-2010/images/middle-pink-idle.png</code>
+
+<a href="../../research/references/ramu-2008-2010/images/middle-pink-idle.png"><img src="../../research/references/ramu-2008-2010/images/middle-pink-idle.png" alt="research/references/ramu-2008-2010/images/middle-pink-idle.png" width="180"></a>
+
+[查看原图](../../research/references/ramu-2008-2010/images/middle-pink-idle.png)
+
+
 ### <code>research/references/ramu-2008-2010/images/middle-red-idle.png</code>
 
 <a href="../../research/references/ramu-2008-2010/images/middle-red-idle.png"><img src="../../research/references/ramu-2008-2010/images/middle-red-idle.png" alt="research/references/ramu-2008-2010/images/middle-red-idle.png" width="180"></a>
@@ -143,34 +171,6 @@
 <a href="../../skills/mole-classic-art/references/v38/elemental-keyframes.png"><img src="../../skills/mole-classic-art/references/v38/elemental-keyframes.png" alt="skills/mole-classic-art/references/v38/elemental-keyframes.png" width="180"></a>
 
 [查看原图](../../skills/mole-classic-art/references/v38/elemental-keyframes.png)
-
-
-### <code>skills/mole-classic-art/references/v38/furniture-sheet.png</code>
-
-<a href="../../skills/mole-classic-art/references/v38/furniture-sheet.png"><img src="../../skills/mole-classic-art/references/v38/furniture-sheet.png" alt="skills/mole-classic-art/references/v38/furniture-sheet.png" width="180"></a>
-
-[查看原图](../../skills/mole-classic-art/references/v38/furniture-sheet.png)
-
-
-### <code>skills/mole-classic-art/references/v38/original-reference.png</code>
-
-<a href="../../skills/mole-classic-art/references/v38/original-reference.png"><img src="../../skills/mole-classic-art/references/v38/original-reference.png" alt="skills/mole-classic-art/references/v38/original-reference.png" width="180"></a>
-
-[查看原图](../../skills/mole-classic-art/references/v38/original-reference.png)
-
-
-### <code>skills/mole-classic-art/references/v38/study-service-keyframes.png</code>
-
-<a href="../../skills/mole-classic-art/references/v38/study-service-keyframes.png"><img src="../../skills/mole-classic-art/references/v38/study-service-keyframes.png" alt="skills/mole-classic-art/references/v38/study-service-keyframes.png" width="180"></a>
-
-[查看原图](../../skills/mole-classic-art/references/v38/study-service-keyframes.png)
-
-
-### <code>skills/mole-classic-art/references/v39/elements-sheet-initial.png</code>
-
-<a href="../../skills/mole-classic-art/references/v39/elements-sheet-initial.png"><img src="../../skills/mole-classic-art/references/v39/elements-sheet-initial.png" alt="skills/mole-classic-art/references/v39/elements-sheet-initial.png" width="180"></a>
-
-[查看原图](../../skills/mole-classic-art/references/v39/elements-sheet-initial.png)
 
 
 [返回素材首页](../README.md) · [上一页](references-006.md) · [下一页](references-008.md)

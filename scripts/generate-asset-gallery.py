@@ -19,10 +19,10 @@ PAGE_SIZE = 24
 EXTENSIONS = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.icns'}
 PREVIEWABLE = {'.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg'}
 CONCEPTS = [
-    ('小兔子', 'artifacts/transform-concepts/rabbit.png'),
-    ('小鸟', 'artifacts/transform-concepts/bird.png'),
-    ('小树', 'artifacts/transform-concepts/tree.png'),
-    ('小猫', 'artifacts/transform-concepts/cat.png'),
+    ('小兔子', 'artifacts/transform-redraw-v43/rabbit.png'),
+    ('小鸟', 'artifacts/transform-redraw-v43/bird.png'),
+    ('小树', 'artifacts/transform-redraw-v43/tree.png'),
+    ('小猫', 'artifacts/transform-redraw-v43/cat.png'),
 ]
 LATEST = [
     ('变身魔术 · 小兔子', 'artifacts/transform-v41/rabbit.gif'),
@@ -119,7 +119,7 @@ def main() -> None:
     rows = [MARKER, '# 拉姆动画和图片素材预览', '',
             '这个分支用于审阅素材。这里列出分支中 **Git 已跟踪** 的 GIF、PNG、JPG、WebP、SVG 和图标文件；提交新素材后自动更新索引，也可以手动运行 `python scripts/generate-asset-gallery.py`。',
             '', '## 最新候选：变身后的造型', '',
-            '先挑选变身后的造型。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。这里是新绘静态候选，烟雾动画和随机触发尚未制作。', '']
+            '以原版红色拉姆的眼睛、身体与叶片为参考重绘的静态候选，可在[新旧对照](../research/transform-redraw-v43.md)中查看。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。烟雾动画和随机触发尚未制作。', '']
     for title, path in CONCEPTS:
         if path in paths:
             url = link(path, '../')

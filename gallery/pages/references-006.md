@@ -5,6 +5,34 @@
 
 本页 24 个文件，点击图片或「查看原图」可打开原文件。
 
+### <code>artifacts/v6-game-puzzle.png</code>
+
+<a href="../../artifacts/v6-game-puzzle.png"><img src="../../artifacts/v6-game-puzzle.png" alt="artifacts/v6-game-puzzle.png" width="180"></a>
+
+[查看原图](../../artifacts/v6-game-puzzle.png)
+
+
+### <code>artifacts/v6-game-rhythm.png</code>
+
+<a href="../../artifacts/v6-game-rhythm.png"><img src="../../artifacts/v6-game-rhythm.png" alt="artifacts/v6-game-rhythm.png" width="180"></a>
+
+[查看原图](../../artifacts/v6-game-rhythm.png)
+
+
+### <code>artifacts/v6-native-compact.png</code>
+
+<a href="../../artifacts/v6-native-compact.png"><img src="../../artifacts/v6-native-compact.png" alt="artifacts/v6-native-compact.png" width="180"></a>
+
+[查看原图](../../artifacts/v6-native-compact.png)
+
+
+### <code>artifacts/v6-native-seed.png</code>
+
+<a href="../../artifacts/v6-native-seed.png"><img src="../../artifacts/v6-native-seed.png" alt="artifacts/v6-native-seed.png" width="180"></a>
+
+[查看原图](../../artifacts/v6-native-seed.png)
+
+
 ### <code>artifacts/v6-native-sidecar.png</code>
 
 <a href="../../artifacts/v6-native-sidecar.png"><img src="../../artifacts/v6-native-sidecar.png" alt="artifacts/v6-native-sidecar.png" width="180"></a>
@@ -143,34 +171,6 @@
 <a href="../../research/references/ramu-2008-2010/images/junior-pink-idle.png"><img src="../../research/references/ramu-2008-2010/images/junior-pink-idle.png" alt="research/references/ramu-2008-2010/images/junior-pink-idle.png" width="180"></a>
 
 [查看原图](../../research/references/ramu-2008-2010/images/junior-pink-idle.png)
-
-
-### <code>research/references/ramu-2008-2010/images/junior-red-idle.png</code>
-
-<a href="../../research/references/ramu-2008-2010/images/junior-red-idle.png"><img src="../../research/references/ramu-2008-2010/images/junior-red-idle.png" alt="research/references/ramu-2008-2010/images/junior-red-idle.png" width="180"></a>
-
-[查看原图](../../research/references/ramu-2008-2010/images/junior-red-idle.png)
-
-
-### <code>research/references/ramu-2008-2010/images/junior-yellow-idle.png</code>
-
-<a href="../../research/references/ramu-2008-2010/images/junior-yellow-idle.png"><img src="../../research/references/ramu-2008-2010/images/junior-yellow-idle.png" alt="research/references/ramu-2008-2010/images/junior-yellow-idle.png" width="180"></a>
-
-[查看原图](../../research/references/ramu-2008-2010/images/junior-yellow-idle.png)
-
-
-### <code>research/references/ramu-2008-2010/images/middle-blue-idle.png</code>
-
-<a href="../../research/references/ramu-2008-2010/images/middle-blue-idle.png"><img src="../../research/references/ramu-2008-2010/images/middle-blue-idle.png" alt="research/references/ramu-2008-2010/images/middle-blue-idle.png" width="180"></a>
-
-[查看原图](../../research/references/ramu-2008-2010/images/middle-blue-idle.png)
-
-
-### <code>research/references/ramu-2008-2010/images/middle-pink-idle.png</code>
-
-<a href="../../research/references/ramu-2008-2010/images/middle-pink-idle.png"><img src="../../research/references/ramu-2008-2010/images/middle-pink-idle.png" alt="research/references/ramu-2008-2010/images/middle-pink-idle.png" width="180"></a>
-
-[查看原图](../../research/references/ramu-2008-2010/images/middle-pink-idle.png)
 
 
 [返回素材首页](../README.md) · [上一页](references-005.md) · [下一页](references-007.md)

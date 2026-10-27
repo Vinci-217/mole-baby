@@ -5,6 +5,34 @@
 
 本页 24 个文件，点击图片或「查看原图」可打开原文件。
 
+### <code>artifacts/v36-nojump/frames.png</code>
+
+<a href="../../artifacts/v36-nojump/frames.png"><img src="../../artifacts/v36-nojump/frames.png" alt="artifacts/v36-nojump/frames.png" width="180"></a>
+
+[查看原图](../../artifacts/v36-nojump/frames.png)
+
+
+### <code>artifacts/v37-bound/frames.png</code>
+
+<a href="../../artifacts/v37-bound/frames.png"><img src="../../artifacts/v37-bound/frames.png" alt="artifacts/v37-bound/frames.png" width="180"></a>
+
+[查看原图](../../artifacts/v37-bound/frames.png)
+
+
+### <code>artifacts/v38-school/academy.png</code>
+
+<a href="../../artifacts/v38-school/academy.png"><img src="../../artifacts/v38-school/academy.png" alt="artifacts/v38-school/academy.png" width="180"></a>
+
+[查看原图](../../artifacts/v38-school/academy.png)
+
+
+### <code>artifacts/v38-school/crown/frames.png</code>
+
+<a href="../../artifacts/v38-school/crown/frames.png"><img src="../../artifacts/v38-school/crown/frames.png" alt="artifacts/v38-school/crown/frames.png" width="180"></a>
+
+[查看原图](../../artifacts/v38-school/crown/frames.png)
+
+
 ### <code>artifacts/v38-school/furnished-room.png</code>
 
 <a href="../../artifacts/v38-school/furnished-room.png"><img src="../../artifacts/v38-school/furnished-room.png" alt="artifacts/v38-school/furnished-room.png" width="180"></a>
@@ -143,34 +171,6 @@
 <a href="../../artifacts/v6-game-orchard.png"><img src="../../artifacts/v6-game-orchard.png" alt="artifacts/v6-game-orchard.png" width="180"></a>
 
 [查看原图](../../artifacts/v6-game-orchard.png)
-
-
-### <code>artifacts/v6-game-puzzle.png</code>
-
-<a href="../../artifacts/v6-game-puzzle.png"><img src="../../artifacts/v6-game-puzzle.png" alt="artifacts/v6-game-puzzle.png" width="180"></a>
-
-[查看原图](../../artifacts/v6-game-puzzle.png)
-
-
-### <code>artifacts/v6-game-rhythm.png</code>
-
-<a href="../../artifacts/v6-game-rhythm.png"><img src="../../artifacts/v6-game-rhythm.png" alt="artifacts/v6-game-rhythm.png" width="180"></a>
-
-[查看原图](../../artifacts/v6-game-rhythm.png)
-
-
-### <code>artifacts/v6-native-compact.png</code>
-
-<a href="../../artifacts/v6-native-compact.png"><img src="../../artifacts/v6-native-compact.png" alt="artifacts/v6-native-compact.png" width="180"></a>
-
-[查看原图](../../artifacts/v6-native-compact.png)
-
-
-### <code>artifacts/v6-native-seed.png</code>
-
-<a href="../../artifacts/v6-native-seed.png"><img src="../../artifacts/v6-native-seed.png" alt="artifacts/v6-native-seed.png" width="180"></a>
-
-[查看原图](../../artifacts/v6-native-seed.png)
 
 
 [返回素材首页](../README.md) · [上一页](references-004.md) · [下一页](references-006.md)

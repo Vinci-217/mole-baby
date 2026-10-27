@@ -5,31 +5,31 @@
 
 ## 最新候选：变身后的造型
 
-先挑选变身后的造型。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。这里是新绘静态候选，烟雾动画和随机触发尚未制作。
+以原版红色拉姆的眼睛、身体与叶片为参考重绘的静态候选，可在[新旧对照](../research/transform-redraw-v43.md)中查看。后续设想：烟雾遮住拉姆，消散后显示选中的目标；停留几秒，再以烟雾遮住目标并恢复原形。烟雾动画和随机触发尚未制作。
 
 ### 小兔子
 
-<a href="../artifacts/transform-concepts/rabbit.png"><img src="../artifacts/transform-concepts/rabbit.png" alt="小兔子" width="280"></a>
+<a href="../artifacts/transform-redraw-v43/rabbit.png"><img src="../artifacts/transform-redraw-v43/rabbit.png" alt="小兔子" width="280"></a>
 
-[查看原图](../artifacts/transform-concepts/rabbit.png)
+[查看原图](../artifacts/transform-redraw-v43/rabbit.png)
 
 ### 小鸟
 
-<a href="../artifacts/transform-concepts/bird.png"><img src="../artifacts/transform-concepts/bird.png" alt="小鸟" width="280"></a>
+<a href="../artifacts/transform-redraw-v43/bird.png"><img src="../artifacts/transform-redraw-v43/bird.png" alt="小鸟" width="280"></a>
 
-[查看原图](../artifacts/transform-concepts/bird.png)
+[查看原图](../artifacts/transform-redraw-v43/bird.png)
 
 ### 小树
 
-<a href="../artifacts/transform-concepts/tree.png"><img src="../artifacts/transform-concepts/tree.png" alt="小树" width="280"></a>
+<a href="../artifacts/transform-redraw-v43/tree.png"><img src="../artifacts/transform-redraw-v43/tree.png" alt="小树" width="280"></a>
 
-[查看原图](../artifacts/transform-concepts/tree.png)
+[查看原图](../artifacts/transform-redraw-v43/tree.png)
 
 ### 小猫
 
-<a href="../artifacts/transform-concepts/cat.png"><img src="../artifacts/transform-concepts/cat.png" alt="小猫" width="280"></a>
+<a href="../artifacts/transform-redraw-v43/cat.png"><img src="../artifacts/transform-redraw-v43/cat.png" alt="小猫" width="280"></a>
 
-[查看原图](../artifacts/transform-concepts/cat.png)
+[查看原图](../artifacts/transform-redraw-v43/cat.png)
 
 
 ## 先前预览：变身魔术和四系法术
@@ -95,7 +95,7 @@
 
 ## 全部素材分类
 
-共 988 个已跟踪图片文件。每页最多 24 项，按路径排序。
+共 992 个已跟踪图片文件。每页最多 24 项，按路径排序。
 
 ### 历史动画（55）
 
@@ -109,7 +109,7 @@
 
 [第 1 页](pages/game-001.md) · [第 2 页](pages/game-002.md) · [第 3 页](pages/game-003.md) · [第 4 页](pages/game-004.md) · [第 5 页](pages/game-005.md) · [第 6 页](pages/game-006.md) · [第 7 页](pages/game-007.md) · [第 8 页](pages/game-008.md) · [第 9 页](pages/game-009.md) · [第 10 页](pages/game-010.md) · [第 11 页](pages/game-011.md) · [第 12 页](pages/game-012.md) · [第 13 页](pages/game-013.md) · [第 14 页](pages/game-014.md) · [第 15 页](pages/game-015.md) · [第 16 页](pages/game-016.md) · [第 17 页](pages/game-017.md) · [第 18 页](pages/game-018.md) · [第 19 页](pages/game-019.md) · [第 20 页](pages/game-020.md) · [第 21 页](pages/game-021.md) · [第 22 页](pages/game-022.md) · [第 23 页](pages/game-023.md) · [第 24 页](pages/game-024.md) · [第 25 页](pages/game-025.md) · [第 26 页](pages/game-026.md) · [第 27 页](pages/game-027.md) · [第 28 页](pages/game-028.md) · [第 29 页](pages/game-029.md) · [第 30 页](pages/game-030.md) · [第 31 页](pages/game-031.md) · [第 32 页](pages/game-032.md)
 
-### 设计参考和其他图片（177）
+### 设计参考和其他图片（181）
 
 设计参考板、历史预览与其他已跟踪图片；部分是精灵图，并非独立动画。
 

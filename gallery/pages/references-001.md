@@ -12,6 +12,34 @@
 [查看原图](../../artifacts/animation-gallery/speech-fixed.png)
 
 
+### <code>artifacts/transform-concepts/bird.png</code>
+
+<a href="../../artifacts/transform-concepts/bird.png"><img src="../../artifacts/transform-concepts/bird.png" alt="artifacts/transform-concepts/bird.png" width="180"></a>
+
+[查看原图](../../artifacts/transform-concepts/bird.png)
+
+
+### <code>artifacts/transform-concepts/cat.png</code>
+
+<a href="../../artifacts/transform-concepts/cat.png"><img src="../../artifacts/transform-concepts/cat.png" alt="artifacts/transform-concepts/cat.png" width="180"></a>
+
+[查看原图](../../artifacts/transform-concepts/cat.png)
+
+
+### <code>artifacts/transform-concepts/rabbit.png</code>
+
+<a href="../../artifacts/transform-concepts/rabbit.png"><img src="../../artifacts/transform-concepts/rabbit.png" alt="artifacts/transform-concepts/rabbit.png" width="180"></a>
+
+[查看原图](../../artifacts/transform-concepts/rabbit.png)
+
+
+### <code>artifacts/transform-concepts/tree.png</code>
+
+<a href="../../artifacts/transform-concepts/tree.png"><img src="../../artifacts/transform-concepts/tree.png" alt="artifacts/transform-concepts/tree.png" width="180"></a>
+
+[查看原图](../../artifacts/transform-concepts/tree.png)
+
+
 ### <code>artifacts/v10-native-presence.png</code>
 
 <a href="../../artifacts/v10-native-presence.png"><img src="../../artifacts/v10-native-presence.png" alt="artifacts/v10-native-presence.png" width="180"></a>
@@ -143,34 +171,6 @@
 <a href="../../artifacts/v18-room.png"><img src="../../artifacts/v18-room.png" alt="artifacts/v18-room.png" width="180"></a>
 
 [查看原图](../../artifacts/v18-room.png)
-
-
-### <code>artifacts/v18-treasure-compact.png</code>
-
-<a href="../../artifacts/v18-treasure-compact.png"><img src="../../artifacts/v18-treasure-compact.png" alt="artifacts/v18-treasure-compact.png" width="180"></a>
-
-[查看原图](../../artifacts/v18-treasure-compact.png)
-
-
-### <code>artifacts/v18-treasure.png</code>
-
-<a href="../../artifacts/v18-treasure.png"><img src="../../artifacts/v18-treasure.png" alt="artifacts/v18-treasure.png" width="180"></a>
-
-[查看原图](../../artifacts/v18-treasure.png)
-
-
-### <code>artifacts/v19-edge-peeks.png</code>
-
-<a href="../../artifacts/v19-edge-peeks.png"><img src="../../artifacts/v19-edge-peeks.png" alt="artifacts/v19-edge-peeks.png" width="180"></a>
-
-[查看原图](../../artifacts/v19-edge-peeks.png)
-
-
-### <code>artifacts/v19-invitation-compact.png</code>
-
-<a href="../../artifacts/v19-invitation-compact.png"><img src="../../artifacts/v19-invitation-compact.png" alt="artifacts/v19-invitation-compact.png" width="180"></a>
-
-[查看原图](../../artifacts/v19-invitation-compact.png)
 
 
 [返回素材首页](../README.md) · [下一页](references-002.md)
