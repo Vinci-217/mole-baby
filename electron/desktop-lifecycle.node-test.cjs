@@ -382,7 +382,9 @@ test('legacy Windows isolates its Chromium profile and keeps architecture-specif
   const run=await launch('mole-baby',false,'win32',{edition:'legacy',arch});t.after(()=>run.cleanup());
   assert.equal(run.app.name,'拉姆兼容版');assert.equal(path.basename(run.app.userData),'mole-baby-legacy');
   assert.equal(run.stats.hardwareAccelerationDisabled,true);
-  assert.deepEqual(run.stats.switches,['disable-gpu','disable-software-rasterizer']);
+  assert.deepEqual(run.stats.switches,['disable-gpu','disable-software-rasterizer','disable-gpu-sandbox']);
+  assert.equal(run.window.options.webPreferences.sandbox,true);
+  assert.equal(run.window.options.webPreferences.contextIsolation,true);
   assert.equal(run.stats.appId,'com.molebaby.ramuhouse.legacy');
   assert.notEqual(path.basename(run.app.userData),'mole-baby','an older Chromium must not open the modern profile');
  }

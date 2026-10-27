@@ -19,6 +19,10 @@ if(windowsEdition?.edition==='legacy'){
   app.disableHardwareAcceleration();
   app.commandLine.appendSwitch('disable-gpu');
   app.commandLine.appendSwitch('disable-software-rasterizer');
+  // Chromium still starts a display/GPU service with acceleration disabled.
+  // Its old GPU sandbox crashes on newer Windows virtual display drivers.
+  // This switch affects that service only; renderer sandboxing stays enabled.
+  app.commandLine.appendSwitch('disable-gpu-sandbox');
 }
 let updates=null,updateRendererBusy=true,updateCheckpoint=null;
 const updatePrompts=createUpdatePrompts({getUpdates:()=>updates,showMessageBox:options=>mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()?dialog.showMessageBox(mainWindow,options):dialog.showMessageBox(options),onError:error=>console.error('Unable to show update confirmation:',error.message)});

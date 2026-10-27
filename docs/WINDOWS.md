@@ -10,7 +10,7 @@
 
 Electron官方从23起不再支持Windows7/8/8.1，因此兼容包固定使用最后的22系版本，构建工具仍使用现代Node；构建Node不会安装到用户电脑。[官方兼容说明](https://www.electronjs.org/docs/latest/breaking-changes#removed-windows-7--8--81-support)。XP、Vista和Windows7 SP0不在支持范围内。
 
-兼容版默认使用CPU绘制Canvas2D界面，并关闭不需要的3D软件渲染路径，避免旧显卡、虚拟显卡或SwiftShader启动崩溃。应用身份与安装目录同样与常规版分开。
+兼容版默认使用CPU绘制Canvas2D界面，并关闭不需要的3D软件渲染路径。Chromium仍会启动显示服务；其旧GPU沙箱可能与新Windows虚拟显示驱动冲突，因此兼容版仅关闭GPU服务的沙箱，页面的sandbox和context isolation继续开启。应用身份与安装目录同样与常规版分开。
 
 兼容版与老系统已停止安全维护。渲染器仅加载打包的本地界面，生产CSP阻止外部脚本与远程连接，保留context isolation与sandbox；更新只访问固定发布源。这些隔离措施不能替代运行时的安全维护。
 
