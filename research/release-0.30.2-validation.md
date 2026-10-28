@@ -14,3 +14,11 @@
 ## 首轮跨平台成品
 
 提交 `5b3f97c0abcb6e87fc066bae80d586fa47838c6f` 的五种成品全部通过：[运行回执](https://github.com/Vinci-217/mole-baby/actions/runs/40641667361)。两种 Mac 的 Electron 通过真实 GitHub 网络取得 v0.30.1 DMG，并通过 SHA256；安装打开使用测试桩。此后仅补充经典超拉原版足球147个非空源帧及对应播放检查；本地原生窗口与浏览器检查均通过，最终成品仍会随标签重新检查。
+
+## 正式发布验收
+
+`v0.30.2` 对应提交 `5033a52c8b60d17df2e0bff8bf8e0a44182fe77e`，已通过五种平台成品检查并公开发布：[正式流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40643049229) · [下载页](https://github.com/Vinci-217/mole-baby/releases/tag/v0.30.2)。完整日志、十个安装/便携包的 SHA256、两种 Mac 的签名状态见 [发布回执](release-0.30.2-receipt.json)。
+
+Windows 常规版和两种兼容版均通过八轮窗口模式切换的无标题/厚边框检查、原生提示与顶部透明区域检查，以及本轮课程、五形态、固定成长和实际后台音乐播放检查。两种 Mac 同样通过成品回归，并在真实 Electron 网络中完成 GitHub 版本检测、用户确认后的 DMG 下载及 SHA256 校验；仅最终安装打开使用测试桩，未宣称验证自动替换应用。
+
+发布后独立读取 `latest.yml`、`latest-mac.yml`、`legacy-x64.yml`、`legacy-ia32.yml`，四个更新清单均为 `0.30.2`，清单 SHA256 与正式发布校验文件一致；十个下载 URL 均返回成功，安装包校验值与构建回执一致。此文档验收不改变标签对应的程序代码。
