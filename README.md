@@ -2,6 +2,23 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
+## 待确认预览 · 两片叶子的安静待机
+
+中级拉姆去掉无人互动时持续游移的瞳孔，平时保持平视；短眨眼之间留出长短不同的停顿，叶片摆动也减小。鼠标靠近时轻轻看过来，离开后缓缓回正。保留当前原素材身体、眼睛、叶片与四种颜色；本次调整的是播放节奏和视线规则，不是重新绘制角色。
+
+以下是100×109像素实际组件、四种配色的12秒录制：前8秒安静陪伴，随后模拟鼠标靠近2秒、离开2秒。288张浏览器截图用于GIF编码，不代表新增288张手绘姿态。本改动仅在 `preview/middle-calm-idle` 分支，尚未合入或发版。
+
+![中级拉姆新版待机 · 四种颜色](artifacts/middle-calm-idle/after.gif)
+
+<details>
+<summary>展开修改前对照</summary>
+
+![修改前同场景待机](artifacts/middle-calm-idle/before.gif)
+
+</details>
+
+[参考、改动与验证记录](research/middle-calm-idle.md)
+
 ## 本轮修复 · v0.30.2
 
 桌面提示结束后移除节点及阴影，避免透明窗口上残留横条；学院显示上课条件，并允许结束自主小动作后直接上课。设置手动选择阶段后固定等级和形态，未选择的拉姆继续正常成长；历史回忆中可识别的手动选择在读档时迁移。神力形态增加原版三片金叶的经典超级拉姆，共五种。

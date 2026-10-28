@@ -214,3 +214,9 @@ artifacts/v38-school/crown/*
 !artifacts/v30-workflow/*.gif
 !artifacts/v30-workflow/*.json
 artifacts/v30-workflow/failed*.png
+
+!artifacts/middle-calm-idle/
+artifacts/middle-calm-idle/*
+!artifacts/middle-calm-idle/*.gif
+!artifacts/middle-calm-idle/*.png
+!artifacts/middle-calm-idle/*-checks.json

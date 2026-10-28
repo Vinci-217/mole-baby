@@ -24,6 +24,17 @@ export function groundedMotion(form:string,action:string,elapsed:number,clock:nu
   if(action==='wake'){frame=0;eyeX=0;eyeY=0}
   if(action==='watch-butterfly'){eyeX=Math.sin(elapsed/6500*Math.PI*2)*2;eyeY=-1.1}
   if(action==='look-around'){eyeX=Math.sin(elapsed/3600*Math.PI*2)*2;eyeY=-.3}
+  if(form==='middle'&&(action==='idle'||action==='waiting')){
+    // A companion looks ahead between interactions. Independent sine waves
+    // made the pupils orbit even with no pointer nearby. Keep the original
+    // open-eye registration, with only a small, eased pointer response.
+    eyeX=gaze.x*.9;eyeY=gaze.y*.5
+    // Brief existing half-lids, with unequal pauses; the happy/smiling eyes
+    // are an expression, not a face to cycle through during neutral idle.
+    const idlePhase=Math.max(0,clock)%19300
+    frame=idlePhase>=4700&&idlePhase<4820||idlePhase>=11800&&idlePhase<11920?1:0
+  }
   const reaction=action==='play'?sampleSocialMotion(form==='junior'?1:2,'play',elapsed).contact:action==='pet'?Math.sin(elapsed/490*Math.PI*2)*Math.sin(Math.min(1,elapsed/2400)*Math.PI):0
-  return {frame,eyeX:Math.max(-2.4,Math.min(2.4,eyeX)),eyeY:Math.max(-1.5,Math.min(1.5,eyeY)),leafAngle:action==='drag'?0:form==='middle'?Math.sin(clock/2200)*1.15+reaction*4:0}
+  const calmIdle=form==='middle'&&(action==='idle'||action==='waiting')
+  return {frame,eyeX:Math.max(-2.4,Math.min(2.4,eyeX)),eyeY:Math.max(-1.5,Math.min(1.5,eyeY)),leafAngle:action==='drag'?0:calmIdle?Math.sin(clock/3600)*.45:form==='middle'?Math.sin(clock/2200)*1.15+reaction*4:0}
 }
