@@ -213,3 +213,4 @@ artifacts/v38-school/crown/*
 !artifacts/v30-workflow/*.png
 !artifacts/v30-workflow/*.gif
 !artifacts/v30-workflow/*.json
+artifacts/v30-workflow/failed*.png

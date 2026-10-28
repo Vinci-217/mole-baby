@@ -379,7 +379,7 @@ export default function App() {
     const item = getItem(itemId), next = type === 'sleep' && saved.sleeping ? 'wake' : type;
     const detail = invitationDetail ?? (item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined);
     const result=care(saved, type, itemId, Date.now());
-    if(result.ok)clearInvitation();
+    if(result.ok){clearInvitation();if(type==='sleep')previousRest.current={petId:result.state.createdAt,sleeping:result.state.sleeping};}
     apply(result, next, detail, itemId);
     return result.ok;
   }
