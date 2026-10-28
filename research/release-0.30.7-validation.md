@@ -26,3 +26,5 @@
 ## 正式成品
 
 [正式流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40680225357)的Windows兼容x64在屏幕锚点检查失败，发布被阻止。源提交77f651a与v0.30.7标签保留追溯，未公开Release、未更新latest渠道。后续补丁采用v0.30.8，补充异步窗口位置对齐及稳定的施法前基准检查。
+
+最终v0.30.8已通过五平台并公开，见 [v0.30.8验收](release-0.30.8-validation.md)。
