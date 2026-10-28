@@ -1,0 +1,42 @@
+[
+  {
+    "form": "seed",
+    "totalOpaqueCharacterPixels": 3445,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "junior",
+    "totalOpaqueCharacterPixels": 3364,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "middle",
+    "totalOpaqueCharacterPixels": 3711,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "senior",
+    "totalOpaqueCharacterPixels": 3839,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "super",
+    "totalOpaqueCharacterPixels": 2421,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "water",
+    "totalOpaqueCharacterPixels": 4265,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "wood",
+    "totalOpaqueCharacterPixels": 3124,
+    "uncoveredPixels": 0
+  },
+  {
+    "form": "fire",
+    "totalOpaqueCharacterPixels": 4250,
+    "uncoveredPixels": 0
+  }
+]

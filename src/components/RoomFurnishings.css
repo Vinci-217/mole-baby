@@ -3,3 +3,5 @@
 .furnishing-canvas{width:min(100%,560px);margin-inline:auto}.furnishing-canvas,.room-furnishing-layer.is-editing{user-select:none;-webkit-user-select:none}
 
 .time-scene[data-phase=night]>.room-furnishing-layer{filter:brightness(.73) saturate(.86)}.time-scene[data-phase=dusk]>.room-furnishing-layer{filter:brightness(.92) sepia(.1)}
+
+.room-decor-drawer{position:absolute;right:18px;top:95px;bottom:45px;width:min(350px,42vw);z-index:90;padding:14px;background:#fffaf0f5;border:1px solid #d9bd88;border-radius:12px;overflow:auto;box-shadow:0 4px 18px #37291025}.room-decor-drawer>header{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px}.room-decor-drawer>header button{padding:5px 14px;border-radius:7px;background:#f2d49c}.room-decor-drawer .furnishing-catalogue{grid-template-columns:repeat(2,minmax(0,1fr))}.room-decor-drawer .room-settings{margin-top:18px}.room-decor-drawer .furnishing-editor>header{font-size:12px}.room-decor-drawer .furnishing-editor>header h3{font-size:13px}.room-decor-drawer .furnishing-tools{flex-wrap:wrap}.room-decor-drawer .furnishing-tools span{font-size:11px}.room-furnishing-layer.is-editing{z-index:60}

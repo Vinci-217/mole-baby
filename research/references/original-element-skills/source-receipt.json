@@ -1,0 +1,133 @@
+{
+  "source": "Original ClientAppDLL com.module.npc.npcInstance.LamuNPC.useLamuSkill",
+  "formula": "1208000 + type - 1 + (level - 1) * 3; fire=1, water=2, wood=3",
+  "run": "https://github.com/Vinci-217/mole-baby/actions/runs/40525187526",
+  "assets": [
+    {
+      "id": 1208000,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208000.swf",
+      "bytes": 20893,
+      "sha256": "26163b1199a6789ed7d3c30a079ed69b92cfad1f44b69405370d26e06f7721bd",
+      "attempts": []
+    },
+    {
+      "id": 1208001,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208001.swf",
+      "bytes": 11733,
+      "sha256": "01b4036f1bdc1db31f7c85d5d7993276e8d358f3a850bfcd6310261e77e2f2db",
+      "attempts": []
+    },
+    {
+      "id": 1208002,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208002.swf",
+      "bytes": 15664,
+      "sha256": "619945c9dde494b9d279e65dab70a00a3ecd781ba414ca049267cc6275681ef9",
+      "attempts": []
+    },
+    {
+      "id": 1208003,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208003.swf",
+      "bytes": 26085,
+      "sha256": "fd95c936ee2eef3f2d21822b0f2431f337cc89fc0ebb963f3ccb709afb628aa8",
+      "attempts": []
+    },
+    {
+      "id": 1208004,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208004.swf",
+      "bytes": 15822,
+      "sha256": "3b5b712041f22c61fa948cf850c84d2a5d3d90d9b7ac7ad18092739a52fd016f",
+      "attempts": []
+    },
+    {
+      "id": 1208005,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208005.swf",
+      "bytes": 17179,
+      "sha256": "46c4fa979dbd3cf578902caba2ccdcb19c6f9e78381c1eda5f490c792ab72c0f",
+      "attempts": []
+    },
+    {
+      "id": 1208006,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208006.swf",
+      "bytes": 19674,
+      "sha256": "83abbb9aa90406a05313ee0b9b68349a326bdc72a00caaf6c487b0a3231e6d54",
+      "attempts": []
+    },
+    {
+      "id": 1208007,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208007.swf",
+      "bytes": 36622,
+      "sha256": "49ef2ae6a57cff4ece6f4361126f42dd0c798ed79a5d22ec7e8bb7902161d758",
+      "attempts": []
+    },
+    {
+      "id": 1208008,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208008.swf",
+      "bytes": 43057,
+      "sha256": "cad96b78c9fdf40003832852114174e05df3f0081a6d0e41d6964c56e59a9a2b",
+      "attempts": []
+    },
+    {
+      "id": 1208009,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208009.swf",
+      "bytes": 62434,
+      "sha256": "900659d10d764135604a59413744b4d8f551c4aae485e059668c5bc94cc09ac5",
+      "attempts": []
+    },
+    {
+      "id": 1208010,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208010.swf",
+      "bytes": 55880,
+      "sha256": "2b0d95415f21992ac3a6a5ca6e735c2ac8550270e7de03b54d0d3505504cc8d0",
+      "attempts": []
+    },
+    {
+      "id": 1208011,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208011.swf",
+      "bytes": 349473,
+      "sha256": "6f54f0bf8f0c8508552bf07c23050ce4d5788a014aba106909e7ce56f8f50113",
+      "attempts": []
+    },
+    {
+      "id": 1208012,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208012.swf",
+      "bytes": 80874,
+      "sha256": "439b7d3bb65883ed183dfb845247be0e12e5bd34ad75bac23488059bf0929d0a",
+      "attempts": []
+    },
+    {
+      "id": 1208013,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208013.swf",
+      "bytes": 88783,
+      "sha256": "797d0882c99b8dc9983d1d34455270338bd52f2835ffa67a587f8fec582573d9",
+      "attempts": []
+    },
+    {
+      "id": 1208014,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208014.swf",
+      "bytes": 149219,
+      "sha256": "60daeb0c55b884cb169eeb8a8ce39481448c6204b42d640081ed6a7c79dc71cd",
+      "attempts": []
+    },
+    {
+      "id": 1208015,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208015.swf",
+      "bytes": 145470,
+      "sha256": "88fc0392b33c35350bcbc3840e15d5ea3986e7e820b4494c904045b5c208979e",
+      "attempts": []
+    },
+    {
+      "id": 1208016,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208016.swf",
+      "bytes": 243939,
+      "sha256": "a2834ac1c0480879743e2b900576653154fd3d94ecdf0c8ffb39acd4b2e80b48",
+      "attempts": []
+    },
+    {
+      "id": 1208017,
+      "url": "https://mole.61.com/resource/petcloth/swf2/1208017.swf",
+      "bytes": 119837,
+      "sha256": "4b9fcddbadf15f5909bf8ba5866f20ff703b93f594891e09822d573c263fc639",
+      "attempts": []
+    }
+  ]
+}

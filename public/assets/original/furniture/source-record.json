@@ -1,0 +1,367 @@
+{
+  "archive_commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "tool": "JPEXS library, source exporter scripts/art/SourceExporter.java",
+  "items": [
+    {
+      "id": "160057",
+      "name": "舒适躺椅",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160057.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160057.swf",
+      "sha256": "1ff6284e29f7b563c7eddcdc1756ea97168a4d5fe9df602dcfa1bd603e2e34ec",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160057.png",
+      "output_sha256": "580a49c4671e746d5827ce5d8599533dbab2ad27cda0258f889098d3776c9c59",
+      "output_size": [
+        161,
+        153
+      ]
+    },
+    {
+      "id": "160136",
+      "name": "粉色窗帘",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160136.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160136.swf",
+      "sha256": "bc39e6f5fcdedc951b687a26f5bd851553fe94d70ad63762bc21586c272925f5",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160136.png",
+      "output_sha256": "656c1edda27355a139714864b255d92507c60e15fcc124563c1b26937c6046cd",
+      "output_size": [
+        358,
+        298
+      ]
+    },
+    {
+      "id": "160185",
+      "name": "红福字",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160185.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160185.swf",
+      "sha256": "46ea8031c5719e543cfe3c5c0f131e14760369cf533ca51e6484fb37ffacbd79",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160185.png",
+      "output_sha256": "e906f610ebdbc441b78bdcb87aa586ae86c45f9ddcedbade16f98840cba99519",
+      "output_size": [
+        175,
+        168
+      ]
+    },
+    {
+      "id": "160188",
+      "name": "方桌",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160188.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160188.swf",
+      "sha256": "1bc14af5710323d013d94644a4838933612122b33ded12e4d16af278de0f53f5",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160188.png",
+      "output_sha256": "6648aea57e12ab5549ae9ebf69cfc2ff9f6b1c704e8a3c4f4f910f68999efcb6",
+      "output_size": [
+        171,
+        144
+      ]
+    },
+    {
+      "id": "160190",
+      "name": "红木长椅",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160190.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160190.swf",
+      "sha256": "6d86ba050f866f38bad5a13b5875e51c067c3212aa38ccecb8395b34d1f2f06b",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160190.png",
+      "output_sha256": "734cbf72058e9cad40cdffca458d1fada694b3d12f2fb06587eb7a35e3cb4e80",
+      "output_size": [
+        241,
+        146
+      ]
+    },
+    {
+      "id": "160216",
+      "name": "储物小圆桌",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160216.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160216.swf",
+      "sha256": "834db7bf00beabe616407c4766eb4cba11b0ae665688848b444a7aceecc5e29f",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160216.png",
+      "output_sha256": "b208328c2fe80fb3c5b6f16418a7cef19b579e5d5f8dc102db1f2352957e1649",
+      "output_size": [
+        149,
+        134
+      ]
+    },
+    {
+      "id": "160218",
+      "name": "大树叶地毯",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160218.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160218.swf",
+      "sha256": "0cc71cccdec9aea250c9974a37fb3a0fbf5e71f0463d4c31c6040c7ffdf83326",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160218.png",
+      "output_sha256": "fbe709950fe397e4689883c7cc31bd06ad55e4f3fd97bf4f03c7962365afdfa7",
+      "output_size": [
+        443,
+        284
+      ]
+    },
+    {
+      "id": "160219",
+      "name": "组合小床",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160219.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160219.swf",
+      "sha256": "9a79054ea0c91655d3b94bb36463fcf9f737574a1e5c290d806b0da2cd61c7ee",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160219.png",
+      "output_sha256": "e1630a20e99463580047fe4ab02c66ebb33b62fc8461977e5e35f126972c052f",
+      "output_size": [
+        206,
+        250
+      ]
+    },
+    {
+      "id": "160220",
+      "name": "木制小书柜",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160220.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160220.swf",
+      "sha256": "d096713f8db024e0501a9e3b97d4413f05ddf8d59a8b27b6d2dcd3b0261f3565",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160220.png",
+      "output_sha256": "cce9f7f57e9c9494411131487797062837484d413b9d709a3493b2f243579087",
+      "output_size": [
+        127,
+        260
+      ]
+    },
+    {
+      "id": "160221",
+      "name": "红宝石靠椅",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160221.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160221.swf",
+      "sha256": "b5e580e0eafafee922df980ccc964763b2a26e8e67f4aa344dbefc3ff2273c50",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160221.png",
+      "output_sha256": "a990710fd79757934661c2fb470fb5152be9937d2ec41dfe5fcac5d22fa7f332",
+      "output_size": [
+        115,
+        213
+      ]
+    },
+    {
+      "id": "160227",
+      "name": "布谷鸟挂钟",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160227.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160227.swf",
+      "sha256": "3b6183187ab216ff852b008d9fb7061f3b5f4f9db6a22476ee1a1b0d2972293e",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160227.png",
+      "output_sha256": "7d7165abc1b2c7259f973a19bb4dc11f6f935c03f92b363e1b6a548bf6715458",
+      "output_size": [
+        75,
+        132
+      ]
+    },
+    {
+      "id": "160254",
+      "name": "草莓地毯",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160254.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160254.swf",
+      "sha256": "b4f861c5ad74905bb1e37e39e7570c63e4a9db8e39e77ba044fedb4929245771",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160254.png",
+      "output_sha256": "1d7d5e770ef68ded49b1cd57b3b0600afacfed3d6b2b69b419c4e3e9671c4243",
+      "output_size": [
+        252,
+        184
+      ]
+    },
+    {
+      "id": "160526",
+      "name": "粉色花朵地毯",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160526.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160526.swf",
+      "sha256": "02266973f1ce360f7f2492e6eea3210febfa63cabe67ac4aa143658e6810f55c",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160526.png",
+      "output_sha256": "4812eb900e94ebfa9a0f2c1f8dfc3bfb8401282adeb0191c60808c063405d023",
+      "output_size": [
+        342,
+        210
+      ]
+    },
+    {
+      "id": "160666",
+      "name": "摩尔吉祥年画",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160666.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160666.swf",
+      "sha256": "be10b6bab416c2763f3c69a55f061e6935c47b61b6dd668b5ae875a70c8d6a35",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160666.png",
+      "output_sha256": "5e058aaa2ab55fdf163830f707c3041d42fe8c0d7898d41d84b0c1b4e08772e2",
+      "output_size": [
+        158,
+        185
+      ]
+    },
+    {
+      "id": "160667",
+      "name": "摩尔如意年画",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160667.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160667.swf",
+      "sha256": "346d09815b96e5e1858f81ad9565215040bf76d7b3d2a80af2379135d47935c7",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160667.png",
+      "output_sha256": "7c1007d1486a67b8fe400f59a37876dc2a24776ea14adff01eb99767d7c488fd",
+      "output_size": [
+        158,
+        185
+      ]
+    },
+    {
+      "id": "160680",
+      "name": "红木雕花床",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160680.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160680.swf",
+      "sha256": "5a02d79da92e3bec1dc149e97523293735fe3128f63d569e5cc2f059e3e98385",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160680.png",
+      "output_sha256": "66cd02c2e9fe4e861da922b396629ee4f516a16e4644fe941145677a2eec927f",
+      "output_size": [
+        247,
+        268
+      ]
+    },
+    {
+      "id": "160681",
+      "name": "红木雕花桌",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160681.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160681.swf",
+      "sha256": "463c0c3770e09aa5c6669dc6d61c38d7f9a7eb09eea04cc951782550f3071dec",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160681.png",
+      "output_sha256": "241cc89eea2d16fb62d6468251940b5a46db7560aaef7fcdc924499e87b7bdfd",
+      "output_size": [
+        217,
+        219
+      ]
+    },
+    {
+      "id": "160683",
+      "name": "红木雕花椅",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160683.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160683.swf",
+      "sha256": "50cc3e3f22f21d1361e810d6f9bb8c5f983616dbeae37dc07793c7a3f68fd404",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160683.png",
+      "output_sha256": "ad51ea30eb93187c27873a971380463018321f5e4f0b07553d99ff83bf89e619",
+      "output_size": [
+        79,
+        169
+      ]
+    },
+    {
+      "id": "160684",
+      "name": "红木雕花衣柜",
+      "kind": "furniture",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160684.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160684.swf",
+      "sha256": "c8784624dc5348d81a51c68704ff2c7dc4e770ca8d7edf9d077f8464940afee0",
+      "export": "mc2 sprite, source frame 1, zoom 2; transparent padding trimmed",
+      "output": "public/assets/original/furniture/160684.png",
+      "output_sha256": "0373751603942ff33ed9a0f59094c3934a4b806ab3a486c9a64d55ec93b47786",
+      "output_size": [
+        169,
+        262
+      ]
+    },
+    {
+      "id": "160419",
+      "name": "魔法拉姆双层小屋",
+      "kind": "room",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160419.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160419.swf",
+      "sha256": "992617404ff2a7bb94ab3f9dc031aaf64c8669f26b899b3188cbff1ae78ab2d0",
+      "export": "root source frame 1, zoom 1; transparent padding trimmed",
+      "output": "public/assets/original/scenes/room-160419.png",
+      "output_sha256": "eae849205df8d914fa42ffc805f2101532001109d5d903c78e9acc805ab6c4a0",
+      "output_size": [
+        550,
+        400
+      ]
+    },
+    {
+      "id": "160427",
+      "name": "魔法小屋",
+      "kind": "room",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160427.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160427.swf",
+      "sha256": "5b4a68a0c1a511befeac2aa91a6386aa2357578205f3fa6382d3fc7c85618eaf",
+      "export": "root source frame 1, zoom 1; transparent padding trimmed",
+      "output": "public/assets/original/scenes/room-160427.png",
+      "output_sha256": "dba640538c4b6a61ed79932b2dfa1e2051930789bc2fbb0214a555e8785706ce",
+      "output_size": [
+        960,
+        560
+      ]
+    },
+    {
+      "id": "160803",
+      "name": "航海小屋",
+      "kind": "room",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160803.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160803.swf",
+      "sha256": "0d61ace29fae41ecd1fd7d80256423a0af5c04b3f2b5eaafcb5e91552d8f89a0",
+      "export": "root source frame 1, zoom 1; transparent padding trimmed",
+      "output": "public/assets/original/scenes/room-160803.png",
+      "output_sha256": "b4108ba99dc6df7a725930ac66ca3ea93db12be09f01fa925b80a3f4acf5a0f1",
+      "output_size": [
+        960,
+        560
+      ]
+    },
+    {
+      "id": "160815",
+      "name": "爱学习小屋",
+      "kind": "room",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160815.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160815.swf",
+      "sha256": "1674d8eceab743ee8b0698f0491818e9d4e4625a81db0ed33f306e9bbb2d40cd",
+      "export": "root source frame 1, zoom 1; transparent padding trimmed",
+      "output": "public/assets/original/scenes/room-160815.png",
+      "output_sha256": "fda974a0a15581706c0276cd4e6db6088be2e43752252315d5133b14dbf63672",
+      "output_size": [
+        960,
+        560
+      ]
+    },
+    {
+      "id": "160841",
+      "name": "爱心公主小屋",
+      "kind": "room",
+      "archive_url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160841.swf",
+      "official_url": "http://mole.61.com/resource/goods/swf/160841.swf",
+      "sha256": "926612ccc5d10ea60d4ce86e59c3931b3ed3b9cce9a5f2eb324d6bcae4f19c9b",
+      "export": "root source frame 1, zoom 1; transparent padding trimmed",
+      "output": "public/assets/original/scenes/room-160841.png",
+      "output_sha256": "5898b2954338cdaeee0909056ee33c5558d8f9eb05ae21214aeb080bde6a6da7",
+      "output_size": [
+        960,
+        560
+      ]
+    }
+  ],
+  "catalog_names_source": "Original JDGoodsXmlData.xml, same archive commit; local coin prices are a desktop adaptation, not original game prices."
+}

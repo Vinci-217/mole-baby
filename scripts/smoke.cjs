@@ -80,7 +80,7 @@ async function checkFourSeedColors() {
   const during = await pot.boundingBox(); assert.ok(during.x > potBefore.x + 20); assert.ok(during.y < potBefore.y - 5); await page.mouse.up();
   const actions = await openActions(page);
   assert.deepEqual(await actions.getByRole('button').evaluateAll(nodes => nodes.map(n => n.getAttribute('aria-label'))), ['查看状态', '喂食', '洗澡', '玩耍', '开始计时', '和拉姆说话', '进入小屋']);
-  await openActions(page);await actions.getByRole('button', { name: '喂食', exact: true }).click();
+  await openActions(page);await actions.getByRole('button', { name: '状态', exact: true }).click();
   const panel = page.getByTestId('companion-panel'); await panel.waitFor(); const pocket = page.locator('.care-pocket');
   assert.ok((await panel.boundingBox()).width>700);
   assert.deepEqual(await panel.getByRole('tab').allTextContents(), ['用品', '装扮', '成长', '游戏', '回忆', '玩耍']);
@@ -177,7 +177,7 @@ async function checkFourSeedColors() {
   await settings.locator('input[type=file][accept^="audio/"]').setInputFiles({name:'broken.mp3',mimeType:'audio/mpeg',buffer:Buffer.from('not audio')}); await expect(settings.getByRole('status').filter({hasText:'无法读取这段音频'})).toBeVisible(); assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId),'castle');
   await settings.getByLabel('小屋背景音乐',{exact:true}).uncheck(); await tracks.getByRole('button',{name:'宠物店',exact:true}).click(); await settings.getByLabel('背景音乐音量',{exact:true}).fill('32');
   await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page); await roomTab(page,'设置'); await expect(backgrounds.getByRole('button',{name:'晴空观星阁',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background','sky-observatory'); await expect(settings.getByLabel('小屋背景音乐',{exact:true})).not.toBeChecked(); await expect(tracks.getByRole('button',{name:'宠物店',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(settings.getByLabel('背景音乐音量',{exact:true})).toHaveValue('32');
-  await page.screenshot({path:path.join(artifacts,'v6-room-settings.png')}); await toDesktop(page); await openActions(page);await actions.getByRole('button',{name:'喂食',exact:true}).click(); await page.setViewportSize({width:390,height:844}); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false); await expect(pocket).toBeVisible();
+  await page.screenshot({path:path.join(artifacts,'v6-room-settings.png')}); await toDesktop(page); await openActions(page);await actions.getByRole('button',{name:'状态',exact:true}).click(); await page.setViewportSize({width:390,height:844}); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false); await expect(pocket).toBeVisible();
   assert.deepEqual(errors,[]); assert.deepEqual(assetFailures,[]); assert.deepEqual(aiRequests,[]);
   console.log('PASS nine backgrounds/four real-time phases including three new scenes, all 12 real audio decodes, room-only playback, IndexedDB music import/restart/delete/invalid guards and narrow-screen layout');
   await checkReminders(initial);

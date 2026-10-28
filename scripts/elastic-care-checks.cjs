@@ -10,8 +10,8 @@ async function verifyElasticCare(page,desktop){
   // Wait for painted pixels using the same budget as desktop waitForClassic.
   await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:20000});
   if(desktop){await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);await window.desktop.movePet(-300,-100)});}
-  await openActions(page);await page.getByRole('button',{name:'喂食',exact:true}).click();const panel=page.getByTestId('companion-panel'),pocket=panel.locator('.care-pocket');
-  const before=await save();await pocket.locator('[data-item-id=biscuit]').click();await expect(ram.locator('[data-care-routine=eat]')).toBeVisible();await expect.poll(async()=>(await save()).inventory.biscuit).toBe(4);await expect(page.getByTestId('care-gain')).toHaveCount(0);await expect(ram.locator('.care-food-bite')).toHaveCount(4);
+  await openActions(page);await page.getByRole('button',{name:'状态',exact:true}).click();const panel=page.getByTestId('companion-panel'),pocket=panel.locator('.care-pocket');
+  await pocket.getByLabel('物品分类',{exact:true}).selectOption('food');const before=await save();await pocket.locator('[data-item-id=biscuit]').click();await expect(ram.locator('[data-care-routine=eat]')).toBeVisible();await expect.poll(async()=>(await save()).inventory.biscuit).toBe(4);await expect(page.getByTestId('care-gain')).toHaveCount(0);await expect(ram.locator('.care-food-bite')).toHaveCount(4);
   await page.waitForTimeout(950);const food=await ram.locator('.care-food-bite').evaluateAll(nodes=>nodes.map(n=>({y:parseFloat(n.style.top),opacity:Number(n.style.opacity)})));assert.ok(food.some(p=>p.opacity>0&&p.y<65));
   // A second one-click portion replaces the clip and merges only actual,
   // already committed gains. The final feedback may not disappear or double.

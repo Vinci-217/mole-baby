@@ -1,0 +1,173 @@
+[
+  {
+    "id": "original-160057",
+    "name": "舒适躺椅",
+    "surface": "floor",
+    "price": 280,
+    "width": 14,
+    "image": "./assets/original/furniture/160057.png",
+    "sourceId": "160057"
+  },
+  {
+    "id": "original-160136",
+    "name": "粉色窗帘",
+    "surface": "wall",
+    "price": 150,
+    "width": 16,
+    "image": "./assets/original/furniture/160136.png",
+    "sourceId": "160136"
+  },
+  {
+    "id": "original-160185",
+    "name": "红福字",
+    "surface": "wall",
+    "price": 150,
+    "width": 8,
+    "image": "./assets/original/furniture/160185.png",
+    "sourceId": "160185"
+  },
+  {
+    "id": "original-160188",
+    "name": "方桌",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160188.png",
+    "sourceId": "160188"
+  },
+  {
+    "id": "original-160190",
+    "name": "红木长椅",
+    "surface": "floor",
+    "price": 280,
+    "width": 14,
+    "image": "./assets/original/furniture/160190.png",
+    "sourceId": "160190"
+  },
+  {
+    "id": "original-160216",
+    "name": "储物小圆桌",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160216.png",
+    "sourceId": "160216"
+  },
+  {
+    "id": "original-160218",
+    "name": "大树叶地毯",
+    "surface": "floor",
+    "price": 150,
+    "width": 23,
+    "image": "./assets/original/furniture/160218.png",
+    "sourceId": "160218"
+  },
+  {
+    "id": "original-160219",
+    "name": "组合小床",
+    "surface": "floor",
+    "price": 280,
+    "width": 14,
+    "image": "./assets/original/furniture/160219.png",
+    "sourceId": "160219"
+  },
+  {
+    "id": "original-160220",
+    "name": "木制小书柜",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160220.png",
+    "sourceId": "160220"
+  },
+  {
+    "id": "original-160221",
+    "name": "红宝石靠椅",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160221.png",
+    "sourceId": "160221"
+  },
+  {
+    "id": "original-160227",
+    "name": "布谷鸟挂钟",
+    "surface": "wall",
+    "price": 150,
+    "width": 8,
+    "image": "./assets/original/furniture/160227.png",
+    "sourceId": "160227"
+  },
+  {
+    "id": "original-160254",
+    "name": "草莓地毯",
+    "surface": "floor",
+    "price": 150,
+    "width": 23,
+    "image": "./assets/original/furniture/160254.png",
+    "sourceId": "160254"
+  },
+  {
+    "id": "original-160526",
+    "name": "粉色花朵地毯",
+    "surface": "floor",
+    "price": 150,
+    "width": 23,
+    "image": "./assets/original/furniture/160526.png",
+    "sourceId": "160526"
+  },
+  {
+    "id": "original-160666",
+    "name": "摩尔吉祥年画",
+    "surface": "wall",
+    "price": 150,
+    "width": 11,
+    "image": "./assets/original/furniture/160666.png",
+    "sourceId": "160666"
+  },
+  {
+    "id": "original-160667",
+    "name": "摩尔如意年画",
+    "surface": "wall",
+    "price": 150,
+    "width": 11,
+    "image": "./assets/original/furniture/160667.png",
+    "sourceId": "160667"
+  },
+  {
+    "id": "original-160680",
+    "name": "红木雕花床",
+    "surface": "floor",
+    "price": 280,
+    "width": 14,
+    "image": "./assets/original/furniture/160680.png",
+    "sourceId": "160680"
+  },
+  {
+    "id": "original-160681",
+    "name": "红木雕花桌",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160681.png",
+    "sourceId": "160681"
+  },
+  {
+    "id": "original-160683",
+    "name": "红木雕花椅",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160683.png",
+    "sourceId": "160683"
+  },
+  {
+    "id": "original-160684",
+    "name": "红木雕花衣柜",
+    "surface": "floor",
+    "price": 280,
+    "width": 11,
+    "image": "./assets/original/furniture/160684.png",
+    "sourceId": "160684"
+  }
+]

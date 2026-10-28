@@ -1,10 +1,13 @@
 import type {GameState} from './game'
 import {COURSES,learned,type CourseId} from './pet-school'
+import originalFurniture from '../public/assets/original/furniture/catalog.json'
 export type Surface='wall'|'floor'
 export interface Placement {id:string;x:number;y:number}
 export interface RoomFurnishings {owned:string[];placed:Placement[]}
 export const hasRoomWall=(backgroundId:string)=>!['berry-picnic','sky-observatory'].includes(backgroundId)
-export const FURNITURE=[
+export interface FurnitureDefinition {id:string;name:string;surface:Surface;price:number;width:number;image?:string;sourceId?:string}
+export const FURNITURE:readonly FurnitureDefinition[]=[
+ ...originalFurniture.map(item=>({...item,surface:(item.surface==='wall'?'wall':'floor') as Surface})),
  {id:'leaf-rug',name:'嫩叶地毯',surface:'floor',price:120,width:17},
  {id:'cushion',name:'浆果软垫',surface:'floor',price:180,width:11},
  {id:'plant',name:'小小绿植',surface:'floor',price:160,width:9},
@@ -18,11 +21,11 @@ export function furnitureById(id:string){
  const f=FURNITURE.find(f=>f.id===id);if(f)return f
  if(id.startsWith('certificate-')){const c=COURSES.find(c=>id===`certificate-${c.id}`);if(c)return {id,name:`${c.name}结业证书`,surface:'wall' as const,price:0,width:12}}
 }
-export const furnitureImage=(id:string)=>`./assets/generated/school/furniture/${id.startsWith('certificate-')?'certificate':id}.png`
+export const furnitureImage=(id:string)=>{const furniture=furnitureById(id);return furniture&&'image' in furniture&&furniture.image?furniture.image:`./assets/generated/school/furniture/${id.startsWith('certificate-')?'certificate':id}.png`}
 export const canOwn=(pet:GameState,id:string)=>id.startsWith('certificate-')?learned(pet,id.slice(12) as CourseId):Boolean(pet.room?.owned.includes(id))
 export function normalizeRoom(value:unknown):RoomFurnishings|undefined{
  if(!value||typeof value!=='object')return
- const raw=value as Partial<RoomFurnishings>,owned=Array.isArray(raw.owned)?[...new Set(raw.owned.filter(id=>typeof id==='string'&&FURNITURE.some(f=>f.id===id)))].slice(0,30):[]
+ const raw=value as Partial<RoomFurnishings>,owned=Array.isArray(raw.owned)?[...new Set(raw.owned.filter(id=>typeof id==='string'&&FURNITURE.some(f=>f.id===id)))].slice(0,FURNITURE.length):[]
  const seen=new Set<string>(),placed:Placement[]=[]
  if(Array.isArray(raw.placed))for(const p of raw.placed){
   if(!p||typeof p.id!=='string'||seen.has(p.id)||!furnitureById(p.id)||!Number.isFinite(p.x)||!Number.isFinite(p.y))continue

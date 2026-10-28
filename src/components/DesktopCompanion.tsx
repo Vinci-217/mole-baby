@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, PointerEvent, ReactNode } from 'react';
-import type { Action, GameState, Stage, ItemCategory, PetColor } from '../game';
+import type { Action, GameState, Stage, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
@@ -12,6 +12,7 @@ import { reminderTime } from '../use-rest-reminder';
 import CareFeedback from './CareFeedback';
 import type {CareFeedbackData} from '../care-feedback';
 import { edgeEntryAction, edgeTargetOffset, paintedEdgeOffset, type EdgeVector } from '../edge-motion';
+import type {PocketCategory} from './CarePocket';
 
 export type CompanionPanel = 'food' | 'play';
 interface Props {
@@ -20,14 +21,14 @@ interface Props {
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
   saveError: boolean;
-  reminderSeconds: number; reminders: boolean; timerRunning: boolean;
+  timerDirection:'countdown'|'countup'; reminderSeconds: number; reminders: boolean; timerRunning: boolean;
   onPanel: (panel: CompanionPanel | null) => void;
   onCare: (action: Action, item?: string) => void;
-  onWork:()=>void;onSchool:()=>void;onHome: () => void; onShop: () => void; onFocus: () => void;
+  onWork:()=>void;onSchool:()=>void;onMagic:()=>void;magicLearned:boolean;onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
   onActionEnd?:()=>void; onTug?:()=>void;
   onRecall:()=>void;
-  pocketCategory: ItemCategory; pocketVisit: number; playInvitation?:ReactNode;
+  pocketCategory: PocketCategory; pocketVisit: number; playInvitation?:ReactNode;
 }
 const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
 function Icon({ path }: { path: string }) { return <img alt="" draggable={false} src={`./assets/original/${path}.png`}/>; }
@@ -154,9 +155,9 @@ export default function DesktopCompanion(p: Props) {
       </button>
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
-                <button aria-label="喂食" onClick={() => show('food')}><Icon path={icons.food}/></button>
+                <button aria-label="状态" onClick={() => show('food')}><Icon path={icons.status}/></button>
         <button aria-label="玩耍" onClick={() => show('play')}><Icon path={icons.play}/></button>
-        <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label="专注倒计时">{reminderTime(p.reminderSeconds)}</span>}</button>
+        <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label={p.timerDirection==='countup'?'专注正向计时':'专注倒计时'}>{reminderTime(p.reminderSeconds)}</span>}</button>
         <button aria-label="进入小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
       </nav></>}
       {p.pet.activity&&<span className="school-desktop-status">{activityName(p.pet.activity)}</span>}
@@ -167,8 +168,13 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={()=>p.onCare('play')}><Icon path="items/180004"/>一起玩球</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onCurious}><img alt="" src="./assets/generated/v15-butterfly.png"/>和蝴蝶玩</button>
-        <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.pet.sleeping?p.onCare('sleep'):p.onMood()}><Icon path="ui/status-health"/>{p.pet.sleeping?'轻轻叫醒':'回应心情'}</button>
-      </div><footer><button disabled={p.moodBusy} onClick={p.onWork}>餐厅打工</button><button onClick={()=>p.onCare('sleep')}>{p.pet.sleeping?'叫醒':'睡一会儿'}</button><button onClick={p.onSchool}>学院</button></footer></>}
+        <button disabled={p.moodBusy||p.pet.sleeping} onClick={p.onMood}><Icon path="ui/status-health"/>回应心情</button>
+        <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.onCare('sleep')}><Icon path="ui/icon-clock"/>{p.pet.sleeping?'轻轻叫醒':'睡一会儿'}</button>
+        <button disabled={p.moodBusy||p.stage===0} onClick={p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>餐厅打工</button>
+        <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
+        <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
+        <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
+      </div></>}
     </section>}
 
   </div>;

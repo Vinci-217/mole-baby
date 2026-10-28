@@ -142,7 +142,7 @@ async function politeDeferral() {
 
 async function realHabitsAndRename() {
   const pet = await save(); await fixture('middle', 180, 'pink', { inventory: { ...pet.inventory, biscuit: 2 }, stats: { ...pet.stats, hunger: 35, energy: 90, health: 100, thirst: 90 } });
-  const before = await save(); await openActions(page); await page.getByTestId('pet-actions').getByRole('button', { name: '喂食', exact: true }).click();
+  const before = await save(); await openActions(page); await page.getByTestId('pet-actions').getByRole('button', { name: '状态', exact: true }).click();
   for (let n = 0; n < 2; n++) { await (await selectPocket(page, 'biscuit', '熊熊饼干')).click(); await advance(n === 0 ? 61000 : 3000); }
   assert.equal((await save()).inventory.biscuit, 0); await openPlay();
   await expect(spirit().locator('.pet-invitation-habit')).toContainText('熊熊饼干');

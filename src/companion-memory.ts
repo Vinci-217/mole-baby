@@ -60,7 +60,7 @@ export function recordEvent(memory: CompanionMemory, event: { kind: string; deta
   // not push the owner's meals and shared experiences out of the diary.
   if(kind.startsWith('self-')&&memory.events.some(e=>e.kind===kind&&dayKey(e.at)===dayKey(at)))return memory;
   const previous = memory.events.at(-1);
-  if (previous?.kind === kind && previous.detail === detail && at >= previous.at && at - previous.at < 60_000) return memory;
+  if (kind!=='focus-timer' && previous?.kind === kind && previous.detail === detail && at >= previous.at && at - previous.at < 60_000) return memory;
   const events=[...memory.events,{id:uid(kind,detail,at),kind,detail,at}];
   const automatic=events.filter(e=>/^(self-|outing-|check-in$)/.test(e.kind));
   const discarded=new Set(automatic.slice(0,Math.max(0,automatic.length-40)).map(e=>e.id));

@@ -262,7 +262,7 @@ async function verifyRecolorPotion(page){
   const before=await save(),color=before.color==='blue'?'pink':'blue',name=color==='blue'?'蓝色换色药水':'粉色换色药水',id=`recolor-${color}`;
   expect(before.coins).toBeGreaterThanOrEqual(80);await enterHome(page);await buy(page,id,name,'药水');
   expect((await save()).coins).toBe(before.coins-80);expect((await save()).inventory[id]).toBe((before.inventory[id]??0)+1);
-  await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await(await selectPocket(page,id,name)).click();
+  await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await(await selectPocket(page,id,name)).click();
   await expect(page.getByTestId('desktop-character').locator('[data-item-gesture=recolor]')).toBeVisible();await expect.poll(async()=>(await save()).color).toBe(color);await expect(page.getByTestId('desktop-character').locator('[data-item-gesture=recolor]')).toHaveCount(0,{timeout:6000});
   await expect(page.getByTestId('care-gain')).toContainText(`变为${color==='blue'?'蓝色':'粉色'}`);await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:4000});
   console.log('PASS: successful colour-potion feedback appears after use and fades away');

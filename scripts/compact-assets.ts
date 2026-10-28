@@ -11,7 +11,7 @@ const names=new Set<string>()
 function inventory(dir:string){for(const entry of readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())inventory(file);else if(entry.name.endsWith('.png')){names.add(entry.name);names.add(path.relative(publicRoot,file).replaceAll('\\','/'))}}}
 inventory(publicRoot)
 export function compactUrl(value:string):string {
- if(!value.endsWith('.png')||/^(https?:|data:)|(?:^|\/)icons\//.test(value))return value
+ if(!value.endsWith('.png')||/^(https?:|data:)|^(?:\.\/|\/)?icons\//.test(value))return value
  const relative=value.replace(/^\.?\/?assets\//,'')
  return names.has(relative)||names.has(value)||names.has(path.posix.basename(value))?value.slice(0,-4)+'.webp':value
 }

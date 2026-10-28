@@ -1,0 +1,66 @@
+{
+  "id": "wood-3",
+  "name": "通天藤蔓",
+  "sourceId": 1208008,
+  "sourceSha256": "cad96b78c9fdf40003832852114174e05df3f0081a6d0e41d6964c56e59a9a2b",
+  "sourceUrl": "https://mole.61.com/resource/petcloth/swf2/1208008.swf",
+  "fps": 24.0,
+  "frames": 29,
+  "frameMap": [
+    0,
+    0,
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12,
+    12,
+    0,
+    0,
+    13
+  ],
+  "cell": 288,
+  "columns": 12,
+  "pageFrames": 96,
+  "pages": [
+    "atlas-0.png"
+  ],
+  "actionSprite": 142,
+  "rootFrame": 68,
+  "nestedSprite": 141,
+  "clearedRuntimeItemSprites": [
+    135
+  ],
+  "sourceBounds": [
+    12,
+    0,
+    269,
+    339
+  ],
+  "registration": {
+    "scale": 0.4896755162241888,
+    "centerX": 144,
+    "baseY": 226,
+    "maxWidth": 144,
+    "maxHeight": 166
+  },
+  "durationMs": 1209
+}

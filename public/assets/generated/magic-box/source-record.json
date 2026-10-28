@@ -1,0 +1,12 @@
+{
+  "sourceBranch": "preview/asset-gallery",
+  "sourceCommit": "0c1736c",
+  "source": "New model-drawn shared layers; original Ram stays independent",
+  "boxDrawings": 4,
+  "smokeDrawings": 16,
+  "durationMs": 4280,
+  "timelineEntries": 39,
+  "references": "skills/mole-classic-art/references/v45/generation.json",
+  "extraction": "scripts/art/preview-shared-magic-box.py in source asset commit",
+  "rule": "Reuse all smoke frames for forward and reverse transformations; keep stage/color/outfit separate."
+}

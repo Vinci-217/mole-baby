@@ -1,0 +1,247 @@
+{
+  "canvas": [
+    288,
+    288
+  ],
+  "durationMs": 4280,
+  "boxFrames": 4,
+  "smokeFrames": 16,
+  "swapSmokeFrame": 8,
+  "timeline": [
+    {
+      "subject": "original",
+      "smoke": null,
+      "box": 0,
+      "ms": 400
+    },
+    {
+      "subject": "original",
+      "smoke": 0,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 1,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 2,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 3,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 4,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 5,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 6,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 7,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 8,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 9,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 10,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 11,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 12,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 13,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 14,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 15,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 0,
+      "ms": 600
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 1,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 2,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 3,
+      "ms": 200
+    },
+    {
+      "subject": "box",
+      "smoke": null,
+      "box": 0,
+      "ms": 300
+    },
+    {
+      "subject": "box",
+      "smoke": 0,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 1,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 2,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 3,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 4,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 5,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "box",
+      "smoke": 6,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 7,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 8,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 9,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 10,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 11,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 12,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 13,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 14,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": 15,
+      "box": 0,
+      "ms": 70
+    },
+    {
+      "subject": "original",
+      "smoke": null,
+      "box": 0,
+      "ms": 400
+    }
+  ],
+  "source": "New model-drawn shared layers; 4 box expressions and 16 smoke drawings reused in both directions. Original character stays separate."
+}

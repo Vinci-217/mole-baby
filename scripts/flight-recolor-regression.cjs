@@ -14,7 +14,7 @@ async function tint(p){return p.getByTestId('desktop-character').locator('canvas
  return {count,r:r/count,g:g/count,b:b/count};
 });}
 function matches(v,color){assert.ok(v.count>300,JSON.stringify(v));return color==='red'?v.r>v.g+70&&v.r>v.b+100:color==='blue'?v.b>v.r+70&&v.g>v.r+50:color==='yellow'?v.r>150&&v.g>150&&v.b<90:v.r>v.g+70&&v.b>v.g+70;}
-async function usePotion(p,color){await openActions(p);await p.getByTestId('pet-actions').getByRole('button',{name:'喂食',exact:true}).click();await p.locator('.pocket-categories').getByRole('button',{name:'药水',exact:true}).click();await(await selectPocket(p,`recolor-${color}`,`${colors[color]}换色药水`)).click();await expect(p.locator('[data-item-gesture=recolor]')).toBeVisible();await p.getByRole('button',{name:'关闭小窗',exact:true}).click();}
+async function usePotion(p,color){await openActions(p);await p.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await p.locator('.pocket-categories').getByRole('button',{name:'药水',exact:true}).click();await(await selectPocket(p,`recolor-${color}`,`${colors[color]}换色药水`)).click();await expect(p.locator('[data-item-gesture=recolor]')).toBeVisible();await p.getByRole('button',{name:'关闭小窗',exact:true}).click();}
 (async()=>{
  for(let n=0;n<100;n++){if(server.exitCode!==null)throw Error(logs);try{if((await fetch(url)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});const p=await browser.newPage({viewport:{width:1180,height:820}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.clock.install();await p.goto(url);await adopt(p,'红色','红豆');

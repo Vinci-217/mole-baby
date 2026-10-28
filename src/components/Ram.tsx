@@ -25,12 +25,14 @@ function requestOutfitMotion(body:HTMLCanvasElement){
 }
 import {getOutfit,outfitCoversCrown} from '../wardrobe'
 import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
-import {isPastime,pastimeBody,spellCostume,PASTIME_LABELS} from '../pet-pastimes'
+import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
 import {dizzyEyes} from '../dizzy-motion'
 import RamSchool,{SCHOOL_CLIPS} from './RamSchool'
 import {isSchoolAction} from '../pet-school'
+import OriginalElementSkill,{originalElementClip,prepareElementSkill} from './OriginalElementSkill'
+import SharedMagicBox,{preloadMagicBox} from './SharedMagicBox'
 
 interface RamProps {
   color: PetColor
@@ -535,20 +537,20 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
   const lifeAction=!sleeping&&!dragging&&!shaking&&isPastime(action)?action:undefined
   const schoolAction=!sleeping&&!dragging&&!shaking&&isSchoolAction(action)?action:undefined
-  const [illusion,setIllusion]=useState(false)
-  const spellChoice=useRef({key:'',outfit:spellCostume(companionId)})
-  if(spellChoice.current.key!==eventKey)spellChoice.current={key:eventKey,outfit:spellCostume(companionId)}
+  const elementId=schoolAction?.startsWith('element-')?schoolAction.slice(8):undefined
+  const elementClip=elementId?originalElementClip(elementId):undefined
+  const magicAction=schoolAction==='skill-magic'||lifeAction==='spell'||Boolean(elementClip)
+  useEffect(()=>{void preloadMagicBox().catch(()=>{})},[])
   const finishRef=useRef(onActionEnd);finishRef.current=onActionEnd
   useEffect(()=>{
-    setIllusion(false)
+    if(magicAction)return
     if(schoolAction){const clip=SCHOOL_CLIPS[schoolAction];if(!clip.loop){const end=setTimeout(()=>finishRef.current?.(),clip.frames/clip.fps*1000);return()=>clearTimeout(end)}return}
     if(!lifeAction)return
     const timers:ReturnType<typeof setTimeout>[]=[]
-    if(lifeAction==='spell'){timers.push(setTimeout(()=>setIllusion(true),1100),setTimeout(()=>setIllusion(false),6100))}
     if(lifeAction!=='play-alone')timers.push(setTimeout(()=>finishRef.current?.(),getRamActionDuration(lifeAction,stage===0?'seed':form)!))
     return()=>timers.forEach(clearTimeout)
-  },[eventKey,lifeAction,schoolAction,form,stage])
-  const wearing=lifeAction==='spell'&&illusion?spellChoice.current.outfit:costume
+  },[eventKey,lifeAction,schoolAction,form,stage,magicAction])
+  const wearing=costume
   const sourceEnd=schoolAction||lifeAction&&lifeAction!=='play-alone'?undefined:onActionEnd
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
@@ -565,8 +567,9 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
   // the native window offset and drag-out placement stay unchanged.
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
   const label = `${COLOR_NAMES[color]}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  if(magicAction)return <SharedMagicBox key={eventKey} startedAt={clock.current.startedAt} onEnd={onActionEnd} prepare={elementId?prepareElementSkill(elementId):undefined} targetDuration={elementClip?.durationMs} label={elementClip?`烟雾变身 · ${elementClip.name} · 恢复原形`:undefined} target={elementId?(began=><OriginalElementSkill id={elementId} startedAt={began}/>):undefined}><Ram color={color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></SharedMagicBox>
   return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
-    role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-illusion={illusion&&lifeAction==='spell'||undefined} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
+    role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-proportion-layer"><span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>

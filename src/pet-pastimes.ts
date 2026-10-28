@@ -7,17 +7,17 @@ export const PASTIMES = ['read-alone','play-alone','spell','balance'] as const
 export type Pastime = typeof PASTIMES[number]
 export const isPastime = (action: string): action is Pastime => (PASTIMES as readonly string[]).includes(action)
 export const pastimeBody = (action: string) => action==='read-alone'?'focus':action==='play-alone'?'play':action==='balance'?'look-around':action==='spell'?'idle':action
-export const PASTIME_LABELS: Record<Pastime,string> = {'read-alone':'翻翻书','play-alone':'自己玩球',spell:'魔法变装',balance:'顶书练习'}
+export const PASTIME_LABELS: Record<Pastime,string> = {'read-alone':'翻翻书','play-alone':'自己玩球',spell:'变魔术',balance:'顶书练习'}
 export const PASTIME_LINES: Record<Pastime,string> = {
   'read-alone':'我翻几页书，你忙你的。读到有趣的再告诉你。',
   'play-alone':'小球滚过来啦！我自己玩一会儿，也给你留个位置。',
-  spell:'变身术练习！咕噜咕噜……这次会变出什么装扮呢？',
+  spell:'魔术练习！冒一股烟，变成蓝紫色魔术盒，再变回我。',
   balance:'把小书顶稳……哎呀，差一点！我再慢慢试一次。',
 }
 export const PASTIME_MEMORIES: Record<Pastime,string> = {
   'read-alone':'我自己翻了几页书，把喜欢的那页多看了一会儿。',
   'play-alone':'我在桌边自己玩了一会儿小球。',
-  spell:'我练习了短暂的魔法变装，最后变回了熟悉的样子。',
+  spell:'我练习了魔术盒变身，最后变回了熟悉的样子。',
   balance:'我顶着小书练平衡，摇摇晃晃也没有放弃。',
 }
 export function mayPlay(pet: GameState): boolean {

@@ -2,7 +2,7 @@ name: Desktop build
 
 on:
   push:
-    branches: [main, 'next/art-direction', 'preview/proportion-polish']
+    branches: [main, 'next/art-direction', 'preview/proportion-polish', 'preview/companion-workflow']
     tags: ['v*']
   pull_request:
     branches: [main]
@@ -106,7 +106,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: windows
@@ -191,7 +191,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: legacy-${{ matrix.arch }}
@@ -300,7 +300,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish')
+        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: mac-${{ matrix.arch }}
@@ -361,7 +361,7 @@ jobs:
 
   report:
     name: Save build receipt
-    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/proportion-polish')
+    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
     needs: [build, legacy, mac, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 dist/
 release/
 *.tsbuildinfo
@@ -208,3 +208,8 @@ artifacts/v38-school/crown/*
 !artifacts/v38-school/crown/*.png
 !artifacts/v38-school/crown/*.gif
 !artifacts/v38-school/crown/*.zip
+
+!artifacts/v30-workflow/
+!artifacts/v30-workflow/*.png
+!artifacts/v30-workflow/*.gif
+!artifacts/v30-workflow/*.json

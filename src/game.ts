@@ -9,6 +9,7 @@ import type {PetOuting} from './pet-pastimes';
 import {normalizeEducation,normalizeActivity,settleActivity,cancelActivity} from './pet-school';
 import type {Education,PetActivity} from './pet-school';
 import {normalizeRoom} from './room-furnishings';
+import {NEED_RATES,HEALTH_RECOVERY_PER_HOUR,HEALTH_LOSS_PER_HOUR} from './pet-status';
 import type {RoomFurnishings} from './room-furnishings';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
@@ -175,9 +176,7 @@ export function evolvePet(state: GameState, evolution: Evolution, now = Date.now
 /** Integrate one continuous awake/asleep span; transitions are handled by tick. */
 function advanceStats(state: GameState, now: number): GameState {
   const hours = Math.min(now - state.lastTick, OFFLINE_CAP_MS) / 3_600_000;
-  const rates = state.sleeping
-    ? { hunger: 3, thirst: 3, happiness: 1, cleanliness: 1.5, energy: -22 }
-    : { hunger: 5, thirst: 6, happiness: 3, cleanliness: 3.5, energy: 4 };
+  const rates = state.sleeping ? NEED_RATES.asleep : NEED_RATES.awake;
 
   // Count only the part of the interval before a need drops below its healthy limit.
   // This gives credit for the healthy part of an absence, without growing indefinitely.
@@ -198,7 +197,7 @@ function advanceStats(state: GameState, now: number): GameState {
     (state.stats.thirst - 20) / rates.thirst,
     (state.stats.cleanliness - 20) / rates.cleanliness,
   ));
-  const health = Math.max(1, clamp(state.stats.health + caredHours * 2) - (hours - caredHours) * 6);
+  const health = Math.max(1, clamp(state.stats.health + caredHours * HEALTH_RECOVERY_PER_HOUR) - (hours - caredHours) * HEALTH_LOSS_PER_HOUR);
 
   return {
     ...state,
@@ -391,7 +390,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
     for (const item of ITEMS) inventory[item.id] ??= 0;
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
     const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
-    const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity(value.activity,{createdAt:value.createdAt,education},now):undefined;
+    const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity(value.activity,{createdAt:value.createdAt,education,growth:value.growth,evolution:value.evolution as Evolution|undefined},now):undefined;
     return tick({
       version: 1,
       name: value.name.trim(),

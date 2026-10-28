@@ -8,6 +8,11 @@ export const ROOM_BACKGROUNDS: readonly RoomBackground[] = [
   { id: 'ramu-home', label: '拉姆小屋', src: './assets/original/scenes/ramu-home.png' },
   { id: 'lake-cabin', label: '神秘湖木屋', src: './assets/original/scenes/lake-cabin.png' },
   { id: 'earthen-home', label: '树洞房', src: './assets/original/scenes/original-earthen-home.png' },
+  { id: 'original-160419', label: '魔法拉姆双层小屋', src: './assets/original/scenes/room-160419.png' },
+  { id: 'original-160427', label: '魔法小屋', src: './assets/original/scenes/room-160427.png' },
+  { id: 'original-160803', label: '航海小屋', src: './assets/original/scenes/room-160803.png' },
+  { id: 'original-160815', label: '爱学习小屋', src: './assets/original/scenes/room-160815.png' },
+  { id: 'original-160841', label: '爱心公主小屋', src: './assets/original/scenes/room-160841.png' },
   { id: 'starlight-greenhouse', label: '星光温室', src: './assets/generated/v6-starlight-greenhouse.png', phaseSheet: true },
   { id: 'creek-treehouse', label: '溪畔树屋', src: './assets/generated/v6-creek-treehouse.png', phaseSheet: true },
   { id: 'berry-picnic', label: '浆果野餐地', src: './assets/generated/v18-berry-picnic.png', phaseSheet: true },
@@ -51,7 +56,7 @@ export interface RoomMediaController {
   resumeMusic: () => void;
 }
 const STORAGE = 'ramu-room-media-v1';
-const DEFAULTS: RoomMediaPreferences = { backgroundId: 'morning', musicId: 'castle', musicEnabled: true, volume: .18 };
+const DEFAULTS: RoomMediaPreferences = { backgroundId: 'ramu-home', musicId: 'castle', musicEnabled: true, volume: .18 };
 function normalize(value: Partial<RoomMediaPreferences>): RoomMediaPreferences {
   return {
     backgroundId: ROOM_BACKGROUNDS.some(b => b.id === value.backgroundId) ? value.backgroundId! : DEFAULTS.backgroundId,
