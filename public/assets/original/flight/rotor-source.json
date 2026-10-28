@@ -1,0 +1,12 @@
+{
+  "sourceSprite": 1777,
+  "sourceSwfSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "originalCrownIndex": 31,
+  "blades": 8,
+  "compositedPoses": 40,
+  "officialNewDrawings": 0,
+  "pngSha256": {
+    "neutral": "772731208a64871558172a7b39a0580a4c6b90610ccdd06ce12800b9f2c7a12b",
+    "mask": "e9080d9361b5338a85102a7479790b2bd7e8e2ac7bc132029757107cb8031262"
+  }
+}

@@ -2,7 +2,316 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮更新 · v0.30.10
+## 本轮更新 · v0.31.0
+
+新增“小屋游戏 → 拉姆换色游戏”：用原版红绿蓝色瓶和调色锅实时试色，装成独特药水，再从背包单击使用。自调颜色随成长、阶段切换和重启保留；首次领养仍只有原著四种基础色。
+
+上传的 **247 个 SWF／238 个不同原件／47,204 个时间帧**已全部分类接入：用品单击播放对应原片，足球、逗逗、弹簧、乐刷刷和涂鸦在桌面与小屋“一起玩耍”。完成一次原版玩耍心情最多 +6、精力 -3；取消不发完成奖励，不靠点击加成长。
+
+删除顶书练习。摸摸、看书、睡眠、追蝴蝶、张望、醒来和眩晕新增九形态 **63 组完整帧序列**。上传原片完整保留身体、眼睛、叶片和道具；日常帧为现有原角色及位图道具的离线合成，来源分别记录。高级八叶冠使用原图层预合成旋转帧。
+
+原片覆盖初级、中级、高级、经典三叶超级拉姆。种子和另外四种神力形态保留既有用品适配；整段原片播放期间暂收装扮，结束自动恢复。[使用说明](docs/UPLOADED_ACTIONS.md) · [来源、适配范围及转换方法](research/v31-original-actions-and-colour-mixing.md)。
+
+![原版 RGB 调色锅与拉姆实时试色](artifacts/v31/browser-colour-mixer.png)
+
+## v0.31 完整帧序列预览
+
+以下 GIF 从应用实际播放的帧表重建，按 24fps 时间表编码（GIF 延时量化到 10ms）。上传原片按同一段动作展示四组原形态，各格完整显示整段活动范围，不代表桌面实际尺寸。相同源帧不冒称新增手绘。下列日常为九形态离线合成，穿装扮时仍保留衣服接点同步的分层方案。
+
+### 乖巧摸摸
+
+![九形态 · 乖巧摸摸](docs/previews/v31/daily-pet.gif)
+
+### 翻书学习
+
+![九形态 · 翻书学习](docs/previews/v31/daily-focus.gif)
+
+### 闭眼安睡
+
+![九形态 · 闭眼安睡](docs/previews/v31/daily-sleep.gif)
+
+### 追逗蝴蝶
+
+![九形态 · 追逗蝴蝶](docs/previews/v31/daily-watch-butterfly.gif)
+
+### 好奇张望
+
+![九形态 · 好奇张望](docs/previews/v31/daily-look-around.gif)
+
+### 醒来
+
+![九形态 · 醒来](docs/previews/v31/daily-wake.gif)
+
+### 眩晕
+
+![九形态 · 眩晕](docs/previews/v31/daily-dizzy.gif)
+
+### 全部上传动作
+
+每个编号都能从用品或一起玩耍触发；原包缺少的阶段不伪造。原编号、中文归档路径、散列和重复文件共用关系见[源件清单](research/references/uploaded-lamu-actions/sources.json)。
+
+<details>
+<summary>展开全部 64 种动作（覆盖上传的 247 个文件）</summary>
+
+#### 巧克力豆 · 180001
+
+![巧克力豆 · 原片四形态](docs/previews/v31/original-180001.gif)
+
+#### 麦香牛奶 · 180002
+
+![麦香牛奶 · 原片四形态](docs/previews/v31/original-180002.gif)
+
+#### 泡泡浴 · 180003
+
+![泡泡浴 · 原片四形态](docs/previews/v31/original-180003.gif)
+
+#### 原版踢足球 · 180004
+
+![原版踢足球 · 原片四形态](docs/previews/v31/original-180004.gif)
+
+#### 万能药水 · 180005
+
+![万能药水 · 原片四形态](docs/previews/v31/original-180005.gif)
+
+#### 复活十字架 · 180006
+
+![复活十字架 · 原片四形态](docs/previews/v31/original-180006.gif)
+
+#### 青叶粽子 · 180007
+
+![青叶粽子 · 原片四形态](docs/previews/v31/original-180007.gif)
+
+#### 浆果果汁 · 180008
+
+![浆果果汁 · 原片四形态](docs/previews/v31/original-180008.gif)
+
+#### 青苹果洗面奶 · 180009
+
+![青苹果洗面奶 · 原片四形态](docs/previews/v31/original-180009.gif)
+
+#### 冰镇西瓜 · 180010
+
+![冰镇西瓜 · 原片四形态](docs/previews/v31/original-180010.gif)
+
+#### 逗逗拉姆 · 一 · 180011
+
+![逗逗拉姆 · 一 · 原片四形态](docs/previews/v31/original-180011.gif)
+
+#### 逗逗拉姆 · 二 · 180012
+
+![逗逗拉姆 · 二 · 原片四形态](docs/previews/v31/original-180012.gif)
+
+#### 逗逗拉姆 · 三 · 180013
+
+![逗逗拉姆 · 三 · 原片四形态](docs/previews/v31/original-180013.gif)
+
+#### 运动可乐 · 180014
+
+![运动可乐 · 原片四形态](docs/previews/v31/original-180014.gif)
+
+#### 蔬菜浓汤 · 180015
+
+![蔬菜浓汤 · 原片四形态](docs/previews/v31/original-180015.gif)
+
+#### 中秋月饼 · 180016
+
+![中秋月饼 · 原片四形态](docs/previews/v31/original-180016.gif)
+
+#### 熊熊饼干 · 180017
+
+![熊熊饼干 · 原片四形态](docs/previews/v31/original-180017.gif)
+
+#### 摩香汉堡 · 180018
+
+![摩香汉堡 · 原片四形态](docs/previews/v31/original-180018.gif)
+
+#### 水晶蛋糕 · 180019
+
+![水晶蛋糕 · 原片四形态](docs/previews/v31/original-180019.gif)
+
+#### 火腿三明治 · 180020
+
+![火腿三明治 · 原片四形态](docs/previews/v31/original-180020.gif)
+
+#### 兔兔胡萝卜汁 · 180021
+
+![兔兔胡萝卜汁 · 原片四形态](docs/previews/v31/original-180021.gif)
+
+#### 清爽沐浴露 · 180022
+
+![清爽沐浴露 · 原片四形态](docs/previews/v31/original-180022.gif)
+
+#### 魔法弹簧 · 180023
+
+![魔法弹簧 · 原片四形态](docs/previews/v31/original-180023.gif)
+
+#### 喜刷刷牙膏 · 180024
+
+![喜刷刷牙膏 · 原片四形态](docs/previews/v31/original-180024.gif)
+
+#### 跳跳布丁 · 180025
+
+![跳跳布丁 · 原片四形态](docs/previews/v31/original-180025.gif)
+
+#### 乐刷刷 · 180026
+
+![乐刷刷 · 原片四形态](docs/previews/v31/original-180026.gif)
+
+#### 可可果 · 180027
+
+![可可果 · 原片四形态](docs/previews/v31/original-180027.gif)
+
+#### 咕咕果 · 180028
+
+![咕咕果 · 原片四形态](docs/previews/v31/original-180028.gif)
+
+#### 爽爽果 · 180029
+
+![爽爽果 · 原片四形态](docs/previews/v31/original-180029.gif)
+
+#### 开心果 · 180030
+
+![开心果 · 原片四形态](docs/previews/v31/original-180030.gif)
+
+#### 珍味八宝饭 · 180041
+
+![珍味八宝饭 · 原片四形态](docs/previews/v31/original-180041.gif)
+
+#### 饺子 · 180042
+
+![饺子 · 原片四形态](docs/previews/v31/original-180042.gif)
+
+#### 苹果派 · 180043
+
+![苹果派 · 原片四形态](docs/previews/v31/original-180043.gif)
+
+#### 草莓派 · 180044
+
+![草莓派 · 原片四形态](docs/previews/v31/original-180044.gif)
+
+#### 拉姆小馒头 · 180045
+
+![拉姆小馒头 · 原片四形态](docs/previews/v31/original-180045.gif)
+
+#### 黑森林怪味圈 · 180046
+
+![黑森林怪味圈 · 原片四形态](docs/previews/v31/original-180046.gif)
+
+#### 热狗 · 180047
+
+![热狗 · 原片四形态](docs/previews/v31/original-180047.gif)
+
+#### 西瓜解暑冲饮 · 180048
+
+![西瓜解暑冲饮 · 原片四形态](docs/previews/v31/original-180048.gif)
+
+#### 清凉草莓浴液 · 180049
+
+![清凉草莓浴液 · 原片四形态](docs/previews/v31/original-180049.gif)
+
+#### 水萤救治药水 · 180050
+
+![水萤救治药水 · 原片四形态](docs/previews/v31/original-180050.gif)
+
+#### 炎火救治药水 · 180051
+
+![炎火救治药水 · 原片四形态](docs/previews/v31/original-180051.gif)
+
+#### 金沙救治药水 · 180052
+
+![金沙救治药水 · 原片四形态](docs/previews/v31/original-180052.gif)
+
+#### 酸甜苹果汁 · 180053
+
+![酸甜苹果汁 · 原片四形态](docs/previews/v31/original-180053.gif)
+
+#### 美味花香豆 · 180054
+
+![美味花香豆 · 原片四形态](docs/previews/v31/original-180054.gif)
+
+#### 牵牛花洗面啫喱 · 180055
+
+![牵牛花洗面啫喱 · 原片四形态](docs/previews/v31/original-180055.gif)
+
+#### 冰酷可乐 · 180056
+
+![冰酷可乐 · 原片四形态](docs/previews/v31/original-180056.gif)
+
+#### 雪顶椰汁 · 180057
+
+![雪顶椰汁 · 原片四形态](docs/previews/v31/original-180057.gif)
+
+#### 爱心魔魔球 · 180058
+
+![爱心魔魔球 · 原片四形态](docs/previews/v31/original-180058.gif)
+
+#### 椰香烤饼 · 180059
+
+![椰香烤饼 · 原片四形态](docs/previews/v31/original-180059.gif)
+
+#### 拉姆魔法洗面奶 · 180060
+
+![拉姆魔法洗面奶 · 原片四形态](docs/previews/v31/original-180060.gif)
+
+#### 石榴多多 · 180061
+
+![石榴多多 · 原片四形态](docs/previews/v31/original-180061.gif)
+
+#### 仙桃玉米酥 · 180062
+
+![仙桃玉米酥 · 原片四形态](docs/previews/v31/original-180062.gif)
+
+#### 石榴甜旋风 · 180063
+
+![石榴甜旋风 · 原片四形态](docs/previews/v31/original-180063.gif)
+
+#### 泡泡桃汁浴 · 180064
+
+![泡泡桃汁浴 · 原片四形态](docs/previews/v31/original-180064.gif)
+
+#### 杰克南瓜酥 · 180065
+
+![杰克南瓜酥 · 原片四形态](docs/previews/v31/original-180065.gif)
+
+#### 南瓜巫浴液 · 180066
+
+![南瓜巫浴液 · 原片四形态](docs/previews/v31/original-180066.gif)
+
+#### 奶油鬼脸匹萨 · 180067
+
+![奶油鬼脸匹萨 · 原片四形态](docs/previews/v31/original-180067.gif)
+
+#### 怪味南瓜汁 · 180068
+
+![怪味南瓜汁 · 原片四形态](docs/previews/v31/original-180068.gif)
+
+#### 百合花浴液 · 180069
+
+![百合花浴液 · 原片四形态](docs/previews/v31/original-180069.gif)
+
+#### 云朵面包 · 180070
+
+![云朵面包 · 原片四形态](docs/previews/v31/original-180070.gif)
+
+#### 彩色涂鸦 · 1 · tuya1
+
+![彩色涂鸦 · 1 · 原片四形态](docs/previews/v31/original-tuya1.gif)
+
+#### 彩色涂鸦 · 2 · tuya2
+
+![彩色涂鸦 · 2 · 原片四形态](docs/previews/v31/original-tuya2.gif)
+
+#### 彩色涂鸦 · 3 · tuya3
+
+![彩色涂鸦 · 3 · 原片四形态](docs/previews/v31/original-tuya3.gif)
+
+#### 彩色涂鸦 · 4 · tuya4
+
+![彩色涂鸦 · 4 · 原片四形态](docs/previews/v31/original-tuya4.gif)
+
+</details>
+
+## 上一版 · v0.30.10
 
 背包仅显示食物、饮品、清洁和药水，状态及规则使用独立入口。小屋增加全屏查看，支持Esc退出，返回桌面自动恢复原窗口。
 
@@ -71,9 +380,9 @@
 
 睡眠、摸摸、足球等既有动作仍全部展示在下面。
 
-## 全部现有动画（全部展开）
+## 此前动画对照（保留历史录制）
 
-按渲染器动作清单核对，展示基础动作、32种用品、9件装扮及本页顶部18段原版三系变身。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，来源与自制适配分别标注。
+以下为此前版本的基础动作、32种用品、9件装扮及18段原版三系变身录制；小日常中的顶书练习已删除，本轮最新日常与全部上传原片以上方 v0.31 预览为准。每一组都直接显示 GIF；相同动作的兼容名称也有对应预览。九件装扮分别展示全部八种形态的摸摸回应。原帧方案与应用内录制分开标注，来源与自制适配分别标注。
 
 ### 日常移动与张望
 

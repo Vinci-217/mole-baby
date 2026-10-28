@@ -1,3 +1,4 @@
+import {isUploadedAction,uploadedSpec} from '../uploaded-actions';
 import originalElementClips from '../../public/assets/original/element-skills/clips.json'
 import {ELEMENT_SKILLS} from '../element-skills'
 import {transformationTimeline} from '../magic-box'
@@ -29,12 +30,14 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
   wake: { row: 0, frames: [0, 1, 2, 1, 0], step: 100 },
 }
 /** Public renderer vocabulary; the README catalogue checks every entry. */
-export const RAM_ACTIONS=[...new Set([...ELEMENT_SKILLS.map(skill=>`element-${skill.id}`),...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','balance','school-language','school-english','school-magic','restaurant','skill-language','skill-english','skill-magic','skill-wind','skill-fire','skill-ice','skill-meteor'])]
+export const RAM_ACTIONS=[...new Set([...ELEMENT_SKILLS.map(skill=>`element-${skill.id}`),...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','school-language','school-english','school-magic','restaurant','skill-language','skill-english','skill-magic','skill-wind','skill-fire','skill-ice','skill-meteor'])]
 export function getRamActionDuration(action: string,form='junior'): number | null {
+  if(isUploadedAction(action))return uploadedSpec(form,action.slice(9))?.durationMs??900;
+  if(action==='play-alone'){const clip=uploadedSpec(form,'180004');if(clip)return clip.durationMs}
   if(action.startsWith('element-')){const clip=originalElementClips[action.slice(8) as keyof typeof originalElementClips];if(clip)return transformationTimeline(clip.durationMs).reduce((total,entry)=>total+entry.ms,0)}
   if(action==='skill-magic'||action==='spell')return 4280
   if(isSchoolAction(action))return action.startsWith('skill-')?action==='skill-language'||action==='skill-english'?2000:3000:null
-  if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:action==='balance'?8000:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
+  if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
   if(isMoodAction(action))return emotionDuration(action,form)??3600
   if(action==='play'&&form!=='seed')return footballDuration(form)??SOCIAL_DURATIONS.play
   if (isSocialAction(action) && action !== 'focus') return SOCIAL_DURATIONS[action]

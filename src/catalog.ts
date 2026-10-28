@@ -1,3 +1,5 @@
+import {UPLOADED_ITEMS} from './uploaded-item-data';
+import {customPotionColor,petColorName} from './pet-color';
 /** Original item names/effects/prices: assets/original/items/petfood.xml.
  * Activity gifts have explicit local shop prices; see research/items-states.md.
  * Stable berry/biscuit/juice IDs keep existing v1 saves and rewards intact.
@@ -56,6 +58,8 @@ export const ITEMS: PetItem[] = [
   { id: '180073', sourceId: '180073', name: '优质牛奶', category: 'drink', image: './assets/original/items/180073.png', emoji: '🥛', price: 60, originalPrice: 0, localPrice: true, hunger: 50, thirst: 50, cleanliness: 0, happiness: 50, health: 0, minStage: 0, description: '饱食+50，水分+50，心情+50；活动道具，商店价格为桌宠设定。' },
 ];
 
+ITEMS.push(...UPLOADED_ITEMS);
+
 // Original petfood.xml has Tool=2 colour-changing items. These four bottled
 // variants and their bean price are this desktop adaptation, not official IDs.
 export const COLOR_POTIONS = ([['red','红色'],['yellow','黄色'],['blue','蓝色'],['pink','粉色']] as const).map(([color,name]): PetItem => ({
@@ -68,5 +72,9 @@ ITEMS.push(...COLOR_POTIONS);
 
 /** Accept a source numeric ID at API boundaries, return the stable save ID. */
 export function getItem(id: string | undefined): PetItem | undefined {
-  return ITEMS.find(item => item.id === id || item.sourceId === id);
+  const known=ITEMS.find(item => item.id === id || item.sourceId === id);if(known)return known;
+  const color=customPotionColor(id);if(!color)return;
+  return {id:id!,sourceId:id!,name:`自调色药水 ${color.toUpperCase()}`,category:'medicine',image:'./assets/original/items/180005.png',emoji:'🧪',price:0,originalPrice:0,localPrice:true,hunger:0,thirst:0,cleanliness:0,happiness:0,health:0,minStage:0,changesColor:color,description:`变为${petColorName(color)}，阶段、课程和回忆不变。`};
 }
+
+export function inventoryItems(inventory:Record<string,number>):PetItem[]{return [...ITEMS,...Object.keys(inventory).filter(id=>customPotionColor(id)&&inventory[id]>0).map(id=>getItem(id)!)];}

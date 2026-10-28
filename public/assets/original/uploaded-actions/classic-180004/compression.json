@@ -1,0 +1,24 @@
+[
+  {
+    "file": "mask-0.webp",
+    "sourcePngSha256": "82b7b743d0e106bc6e4be97e0b09f69912de6e3c2d3fb17ef0fd1549697b6e2d",
+    "sha256": "9f81713c256d6093a55fd3364f037a0758e5a7014827fcf31864b86fbdabb2d4",
+    "before": 458007,
+    "after": 331346,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "neutral-0.webp",
+    "sourcePngSha256": "03010c18f78e777302bca0de670d3f78a7dc3edf523ca9c4c542eb3ef229eb7b",
+    "sha256": "2352a5395f914f8423f7da77016e07f27d333fd364771ede0603ee87424f7875",
+    "before": 1078358,
+    "after": 344120,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  }
+]

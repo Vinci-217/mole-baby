@@ -4,7 +4,8 @@ const{warpPointer}=require('./native-pointer.cjs');
 async function verifyElasticCare(page,desktop){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
  try{
-  await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:180,coins:2000,sleeping:false,wardrobe:['wizard-cap'],wearing:'wizard-cap',lastTick:Date.now(),stats:{hunger:15,thirst:15,cleanliness:15,happiness:90,health:60,energy:95}});delete p.evolution;delete p.outing;p.inventory.biscuit=5;p.inventory.juice=5;p.inventory['180003']=5;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,lively:false,presence:false}));});await page.reload();
+  // Seed has no uploaded SWF body; its registered plate/bottle fallback and fixed pot still need coverage.
+  await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:0,coins:2000,sleeping:false,wardrobe:['wizard-cap'],wearing:'wizard-cap',lastTick:Date.now(),stats:{hunger:15,thirst:15,cleanliness:15,happiness:90,health:60,energy:95}});delete p.evolution;delete p.outing;p.inventory.biscuit=5;p.inventory.juice=5;p.inventory['180003']=5;localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,lively:false,presence:false}));});await page.reload();
   const character=page.getByTestId('desktop-character'),ram=character.locator('.ram-sprite'),save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
   // A cold Electron profile decodes and tints the full middle-form atlas here.
   // Wait for painted pixels using the same budget as desktop waitForClassic.

@@ -1,0 +1,56 @@
+{
+  "source": "research/references/color-mixing/colorEditor.swf",
+  "sha256": "b42c6e29f5f30d2f9aae412c604fd4ba2de738e830e66b8c4a6f844d696a3ebc",
+  "sprites": {
+    "cauldron": 24,
+    "water": 5,
+    "redBottle": 65,
+    "greenBottle": 78,
+    "blueBottle": 91
+  },
+  "crockFrames": 7,
+  "fps": 24,
+  "adaptation": "Original RGB mixing art; the bottled, persistent pet-colour inventory flow is a desktop adaptation.",
+  "bottleStillsRootFrame": 1,
+  "bottleStripSampleCount": 12,
+  "bottleStripDistinctFrames": 1,
+  "bottleNote": "UI uses the original still bottles; the unused nested-subframe strips contain one distinct pose, not twelve original pouring drawings.",
+  "files": {
+    "blue-still.png": {
+      "bytes": 14411,
+      "sha256": "46ad38f1ac319f2b718d289965a0d657d19359be7869450eafadd61e4524d000"
+    },
+    "blue.png": {
+      "bytes": 23010,
+      "sha256": "f0dc526c0409e021f6dd3771976629076a2c14c2abddfeb35cf9fcfe28323b26"
+    },
+    "crock-still.png": {
+      "bytes": 119754,
+      "sha256": "603c6bb9bf361d17cb9521ded6a3e05b785ba35a7446b6bec7dadbb3185f40a0"
+    },
+    "crock.png": {
+      "bytes": 125294,
+      "sha256": "b240272c5d66450b4e3b393a2caabb8abfc7a7c336926b5404ad5de6dad4bf0a"
+    },
+    "green-still.png": {
+      "bytes": 14425,
+      "sha256": "4ac04ce1ab13df822f3e730fdea96f431cfa5d4afe40e492ca75ee764700a806"
+    },
+    "green.png": {
+      "bytes": 22976,
+      "sha256": "17cf33535c3ecee799f3a119b1cf0aeafcaaedd9f8b388237b5d541099d51dc7"
+    },
+    "red-still.png": {
+      "bytes": 14437,
+      "sha256": "8ceb5ae8311f967a4883b08edd80ebca563ee7bf65e222b475180d40787df188"
+    },
+    "red.png": {
+      "bytes": 23189,
+      "sha256": "c9fb8ccccd88c432e7a84d1a96c967ffda4d40464ab46bf35870305367468202"
+    },
+    "water-mask.png": {
+      "bytes": 3112,
+      "sha256": "b704a18ba4d896b82579383161a628fb750b63732a6920d14f9f10c94cf45737"
+    }
+  }
+}

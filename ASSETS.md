@@ -268,3 +268,14 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 `public/assets/generated/school/`是本项目新绘的课程道具、餐盘、帽子变花、四系法术、家具和证书框，使用image_gen生成关键姿态，经原小屋、UI、熊熊饼干及中级拉姆参考对照后修订为较平的色面。不是官方《摩尔勇士》技能原帧。
 
 最终模型图、原角色参考板和完整精修提示词保存在`skills/mole-classic-art/references/v38/`；工具、日期、用途、源图哈希和帧数见`public/assets/generated/school/source.json`。`scripts/art/pack-school-art.py`裁分关键帧、编排时序和文字、生成24fps透明图集；没有重新绘制角色身体、眼睛或嘴。原始大图与预览GIF不进入安装目录。
+
+
+## v0.31 · 用户上传的完整原动作、日常帧与调色
+
+用户提供的247个SWF（238个不同源件、47,204个时间帧）保存在`research/references/uploaded-lamu-actions/raw/`，原始中文路径和SHA见同目录`sources.json`。四组是初级、中级、高级和经典三叶超级拉姆。`public/assets/original/uploaded-actions/`为完整身体/眼睛/叶片/道具一起栅格化后的24fps帧表，不是整体缩放假冒的独立动作，不运行ActionScript。源件没有DefineSound；现有照料声为项目适配，不宣称取自这些SWF。重复原件共享纹理，但用品身份保留。
+
+`public/assets/original/daily-frames/`为摸摸、翻书、睡眠、追蝴蝶、张望、醒来和眩晕的九形态63组离线合成序列：原角色图层和既有位图道具在浏览器以24fps采样，非官方独立完整原片、非新增手绘。`flight/rotor-source.json`记录高级八叶冠的40个离线投影姿态，原始身体时间帧保留。
+
+`public/assets/original/color-mixer/`导出自原调色模块`colorEditor.swf`。官网请求被环境拒绝，实际文件来自固定提交的Miigon/RecMoleRes社区归档；下载记录、原SWF、原客户端控制类见`research/references/color-mixing/`。原玩法给摩尔玩家调色，本项目新增装瓶、背包与拉姆持久换色流程。
+
+中性WebP纹理允许最多1级RGB压缩差，无损遮罩恢复精确透明度；全纹理校验、952个源整帧透明度重建和每页散列见转换/核验脚本及来源目录。`docs/previews/v31/`的71组GIF从同一帧表重建，全部原件和日常动作可在README预览；GIF、SWF、研究目录不进入安装包。完整覆盖与限制见[本轮调研](research/v31-original-actions-and-colour-mixing.md)。

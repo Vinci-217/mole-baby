@@ -1,0 +1,71 @@
+{
+  "version": "0.31.0",
+  "vitest": 374,
+  "nodeTests": 119,
+  "suppliedFiles": 247,
+  "distinctSwfs": 238,
+  "sourceTimeFrames": 47204,
+  "dailyFormActionClips": 63,
+  "alphaSamples": 952,
+  "previewGifs": 71,
+  "runs": [
+    {
+      "run": "atlas-verify",
+      "exitCode": 0,
+      "finishedAtUnix": 1793212891.6910727
+    },
+    {
+      "run": "audio-review",
+      "exitCode": 0,
+      "finishedAtUnix": 1793213222.1003668
+    },
+    {
+      "run": "unit-final3",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214877.6646893
+    },
+    {
+      "run": "build-modern-final",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214997.9104156
+    },
+    {
+      "run": "legacy-build",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214100.1041586
+    },
+    {
+      "run": "v31-defensive",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214925.4815972
+    },
+    {
+      "run": "compact-browser3",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214597.397188
+    },
+    {
+      "run": "native-full2",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214503.5189497
+    },
+    {
+      "run": "legacy22-smoke2",
+      "exitCode": 0,
+      "finishedAtUnix": 1793214737.4226549
+    },
+    {
+      "run": "native-v31-final",
+      "exitCode": 0,
+      "finishedAtUnix": 1793215209.467329
+    }
+  ],
+  "nativeV31Final": "passed",
+  "platformsBuiltByCI": [
+    "windows-x64",
+    "legacy-x64",
+    "legacy-ia32",
+    "mac-arm64",
+    "mac-x64"
+  ]
+}

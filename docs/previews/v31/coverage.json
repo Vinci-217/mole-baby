@@ -1,0 +1,1028 @@
+{
+  "method": "Exact source time-frame tables at 24fps, GIF delay quantized to 10ms; red body palette, full fixed viewport scaled once per clip for the grid; original SWF sources separate from baked daily compositions",
+  "suppliedFiles": 247,
+  "distinctSourceSwfs": 238,
+  "suppliedTimeFrames": 47204,
+  "previews": [
+    {
+      "file": "original-180001.gif",
+      "sourceTimeFrames": {
+        "junior": 333,
+        "middle": 170,
+        "senior": 167,
+        "classic": 238
+      },
+      "gifFrames": 222,
+      "fps": 24,
+      "sha256": "99662cd6e0e88a6655ba728c9ccb123a05225add30ecd846af64c801bf894646",
+      "timeSamples": 333,
+      "gifDurationMs": 13880
+    },
+    {
+      "file": "original-180002.gif",
+      "sourceTimeFrames": {
+        "junior": 231,
+        "middle": 224,
+        "senior": 112,
+        "classic": 185
+      },
+      "gifFrames": 180,
+      "fps": 24,
+      "sha256": "dde1528bd35a0d33e29fe5b9a438060c5c68eb00aafb4ff6947fac9720770ceb",
+      "timeSamples": 231,
+      "gifDurationMs": 9620
+    },
+    {
+      "file": "original-180003.gif",
+      "sourceTimeFrames": {
+        "junior": 208,
+        "middle": 174,
+        "senior": 180,
+        "classic": 151
+      },
+      "gifFrames": 169,
+      "fps": 24,
+      "sha256": "d562d9f79b2ae7b3de0e9a3e6de372d4de6c65ad191d16cadd106754f197a0ad",
+      "timeSamples": 208,
+      "gifDurationMs": 8670
+    },
+    {
+      "file": "original-180004.gif",
+      "sourceTimeFrames": {
+        "junior": 258,
+        "middle": 149,
+        "senior": 144,
+        "classic": 148
+      },
+      "gifFrames": 209,
+      "fps": 24,
+      "sha256": "d631ccb18178d60e1f198b7f3cbcdd82b42aabaf3efc6a9590ddd945187e1256",
+      "timeSamples": 258,
+      "gifDurationMs": 10750
+    },
+    {
+      "file": "original-180005.gif",
+      "sourceTimeFrames": {
+        "junior": 136,
+        "middle": 154,
+        "senior": 154,
+        "classic": 142
+      },
+      "gifFrames": 129,
+      "fps": 24,
+      "sha256": "1ad92403bbe2f54f8001373d874478951a0a286a01fe6aa0e502b93325d7bdbf",
+      "timeSamples": 154,
+      "gifDurationMs": 6420
+    },
+    {
+      "file": "original-180006.gif",
+      "sourceTimeFrames": {
+        "junior": 151,
+        "middle": 151,
+        "senior": 151
+      },
+      "gifFrames": 132,
+      "fps": 24,
+      "sha256": "ca0ed52f90c4ae885d4fbd15356ee3df8c0a621e9301203dafdb342d9377d683",
+      "timeSamples": 151,
+      "gifDurationMs": 6290
+    },
+    {
+      "file": "original-180007.gif",
+      "sourceTimeFrames": {
+        "junior": 154,
+        "middle": 216,
+        "senior": 115,
+        "classic": 142
+      },
+      "gifFrames": 136,
+      "fps": 24,
+      "sha256": "257f74951475453957c0d466abc45d9a1ab49435fb1dadf24292c5180f3b2230",
+      "timeSamples": 216,
+      "gifDurationMs": 9000
+    },
+    {
+      "file": "original-180008.gif",
+      "sourceTimeFrames": {
+        "junior": 158,
+        "middle": 105,
+        "senior": 122,
+        "classic": 146
+      },
+      "gifFrames": 126,
+      "fps": 24,
+      "sha256": "80cdef577ad0cbf415775de3886f9c20bc3e189ff2cb489bf228baf891463dff",
+      "timeSamples": 158,
+      "gifDurationMs": 6580
+    },
+    {
+      "file": "original-180009.gif",
+      "sourceTimeFrames": {
+        "junior": 131,
+        "middle": 90,
+        "senior": 134,
+        "classic": 138
+      },
+      "gifFrames": 111,
+      "fps": 24,
+      "sha256": "5937efe491f2685a78306ab2d3f34c6d223e91464a0a1625f5d9877ce768ec92",
+      "timeSamples": 138,
+      "gifDurationMs": 5750
+    },
+    {
+      "file": "original-180010.gif",
+      "sourceTimeFrames": {
+        "junior": 134,
+        "middle": 99,
+        "senior": 144,
+        "classic": 238
+      },
+      "gifFrames": 170,
+      "fps": 24,
+      "sha256": "1a3e150d5ac8892d8cd21af77f52c17853234ad2bc418fce8713d34f8faa5971",
+      "timeSamples": 238,
+      "gifDurationMs": 9920
+    },
+    {
+      "file": "original-180011.gif",
+      "sourceTimeFrames": {
+        "junior": 321,
+        "middle": 103,
+        "senior": 350,
+        "classic": 205
+      },
+      "gifFrames": 316,
+      "fps": 24,
+      "sha256": "5f3ba1246147406dd1771a7531e3412631b69424adaab870957820c9e5783ecc",
+      "timeSamples": 350,
+      "gifDurationMs": 14580
+    },
+    {
+      "file": "original-180012.gif",
+      "sourceTimeFrames": {
+        "junior": 210,
+        "middle": 237,
+        "senior": 79,
+        "classic": 225
+      },
+      "gifFrames": 177,
+      "fps": 24,
+      "sha256": "4faa14bb67b15826f42489f571cb6923fe9f9b38f87f3f94fdfb152136e20f3f",
+      "timeSamples": 237,
+      "gifDurationMs": 9880
+    },
+    {
+      "file": "original-180013.gif",
+      "sourceTimeFrames": {
+        "junior": 92,
+        "middle": 210,
+        "senior": 210,
+        "classic": 217
+      },
+      "gifFrames": 169,
+      "fps": 24,
+      "sha256": "e51b2e7255dbe5b089ddf169057c5e12f04637b7534d21c7e0a4d899a7f07493",
+      "timeSamples": 217,
+      "gifDurationMs": 9040
+    },
+    {
+      "file": "original-180014.gif",
+      "sourceTimeFrames": {
+        "junior": 205,
+        "middle": 210,
+        "senior": 182,
+        "classic": 170
+      },
+      "gifFrames": 177,
+      "fps": 24,
+      "sha256": "ec90bdcda4d15295ddf34d6a8cc225c4a56e98f9f1008d1783c604be78829a17",
+      "timeSamples": 210,
+      "gifDurationMs": 8750
+    },
+    {
+      "file": "original-180015.gif",
+      "sourceTimeFrames": {
+        "junior": 202,
+        "middle": 201,
+        "senior": 188,
+        "classic": 205
+      },
+      "gifFrames": 160,
+      "fps": 24,
+      "sha256": "3dbe89f6b5ba80f23634ed75e005c53a0c4114b48b73ab42cd8343beb897cf32",
+      "timeSamples": 205,
+      "gifDurationMs": 8540
+    },
+    {
+      "file": "original-180016.gif",
+      "sourceTimeFrames": {
+        "junior": 201,
+        "middle": 222,
+        "senior": 214,
+        "classic": 207
+      },
+      "gifFrames": 183,
+      "fps": 24,
+      "sha256": "13fa86620b1f4c4ef49a0645b63f2cf4a724add755abd1b20ef5b67532517b47",
+      "timeSamples": 222,
+      "gifDurationMs": 9250
+    },
+    {
+      "file": "original-180017.gif",
+      "sourceTimeFrames": {
+        "junior": 145,
+        "middle": 163,
+        "senior": 112,
+        "classic": 115
+      },
+      "gifFrames": 108,
+      "fps": 24,
+      "sha256": "b008ae6130709abae2a237b28fd55eb68c94a95ecb8da54dba2fbab0a366b2bb",
+      "timeSamples": 163,
+      "gifDurationMs": 6790
+    },
+    {
+      "file": "original-180018.gif",
+      "sourceTimeFrames": {
+        "middle": 202,
+        "senior": 224,
+        "classic": 217
+      },
+      "gifFrames": 156,
+      "fps": 24,
+      "sha256": "2d9e4ab5ccecabffdfa34e60d97e072b928bc3d2b027a306d1e1b6df577548f1",
+      "timeSamples": 224,
+      "gifDurationMs": 9330
+    },
+    {
+      "file": "original-180019.gif",
+      "sourceTimeFrames": {
+        "senior": 240,
+        "classic": 180
+      },
+      "gifFrames": 141,
+      "fps": 24,
+      "sha256": "b71c418b8c3dc120e2acab07be94a07423307095231d5eb2693ec9d5c072109e",
+      "timeSamples": 240,
+      "gifDurationMs": 10000
+    },
+    {
+      "file": "original-180020.gif",
+      "sourceTimeFrames": {
+        "junior": 163,
+        "middle": 160,
+        "senior": 200,
+        "classic": 190
+      },
+      "gifFrames": 164,
+      "fps": 24,
+      "sha256": "a68d509927d0403f7c6018d97f87020599f8f5ef5b38fc69c2cfd2aa6ec08205",
+      "timeSamples": 200,
+      "gifDurationMs": 8330
+    },
+    {
+      "file": "original-180021.gif",
+      "sourceTimeFrames": {
+        "junior": 148,
+        "middle": 201,
+        "senior": 146,
+        "classic": 138
+      },
+      "gifFrames": 147,
+      "fps": 24,
+      "sha256": "47e1e7263d9d5d1a897776e9e31ae5302b4a8dcd388ee30a8b7aad85efbf567d",
+      "timeSamples": 201,
+      "gifDurationMs": 8380
+    },
+    {
+      "file": "original-180022.gif",
+      "sourceTimeFrames": {
+        "junior": 216,
+        "middle": 173,
+        "senior": 212,
+        "classic": 125
+      },
+      "gifFrames": 186,
+      "fps": 24,
+      "sha256": "001ac77d888c2bc0e5634e2c9aa831c01d5889c5b69bfb82289a99fffbb39ff7",
+      "timeSamples": 216,
+      "gifDurationMs": 9000
+    },
+    {
+      "file": "original-180023.gif",
+      "sourceTimeFrames": {
+        "junior": 198,
+        "middle": 198,
+        "senior": 135,
+        "classic": 217
+      },
+      "gifFrames": 164,
+      "fps": 24,
+      "sha256": "42cf9aca16bf07fb580733b1f908a56a2fd867b9af3b85850420e2c4f178595d",
+      "timeSamples": 217,
+      "gifDurationMs": 9040
+    },
+    {
+      "file": "original-180024.gif",
+      "sourceTimeFrames": {
+        "junior": 264,
+        "middle": 248,
+        "senior": 136,
+        "classic": 235
+      },
+      "gifFrames": 228,
+      "fps": 24,
+      "sha256": "aa6eb9edad2535b908d5adde3b1185bcc0e425c51d39b04e47e6b77adbacc039",
+      "timeSamples": 264,
+      "gifDurationMs": 11000
+    },
+    {
+      "file": "original-180025.gif",
+      "sourceTimeFrames": {
+        "junior": 241,
+        "middle": 235,
+        "senior": 215,
+        "classic": 260
+      },
+      "gifFrames": 222,
+      "fps": 24,
+      "sha256": "62549548f13a699fdf24983da3286e6475fdaf176f91588474faa90cfd7c7f08",
+      "timeSamples": 260,
+      "gifDurationMs": 10830
+    },
+    {
+      "file": "original-180026.gif",
+      "sourceTimeFrames": {
+        "junior": 295,
+        "middle": 207,
+        "senior": 255,
+        "classic": 229
+      },
+      "gifFrames": 222,
+      "fps": 24,
+      "sha256": "6e983f5839f5452022bf495670213218affcfd4a32f363f2779b6201b55ccb56",
+      "timeSamples": 295,
+      "gifDurationMs": 12290
+    },
+    {
+      "file": "original-180027.gif",
+      "sourceTimeFrames": {
+        "junior": 185,
+        "middle": 201,
+        "senior": 193,
+        "classic": 191
+      },
+      "gifFrames": 150,
+      "fps": 24,
+      "sha256": "070c66af6d71377021ade42771f47b74cecf80291659c08775c3c86140273aab",
+      "timeSamples": 201,
+      "gifDurationMs": 8380
+    },
+    {
+      "file": "original-180028.gif",
+      "sourceTimeFrames": {
+        "junior": 161,
+        "middle": 170,
+        "senior": 176,
+        "classic": 124
+      },
+      "gifFrames": 137,
+      "fps": 24,
+      "sha256": "5aba06f4f5ee8d57ac573795b3ccfcc036b767c968381a0bd45b151cd7c7f64e",
+      "timeSamples": 176,
+      "gifDurationMs": 7330
+    },
+    {
+      "file": "original-180029.gif",
+      "sourceTimeFrames": {
+        "junior": 156,
+        "middle": 170,
+        "senior": 183,
+        "classic": 183
+      },
+      "gifFrames": 156,
+      "fps": 24,
+      "sha256": "4e0f5427c4eca7a645d4e028df1677176b3fbbffc493633c311565e8142c22c5",
+      "timeSamples": 183,
+      "gifDurationMs": 7620
+    },
+    {
+      "file": "original-180030.gif",
+      "sourceTimeFrames": {
+        "junior": 229,
+        "middle": 161,
+        "senior": 192,
+        "classic": 188
+      },
+      "gifFrames": 172,
+      "fps": 24,
+      "sha256": "842093cf1f35abbba8203c11566db39eb745434723a40b4943bf9aa5cae6ec9f",
+      "timeSamples": 229,
+      "gifDurationMs": 9540
+    },
+    {
+      "file": "original-180041.gif",
+      "sourceTimeFrames": {
+        "junior": 208,
+        "middle": 191,
+        "senior": 183,
+        "classic": 191
+      },
+      "gifFrames": 152,
+      "fps": 24,
+      "sha256": "2f1511583beffcff76d55402d363043890e7ab413b166bc826dcac07f5d8eb45",
+      "timeSamples": 208,
+      "gifDurationMs": 8670
+    },
+    {
+      "file": "original-180042.gif",
+      "sourceTimeFrames": {
+        "junior": 221,
+        "middle": 195,
+        "senior": 241,
+        "classic": 238
+      },
+      "gifFrames": 169,
+      "fps": 24,
+      "sha256": "ce60f9b82457b6b2d05d931d0817f3db31a108b4a66b533ca37daef30566650b",
+      "timeSamples": 241,
+      "gifDurationMs": 10040
+    },
+    {
+      "file": "original-180043.gif",
+      "sourceTimeFrames": {
+        "junior": 209,
+        "middle": 199,
+        "senior": 217,
+        "classic": 195
+      },
+      "gifFrames": 173,
+      "fps": 24,
+      "sha256": "8d59813413473cf88d00b1c1cb02f469b227c75391782ffb7d749f42387daf67",
+      "timeSamples": 217,
+      "gifDurationMs": 9040
+    },
+    {
+      "file": "original-180044.gif",
+      "sourceTimeFrames": {
+        "junior": 209,
+        "middle": 199,
+        "senior": 217,
+        "classic": 195
+      },
+      "gifFrames": 173,
+      "fps": 24,
+      "sha256": "679f64a80f53ee14b6c27f22531f8d1ed4124a095fe1b257d3e81885a7437092",
+      "timeSamples": 217,
+      "gifDurationMs": 9040
+    },
+    {
+      "file": "original-180045.gif",
+      "sourceTimeFrames": {
+        "junior": 269,
+        "middle": 131,
+        "senior": 133,
+        "classic": 268
+      },
+      "gifFrames": 213,
+      "fps": 24,
+      "sha256": "d5d488fd55cfa47fcc3c6f6f04eb1a295006055ecaf95cc63c20f6f3f510f4b4",
+      "timeSamples": 269,
+      "gifDurationMs": 11210
+    },
+    {
+      "file": "original-180046.gif",
+      "sourceTimeFrames": {
+        "junior": 412,
+        "middle": 239,
+        "senior": 294,
+        "classic": 220
+      },
+      "gifFrames": 280,
+      "fps": 24,
+      "sha256": "a7592347795fc68defc7fd16b4729e489c652c5e681dc45da27732a3f194fac6",
+      "timeSamples": 412,
+      "gifDurationMs": 17170
+    },
+    {
+      "file": "original-180047.gif",
+      "sourceTimeFrames": {
+        "junior": 316,
+        "middle": 256,
+        "senior": 236,
+        "classic": 206
+      },
+      "gifFrames": 234,
+      "fps": 24,
+      "sha256": "969566a3c377bac608d8b41bcd0496f8e1220085752efe4ceee1c00e8ae1637a",
+      "timeSamples": 316,
+      "gifDurationMs": 13170
+    },
+    {
+      "file": "original-180048.gif",
+      "sourceTimeFrames": {
+        "junior": 172,
+        "middle": 172,
+        "senior": 122,
+        "classic": 165
+      },
+      "gifFrames": 147,
+      "fps": 24,
+      "sha256": "edc39435735ffc04cd1ae315e00073b18ba52a010a0821171aa5899f803167a8",
+      "timeSamples": 172,
+      "gifDurationMs": 7170
+    },
+    {
+      "file": "original-180049.gif",
+      "sourceTimeFrames": {
+        "junior": 206,
+        "middle": 206,
+        "senior": 206,
+        "classic": 206
+      },
+      "gifFrames": 109,
+      "fps": 24,
+      "sha256": "31444d7b755bc2946d7da519f3818494217362f96237936b0c17dfd6a02e4fd5",
+      "timeSamples": 206,
+      "gifDurationMs": 8580
+    },
+    {
+      "file": "original-180050.gif",
+      "sourceTimeFrames": {
+        "junior": 136,
+        "middle": 154,
+        "senior": 154
+      },
+      "gifFrames": 114,
+      "fps": 24,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b",
+      "timeSamples": 154,
+      "gifDurationMs": 6420
+    },
+    {
+      "file": "original-180051.gif",
+      "sourceTimeFrames": {
+        "junior": 136,
+        "middle": 154,
+        "senior": 154
+      },
+      "gifFrames": 114,
+      "fps": 24,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b",
+      "timeSamples": 154,
+      "gifDurationMs": 6420
+    },
+    {
+      "file": "original-180052.gif",
+      "sourceTimeFrames": {
+        "junior": 136,
+        "middle": 154,
+        "senior": 154
+      },
+      "gifFrames": 114,
+      "fps": 24,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b",
+      "timeSamples": 154,
+      "gifDurationMs": 6420
+    },
+    {
+      "file": "original-180053.gif",
+      "sourceTimeFrames": {
+        "junior": 153,
+        "middle": 165,
+        "senior": 172,
+        "classic": 216
+      },
+      "gifFrames": 181,
+      "fps": 24,
+      "sha256": "bb66c9615e245b607e97766f28aff0693486f1b5743df075f3e54cebc24ef7fa",
+      "timeSamples": 216,
+      "gifDurationMs": 9000
+    },
+    {
+      "file": "original-180054.gif",
+      "sourceTimeFrames": {
+        "junior": 199,
+        "middle": 190,
+        "senior": 168,
+        "classic": 224
+      },
+      "gifFrames": 199,
+      "fps": 24,
+      "sha256": "71c4cee3a69beffea65169b3583135f8d809b4924693066326d6e1dfbcf187e6",
+      "timeSamples": 224,
+      "gifDurationMs": 9330
+    },
+    {
+      "file": "original-180055.gif",
+      "sourceTimeFrames": {
+        "junior": 158,
+        "middle": 166,
+        "senior": 171,
+        "classic": 188
+      },
+      "gifFrames": 161,
+      "fps": 24,
+      "sha256": "c85284ec03d2f3b7a753437f24bd6480028908b8f85ea51f8398a4fd6d96e688",
+      "timeSamples": 188,
+      "gifDurationMs": 7830
+    },
+    {
+      "file": "original-180056.gif",
+      "sourceTimeFrames": {
+        "junior": 205,
+        "middle": 210,
+        "senior": 182,
+        "classic": 170
+      },
+      "gifFrames": 175,
+      "fps": 24,
+      "sha256": "2cfbf8637ff11a2f9e592f2fd432a366716c1c6731fd6b3b343d7dcbc00f3cbd",
+      "timeSamples": 210,
+      "gifDurationMs": 8750
+    },
+    {
+      "file": "original-180057.gif",
+      "sourceTimeFrames": {
+        "junior": 160,
+        "middle": 195,
+        "senior": 171,
+        "classic": 219
+      },
+      "gifFrames": 209,
+      "fps": 24,
+      "sha256": "704c4824fe8caf963f45177172e2933864921573304b443e06f8001f623e4a5d",
+      "timeSamples": 219,
+      "gifDurationMs": 9120
+    },
+    {
+      "file": "original-180058.gif",
+      "sourceTimeFrames": {
+        "junior": 228,
+        "middle": 281,
+        "senior": 201,
+        "classic": 281
+      },
+      "gifFrames": 251,
+      "fps": 24,
+      "sha256": "a9898c5ec3ba00afe0cea45523482de14853d2fe0a44a8b0e6574386761db1fd",
+      "timeSamples": 281,
+      "gifDurationMs": 11710
+    },
+    {
+      "file": "original-180059.gif",
+      "sourceTimeFrames": {
+        "junior": 189,
+        "middle": 281,
+        "senior": 208,
+        "classic": 145
+      },
+      "gifFrames": 239,
+      "fps": 24,
+      "sha256": "323ef91033de6a4f667e65be985f26520300ed5e03cb140af1c3c3fe0201b7f2",
+      "timeSamples": 281,
+      "gifDurationMs": 11710
+    },
+    {
+      "file": "original-180060.gif",
+      "sourceTimeFrames": {
+        "junior": 146,
+        "middle": 337,
+        "senior": 192,
+        "classic": 217
+      },
+      "gifFrames": 227,
+      "fps": 24,
+      "sha256": "a7a65397a4010902d39071522ad10ce3c046794ad18cb8ffe96bba0a388a3044",
+      "timeSamples": 337,
+      "gifDurationMs": 14040
+    },
+    {
+      "file": "original-180061.gif",
+      "sourceTimeFrames": {
+        "junior": 163,
+        "middle": 124,
+        "senior": 159,
+        "classic": 175
+      },
+      "gifFrames": 169,
+      "fps": 24,
+      "sha256": "6d081883e178fc1e26c093c59c91b7affaff0468cff34295891fdfd17120bd82",
+      "timeSamples": 175,
+      "gifDurationMs": 7290
+    },
+    {
+      "file": "original-180062.gif",
+      "sourceTimeFrames": {
+        "junior": 215,
+        "middle": 205,
+        "senior": 199,
+        "classic": 222
+      },
+      "gifFrames": 212,
+      "fps": 24,
+      "sha256": "5acecafcb228db4b71da3cf51be9976772ceafcb88bba38aa08de0a539e53326",
+      "timeSamples": 222,
+      "gifDurationMs": 9250
+    },
+    {
+      "file": "original-180063.gif",
+      "sourceTimeFrames": {
+        "junior": 226,
+        "middle": 144,
+        "senior": 178,
+        "classic": 153
+      },
+      "gifFrames": 188,
+      "fps": 24,
+      "sha256": "0b733d0b826a20fa6fcca7021b3c512cdeee63d9bc1f24cc142f9bf079c004dd",
+      "timeSamples": 226,
+      "gifDurationMs": 9420
+    },
+    {
+      "file": "original-180064.gif",
+      "sourceTimeFrames": {
+        "junior": 120,
+        "middle": 153,
+        "senior": 175,
+        "classic": 205
+      },
+      "gifFrames": 190,
+      "fps": 24,
+      "sha256": "edd25c33ac18bb829f8496b78b8cc92c0b885cfdcf0cfbfb0a8eeb6bcb09ea6f",
+      "timeSamples": 205,
+      "gifDurationMs": 8540
+    },
+    {
+      "file": "original-180065.gif",
+      "sourceTimeFrames": {
+        "junior": 234,
+        "middle": 243,
+        "senior": 228,
+        "classic": 242
+      },
+      "gifFrames": 243,
+      "fps": 24,
+      "sha256": "be074705e5ef948becf251d0e2c53088a53c2b819819330afec44a70f75775fc",
+      "timeSamples": 243,
+      "gifDurationMs": 10120
+    },
+    {
+      "file": "original-180066.gif",
+      "sourceTimeFrames": {
+        "junior": 179,
+        "middle": 217,
+        "senior": 240,
+        "classic": 186
+      },
+      "gifFrames": 239,
+      "fps": 24,
+      "sha256": "03949fda9cf7cfdc387fa87bc6993e4f1f40dea33018382da99f079bf9959002",
+      "timeSamples": 240,
+      "gifDurationMs": 10000
+    },
+    {
+      "file": "original-180067.gif",
+      "sourceTimeFrames": {
+        "junior": 242,
+        "senior": 226,
+        "classic": 237
+      },
+      "gifFrames": 233,
+      "fps": 24,
+      "sha256": "63c554cfa51a1cde8f8b6271262623dd4e71fe382c32d7de6cafbac4716d1f7b",
+      "timeSamples": 242,
+      "gifDurationMs": 10080
+    },
+    {
+      "file": "original-180068.gif",
+      "sourceTimeFrames": {
+        "junior": 242,
+        "senior": 275,
+        "classic": 214
+      },
+      "gifFrames": 274,
+      "fps": 24,
+      "sha256": "58597607551b12dd031f0707c84940ebf93dd303e18e00089e10b0658c7d7c12",
+      "timeSamples": 275,
+      "gifDurationMs": 11460
+    },
+    {
+      "file": "original-180069.gif",
+      "sourceTimeFrames": {
+        "junior": 258,
+        "middle": 242,
+        "senior": 242,
+        "classic": 179
+      },
+      "gifFrames": 241,
+      "fps": 24,
+      "sha256": "5d57fb112990239d2070b1b10d9c7ea9a15f1cf563c6694e3955f1f54ab8ada9",
+      "timeSamples": 258,
+      "gifDurationMs": 10750
+    },
+    {
+      "file": "original-180070.gif",
+      "sourceTimeFrames": {
+        "junior": 180,
+        "middle": 193,
+        "senior": 196,
+        "classic": 238
+      },
+      "gifFrames": 220,
+      "fps": 24,
+      "sha256": "6302423d588eb1b50cc3aa22c6fc727f2a16568d2a04d5c576aa4e7ee653da0d",
+      "timeSamples": 238,
+      "gifDurationMs": 9920
+    },
+    {
+      "file": "original-tuya1.gif",
+      "sourceTimeFrames": {
+        "junior": 175,
+        "middle": 170,
+        "senior": 153,
+        "classic": 144
+      },
+      "gifFrames": 150,
+      "fps": 24,
+      "sha256": "8cbe947779d1aeffda53d60abf67c9f3df1682bb2e81ee27c9af25f3637d6c48",
+      "timeSamples": 175,
+      "gifDurationMs": 7290
+    },
+    {
+      "file": "original-tuya2.gif",
+      "sourceTimeFrames": {
+        "junior": 175,
+        "middle": 170,
+        "senior": 153,
+        "classic": 144
+      },
+      "gifFrames": 149,
+      "fps": 24,
+      "sha256": "9579fdf5ee115c681de56459f6522e0b4ae1d61c2de16074eb2bf7757792f394",
+      "timeSamples": 175,
+      "gifDurationMs": 7290
+    },
+    {
+      "file": "original-tuya3.gif",
+      "sourceTimeFrames": {
+        "junior": 167,
+        "middle": 159,
+        "senior": 180,
+        "classic": 176
+      },
+      "gifFrames": 158,
+      "fps": 24,
+      "sha256": "dd03f22b85611f988fe8563ea19e5dc22281d9b725cc00f2d894dad2f0fa74a4",
+      "timeSamples": 180,
+      "gifDurationMs": 7500
+    },
+    {
+      "file": "original-tuya4.gif",
+      "sourceTimeFrames": {
+        "junior": 167,
+        "middle": 159,
+        "senior": 180,
+        "classic": 176
+      },
+      "gifFrames": 157,
+      "fps": 24,
+      "sha256": "9fafa1346a0a33b2cca9883f7c9041c7569d66fafcbddbe87c582a5de4a61a1e",
+      "timeSamples": 180,
+      "gifDurationMs": 7500
+    },
+    {
+      "file": "daily-pet.gif",
+      "sourceTimeFrames": {
+        "seed": 58,
+        "junior": 58,
+        "middle": 58,
+        "senior": 58,
+        "super": 58,
+        "classic": 58,
+        "water": 58,
+        "wood": 58,
+        "fire": 58
+      },
+      "gifFrames": 58,
+      "fps": 24,
+      "sha256": "4ca5b310cd8bc25d147aa30e3f98d8484e488bbd38b2acafdbb4ae07d7032032",
+      "timeSamples": 58,
+      "gifDurationMs": 2420
+    },
+    {
+      "file": "daily-focus.gif",
+      "sourceTimeFrames": {
+        "seed": 192,
+        "junior": 192,
+        "middle": 192,
+        "senior": 192,
+        "super": 192,
+        "classic": 192,
+        "water": 192,
+        "wood": 192,
+        "fire": 192
+      },
+      "gifFrames": 192,
+      "fps": 24,
+      "sha256": "9f5d8e2fe2747a9a025d05b5552a3f0dacea0709105565ddf0ea2e41776ed0fa",
+      "timeSamples": 192,
+      "gifDurationMs": 8000
+    },
+    {
+      "file": "daily-sleep.gif",
+      "sourceTimeFrames": {
+        "seed": 154,
+        "junior": 154,
+        "middle": 154,
+        "senior": 154,
+        "super": 154,
+        "classic": 154,
+        "water": 154,
+        "wood": 154,
+        "fire": 154
+      },
+      "gifFrames": 140,
+      "fps": 24,
+      "sha256": "8a0dfe768516f4b553e8e5e9897907ee0ef4730ba3be3f186d0834c9c3939fa9",
+      "timeSamples": 154,
+      "gifDurationMs": 6420
+    },
+    {
+      "file": "daily-watch-butterfly.gif",
+      "sourceTimeFrames": {
+        "seed": 156,
+        "junior": 156,
+        "middle": 156,
+        "senior": 156,
+        "super": 156,
+        "classic": 156,
+        "water": 156,
+        "wood": 156,
+        "fire": 156
+      },
+      "gifFrames": 156,
+      "fps": 24,
+      "sha256": "8d4258d802f26df7d3432431536642470ea28c51a697313f66cf182e3548dae1",
+      "timeSamples": 156,
+      "gifDurationMs": 6500
+    },
+    {
+      "file": "daily-look-around.gif",
+      "sourceTimeFrames": {
+        "seed": 87,
+        "junior": 87,
+        "middle": 87,
+        "senior": 87,
+        "super": 87,
+        "classic": 87,
+        "water": 87,
+        "wood": 87,
+        "fire": 87
+      },
+      "gifFrames": 87,
+      "fps": 24,
+      "sha256": "3faca0b09c23d26c7a543c1d28254ca00c7d330c6be4e3fd10643fe240a97ce8",
+      "timeSamples": 87,
+      "gifDurationMs": 3620
+    },
+    {
+      "file": "daily-wake.gif",
+      "sourceTimeFrames": {
+        "seed": 44,
+        "junior": 44,
+        "middle": 44,
+        "senior": 44,
+        "super": 44,
+        "classic": 44,
+        "water": 44,
+        "wood": 44,
+        "fire": 44
+      },
+      "gifFrames": 44,
+      "fps": 24,
+      "sha256": "2cba49aea9015c6f3e8fe1d9c184a96f6af4c086c41ef970b838ca1436c012d3",
+      "timeSamples": 44,
+      "gifDurationMs": 1830
+    },
+    {
+      "file": "daily-dizzy.gif",
+      "sourceTimeFrames": {
+        "seed": 77,
+        "junior": 77,
+        "middle": 77,
+        "senior": 77,
+        "super": 77,
+        "classic": 77,
+        "water": 77,
+        "wood": 77,
+        "fire": 77
+      },
+      "gifFrames": 77,
+      "fps": 24,
+      "sha256": "48069343602c0e49610f70049879e8a8264fc0139afe49bf3a993a7417404842",
+      "timeSamples": 77,
+      "gifDurationMs": 3210
+    }
+  ]
+}

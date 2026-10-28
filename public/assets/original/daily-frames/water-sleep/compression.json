@@ -1,0 +1,46 @@
+[
+  {
+    "file": "mask-0.webp",
+    "sourcePngSha256": "7b592ac20609d95afeb01d673d51516202354625135a62c71390f7fccfd5a2b1",
+    "sha256": "c91647e30ba059a9f887bf094530ccbdd410bdbd99a7ab11d6e79e6c69b63a7f",
+    "before": 272454,
+    "after": 71140,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "mask-1.webp",
+    "sourcePngSha256": "227e12a22eec3da102218a50cb313b34e205c2013d006a5484caa85e31851131",
+    "sha256": "63526e869ca41aabe002f218b9f1265cdc71eedb0838777b4769a4fbef621dd5",
+    "before": 110037,
+    "after": 38362,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "neutral-0.webp",
+    "sourcePngSha256": "e2a2eb1a632cc423a5fcea4bb51e7ef19981ee9d1a88849cedd285f6888c1a5b",
+    "sha256": "dd5e6b5c32b5f45927fd3de42f68c9a652bfb9a90d68530bb076a01a78b1f3af",
+    "before": 511272,
+    "after": 395256,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  },
+  {
+    "file": "neutral-1.webp",
+    "sourcePngSha256": "4fc7596fcc545c7c14d02bdc7b4b6c24b9991300b3b03a29f7c9a8f8037912ec",
+    "sha256": "f60ae4e89f63566d680c72a016e070e53ce82b0f4bb14cd17f0f4c5b2abd33fd",
+    "before": 208482,
+    "after": 131866,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  }
+]

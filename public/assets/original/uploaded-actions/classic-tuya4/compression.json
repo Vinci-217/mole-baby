@@ -1,0 +1,68 @@
+[
+  {
+    "file": "mask-0.webp",
+    "sourcePngSha256": "b25581330d13e4a29a9c914c02c9e8af5253f39e1d05908c94ec458c3e37b99e",
+    "sha256": "96b898c98317c7870ccd32add2bc8dd0f4cbe5f6a8bcb992d8a1aeb6f3bc36c8",
+    "before": 787557,
+    "after": 513506,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "mask-1.webp",
+    "sourcePngSha256": "502266f04fe8f02ff9359c485edf8dbff183f820e5d97b74496d5100298d0d47",
+    "sha256": "93497b095ca0d5fe741cd419f2dcd33d731ef1208598be279d3ac7e2b44a8a5a",
+    "before": 680495,
+    "after": 460424,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "mask-2.webp",
+    "sourcePngSha256": "c44ff9b8b2961fa51a681d9167e85cd3d72461ec7715fcb076498c373c8b8042",
+    "sha256": "e4d50e30c48b5dd2760abdf9b12d4817829ed457c96cdae4d593baff8076e825",
+    "before": 260472,
+    "after": 168150,
+    "exactMask": true,
+    "maxVisibleRgbError": 0,
+    "exactStoredAlpha": true,
+    "alphaRestoredFromLosslessMask": false
+  },
+  {
+    "file": "neutral-0.webp",
+    "sourcePngSha256": "22e09687bc4b8158b16a4cc83d5bce4b2dbdb76e332b11ff251fc1276e4ffd46",
+    "sha256": "b26b761d068c40532f5f574a263c972e711ed1875e3358c867c4c8157854f1df",
+    "before": 1801602,
+    "after": 728412,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  },
+  {
+    "file": "neutral-1.webp",
+    "sourcePngSha256": "b95ace3b611db1e79dc05138ca2f52af3f7d557e6ada18f23661c5c1f7e0492c",
+    "sha256": "c7f33d8c60eac1edad4060b244b80c1a0013ea0c3ee559a7b54030ce5c8372cd",
+    "before": 2039080,
+    "after": 1040380,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  },
+  {
+    "file": "neutral-2.webp",
+    "sourcePngSha256": "7dc53ff216a0b9bd9c0b1e366754ca43fbc1614eaaa422588d9bd9db3c36aee0",
+    "sha256": "7675054cf9dfa3029a867b36fa2c7e548e2588d6239367caa7dbe892ab081cdb",
+    "before": 543751,
+    "after": 240940,
+    "exactMask": false,
+    "maxVisibleRgbError": 1,
+    "exactStoredAlpha": false,
+    "alphaRestoredFromLosslessMask": true
+  }
+]

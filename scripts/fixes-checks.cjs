@@ -47,6 +47,8 @@ async function verifyFixes(page,desktop){
   await require('./spell-care-checks.cjs').verifySpellCare(page,desktop);
   await require('./growth-settings-checks.cjs').verifyGrowthSettings(page,desktop);
   await require('./original-room-checks.cjs').verifyOriginalRoom(page,desktop);
+  await require('./color-mixer-checks.cjs').verifyColorMixer(page,{label:desktop?'native':'browser'});
+  await require('./uploaded-motion-checks.cjs').verifyUploadedMotion(page,desktop);
   console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});

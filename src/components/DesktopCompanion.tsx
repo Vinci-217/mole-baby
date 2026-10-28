@@ -1,10 +1,11 @@
+import UploadedActionMenu from './UploadedActionMenu';
+import {isUploadedAction} from '../uploaded-actions';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
-import {isMoodAction} from '../mood-motion';
 import {isPastime} from '../pet-pastimes';
 import {isSchoolAction,learned,type CourseId} from '../pet-school';
 import ActivityCountdown from './ActivityCountdown';
@@ -19,7 +20,7 @@ import type {PocketCategory} from './CarePocket';
 export type CompanionPanel = 'status' | 'food' | 'play';
 interface Props {
   moodLabel:string;moodBusy:boolean;onMood:()=>void; pocketContent:ReactNode;statusContent:ReactNode;
-  courseCompletion:string;onElementSkill:(id:string)=>void;
+  onUploadedPlay:(id:string)=>void;onStopUploaded:()=>void;uploadedPlaying:boolean;courseCompletion:string;onElementSkill:(id:string)=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
@@ -29,7 +30,7 @@ interface Props {
   onCare: (action: Action, item?: string) => void;
   onWork:()=>void;onSchool:()=>void;onMagic:()=>void;magicLearned:boolean;onHome: () => void; onShop: () => void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
-  onActionEnd?:()=>void; onTug?:()=>void;
+  onActionEnd?:(completed?:boolean)=>void; onTug?:()=>void;
   onRecall:()=>void;
   pocketCategory: PocketCategory; pocketVisit: number; playInvitation?:ReactNode;
 }
@@ -85,7 +86,7 @@ export default function DesktopCompanion(p: Props) {
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  const selfBusy=isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
+  const selfBusy=isUploadedAction(p.action)||Boolean(p.itemId)||isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
   useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null || selfBusy); }, [tools, dragging, p.panel,docked,selfBusy]);
   useEffect(()=>{if(p.desktopState.mouseThrough){setTools(false);if(p.panel)p.onPanel(null)}},[p.desktopState.mouseThrough,p.panel]);
   useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
@@ -154,7 +155,7 @@ export default function DesktopCompanion(p: Props) {
       <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/>{p.bubbleVisible&&!docked&&!p.pet.activity&&!p.courseCompletion&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)||isPastime(displayAction)||isSchoolAction(displayAction)?p.onActionEnd:undefined}/>
+        <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>
       </button>
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
@@ -177,7 +178,7 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
         <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
-      </div>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
+      </div><UploadedActionMenu pet={p.pet} busy={p.moodBusy} onPlay={p.onUploadedPlay} onStop={p.onStopUploaded} playing={p.uploadedPlaying}/>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
     </section>}
 
   </div>;

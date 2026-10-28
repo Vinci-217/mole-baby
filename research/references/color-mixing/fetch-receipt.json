@@ -1,0 +1,21 @@
+[
+  {
+    "url": "https://mole.61.com/module/colorEditor/colorEditor.swf",
+    "validSwf": false,
+    "bytes": 0,
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "url": "http://mole.61.com/module/colorEditor/colorEditor.swf",
+    "validSwf": false,
+    "bytes": 0,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/colorEditor/colorEditor.swf",
+    "validSwf": true,
+    "bytes": 100198,
+    "error": null,
+    "sha256": "b42c6e29f5f30d2f9aae412c604fd4ba2de738e830e66b8c4a6f844d696a3ebc"
+  }
+]

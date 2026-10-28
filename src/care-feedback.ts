@@ -1,4 +1,5 @@
-import { COLORS, getItem, type GameState } from './game'
+import {petColorName} from './pet-color';
+import { getItem, type GameState } from './game'
 export interface CareGain { key:string; label:string; amount?:number; image:string }
 export interface CareFeedbackData { id:number; petId:number; gains:CareGain[] }
 const NEEDS = [
@@ -8,7 +9,7 @@ const NEEDS = [
 export function careGains(before:GameState,after:GameState,itemId:string):CareGain[] {
   const item=getItem(itemId)
   if(!item||before.createdAt!==after.createdAt)return []
-  if(item.changesColor)return before.color===after.color?[]:[{key:'color',label:`变为${COLORS.find(c=>c.id===after.color)!.name}`,image:item.image}]
+  if(item.changesColor)return before.color===after.color?[]:[{key:'color',label:`变为${petColorName(after.color)}`,image:item.image}]
   return NEEDS.flatMap(([key,label,icon])=>{
     const amount=Math.round(after.stats[key])-Math.round(before.stats[key])
     return item[key]>0&&amount>0?[{key,label,amount,image:`./assets/original/ui/${icon}.png`}]:[]

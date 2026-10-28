@@ -1,0 +1,223 @@
+[
+  {
+    "id": "180006",
+    "name": "复活十字架",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180006.swf",
+    "sha256": "6895b48fefe21281e99761833236f3a88257042140b93b9bda753a598e76efa6",
+    "pngSha256": "da34f38396a300fe143b7fa1c33f3f2166f70ecdae450c3e49f14ea214855517"
+  },
+  {
+    "id": "180011",
+    "name": "逗宠物1",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180011.swf",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "id": "180012",
+    "name": "逗宠物2",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180012.swf",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "id": "180013",
+    "name": "逗宠物3",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180013.swf",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "id": "180015",
+    "name": "蔬菜浓汤",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180015.swf",
+    "sha256": "2dee2c9c3df4306193847551128166ab870201144ea9948e4043a85e421d9216",
+    "pngSha256": "d7a27995883b1cf08d4d3f85e18238b7b33052740e47b0c50c2e84d7b6f162b4"
+  },
+  {
+    "id": "180016",
+    "name": "中秋月饼",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180016.swf",
+    "sha256": "6457ed9eb0a1d4349cdd283b282896ae1de50b291ab471ad04228461a2876555",
+    "pngSha256": "e1b6f8de4c20cbf3b9f850f30c52da7f6361d8d2a79f5322128f7215aa691c88"
+  },
+  {
+    "id": "180026",
+    "name": "乐刷刷",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180026.swf",
+    "sha256": "70d521b4a9e7bb06ec9ca4229b40ea8856bc3ceb2b3b5b0fe93f78b04848c3de",
+    "pngSha256": "5480e2d849a4a01609567144695af38ce94bf6db8514aec3fc1be0120c888350"
+  },
+  {
+    "id": "180041",
+    "name": "珍味八宝饭",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180041.swf",
+    "sha256": "eeeddf200f1f1103eb9e57dcc4718145ca5cdb6829304f1289f5605326f8a4de",
+    "pngSha256": "512cf4c63839df07bb2073b8d681c0e012908711c80d793efe4108003b4956a9"
+  },
+  {
+    "id": "180042",
+    "name": "饺子",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180042.swf",
+    "sha256": "9da90bc9ec05523cc5756f7b11e8101031d08bcc1942f5620b79d6e3fd80f456",
+    "pngSha256": "a5f8032ff5cfc7e25e08dc44f10f7abc009f02501802798790506366a160860f"
+  },
+  {
+    "id": "180046",
+    "name": "黑森林怪味圈",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180046.swf",
+    "sha256": "7831b0274fa4f9f2ef010d07b1cd747702d35c6d49da091e5219da9b1c9fcd78",
+    "pngSha256": "12dc4bf1c9f734d0fd6c7419159285911917cb6ba10a411cfe3ff9741396c13d"
+  },
+  {
+    "id": "180048",
+    "name": "西瓜解暑冲饮",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180048.swf",
+    "sha256": "9a54ef5fa85478d040176b02dc89ab3e17d933e875803b2cd6357f11cb1d6070",
+    "pngSha256": "a09153127f576e449f1a86813cea950e6379b86e817ae61ddb05f87fb84f5629"
+  },
+  {
+    "id": "180049",
+    "name": "清凉草莓浴液",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180049.swf",
+    "sha256": "be144574a198d18bd3809ebf19578b79f7c2b1de5ea95c38c39d6f774b4de127",
+    "pngSha256": "17990a6ac80387ae787cd3e06709869a33c0717603d2cd06f7042bd862ed7d06"
+  },
+  {
+    "id": "180050",
+    "name": "水萤救治药水",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180050.swf",
+    "sha256": "fbff0975f884f1139428681dd986866a194441d3121ce17736a40c040c331324",
+    "pngSha256": "50ba0cdb6b9a5745e6b0ee4146da11f90ac1fbbcb2c87e6911e3a2fbc49aee6a"
+  },
+  {
+    "id": "180051",
+    "name": "炎火救治药水",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180051.swf",
+    "sha256": "879b1868f2450b847eed444c160ebb6084e8665a263ae1a06918f9841b53ea76",
+    "pngSha256": "7e0b743667377bb791600ae25f7dca8296449567bec488da74d96bd45070f8eb"
+  },
+  {
+    "id": "180052",
+    "name": "金沙救治药水",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180052.swf",
+    "sha256": "5d163be0a43447d610cef77d850a8f3bff10ca4a89a2744638383b8ef60def52",
+    "pngSha256": "7fb5c603c2ffabd901114ebe5203748666ad0657ef62f34eb34622274c2367cb"
+  },
+  {
+    "id": "180053",
+    "name": "酸甜苹果汁",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180053.swf",
+    "sha256": "1bd7e52627a2a607c753368f60d01f64541687cfe0f3b676c6303fa3eae8f118",
+    "pngSha256": "16557751551591f317d1710e04fc6e395ed58afae40d052ee707ca1bc83556c3"
+  },
+  {
+    "id": "180054",
+    "name": "美味花香豆",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180054.swf",
+    "sha256": "c9c1cd5ef934625f4a3fee934ef1beedb4c51c943f8fe672d6705656f4af4ec7",
+    "pngSha256": "93a109c5438a2775e9204a306cc0fd355f07294257e3c49cf41b50cbb8e79aeb"
+  },
+  {
+    "id": "180055",
+    "name": "牵牛花洗面啫喱",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180055.swf",
+    "sha256": "5fc5fb472abe173b62708ccbf31ec7438565433d71fdb224ee7afd615d29d117",
+    "pngSha256": "39bebc10e993c5fafdc291d23514f86fd7a5852780739b7fb3e96619988288b3"
+  },
+  {
+    "id": "180056",
+    "name": "冰酷可乐",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180056.swf",
+    "sha256": "62919dbdb5d5bbd04ea7bc99ec77e2dcffc531433c261930211bb6a865dc9fe8",
+    "pngSha256": "f5f8bd670dd6d09b9f18675040e8692c41054e3c56374b1900a7d3cb6d4a160e"
+  },
+  {
+    "id": "180057",
+    "name": "雪顶椰汁",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180057.swf",
+    "sha256": "b2aee94bd70f71ee89e5dca63adfd8f50c87d31683fcf779e8663c2c9cdc7138",
+    "pngSha256": "61232ef3429e33cc50a6c4cdb9b2a5a2d671e16142adb527740d071c613ef09e"
+  },
+  {
+    "id": "180058",
+    "name": "爱心魔魔球",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180058.swf",
+    "sha256": "6c5e1f153387f5779529adf35aaed1e6328b5b7fe1d10ed5f630c62951a9c9f6",
+    "pngSha256": "41c6a0ed45b232c4c331f95eda42a8421e34e143fc1db1adb41d9b8806b651cc"
+  },
+  {
+    "id": "180059",
+    "name": "椰香烤饼",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180059.swf",
+    "sha256": "2f8272f68b466bdbc01752a53df0521cdb318f3375ba5e1756c1e2a580103619",
+    "pngSha256": "f0cf4e9f07dde6bd7e9ccab94842c2e2a41772356a1e87b84c14d996d31aed63"
+  },
+  {
+    "id": "180060",
+    "name": "拉姆魔法洗面奶",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180060.swf",
+    "sha256": "876cd5978dc96adf1ce2ddf4535aa343651694b4449e2e408f797d380d64125e",
+    "pngSha256": "811c81ee4ed0137377f1ec9b3e37340f1c86e27bfbc5c8033f6947ebf8be45bd"
+  },
+  {
+    "id": "180061",
+    "name": "石榴多多",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180061.swf",
+    "sha256": "efb6b363b59bb957be61c3a9f95594ba6a5cff1187109aad2b5dee3b6d47dc71",
+    "pngSha256": "bbf2b4e96978067539e099045539bfaf2b12a003b946539b2c850172fdebea45"
+  },
+  {
+    "id": "180062",
+    "name": "仙桃玉米酥",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180062.swf",
+    "sha256": "6cff20f51a07e65d6bcb4dcf5ced8db60eed508577546a3b02054b9a1eaa5427",
+    "pngSha256": "95e2035a8df8d9612f4317d11b810a856bab6ade31e9ec241cb3c4be23de378d"
+  },
+  {
+    "id": "180063",
+    "name": "石榴甜旋风",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180063.swf",
+    "sha256": "c8a99f58ba437eec4d302d6c0c559a3e318b575cafa0cdf0d14327f976c5a036",
+    "pngSha256": "b88c470b4b98d917c258cc62e8b7cde3590a9198429897f140077ae9784c7fc1"
+  },
+  {
+    "id": "180064",
+    "name": "泡泡桃汁浴",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180064.swf",
+    "sha256": "07cb1ab4d2d749cb8a4ce03435ee83c20793348c51a8fd8afd1c4b31c78d0c43",
+    "pngSha256": "8960d5c5b32aa8f82d0fdc3a5026827ebedb43a600bdc5eea93b32d177b50f10"
+  },
+  {
+    "id": "180065",
+    "name": "杰克南瓜酥",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180065.swf",
+    "sha256": "e1f2ed6dcf0dfadbd009a6b4f1ceb1149ed26baaa7fbd201b2f7103e0b9c809e",
+    "pngSha256": "6f5b5aa8c6e9188c848360180570c4100d1fdbb4ea229bb2c5f295474ff4ac4b"
+  },
+  {
+    "id": "180066",
+    "name": "南瓜巫浴液",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180066.swf",
+    "sha256": "bfe792635f7ecd47cacde3006ec6eb5721957c56e2b74a084e54643065884c2c",
+    "pngSha256": "d2fb15f02b547e6a008d7660a4689875128c514f03c7f7f0c8b48324a971ca17"
+  },
+  {
+    "id": "180067",
+    "name": "奶油鬼脸匹萨",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180067.swf",
+    "sha256": "01c2ea16e5134610d81d832e94fda81b6c2c908d2db1425a5e2f277f07c51eb9",
+    "pngSha256": "5484b8178782780a67830908b0a5032c8d00ff527927240622f8092b4f8e60ab"
+  },
+  {
+    "id": "180068",
+    "name": "怪味南瓜汁",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180068.swf",
+    "sha256": "2ed69148c14d06b478d050ac19859370583ef2ad3642c6e44bb45f2ab30289dd",
+    "pngSha256": "513069178a9ce3737e75ad095efcf5f20b5bbb9f79498226b46fcdf1028bf3fe"
+  },
+  {
+    "id": "180069",
+    "name": "百合花浴液",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/pet/icon/180069.swf",
+    "sha256": "f08dfcb75abcebbf707bc2677aaf5bd2587798f11e388eedf30b9981f16c366c",
+    "pngSha256": "ee7ebe0cc3355fc7dbc72e67f66e6ddf7726e4c4588a005f57d33ffa7750f2b2"
+  }
+]

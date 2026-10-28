@@ -151,11 +151,6 @@
 .life-magic-star.star-1{left:78%;top:17%;animation-delay:90ms}.life-magic-star.star-2{left:67%;top:74%;animation-delay:160ms}
 @keyframes ram-cast-wand{0%,100%{opacity:0;transform:translateY(8%) rotate(-10deg)}12%,82%{opacity:1}24%,38%,65%{transform:translateY(-6%) rotate(13deg)}32%,58%,76%{transform:translateY(-2%) rotate(-12deg)}}
 @keyframes ram-magic-glint{0%,10%,29%,72%,100%{opacity:0;transform:scale(.4) rotate(0)}16%,24%,80%,88%{opacity:.9;transform:scale(1) rotate(65deg)}40%,60%{opacity:.3;transform:scale(.65) rotate(130deg)}}
-.life-balance-book{position:absolute;width:35%;height:19%;object-fit:contain;left:33%;top:-4%;transform-origin:50% 90%;animation:ram-balance-book 8s ease-in-out both}
-.balance-stage-0 .life-balance-book{width:26%;left:38%;top:9%}.balance-stage-1 .life-balance-book{top:7%}.balance-stage-3 .life-balance-book,.balance-stage-4 .life-balance-book{top:-10%}
-.life-balance .ram-pose-layer{animation:ram-balance-body 8s ease-in-out both!important}
-@keyframes ram-balance-book{0%,100%{opacity:0;transform:translateY(-10px) rotate(0)}12%,88%{opacity:1}23%{transform:rotate(-9deg)}41%{transform:rotate(7deg)}59%{transform:rotate(-4deg)}77%,90%{transform:rotate(0)}}
-@keyframes ram-balance-body{0%,100%{transform:rotate(0)}23%{transform:rotate(2deg)}41%{transform:rotate(-1.8deg)}59%{transform:rotate(1deg)}77%{transform:rotate(0)}}
 @media(prefers-reduced-motion:reduce){.ram-life-cue *,.life-balance .ram-pose-layer{animation:none!important;transform:none!important}.life-wand,.life-balance-book{opacity:1}.life-magic-star{opacity:.5}}
 
 .ram-sprite.is-gentle-eating:not(.is-dragging) .ram-pose-layer{transform:scale(calc(1 + var(--care-jaw,0)*.006),calc(1 - var(--care-jaw,0)*.012))}

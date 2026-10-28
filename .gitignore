@@ -223,3 +223,17 @@ artifacts/middle-calm-idle/*
 
 !artifacts/v303-room-moving.png
 !artifacts/v305-*.png
+
+!artifacts/v31/
+artifacts/v31/*
+!artifacts/v31/*.png
+!artifacts/v31/*.json
+!artifacts/original-room/
+artifacts/original-room/*
+!artifacts/original-room/*.png
+!artifacts/original-room/*-checks.json
+!artifacts/original-game-audio/
+artifacts/original-game-audio/*
+!artifacts/original-game-audio/review.json
+artifacts/v31/failed*.png
+artifacts/original-room/failed*.png

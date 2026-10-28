@@ -16,7 +16,7 @@ async function verifyOriginalRoom(page,desktop){
   await page.reload();const character=page.getByTestId('desktop-character');await character.waitFor();
   const rotor=character.locator('canvas[data-form=senior][data-sheet=flight]');await expect(rotor).toHaveAttribute('data-loaded','true',{timeout:25000});await expect(rotor).toHaveAttribute('data-fan-blades','8');
   const speed=async()=>Number(await rotor.getAttribute('data-fan-speed'));
-  await screenshot('senior-idle');await character.click();await expect.poll(speed).toBeGreaterThan(1);const petting=await speed();await screenshot('senior-petting');await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:8000});await expect.poll(speed,{timeout:5000}).toBeLessThan(.4);
+  await screenshot('senior-idle');await character.click();const daily=character.locator('canvas[data-sheet=daily]');await expect(daily).toHaveAttribute('data-loaded','true');await expect(daily).toHaveAttribute('data-uploaded-id','pet');const petting=Number(await daily.getAttribute('data-source-frame'));await expect.poll(async()=>Number(await daily.getAttribute('data-source-frame'))).toBeGreaterThan(petting);await screenshot('senior-petting');await expect(character.locator('.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:8000});await expect.poll(speed,{timeout:5000}).toBeLessThan(.4);
   let slow=null,fast=null;
   if(!desktop){
    const drag=async(delay,step)=>{

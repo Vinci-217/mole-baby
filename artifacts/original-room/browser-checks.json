@@ -1,0 +1,12 @@
+{
+  "version": "0.31.0",
+  "native": false,
+  "pettingSpeed": 3,
+  "slowDragSpeed": 0.405,
+  "fastDragSpeed": 1.172,
+  "distinctIcons": 9,
+  "growthLocation": "成长",
+  "diaryBeforeTimers": true,
+  "independentDisclosure": true,
+  "officialLink": "https://mole.61.com/"
+}

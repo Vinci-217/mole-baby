@@ -41,7 +41,7 @@ export function idleCandidates(pet: GameState, memory?: CompanionMemory, now = D
   return [...IDLE_ACTIONS.slice(0,4).map((action, index) => ({ action, weight: weights[index] })),
     {action:'mood-joy' as const,weight:pet.stats.happiness>=80?7:3},{action:'mood-content' as const,weight:4},
     {action:'read-alone' as const,weight:5},{action:'play-alone' as const,weight:pet.stats.happiness>=70?5:2},
-    {action:'balance' as const,weight:3},...(getStage(pet.growth,pet.evolution)>=2?[{action:'spell' as const,weight:3}]:[])]
+    ...(getStage(pet.growth,pet.evolution)>=2?[{action:'spell' as const,weight:3}]:[])]
 }
 
 /** A deterministic weighted draw makes each pet varied and testable; the last

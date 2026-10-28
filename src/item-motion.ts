@@ -71,6 +71,14 @@ const byAction = new Map([...motions.values()].map(motion => [motion.action, mot
 export function getItemMotion(id: string | undefined): ItemMotion {
   const found = id ? motions.get(id) : undefined
   if (found) return found
+  const item=id?getItem(id):undefined
+  if(item){
+    const body=item.category==='food'?'eat':item.category==='drink'?'drink':item.category==='clean'?'wash':'medical'
+    const duration=body==='eat'?4600:body==='drink'?4000:body==='wash'?3600:2800
+    const motion:ItemMotion={action:item.changesColor?'drink-custom-color':`original-use-${item.id}`,duration,label:`正在使用${item.name}`,itemId:item.id,image:item.image,gesture:item.changesColor?'recolor':body==='eat'?'nibble':body==='drink'?'gulp':body==='wash'?'bath':'medicine',body,beats:body==='eat'?4:body==='drink'?3:body==='wash'?5:2,tilt:-12,accent:item.changesColor??'#e9ca88',adaptation:true}
+    motions.set(item.id,motion);byAction.set(motion.action,motion)
+    return motion
+  }
   return { action: FALLBACK[0], duration: FALLBACK[2], label: '正在吃东西', itemId: '', image: '', gesture: FALLBACK[1], body: 'eat', beats: FALLBACK[3], tilt: FALLBACK[4], accent: FALLBACK[5], adaptation: true }
 }
 export function getItemMotionByAction(action: string): ItemMotion | undefined { return byAction.get(action) }

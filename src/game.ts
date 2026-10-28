@@ -15,7 +15,9 @@ import type {RoomFurnishings} from './room-furnishings';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
 
-export type PetColor = 'pink' | 'yellow' | 'blue' | 'red';
+import {isPetColor,petColorName,customPotionColor,MAX_CUSTOM_POTION_COLORS} from './pet-color';
+import type {PetColor} from './pet-color';
+export type {PetColor} from './pet-color';
 export type Stage = 0 | 1 | 2 | 3 | 4;
 export type GrowthMode = 'auto' | 'fixed';
 export interface GrowthSelection {mode:GrowthMode;stage:Stage;evolution?:Evolution}
@@ -290,7 +292,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     if (!(current.inventory[item.id] > 0)) return { state: current, message: `${item.name}用完啦，去商店用摩尔豆补充一些吧。`, ok: false };
     if (item.changesColor) {
       if (current.color === item.changesColor) return {state:current,ok:false,message:'已经是这个颜色啦，药水先收好。'};
-      return {state:{...current,color:item.changesColor,inventory:{...current.inventory,[item.id]:current.inventory[item.id]-1}},ok:true,message:`咕嘟～换成${COLORS.find(c=>c.id===item.changesColor)!.name}啦，还是陪着你的我。`};
+      return {state:{...current,color:item.changesColor,inventory:{...current.inventory,[item.id]:current.inventory[item.id]-1}},ok:true,message:`咕嘟～换成${petColorName(item.changesColor)}啦，还是陪着你的我。`};
     }
     const keys = ['hunger', 'thirst', 'cleanliness', 'happiness', 'health'] as const;
     if (!keys.some(key => item[key] > 0 && stats[key] < 100)) {
@@ -323,6 +325,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
 export function buyItem(state: GameState, itemId: string): CareResult {
   const item = getItem(itemId);
   if (!item) return { state, message: '商店里暂时没有这种用品。', ok: false };
+  if (customPotionColor(item.id)) return { state, message: '这种药水只能在拉姆换色游戏里自己调制。', ok: false };
   if (state.coins < item.price) return { state, message: '摩尔豆不够啦，玩一局小游戏赚一些吧。', ok: false };
   const count = state.inventory[item.id] ?? 0;
   if (count >= MAX_INVENTORY) return { state, message: '这种用品已经装满背包啦。', ok: false };
@@ -401,7 +404,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     const value: unknown = JSON.parse(raw);
     if (!isRecord(value) || value.version !== 1) return null;
     if (typeof value.name !== 'string' || !value.name.trim() || Array.from(value.name).length > 16 || /[\u0000-\u001f\u007f]/.test(value.name)) return null;
-    if (!COLORS.some((color) => color.id === value.color)) return null;
+    if (!isPetColor(value.color)) return null;
     if (!isIntegerIn(value.createdAt, 0, now + 300_000) || !isIntegerIn(value.lastTick, value.createdAt, now + 300_000)) return null;
     if (!isNumberIn(value.growth, 0, GROWTH_MAX) || !isIntegerIn(value.coins, 0, MAX_COINS)) return null;
     if (value.growthLocked !== undefined && typeof value.growthLocked !== 'boolean') return null;
@@ -421,6 +424,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       if (!item || !isIntegerIn(count, 0, MAX_INVENTORY) || Object.hasOwn(inventory, item.id)) return null;
       inventory[item.id] = count;
     }
+    if(Object.keys(inventory).filter(id=>customPotionColor(id)).length>MAX_CUSTOM_POTION_COLORS)return null;
     for (const item of ITEMS) inventory[item.id] ??= 0;
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
     const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
