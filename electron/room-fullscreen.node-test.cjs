@@ -32,3 +32,16 @@ test('restoration errors do not strand a pending transition',async()=>{
  const {api,finish}=fixture({afterLeave:()=>{throw Error('restore failed')}});const first=api.set(true);finish(true);await first;
  const second=api.set(false);finish(false);await assert.rejects(second,/restore failed/);assert.equal(api.isChanging(),false);assert.equal(await api.set(false),false);
 });
+
+test('Windows transparent fullscreen tracks events when native isFullScreen stays false',async()=>{
+ const {api,window}=fixture({platform:'win32'});const order=[];
+ window.setFullScreen=value=>{window.requests.push(value);window.emit(value?'enter-full-screen':'leave-full-screen');order.push(api.isChanging());};
+ await api.set(true);assert.equal(window.isFullScreen(),false);assert.equal(api.isFullscreen(),true);assert.deepEqual(order,[true]);
+ await api.set(true);assert.deepEqual(window.requests,[true]);
+ await api.set(false);assert.equal(api.isFullscreen(),false);assert.deepEqual(window.requests,[true,false]);assert.deepEqual(order,[true,true]);
+});
+test('synchronous Windows events publish after native bounds have actually been applied',async()=>{
+ let applied=false;const {api,window}=fixture({platform:'win32',onChange:()=>assert.equal(applied,true)});
+ window.setFullScreen=value=>{window.emit(value?'enter-full-screen':'leave-full-screen');applied=true};
+ await api.set(true);assert.equal(api.isFullscreen(),true);
+});

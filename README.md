@@ -2,13 +2,13 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮更新 · v0.30.9
+## 本轮更新 · v0.30.10
 
 背包仅显示食物、饮品、清洁和药水，状态及规则使用独立入口。小屋增加全屏查看，支持Esc退出，返回桌面自动恢复原窗口。
 
 设置支持“自动成长／固定形态”，修改后点击应用并确认。同阶段保留已有进度，选择其他阶段从该阶段起点重新成长；进度自动保存，显示百分比及距下一阶段所需的健康清醒时间。修复旧存档重开后自动成长被重新锁定的问题。
 
-设置按拉姆信息、成长、陪伴与桌面、声音与音乐、计时、存档、软件帮助分组。水火木魔法固定比例、快速睡眠、随机奖励和托盘状态继续保留。[本轮验收](research/release-0.30.9-validation.md) · [完整更新说明](RELEASE_NOTES.md)。
+设置按拉姆信息、成长、陪伴与桌面、声音与音乐、计时、存档、软件帮助分组。水火木魔法固定比例、快速睡眠、随机奖励和托盘状态继续保留。[本轮验收](research/release-0.30.10-validation.md) · [完整更新说明](RELEASE_NOTES.md)。
 
 ![火系最高技能 · 固定比例，大特效超出原区域](artifacts/v307/fire-6-browser.png)
 

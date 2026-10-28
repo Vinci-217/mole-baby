@@ -94,14 +94,14 @@ let petEffectAnchor=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
-const roomFullscreen=createRoomFullscreen({getWindow:()=>mainWindow,isPetMode:()=>petMode,beforeEnter:()=>rememberBounds(),afterLeave:()=>{
+const roomFullscreen=createRoomFullscreen({platform:process.platform,getWindow:()=>mainWindow,isPetMode:()=>petMode,beforeEnter:()=>rememberBounds(),afterLeave:()=>{
  if(normalBounds&&mainWindow&&!mainWindow.isDestroyed()&&!petMode)mainWindow.setBounds(clampBounds(normalBounds,NORMAL_SIZE));
 },onChange:()=>{publishState();scheduleSave()}});
 
 function getDesktopState() {
   return {
     petMode,
-    roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isFullScreen()),
+    roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&roomFullscreen.isFullscreen()),
     windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
     petOffset,mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
@@ -514,7 +514,7 @@ function loadWindowState() {
 }
 
 function rememberBounds() {
-  if (!mainWindow || mainWindow.isDestroyed() || changingMode || roomFullscreen.isChanging() || mainWindow.isMinimized() || mainWindow.isFullScreen()) return;
+  if (!mainWindow || mainWindow.isDestroyed() || changingMode || roomFullscreen.isChanging() || mainWindow.isMinimized() || roomFullscreen.isFullscreen()) return;
   if (petMode) petBounds = currentPetBounds();
   else normalBounds = mainWindow.getNormalBounds();
 }
@@ -604,7 +604,7 @@ function listen(channel, callback) {
 
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
-  if(enabled&&(mainWindow.isFullScreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
+  if(enabled&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
   if (enabled === petMode) return petMode;
   changePetEffectBounds(null);
 
@@ -655,7 +655,7 @@ function iconPath(filename) {
 
 function hideToTray() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  if(mainWindow.isFullScreen()||roomFullscreen.isChanging()){void roomFullscreen.set(false).then(()=>hideToTray()).catch(error=>console.error(error.message));return;}
+  if(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()){void roomFullscreen.set(false).then(()=>hideToTray()).catch(error=>console.error(error.message));return;}
   dragging = false;clearInterval(dragPoll);dragPoll=null;pointerPress=null;cursorDrag=null;
   stopMovement();
   revealPet();
@@ -668,7 +668,7 @@ function hideToTray() {
 function showFromTray(home = false) {
   if (!mainWindow || mainWindow.isDestroyed()) { createWindow(); return; }
   if (!rendererReady) return;
-  if(!home&&(mainWindow.isFullScreen()||roomFullscreen.isChanging())){void roomFullscreen.set(false).then(()=>showFromTray(home)).catch(error=>console.error(error.message));return;}
+  if(!home&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging())){void roomFullscreen.set(false).then(()=>showFromTray(home)).catch(error=>console.error(error.message));return;}
   revealPet();
   changePetMode(hasPet && !home);
   if (mainWindow.isMinimized()) mainWindow.restore();

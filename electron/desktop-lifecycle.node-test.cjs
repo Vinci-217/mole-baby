@@ -166,6 +166,18 @@ test('tray close during a pending fullscreen entry waits, leaves and then hides'
  assert.equal(run.window.isVisible(),false);
 });
 
+test('Windows transparent windows exit fullscreen before returning to pet even with a false native flag',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
+ run.window.isFullScreen=()=>false;
+ const normal=run.window.getBounds();await run.invoke('desktop:set-room-fullscreen',true);
+ assert.equal(run.invoke('desktop:get-state').roomFullscreen,true);
+ await run.invoke('desktop:set-pet-mode',true);
+ assert.equal(run.invoke('desktop:get-state').roomFullscreen,false);assert.equal(run.window.getBounds().width,160);
+ await run.invoke('desktop:set-pet-mode',false);assert.deepEqual(run.window.getBounds(),normal);
+ await run.invoke('desktop:set-room-fullscreen',true);run.send('desktop:hide-to-tray');await new Promise(setImmediate);
+ assert.equal(run.invoke('desktop:get-state').roomFullscreen,false);assert.equal(run.window.isVisible(),false);
+});
+
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   assert.equal(run.app.name, '拉姆');

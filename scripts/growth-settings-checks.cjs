@@ -35,7 +35,13 @@ async function verifyGrowthSettings(page,desktop){
   await page.getByRole('button',{name:'全屏查看小屋',exact:true}).click();await expect(page.getByRole('button',{name:'退出小屋全屏',exact:true})).toHaveAttribute('aria-pressed','true');
   const screen=await page.locator('.cottage-scene').evaluate(el=>{const b=el.getBoundingClientRect();return{x:b.x,y:b.y,w:b.width,h:b.height,vw:innerWidth,vh:innerHeight}});
   assert.ok(Math.abs(screen.x)<1&&Math.abs(screen.y)<1&&Math.abs(screen.w-screen.vw)<1&&Math.abs(screen.h-screen.vh)<1,'fullscreen room fills the actual viewport');
-  if(desktop)assert.equal((await page.evaluate(()=>window.desktop.getState())).roomFullscreen,true);
+  if(desktop){
+   assert.equal((await page.evaluate(()=>window.desktop.getState())).roomFullscreen,true);
+   if(await desktop.evaluate(()=>process.platform==='win32')){
+    const displayBounds=await desktop.evaluate(({BrowserWindow,screen})=>screen.getDisplayMatching(BrowserWindow.getAllWindows()[0].getBounds()).bounds);
+    await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds())).toEqual(displayBounds);
+   }
+  }
   else assert.equal(await page.evaluate(()=>Boolean(document.fullscreenElement)),true);
   await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'全屏查看小屋',exact:true})).toHaveAttribute('aria-pressed','false');
   if(desktop)await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>{const b=BrowserWindow.getAllWindows()[0].getBounds();return[b.width,b.height]})).toEqual(normal);
