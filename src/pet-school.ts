@@ -41,15 +41,28 @@ export function normalizeActivity(value:unknown,pet:Pick<GameState,'createdAt'|'
  if(!duration||a.endsAt!==a.startedAt+duration||a.kind==='course'&&(!c||learned(pet,c.id)||getStage(pet.growth,pet.evolution)<c.minStage||c.requires&&!learned(pet,c.requires)))return
  return {id:a.id,kind:a.kind,...(a.kind==='course'?{course:c!.id}:{}),startedAt:a.startedAt,endsAt:a.endsAt}
 }
+export function activityBlockReason(pet:GameState,kind:'course'|'restaurant',id?:CourseId):string|null{
+ const c=courseById(id)
+ if(pet.activity)return '先完成或结束当前课程、工作。'
+ if(pet.sleeping)return '拉姆睡着了，先轻轻叫醒再来上课。'
+ if(pet.outing)return '拉姆正在外出，先叫它回来。'
+ if(getStage(pet.growth,pet.evolution)<1)return '初级拉姆开始可以上课和打工；种子需要先长大。'
+ if(kind==='course'){
+  if(!c)return '请选择要学习的课程。'
+  if(learned(pet,c.id))return '这门课已经结业，可以展示本领。'
+  if(c.requires&&!learned(pet,c.requires))return `先完成${courseById(c.requires)!.name}。`
+  if(getStage(pet.growth,pet.evolution)<c.minStage)return '第五阶段的神力拉姆才能学习三系变身课。'
+ }
+ if(pet.stats.health<35)return '健康不足，先照料拉姆恢复到35以上。'
+ if(pet.stats.energy<30)return '精力不足，先休息恢复到30以上。'
+ if(pet.stats.hunger<25)return '肚子饿了，先喂食恢复到25以上。'
+ if(pet.stats.thirst<25)return '有点口渴，先喝水恢复到25以上。'
+ return null
+}
 export function beginActivity(pet:GameState,kind:'course'|'restaurant',id?:CourseId,now=Date.now()){
  const c=courseById(id)
  const fail=(message:string)=>({state:pet,ok:false,message})
- if(pet.activity)return fail('先完成眼前的课程或工作吧。')
- if(pet.sleeping||pet.outing)return fail('先叫醒拉姆，等它回到身边吧。')
- if(pet.growth<60)return fail('长成初级以后，就可以上课和打工啦。')
- if(pet.stats.energy<30||pet.stats.hunger<25||pet.stats.thirst<25||pet.stats.health<35)return fail('先吃饱喝足，恢复一点精神吧。')
- if(kind==='course'&&(!c||learned(pet,c.id)||c.requires&&!learned(pet,c.requires)))return fail(c?.requires&&!learned(pet,c.requires)?`先完成${courseById(c.requires)!.name}。`:'这门课已经结业啦。')
- if(kind==='course'&&c&&getStage(pet.growth,pet.evolution)<c.minStage)return fail('第五阶段的神力拉姆才能学习三系变身课。')
+ const reason=activityBlockReason(pet,kind,id);if(reason)return fail(reason)
  if(!Number.isSafeInteger(now)||now<pet.lastTick)return fail('时间暂时不正确，请稍后再试。')
  const activity:PetActivity={id:`${pet.createdAt}:${now}`,kind,...(kind==='course'?{course:c!.id}:{}),startedAt:now,endsAt:now+(kind==='restaurant'?JOB_MS:c!.minutes*60_000)}
  return {state:{...pet,activity,stats:{...pet.stats,energy:pet.stats.energy-(kind==='restaurant'?10:5)}},ok:true,message:kind==='restaurant'?'围裙系好，去餐厅送餐啦！':`开始${c!.name}，这一节慢慢学。`}

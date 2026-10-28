@@ -93,3 +93,15 @@ test('disposing an in-flight Mac download aborts requests and removes partial fi
 test('repeated start calls do not create duplicate startup checks',async t=>{
  const f=fixture(t);f.updates.start();f.updates.start();assert.equal(f.pending.size,1);f.updates.dispose();assert.equal(f.pending.size,0);
 });
+
+
+test('Mac resolves the published version through GET when HEAD redirects fail',async t=>{
+ const payload=Buffer.from('verified mac image'),base=macFetch(payload);let metadata=false;
+ const f=fixture(t,{platform:'darwin',arch:'arm64',fetch:async(url,options)=>{
+  if(url.endsWith('/releases/latest'))throw Error('HEAD blocked by proxy');
+  if(url.endsWith('/latest-mac.yml')){metadata=true;return new Response("version: 1.1.0\nfiles: []\n")}
+  return base(url,options);
+ }});
+ await f.updates.check();assert.equal(metadata,true);assert.equal(f.updates.getState().status,'available');
+ assert.equal(await f.updates.download(true),true);assert.equal(f.updates.getState().status,'ready');
+});

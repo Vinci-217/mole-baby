@@ -13,10 +13,10 @@ const server=spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.
  for(const button of await buttons.all()){const box=await button.boundingBox();assert.ok(box.x>=bounds.x&&box.x+box.width<=bounds.x+bounds.width+.5);}
  fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});await pet.screenshot({path:path.join(root,'artifacts/v13-compact.png')});
  await enterHome(p);await roomTab(p,'设置');const stages=p.getByRole('region',{name:'当前成长阶段',exact:true});await stages.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
- await stages.scrollIntoViewIfNeeded();await expect(stages.getByRole('group',{name:'选择当前阶段',exact:true}).getByRole('button')).toHaveCount(5);await expect(stages.getByRole('group',{name:'选择神力形态',exact:true}).getByRole('button')).toHaveCount(4);
+ await stages.scrollIntoViewIfNeeded();await expect(stages.getByRole('group',{name:'选择当前阶段',exact:true}).getByRole('button')).toHaveCount(5);await expect(stages.getByRole('group',{name:'选择神力形态',exact:true}).getByRole('button')).toHaveCount(5);
  for(const image of await stages.locator('canvas:not(.ram-wear)[data-loaded=true]').all())assert.ok(await image.evaluate(n=>n.width>0));
  await expect(p.locator('.classic-toast')).toHaveCount(0,{timeout:6000});
  await stages.screenshot({path:path.join(root,'artifacts/v13-stage-settings.png')});
  await stages.getByRole('button',{name:'切换为霹雳火系拉姆',exact:true}).click();await toDesktop(p);await p.reload();await expect(p.locator('.desktop-character .ram-sprite')).toHaveAttribute('data-evolution','fire');await expect(p.locator('.desktop-character .ram-sprite')).toHaveAttribute('data-color','blue');
- assert.deepEqual(errors,[]);console.log('PASS five settings stages/four evolutions, reload/downgrade, identity/items/memory retained, 160 px frame and seven unclipped hover buttons');
+ assert.deepEqual(errors,[]);console.log('PASS five settings stages/five evolutions, reload/downgrade, identity/items/memory retained, 160 px frame and seven unclipped hover buttons');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();server.kill('SIGTERM');});

@@ -441,7 +441,7 @@ describe('deliberate settings stage selection', () => {
   });
   it('preserves natural progress on repeated selection and rejects invalid stages/forms', () => {
     const current={...fresh(),growth:213};
-    expect(changePetStage(current,2).state).toBe(current);
+    const locked=changePetStage(current,2).state;expect(locked.growth).toBe(current.growth);expect(locked.growthLocked).toBe(true);expect(changePetStage(locked,2).state).toBe(locked);
     for(const stage of [-1,5,1.5,NaN])expect(changePetStage(current,stage as 0).ok).toBe(false);
     expect(changePetStage(current,4,'invalid' as 'super').ok).toBe(false);
     expect(changePetStage(current,4).state.evolution).toBe('super');
@@ -468,5 +468,26 @@ describe('local four-colour potion transactions',()=>{
   const old=fresh();for(const v of ITEMS.filter(v=>v.changesColor))delete old.inventory[v.id];const restored=parseSave(JSON.stringify(old),NOW)!;
   for(const v of ITEMS.filter(v=>v.changesColor))expect(restored.inventory[v.id]).toBe(0);
   expect(COLORS).toHaveLength(4);
+ });
+});
+
+
+describe('manual stage selection stays fixed',()=>{
+ it('locks even selecting the current seed, survives reopen and still decays needs',()=>{
+  const time=1_700_000_000_000,p=createPet('豆','red',time);
+  const locked=changePetStage(p,0,undefined,time).state;
+  expect(locked.growthLocked).toBe(true);
+  const next=parseSave(JSON.stringify(locked),time+4*3_600_000)!;
+  expect(next.growth).toBe(0);expect(next.stats.hunger).toBeLessThan(p.stats.hunger);
+ });
+ it('preserves natural growth unless settings explicitly selected a stage',()=>{
+  const time=1_700_000_000_000,p=createPet('豆','red',time);
+  expect(tick(p,time+3_600_000).growth).toBeGreaterThan(0);
+  const locked=changePetStage(p,2,undefined,time).state;
+  expect(tick(locked,time+3_600_000).growth).toBe(STAGES[2].threshold);
+ });
+ it('migrates recorded old manual choices before applying offline growth',()=>{
+  const time=1_700_000_000_000,p={...createPet('豆','red',time),growth:60};
+  expect(parseSave(JSON.stringify(p),time+3_600_000,true)!.growth).toBe(60);
  });
 });

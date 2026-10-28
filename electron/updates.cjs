@@ -18,7 +18,7 @@ function createUpdates(options){
  const timers=options.timers??{set:setTimeout,clear:clearTimeout};
  const later=(fn,ms)=>{const t=timers.set(fn,ms);t?.unref?.();return t};
  const publish=patch=>{if(disposed)return;state={...state,...patch};onChange({...state})};
- const fail=()=>{if(disposed)return;publish({status:'error',message:'暂时无法完成更新，请检查网络后重试。'});if(state.enabled&&!disabled){timers.clear(retryTimer);retryTimer=later(()=>void check(false),30*60000)}};
+ const fail=(error)=>{if(disposed)return;publish({status:'error',message:/checksum/i.test(error?.message??'')?'更新文件校验失败，请重新下载。':'无法连接 GitHub 或下载更新，请检查网络后重试，也可从发布页手动下载。'});if(state.enabled&&!disabled){timers.clear(retryTimer);retryTimer=later(()=>void check(false),30*60000)}};
  const ensureActive=()=>shutdown.signal.throwIfAborted();
  const request=async(url,settings,timeout)=>{
   ensureActive();
@@ -70,10 +70,21 @@ function createUpdates(options){
   }finally{finishRequest?.();if(file)await file.close();await fsp.rm(partial,{force:true})}
  }
  async function checkMac(){
-  const head=await request(`${REPOSITORY}/releases/latest`,{method:'HEAD'},30000);const response=head.response;head.finish();if(!response.ok)throw Error('Releases unavailable');
-  const url=new URL(response.url),match=/^\/Vinci-217\/mole-baby\/releases\/tag\/v(\d+\.\d+\.\d+)$/.exec(url.pathname);
-  if(url.origin!=='https://github.com'||!match)throw Error('Invalid release URL');
-  const next=match[1];if(!stableNewer(next,version)){publish({status:'current',version:null,checkedAt:Date.now(),message:'已经是最新版本。'});return}
+  let next;
+  try{
+   const head=await request(`${REPOSITORY}/releases/latest`,{method:'HEAD'},15000);const response=head.response;head.finish();if(!response.ok)throw Error('Releases unavailable');
+   const url=new URL(response.url),match=/^\/Vinci-217\/mole-baby\/releases\/tag\/v(\d+\.\d+\.\d+)$/.exec(url.pathname);
+   if(url.origin!=='https://github.com'||!match)throw Error('Invalid release URL');
+   next=match[1];
+  }catch{
+   // Some networks/Electron versions cannot resolve HEAD redirects. Read the
+   // published version file through GET; download URLs remain repository-fixed.
+   ensureActive();const metadata=await request(`${REPOSITORY}/releases/latest/download/latest-mac.yml`,{},30000);let text;
+   try{if(!metadata.response.ok)throw Error('Update metadata unavailable');text=await metadata.response.text()}finally{metadata.finish()}
+   const match=text.length<=65536&&/^version:[ \t]*['"]?(\d+\.\d+\.\d+)['"]?[ \t]*$/m.exec(text);
+   if(!match)throw Error('Invalid update metadata');next=match[1];
+  }
+  if(!stableNewer(next,version)){publish({status:'current',version:null,checkedAt:Date.now(),message:'已经是最新版本。'});return}
   const root=`${REPOSITORY}/releases/download/v${next}`,name=`mole-baby-${next}-mac-${arch}.dmg`;
   const sums=await request(`${root}/SHA256SUMS.txt`,{},30000);let content;
   try{if(!sums.response.ok)throw Error('Update checksum unavailable');content=await sums.response.text()}finally{sums.finish()}
@@ -93,14 +104,14 @@ function createUpdates(options){
    publish({status:'checking',version:null,percent:0,message:'正在检查 GitHub 最新正式版…'});
    if(platform==='darwin'&&!options.macSigned)await checkMac();else await loadEngine().checkForUpdates();
    return !disposed&&state.status!=='error';
-  }catch{fail();return false}finally{checkPromise=null}});return checkPromise;
+  }catch(error){fail(error);return false}finally{checkPromise=null}});return checkPromise;
  }
  function download(confirmed=false){
   if(confirmed!==true||disabled||disposed)return Promise.resolve(false);if(downloadPromise)return downloadPromise;
   if(state.status!=='available')return Promise.resolve(false);
   approvedDownloadVersion=state.version;
   publish({status:'downloading',percent:0,message:'正在下载已确认的更新…'});
-  downloadPromise=Promise.resolve().then(async()=>{try{ensureActive();if(platform==='darwin'&&!options.macSigned)await downloadMac();else{const files=await loadEngine().downloadUpdate();if(!disposed)downloadedFile=files?.[0]??downloadedFile}return !disposed&&state.status==='ready'}catch{fail();return false}finally{downloadPromise=null}});return downloadPromise;
+  downloadPromise=Promise.resolve().then(async()=>{try{ensureActive();if(platform==='darwin'&&!options.macSigned)await downloadMac();else{const files=await loadEngine().downloadUpdate();if(!disposed)downloadedFile=files?.[0]??downloadedFile}return !disposed&&state.status==='ready'}catch(error){fail(error);return false}finally{downloadPromise=null}});return downloadPromise;
  }
  async function install(confirmed=false){
   if(confirmed!==true||disabled||disposed||state.status!=='ready')return false;

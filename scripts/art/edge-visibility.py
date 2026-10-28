@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np,json
 from pathlib import Path
 root=Path(__file__).resolve().parents[2];profiles={}
-for form in ['seed','junior','middle','senior','super','water','wood','fire']:
+for form in ['seed','junior','middle','senior','super','water','wood','fire','classic']:
  if form=='seed':
   # A potted seed's visible silhouette includes its independent original pot.
   a=np.asarray(Image.open(root/'public/assets/original/seed/body-mask.png').convert('RGBA'))[:99,:96];y,x=np.where((a[:,:,:3].max(2)>50)&(a[:,:,3]>32));b=[26.56+x.min()/96*50,17.31,26.56+(x.max()+1)/96*50,95.19]

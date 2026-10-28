@@ -13,7 +13,8 @@ export default function UpdateSettings(){
   {state.status==='downloading'&&<progress aria-label="更新下载进度" max={100} value={state.percent}/>}
   <div className="update-buttons"><button className="game-button small" disabled={busy} onClick={()=>run(()=>window.desktop!.updates.check())}>检查更新</button>
    {state.status==='available'&&<button className="game-button small" onClick={()=>run(()=>window.desktop!.updates.download())}>确认下载更新</button>}
-   {state.status==='ready'&&<button className="game-button small" onClick={()=>run(()=>window.desktop!.updates.install())}>{state.automaticInstall?'确认更新并重启':'确认打开安装包'}</button>}
+   {state.status==='ready'&&<button className="game-button small" onClick={()=>run(()=>window.desktop!.updates.install())}>{state.automaticInstall?'确认更新并重启':window.desktop?.platform==='darwin'?'打开 DMG 安装':'确认打开安装包'}</button>}
+   {state.status==='error'&&<button className="game-button small" onClick={()=>run(()=>window.desktop!.updates.openRelease())}>打开下载页</button>}
   </div>
   {state.status!=='disabled'&&<p className="update-note">发现新版会先询问你；只有确认后才会下载或安装，退出时也不会自动更新。{!state.automaticInstall&&(window.desktop?.platform==='darwin'?' Mac 下载完成后需打开安装包替换应用。':' 便携版下载完成后需打开安装包安装。')}</p>}
  </section>

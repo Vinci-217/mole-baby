@@ -506,7 +506,7 @@ function DizzyFrames({form,color,startedAt,onError}:{form:Form;color:PetColor;st
   let sheet:HTMLCanvasElement|null=null
   const paint=(now:number)=>{
    if(cancelled||!canvas.isConnected||!sheet||document.hidden)return
-   const elapsed=Math.max(0,now-startedAt),pose=dizzyEyes(elapsed,media.matches,dizzySource.forms[form].orbit)
+   const elapsed=Math.max(0,now-startedAt),pose=dizzyEyes(elapsed,media.matches,dizzySource.forms[form==='classic'?'super':form].orbit)
    const body=wardrobeBody(canvas,sheet);ctx.clearRect(0,0,w,h);ctx.drawImage(body,0,0,w,h,0,0,w,h);ctx.drawImage(body,w,0,w,h,pose.x,pose.y,w,h)
    paintWear(canvas,sheet,0,0,w,h);paintSocialCue(canvas,form==='seed'?0:form==='junior'?1:form==='middle'?2:form==='senior'?3:4,'dizzy',elapsed,media.matches)
    canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.sheet='dizzy';canvas.dataset.pupilX=pose.x.toFixed(3);canvas.dataset.pupilY=pose.y.toFixed(3)
@@ -528,6 +528,27 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     <span className="care-finish-sparkle">{[0,1,2].map(i=><img key={i} src="./assets/generated/v12-dizzy-star.png" alt="" draggable={false}/>)}</span>
   </span>
 }
+/** The classic three-leaf form uses its own original source action sheet. */
+function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:PetColor;action:string;actionId?:number|string;onActionEnd?:()=>void;onError:()=>void}){
+ const ref=useRef<HTMLCanvasElement>(null),end=useRef(onActionEnd);end.current=onActionEnd;
+ useEffect(()=>{
+  let live=true,raf=0,done=false;const start=performance.now(),still=action==='still',media=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let redraw=()=>{};const canvas=ref.current;const wardrobeChanged=()=>{if(still)redraw()};canvas?.addEventListener('ram-wardrobe-change',wardrobeChanged);
+  void getTintedSheet('classic',color,'classic').then(sheet=>{
+   if(!live)return;
+   const draw=()=>{if(!live||!ref.current)return;const ctx=ref.current.getContext('2d');if(!ctx)return;
+    const elapsed=performance.now()-start,duration=getRamActionDuration(action,'classic');
+    const row=action.includes('left')?2:action.includes('right')?1:action==='pet'||action==='waving'?3:action==='play'?4:['sleep','waiting'].includes(action)?6:action==='happy'||action==='reward'?8:0;
+    const frame=still||media.matches?0:Math.floor(elapsed/140)%6;
+    const body=wardrobeBody(ref.current,sheet);ctx.clearRect(0,0,192,208);ctx.drawImage(body,frame*192,row*208,192,208,0,0,192,208);paintWear(ref.current,sheet,frame,row);ref.current.dataset.loaded='true';
+    if(duration&&elapsed>=duration&&!done){done=true;end.current?.()}if(!still)raf=requestAnimationFrame(draw);
+   };redraw=draw;draw();
+  }).catch(()=>{if(live)onError()});
+  return()=>{live=false;cancelAnimationFrame(raf);canvas?.removeEventListener('ram-wardrobe-change',wardrobeChanged)};
+ },[color,action,actionId]);
+ return <canvas ref={ref} width={192} height={208} className="ram-classic-frame" data-form="classic" data-color={color} aria-hidden="true"/>;
+}
+
 export default function Ram({ color, costume, companionId=0, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const clock=useRef({key:'',startedAt:0})
   const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
@@ -573,7 +594,7 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
     <span className="ram-proportion-layer"><span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
-        {fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
+        {!fallback&&form==='classic'?<ClassicSuperFrames color={color} action={activeAction} actionId={actionId} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={schoolAction?'idle':activeAction} originalFootball={stage>0&&activeAction==='play'}/>
     {schoolAction&&<RamSchool key={`school:${action}:${actionId??0}`} action={schoolAction} sound={sound} startedAt={clock.current.startedAt} stage={stage}/>}

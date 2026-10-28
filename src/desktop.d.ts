@@ -3,6 +3,7 @@ declare global {
   interface UpdateState {status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string}
   interface DesktopState {
     petMode: boolean;
+    windowVisible?: boolean;
     dragPoint?:{x:number;y:number;at:number};
     petOffset?:{x:number;y:number};
     mouseThrough?:boolean;
@@ -23,8 +24,10 @@ declare global {
   interface Window {
     desktop?: {
       isElectron: boolean;
-      updates:{getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
+      updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
       platform: string;
+      setMusicState:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
+      onMusicToggle:(callback:(enabled:boolean)=>void)=>()=>void;
       openMacSettings: (kind:'security')=>Promise<boolean>;
       openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;

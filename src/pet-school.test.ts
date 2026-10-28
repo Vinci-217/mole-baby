@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {createPet,care,parseSave,tick} from './game'
-import {COURSES,beginActivity,cancelActivity,learned,settleActivity,petSpeech,JOB_MS,JOB_PAY,type CourseId} from './pet-school'
+import {COURSES,activityBlockReason,beginActivity,cancelActivity,learned,settleActivity,petSpeech,JOB_MS,JOB_PAY,type CourseId} from './pet-school'
 const now=1_700_000_000_000
 const pet=()=>({...createPet('豆豆','red',now),growth:60})
 function graduate(id:CourseId,state=pet()){
@@ -84,3 +84,13 @@ describe('persistent school and restaurant activities',()=>{
   expect(learned(saved,'fire')).toBe(false);expect(saved.activity).toBeUndefined()
  })
 })
+
+it('explains every language class blocker and accepts healthy junior students',()=>{
+ const p=pet();expect(activityBlockReason(p,'course','language')).toBeNull();
+ expect(beginActivity(p,'course','language',now+1).ok).toBe(true);
+ expect(activityBlockReason({...p,growth:0},'course','language')).toContain('初级');
+ expect(activityBlockReason({...p,sleeping:true},'course','language')).toContain('叫醒');
+ for(const [key,label] of [['energy','精力'],['hunger','喂食'],['thirst','喝水'],['health','健康']] as const){
+  expect(activityBlockReason({...p,stats:{...p.stats,[key]:10}},'course','language')).toContain(label);
+ }
+});

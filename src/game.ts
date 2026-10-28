@@ -16,8 +16,9 @@ export type { PetItem, ItemCategory } from './catalog';
 
 export type PetColor = 'pink' | 'yellow' | 'blue' | 'red';
 export type Stage = 0 | 1 | 2 | 3 | 4;
-export type Evolution = 'super' | 'water' | 'wood' | 'fire';
+export type Evolution = 'super' | 'water' | 'wood' | 'fire' | 'classic';
 export const EVOLUTIONS: { id: Evolution; name: string; description: string }[] = [
+  { id: 'classic', name: '经典超级拉姆', description: '三片金色叶子的经典超级拉姆。' },
   { id: 'super', name: '神力超级拉姆', description: '金色神力头冠，神力超级形态。' },
   { id: 'water', name: '神奇水系拉姆', description: '展开晶莹的水花头冠。' },
   { id: 'wood', name: '弹力木系拉姆', description: '戴着翠绿的木系头冠。' },
@@ -41,6 +42,8 @@ export interface GameState {
   createdAt: number;
   lastTick: number;
   growth: number;
+  /** Set only by an explicit stage choice in settings. */
+  growthLocked?: boolean;
   evolution?: Evolution;
   coins: number;
   wardrobe?: OutfitId[];
@@ -88,7 +91,7 @@ export const STAGES = [
   { name: '初级拉姆', description: '离开花盆，无叶的初级拉姆。', threshold: 60 },
   { name: '中级拉姆', description: '长出两片嫩叶的中级拉姆。', threshold: 180 },
   { name: '高级拉姆', description: '扇形叶片展开的高级拉姆。', threshold: 420 },
-  { name: '神力拉姆', description: '四种原版神力形态，选择自己的成长方向。', threshold: 840 },
+  { name: '神力拉姆', description: '五种原版神力形态，选择自己的成长方向。', threshold: 840 },
 ] as const;
 
 export const GROWTH_MAX = STAGES[4].threshold;
@@ -157,10 +160,10 @@ export function changePetStage(state: GameState, stage: Stage, evolution?: Evolu
     return { state, ok: false, message: '请选择一个拉姆阶段。' };
   }
   const form = stage === 4 ? evolution ?? state.evolution ?? 'super' : undefined;
-  if (getStage(state.growth, state.evolution) === stage && state.evolution === form) {
+  if (state.growthLocked && getStage(state.growth, state.evolution) === stage && state.evolution === form) {
     return { state, ok: true, message: `现在就是${STAGES[stage].name}啦。` };
   }
-  const next = { ...state, growth: STAGES[stage].threshold, lastTick: now };
+  const next = { ...state, growth: getStage(state.growth,state.evolution)===stage && state.evolution===form ? state.growth : STAGES[stage].threshold, growthLocked: true, lastTick: Math.max(now,state.lastTick) };
   if (form) next.evolution = form; else delete next.evolution;
   return { state: next, ok: true, message: `已经切换为${form ? EVOLUTIONS.find(v => v.id === form)!.name : STAGES[stage].name}。` };
 }
@@ -168,6 +171,7 @@ export function changePetStage(state: GameState, stage: Stage, evolution?: Evolu
 export function evolvePet(state: GameState, evolution: Evolution, now = Date.now()): CareResult {
   const current = tick(state, now);
   const form = EVOLUTIONS.find(form => form.id === evolution);
+  if(current.growthLocked)return {state:current,ok:false,message:'当前形态已在设置中固定，请在设置里选择神力形态。'};
   if (!form || current.evolution || current.growth < GROWTH_MAX) return { state: current, ok: false, message: '继续健康成长，等高级阶段的陪伴进度积满后再选择进化吧。' };
   if (current.sleeping) return { state: current, ok: false, message: '先轻轻叫醒拉姆，再一起选择成长的方向。' };
   return { state: { ...current, evolution }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
@@ -202,7 +206,7 @@ function advanceStats(state: GameState, now: number): GameState {
   return {
     ...state,
     lastTick: now,
-    growth: growForHours(state.growth, healthyHours),
+    growth: state.growthLocked ? state.growth : growForHours(state.growth, healthyHours),
     stats: {
       hunger: rounded(clamp(state.stats.hunger - hours * rates.hunger)),
       thirst: rounded(clamp(state.stats.thirst - hours * rates.thirst)),
@@ -362,7 +366,7 @@ const isIntegerIn = (value: unknown, min: number, max: number): value is number 
   isNumberIn(value, min, max) && Number.isInteger(value);
 
 /** Validate untrusted local storage, normalize known fields, then apply offline time. */
-export function parseSave(raw: string | null, now = Date.now()): GameState | null {
+export function parseSave(raw: string | null, now = Date.now(), manualStageSelected = false): GameState | null {
   if (!raw || raw.length > 50_000 || !Number.isFinite(now) || now < 0) return null;
   try {
     const value: unknown = JSON.parse(raw);
@@ -371,6 +375,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
     if (!COLORS.some((color) => color.id === value.color)) return null;
     if (!isIntegerIn(value.createdAt, 0, now + 300_000) || !isIntegerIn(value.lastTick, value.createdAt, now + 300_000)) return null;
     if (!isNumberIn(value.growth, 0, GROWTH_MAX) || !isIntegerIn(value.coins, 0, MAX_COINS)) return null;
+    if (value.growthLocked !== undefined && typeof value.growthLocked !== 'boolean') return null;
     if (value.evolution !== undefined && (!EVOLUTIONS.some(form => form.id === value.evolution) || value.growth < GROWTH_MAX)) return null;
     if (typeof value.sleeping !== 'boolean' || !isIntegerIn(value.completedGames, 0, MAX_COINS)) return null;
     if (!isIntegerIn(value.lastRewardAt, 0, value.lastTick)) return null;
@@ -398,6 +403,7 @@ export function parseSave(raw: string | null, now = Date.now()): GameState | nul
       createdAt: value.createdAt,
       lastTick: value.lastTick,
       growth: value.growth,
+      ...(value.growthLocked === true || value.growthLocked === undefined && manualStageSelected ? {growthLocked:true} : {}),
       ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,
       ...normalizeWardrobe(value.wardrobe,value.wearing),

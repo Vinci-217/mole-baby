@@ -1,0 +1,213 @@
+{
+  "sourceSprite": 2525,
+  "source": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "sourceSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "sampling": "existing classic row actionFrames; fixed body width88, baseline169; no redrawing",
+  "rows": [
+    {
+      "state": "idle",
+      "gameAction": "down",
+      "sourceFrameCount": 11,
+      "actionFrames": [
+        1,
+        3,
+        4,
+        6,
+        7,
+        9
+      ],
+      "frames": [
+        1,
+        3,
+        4,
+        6,
+        7,
+        9
+      ]
+    },
+    {
+      "state": "running-right",
+      "gameAction": "right",
+      "sourceFrameCount": 11,
+      "actionFrames": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9
+      ],
+      "frames": [
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "state": "running-left",
+      "gameAction": "left",
+      "sourceFrameCount": 11,
+      "actionFrames": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9
+      ],
+      "frames": [
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31
+      ]
+    },
+    {
+      "state": "waving",
+      "gameAction": "dance",
+      "sourceFrameCount": 206,
+      "actionFrames": [
+        1,
+        3,
+        6,
+        3
+      ],
+      "frames": [
+        576,
+        578,
+        581,
+        578
+      ]
+    },
+    {
+      "state": "jumping",
+      "gameAction": "dance",
+      "sourceFrameCount": 206,
+      "actionFrames": [
+        63,
+        69,
+        75,
+        81,
+        87
+      ],
+      "frames": [
+        638,
+        644,
+        650,
+        656,
+        662
+      ],
+      "registration": {
+        "mode": "bounded",
+        "scale": 0.8983957219251337,
+        "sourceCenter": [
+          982.2,
+          432.6
+        ]
+      }
+    },
+    {
+      "state": "failed",
+      "gameAction": "spring",
+      "sourceFrameCount": 217,
+      "actionFrames": [
+        137,
+        139,
+        141,
+        143,
+        145,
+        143,
+        139,
+        137
+      ],
+      "frames": [
+        918,
+        920,
+        922,
+        924,
+        926,
+        924,
+        920,
+        918
+      ],
+      "registration": "bounded"
+    },
+    {
+      "state": "waiting",
+      "gameAction": "boring",
+      "sourceFrameCount": 177,
+      "actionFrames": [
+        1,
+        3,
+        5,
+        9,
+        5,
+        3
+      ],
+      "frames": [
+        251,
+        253,
+        255,
+        259,
+        255,
+        253
+      ]
+    },
+    {
+      "state": "running",
+      "gameAction": "dance",
+      "sourceFrameCount": 206,
+      "actionFrames": [
+        10,
+        19,
+        28,
+        36,
+        28,
+        19
+      ],
+      "frames": [
+        585,
+        594,
+        603,
+        611,
+        603,
+        594
+      ],
+      "registration": "bounded"
+    },
+    {
+      "state": "review",
+      "gameAction": "happy",
+      "sourceFrameCount": 111,
+      "actionFrames": [
+        20,
+        24,
+        29,
+        34,
+        29,
+        24
+      ],
+      "frames": [
+        53,
+        57,
+        62,
+        67,
+        62,
+        57
+      ]
+    }
+  ]
+}

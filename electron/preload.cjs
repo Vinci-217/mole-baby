@@ -21,12 +21,15 @@ function subscribeToState(channel, callback, selectInitial) {
 contextBridge.exposeInMainWorld('desktop', Object.freeze({
   isElectron: true,
   updates:Object.freeze({
+    openRelease:()=>ipcRenderer.invoke('updates:open-release'),
     getState:()=>ipcRenderer.invoke('updates:get-state'),check:()=>ipcRenderer.invoke('updates:check'),download:()=>ipcRenderer.invoke('updates:download'),install:()=>ipcRenderer.invoke('updates:install'),setEnabled:enabled=>ipcRenderer.invoke('updates:set-enabled',enabled),
     setBusy:busy=>{if(typeof busy==='boolean')ipcRenderer.send('updates:busy',busy)},
     onStateChanged:callback=>{const listener=(_event,state)=>callback(state);ipcRenderer.on('updates:state',listener);return()=>ipcRenderer.removeListener('updates:state',listener)},
     onPrepare:callback=>{const listener=(_event,id)=>{if(typeof id!=='string')return;Promise.resolve().then(callback).then(ok=>ipcRenderer.send('updates:prepared',id,ok===true)).catch(()=>ipcRenderer.send('updates:prepared',id,false))};ipcRenderer.on('updates:prepare',listener);return()=>ipcRenderer.removeListener('updates:prepare',listener)},
   }),
   platform: process.platform,
+  setMusicState: state=>ipcRenderer.invoke('desktop:set-music-state',state),
+  onMusicToggle: callback=>{const listener=(_event,enabled)=>callback(enabled);ipcRenderer.on('desktop:music-toggle',listener);return()=>ipcRenderer.removeListener('desktop:music-toggle',listener)},
   openMacSettings: kind=>ipcRenderer.invoke('desktop:open-mac-settings',kind),
   openMacGuide: ()=>ipcRenderer.invoke('desktop:open-mac-guide'),
   getState: () => ipcRenderer.invoke('desktop:get-state'),

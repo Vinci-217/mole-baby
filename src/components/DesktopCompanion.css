@@ -214,3 +214,6 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout.is-edge-docked.edge-left{clip-path:inset(0 0 0 calc(var(--classic-pet-x,0px) + 30px))}.companion-layout.is-edge-docked.edge-right{clip-path:inset(0 calc(100% - var(--classic-pet-x,0px) - 130px) 0 0)}.companion-layout.is-edge-docked.edge-top{clip-path:inset(calc(var(--classic-pet-y,0px) + 71px) 0 0 0)}.companion-layout.is-edge-docked.edge-bottom{clip-path:inset(0 0 calc(100% - var(--classic-pet-y,0px) - 179px) 0)}.companion-layout.is-mouse-through .compact-pet{pointer-events:none}.companion-layout.is-mouse-through .pet-actions{display:none}
 
 .companion-layout .desktop-play{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:6px}.companion-layout .desktop-play>button{font-size:11px;line-height:1.35;padding:5px 2px}.companion-layout .desktop-play>button>img{width:26px;height:26px}
+
+/* Do not retain a faded compositor layer above the transparent desktop pet. */
+.companion-layout .compact-bubble{box-shadow:none;transition:none}

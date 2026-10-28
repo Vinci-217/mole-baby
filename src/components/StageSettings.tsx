@@ -6,7 +6,7 @@ export default function StageSettings({ pet, onChange }: { pet: GameState; onCha
   const stage = getStage(pet.growth, pet.evolution);
   return <section className="stage-settings" aria-label="当前成长阶段">
     <h3>当前成长阶段</h3>
-    <p>随时切换，名字、颜色和回忆都会保留。</p>
+    <p>{pet.growthLocked ? '已固定当前阶段与形态，不再自动成长。' : '当前按正常计划成长；手动选择后将固定阶段与形态。'}</p>
     <div className="stage-choices" role="group" aria-label="选择当前阶段">
       {STAGES.map((s, i) => <button key={s.name} type="button" aria-label={`切换到${s.name}`} aria-pressed={stage === i} onClick={() => onChange(i as Stage)}>
         <span className="stage-portrait"><Ram costume={pet.wearing} color={pet.color} stage={i as Stage} evolution={i === 4 ? pet.evolution ?? 'super' : undefined} action="still"/></span>

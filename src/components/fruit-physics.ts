@@ -24,6 +24,7 @@ const BODY_BOUNDS = {
 
 // Body-only bounds measured from each original evolution atlas mask, row 0.
 const EVOLVED_BODY_BOUNDS: Record<Evolution, { left: number; top: number; right: number; bottom: number }> = {
+  classic: { left: 52, top: 96, right: 140, bottom: 169 },
   super: { left: 50, top: 116, right: 135, bottom: 187 },
   water: { left: 32, top: 95, right: 154, bottom: 186 },
   wood: { left: 39, top: 109, right: 144, bottom: 188 },

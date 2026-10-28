@@ -78,6 +78,7 @@ let wanderPreference = true;
 let edgeHiding = true;
 let edgeSide = null;
 let petAppearance='seed';
+let musicState={playing:false,enabled:true,background:false};
 let edgePose = 'visible';
 let edgeTimer = null;
 let edgeTuckUntil = null;
@@ -92,6 +93,7 @@ let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
 function getDesktopState() {
   return {
     petMode,
+    windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
     petOffset,mouseThrough,mousePassthrough,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
@@ -650,10 +652,11 @@ function markRendererReady(adopted) {
 function refreshTrayMenu() {
   if (!tray || tray.isDestroyed()) return;
   const movable = hasPet && petCanMove;
-  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
+  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
+    { label: '播放背景音乐',type:'checkbox',checked:musicState.playing,enabled:hasPet,click:item=>mainWindow.webContents.send('desktop:music-toggle',item.checked) },
     { type: 'separator' },
     { label: '拉姆置顶',type:'checkbox',checked:petMode?mainWindow.isAlwaysOnTop():petAlwaysOnTop,click:item=>changeAlwaysOnTop(item.checked,true)},
     { label: '鼠标穿透',type:'checkbox',checked:mouseThrough,click:item=>changeMouseThrough(item.checked)},
@@ -717,6 +720,8 @@ function createTray() {
 }
 
 function registerIPC() {
+  handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
+  handle('updates:open-release',()=>shell.openExternal('https://github.com/Vinci-217/mole-baby/releases/latest'));
   listen('desktop:minimize', hideToTray);
   listen('desktop:close', hideToTray);
   listen('desktop:hide-to-tray', hideToTray);
@@ -795,6 +800,7 @@ function createWindow() {
     skipTaskbar: true,
     autoHideMenuBar: true,
     alwaysOnTop: normalAlwaysOnTop,
+    ...(process.platform==='win32'?{backgroundMaterial:'none',roundedCorners:false}:{}),
     thickFrame: process.platform !== 'win32',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -803,6 +809,7 @@ function createWindow() {
       sandbox: true,
       webSecurity: true,
       spellcheck: false,
+      autoplayPolicy: 'no-user-gesture-required',
     },
   });
 
@@ -812,6 +819,8 @@ function createWindow() {
     if (!window.isDestroyed()) window.setTitle('');
   });
   window.setMenu(null);
+  window.on('show',()=>publishState());
+  window.on('hide',()=>publishState());
   window.on('move', scheduleSave);
   window.on('resize', scheduleSave);
   window.on('always-on-top-changed', () => publishState());

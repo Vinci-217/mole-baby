@@ -4,6 +4,7 @@ const clips=require('../public/assets/original/element-skills/clips.json');
 /** Exercise actual controls and persisted state. Packaged runs cover one full
  * source animation per type; the browser review covers all eighteen clips. */
 async function verifyWorkflow(page,{full=false}={}){
+ let clockInstalled=false;
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
  try{
@@ -42,7 +43,7 @@ async function verifyWorkflow(page,{full=false}={}){
    await expect(canvas).toHaveCount(0,{timeout:clips[id].durationMs+10000});const trace=await page.evaluate(id=>window.__skillTrace[id]??[],id);assert.equal(trace[0],1,`${id}: first original frame`);assert.equal(trace.at(-1),clips[id].frames,`${id}: last original frame`);await expect(page.locator('.scene-character .ram-wear')).toHaveAttribute('data-outfit','wizard-cap');
   }
   // Install before reloading so all course/timer deadlines use this clock.
-  await page.clock.install();
+  await page.clock.install();clockInstalled=true;
   // A completed lesson awards one ability once across a real reload.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.education.lessons['element-fire']=0;delete p.education.graduated['element-fire'];p.lastTick=Date.now();localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))});await page.reload();await enterHome(page);await roomTab(page,'学院');await page.locator('.school-course-grid article').filter({hasText:'火系变身课'}).getByRole('button',{name:'学习第 1 节',exact:true}).click();
   await page.clock.fastForward(240100);await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);await page.reload();await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);
@@ -54,6 +55,6 @@ async function verifyWorkflow(page,{full=false}={}){
   await roomTab(page,'设置');await page.getByLabel('计时方向',{exact:true}).selectOption('countdown');await toDesktop(page);await openActions(page);await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer')).toHaveText('01:00');await page.clock.fastForward(60100);await expect(page.getByRole('timer')).toHaveCount(0);
   await enterHome(page);await roomTab(page,'回忆');const history=page.getByRole('region',{name:'计时记录',exact:true});await expect(history).toContainText('倒数计时完成：01:00');await expect(history.locator('article')).toHaveCount(2);await page.clock.fastForward(60000);await expect(history.locator('article')).toHaveCount(2);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v30-timer-history.png')});
   console.log(`PASS: nine actions, help/status, shared magic and outfit restoration, original furniture drag/save and room backgrounds, ${ids.length} complete original skills, one lesson per deadline, count-up cancellation and countdown completion records`);
- }catch(error){await page.screenshot({path:path.resolve(__dirname,'../artifacts/v30-workflow/failed-before-restore.png')}).catch(()=>{});console.error('Workflow state:',await page.evaluate(()=>({save:localStorage.getItem('ramu-house-save-v1'),body:document.body.innerText.slice(-1600),trace:window.__skillTrace,performance:performance.now(),magic:[...document.querySelectorAll('.magic-box-performance')].map(n=>({frame:n.dataset.magicFrame,subject:n.dataset.magicSubject,label:n.getAttribute('aria-label')}))})));throw error;}finally{await page.clock.resume();await page.evaluate(snapshot=>{localStorage.clear();for(const[k,v]of Object.entries(snapshot))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor()}
+ }catch(error){console.error('Workflow original error:',error);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v30-workflow/failed-before-restore.png')}).catch(()=>{});console.error('Workflow state:',await page.evaluate(()=>({save:localStorage.getItem('ramu-house-save-v1'),body:document.body.innerText.slice(-1600),trace:window.__skillTrace,performance:performance.now(),magic:[...document.querySelectorAll('.magic-box-performance')].map(n=>({frame:n.dataset.magicFrame,subject:n.dataset.magicSubject,label:n.getAttribute('aria-label')}))})));throw error;}finally{if(clockInstalled)await page.clock.resume();await page.evaluate(snapshot=>{localStorage.clear();for(const[k,v]of Object.entries(snapshot))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor()}
 }
 module.exports={verifyWorkflow};

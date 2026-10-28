@@ -37,6 +37,7 @@ export interface RoomMediaPreferences {
   backgroundId: string;
   musicId: string;
   musicEnabled: boolean;
+  backgroundPlayback: boolean;
   volume: number;
 }
 export interface RoomMediaController {
@@ -56,12 +57,13 @@ export interface RoomMediaController {
   resumeMusic: () => void;
 }
 const STORAGE = 'ramu-room-media-v1';
-const DEFAULTS: RoomMediaPreferences = { backgroundId: 'ramu-home', musicId: 'castle', musicEnabled: true, volume: .18 };
+const DEFAULTS: RoomMediaPreferences = { backgroundId: 'ramu-home', musicId: 'castle', musicEnabled: true, backgroundPlayback: false, volume: .18 };
 function normalize(value: Partial<RoomMediaPreferences>): RoomMediaPreferences {
   return {
     backgroundId: ROOM_BACKGROUNDS.some(b => b.id === value.backgroundId) ? value.backgroundId! : DEFAULTS.backgroundId,
     musicId: value.musicId === 'custom' || ROOM_MUSIC.some(m => m.id === value.musicId) ? value.musicId! : DEFAULTS.musicId,
     musicEnabled: typeof value.musicEnabled === 'boolean' ? value.musicEnabled : DEFAULTS.musicEnabled,
+    backgroundPlayback: value.backgroundPlayback === true,
     volume: typeof value.volume === 'number' && Number.isFinite(value.volume) ? Math.max(0, Math.min(1, value.volume)) : DEFAULTS.volume,
   };
 }
@@ -87,9 +89,9 @@ async function musicStore<T>(mode: IDBTransactionMode, operation: (store: IDBObj
   } finally { database.close(); }
 }
 
-/** Room-only music. Blobs stay in IndexedDB; leaving the room always pauses.
+/** Background playback is opt-in. Local tracks stay in IndexedDB.
  * Background music has independent volume and enable settings. */
-export function useRoomMedia(inRoom: boolean): RoomMediaController {
+export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaController {
   const [settings, setSettings] = useState(loadPreferences);
   const localPhase = useLocalScenePhase();
   // Preview is transient. Stored preferences always follow the real local time.
@@ -100,9 +102,11 @@ export function useRoomMedia(inRoom: boolean): RoomMediaController {
   const [error, setError] = useState<string | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   const active = useRef(false);
+  const nativeVisible = useRef(true);
   const customUrl = useRef<string | null>(null);
   const generation = useRef(0);
-  active.current = inRoom && settings.musicEnabled;
+  active.current = hasPet && (inRoom || settings.backgroundPlayback) && settings.musicEnabled;
+  const backgroundAllowed = useRef(settings.backgroundPlayback); backgroundAllowed.current = settings.backgroundPlayback;
   const update = useCallback((change: Partial<RoomMediaPreferences>) => {
     setSettings(previous => normalize({ ...previous, ...change }));
   }, []);
@@ -125,19 +129,23 @@ export function useRoomMedia(inRoom: boolean): RoomMediaController {
   const resumeMusic = useCallback(() => {
     // A room can remain mounted while the native window lives in the tray.
     // Guard every playback entry, including a track change while hidden.
-    if (!active.current || document.visibilityState === 'hidden' || !audio.current) return;
+    if (!active.current || (document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !audio.current) { audio.current?.pause(); return; }
     void audio.current.play().then(() => setError(null)).catch(reason => {
       if (reason instanceof DOMException && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')) return;
       setError('这首音乐暂时无法播放，可以换一首或重新导入。');
     });
   }, []);
+  useEffect(()=>window.desktop?.onStateChanged(state=>{
+    nativeVisible.current=state.windowVisible!==false;
+    if(!nativeVisible.current&&!backgroundAllowed.current)audio.current?.pause();else resumeMusic();
+  }),[resumeMusic]);
   const source = settings.musicId === 'custom' && custom ? custom.url : (ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0]).src;
   useEffect(() => {
     if (!customLoaded) return;
     const element = new Audio(source); element.loop = true; element.preload = 'metadata';
     audio.current = element;
     const started = () => {
-      if (document.visibilityState === 'hidden' || !active.current) { element.pause(); return; }
+      if ((document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !active.current) { element.pause(); return; }
       setPlaying(true);
     }, stopped = () => setPlaying(false);
     const failed = () => { setPlaying(false); setError('这首音乐暂时无法播放，可以换一首或重新导入。'); };
@@ -149,23 +157,23 @@ export function useRoomMedia(inRoom: boolean): RoomMediaController {
     };
   }, [source, customLoaded, resumeMusic]);
   useEffect(() => {
-    if (inRoom && settings.musicEnabled) resumeMusic();
+    if (active.current) resumeMusic();
     else audio.current?.pause();
-  }, [inRoom, settings.musicEnabled, resumeMusic]);
+  }, [inRoom, hasPet, settings.musicEnabled, settings.backgroundPlayback, resumeMusic]);
   useEffect(() => {
     const visibilityChanged = () => {
-      if (document.visibilityState === 'hidden') audio.current?.pause();
+      if ((document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current) audio.current?.pause();
       else resumeMusic(); // Respects both room membership and the user's switch.
     };
     document.addEventListener('visibilitychange', visibilityChanged);
     return () => document.removeEventListener('visibilitychange', visibilityChanged);
   }, [resumeMusic]);
   useEffect(() => {
-    if (!inRoom) return;
+    if (!hasPet) return;
     const unlock = () => resumeMusic();
     document.addEventListener('pointerdown', unlock); document.addEventListener('keydown', unlock);
     return () => { document.removeEventListener('pointerdown', unlock); document.removeEventListener('keydown', unlock); };
-  }, [inRoom, resumeMusic]);
+  }, [hasPet, resumeMusic]);
   useEffect(() => {
     const adjust = () => {
       if (audio.current) audio.current.volume = settings.volume;
