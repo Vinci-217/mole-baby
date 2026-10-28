@@ -2,7 +2,7 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮更新 · v0.31.1
+## 本轮更新 · v0.31.2
 
 新增“小屋游戏 → 拉姆换色游戏”：用原版红绿蓝色瓶和调色锅实时试色，装成独特药水，再从背包单击使用。自调颜色随成长、阶段切换和重启保留；首次领养仍只有原著四种基础色。
 

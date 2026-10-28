@@ -1,11 +1,11 @@
-拉姆 v0.31.1 · 原版完整动作与拉姆换色游戏
+拉姆 v0.31.2 · 原版完整动作与拉姆换色游戏
 
 - 小屋游戏新增“拉姆换色游戏”。红绿蓝色瓶、调色锅取自原版调色模块，可点击、拖动、调滑块或拾色器实时试色；装成独特药水后从药水背包单击使用。自调颜色随成长、阶段切换、重启与存档保存，首次领养仍选四种原著基础色。
 - 上传的247个SWF全部分类接入，共238个不同原件、47,204个源时间帧。吃、喝、清洁、药水绑定对应用品；踢足球、逗逗、弹簧、乐刷刷、涂鸦放在桌面和小屋“一起玩耍”。新增28种原版用品及图标，商店用摩尔豆购买。
 - 删除顶书练习。摸摸、翻书、睡觉、追蝴蝶、张望、醒来和眩晕改用九形态63组完整帧序列；高级八叶冠预合成旋转帧。日常序列为原角色和既有位图道具的离线合成，与完整原SWF分别标明来源。
 - 完成原版玩耍后心情最多+6、精力-3，只结算一次；取消不奖励，不额外增加成长。用品仍单击即扣库存并生效，播放结束显示实际增量。按ESC、摸摸或打开其他功能可结束动作。
 - 原片覆盖初级、中级、高级和经典三叶超级拉姆；种子及其余神力形态保留已有用品适配。整段原片期间暂收装扮，结束恢复，不改变装扮所有权。README展示全部上传动作和本轮日常帧预览。
-- 修复完整图集导致Windows便携包单文件超限的问题：大图集独立存储，核心包缩至约102MiB；保留ZIP完整性与逐文件散列校验。v0.31.0被测试拦截，未公开发布。
+- 修复完整图集导致Windows便携包单文件超限的问题：大图集独立存储，核心包缩至约102MiB；保留ZIP完整性与逐文件散列校验。v0.31.0被体积校验拦截、v0.31.1被Windows校验路径问题拦截，均未公开；本版同时修正ASAR查询的Windows路径规范化。
 - 整帧保留原来的身体、眼睛、叶片及道具，避免运行时重新拼叶；完整动作按需加载、重复文件去重、遮罩保持透明度，隐藏窗口暂停帧刷新。整库栅格素材增加了下载体积，本轮未声称安装包缩小。
 - 完成交接中的原版小屋导航、成长入口、回忆折叠、18段法术占位清理和12段游戏音效验证。旧存档、托盘、背景音乐和成长机制继续保留，更新仍需确认。
 
@@ -13,14 +13,14 @@
 
 | 你的电脑 | 下载这个文件 |
 | --- | --- |
-| Windows10/11，64位 | `mole-baby-0.31.1-Setup.exe`，双击安装 |
-| Windows7 SP1／8／8.1，64位 | `mole-baby-0.31.1-legacy-x64-Setup.exe` |
-| Windows7 SP1／8／8.1，32位 | `mole-baby-0.31.1-legacy-ia32-Setup.exe` |
-| Mac，Apple芯片（M系列） | `mole-baby-0.31.1-mac-arm64.dmg` |
-| Mac，Intel芯片 | `mole-baby-0.31.1-mac-x64.dmg` |
+| Windows10/11，64位 | `mole-baby-0.31.2-Setup.exe`，双击安装 |
+| Windows7 SP1／8／8.1，64位 | `mole-baby-0.31.2-legacy-x64-Setup.exe` |
+| Windows7 SP1／8／8.1，32位 | `mole-baby-0.31.2-legacy-ia32-Setup.exe` |
+| Mac，Apple芯片（M系列） | `mole-baby-0.31.2-mac-arm64.dmg` |
+| Mac，Intel芯片 | `mole-baby-0.31.2-mac-x64.dmg` |
 
 Mac 打开DMG后，把「拉姆」拖到「应用程序」，覆盖时选择替换；从状态栏退出旧拉姆，再打开新版。遇到Apple验证提示，先看附件 `mole-baby-mac-help.html`。Mac12或更新系统受支持。
 
 ZIP是对应系统的便携/归档包。不要下载底部的Source code ZIP，那是源代码。Windows安装版确认后可更新并重启；当前本地签名Mac版仍需打开DMG手动替换应用。关闭窗口只是缩到托盘，完全退出后启动约8秒检查新版。旧版检测不到时，从本页下载安装包覆盖安装，原存档保留。
 
-[课程与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.31.1/docs/COURSES.md) · [更新说明](https://github.com/Vinci-217/mole-baby/blob/v0.31.1/docs/UPDATES.md) · [动画与预览](https://github.com/Vinci-217/mole-baby/blob/v0.31.1/README.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.31.1-validation.md)
+[课程与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.31.2/docs/COURSES.md) · [更新说明](https://github.com/Vinci-217/mole-baby/blob/v0.31.2/docs/UPDATES.md) · [动画与预览](https://github.com/Vinci-217/mole-baby/blob/v0.31.2/README.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.31.2-validation.md)
