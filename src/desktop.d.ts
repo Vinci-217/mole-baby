@@ -3,6 +3,7 @@ declare global {
   interface UpdateState {status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string}
   interface DesktopState {
     petMode: boolean;
+    roomFullscreen?:boolean;
     effectExpanded?:boolean;
     trayTooltip?:string;
     windowVisible?: boolean;
@@ -42,6 +43,7 @@ declare global {
       setMouseThrough:(enabled:boolean)=>Promise<boolean>;
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
+      setRoomFullscreen:(enabled:boolean)=>Promise<boolean>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
       setPetStatus:(status:{name:string;stage:number;sleeping:boolean;stats:Record<string,number>;activity?:'course'|'restaurant'|'outing'}|null)=>Promise<void>;
       setPetEffectBounds:(bounds:{x:number;y:number;width:number;height:number}|null)=>Promise<DesktopState>;

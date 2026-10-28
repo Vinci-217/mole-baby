@@ -14,7 +14,7 @@ async function verifyFixes(page,desktop){
   await page.locator('.school-scene-status').getByRole('button').click();await roomTab(page,'设置');
   await page.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
   const forms=page.getByRole('group',{name:'选择神力形态',exact:true});await expect(forms.getByRole('button')).toHaveCount(5);
-  await forms.getByRole('button',{name:'切换为经典超级拉姆',exact:true}).click();
+  await forms.getByRole('button',{name:'切换为经典超级拉姆',exact:true}).click();await require('./smoke-helpers.cjs').applyGrowthSettings(page,{mode:'fixed'});
   await expect(page.locator('.scene-character canvas[data-form=classic]')).toBeVisible();
   await expect.poll(()=>page.locator('.scene-character canvas[data-form=classic]').evaluate(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data.filter((_,i)=>i%4===3).some(v=>v>0))).toBe(true);
   const locked=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));assert.equal(locked.growthLocked,true);assert.equal(locked.evolution,'classic');
@@ -45,6 +45,7 @@ async function verifyFixes(page,desktop){
   await require('./room-upgrade-checks.cjs').verifyRoomUpgrade(page);
   await require('./school-spells-checks.cjs').verifySchoolSpells(page);
   await require('./spell-care-checks.cjs').verifySpellCare(page,desktop);
+  await require('./growth-settings-checks.cjs').verifyGrowthSettings(page,desktop);
   console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});

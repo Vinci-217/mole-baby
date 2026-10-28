@@ -43,6 +43,8 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     isMinimized() { return false; }
     isAlwaysOnTop() { return Boolean(this.top); }
     isVisible() { return this.visible; }
+    isFullScreen() {return this.fullscreen===true}
+    setFullScreen(value) {if(value){this.beforeFullscreen=this.getBounds();this.bounds={x:0,y:0,width:1920,height:1080}}else if(this.beforeFullscreen)this.bounds={...this.beforeFullscreen};this.fullscreen=value;this.emit(value?'enter-full-screen':'leave-full-screen');this.emit('resize')}
     getBounds() { return { ...this.bounds }; }
     getNormalBounds() { return this.getBounds(); }
     setBounds(bounds) {
@@ -135,6 +137,33 @@ test('delayed Windows placement preserves the spell anchor and the position rest
  assert.equal(actual.x,first.x+11);assert.equal(actual.y,first.y+7);
  assert.equal(actual.x+state.petOffset.x,base.x);assert.equal(actual.y+state.petOffset.y,base.y);
  run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),base);
+});
+
+test('room fullscreen restores its normal bounds and exits before returning to the compact pet',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
+ const normal=run.window.getBounds();await run.invoke('desktop:set-room-fullscreen',true);
+ assert.equal(run.invoke('desktop:get-state').roomFullscreen,true);
+ await run.invoke('desktop:set-room-fullscreen',false);assert.deepEqual(run.window.getBounds(),normal);
+ await run.invoke('desktop:set-room-fullscreen',true);await run.invoke('desktop:set-pet-mode',true);
+ assert.equal(run.window.isFullScreen(),false);assert.equal(run.window.getBounds().width,160);assert.equal(run.window.getBounds().height,240);
+ await assert.rejects(run.invoke('desktop:set-room-fullscreen',true),/小屋/);
+ assert.throws(()=>run.handles.get('desktop:set-room-fullscreen')({sender:{},senderFrame:{}},true),/Untrusted/);
+});
+test('closing fullscreen leaves it before hiding to the tray',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
+ await run.invoke('desktop:set-room-fullscreen',true);run.send('desktop:hide-to-tray');await new Promise(setImmediate);
+ assert.equal(run.window.isFullScreen(),false);assert.equal(run.window.isVisible(),false);
+});
+
+test('tray close during a pending fullscreen entry waits, leaves and then hides',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
+ const requests=[];run.window.setFullScreen=value=>requests.push(value);
+ const entering=run.invoke('desktop:set-room-fullscreen',true);run.send('desktop:hide-to-tray');
+ assert.deepEqual(requests,[true]);assert.equal(run.window.isVisible(),true);
+ run.window.fullscreen=true;run.window.emit('enter-full-screen');await entering;await new Promise(setImmediate);
+ assert.deepEqual(requests,[true,false]);assert.equal(run.window.isVisible(),true);
+ run.window.fullscreen=false;run.window.emit('leave-full-screen');await new Promise(setImmediate);
+ assert.equal(run.window.isVisible(),false);
 });
 
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {

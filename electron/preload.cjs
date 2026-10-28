@@ -60,6 +60,7 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   setPetStatus:status=>ipcRenderer.invoke('desktop:set-pet-status',status),
   setPetEffectBounds:bounds=>ipcRenderer.invoke('desktop:set-pet-effect-bounds',bounds),
   setPetAppearance:form=>ipcRenderer.invoke('desktop:set-pet-appearance',form),
+  setRoomFullscreen:enabled=>ipcRenderer.invoke('desktop:set-room-fullscreen',enabled),
   setEdgeHiding: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Edge hiding must be a boolean'));
     return ipcRenderer.invoke('desktop:set-edge-hiding', enabled);

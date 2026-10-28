@@ -7,6 +7,7 @@ const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
 const {trayStatusText}=require('./tray-status.cjs');
+const {createRoomFullscreen}=require('./room-fullscreen.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const {createUpdates}=require('./updates.cjs');
@@ -93,10 +94,14 @@ let petEffectAnchor=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
+const roomFullscreen=createRoomFullscreen({getWindow:()=>mainWindow,isPetMode:()=>petMode,beforeEnter:()=>rememberBounds(),afterLeave:()=>{
+ if(normalBounds&&mainWindow&&!mainWindow.isDestroyed()&&!petMode)mainWindow.setBounds(clampBounds(normalBounds,NORMAL_SIZE));
+},onChange:()=>{publishState();scheduleSave()}});
 
 function getDesktopState() {
   return {
     petMode,
+    roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isFullScreen()),
     windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
     petOffset,mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
@@ -509,7 +514,7 @@ function loadWindowState() {
 }
 
 function rememberBounds() {
-  if (!mainWindow || mainWindow.isDestroyed() || changingMode || mainWindow.isMinimized()) return;
+  if (!mainWindow || mainWindow.isDestroyed() || changingMode || roomFullscreen.isChanging() || mainWindow.isMinimized() || mainWindow.isFullScreen()) return;
   if (petMode) petBounds = currentPetBounds();
   else normalBounds = mainWindow.getNormalBounds();
 }
@@ -599,6 +604,7 @@ function listen(channel, callback) {
 
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
+  if(enabled&&(mainWindow.isFullScreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
   if (enabled === petMode) return petMode;
   changePetEffectBounds(null);
 
@@ -649,6 +655,7 @@ function iconPath(filename) {
 
 function hideToTray() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
+  if(mainWindow.isFullScreen()||roomFullscreen.isChanging()){void roomFullscreen.set(false).then(()=>hideToTray()).catch(error=>console.error(error.message));return;}
   dragging = false;clearInterval(dragPoll);dragPoll=null;pointerPress=null;cursorDrag=null;
   stopMovement();
   revealPet();
@@ -661,6 +668,7 @@ function hideToTray() {
 function showFromTray(home = false) {
   if (!mainWindow || mainWindow.isDestroyed()) { createWindow(); return; }
   if (!rendererReady) return;
+  if(!home&&(mainWindow.isFullScreen()||roomFullscreen.isChanging())){void roomFullscreen.set(false).then(()=>showFromTray(home)).catch(error=>console.error(error.message));return;}
   revealPet();
   changePetMode(hasPet && !home);
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -779,6 +787,7 @@ function registerIPC() {
   handle('desktop:prepare-pet-drag',preparePetDrag);
   handle('desktop:drag-pet-to-cursor',dragPetToCursor);
   handle('desktop:set-pet-mode', changePetMode);
+  handle('desktop:set-room-fullscreen',enabled=>roomFullscreen.set(enabled));
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
   handle('desktop:set-pet-appearance',form=>{if(typeof form!=='string'||!Object.hasOwn(require('./edge-visibility.json').forms,form))throw new TypeError('Unknown pet appearance');petAppearance=form;publishState();return getDesktopState()});
@@ -865,6 +874,8 @@ function createWindow() {
   window.on('move',()=>{syncEffectAnchor();scheduleSave()});
   window.on('resize',()=>{syncEffectAnchor();scheduleSave()});
   window.on('always-on-top-changed', () => publishState());
+  window.on('enter-full-screen',()=>publishState());
+  window.on('leave-full-screen',()=>{publishState();scheduleSave()});
   window.on('minimize', event => { event.preventDefault(); hideToTray(); });
   window.on('restore', scheduleWander);
   window.on('blur', () => { if (dragging) endPetDrag(); });

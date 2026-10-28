@@ -17,6 +17,8 @@ export type { PetItem, ItemCategory } from './catalog';
 
 export type PetColor = 'pink' | 'yellow' | 'blue' | 'red';
 export type Stage = 0 | 1 | 2 | 3 | 4;
+export type GrowthMode = 'auto' | 'fixed';
+export interface GrowthSelection {mode:GrowthMode;stage:Stage;evolution?:Evolution}
 export type Evolution = 'super' | 'water' | 'wood' | 'fire' | 'classic';
 export const EVOLUTIONS: { id: Evolution; name: string; description: string }[] = [
   { id: 'classic', name: '经典超级拉姆', description: '三片金色叶子的经典超级拉姆。' },
@@ -155,9 +157,13 @@ export function getNextStage(growth: number): (typeof STAGES)[number] | null {
   return growth >= GROWTH_MAX ? null : STAGES[stage + 1];
 }
 
+function validStageChoice(stage:Stage,evolution?:Evolution){
+  return Number.isInteger(stage)&&stage>=0&&stage<=4&&(evolution===undefined||EVOLUTIONS.some(form=>form.id===evolution));
+}
+
 /** Deliberate local stage selection, separate from the slow natural growth clock. */
 export function changePetStage(state: GameState, stage: Stage, evolution?: Evolution, now = Date.now()): CareResult {
-  if (!Number.isInteger(stage) || stage < 0 || stage > 4 || (evolution !== undefined && !EVOLUTIONS.some(form => form.id === evolution))) {
+  if (!validStageChoice(stage,evolution)) {
     return { state, ok: false, message: '请选择一个拉姆阶段。' };
   }
   const form = stage === 4 ? evolution ?? state.evolution ?? 'super' : undefined;
@@ -176,6 +182,22 @@ export function evolvePet(state: GameState, evolution: Evolution, now = Date.now
   if (!form || current.evolution || current.growth < GROWTH_MAX) return { state: current, ok: false, message: '继续健康成长，等高级阶段的陪伴进度积满后再选择进化吧。' };
   if (current.sleeping) return { state: current, ok: false, message: '先轻轻叫醒拉姆，再一起选择成长的方向。' };
   return { state: { ...current, evolution }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
+}
+
+/** Settle elapsed time under the OLD mode before changing it. A mode-only
+ * switch never resets growth; choosing another stage starts at its threshold. */
+export function configureGrowth(state:GameState,selection:GrowthSelection,now=Date.now()):CareResult{
+  if(!selection||!['auto','fixed'].includes(selection.mode)||!validStageChoice(selection.stage,selection.evolution)||!Number.isFinite(now))return {state,ok:false,message:'请选择有效的成长设置。'};
+  const current=tick(state,Math.max(now,state.lastTick));
+  const sameAppearance=selection.stage===getStage(state.growth,state.evolution)&&(selection.stage!==4||(selection.evolution??state.evolution)===state.evolution);
+  // Crossing a natural stage boundary while the confirmation is open must
+  // not turn a mode-only switch into a rollback to the previous threshold.
+  const targetStage=sameAppearance?getStage(current.growth,current.evolution):selection.stage;
+  const changed=changePetStage(current,targetStage,sameAppearance?current.evolution:selection.evolution,current.lastTick);
+  if(!changed.ok)return changed;
+  const next={...changed.state,growthLocked:selection.mode==='fixed'};
+  const label=next.evolution?EVOLUTIONS.find(form=>form.id===next.evolution)!.name:STAGES[getStage(next.growth,next.evolution)].name;
+  return {state:next,ok:true,message:selection.mode==='auto'?`已从${label}继续自动成长，进度会保存。`:`已固定为${label}，成长进度已保留。`};
 }
 
 /** Integrate one continuous awake/asleep span; transitions are handled by tick. */
@@ -410,7 +432,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       createdAt: value.createdAt,
       lastTick: value.lastTick,
       growth: value.growth,
-      ...(value.growthLocked === true || value.growthLocked === undefined && manualStageSelected ? {growthLocked:true} : {}),
+      ...(typeof value.growthLocked==='boolean'?{growthLocked:value.growthLocked}:manualStageSelected?{growthLocked:true}:{}),
       ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,
       ...normalizeWardrobe(value.wardrobe,value.wearing),

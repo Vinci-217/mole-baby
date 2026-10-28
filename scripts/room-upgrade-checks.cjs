@@ -46,7 +46,7 @@ async function verifyRoomUpgrade(page){
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=12});await toDesktop(page);await enterHome(page);await expect.poll(audio).toBeLessThan(3);
   // Toggling playback also restarts; ordinary clicks must not reset it.
   await roomTab(page,'设置');const music=page.getByRole('checkbox',{name:'播放背景音乐',exact:true});await music.uncheck();await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.check();await expect.poll(audio).toBeLessThan(3);
-  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'背景音乐',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
+  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'声音与音乐',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
   const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await background.check();await toDesktop(page);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=14});await enterHome(page);await expect.poll(audio).toBeGreaterThanOrEqual(14);
   // A previous one-session save is already graduated, without another class.

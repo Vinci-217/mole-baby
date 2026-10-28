@@ -10,7 +10,7 @@ async function verifyBackupImport(source){
   const saved=await source.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
   await page.goto(source.url());await page.evaluate(values=>{localStorage.clear();for(const[key,value]of Object.entries(values))localStorage.setItem(key,value)},saved);await page.reload();
   await enterHome(page);await roomTab(page,'设置');
-  const input=page.locator('.room-backup input[type=file]');
+  const input=page.getByRole('region',{name:'存档与送别',exact:true}).locator('input[type=file]');
   const original=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
   const upload=async(name,pet)=>input.setInputFiles({name,mimeType:'application/json',buffer:Buffer.from(typeof pet==='string'?pet:JSON.stringify(pet))});
   await upload('broken.json','{invalid');

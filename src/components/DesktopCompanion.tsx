@@ -16,9 +16,9 @@ import type {CareFeedbackData} from '../care-feedback';
 import { edgeEntryAction, edgeTargetOffset, paintedEdgeOffset, type EdgeVector } from '../edge-motion';
 import type {PocketCategory} from './CarePocket';
 
-export type CompanionPanel = 'food' | 'play';
+export type CompanionPanel = 'status' | 'food' | 'play';
 interface Props {
-  moodLabel:string;moodBusy:boolean;onMood:()=>void; pocketContent:ReactNode;
+  moodLabel:string;moodBusy:boolean;onMood:()=>void; pocketContent:ReactNode;statusContent:ReactNode;
   courseCompletion:string;onElementSkill:(id:string)=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
@@ -35,7 +35,7 @@ interface Props {
 }
 const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-clock', chat: 'ui/toolbar-talk-normal', play: 'items/180004', status: 'ui/status-health', home: 'ui/toolbar-home-normal' };
 function Icon({ path }: { path: string }) { return <img alt="" draggable={false} src={`./assets/original/${path}.png`}/>; }
-const labels: Record<CompanionPanel, string> = {food:'背包',play:'一起玩耍'};
+const labels: Record<CompanionPanel, string> = {status:'状态',food:'背包',play:'一起玩耍'};
 export default function DesktopCompanion(p: Props) {
   const [tools, setTools] = useState(false), [dragging, setDragging] = useState(false);
   const [shaking, setShaking] = useState(false);
@@ -158,7 +158,7 @@ export default function DesktopCompanion(p: Props) {
       </button>
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
-                <button aria-label="状态" onClick={() => show('food')}><Icon path={icons.status}/></button>
+                <button aria-label="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>
         <button aria-label="玩耍" onClick={() => show('play')}><Icon path={icons.play}/></button>
         <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label={p.timerDirection==='countup'?'专注正向计时':'专注倒计时'}>{reminderTime(p.reminderSeconds)}</span>}</button>
         <button aria-label="进入小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
@@ -167,7 +167,7 @@ export default function DesktopCompanion(p: Props) {
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel&&<section className={`companion-panel panel-${p.panel}`} role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
-      {p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><div className="desktop-play">
+      {p.panel==='status'?p.statusContent:p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><div className="desktop-play">
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={()=>p.onCare('play')}><Icon path="items/180004"/>一起玩球</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onCurious}><img alt="" src="./assets/generated/v15-butterfly.png"/>和蝴蝶玩</button>

@@ -20,6 +20,18 @@ async function openActions(page) {
   await expect(actions).toBeVisible();
   return actions;
 }
+async function enterBackpack(page){
+ const panel=page.getByTestId('companion-panel'),link=panel.getByRole('button',{name:'打开背包',exact:true});
+ if(await link.isVisible())await link.click();
+ const pocket=panel.getByRole('region',{name:'拉姆用品背包',exact:true});await expect(pocket).toBeVisible();return pocket;
+}
+async function applyGrowthSettings(page,{mode}={}){
+ const settings=page.getByRole('region',{name:'当前成长阶段',exact:true});
+ if(mode)await settings.getByRole('button',{name:mode==='fixed'?'固定形态':'自动成长',exact:true}).click();
+ const apply=settings.getByRole('button',{name:'应用成长设置',exact:true});if(!await apply.isEnabled())return;
+ await apply.click();const confirmation=page.getByRole('alertdialog',{name:'确认切换成长设置？',exact:true});
+ await confirmation.getByRole('button',{name:'确认切换',exact:true}).click();await expect(confirmation).toHaveCount(0);
+}
 async function enterHome(page) {
   if (await page.locator('.cottage-scene').isVisible()) return;
   const actions = await openActions(page);
@@ -207,7 +219,7 @@ async function verifyStageSettings(page,desktop){
   const settings=page.getByRole('region',{name:'当前成长阶段',exact:true});
   const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
   for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
-    await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();
+    await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});
     await expect(settings.getByRole('button',{name:`切换到${label}`,exact:true})).toHaveAttribute('aria-pressed','true');
     if(stage===1||stage===2){const canvas=page.locator('.scene-character canvas');await expect(canvas).toHaveAttribute('data-sheet','grounded',{timeout:15000});await expect(canvas).toHaveAttribute('data-form',stage===1?'junior':'middle',{timeout:15000});}
     // An already selected stage keeps its progress, and the real clock may tick.
@@ -216,19 +228,19 @@ async function verifyStageSettings(page,desktop){
     if(stage<4)expect(growth).toBeLessThan(thresholds[stage+1]);else expect(growth).toBe(840);
   }
   for(const [form,label] of Object.entries({super:'神力超级拉姆',fire:'霹雳火系拉姆',wood:'弹力木系拉姆',water:'神奇水系拉姆'})){
-    await settings.getByRole('button',{name:`切换为${label}`,exact:true}).click();await expect.poll(async()=>(await save()).evolution).toBe(form);
+    await settings.getByRole('button',{name:`切换为${label}`,exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});await expect.poll(async()=>(await save()).evolution).toBe(form);
   }
   await toDesktop(page);await page.reload();
   const sprite=page.getByTestId('desktop-character').locator('.ram-sprite');
   await expect(sprite).toHaveAttribute('data-stage','4');await expect(sprite).toHaveAttribute('data-evolution','water');await expect(sprite).toHaveAttribute('data-color',before.color);
-  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();
+  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});
   await toDesktop(page);const character=page.getByTestId('desktop-character');await character.hover({position:{x:94,y:54}});
   await expect.poll(async()=>Number(await character.locator('canvas:not(.ram-wear)').getAttribute('data-gaze-x'))).toBeGreaterThan(1);
   console.log('PASS: nearby pointer attention responds in the actual desktop window');
   if(desktop){
     await enterHome(page);await roomTab(page,'设置');
-    await settings.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
-    await settings.getByRole('button',{name:'切换为神力超级拉姆',exact:true}).click();await toDesktop(page);
+    await settings.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});
+    await settings.getByRole('button',{name:'切换为神力超级拉姆',exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});await toDesktop(page);
     await expect(character.locator('canvas:not(.ram-wear)')).toHaveAttribute('data-form','super');
     await character.locator('.ram-flight-layer').evaluate(n=>{window.__nativeFlight=n.getAnimations()[0];});
     const flags=await page.evaluate(()=>window.desktop.getState());
@@ -249,7 +261,7 @@ async function verifyStageSettings(page,desktop){
     console.log('PASS: super Ram follows native movement with original side-facing flight and returns to front');
   }
 
-  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();
+  await enterHome(page);await roomTab(page,'设置');await settings.getByRole('button',{name:'切换到种子期',exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});
   await toDesktop(page);await page.reload();await expect(sprite).toHaveAttribute('data-stage','0');await expect(sprite).toHaveAttribute('data-color',before.color);
   const after=await save();for(const key of ['name','color','createdAt','coins','inventory','completedGames'])expect(after[key]).toEqual(before[key]);expect(after.evolution).toBeUndefined();
   console.log('PASS: original junior/middle layered atlases load through actual stage settings');
@@ -457,4 +469,4 @@ async function verifyMoodWardrobe(page) {
   }
 }
 
-module.exports = { adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };
+module.exports = { enterBackpack,applyGrowthSettings,adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };
