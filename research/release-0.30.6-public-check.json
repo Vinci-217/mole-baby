@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-28T10:08:52Z",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.30.6",
+  "sourceSha": "d714d944bc8bfca79d89cbad36e29955b2c6af0e",
+  "metadata": [
+    {
+      "name": "latest.yml",
+      "files": [
+        "mole-baby-0.30.6-Setup.exe"
+      ]
+    },
+    {
+      "name": "legacy-x64.yml",
+      "files": [
+        "mole-baby-0.30.6-legacy-x64-Setup.exe"
+      ]
+    },
+    {
+      "name": "legacy-ia32.yml",
+      "files": [
+        "mole-baby-0.30.6-legacy-ia32-Setup.exe"
+      ]
+    },
+    {
+      "name": "latest-mac.yml",
+      "files": [
+        "mole-baby-0.30.6-mac-arm64.zip",
+        "mole-baby-0.30.6-mac-arm64.dmg",
+        "mole-baby-0.30.6-mac-x64.zip",
+        "mole-baby-0.30.6-mac-x64.dmg"
+      ]
+    }
+  ],
+  "downloads": 10,
+  "allDownloadHeads": 200,
+  "allChecksumsMatch": true
+}
