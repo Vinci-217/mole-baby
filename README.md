@@ -2,7 +2,7 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮新增 · v0.30.0
+## 本轮新增 · v0.30.1
 
 魔法入门课一节后学会变魔术：原形冒烟遮住，变成蓝紫色纹样魔术盒，再冒烟恢复。4张盒子表情、16张烟复用于所有形态，颜色与装扮独立保留。盒子和烟为自制素材，原拉姆继续使用原图。
 

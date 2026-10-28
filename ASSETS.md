@@ -1,6 +1,6 @@
 # 拉姆素材记录
 
-v0.30.0 新增三系18个官网原版变身完整动作、19件原版家具和5间原版小屋。三系来源、完整帧导出与运行时占位道具处理见 [逆向与导出记录](research/original-element-skills.md)；家具／小屋来源与哈希见 [source-record.json](public/assets/original/furniture/source-record.json)。蓝紫色魔术盒与烟雾是自制共用图层，4张盒子、16张烟复用于全部形态和来回变身；见 [生成记录](skills/mole-classic-art/references/v45/generation.json)。角色原形与装扮保持独立，不把自制过渡称为官方动画。
+v0.30.1 新增三系18个官网原版变身完整动作、19件原版家具和5间原版小屋。三系来源、完整帧导出与运行时占位道具处理见 [逆向与导出记录](research/original-element-skills.md)；家具／小屋来源与哈希见 [source-record.json](public/assets/original/furniture/source-record.json)。蓝紫色魔术盒与烟雾是自制共用图层，4张盒子、16张烟复用于全部形态和来回变身；见 [生成记录](skills/mole-classic-art/references/v45/generation.json)。角色原形与装扮保持独立，不把自制过渡称为官方动画。
 
 
 v0.28.0 从原SWF分离正常身体/眼白和原瞳孔，供眩晕时的眼内绕圈使用。见 [分层说明](public/assets/original/dizzy/README.md)；没有新画眼睛或角色。边缘露出比例用原身体遮罩校准，见 [本轮检查](research/v28-edge-eyes.md)。

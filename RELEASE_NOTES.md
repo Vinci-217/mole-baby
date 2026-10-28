@@ -1,4 +1,4 @@
-拉姆 v0.30.0 · 原版三系变身、魔术盒与小屋布置
+拉姆 v0.30.1 · 原版三系变身、魔术盒与小屋布置
 
 - 魔法入门课完成一节后学会变魔术：原形冒烟遮盖，变成蓝紫色纹样魔术盒，再冒烟变回原形。盒子只保留拉姆眼睛特色；4张盒子表情和16张烟复用于各阶段，表演后保留原色及装扮。
 - 第五阶段新增原版火、水、木三系课程，每系六节，每节解锁一个变身。18段动画从官网公开SWF完整导出，保留原始帧序和24fps动作，运行时占位道具按原客户端规则清除。新绘烟雾只负责前后衔接；完整来源、哈希及适配说明在仓库记录。
@@ -13,8 +13,8 @@
 
 ## 下载选择
 
-Windows10/11 x64使用常规版；Windows7 SP1／8／8.1使用legacy-x64或legacy-ia32兼容安装包／便携包。兼容运行时固定Electron22.3.27，数据目录和更新渠道独立。云端旧版运行时检查不能代替每种旧Windows实机的显卡、DPI与补丁组合验收。[兼容说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.0/docs/WINDOWS.md)。
+Windows10/11 x64使用常规版；Windows7 SP1／8／8.1使用legacy-x64或legacy-ia32兼容安装包／便携包。兼容运行时固定Electron22.3.27，数据目录和更新渠道独立。云端旧版运行时检查不能代替每种旧Windows实机的显卡、DPI与补丁组合验收。[兼容说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.1/docs/WINDOWS.md)。
 
 Mac提供arm64和x64成品，首次打开方式见下载页与随包说明。
 
-[玩法与预览](https://github.com/Vinci-217/mole-baby/blob/v0.30.0/README.md) · [课程说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.0/docs/COURSES.md) · [素材来源](https://github.com/Vinci-217/mole-baby/blob/v0.30.0/research/original-element-skills.md)
+[玩法与预览](https://github.com/Vinci-217/mole-baby/blob/v0.30.1/README.md) · [课程说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.1/docs/COURSES.md) · [素材来源](https://github.com/Vinci-217/mole-baby/blob/v0.30.1/research/original-element-skills.md)
