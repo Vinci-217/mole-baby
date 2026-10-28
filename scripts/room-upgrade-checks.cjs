@@ -5,6 +5,7 @@ async function verifyRoomUpgrade(page){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));let clock=false,failed=false;
  await page.addInitScript(()=>{const Base=window.Audio;window.__roomAudio=[];window.Audio=class extends Base{constructor(...args){super(...args);window.__roomAudio.push(this)}}});
  try{
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await page.evaluate(()=>{
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
    Object.assign(p,{growth:180,growthLocked:true,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,wearing:undefined,lastTick:now,education:{lessons:{language:1},graduated:{}}});
@@ -14,8 +15,14 @@ async function verifyRoomUpgrade(page){
   });
   await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);
   const walker=page.locator('.room-walker'),floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),position=page.locator('.room-pet-position');
-  await expect(floor).toBeEnabled();const box=await floor.boundingBox(),destination={x:box.x+30,y:box.y+20},scene=await page.locator('.cottage-scene').boundingBox();
-  const initial=Number(await position.getAttribute('data-x'));await page.mouse.click(destination.x,destination.y);await expect(walker).toHaveAttribute('data-moving','true');
+  await expect(floor).toBeEnabled();
+  // Native room restoration can still be resizing on Windows. Wait for the
+  // actual target to settle, and dispatch relative to it instead of an old
+  // client rectangle captured while the compact window was expanding.
+  await floor.click({trial:true,position:{x:30,y:20}});
+  await floor.evaluate(element=>element.addEventListener('pointerdown',e=>{window.__roomWalkClick={x:e.clientX,y:e.clientY}},{once:true}));
+  const initial=Number(await position.getAttribute('data-x'));await floor.click({position:{x:30,y:20}});await expect(walker).toHaveAttribute('data-moving','true');
+  const box=await floor.boundingBox(),destination=await page.evaluate(()=>window.__roomWalkClick),scene=await page.locator('.cottage-scene').boundingBox();
   await expect.poll(async()=>Number(await position.getAttribute('data-x'))).toBeLessThan(initial);
   const during=Number(await position.getAttribute('data-x'));assert.ok(during<initial&&during>destination.x-scene.x,'Travel must be visible before arrival');
   await page.screenshot({path:path.resolve(__dirname,'../artifacts/v303-room-moving.png')});
@@ -48,7 +55,7 @@ async function verifyRoomUpgrade(page){
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).education?.lessons.language)).toBe(1);
   await page.reload();await enterHome(page);await roomTab(page,'学院');await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);
   console.log('PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist');
- }catch(error){failed=true;console.error('Room upgrade error:',error);throw error;}finally{
+ }catch(error){failed=true;console.error('Room upgrade error:',error);console.error('Room geometry:',await page.evaluate(()=>({width:innerWidth,height:innerHeight,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,click:window.__roomWalkClick,position:document.querySelector('.room-pet-position')?.dataset,floor:document.querySelector('.room-walk-surface')?.getBoundingClientRect().toJSON(),blocked:document.querySelector('.room-walk-surface')?.disabled})));throw error;}finally{
   if(clock)await page.clock.resume();await page.emulateMedia({reducedMotion:'no-preference'});
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
  }
