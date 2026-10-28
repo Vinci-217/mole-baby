@@ -1,0 +1,10 @@
+{
+  "source": "http://mole.61.com/resource/NPC/lamubone.swf",
+  "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "sprite": 2525,
+  "action": "football",
+  "clip": 2260,
+  "sourceFrameCount": 148,
+  "exportedFrameCount": 147,
+  "note": "Last source frame clears display list; original shapes and their relative positions retained. Body-following desktop camera uses width88 and world origin[64,128], baseline297 before 2x reduction; contact sound times derived from proximity."
+}
