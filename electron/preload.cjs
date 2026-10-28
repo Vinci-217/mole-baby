@@ -57,6 +57,8 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Pet mobility must be a boolean'));
     return ipcRenderer.invoke('desktop:set-pet-can-move', enabled);
   },
+  setPetStatus:status=>ipcRenderer.invoke('desktop:set-pet-status',status),
+  setPetEffectBounds:bounds=>ipcRenderer.invoke('desktop:set-pet-effect-bounds',bounds),
   setPetAppearance:form=>ipcRenderer.invoke('desktop:set-pet-appearance',form),
   setEdgeHiding: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Edge hiding must be a boolean'));

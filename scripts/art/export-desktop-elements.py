@@ -1,80 +1,128 @@
 #!/usr/bin/env python3
-"""Re-register original frames using bounded, overlapping desktop camera shots.
-No character drawing, no per-frame auto-fit: each clip has at most six camera
-keys. Every blend stays between two cameras that fully contain its source ink.
+"""Pack complete original timelines with one fixed registration per skill.
+The first source pose determines scale/ground, never the maximum effect bounds.
+Tight frame rectangles save memory; original offsets preserve all source motion.
 """
-import argparse,concurrent.futures,hashlib,json,math,subprocess
+import argparse
+import concurrent.futures
+import hashlib
+import json
+import math
+import subprocess
 from pathlib import Path
 from PIL import Image
 
-ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'public/assets/original/element-skills'
-CELL=288;COLS=12;PER_PAGE=96
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / 'public/assets/original/element-skills'
+PAGE_SIZE = 2048
+PADDING = 2
 
-def union(boxes):
- return (min(b[0] for b in boxes),min(b[1] for b in boxes),max(b[2] for b in boxes),max(b[3] for b in boxes))
-def camera(bounds,w,h):
- x0,y0,x1,y1=bounds;s=min(w/(x1-x0),h/(y1-y0))
- return (s,144-(x0+x1)/2*s,226-y1*s)
-def fits(box,cam):
- if not box:return True
- s,x,y=cam;a,b,c,d=box
- return a*s+x>=20 and c*s+x<=268 and b*s+y>=20 and d*s+y<=264
-def blend(a,b,t):
- t=t*t*(3-2*t)
- return tuple(x+(y-x)*t for x,y in zip(a,b))
-def pose(keys,frame):
- for i in range(len(keys)-1):
-  if frame<=keys[i+1][0]:
-   a,b=keys[i],keys[i+1]
-   return blend(a[1],b[1],(frame-a[0])/max(1,b[0]-a[0]))
- return keys[-1][1]
 
-def export(meta,exporter,work):
- raw=ROOT/f"research/references/original-element-skills/raw/{meta['sourceId']}.swf"
- dest=work/meta['id'];frames=list(dest.rglob('*.png'))
- if len(frames)!=meta['frames']:
-  subprocess.run([exporter,'nested',str(raw),str(dest),str(meta['actionSprite']),str(meta['rootFrame']),str(meta['frames']),'2',','.join(map(str,meta['clearedRuntimeItemSprites']))],check=True,stdout=subprocess.DEVNULL)
- frames=sorted(dest.rglob('*.png'),key=lambda p:int(p.stem))
- if len(frames)!=meta['frames']:raise ValueError('Incomplete original frames: '+meta['id'])
- boxes=[]
- for file in frames:
-  with Image.open(file) as im:boxes.append(im.getbbox())
- visible=[(i,b) for i,b in enumerate(boxes) if b]
- all_bounds=union([b for _,b in visible]);first=visible[0][1]
- close=camera(first,130,150)
- if all(fits(b,close) for b in boxes):keys=[(0,close),(len(frames)-1,close)]
- else:
-  centres=[round((len(frames)-1)*i/5) for i in range(6)];keys=[]
-  for j,frame in enumerate(centres):
-   # Each fixed shot contains BOTH neighboring intervals. Thus every source
-   # point is contained by both ends of its blend, including moving projectiles.
-   span=[b for b in boxes[centres[max(0,j-1)]:centres[min(5,j+1)]+1] if b]
-   keys.append((frame,camera(union(span) if span else all_bounds,190,190)))
- unique=[];lookup={};frame_map=[]
- for i,file in enumerate(frames):
-  cam=pose(keys,i)
-  if not fits(boxes[i],cam):raise ValueError(f"Camera clips original ink: {meta['id']} frame {i+1}")
-  s,x,y=cam
-  with Image.open(file) as image:
-   im=image.convert('RGBA').transform((CELL,CELL),Image.Transform.AFFINE,(1/s,0,-x/s,0,1/s,-y/s),resample=Image.Resampling.BICUBIC)
-  digest=hashlib.sha256(im.tobytes()).hexdigest()
-  if digest not in lookup:lookup[digest]=len(unique);unique.append(im)
-  frame_map.append(lookup[digest])
- target=OUT/meta['id'];pages=[]
- for start in range(0,len(unique),PER_PAGE):
-  group=unique[start:start+PER_PAGE];atlas=Image.new('RGBA',(COLS*CELL,math.ceil(len(group)/COLS)*CELL))
-  for j,im in enumerate(group):atlas.alpha_composite(im,(j%COLS*CELL,j//COLS*CELL))
-  name=f'atlas-{len(pages)}.png';atlas.save(target/name,optimize=True);pages.append(name)
- for old in target.glob('atlas-*.png'):
-  if old.name not in pages:old.unlink()
- result={**meta,'frameMap':frame_map,'pages':pages,'sourceBounds':list(all_bounds),'registration':{'method':'Original source frames at zoom2; up to six fixed camera keys, smooth shot blends; no per-frame fit','sourceRasterZoom':2,'baseY':226,'centerX':144,'maxWidth':248,'maxHeight':244,'cameraKeys':[{'frame':i+1,'scale':c[0],'x':c[1],'y':c[2]} for i,c in keys]}}
- (target/'clip.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
- print(meta['id'],len(frames),'original frames,',len(keys),'camera keys',flush=True)
- return result
+def export(meta, exporter, work):
+    raw = ROOT / f"research/references/original-element-skills/raw/{meta['sourceId']}.swf"
+    dest = work / str(meta['sourceId'])
+    frames = list(dest.rglob('*.png'))
+    if len(frames) != meta['frames']:
+        subprocess.run([exporter, 'nested', str(raw), str(dest), str(meta['actionSprite']),
+                        str(meta['rootFrame']), str(meta['frames']), '4',
+                        ','.join(map(str, meta['clearedRuntimeItemSprites']))],
+                       check=True, stdout=subprocess.DEVNULL)
+    frames = sorted(dest.rglob('*.png'), key=lambda p: int(p.stem))
+    if len(frames) != meta['frames']:
+        raise ValueError('Incomplete original frames: ' + meta['id'])
+    boxes = []
+    for file in frames:
+        with Image.open(file) as im:
+            boxes.append(im.getbbox())
+    visible = [b for b in boxes if b]
+    first = visible[0]
+    bounds = (min(b[0] for b in visible), min(b[1] for b in visible),
+              max(b[2] for b in visible), max(b[3] for b in visible))
+    scale = min(130 / (first[2] - first[0]), 150 / (first[3] - first[1]))
+    width = math.ceil((bounds[2] - bounds[0]) * scale) + PADDING * 2
+    height = math.ceil((bounds[3] - bounds[1]) * scale) + PADDING * 2
+    unique, lookup, frame_map = [], {}, []
+    for file, box in zip(frames, boxes):
+        if box:
+            # Quantize absolute coordinates, keeping registration and scale.
+            x = round((box[0] - bounds[0]) * scale) + PADDING
+            y = round((box[1] - bounds[1]) * scale) + PADDING
+            right = round((box[2] - bounds[0]) * scale) + PADDING
+            bottom = round((box[3] - bounds[1]) * scale) + PADDING
+            with Image.open(file) as im:
+                crop = im.convert('RGBA').crop(box).resize(
+                    (max(1, right - x), max(1, bottom - y)), Image.Resampling.LANCZOS)
+        else:
+            x = y = PADDING
+            crop = Image.new('RGBA', (1, 1))
+        assert x >= 0 and y >= 0 and x + crop.width <= width and y + crop.height <= height
+        digest = hashlib.sha256(crop.tobytes() + str((crop.size, x, y)).encode()).hexdigest()
+        if digest not in lookup:
+            lookup[digest] = len(unique)
+            unique.append((crop, x, y))
+        frame_map.append(lookup[digest])
 
-if __name__=='__main__':
- args=argparse.ArgumentParser();args.add_argument('--exporter',required=True);args.add_argument('--work',default='/tmp/ramu-element-highres');args.add_argument('--workers',type=int,default=2);args=args.parse_args()
- metas=json.loads((OUT/'clips.json').read_text());work=Path(args.work);work.mkdir(parents=True,exist_ok=True)
- with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:results=list(pool.map(lambda m:export(m,args.exporter,work),metas.values()))
- (OUT/'clips.json').write_text(json.dumps({m['id']:m for m in results},ensure_ascii=False,indent=2)+'\n')
+    # Shelf pack large frames first, retaining limits for old Windows GPUs.
+    bins, rectangles = [], [None] * len(unique)
+    for index in sorted(range(len(unique)), key=lambda i: unique[i][0].height, reverse=True):
+        im, dx, dy = unique[index]
+        w, h = im.size
+        if max(w, h) > PAGE_SIZE - 2:
+            raise ValueError(f"Source frame exceeds texture limit: {meta['id']} {im.size}")
+        slot = None
+        for page, state in enumerate(bins):
+            for shelf in state['shelves']:
+                if h <= shelf['height'] and shelf['x'] + w + 1 <= PAGE_SIZE:
+                    slot = (page, shelf['x'], shelf['y'])
+                    shelf['x'] += w + 1
+                    break
+            if slot:
+                break
+            if state['bottom'] + h + 1 <= PAGE_SIZE:
+                slot = (page, 1, state['bottom'])
+                state['shelves'].append({'x': w + 2, 'y': state['bottom'], 'height': h})
+                state['bottom'] += h + 1
+                break
+        if slot is None:
+            bins.append({'shelves': [{'x': w + 2, 'y': 1, 'height': h}], 'bottom': h + 2})
+            slot = (len(bins) - 1, 1, 1)
+        rectangles[index] = [*slot, w, h, dx, dy]
+    target = OUT / meta['id']
+    pages = []
+    for page in range(len(bins)):
+        entries = [(im, r) for (im, _, _), r in zip(unique, rectangles) if r[0] == page]
+        atlas = Image.new('RGBA', (max(r[1] + r[3] + 1 for _, r in entries),
+                                   max(r[2] + r[4] + 1 for _, r in entries)))
+        for im, r in entries:
+            atlas.paste(im, (r[1], r[2]))
+        name = f'atlas-{page}.png'
+        atlas.save(target / name, optimize=True)
+        pages.append(name)
+    for old in target.glob('atlas-*.png'):
+        if old.name not in pages:
+            old.unlink()
+    result = {k: v for k, v in meta.items() if k not in ['cell', 'columns', 'pageFrames']}
+    result.update(frameMap=frame_map, pages=pages, rectangles=rectangles, width=width, height=height,
+                  sourceBounds=list(bounds), registration={
+                      'method': 'One fixed scale and origin for the full original timeline; effects overflow',
+                      'sourceRasterZoom': 4, 'scale': scale, 'referenceBounds': list(first),
+                      'centerX': ((first[0] + first[2]) / 2 - bounds[0]) * scale + PADDING,
+                      'baseY': (first[3] - bounds[1]) * scale + PADDING,
+                      'cssPixelsPerAtlasPixel': 160 / 288})
+    (target / 'clip.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    print(meta['id'], meta['frames'], 'fixed-scale source frames,', len(pages), 'packed pages', flush=True)
+    return result
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--exporter', required=True)
+    parser.add_argument('--work', default='/tmp/mole-original-element-export')
+    parser.add_argument('--workers', type=int, default=2)
+    args = parser.parse_args()
+    metas = json.loads((OUT / 'clips.json').read_text())
+    work = Path(args.work)
+    work.mkdir(parents=True, exist_ok=True)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+        results = list(pool.map(lambda m: export(m, args.exporter, work), metas.values()))
+    (OUT / 'clips.json').write_text(json.dumps({m['id']: m for m in results}, ensure_ascii=False, indent=2) + '\n')

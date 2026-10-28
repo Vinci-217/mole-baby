@@ -1,0 +1,444 @@
+{
+  "sourceFrames": 1711,
+  "atlasMax": 2048,
+  "cacheBudgetMiB": 64,
+  "oversizePolicy": "One oversized current skill may occupy the cache alone",
+  "clips": [
+    {
+      "id": "fire-1",
+      "frames": 124,
+      "fixedSourceScale": 1.1904761904761905,
+      "virtualCanvas": [
+        169,
+        200
+      ],
+      "decodedMiB": 4.09,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2025,
+          "height": 529
+        }
+      ]
+    },
+    {
+      "id": "water-1",
+      "frames": 100,
+      "fixedSourceScale": 0.9146341463414634,
+      "virtualCanvas": [
+        141,
+        261
+      ],
+      "decodedMiB": 2.16,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2013,
+          "height": 281
+        }
+      ]
+    },
+    {
+      "id": "wood-1",
+      "frames": 100,
+      "fixedSourceScale": 1.0236220472440944,
+      "virtualCanvas": [
+        160,
+        292
+      ],
+      "decodedMiB": 4.24,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2027,
+          "height": 548
+        }
+      ]
+    },
+    {
+      "id": "fire-2",
+      "frames": 91,
+      "fixedSourceScale": 0.8125,
+      "virtualCanvas": [
+        280,
+        174
+      ],
+      "decodedMiB": 3.54,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2042,
+          "height": 454
+        }
+      ]
+    },
+    {
+      "id": "water-2",
+      "frames": 81,
+      "fixedSourceScale": 1.4423076923076923,
+      "virtualCanvas": [
+        405,
+        405
+      ],
+      "decodedMiB": 6.43,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2040,
+          "height": 826
+        }
+      ]
+    },
+    {
+      "id": "wood-2",
+      "frames": 69,
+      "fixedSourceScale": 0.9090909090909091,
+      "virtualCanvas": [
+        190,
+        286
+      ],
+      "decodedMiB": 4.81,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2048,
+          "height": 616
+        }
+      ]
+    },
+    {
+      "id": "fire-3",
+      "frames": 51,
+      "fixedSourceScale": 0.9615384615384616,
+      "virtualCanvas": [
+        377,
+        325
+      ],
+      "decodedMiB": 3.9,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2030,
+          "height": 504
+        }
+      ]
+    },
+    {
+      "id": "water-3",
+      "frames": 61,
+      "fixedSourceScale": 1.1206896551724137,
+      "virtualCanvas": [
+        301,
+        238
+      ],
+      "decodedMiB": 3.93,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2006,
+          "height": 513
+        }
+      ]
+    },
+    {
+      "id": "wood-3",
+      "frames": 29,
+      "fixedSourceScale": 0.8379888268156425,
+      "virtualCanvas": [
+        230,
+        289
+      ],
+      "decodedMiB": 3.31,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 1998,
+          "height": 434
+        }
+      ]
+    },
+    {
+      "id": "fire-4",
+      "frames": 83,
+      "fixedSourceScale": 0.4918032786885246,
+      "virtualCanvas": [
+        192,
+        300
+      ],
+      "decodedMiB": 6.29,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2047,
+          "height": 806
+        }
+      ]
+    },
+    {
+      "id": "water-4",
+      "frames": 91,
+      "fixedSourceScale": 0.5190311418685121,
+      "virtualCanvas": [
+        234,
+        277
+      ],
+      "decodedMiB": 5.23,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2035,
+          "height": 674
+        }
+      ]
+    },
+    {
+      "id": "wood-4",
+      "frames": 105,
+      "fixedSourceScale": 0.6122448979591837,
+      "virtualCanvas": [
+        499,
+        544
+      ],
+      "decodedMiB": 18.49,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2048,
+          "height": 1985
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2037,
+          "height": 384
+        }
+      ]
+    },
+    {
+      "id": "fire-5",
+      "frames": 43,
+      "fixedSourceScale": 0.4918032786885246,
+      "virtualCanvas": [
+        602,
+        476
+      ],
+      "decodedMiB": 12.71,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2005,
+          "height": 1662
+        }
+      ]
+    },
+    {
+      "id": "water-5",
+      "frames": 89,
+      "fixedSourceScale": 0.7142857142857143,
+      "virtualCanvas": [
+        838,
+        981
+      ],
+      "decodedMiB": 27.35,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2036,
+          "height": 2033
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2040,
+          "height": 1486
+        }
+      ]
+    },
+    {
+      "id": "wood-5",
+      "frames": 113,
+      "fixedSourceScale": 0.6190476190476191,
+      "virtualCanvas": [
+        736,
+        682
+      ],
+      "decodedMiB": 62.72,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2047,
+          "height": 2048
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2039,
+          "height": 2047
+        },
+        {
+          "file": "atlas-2.png",
+          "width": 2036,
+          "height": 2034
+        },
+        {
+          "file": "atlas-3.png",
+          "width": 1965,
+          "height": 2002
+        }
+      ]
+    },
+    {
+      "id": "fire-6",
+      "frames": 150,
+      "fixedSourceScale": 0.4398826979472141,
+      "virtualCanvas": [
+        1006,
+        1791
+      ],
+      "decodedMiB": 90.63,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2046,
+          "height": 2045
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2047,
+          "height": 2036
+        },
+        {
+          "file": "atlas-2.png",
+          "width": 2027,
+          "height": 2044
+        },
+        {
+          "file": "atlas-3.png",
+          "width": 2009,
+          "height": 2029
+        },
+        {
+          "file": "atlas-4.png",
+          "width": 2047,
+          "height": 2036
+        },
+        {
+          "file": "atlas-5.png",
+          "width": 2038,
+          "height": 1482
+        }
+      ]
+    },
+    {
+      "id": "water-6",
+      "frames": 141,
+      "fixedSourceScale": 0.5725190839694656,
+      "virtualCanvas": [
+        1218,
+        1125
+      ],
+      "decodedMiB": 121.57,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2041,
+          "height": 2046
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2046,
+          "height": 2042
+        },
+        {
+          "file": "atlas-2.png",
+          "width": 2040,
+          "height": 2028
+        },
+        {
+          "file": "atlas-3.png",
+          "width": 2042,
+          "height": 2002
+        },
+        {
+          "file": "atlas-4.png",
+          "width": 2044,
+          "height": 1976
+        },
+        {
+          "file": "atlas-5.png",
+          "width": 2035,
+          "height": 2013
+        },
+        {
+          "file": "atlas-6.png",
+          "width": 2027,
+          "height": 1391
+        },
+        {
+          "file": "atlas-7.png",
+          "width": 1863,
+          "height": 2042
+        },
+        {
+          "file": "atlas-8.png",
+          "width": 779,
+          "height": 680
+        }
+      ]
+    },
+    {
+      "id": "wood-6",
+      "frames": 190,
+      "fixedSourceScale": 0.635593220338983,
+      "virtualCanvas": [
+        1391,
+        1391
+      ],
+      "decodedMiB": 134.48,
+      "pages": [
+        {
+          "file": "atlas-0.png",
+          "width": 2041,
+          "height": 2047
+        },
+        {
+          "file": "atlas-1.png",
+          "width": 2036,
+          "height": 2016
+        },
+        {
+          "file": "atlas-2.png",
+          "width": 2018,
+          "height": 2045
+        },
+        {
+          "file": "atlas-3.png",
+          "width": 2046,
+          "height": 2043
+        },
+        {
+          "file": "atlas-4.png",
+          "width": 2029,
+          "height": 2040
+        },
+        {
+          "file": "atlas-5.png",
+          "width": 2033,
+          "height": 1996
+        },
+        {
+          "file": "atlas-6.png",
+          "width": 2047,
+          "height": 2048
+        },
+        {
+          "file": "atlas-7.png",
+          "width": 1976,
+          "height": 2042
+        },
+        {
+          "file": "atlas-8.png",
+          "width": 2043,
+          "height": 1096
+        }
+      ]
+    }
+  ]
+}

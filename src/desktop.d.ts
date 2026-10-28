@@ -3,6 +3,8 @@ declare global {
   interface UpdateState {status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string}
   interface DesktopState {
     petMode: boolean;
+    effectExpanded?:boolean;
+    trayTooltip?:string;
     windowVisible?: boolean;
     dragPoint?:{x:number;y:number;at:number};
     petOffset?:{x:number;y:number};
@@ -41,6 +43,8 @@ declare global {
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
+      setPetStatus:(status:{name:string;stage:number;sleeping:boolean;stats:Record<string,number>;activity?:'course'|'restaurant'|'outing'}|null)=>Promise<void>;
+      setPetEffectBounds:(bounds:{x:number;y:number;width:number;height:number}|null)=>Promise<DesktopState>;
       setPetAppearance:(form:string)=>Promise<DesktopState>;
       setPetCanMove: (enabled: boolean) => Promise<boolean>;
       setEdgeHiding: (enabled: boolean) => Promise<boolean>;

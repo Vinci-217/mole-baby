@@ -46,13 +46,16 @@ describe('persistent school and restaurant activities',()=>{
   const started=beginActivity(pet(),'restaurant',undefined,now+1).state,done=parseSave(JSON.stringify(started),now+JOB_MS+2)!
   expect(done.coins).toBe(pet().coins+JOB_PAY);expect(done.activity).toBeUndefined();expect(parseSave(JSON.stringify(done),now+JOB_MS+3)!.coins).toBe(done.coins)
  })
- it('cancels an unfinished shift when energy causes automatic sleep',()=>{
-  const tired={...pet(),stats:{...pet().stats,energy:30.1}}
-  const started=beginActivity(tired,'restaurant',undefined,now).state
-  const asleep=tick(started,now+100_000)
-  expect(asleep.sleeping).toBe(true);expect(asleep.activity).toBeUndefined()
-  expect(tick(asleep,now+JOB_MS+1).coins).toBe(tired.coins)
-  expect(started.activity).toBeDefined();expect(started.sleeping).toBe(false)
+ it('requires enough energy to finish a shift without an immediate automatic nap',()=>{
+  const tired={...pet(),stats:{...pet().stats,energy:30.1}};
+  const refused=beginActivity(tired,'restaurant',undefined,now);
+  expect(refused.ok).toBe(false);expect(refused.state).toBe(tired);expect(refused.message).toContain('31');
+  const ready={...tired,stats:{...tired.stats,energy:31}};
+  const started=beginActivity(ready,'restaurant',undefined,now);
+  expect(started.ok).toBe(true);
+  const done=tick(started.state,now+JOB_MS);
+  expect(done.coins).toBe(tired.coins+JOB_PAY);expect(done.sleeping).toBe(false);
+  expect(done.activity).toBeUndefined();expect(done.stats.energy).toBeGreaterThan(20);
  })
  it('settles before a later nap and integrates rewards identically across long and short ticks',()=>{
   const initial={...pet(),stats:{...pet().stats,energy:50,happiness:34.95}}

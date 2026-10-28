@@ -81,7 +81,7 @@ export const COLORS: { id: PetColor; name: string; hex: string; light: string }[
   { id: 'red', name: '红色', hex: '#ff3805', light: '#ffded3' },
 ];
 
-/** Stable reward order: old save IDs and minigame reward receipts depend on it. */
+/** Compatibility export for older callers; rewards use the full usable pool. */
 export const FOODS: Food[] = ['berry', 'biscuit', 'juice'].map(id => getItem(id)!);
 
 // Desktop adaptation: growth is earned by healthy elapsed time, never by clicks.
@@ -234,8 +234,8 @@ export function tick(state: GameState, now = Date.now()): GameState {
   let current=settleRest(settleActivity(cursor===state.lastTick?state:{...state,lastTick:cursor},cursor),cursor);
   while(cursor<now){
     const untilTransition=current.sleeping
-      ? Math.max((WAKE_ENERGY-current.stats.energy)/22*3_600_000,(current.sleepUntil??0)-cursor)
-      : Math.max((current.stats.energy-REST_ENERGY)/4*3_600_000,(current.awakeUntil??0)-cursor);
+      ? Math.max((WAKE_ENERGY-current.stats.energy)/-NEED_RATES.asleep.energy*3_600_000,(current.sleepUntil??0)-cursor)
+      : Math.max((current.stats.energy-REST_ENERGY)/NEED_RATES.awake.energy*3_600_000,(current.awakeUntil??0)-cursor);
     // Reward at the actual deadline, before a later nap or stat decay. This
     // keeps a bulk offline tick equivalent to many ordinary timer ticks.
     const end=Math.min(now,cursor+Math.max(1,untilTransition),current.activity?.endsAt??Infinity);
@@ -291,7 +291,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     stats.happiness = clamp(stats.happiness + 6);
     return { state: { ...current, stats }, message: '咕噜咕噜～最喜欢你摸摸我啦！', ok: true };
   }
-  if (stats.energy < 12) return { state: current, message: '有一点困啦，睡一会儿再玩好不好？', ok: false };
+  if (stats.energy < 12) return { state: current, message: `玩球至少需要 12 点精力（当前 ${Math.floor(stats.energy*10)/10} 点），睡一会儿恢复后再玩吧。`, ok: false };
   stats.happiness = clamp(stats.happiness + 16);
   stats.energy = clamp(stats.energy - 12);
   stats.hunger = clamp(stats.hunger - 5);
@@ -329,7 +329,12 @@ export function getPetCondition(state: GameState): PetCondition {
   return { id: 'healthy', label: '状态很好', action: 'idle', description: '吃得饱、喝得足，正在安心地陪伴你。' };
 }
 
-export function rewardGame(state: GameState, score: number, now = Date.now()): CareResult {
+export function gameRewardItems(state:GameState):PetItem[]{
+  const stage=getStage(state.growth,state.evolution);
+  return ITEMS.filter(item=>['food','drink','clean'].includes(item.category)&&item.minStage<=stage);
+}
+
+export function rewardGame(state: GameState, score: number, now = Date.now(), random:()=>number=Math.random): CareResult & {rewardItem?:PetItem} {
   const current = tick(state, now);
   if (current.sleeping) return { state: current, message: '小拉姆正在睡觉，醒来再一起玩吧。', ok: false };
   if (current.completedGames > 0 && now - current.lastRewardAt < GAME_REWARD_COOLDOWN_MS) {
@@ -337,9 +342,9 @@ export function rewardGame(state: GameState, score: number, now = Date.now()): C
   }
   const safeScore = Number.isFinite(score) ? Math.floor(clamp(score, 10)) : 0;
   const coins = Math.min(4 + safeScore * 2, MAX_COINS - current.coins);
-  const food = FOODS[safeScore >= 8 ? 2 : safeScore >= 5 ? 1 : 0];
-  const count = current.inventory[food.id] ?? 0;
-  const foodReward = count < MAX_INVENTORY;
+  const pool=gameRewardItems(current).filter(item=>(current.inventory[item.id]??0)<MAX_INVENTORY);
+  const roll=pool.length?random():0;
+  const food=pool[Math.min(pool.length-1,Math.max(0,Math.floor((Number.isFinite(roll)?roll:0)*pool.length)))];
   return {
     state: {
       ...current,
@@ -350,11 +355,12 @@ export function rewardGame(state: GameState, score: number, now = Date.now()): C
         hunger: clamp(current.stats.hunger - 4),
         energy: clamp(current.stats.energy - 8),
       },
-      inventory: foodReward ? { ...current.inventory, [food.id]: count + 1 } : { ...current.inventory },
+      inventory: food ? { ...current.inventory, [food.id]: (current.inventory[food.id]??0) + 1 } : { ...current.inventory },
       completedGames: Math.min(current.completedGames + 1, MAX_COINS),
       lastRewardAt: now,
     },
-    message: `本局获得 ${safeScore} 分！收获 ${coins} 摩尔豆${foodReward ? `和${food.name} × 1` : '，食物背包已满'}。`,
+    rewardItem:food,
+    message: `本局获得 ${safeScore} 分！收获 ${coins} 摩尔豆${food ? `和${food.name} × 1` : '，可用用品背包已满'}。`,
     ok: true,
   };
 }

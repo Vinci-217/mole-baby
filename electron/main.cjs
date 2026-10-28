@@ -2,10 +2,11 @@ const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, n
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget, compactPanelBounds } = require('./desktop-geometry.cjs');
+const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget, compactPanelBounds, effectWindowBounds } = require('./desktop-geometry.cjs');
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
+const {trayStatusText}=require('./tray-status.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const {createUpdates}=require('./updates.cjs');
@@ -87,6 +88,8 @@ let edgeHovered = false;
 let edgeNextPeekAt = null;
 let draggingFromEdge = false;
 let petOffset={x:0,y:0};
+let petEffectBounds=null;
+let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
 
@@ -94,7 +97,7 @@ function getDesktopState() {
   return {
     petMode,
     windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
-    petOffset,mouseThrough,mousePassthrough,
+    petOffset,mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
@@ -133,7 +136,7 @@ function changeMotion(next) {
 }
 
 function canWander() {
-  return canMoveOnDesktop() && wandering && edgeSide === null;
+  return !petEffectBounds && canMoveOnDesktop() && wandering && edgeSide === null;
 }
 
 function canMoveOnDesktop() {
@@ -145,7 +148,7 @@ function canMoveOnDesktop() {
 
 function canHideAtEdge() {
   return Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()
-    && !mainWindow.isMinimized() && petMode && hasPet && !companionPanel && !dragging && !interacting);
+    && !mainWindow.isMinimized() && petMode && hasPet && !companionPanel && !petEffectBounds && !dragging && !interacting);
 }
 
 function revealPet() {
@@ -309,12 +312,12 @@ function placePetAt(target){
   petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
 }
 function preparePetDrag(){
-  if(!petMode||mouseThrough)return false;
+  if(!petMode||mouseThrough||petEffectBounds)return false;
   pointerPress={point:screen.getCursorScreenPoint(),base:currentPetBounds()};return true;
 }
 function startPetDrag(paintedOffset){
   if(paintedOffset!==undefined&&(!paintedOffset||Array.isArray(paintedOffset)||typeof paintedOffset.x!=='number'||typeof paintedOffset.y!=='number'||!Number.isFinite(paintedOffset.x)||!Number.isFinite(paintedOffset.y)||Math.abs(paintedOffset.x)>82||Math.abs(paintedOffset.y)>92))throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
-  if(!petMode||mouseThrough)return false;
+  if(!petMode||mouseThrough||petEffectBounds)return false;
   const offset=paintedOffset??(edgeSide?edgeOffset(edgeSide,edgePose,petAppearance):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
   if(companionPanel)changeCompanionPanel(false);
   const base=currentPetBounds();revealPet();dragging=true;stopMovement();
@@ -345,7 +348,7 @@ function movePet(dx, dy) {
     || Math.abs(dx) > 10000 || Math.abs(dy) > 10000) {
     throw new TypeError('Pet movement must use finite screen-coordinate deltas');
   }
-  if (!petMode) return false; // Manual dragging is allowed even for a seed or sleeping pet.
+  if (!petMode || petEffectBounds) return false; // Keep a running spell anchored.
   revealPet();
   if (companionPanel) changeCompanionPanel(false);
   stopMovement();
@@ -419,6 +422,24 @@ function changeMouseThrough(enabled){
 function currentPetBounds(){
  const b=mainWindow.getBounds();return {...PET_SIZE,x:b.x+(companionPanel&&panelGeometry?panelGeometry.petX:petOffset.x),y:b.y+(companionPanel&&panelGeometry?panelGeometry.petY:petOffset.y)};
 }
+function changePetEffectBounds(effect){
+ if(effect!==null&&(!effect||Array.isArray(effect)||['x','y','width','height'].some(key=>typeof effect[key]!=='number'||!Number.isFinite(effect[key]))||Math.abs(effect.x)>4096||Math.abs(effect.y)>4096||effect.width<=0||effect.height<=0||effect.width>4096||effect.height>4096))throw new TypeError('Invalid pet effect bounds');
+ if(!petMode||JSON.stringify(effect)===JSON.stringify(petEffectBounds))return getDesktopState();
+ if(effect&&companionPanel)changeCompanionPanel(false);
+ stopMovement();
+ if(effect)revealPet();
+ const base=currentPetBounds();
+ const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,effect):clampBounds(base,PET_SIZE);
+ petEffectBounds=effect?{x:effect.x,y:effect.y,width:effect.width,height:effect.height}:null;
+ changingMode=true;
+ if(process.platform==='win32')applyMinimum(target,true);
+ mainWindow.setBounds(target);
+ const actual=mainWindow.getBounds();petOffset={x:base.x-actual.x,y:base.y-actual.y};
+ changingMode=false;
+ changeMousePassthrough(Boolean(effect));
+ publishState();scheduleSave();scheduleWander();
+ return getDesktopState();
+}
 function companionBounds(base){
  const result=compactPanelBounds(base,screen.getDisplayMatching(base).workArea);panelSide=result.panelSide;panelGeometry=result.geometry;return result.bounds;
 }
@@ -426,7 +447,7 @@ function changeCompanionPanel(open, layout = 'compact') {
   if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
   if (!['compact', 'classic', 'profile'].includes(layout)) throw new TypeError('Unknown companion layout');
   if (!petMode || (open === companionPanel && (!open || layout === panelLayout))) return getDesktopState();
-  if (open) revealPet();
+  if (open) { changePetEffectBounds(null);revealPet(); }
   stopMovement();
   const base = currentPetBounds();
   panelLayout = 'compact';
@@ -568,6 +589,7 @@ function listen(channel, callback) {
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
   if (enabled === petMode) return petMode;
+  changePetEffectBounds(null);
 
   stopMovement();
   revealPet();
@@ -640,6 +662,7 @@ function showFromTray(home = false) {
 function markRendererReady(adopted) {
   if (typeof adopted !== 'boolean') return;
   hasPet = adopted;
+  if(!adopted)updateTrayStatus(null);
   refreshTrayMenu();
   // React calls this after painting its first correctly sized mode. It also
   // updates adoption state later, without reopening a window hidden to tray.
@@ -709,7 +732,7 @@ function createTray() {
   if (tray && !tray.isDestroyed()) return;
   const image = createTrayIcon(nativeImage, process.platform, iconPath);
   tray = new Tray(image);trayMenuKey='';
-  tray.setToolTip(process.platform==='win32'?'':'拉姆');
+  tray.setToolTip(trayTooltip);
   // On macOS, either mouse button opens the native status menu. Restoring on
   // click as well would open the pet while the user is trying to select Exit.
   if (process.platform !== 'darwin') {
@@ -719,7 +742,14 @@ function createTray() {
   refreshTrayMenu();
 }
 
+function updateTrayStatus(status){
+ const text=trayStatusText(status);if(text===trayTooltip)return;trayTooltip=text;
+ if(tray&&!tray.isDestroyed())tray.setToolTip(text);
+}
+
 function registerIPC() {
+  handle('desktop:set-pet-status',updateTrayStatus);
+  handle('desktop:set-pet-effect-bounds',changePetEffectBounds);
   handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
   handle('updates:open-release',()=>shell.openExternal('https://github.com/Vinci-217/mole-baby/releases/latest'));
   listen('desktop:minimize', hideToTray);

@@ -98,7 +98,7 @@ export default function DesktopCompanion(p: Props) {
   }, [p.onPanel]);
   const touchPet = () => {if(dockedRef.current){peek(true);return;} void window.desktop?.revealPet(); revealTools(); p.onPet(); };
   function down(e: PointerEvent<HTMLButtonElement>) {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || p.action.startsWith('element-')) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     if (p.panel) p.onPanel(null);
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;

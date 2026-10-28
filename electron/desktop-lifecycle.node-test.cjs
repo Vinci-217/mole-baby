@@ -90,6 +90,38 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   };
 }
 
+test('tray state refreshes while hidden, clears on farewell and rejects untrusted senders',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());
+ const pet={name:'小叶',stage:2,sleeping:false,stats:{hunger:80,thirst:90,cleanliness:70,happiness:60,health:100,energy:30}};
+ run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-status',pet);
+ assert.match(run.tray.tooltip,/小叶/);assert.match(run.tray.tooltip,/精力 30/);
+ run.send('desktop:hide-to-tray');run.invoke('desktop:set-pet-status',{...pet,sleeping:true,stats:{...pet.stats,energy:40}});
+ assert.equal(run.window.isVisible(),false);assert.match(run.tray.tooltip,/睡觉中/);assert.match(run.tray.tooltip,/精力 40/);
+ assert.throws(()=>run.handles.get('desktop:set-pet-status')({sender:{},senderFrame:{}},pet),/Untrusted/);
+ run.send('desktop:ready-to-show',false);assert.equal(run.tray.tooltip,'拉姆 · 等待领养');
+});
+
+for(const platform of ['win32','darwin','linux'])test(`${platform}: expanded spell host preserves anchor, respects screen edges and restores after completion/interruption`,async t=>{
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ const base=run.window.getBounds(),effect={x:-400,y:-800,width:1000,height:1200};
+ run.invoke('desktop:set-pet-effect-bounds',effect);
+ const bounds=run.window.getBounds(),state=run.invoke('desktop:get-state');
+ assert.equal(bounds.x+state.petOffset.x,base.x);assert.equal(bounds.y+state.petOffset.y,base.y);
+ assert.ok(bounds.width>base.width&&bounds.height>base.height);
+ assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=1920&&bounds.y+bounds.height<=1040);
+ assert.equal(state.effectExpanded,true);assert.equal(run.invoke('desktop:prepare-pet-drag'),false);
+ assert.equal(run.invoke('desktop:move-pet',40,40),false);
+ run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),base);
+ run.invoke('desktop:set-pet-effect-bounds',effect);run.invoke('desktop:set-companion-panel',true);
+ assert.equal(run.invoke('desktop:get-state').effectExpanded,false);
+ run.invoke('desktop:set-companion-panel',false);assert.deepEqual(run.window.getBounds(),base);
+ run.invoke('desktop:set-pet-effect-bounds',effect);run.invoke('desktop:set-pet-mode',false);
+ assert.equal(run.invoke('desktop:get-state').effectExpanded,false);
+ run.invoke('desktop:set-pet-mode',true);assert.deepEqual(run.window.getBounds(),base);
+ for(const bad of [{...effect,width:Infinity},{...effect,x:-5000},{...effect,height:0},[],true])assert.throws(()=>run.invoke('desktop:set-pet-effect-bounds',bad));
+});
+
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   assert.equal(run.app.name, '拉姆');
@@ -110,7 +142,7 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   run.send('desktop:ready-to-show', true);
   assert.equal(run.window.isVisible(), true);
   assert.deepEqual(run.window.getBounds(), { x: 1754, y: 792, width: 160, height: 240 });
-  assert.equal(run.tray.tooltip, '', 'Windows must not show a native horizontal tray tooltip');
+  assert.equal(run.tray.tooltip, '拉姆 · 等待领养');
   assert.equal(run.tray.image.template, false);
   assert.equal(path.basename(run.tray.image.path), 'tray.png');
 });

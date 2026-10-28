@@ -148,7 +148,7 @@ async function checkFourSeedColors() {
   await enterHome(page); await roomTab(page, '游戏'); await page.getByRole('button', { name: '开始翻牌', exact: true }).click();
   const beforeMemory = await save(page); await page.getByTestId('memory-start').click(); const kinds = await page.getByTestId('memory-card').evaluateAll(cards => cards.map(c => c.dataset.kind)); await page.waitForTimeout(3150); const pairs = {}; kinds.forEach((k, i) => (pairs[k] ??= []).push(i));
   for (const pair of Object.values(pairs)) { await page.getByTestId('memory-card').nth(pair[0]).click(); await page.getByTestId('memory-card').nth(pair[1]).click(); }
-  await page.getByTestId('memory-result').waitFor(); const afterMemory = await save(page); assert.equal(afterMemory.coins, beforeMemory.coins + 24); assert.equal(afterMemory.inventory.juice, beforeMemory.inventory.juice + 1); assert.ok(afterMemory.growth - beforeMemory.growth < .03, 'game grants no instant growth');
+  await page.getByTestId('memory-result').waitFor(); const afterMemory = await save(page); assert.equal(afterMemory.coins, beforeMemory.coins + 24); assert.equal(Object.keys(afterMemory.inventory).reduce((n,id)=>n+afterMemory.inventory[id]-(beforeMemory.inventory[id]??0),0),1); assert.ok(afterMemory.growth - beforeMemory.growth < .03, 'game grants no instant growth');
   await page.getByRole('button', { name: '收好奖励', exact: true }).click(); await page.getByRole('button', { name: '开始接果子', exact: true }).click(); const beforeFruit = await save(page); await page.getByTestId('fruit-game-start').click(); const arena = await page.getByTestId('game-arena').boundingBox(); assert.equal(await page.locator('.fruit-basket .action-play').count(), 0);
   const start = Date.now(); let feedbackSeen = false;
   while (!(await page.getByTestId('fruit-game-result').isVisible())) {
@@ -156,7 +156,7 @@ async function checkFourSeedColors() {
     if (fruits.length) await page.mouse.move(fruits[0].x, arena.y + arena.height * .9); if (await page.getByTestId('fruit-caught').count()) feedbackSeen = true; if (Date.now() - start > 35000) throw Error('Fruit game timed out'); await page.waitForTimeout(70);
   }
   assert.equal(Number(await page.locator('.fruit-result>p strong').textContent()), 10); assert.equal(feedbackSeen, true);
-  const afterFruit = await save(page); assert.equal(afterFruit.coins, beforeFruit.coins + 24); assert.equal(afterFruit.inventory.juice, beforeFruit.inventory.juice + 1); assert.ok(afterFruit.growth - beforeFruit.growth < .03);
+  const afterFruit = await save(page); assert.equal(afterFruit.coins, beforeFruit.coins + 24); assert.equal(Object.keys(afterFruit.inventory).reduce((n,id)=>n+afterFruit.inventory[id]-(beforeFruit.inventory[id]??0),0),1); assert.ok(afterFruit.growth - beforeFruit.growth < .03);
   await expect(page.getByText('接到的果子用于本局计分', { exact: false })).toBeVisible(); await page.screenshot({ path: path.join(artifacts, 'v6-contact-game.png') }); await page.getByRole('button', { name: '再来一局', exact: true }).click(); await page.keyboard.press('Escape'); assert.equal((await save(page)).completedGames, afterFruit.completedGames);
   console.log('PASS complete memory/catch games, contact feedback, actual rewards and no game-based growth');
 

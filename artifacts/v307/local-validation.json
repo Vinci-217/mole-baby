@@ -1,0 +1,100 @@
+{
+  "version": "0.30.7",
+  "baseCommit": "b8e84364ab9b57224dead8931c5893d0f609a19d",
+  "unitTests": {
+    "vitest": 339,
+    "node": 105
+  },
+  "host": "Linux cloud; old Windows OS not available",
+  "checks": {
+    "unit": {
+      "command": "npm test",
+      "exitCode": 0,
+      "logSha256": "2b6847a4b982db150c37085b6539f94c8319e1f284e2a01be6317ebac7fcfe4e",
+      "evidence": [
+        "PASS: ten checked downloads and isolated modern/legacy/Mac update channels match size and SHA512 digests",
+        "PASS: ten checked downloads and isolated modern/legacy/Mac update channels match size and SHA512 digests",
+        "ℹ tests 105",
+        "ℹ fail 0"
+      ]
+    },
+    "browser": {
+      "command": "node scripts/compact-care-regression.cjs",
+      "exitCode": 0,
+      "logSha256": "68532f222dc8168d1340d449c47774725a9cfdce62d48c0eba127ec62d17a6f0",
+      "evidence": [
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue",
+        "PASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works",
+        "PASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net",
+        "PASS: real UI dragging and visible release overshoot across five stages; seed pot stays upright",
+        "PASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards",
+        "PASS: real dizziness uses orbiting original pupils and recovers; calibrated 30 percent body exposure across eight forms and all four edges",
+        "PASS transparent hover: idle/food/play have no native title tooltips; bounded accessible hints clear on leave, focus, category, use and close",
+        "PASS backup file import: malformed/quota failure preserves pet, valid restore survives reload, stale imports cannot overwrite or resurrect a pet",
+        "PASS: nine actions, help/status, shared magic and outfit restoration, original furniture drag/save and room backgrounds, 18 complete original skills, one lesson per deadline, count-up cancellation and countdown completion records",
+        "PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist",
+        "PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, all 18 scrolling desktop entries, three apex casts with pure-white smoke and restored outfit",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory",
+        "PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node",
+        "PASS production compact desktop interaction and room surfaces without renderer errors"
+      ]
+    },
+    "nativeFull": {
+      "command": "node scripts/desktop-smoke.cjs",
+      "exitCode": 0,
+      "logSha256": "0ee91dfcc816e4fd5e7593d1077f080d3dcc2119338c5dc9d8a39030f4e0ab40",
+      "evidence": [
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue",
+        "PASS physical edge left",
+        "PASS physical edge right",
+        "PASS physical edge top",
+        "PASS physical edge bottom",
+        "PASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through",
+        "PASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works",
+        "PASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net",
+        "PASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books, balance and reversible illusion; persisted outings recall and return once without rewards",
+        "PASS: real dizziness uses orbiting original pupils and recovers; calibrated 30 percent body exposure across eight forms and all four edges",
+        "PASS: packaged updater settings/IPC, persisted toggle and renderer save checkpoint; disabled test contexts never contact live releases",
+        "PASS transparent hover: idle/food/play have no native title tooltips; bounded accessible hints clear on leave, focus, category, use and close; unused renderer top is alpha-transparent",
+        "PASS native update confirmation: download/install prompts render; Escape defers both without network, installer or restart",
+        "PASS: nine actions, help/status, shared magic and outfit restoration, original furniture drag/save and room backgrounds, 3 complete original skills, one lesson per deadline, count-up cancellation and countdown completion records",
+        "PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist",
+        "PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, all 18 scrolling desktop entries, three apex casts with pure-white smoke and restored outfit",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory",
+        "PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node",
+        "PASS native compact desktop regression"
+      ]
+    },
+    "nativeFinal": {
+      "command": "node scripts/desktop-smoke.cjs --spell-care-only",
+      "exitCode": 0,
+      "logSha256": "6f18938e8a6bcf8b8984250b5c27fcb98736b88b0adf68d96430e49a3f2f9560",
+      "evidence": [
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory"
+      ]
+    },
+    "legacyRuntime": {
+      "command": "Electron 22: node scripts/desktop-smoke.cjs --spell-care-only",
+      "exitCode": 0,
+      "logSha256": "11e053e323b1e1b2e0e28b5910e2a9cf47f3ee128bb88221d3ec5cf75190b8bd",
+      "evidence": [
+        "Compatibility runtime: { electron: '22.3.27', node: '16.17.1', chrome: '108.0.5359.215' }",
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory"
+      ]
+    }
+  },
+  "sourceFiles": {
+    "src/App.tsx": "f7f24d97afdacd40886ff61807235d68ae9e7c2113e0f84c389c8258eadbdae4",
+    "src/game.ts": "614cda139a38ab9cc79a6304f484b167829e0d28d69a9a3bea00d5a25994c8c9",
+    "src/pet-status.ts": "9d738a120d3593bcc3fa4f4c71c0c6586e4526c941a61a9296b93d2cee925a93",
+    "src/components/OriginalElementSkill.tsx": "dfb7e48006285e6c1cf2124487899966aff58300681c7bab27eebb008588ee57",
+    "electron/main.cjs": "1805a64a54f624e6ea744ab8560d0740d163c3e532be2eea75678cb6162a970f",
+    "electron/desktop-geometry.cjs": "7f1dbdfb4b0b3f13f9f670cf01c9af789586f917e097e1d0f78c65a07da62cc1",
+    "electron/tray-status.cjs": "33b9219acbc308ec4db1f7847181bb8fd06655206a49d45d6fa3af163b8b2d26",
+    "public/assets/original/element-skills/clips.json": "3b63f1345780a8b1ee8d185b2e4979513495dcaa191a8f2e6ee11c15c65080e7"
+  }
+}

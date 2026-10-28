@@ -1,6 +1,7 @@
 import {getStage,type GameState} from './game'
 import {elementSkillById} from './element-skills'
 import {reconcileCourseRewards} from './course-rewards'
+import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,unmetNeedReason} from './pet-status'
 
 const COURSE_DEFINITIONS=[
  {id:'language',name:'语言课',skill:'说中文',minutes:3,lessons:1,requires:null,icon:'language'},
@@ -62,11 +63,7 @@ export function activityBlockReason(pet:GameState,kind:'course'|'restaurant',id?
   if(c.requires&&!learned(pet,c.requires))return `先完成${courseById(c.requires)!.name}。`
   if(getStage(pet.growth,pet.evolution)<c.minStage)return '第五阶段的神力拉姆才能学习三系变身课。'
  }
- if(pet.stats.health<35)return '健康不足，先照料拉姆恢复到35以上。'
- if(pet.stats.energy<30)return '精力不足，先休息恢复到30以上。'
- if(pet.stats.hunger<25)return '肚子饿了，先喂食恢复到25以上。'
- if(pet.stats.thirst<25)return '有点口渴，先喝水恢复到25以上。'
- return null
+ return unmetNeedReason(pet.stats,kind==='restaurant'?RESTAURANT_REQUIREMENTS:ACTIVITY_REQUIREMENTS)
 }
 export function beginActivity(pet:GameState,kind:'course'|'restaurant',id?:CourseId,now=Date.now()){
  const c=courseById(id)

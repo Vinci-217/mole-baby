@@ -1,10 +1,9 @@
 import {useEffect,useRef} from 'react';
-import clips from '../../public/assets/original/element-skills/clips.json';
 import {TRANSFORMATION_TARGET_START} from '../magic-box';
-import visibility from '../../electron/edge-visibility.json';
 import type {RamForm} from '../original-actions';
+import {originalElementClip,elementEffectRect,elementDecodedBytes} from '../element-playback';
 
-export const originalElementClip=(id:string)=>clips[id as keyof typeof clips];
+export {originalElementClip};
 // A few decoded atlases fit old 32-bit machines; playing all eighteen skills
 // must not permanently retain every full-size transparent texture.
 const images=new Map<string,{pages:Promise<HTMLImageElement[]>;ready:Promise<void>}>();
@@ -17,7 +16,7 @@ function cached(id:string){
   const current=entry;void entry.ready.catch(()=>{if(images.get(id)===current)images.delete(id)});
  }
  images.delete(id);images.set(id,entry);
- while(images.size>3)images.delete(images.keys().next().value!);
+ while(images.size>1&&(images.size>3||[...images.keys()].reduce((n,key)=>n+elementDecodedBytes(key),0)>64*1024*1024))images.delete(images.keys().next().value!);
  return entry;
 }
 export const preloadElementSkill=(id:string)=>cached(id).ready;
@@ -34,11 +33,18 @@ export default function OriginalElementSkill({id,startedAt,form='super'}:{id:str
    const paint=(now:number)=>{
     if(!live)return;
     const frame=Math.min(clip.frames-1,Math.max(0,Math.floor((now-startedAt-TRANSFORMATION_TARGET_START)*clip.fps/1000))),index=clip.frameMap[frame];
-    if(previous!==frame){previous=frame;const cell=index%clip.pageFrames;ctx.clearRect(0,0,clip.cell,clip.cell);ctx.drawImage(pages[Math.floor(index/clip.pageFrames)],cell%clip.columns*clip.cell,Math.floor(cell/clip.columns)*clip.cell,clip.cell,clip.cell,0,0,clip.cell,clip.cell);canvas.dataset.sourceFrame=String(frame+1)}
+    if(previous!==frame){
+     previous=frame;
+     const [page,x,y,width,height,dx,dy]=clip.rectangles[index];
+     ctx.clearRect(0,0,clip.width,clip.height);
+     ctx.drawImage(pages[page],x,y,width,height,dx,dy,width,height);
+     canvas.dataset.sourceFrame=String(frame+1);
+    }
     request=requestAnimationFrame(paint);
    };request=requestAnimationFrame(paint);
   }).catch(()=>{});
   return()=>{live=false;cancelAnimationFrame(request)};
  },[id,startedAt,clip]);
- return clip?<canvas ref={ref} className="magic-box-layer original-element-skill" style={{left:'50%',top:`${visibility.forms[form].body[3]/108*100}%`,width:'160%',height:'auto',transform:`translate(-50%,-${226/288*100}%)`}} data-element-skill={id} width={clip.cell} height={clip.cell} aria-label={`原版${clip.name}变身`}/>:null;
+ const rect=elementEffectRect(id,form);
+ return clip&&rect?<canvas ref={ref} className="magic-box-layer original-element-skill" style={{left:`${rect.x}%`,top:`${rect.y/108*100}%`,width:`${rect.width}%`,height:'auto',transform:'none'}} data-element-skill={id} data-scale={clip.registration.scale} width={clip.width} height={clip.height} aria-label={`原版${clip.name}变身`}/>:null;
 }

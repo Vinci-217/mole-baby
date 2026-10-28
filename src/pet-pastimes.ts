@@ -2,6 +2,7 @@ import { getStage } from './game'
 import type { GameState } from './game'
 import type { OutfitId } from './wardrobe'
 import {learned} from './pet-school'
+import {PLAY_REQUIREMENTS,unmetNeedReason} from './pet-status'
 
 export const PASTIMES = ['read-alone','play-alone','spell','balance'] as const
 export type Pastime = typeof PASTIMES[number]
@@ -21,7 +22,13 @@ export const PASTIME_MEMORIES: Record<Pastime,string> = {
   balance:'我顶着小书练平衡，摇摇晃晃也没有放弃。',
 }
 export function mayPlay(pet: GameState): boolean {
-  return !pet.sleeping && !pet.outing && !pet.activity && pet.stats.health>35 && pet.stats.hunger>=30 && pet.stats.thirst>=30 && pet.stats.cleanliness>=30 && pet.stats.energy>=30
+  return playBlockReason(pet)===null
+}
+export function playBlockReason(pet:GameState):string|null{
+  if(pet.sleeping)return '拉姆正在睡觉，先轻轻叫醒它。'
+  if(pet.outing)return '拉姆正在外出，先叫它回来。'
+  if(pet.activity)return '先完成或结束当前课程、工作。'
+  return unmetNeedReason(pet.stats,PLAY_REQUIREMENTS)
 }
 /** A local illusion uses original clothes; it never buys, unlocks or overwrites the wardrobe. */
 export function spellCostume(petId: number, now = Date.now()): OutfitId {

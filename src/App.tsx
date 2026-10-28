@@ -1,7 +1,9 @@
 import UpdateSettings from './components/UpdateSettings';
+import {useDesktopPetStatus} from './use-desktop-pet-status';
+import {elementEffectRect} from './element-playback';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
-import { COLORS, FOODS, STAGES, EVOLUTIONS, GROWTH_MAX, evolvePet, changePetStage, GROWTH_STAGE_HOURS, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
+import { COLORS, STAGES, EVOLUTIONS, GROWTH_MAX, evolvePet, changePetStage, GROWTH_STAGE_HOURS, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
 import type { Action, GameState, PetColor, Evolution, Stage } from './game';
 import Ram from './components/Ram';
 import FruitGame from './components/FruitGame';
@@ -45,7 +47,7 @@ import { createInvitation, companionSnoozeUntil } from './companion-invitation';
 import type { CompanionInvitation } from './companion-invitation';
 import { getPetHabits, nameResponse } from './companion-instinct';
 import {claimDailyCheckIn,checkedInToday} from './daily-check-in';
-import {isPastime,mayPlay,beginOuting,finishOuting,PASTIME_LINES,PASTIME_MEMORIES} from './pet-pastimes';
+import {isPastime,playBlockReason,beginOuting,finishOuting,PASTIME_LINES,PASTIME_MEMORIES} from './pet-pastimes';
 import type {Pastime} from './pet-pastimes';
 import PetPastimes from './components/PetPastimes';
 import {elementSkillById,learnedElementSkill} from './element-skills';
@@ -251,7 +253,9 @@ export default function App() {
     const saved=petRef.current;if(!saved)return;const next=x===undefined?removeFurniture(saved,id):placeFurniture(saved,id,x,y!);petRef.current=next;setPet(next);
   }
   function startPastime(kind:Pastime){
-    const saved=petRef.current;if(!saved||!mayPlay(saved)||timer.running||Date.now()<careUntil.current||Date.now()<dizzyUntil.current)return;
+    const saved=petRef.current;if(!saved)return;
+    const reason=playBlockReason(saved);if(reason){notify(reason);return;}
+    if(timer.running||Date.now()<careUntil.current||Date.now()<dizzyUntil.current){notify('先结束当前互动或专注计时吧。');return;}
     if(kind==='spell'&&!learned(saved,'magic')){notify('先到拉姆学院学会魔术，再展示变身本领吧。');return}
     clearInvitation();if(!floating)setPanel(null);preparePetSound(prefs.sound);animate(kind);pastimeRun.current={petId:saved.createdAt,kind};
     if(prefs.presence&&!prefs.quiet)speak(PASTIME_LINES[kind],9500);
@@ -262,7 +266,7 @@ export default function App() {
   }
   function startOuting(manual=false,sequence=0){
     const saved=petRef.current;if(!saved||saved.activity||timer.running||Date.now()<careUntil.current||Date.now()<dizzyUntil.current)return false;
-    const next=beginOuting(saved,sequence,Date.now(),manual);if(!next){if(manual)notify(getStage(saved.growth,saved.evolution)===0?'小花盆先留在家，长成初级再去逛逛吧。':'先吃饱喝足、恢复精神，再去逛逛。');return false}
+    const next=beginOuting(saved,sequence,Date.now(),manual);if(!next){if(manual)notify(getStage(saved.growth,saved.evolution)===0?'小花盆先留在家，长成初级再去逛逛吧。':playBlockReason(saved)??'暂时不能外出，请稍后再试。');return false}
     clearInvitation();if(manual)setPanel(null);pastimeRun.current=null;clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setCareFeedback(null);
     petRef.current=next;setPet(next);speak(`我去${next.outing!.place}逛逛，过几分钟就回来。想我了就叫我！`,12000);
     setMemory(m=>m?recordEvent(m,{kind:'outing-start',detail:`我出发去了${next.outing!.place}，约好几分钟后回来。`}):m);return true;
@@ -330,6 +334,16 @@ export default function App() {
     if(offer&&offer.petId===current.createdAt&&Date.now()-offer.at<5*60000&&bubble===offer.offer.text){void openPanel('play');return;}
     setBubbleVisible(false);
   }
+  useDesktopPetStatus(pet);
+  const effectId=action.startsWith('element-')?action.slice(8):null;
+  const previousEffectMode=useRef(floating);
+  useEffect(()=>{
+    const changedMode=previousEffectMode.current!==floating;previousEffectMode.current=floating;
+    const interrupted=Boolean(effectId&&(changedMode||panel!==null||game!==null));
+    if(interrupted)finishPerformance();
+    const rect=!interrupted&&petMode&&effectId?elementEffectRect(effectId,ramForm(stage,pet?.evolution)):null;
+    void window.desktop?.setPetEffectBounds?.(rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
+  },[effectId,petMode,stage,pet?.evolution,floating,panel,game]);
   useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(ramForm(stage,pet?.evolution));},[hasPet,stage,pet?.evolution]);
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !pet?.sleeping && !pet?.outing && !pet?.activity); }, [hasPet,pet?.sleeping,pet?.outing,pet?.activity,stage]);
   useEffect(()=>{
@@ -488,10 +502,10 @@ export default function App() {
     if (!saved) return { ok: false, coins: 0, growth: 0, food: 0, message: '当前没有可领取奖励的拉姆。' };
     const safeScore = Number.isFinite(score) ? Math.floor(Math.max(0,Math.min(10,score))) : 0;
     const before = tick(saved, now), result = rewardGame(before, safeScore, now);
-    const food = FOODS[safeScore >= 8 ? 2 : safeScore >= 5 ? 1 : 0];
+    const food = result.rewardItem;
     apply(result, 'reward', `我们一起在${roomMedia.background.label}完成了《${game ? GAME_LABELS[game] : '小屋游戏'}》，得到${safeScore}分，收获${result.state.coins-before.coins}摩尔豆。`);
     return { ok: result.ok, coins: result.state.coins - before.coins, growth: Math.round((result.state.growth - before.growth) * 100) / 100,
-      food: (result.state.inventory[food.id] ?? 0) - (before.inventory[food.id] ?? 0), message: result.message };
+      food: food ? (result.state.inventory[food.id] ?? 0) - (before.inventory[food.id] ?? 0) : 0, itemId:food?.id, message: result.message };
   }
 
   const mood = getCompanionMood(currentMemory, current);

@@ -73,3 +73,16 @@ function compactPanelBounds(base, area) {
   return {bounds:{x:hostX,y:hostY,width:Math.max(base.x+PET_SIZE.width,x+width)-hostX,height:Math.max(base.y+PET_SIZE.height,y+height)-hostY},panelSide:side,geometry:{petX:base.x-hostX,petY:base.y-hostY,panelX:x-hostX,panelY:y-hostY,panelWidth:width,panelHeight:height,scale:1}};
 }
 module.exports.compactPanelBounds=compactPanelBounds;
+
+/** Expand the transparent host, keeping the pet's screen anchor unchanged.
+ * Only the physical display clips effects; their scale never depends on it. */
+function effectWindowBounds(base,area,effect){
+ // Reserve a few pixels for fractional CSS registration and antialiased ink.
+ const margin=4;
+ const x=Math.floor(Math.min(base.x,Math.max(area.x,base.x+effect.x-margin)));
+ const y=Math.floor(Math.min(base.y,Math.max(area.y,base.y+effect.y-margin)));
+ const right=Math.ceil(Math.max(base.x+PET_SIZE.width,Math.min(area.x+area.width,base.x+effect.x+effect.width+margin)));
+ const bottom=Math.ceil(Math.max(base.y+PET_SIZE.height,Math.min(area.y+area.height,base.y+effect.y+effect.height+margin)));
+ return {x,y,width:right-x,height:bottom-y};
+}
+module.exports.effectWindowBounds=effectWindowBounds;
