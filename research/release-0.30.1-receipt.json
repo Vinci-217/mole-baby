@@ -1,0 +1,75 @@
+{
+  "version": "0.30.1",
+  "tag": "v0.30.1",
+  "sourceSha": "e5ea6dee8a18ea363c171900297fcc5748715993",
+  "buildResult": "success",
+  "platforms": {
+    "windows": "success",
+    "legacyWindows": "success",
+    "mac": "success"
+  },
+  "releaseResult": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40629997837",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.30.1",
+  "downloads": [
+    {
+      "file": "mole-baby-0.30.1-legacy-ia32.zip",
+      "sha256": "3099767f29393aa1270382902ae5c7c9fe3f093b3ea148b26e580474b1c2f9a5"
+    },
+    {
+      "file": "mole-baby-0.30.1-legacy-ia32-Setup.exe",
+      "sha256": "b4c16baa032ea303415adc0a26359c2cd3dd866129ca1c2141d7eacd2fe983c9"
+    },
+    {
+      "file": "mole-baby-0.30.1-legacy-x64.zip",
+      "sha256": "ac12b52daf9338deb91d9a55b332b30caa07c917aedf596e5fed9b7326b73151"
+    },
+    {
+      "file": "mole-baby-0.30.1-legacy-x64-Setup.exe",
+      "sha256": "66c838e8c5ab7bde14f231e80c68af51904d805f0c7cffa0618bdfd7a185142b"
+    },
+    {
+      "file": "mole-baby-0.30.1-mac-arm64.dmg",
+      "sha256": "952b95a5c4ba9232f9483525c0cdc46a5d8ce711919c8d29f1af49d5d1eaa2a4"
+    },
+    {
+      "file": "mole-baby-0.30.1-mac-arm64.zip",
+      "sha256": "dad8a7b2604380edb645d6b2cc0dcfd5c701484a32fc3b578056d4b0b7f508d0"
+    },
+    {
+      "file": "mole-baby-0.30.1-mac-x64.dmg",
+      "sha256": "2dabbe945193d2caf5153c11b5917ea8b9cf3e1d428d064e455db2f4ed9863fa"
+    },
+    {
+      "file": "mole-baby-0.30.1-mac-x64.zip",
+      "sha256": "5672bb025cbe0c271e2cceebce2fb5e28ec6d3682a1a02d264fa783ea5149dea"
+    },
+    {
+      "file": "mole-baby-0.30.1-x64.zip",
+      "sha256": "537c927181651bc287ea6492f2d338e094351136042389a6ee8b239ba9daae9d"
+    },
+    {
+      "file": "mole-baby-0.30.1-Setup.exe",
+      "sha256": "28a52e806e1aee4bea380e33232cede15ffbd7994ff07c51c8d5e9b1ea5b4c46"
+    }
+  ],
+  "macTrust": {
+    "arm64": {
+      "architecture": "arm64",
+      "sourceSha": "e5ea6dee8a18ea363c171900297fcc5748715993",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "e5ea6dee8a18ea363c171900297fcc5748715993",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "recordedAt": "2026-10-28T04:13:33.329Z"
+}
