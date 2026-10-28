@@ -46,7 +46,7 @@ async function verifyWorkflow(page,{full=false}={}){
   await page.clock.install();clockInstalled=true;
   // One completed lesson unlocks its whole school once across a real reload.
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));p.education.lessons['element-fire']=0;delete p.education.graduated['element-fire'];p.lastTick=Date.now();localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))});await page.reload();await enterHome(page);await roomTab(page,'学院');await page.locator('.school-course-grid article').filter({hasText:'火系变身课'}).getByRole('button',{name:'上这一课',exact:true}).click();
-  await page.clock.fastForward(240100);await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);await page.reload();await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);
+  await page.clock.fastForward(180100);await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);await page.reload();await expect.poll(async()=>(await save()).education.lessons['element-fire']).toBe(1);
   await enterHome(page);await roomTab(page,'学院');await expect(page.locator('.school-course-grid article').filter({hasText:'火系变身课'}).locator('.element-skill-list button:not(:disabled)')).toHaveCount(6);
   await roomTab(page,'设置');await page.getByLabel('计时方向',{exact:true}).selectOption('countup');await page.getByLabel('提醒间隔',{exact:true}).fill('1');
   // Keep native UI latency out of the three-second timer fixture.

@@ -45,13 +45,13 @@ async function verifyRoomUpgrade(page){
   await roomTab(page,'设置');const music=page.getByRole('checkbox',{name:'播放背景音乐',exact:true});await music.uncheck();await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.check();await expect.poll(audio).toBeLessThan(3);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'背景音乐',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
   const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await background.check();await toDesktop(page);
-  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=14});await enterHome(page);await expect.poll(audio).toBeLessThan(3);
+  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=14});await enterHome(page);await expect.poll(audio).toBeGreaterThanOrEqual(14);
   // A previous one-session save is already graduated, without another class.
   await roomTab(page,'学院');let language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));delete p.education;p.lastTick=Date.now();localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))});
   // Earlier workflow checks may already have advanced this page's clock.
   // Reinstalling at wall time would make its saved lastTick look future-dated.
-  await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await page.reload();await enterHome(page);await roomTab(page,'学院');await language.getByRole('button',{name:'上这一课',exact:true}).click();await page.clock.fastForward(120150);
+  await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await page.reload();await enterHome(page);await roomTab(page,'学院');await language.getByRole('button',{name:'上这一课',exact:true}).click();await page.clock.fastForward(180150);
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).education?.lessons.language)).toBe(1);
   await page.reload();await enterHome(page);await roomTab(page,'学院');await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);
   console.log('PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist');

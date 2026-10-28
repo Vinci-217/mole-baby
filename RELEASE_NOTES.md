@@ -1,27 +1,23 @@
-拉姆 v0.30.4 · 一次学会、小屋移动与音乐重播
+拉姆 v0.30.5 · 三分钟课程、结业法杖与桌面法术
 
-- 每门课程完成一节即可掌握并获得证书，不能重复报读。火、水、木各学一次即可使用本系全部六个变身；旧存档有效进度完成过至少一节就自动结业，已有证书日期保留。
-- 小屋支持点击地面活动区移动，途中再次点击可改向。初中级走动，高级、神力飞行，种子响应用户指令小跳；不会走上墙或钻进功能栏。睡觉、上课、互动或打开面板时停下，家具布置继续保持原来的拖动操作。键盘聚焦地面后可用方向键，减少动态效果时直接到达。
-- 重新进入小屋、暂停后重新播放音乐时从头开始，普通点击不会重置曲目。后台播放开关默认关闭，托盘音乐控制继续保留。
-- 经确认的中级双叶待机：平视陪伴、短眨眼、轻摆叶片；去掉无人互动时持续游移的眼睛，鼠标靠近时才轻轻看过来。
-- Mac 更新请求不复用旧网络缓存，下载后明确提示打开 DMG、替换「应用程序」里的旧拉姆、退出旧版再重开。当前本地签名包仍需手动完成应用替换，不是静默安装。
+- 所有课程统一3分钟，完成一次即掌握。学习时小屋和桌面都显示进度条、倒计时，重开继续，结束显示学习完成；旧版进行中的课程保留已学时间，已按旧规则到期的直接结算。
+- 魔法法杖改为魔法入门课结业奖励，自动放进衣橱，不能购买。已结业的旧存档自动补发；未结业且以前买过的旧法杖收回并退还65摩尔豆，结业后再获得。奖励不重复发放。
+- 学会火、水、木课程后，桌面「一起玩耍」向下滚动即可找到18个法术；在神力形态直接施放，结束恢复原形、原色和装扮。
+- 重新导出三系完整1,711个原始时间帧，以少量平滑镜头校准准备、施法与收尾的比例，避免小角色被巨大特效的包围框压成小点；按当前形态校准落点。共用变身烟雾渲染为纯白，轮廓和透明度保留。
+- BGM正在播放时进入小屋继续原进度；暂停、关闭或未播放后重新启动，才从头播放。普通点击不会重置音乐。后台播放默认关闭，仍可从设置和托盘控制。
 
 ## 下载与安装
 
 | 你的电脑 | 下载这个文件 |
 | --- | --- |
-| Windows10/11，64位 | `mole-baby-0.30.4-Setup.exe`，双击安装 |
-| Windows7 SP1／8／8.1，64位 | `mole-baby-0.30.4-legacy-x64-Setup.exe` |
-| Windows7 SP1／8／8.1，32位 | `mole-baby-0.30.4-legacy-ia32-Setup.exe` |
-| Mac，Apple芯片（M系列） | `mole-baby-0.30.4-mac-arm64.dmg` |
-| Mac，Intel芯片 | `mole-baby-0.30.4-mac-x64.dmg` |
+| Windows10/11，64位 | `mole-baby-0.30.5-Setup.exe`，双击安装 |
+| Windows7 SP1／8／8.1，64位 | `mole-baby-0.30.5-legacy-x64-Setup.exe` |
+| Windows7 SP1／8／8.1，32位 | `mole-baby-0.30.5-legacy-ia32-Setup.exe` |
+| Mac，Apple芯片（M系列） | `mole-baby-0.30.5-mac-arm64.dmg` |
+| Mac，Intel芯片 | `mole-baby-0.30.5-mac-x64.dmg` |
 
-Mac 打开DMG后，把「拉姆」拖到「应用程序」，覆盖时选择替换；从状态栏退出旧拉姆，再打开新版。遇到Apple验证提示，先看本页附件 `mole-baby-mac-help.html`。Mac12或更新系统受支持。
+Mac 打开DMG后，把「拉姆」拖到「应用程序」，覆盖时选择替换；从状态栏退出旧拉姆，再打开新版。遇到Apple验证提示，先看附件 `mole-baby-mac-help.html`。Mac12或更新系统受支持。
 
-ZIP 是对应系统的便携/归档包。不要下载底部的 Source code ZIP，那是开发源代码。Windows兼容版与常规版运行时不同，安装选择和迁移请看 [Windows说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.4/docs/WINDOWS.md)。
+ZIP是对应系统的便携/归档包。不要下载底部的Source code ZIP，那是源代码。Windows安装版确认后可更新并重启；当前本地签名Mac版仍需打开DMG手动替换应用。关闭窗口只是缩到托盘，完全退出后启动约8秒检查新版。旧版检测不到时，从本页下载安装包覆盖安装，原存档保留。
 
-## 已安装用户如何更新
-
-完全退出再启动约8秒后检查新版，发现后先确认下载，再确认安装；关闭窗口只是缩到托盘。Windows安装版可确认更新并重启；当前Mac版确认后打开DMG，还需手动替换应用，打开DMG本身不等于安装完成。若旧版检测失败，请从本页下载对应安装包覆盖安装，本地宠物存档保留。
-
-[更新流程](https://github.com/Vinci-217/mole-baby/blob/v0.30.4/docs/UPDATES.md) · [课程与小屋玩法](https://github.com/Vinci-217/mole-baby/blob/v0.30.4/docs/COURSES.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.30.4-validation.md)
+[课程与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.30.5/docs/COURSES.md) · [更新说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.5/docs/UPDATES.md) · [动画与预览](https://github.com/Vinci-217/mole-baby/blob/v0.30.5/README.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.30.5-validation.md)

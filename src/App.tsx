@@ -49,8 +49,8 @@ import {isPastime,mayPlay,beginOuting,finishOuting,PASTIME_LINES,PASTIME_MEMORIE
 import type {Pastime} from './pet-pastimes';
 import PetPastimes from './components/PetPastimes';
 import {elementSkillById,learnedElementSkill} from './element-skills';
-import RamSchoolPanel,{RestaurantCard} from './components/RamSchoolPanel';
-import {activityAction,activityName,beginActivity,cancelActivity,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
+import RamSchoolPanel,{RestaurantCard,ActivityCard} from './components/RamSchoolPanel';
+import {activityAction,beginActivity,cancelActivity,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
 import {RoomFurnishingLayer,RoomFurnishingEditor} from './components/RoomFurnishings';
 import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup} from './pet-backup';
 import {buyFurniture,placeFurniture,removeFurniture,hasRoomWall} from './room-furnishings';
@@ -103,6 +103,7 @@ export default function App() {
   const pendingCareFeedback=useRef<CareFeedbackData|null>(null);
   const lastTug=useRef(0);
   const [action, setAction] = useState('idle');
+  const [courseCompletion,setCourseCompletion]=useState('');
   const [petMode, setPetMode] = useState(false);
   const [preview, setPreview] = useState(() => !window.desktop && readSave() !== null);
   const [actionId, setActionId] = useState(0);
@@ -122,7 +123,7 @@ export default function App() {
   const [memorySaveError, setMemorySaveError] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const petRef = useRef(pet); petRef.current = pet;
-  const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout>; feedback?: ReturnType<typeof setTimeout> }>({});
+  const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout>; feedback?: ReturnType<typeof setTimeout>;course?:ReturnType<typeof setTimeout> }>({});
   const ambient = useRef<{line:PresenceLine;at:number}|null>(null);
   const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
   const pastimeRun=useRef<{petId:number;kind:Pastime}|null>(null);
@@ -154,7 +155,7 @@ export default function App() {
 
   const speak = useCallback((text: string, duration = 6500) => { ambient.current = null; setBubble(text); setBubbleVisible(true); clearTimeout(timers.current.bubble); timers.current.bubble = setTimeout(() => setBubbleVisible(false), duration); }, []);
   const notify = useCallback((text: string) => { setToast(text); clearTimeout(timers.current.toast); timers.current.toast = setTimeout(() => setToast(''), 3800); }, []);
-  useEffect(() => { clearInvitation(); suggestionSequence.current=0; nameSequence.current=0; nameCallUntil.current=0; }, [pet?.createdAt]);
+  useEffect(() => { setCourseCompletion('');clearTimeout(timers.current.course);clearInvitation(); suggestionSequence.current=0; nameSequence.current=0; nameCallUntil.current=0; }, [pet?.createdAt]);
   useEffect(() => { if(pet?.sleeping||prefs.quiet)clearInvitation(); }, [pet?.sleeping,prefs.quiet]);
   useEffect(() => {
     if (!invitation) return;
@@ -217,8 +218,9 @@ export default function App() {
   useEffect(()=>{
     const before=previousActivity.current;previousActivity.current=pet?.activity;
     if(!pet||!before||!before.id.startsWith(`${pet.createdAt}:`)||pet.activity?.id===before.id||Date.now()<before.endsAt)return;
-    const c=courseById(before.course),text=before.kind==='restaurant'?`工作完成！摩尔豆 +${JOB_PAY}`:learned(pet,c!.id)?`${c!.name}结业啦！证书可以挂到小屋墙上。`:`${c!.name}这一节完成啦，下次继续。`;
+    const c=courseById(before.course),text=before.kind==='restaurant'?`工作完成！摩尔豆 +${JOB_PAY}`:before.course==='magic'?'魔法课学习完成！获得魔法法杖，已放进衣橱。':`${c!.name}学习完成！已掌握。`;
     notify(text);speak(text);playGameSound('reward',prefs.sound);
+    if(before.kind==='course'){setCourseCompletion(text);clearTimeout(timers.current.course);timers.current.course=setTimeout(()=>setCourseCompletion(''),6500)}
     if(before.kind==='restaurant'){
       clearTimeout(timers.current.feedback);setBubbleVisible(false);setCareFeedback({id:Date.now(),petId:pet.createdAt,gains:[{key:'coins',label:'摩尔豆',amount:JOB_PAY,image:'./assets/original/ui/icon-medal.png'}]});timers.current.feedback=setTimeout(()=>setCareFeedback(null),2300);
     }
@@ -228,7 +230,7 @@ export default function App() {
     const saved=petRef.current;if(!saved)return;
     if(schoolBusy){notify('先结束正在进行的互动或专注计时吧。');return;}
     const result=beginActivity(tick(saved),kind,id);if(!result.ok){notify(result.message);return;}
-    clearInvitation();pastimeRun.current=null;clearTimeout(timers.current.animation);setActionId(n=>n+1);setPanel(null);apply(result);setAction('idle');
+    setCourseCompletion('');clearInvitation();pastimeRun.current=null;clearTimeout(timers.current.animation);setActionId(n=>n+1);setPanel(null);apply(result);setAction('idle');
   }
   function stopActivity(){
     const saved=petRef.current;if(!saved?.activity)return;
@@ -242,7 +244,7 @@ export default function App() {
   function showElementSkill(id:string){
     const saved=petRef.current,skill=elementSkillById(id);if(!saved||!skill||!learnedElementSkill(saved,id)||schoolBusy||saved.sleeping||saved.activity||saved.outing)return;
     pastimeRun.current=null;clearTimeout(timers.current.animation);
-    setPanel(null);animate(`element-${id}`);speak(`看我新学会的${skill.name}！`);
+    setPanel(null);setBubbleVisible(false);animate(`element-${id}`);
   }
   useEffect(()=>{if(panel!=='decor')return;const close=(event:KeyboardEvent)=>{if(event.key==='Escape')setPanel(null)};document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close)},[panel]);
   function updateFurniture(id:string,x?:number,y?:number){
@@ -520,7 +522,7 @@ export default function App() {
     <DesktopCompanion pocketContent={pocket} moodBusy={interactionBusy} moodLabel={mood.label} onMood={respondMood} onActionEnd={finishPerformance} pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={spokenBubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['food','play'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
       sound={prefs.sound} timerDirection={prefs.timerDirection} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} playInvitation={playInvitation}
-      onPanel={next => { if (next === 'food') setPocketCategory('status'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onWork={()=>startActivity('restaurant')} onSchool={()=>void enterHome('school')} magicLearned={learned(current,'magic')} onMagic={()=>showSkill('magic')} onShop={visitShop} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
+      onPanel={next => { if (next === 'food') setPocketCategory('status'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onWork={()=>startActivity('restaurant')} onSchool={()=>void enterHome('school')} courseCompletion={courseCompletion} onElementSkill={showElementSkill} magicLearned={learned(current,'magic')} onMagic={()=>showSkill('magic')} onShop={visitShop} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;
 
@@ -533,7 +535,7 @@ export default function App() {
       <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button className="room-change-button" onClick={() => setPanel(p=>p==='decor'?null:'decor')}>{panel==='decor'?'完成布置':'布置小屋'}</button><button className="daily-check-in" disabled={checkedInToday(current)} onClick={checkIn} aria-label={checkedInToday(current)?"今日已签到":"每日签到领取1000摩尔豆"}>{checkedInToday(current)?"今日已签到":"签到 +1000 豆"}</button><span className="coin-sign">{current.coins} 摩尔豆</span><button className="game-button" onClick={() => void toDesktop()}>回到桌面</button></div>}</div>
       {pet && panel!=='decor' && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
         <RoomWalker stage={stage} evolution={current.evolution} blocked={interactionBusy||panel!==null||game!==null||reset}>{walkAction=><div className={`scene-pet ${current.outing?"pet-is-away":""}`}><CareFeedback feedback={panel==='food'||panel==='status'?null:careFeedback?.petId===current.createdAt?careFeedback:null}/>{bubbleVisible && <button type="button" className="scene-bubble visible" aria-label="收起拉姆提示" onClick={respondToBubble}><span role="status">{spokenBubble}</span></button>}<button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram companionId={current.createdAt} costume={current.wearing} onActionEnd={action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)?finishPerformance:undefined} sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={walkAction??(timer.running && action === 'idle' ? 'focus' : renderedAction)} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button><span className="scene-pet-name">{current.outing&&<button className="game-button small" onClick={()=>recallPet()}>去{current.outing.place}了 · 叫回来</button>}{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>}</RoomWalker>
-        {current.activity&&<div className="school-scene-status" role="status">{activityName(current.activity)} · <button onClick={stopActivity}>结束活动</button></div>}
+        {(current.activity||courseCompletion)&&<div className="school-scene-status">{current.activity?<ActivityCard pet={current} onCancel={stopActivity}/>:<span role="status">{courseCompletion}</span>}</div>}
         <nav className="classic-dock room-dock" aria-label="小屋功能">
           <button aria-label="我的拉姆" onClick={() => setPanel('status')}><UiArt name="status-health"/><b>状态</b></button>
           <button aria-label="打开背包" onClick={() => { setPocketCategory('food'); setPanel('food'); }}><UiArt name="toolbar-bag-normal"/><b>背包</b></button>

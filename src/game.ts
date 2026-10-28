@@ -1,5 +1,6 @@
 import { ITEMS, getItem } from './catalog';
 import {normalizeWardrobe} from './wardrobe';
+import {reconcileCourseRewards} from './course-rewards';
 import type {OutfitId} from './wardrobe';
 import type { PetItem } from './catalog';
 import {normalizeCheckIn} from './daily-check-in';
@@ -396,7 +397,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
     const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
     const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity(value.activity,{createdAt:value.createdAt,education,growth:value.growth,evolution:value.evolution as Evolution|undefined},now):undefined;
-    return tick({
+    return tick(reconcileCourseRewards({
       version: 1,
       name: value.name.trim(),
       color: value.color as PetColor,
@@ -418,7 +419,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       ...(importedOuting?{outing:importedOuting}:{}),
       ...(education?{education}:{}),...(activity?{activity}:{}),...(room?{room}:{}),
       ...(isIntegerIn(value.lastOutingAt,value.createdAt,now+300000)?{lastOutingAt:value.lastOutingAt}:{}),
-    }, now);
+    }), now);
   } catch {
     return null;
   }

@@ -20,7 +20,7 @@ export default function SharedMagicBox({children,startedAt,onEnd,target,targetDu
   return()=>{live=false;cancelAnimationFrame(request)};
  },[startedAt,timeline,duration,prepare]);
  const entry=timeline[Math.min(frame,timeline.length-1)];
- return <span className="magic-box-performance" role="img" aria-label={label} data-magic-frame={frame} data-magic-subject={ready?entry.subject:'original'}>
+ return <span className="magic-box-performance" role="img" aria-label={label} data-ready={ready} data-magic-frame={frame} data-magic-subject={ready?entry.subject:'original'}>
   <span className="magic-box-original" aria-hidden={ready&&entry.subject==='box'} style={{opacity:ready&&entry.subject==='box'?0:1}}>{children}</span>
   {ready&&entry.subject==='box'&&(typeof target==='function'?target(playbackStart):target??<img className="magic-box-layer" alt="" draggable={false} src={magicBoxImage('box',entry.box)}/>)}
   {ready&&entry.smoke!==null&&<img className="magic-box-layer magic-box-smoke" alt="" draggable={false} src={magicBoxImage('smoke',entry.smoke)}/>}

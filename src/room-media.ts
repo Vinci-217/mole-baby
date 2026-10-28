@@ -105,7 +105,6 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
   const nativeVisible = useRef(true);
   const customUrl = useRef<string | null>(null);
   const generation = useRef(0);
-  const previouslyInRoom = useRef(inRoom);
   active.current = hasPet && (inRoom || settings.backgroundPlayback) && settings.musicEnabled;
   const backgroundAllowed = useRef(settings.backgroundPlayback); backgroundAllowed.current = settings.backgroundPlayback;
   const update = useCallback((change: Partial<RoomMediaPreferences>) => {
@@ -161,8 +160,6 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     };
   }, [source, customLoaded, resumeMusic]);
   useEffect(() => {
-    const entering=inRoom&&!previouslyInRoom.current;previouslyInRoom.current=inRoom;
-    if(entering&&audio.current)try{audio.current.currentTime=0}catch{ /* Metadata may still be loading. */ }
     if (active.current) resumeMusic();
     else audio.current?.pause();
   }, [inRoom, hasPet, settings.musicEnabled, settings.backgroundPlayback, resumeMusic]);

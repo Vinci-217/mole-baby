@@ -6,7 +6,9 @@ import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
 import {isMoodAction} from '../mood-motion';
 import {isPastime} from '../pet-pastimes';
-import {isSchoolAction,activityName} from '../pet-school';
+import {isSchoolAction,learned,type CourseId} from '../pet-school';
+import ActivityCountdown from './ActivityCountdown';
+import {ELEMENT_TYPES,elementSkillsForCourse,learnedElementSkill} from '../element-skills';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CareFeedback from './CareFeedback';
@@ -17,6 +19,7 @@ import type {PocketCategory} from './CarePocket';
 export type CompanionPanel = 'food' | 'play';
 interface Props {
   moodLabel:string;moodBusy:boolean;onMood:()=>void; pocketContent:ReactNode;
+  courseCompletion:string;onElementSkill:(id:string)=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
   native: boolean; desktopState: DesktopState; sound: boolean;
@@ -82,7 +85,7 @@ export default function DesktopCompanion(p: Props) {
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  const selfBusy=isPastime(p.action)||Boolean(p.pet.outing);
+  const selfBusy=isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
   useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null || selfBusy); }, [tools, dragging, p.panel,docked,selfBusy]);
   useEffect(()=>{if(p.desktopState.mouseThrough){setTools(false);if(p.panel)p.onPanel(null)}},[p.desktopState.mouseThrough,p.panel]);
   useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
@@ -148,7 +151,7 @@ export default function DesktopCompanion(p: Props) {
   const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
     <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('food'); }}>
-      <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/>{p.bubbleVisible&&!docked&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
+      <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/>{p.bubbleVisible&&!docked&&!p.pet.activity&&!p.courseCompletion&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.sleeping ? '睡着了 · 叫醒' : p.pet.name}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         <Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={displayAction==='play'||isMoodAction(displayAction)||isPastime(displayAction)||isSchoolAction(displayAction)?p.onActionEnd:undefined}/>
@@ -160,7 +163,7 @@ export default function DesktopCompanion(p: Props) {
         <button className={`timer-tool ${p.timerRunning?'running':''}`} aria-label={p.timerRunning?'取消计时':'开始计时'} aria-pressed={p.timerRunning} disabled={!p.reminders} onClick={p.onFocus}><Icon path={icons.timer}/>{p.timerRunning&&<span className="tool-countdown" role="timer" aria-label={p.timerDirection==='countup'?'专注正向计时':'专注倒计时'}>{reminderTime(p.reminderSeconds)}</span>}</button>
         <button aria-label="进入小屋" onClick={p.onHome}><Icon path={icons.home}/></button>
       </nav></>}
-      {p.pet.activity&&<span className="school-desktop-status">{activityName(p.pet.activity)}</span>}
+      {(p.pet.activity||p.courseCompletion)&&!docked&&<div className="school-desktop-status">{p.pet.activity?<ActivityCountdown activity={p.pet.activity}/>:<span role="status">{p.courseCompletion}</span>}</div>}
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel&&<section className={`companion-panel panel-${p.panel}`} role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
@@ -174,7 +177,7 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
         <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
-      </div></>}
+      </div>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
     </section>}
 
   </div>;

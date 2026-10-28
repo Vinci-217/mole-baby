@@ -1,6 +1,8 @@
 import {useEffect,useRef} from 'react';
 import clips from '../../public/assets/original/element-skills/clips.json';
 import {TRANSFORMATION_TARGET_START} from '../magic-box';
+import visibility from '../../electron/edge-visibility.json';
+import type {RamForm} from '../original-actions';
 
 export const originalElementClip=(id:string)=>clips[id as keyof typeof clips];
 // A few decoded atlases fit old 32-bit machines; playing all eighteen skills
@@ -23,7 +25,7 @@ export const prepareElementSkill=preloadElementSkill;
 const load=(id:string)=>cached(id).pages;
 /** Plays every source frame at its original 24 fps. The shared smoke only
  * covers the swap; the target timeline starts once the first smoke clears. */
-export default function OriginalElementSkill({id,startedAt}:{id:string;startedAt:number}){
+export default function OriginalElementSkill({id,startedAt,form='super'}:{id:string;startedAt:number;form?:RamForm}){
  const ref=useRef<HTMLCanvasElement>(null),clip=originalElementClip(id);
  useEffect(()=>{
   let live=true,request=0,previous=-1;
@@ -38,5 +40,5 @@ export default function OriginalElementSkill({id,startedAt}:{id:string;startedAt
   }).catch(()=>{});
   return()=>{live=false;cancelAnimationFrame(request)};
  },[id,startedAt,clip]);
- return clip?<canvas ref={ref} className="magic-box-layer original-element-skill" data-element-skill={id} width={clip.cell} height={clip.cell} aria-label={`原版${clip.name}变身`}/>:null;
+ return clip?<canvas ref={ref} className="magic-box-layer original-element-skill" style={{left:'50%',top:`${visibility.forms[form].body[3]/108*100}%`,width:'160%',height:'auto',transform:`translate(-50%,-${226/288*100}%)`}} data-element-skill={id} width={clip.cell} height={clip.cell} aria-label={`原版${clip.name}变身`}/>:null;
 }

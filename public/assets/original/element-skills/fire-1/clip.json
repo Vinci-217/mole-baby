@@ -145,17 +145,32 @@
     116
   ],
   "sourceBounds": [
-    11,
+    5,
     0,
-    138,
-    164
+    69,
+    82
   ],
   "registration": {
-    "scale": 1.0121951219512195,
-    "centerX": 144,
+    "method": "Original source frames at zoom2; up to six fixed camera keys, smooth shot blends; no per-frame fit",
+    "sourceRasterZoom": 2,
     "baseY": 226,
-    "maxWidth": 144,
-    "maxHeight": 166
+    "centerX": 144,
+    "maxWidth": 248,
+    "maxHeight": 244,
+    "cameraKeys": [
+      {
+        "frame": 1,
+        "scale": 2.380952380952381,
+        "x": 54.71428571428571,
+        "y": 30.76190476190476
+      },
+      {
+        "frame": 124,
+        "scale": 2.380952380952381,
+        "x": 54.71428571428571,
+        "y": 30.76190476190476
+      }
+    ]
   },
   "durationMs": 5167
 }

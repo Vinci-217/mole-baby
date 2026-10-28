@@ -4,6 +4,10 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 test('all eighteen original source clips preserve the complete nested timeline and have bounded transparent atlases',()=>{
  assert.equal(Object.keys(clips).length,18);assert.equal(Object.values(clips).reduce((n,c)=>n+c.frames,0),1711);
  for(const clip of Object.values(clips)){
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root,'public/assets/original/element-skills',clip.id,'clip.json'),'utf8')),clip,'runtime and per-clip metadata stay synchronized');
+  assert.equal(clip.registration.sourceRasterZoom,2);const keys=clip.registration.cameraKeys;
+  assert.ok(keys.length>=2&&keys.length<=6);assert.equal(keys[0].frame,1);assert.equal(keys.at(-1).frame,clip.frames);
+  for(let i=0;i<keys.length;i++){assert.ok(Number.isFinite(keys[i].scale)&&keys[i].scale>0);if(i)assert.ok(keys[i].frame>keys[i-1].frame,'camera keys are sparse, ordered shots rather than per-frame fits')}
   const original=fs.readFileSync(path.join(root,'research/references/original-element-skills/raw',clip.sourceId+'.swf'));
   assert.ok(['CWS','FWS','ZWS'].includes(original.subarray(0,3).toString()));assert.equal(sha(original),clip.sourceSha256);assert.equal(receipt.assets.find(a=>a.id===clip.sourceId).sha256,clip.sourceSha256);
   assert.equal(clip.rootFrame,68);assert.equal(clip.fps,24);assert.equal(clip.frameMap.length,clip.frames);assert.equal(clip.durationMs,Math.ceil(clip.frames/24*1000));assert.ok(clip.clearedRuntimeItemSprites.length>0);

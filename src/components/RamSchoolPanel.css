@@ -2,3 +2,7 @@
 
 .school-desktop-status{background:none;text-shadow:0 1px 2px #fff,0 0 3px #fff}
 .element-skill-list{list-style:none;padding:0;margin:14px 0 0;text-align:left}.element-skill-list li{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 3px;border-top:1px solid #e9ddc5;font-size:12px}.element-skill-list button{flex-shrink:0;border:1px solid #d1bb8e;border-radius:7px;padding:4px 8px;background:#fff7e2;font-size:12px}.element-skill-list button:disabled{opacity:.45}
+.activity-countdown{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-width:0}.activity-countdown strong{font-weight:500}.activity-countdown [role=timer]{margin-left:auto;font-variant-numeric:tabular-nums}.activity-countdown progress{display:block;width:100%;height:8px;accent-color:#8fae59}
+.school-scene-status{left:auto;right:24px;top:112px;bottom:auto;translate:none;width:270px;white-space:normal;padding:10px 12px}.school-scene-status .school-activity{margin:0;padding:0;background:none;gap:8px}.school-scene-status .school-activity>img{width:30px;height:30px}.school-scene-status .activity-countdown{font-size:13px}
+.school-desktop-status{top:36px;left:12px;right:12px;font-size:10px;line-height:1.3}.school-desktop-status .activity-countdown{gap:2px 4px}.school-desktop-status progress{height:5px}.school-desktop-status strong{max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.companion-layout .compact-pet:has(.school-desktop-status) .compact-pet-name{opacity:0}.scene-pet:has([data-action^="school-"])>.scene-pet-name{visibility:hidden}
