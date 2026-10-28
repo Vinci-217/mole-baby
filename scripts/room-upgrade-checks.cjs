@@ -16,6 +16,9 @@ async function verifyRoomUpgrade(page){
   await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);
   const walker=page.locator('.room-walker'),floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),position=page.locator('.room-pet-position');
   await expect(floor).toBeEnabled();
+  // A native window first paints at compact dimensions. Until the first user
+  // move, every resize must keep the pet centered in the actual room.
+  await expect.poll(async()=>Math.abs(Number(await position.getAttribute('data-x'))-(await walker.boundingBox()).width/2)).toBeLessThan(1);
   // Native room restoration can still be resizing on Windows. Wait for the
   // actual target to settle, and dispatch relative to it instead of an old
   // client rectangle captured while the compact window was expanding.

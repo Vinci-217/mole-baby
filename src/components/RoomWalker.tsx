@@ -7,7 +7,7 @@ import {roomWalkArea,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-w
 import './RoomWalker.css'
 
 export default function RoomWalker({stage,evolution,blocked,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;children:(action:string|null)=>ReactNode}) {
- const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),initialized=useRef(false)
+ const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),placedByUser=useRef(false)
  const [area,setArea]=useState(()=>roomWalkArea(1000,750)),[position,setPosition]=useState<RoomPoint|null>(null)
  const [target,setTarget]=useState<RoomPoint|null>(null),[moving,setMoving]=useState(false),[direction,setDirection]=useState('walk-right')
  useLayoutEffect(()=>{
@@ -15,8 +15,8 @@ export default function RoomWalker({stage,evolution,blocked,children}:{stage:Sta
   const measure=()=>{
    const box=element.getBoundingClientRect(),dock=element.parentElement?.querySelector('.room-dock')?.getBoundingClientRect()
    const next=roomWalkArea(box.width,box.height,dock?dock.top-box.top:undefined);setArea(next)
-   point.current=roomWalkTarget(initialized.current?point.current:{x:box.width/2,y:next.bottom-25},next)
-   initialized.current=true;setPosition(point.current);setTarget(t=>t?roomWalkTarget(t,next):null)
+   point.current=roomWalkTarget(placedByUser.current?point.current:{x:box.width/2,y:next.bottom-25},next)
+   setPosition(point.current);setTarget(t=>t?roomWalkTarget(t,next):null)
   }
   const observer=new ResizeObserver(measure);observer.observe(element)
   const dock=element.parentElement?.querySelector('.room-dock');if(dock)observer.observe(dock)
@@ -39,7 +39,7 @@ export default function RoomWalker({stage,evolution,blocked,children}:{stage:Sta
   frame=requestAnimationFrame(tick)
   return()=>{cancelled=true;cancelAnimationFrame(frame)}
  },[target,blocked,stage])
- const go=(next:RoomPoint)=>{if(!blocked)setTarget(roomWalkTarget(next,area))}
+ const go=(next:RoomPoint)=>{if(!blocked){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
  const down=(e:PointerEvent<HTMLButtonElement>)=>{
   if(e.button!==0)return
   const box=root.current?.getBoundingClientRect();if(box)go({x:e.clientX-box.left,y:e.clientY-box.top})
