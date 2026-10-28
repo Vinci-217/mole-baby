@@ -1,0 +1,22 @@
+{
+  "version": "0.31.1",
+  "vitest": 374,
+  "nodeTests": 121,
+  "coreAsarBytes": 106612229,
+  "externalMotionFiles": 1635,
+  "externalMotionBytes": 463921585,
+  "allExternalBytesVerified": true,
+  "packagedNativeNewFeatures": "passed",
+  "originalZipSingleFileLimit": 536870912,
+  "originalZipTotalLimit": 2147483648,
+  "nativeResult": {
+    "code": 0,
+    "finishedAt": 1793231166.6732166
+  },
+  "testResult": {
+    "code": 0,
+    "finishedAt": 1793231127.4324157
+  },
+  "firstTag": "v0.31.0",
+  "firstTagPublished": false
+}

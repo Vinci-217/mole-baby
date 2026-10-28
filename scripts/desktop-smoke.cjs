@@ -112,7 +112,9 @@ async function verifyBackground(page, selector, suffix) {
       assert.ok(windowManagerReady(env.DISPLAY), 'The cloud window manager did not become ready');
     }
   }
-  desktop = await _electron.launch({ args, env, cwd: root, timeout: 30000 });
+  const packagedIndex=process.argv.indexOf('--packaged'),packaged=packagedIndex<0?null:process.argv[packagedIndex+1];
+  if(packaged){assert.ok(fs.existsSync(packaged),'Packaged executable missing');const result=await require('./packaged-motion-assets.cjs').verifyMotionResources(path.join(path.dirname(packaged),'resources/app.asar'));console.log('PASS packaged split animation bytes and bounded core ASAR',JSON.stringify(result))}
+  desktop = await _electron.launch({ args:packaged?args.filter(value=>value!==root):args, ...(packaged?{executablePath:packaged}:{}), env, cwd: root, timeout: 30000 });
   const page = await desktop.firstWindow();
   page.setDefaultTimeout(15000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
