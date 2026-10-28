@@ -51,7 +51,8 @@ async function verifyGrowthSettings(page,desktop){
   if(desktop&&await desktop.evaluate(()=>process.platform==='win32'))await require('./windows-window-chrome.cjs').verifyWindowsChrome(page,desktop);
   await enterHome(page);await roomTab(page,'设置');
   const titles=await page.locator('.settings-panel>section').evaluateAll(items=>items.map(s=>s.querySelector('h3')?.textContent));
-  assert.deepEqual(titles,['拉姆信息','当前成长阶段','陪伴与桌面','声音与音乐','专注计时','存档与送别',...(desktop?['软件与帮助']:[])]);
+  assert.deepEqual(titles,['拉姆信息','陪伴与桌面','声音与音乐','专注计时','存档与送别',...(desktop?['软件与帮助']:[])]);
+  await expect(stagePanel()).toHaveCount(0);await roomTab(page,'成长');
   await expect(stagePanel().getByRole('region',{name:'成长进度',exact:true})).toContainText('5天 13小时');
   const baseline=(await save()).growth;
   await stagePanel().getByRole('button',{name:'固定形态',exact:true}).click();assert.equal((await save()).growthLocked,false);
@@ -61,10 +62,10 @@ async function verifyGrowthSettings(page,desktop){
   await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growthLocked,false);
   await applyGrowthSettings(page);assert.equal((await save()).growthLocked,true);assert.equal((await save()).growth,baseline);
   await page.clock.fastForward(3600000);assert.equal((await save()).growth,baseline);
-  await page.reload();await enterHome(page);await roomTab(page,'设置');assert.equal((await save()).growthLocked,true);
+  await page.reload();await enterHome(page);await roomTab(page,'成长');assert.equal((await save()).growthLocked,true);
   await applyGrowthSettings(page,{mode:'auto'});assert.equal((await save()).growth,baseline);assert.equal((await save()).growthLocked,false);
   await page.clock.fastForward(3600000);const grown=(await save()).growth;assert.ok(grown>baseline);
-  for(let n=0;n<2;n++){await page.reload();await enterHome(page);await roomTab(page,'设置');assert.equal((await save()).growthLocked,false);assert.ok((await save()).growth>=grown)}
+  for(let n=0;n<2;n++){await page.reload();await enterHome(page);await roomTab(page,'成长');assert.equal((await save()).growthLocked,false);assert.ok((await save()).growth>=grown)}
 
   const identity=await save();await stagePanel().getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();
   await expect(confirm).toContainText('从所选阶段的起点重新计算');await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growth,grown);
@@ -74,7 +75,7 @@ async function verifyGrowthSettings(page,desktop){
   await roomTab(page,'学院');const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
   if(await language.getByRole('button',{name:'上这一课',exact:true}).count()){
    await language.getByRole('button',{name:'上这一课',exact:true}).click();const activity=(await save()).activity;
-   await roomTab(page,'设置');await applyGrowthSettings(page,{mode:'fixed'});assert.equal((await save()).activity.id,activity.id);await page.clock.fastForward(180100);assert.ok((await save()).education.graduated.language);
+   await roomTab(page,'成长');await applyGrowthSettings(page,{mode:'fixed'});assert.equal((await save()).activity.id,activity.id);await page.clock.fastForward(180100);assert.ok((await save()).education.graduated.language);
   }
   await roomTab(page,'设置');
   // Visual review runs with a live animation clock: frozen rAF can leave an
@@ -94,12 +95,13 @@ async function verifyGrowthSettings(page,desktop){
   await (await openActions(page)).getByRole('button',{name:'状态',exact:true}).click();await enterBackpack(page);await screenshot('backpack');
   await page.getByTestId('companion-panel').getByRole('button',{name:'关闭小窗',exact:true}).click();await enterHome(page);
   await painted('.scene-character canvas.ram-classic-frame');await page.getByRole('button',{name:'全屏查看小屋',exact:true}).click();await expect(page.getByRole('button',{name:'退出小屋全屏',exact:true})).toBeVisible();await screenshot('fullscreen');await page.keyboard.press('Escape');
-  await roomTab(page,'设置');await stagePanel().scrollIntoViewIfNeeded();await painted('.stage-settings canvas.ram-classic-frame');await screenshot('growth');
+  await roomTab(page,'成长');await stagePanel().scrollIntoViewIfNeeded();await painted('.stage-settings canvas.ram-classic-frame');await screenshot('growth');
   await stagePanel().getByRole('button',{name:'固定形态',exact:true}).click();await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();await screenshot('confirmation');await page.keyboard.press('Escape');
+  await roomTab(page,'设置');
   for(const name of ['声音与音乐','专注计时']){await page.getByRole('region',{name,exact:true}).scrollIntoViewIfNeeded();await screenshot(name==='声音与音乐'?'sound':'timer')}
   assert.equal(await page.locator('.settings-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);
   if(!desktop){
-   await page.setViewportSize({width:1000,height:720});await stagePanel().scrollIntoViewIfNeeded();assert.equal(await page.locator('.settings-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);await screenshot('small-growth');await page.setViewportSize({width:1180,height:820});
+   await page.setViewportSize({width:1000,height:720});await roomTab(page,'成长');await stagePanel().scrollIntoViewIfNeeded();assert.equal(await page.locator('.settings-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);await screenshot('small-growth');await page.setViewportSize({width:1180,height:820});
   }
   fs.writeFileSync(path.join(out,`${label}-checks.json`),JSON.stringify({version:require('../package.json').version,native:Boolean(desktop),backpackCategories:4,fullscreen:true,restoredBounds:normal??null,confirmationCancel:true,autoBefore:baseline,autoAfter:grown,repeatedReloads:2,newStageFrom:60,settingsOrder:titles},null,2)+'\n');
   console.log('PASS independent status/backpack without status category, room fullscreen+Escape+desktop restoration, confirmed auto/fixed growth and repeated reloads, retained progress/identity/course, remaining healthy time and ordered responsive settings');

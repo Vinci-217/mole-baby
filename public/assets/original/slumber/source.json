@@ -1,5 +1,5 @@
 {
-  "description": "Original closed-eye shapes35/1726 at natural spacing, original mouth743 kept small. Quiet desktop sleep adaptation; the body, crown and seed pot stay upright. Not a complete official sleep clip.",
+  "description": "Original relaxed closed-eye shapes35/1726 at natural spacing and small original mouth743. Upright body and crown; desktop sleep adaptation, not a complete official sleep clip.",
   "eyes": {
     "seed": 35,
     "junior": 1726,
@@ -177,6 +177,27 @@
       "snorePoint": [
         85.25,
         79.54094292803971
+      ]
+    },
+    "classic": {
+      "cell": [
+        192,
+        208
+      ],
+      "columns": 8,
+      "sourceSprite": 2525,
+      "scale": 0.5432098765432098,
+      "translation": [
+        17.864197530864203,
+        0.0617283950617491
+      ],
+      "mouthPoint": [
+        48.91332304526749,
+        73.80698005698007
+      ],
+      "snorePoint": [
+        76.39583333333334,
+        73.80698005698007
       ]
     }
   },

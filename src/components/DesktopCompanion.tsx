@@ -172,7 +172,7 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onCurious}><img alt="" src="./assets/generated/v15-butterfly.png"/>和蝴蝶玩</button>
         <button disabled={p.moodBusy||p.pet.sleeping} onClick={p.onMood}><Icon path="ui/status-health"/>回应心情</button>
-        <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.onCare('sleep')}><Icon path="ui/icon-clock"/>{p.pet.sleeping?'轻轻叫醒':'睡一会儿'}</button>
+        <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.onCare('sleep')}><Icon path="ui/status-sleep"/>{p.pet.sleeping?'轻轻叫醒':'睡一会儿'}</button>
         <button disabled={p.moodBusy||p.stage===0} onClick={p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>餐厅打工</button>
         <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>

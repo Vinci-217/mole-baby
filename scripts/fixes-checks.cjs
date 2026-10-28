@@ -11,7 +11,7 @@ async function verifyFixes(page,desktop){
   await expect(page.locator('.school-scene-status')).toContainText('语言课');
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));assert.equal(saved.activity.course,'language');
   await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await expect(page.locator('.school-scene-status')).toContainText('语言课');
-  await page.locator('.school-scene-status').getByRole('button').click();await roomTab(page,'设置');
+  await page.locator('.school-scene-status').getByRole('button').click();await roomTab(page,'成长');
   await page.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
   const forms=page.getByRole('group',{name:'选择神力形态',exact:true});await expect(forms.getByRole('button')).toHaveCount(5);
   await forms.getByRole('button',{name:'切换为经典超级拉姆',exact:true}).click();await require('./smoke-helpers.cjs').applyGrowthSettings(page,{mode:'fixed'});
@@ -46,6 +46,7 @@ async function verifyFixes(page,desktop){
   await require('./school-spells-checks.cjs').verifySchoolSpells(page);
   await require('./spell-care-checks.cjs').verifySpellCare(page,desktop);
   await require('./growth-settings-checks.cjs').verifyGrowthSettings(page,desktop);
+  await require('./original-room-checks.cjs').verifyOriginalRoom(page,desktop);
   console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});

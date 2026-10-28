@@ -1,0 +1,16 @@
+{
+  "archive": "Miigon/RecMoleRes",
+  "commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "files": [
+    {
+      "file": "lamubone.swf",
+      "archivePath": "root/resource/NPC/lamubone.swf",
+      "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf"
+    },
+    {
+      "file": "super.swf",
+      "archivePath": "root/resource/petcloth/swf2/pet101/skill_7.swf",
+      "sha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20"
+    }
+  ]
+}

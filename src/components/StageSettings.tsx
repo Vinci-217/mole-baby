@@ -16,7 +16,7 @@ export default function StageSettings({pet,onChange}:{pet:GameState;onChange:(se
   <GrowthProgress pet={pet}/>
   <div className="growth-mode-choices" role="group" aria-label="选择成长模式">
    <button type="button" aria-label="自动成长" aria-pressed={draft.mode==='auto'} onClick={()=>setDraft(d=>({...d,mode:'auto'}))}><b>自动成长</b><small>继续积累健康清醒时间</small></button>
-   <button type="button" aria-label="固定形态" aria-pressed={draft.mode==='fixed'} onClick={()=>setDraft(d=>({...d,mode:'fixed'}))}><b>固定形态</b><small>暂停成长，保存已有进度</small></button>
+   <button type="button" aria-label="固定形态" aria-pressed={draft.mode==='fixed'} onClick={()=>setDraft(d=>({...d,mode:'fixed'}))}><b>手动固定形态</b><small>自由选择形态，保存已有进度</small></button>
   </div>
   <p className="settings-hint">选择起始阶段；同阶段保留进度，选择其他阶段从该阶段起点开始。点击应用并确认后生效。</p>
   <div className="stage-choices" role="group" aria-label="选择当前阶段">

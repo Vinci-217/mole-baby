@@ -33,6 +33,8 @@ import RamSchool,{SCHOOL_CLIPS} from './RamSchool'
 import {isSchoolAction} from '../pet-school'
 import OriginalElementSkill,{originalElementClip,prepareElementSkill} from './OriginalElementSkill'
 import SharedMagicBox,{preloadMagicBox} from './SharedMagicBox'
+import flight from '../../public/assets/original/flight/runtime.json'
+import {createFanMotion,stepFanMotion} from '../fan-motion'
 
 interface RamProps {
   color: PetColor
@@ -60,7 +62,7 @@ interface RamProps {
   onActionEnd?: () => void
 }
 type Form = RamForm
-type SheetKind = 'dizzy' | 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'yawn' | 'drag' | 'affection' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy'
+type SheetKind = 'dizzy' | 'classic' | 'care' | 'seed' | 'item' | 'grounded' | 'slumber' | 'yawn' | 'drag' | 'affection' | 'gentle' | 'football' | 'emotion-joy' | 'emotion-grumpy' | 'flight'
 interface SheetSource { neutral: ImageData; mask: Uint8ClampedArray; form?:string;kind?:SheetKind }
 const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
@@ -87,6 +89,7 @@ const ACTION_NAMES: Record<string, string> = {
   peek: '从角落探出头看你', hide: '在角落安静地陪伴',
 }
 function sheetSpec(form: Form, kind: SheetKind) {
+  if(kind==='flight'&&(form==='senior'||form==='classic'||form==='super'))return {width:192*8,height:208*flight.forms[form].rows,neutral:`./assets/original/flight/${form}-neutral.png`,mask:`./assets/original/flight/${form}-mask.png`}
   if(kind==='dizzy')return {width:(form==='seed'?96:192)*2,height:form==='seed'?99:208,neutral:`./assets/original/dizzy/${form}-neutral.png`,mask:`./assets/original/dizzy/${form}-mask.png`}
   if(kind==='gentle')return {width:(form==='seed'?96:CELL_WIDTH)*8,height:form==='seed'?99:CELL_HEIGHT,neutral:`./assets/original/gentle-care/${form}-neutral.png`,mask:`./assets/original/gentle-care/${form}-mask.png`}
   if (kind === 'seed') return { width: 96 * 8, height: 99 * 8, neutral: './assets/original/seed/body.png', mask: './assets/original/seed/body-mask.png' }
@@ -135,7 +138,7 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
  * colour offsets from adoption onwards, as requested for this desktop pet.
  */
 function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<HTMLCanvasElement> {
-  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','yawn','affection','gentle','football'].includes(kind)&&!kind.startsWith('emotion-')) kind = 'classic'
+  if (['super', 'water', 'wood', 'fire'].includes(form) && !['seed','slumber','yawn','affection','gentle','football','flight'].includes(kind)&&!kind.startsWith('emotion-')) kind = 'classic'
   const key = kind === 'seed' ? `seed:${color}` : `${kind}:${form}:${color}`
   const cached = tintedCache.get(key)
   if (cached) return cached
@@ -528,6 +531,86 @@ function ItemCue({ motion }: { motion: ItemMotion }) {
     <span className="care-finish-sparkle">{[0,1,2].map(i=><img key={i} src="./assets/generated/v12-dizzy-star.png" alt="" draggable={false}/>)}</span>
   </span>
 }
+type FlightForm='senior'|'classic'|'super';
+const flightActions=new Set(['idle','waiting','still','drag','pet','focus','mood-content','watch-butterfly','look-around','waving','walk-left','walk-right','running-left','running-right']);
+function hasFlightRig(form:string,action:string):form is FlightForm{return ['senior','classic','super'].includes(form)&&flightActions.has(action)}
+/** Original full loops; senior's original body/stem and all eight crown blades
+ * are separate source layers so only the rotor responds to cursor speed. */
+function OriginalFlightFrames({form,color,action,actionId,startedAt,onError,onActionEnd}:{form:FlightForm;color:PetColor;action:string;actionId?:number|string;startedAt:number;onError:()=>void;onActionEnd?:()=>void}){
+ const ref=useRef<HTMLCanvasElement>(null),phase=useRef(0),fan=useRef(createFanMotion());
+ const end=useRef(onActionEnd),error=useRef(onError);end.current=onActionEnd;error.current=onError;
+ usePaintReadiness(ref,`${form}:${color}:${action}:${actionId??0}`);
+ useEffect(()=>{
+  const canvas=ref.current,context=canvas?.getContext('2d');if(!canvas||!context)return;
+  let live=true,request=0,last=0,finished=false,source:HTMLCanvasElement|null=null,previous='';
+  const media=matchMedia('(prefers-reduced-motion: reduce)'),spec=flight.forms[form];
+  const drawCell=(sheet:HTMLCanvasElement,index:number)=>context.drawImage(sheet,index%8*192,Math.floor(index/8)*208,192,208,0,0,192,208);
+  const paint=(now:number)=>{
+   if(!live||!source||!canvas.isConnected||document.hidden){last=0;return}
+   const delta=last?Math.min(100,Math.max(0,now-last)):0;last=now;phase.current+=delta;
+   const root=canvas.closest<HTMLElement>('.ram-sprite'),still=action==='still',reduced=media.matches||still;
+   const direction=action.includes('left')?'left':action.includes('right')?'right':'down',clip=spec.clips[direction];
+   const pose=clip.frames[reduced?0:Math.floor(phase.current*flight.fps/1000)%clip.frames.length];
+   const split=form==='senior'&&direction==='down',senior=flight.forms.senior;
+   const elapsed=Math.max(0,now-startedAt),speed=parseFloat(root?.style.getPropertyValue('--drag-horizontal-speed')||'0');
+   if(split)stepFanMotion(fan.current,delta,speed,action==='pet'?elapsed:null,reduced);
+   const index=split?senior.bodyIndex:pose.index,signature=`${index}:${split?fan.current.angle.toFixed(3):''}:${root?.dataset.crownHidden}`;
+   if(signature!==previous){
+    context.clearRect(0,0,192,208);drawCell(wardrobeBody(canvas,source),index);
+    if(split&&root?.dataset.crownHidden!=='true'){
+     const [x,y]=senior.rotor.pivot,projection=senior.rotor.projectionY;
+     context.save();context.translate(x,y);context.scale(1,projection);context.rotate(fan.current.angle);context.scale(1,1/projection);context.translate(-x,-y);drawCell(source,senior.crownIndex);context.restore();
+    }
+    previous=signature;
+   }
+   paintWear(canvas,source,index%8,Math.floor(index/8),192,208,false,pose.sourceFrame);
+   canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(index);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.row=String(Math.floor(index/8));canvas.dataset.direction=direction;
+   if(split){canvas.dataset.fanSpeed=fan.current.speed.toFixed(3);canvas.dataset.fanAngle=fan.current.angle.toFixed(3);canvas.dataset.fanBlades=String(senior.bladeCount)}
+   const duration=getRamActionDuration(action,form);
+   if(duration!==null&&elapsed>=duration&&!finished){finished=true;end.current?.()}
+   if(!still&&(!media.matches||duration!==null))request=requestAnimationFrame(paint);
+  };
+  const resume=()=>{cancelAnimationFrame(request);last=0;previous='';if(source)request=requestAnimationFrame(paint)};
+  void getTintedSheet(form,color,'flight').then(sheet=>{if(live){source=sheet;resume()}}).catch(()=>{if(live)error.current()});
+  canvas.addEventListener('ram-wardrobe-change',resume);document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume);
+  return()=>{live=false;cancelAnimationFrame(request);canvas.removeEventListener('ram-wardrobe-change',resume);document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume)};
+ },[form,color,action,actionId,startedAt]);
+ return <canvas ref={ref} width={192} height={208} className="ram-classic-frame ram-original-flight" data-sheet="flight" data-form={form} data-color={color} aria-hidden="true"/>;
+}
+
+/** Keep classic's own golden crown/body for sleep and small-mouth care too. */
+function ClassicGentleFrames({color,fromColor,action,actionId,startedAt,itemMotion,sound,onError,onActionEnd}:{color:PetColor;fromColor?:PetColor;action:string;actionId?:string|number;startedAt:number;itemMotion?:ItemMotion;sound?:boolean;onError:()=>void;onActionEnd?:()=>void}){
+ const ref=useRef<HTMLCanvasElement>(null),end=useRef(onActionEnd),error=useRef(onError),voice=useRef(sound);end.current=onActionEnd;error.current=onError;voice.current=sound;
+ usePaintReadiness(ref,`${color}:${fromColor??''}:${action}:${actionId??0}`);
+ useEffect(()=>{
+  const canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
+  let live=true,request=0,finished=false;const media=matchMedia('(prefers-reduced-motion: reduce)');
+  const audio=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>voice.current===true);
+  const load=(c:PetColor)=>Promise.all([getTintedSheet('classic',c,'gentle'),getTintedSheet('classic',c,'slumber')]);
+  void Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([sheets,old])=>{
+   if(!live)return;
+   const paint=(now:number)=>{
+    if(!live||!canvas.isConnected||document.hidden)return;
+    const elapsed=Math.max(0,now-startedAt),closed=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&elapsed>=450&&elapsed<3300;
+    const index=closed?1:0,frame=closed?sleepPose(elapsed,media.matches).frame:itemMotion?sampleGentleMouth(itemMotion,elapsed,media.matches):0;
+    const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;
+    ctx.clearRect(0,0,192,208);
+    if(old&&mix<1)ctx.drawImage(wardrobeBody(canvas,old[index]),frame*192,0,192,208,0,0,192,208);
+    ctx.globalAlpha=mix;ctx.drawImage(wardrobeBody(canvas,sheets[index]),frame*192,0,192,208,0,0,192,208);ctx.globalAlpha=1;
+    paintWear(canvas,sheets[index],frame,0);paintItemCue(canvas,itemMotion,elapsed,media.matches);paintSocialCue(canvas,4,action,elapsed,media.matches,'classic');
+    audio.tick(elapsed);canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(frame);canvas.dataset.sheet=closed?'slumber':'gentle';
+    const duration=getRamActionDuration(action,'classic');if(duration!==null&&elapsed>=duration&&!finished){finished=true;end.current?.()}
+    if(!media.matches||duration!==null)request=requestAnimationFrame(paint);
+   };const resume=()=>{cancelAnimationFrame(request);request=requestAnimationFrame(paint)};
+   canvas.addEventListener('ram-wardrobe-change',resume);document.addEventListener('visibilitychange',resume);media.addEventListener('change',resume);
+   cleanup=()=>{canvas.removeEventListener('ram-wardrobe-change',resume);document.removeEventListener('visibilitychange',resume);media.removeEventListener('change',resume)};resume();
+  }).catch(()=>{if(live)error.current()});
+  let cleanup=()=>{};
+  return()=>{live=false;cancelAnimationFrame(request);audio.stop();cleanup()};
+ },[color,fromColor,action,actionId,startedAt,itemMotion]);
+ return <canvas ref={ref} width={192} height={208} className="ram-classic-frame" data-form="classic" data-color={color} aria-hidden="true"/>;
+}
+
 /** The classic three-leaf form uses its own original source action sheet. */
 function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:PetColor;action:string;actionId?:number|string;onActionEnd?:()=>void;onError:()=>void}){
  const ref=useRef<HTMLCanvasElement>(null),end=useRef(onActionEnd);end.current=onActionEnd;
@@ -594,7 +677,7 @@ export default function Ram({ color, costume, companionId=0, stage, evolution, a
     <span className="ram-proportion-layer"><span className="ram-flight-layer">
     {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
       : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
-        {!fallback&&form==='classic'&&activeAction!=='play'?<ClassicSuperFrames color={color} action={activeAction} actionId={actionId} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
+        {!fallback&&form==='classic'&&(Boolean(itemMotion)||['sleep','wake','mood-dozy'].includes(activeAction))?<ClassicGentleFrames color={color} fromColor={fromColor} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} itemMotion={itemMotion} sound={sound} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&hasFlightRig(form,activeAction)?<OriginalFlightFrames form={form} color={color} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&form==='classic'&&activeAction!=='play'?<ClassicSuperFrames color={color} action={activeAction} actionId={actionId} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={schoolAction?'idle':activeAction} originalFootball={stage>0&&activeAction==='play'}/>
     {schoolAction&&<RamSchool key={`school:${action}:${actionId??0}`} action={schoolAction} sound={sound} startedAt={clock.current.startedAt} stage={stage}/>}

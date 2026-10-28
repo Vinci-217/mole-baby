@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import subprocess
+import shutil
 from pathlib import Path
 from PIL import Image
 
@@ -21,12 +22,26 @@ PADDING = 2
 def export(meta, exporter, work):
     raw = ROOT / f"research/references/original-element-skills/raw/{meta['sourceId']}.swf"
     dest = work / str(meta['sourceId'])
+    signature = {
+        'sourceSha256': hashlib.sha256(raw.read_bytes()).hexdigest(),
+        'exporterSha256': hashlib.sha256((ROOT / 'scripts/art/SourceExporter.java').read_bytes()).hexdigest(),
+        'sprite': meta['actionSprite'], 'frame': meta['rootFrame'],
+        'frames': meta['frames'], 'zoom': 4,
+        'clearedSprites': meta['clearedRuntimeItemSprites'],
+    }
+    receipt = dest / 'export-receipt.json'
     frames = list(dest.rglob('*.png'))
-    if len(frames) != meta['frames']:
+    # Frame count alone cannot identify an export: older cached frames still
+    # contain the game's item placeholder even after the clearing rule changed.
+    cached = json.loads(receipt.read_text()) if receipt.exists() else None
+    if len(frames) != meta['frames'] or cached != signature:
+        if dest.exists():
+            shutil.rmtree(dest)
         subprocess.run([exporter, 'nested', str(raw), str(dest), str(meta['actionSprite']),
                         str(meta['rootFrame']), str(meta['frames']), '4',
                         ','.join(map(str, meta['clearedRuntimeItemSprites']))],
                        check=True, stdout=subprocess.DEVNULL)
+        receipt.write_text(json.dumps(signature, indent=2) + '\n')
     frames = sorted(dest.rglob('*.png'), key=lambda p: int(p.stem))
     if len(frames) != meta['frames']:
         raise ValueError('Incomplete original frames: ' + meta['id'])

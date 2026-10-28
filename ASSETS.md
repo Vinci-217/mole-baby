@@ -1,5 +1,7 @@
 # 拉姆素材记录
 
+当前预览分支补齐高级／两种超级拉姆的原版飞行动作，重新导出三系18段动画以清除结尾占位石头，并加入12段原版游戏录音和3个不同的原版导航图标。来源、适配范围和接手说明见 [本轮交接记录](research/original-room-handoff.md)。高级叶冠转速与经典超级拉姆睡眠属于桌宠适配，并非官方独立交互动画。
+
 v0.30.1 新增三系18个官网原版变身完整动作、19件原版家具和5间原版小屋。三系来源、完整帧导出与运行时占位道具处理见 [逆向与导出记录](research/original-element-skills.md)；家具／小屋来源与哈希见 [source-record.json](public/assets/original/furniture/source-record.json)。蓝紫色魔术盒与烟雾是自制共用图层，4张盒子、16张烟复用于全部形态和来回变身；见 [生成记录](skills/mole-classic-art/references/v45/generation.json)。角色原形与装扮保持独立，不把自制过渡称为官方动画。
 
 
@@ -258,7 +260,7 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 
 `public/assets/original/gentle-care/`以既有原 down 身体、原眼睛/瞳孔和缩小的嘴形743重新导出，沿原身体遮罩保持四色；睡眠缩小原35/1726眼睑与原嘴形。它们是明确的桌宠适配，并非官方独立动画。来源和原文件SHA256见各目录source.json，PNG校验见checksums.json。没有生成或绘制新角色脸。服饰继续使用原swf2，只改中性校准及动作注册，来源不变；脚本见scripts/art/export-slumber.py（--awake导出温和照料）与export-registered-outfits.py。小日常复用既有原服饰、足球与已记录的书/星星道具。
 
-`artifacts/v26-game-effects.wav`是本项目Web Audio事件音效合成器的离线试听，不是官方录音；由scripts/review-game-audio.cjs生成并检查静音、非静音与峰值。
+历史版本的 `artifacts/v26-game-effects.wav` 是项目自行合成的试听，不是官方录音。当前预览已将小游戏事件音效替换为原版 MP3；来源见 `public/assets/original/game-audio/sources.json`，`scripts/review-game-audio.cjs` 已改为检查原录音解码、播放和静音停止。
 
 `public/assets/original/football/head-poses.json`由相同原SWF显示列表的眼睛符号与局部Y轴提取，经现有足球相机映射。闭眼/遮挡帧为身体空间插值；是服饰挂接的桌面适配，不是官方骨骼导出。脚本为scripts/art/export-football-heads.py，不从画面白色像素推测朝向。
 ## v38 · 课程、餐厅与小屋摆设（预览）

@@ -26,6 +26,7 @@ export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,nati
     sprite.style.setProperty('--pull-grip',`${grip.current.x}% ${grip.current.y}%`)
     sprite.style.setProperty('--drag-view',s.view.toFixed(4))
     sprite.style.setProperty('--drag-distance',s.phaseDistance.toFixed(3))
+    sprite.style.setProperty('--drag-horizontal-speed',s.horizontalSpeed.toFixed(3))
     sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'
     // Publish the pose after its inputs. Independent body RAF registration
     // must not leave one form sampling the previous drag frame.

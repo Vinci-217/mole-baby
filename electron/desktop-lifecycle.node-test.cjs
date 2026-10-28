@@ -69,7 +69,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const display = { workArea: { x: 0, y: 0, width: 1920, height: 1040 } };
   screen.getCursorScreenPoint=()=>({...cursor});screen.getDisplayNearestPoint=()=>display;
   screen.getPrimaryDisplay = screen.getDisplayMatching = () => display;
-  const electron = { app, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
+  const electron = { app, shell:{openExternal:async url=>{(stats.openedExternal??=[]).push(url)}}, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
     Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => ({path:value,template:false,setTemplateImage(flag){this.template=flag;}}) },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
     Notification: { isSupported: () => false }, dialog:{showMessageBox:async(...args)=>{stats.dialogs.push({parent:args.length===2?args[0]:null,options:args.at(-1)});return{response:options.dialogAnswers?.shift()??1}}} };
@@ -176,6 +176,13 @@ test('Windows transparent windows exit fullscreen before returning to pet even w
  await run.invoke('desktop:set-pet-mode',false);assert.deepEqual(run.window.getBounds(),normal);
  await run.invoke('desktop:set-room-fullscreen',true);run.send('desktop:hide-to-tray');await new Promise(setImmediate);
  assert.equal(run.invoke('desktop:get-state').roomFullscreen,false);assert.equal(run.window.isVisible(),false);
+});
+
+test('official manor link uses only its fixed HTTPS destination and trusted renderer',async t=>{
+ const run=await launch();t.after(()=>run.cleanup());
+ await run.invoke('desktop:open-manor-site');await run.invoke('desktop:open-manor-site','https://untrusted.invalid');
+ assert.deepEqual(run.stats.openedExternal,['https://mole.61.com/','https://mole.61.com/']);
+ assert.throws(()=>run.handles.get('desktop:open-manor-site')({sender:{},senderFrame:{}}),/Untrusted/);
 });
 
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {

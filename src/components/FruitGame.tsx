@@ -8,7 +8,7 @@ import Ram from './Ram';
 import type { GameReceipt } from './game-receipt';
 import { advanceFruitGame, initialFruitModel, getCatchBand, FRUIT_ARENA, FRUIT_SIZE, PET_WIDTH, PET_HEIGHT, GAME_SECONDS } from './fruit-physics';
 import type { FruitModel } from './fruit-physics';
-import { playGameSound } from '../pet-audio';
+import { playGameSound,stopGameSounds } from '../pet-audio';
 
 interface FruitGameProps {
   onComplete: (score: number) => GameReceipt | void;
@@ -24,6 +24,7 @@ type Phase = 'ready' | 'playing' | 'finished';
 function BerryIllustration({ className = '' }: { className?: string }) { return <GameArt kind="apple" className={className}/>; }
 
 export default function FruitGame({ onComplete, onClose, color = 'red', stage = 1, evolution, costume, sound = false }: FruitGameProps) {
+  useEffect(()=>()=>stopGameSounds(),[]);
   const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [phase, setPhase] = useState<Phase>('ready');
   const [frame, setFrame] = useState<FruitModel>(initialFruitModel);

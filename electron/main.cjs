@@ -788,6 +788,7 @@ function registerIPC() {
   handle('desktop:drag-pet-to-cursor',dragPetToCursor);
   handle('desktop:set-pet-mode', changePetMode);
   handle('desktop:set-room-fullscreen',enabled=>roomFullscreen.set(enabled));
+  handle('desktop:open-manor-site',()=>shell.openExternal(require('./external-sites.json').manor));
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
   handle('desktop:set-pet-appearance',form=>{if(typeof form!=='string'||!Object.hasOwn(require('./edge-visibility.json').forms,form))throw new TypeError('Unknown pet appearance');petAppearance=form;publishState();return getDesktopState()});
@@ -901,8 +902,8 @@ function createWindow() {
   window.webContents.on('will-navigate', (event, target) => {
     if (!isOurURL(target)) event.preventDefault();
   });
-  // The pet currently has no external-link workflow. Deny popups and protocol
-  // handlers; future external links should explicitly allow only HTTPS URLs.
+  // External destinations use fixed, trusted IPC handlers. Renderer popups
+  // and arbitrary protocol handlers remain blocked.
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   window.webContents.session.setPermissionCheckHandler(() => false);

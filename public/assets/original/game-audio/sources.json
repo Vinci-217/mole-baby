@@ -1,0 +1,151 @@
+{
+  "archive": "Miigon/RecMoleRes",
+  "commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "extractionDate": "2026-10-28",
+  "files": [
+    {
+      "file": "button.mp3",
+      "sourcePath": "root/resource/soundLib/lib1.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/soundLib/lib1.swf",
+      "sourceSha256": "d93e633b849cb02e28eceef6f2108bb67ccc46d3dc39a2318205bff4ba1cd275",
+      "soundId": 10,
+      "symbol": "S_button",
+      "duration": 0.398938,
+      "sha256": "22be050233c9f068d16c168258057014235056cdccbef57ae0187eac644cfe9b",
+      "bytes": 6383,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "tap.mp3",
+      "sourcePath": "root/resource/soundLib/lib1.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/soundLib/lib1.swf",
+      "sourceSha256": "d93e633b849cb02e28eceef6f2108bb67ccc46d3dc39a2318205bff4ba1cd275",
+      "soundId": 5,
+      "symbol": "S_hitWoodBlock",
+      "duration": 0.2085,
+      "sha256": "a39180c636600ca4ce4584f02e57a5396e5ebf9e796678d330e7575ae878aee9",
+      "bytes": 3336,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "catch.mp3",
+      "sourcePath": "root/module/game/CullFruit.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/CullFruit.swf",
+      "sourceSha256": "44ca0536dd35fa4280588f67a8de2aab21003137935ed6218d256d26bc88e766",
+      "soundId": 10,
+      "symbol": "catchNormal",
+      "duration": 1.04,
+      "sha256": "68a53550e2210ecfb5a590f0435dfd53e5f6d1a2bc17a0e6b50b3bb23c042815",
+      "bytes": 2080,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "miss.mp3",
+      "sourcePath": "root/module/game/CullFruit.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/CullFruit.swf",
+      "sourceSha256": "44ca0536dd35fa4280588f67a8de2aab21003137935ed6218d256d26bc88e766",
+      "soundId": 399,
+      "symbol": "catchBad",
+      "duration": 0.936,
+      "sha256": "3c2ef488db12e3601ad69cc48436c89fd2d322c8f326ca6ba98980e2648c2f65",
+      "bytes": 1872,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "mismatch.mp3",
+      "sourcePath": "root/module/game/CullFruit.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/CullFruit.swf",
+      "sourceSha256": "44ca0536dd35fa4280588f67a8de2aab21003137935ed6218d256d26bc88e766",
+      "soundId": 222,
+      "symbol": "badFruit",
+      "duration": 0.76425,
+      "sha256": "64b4fb04f43178d11fc8b574e4a64fb2280472953878a583e936409d486e54ee",
+      "bytes": 6114,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "start.mp3",
+      "sourcePath": "root/module/game/BeatsMain.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/BeatsMain.swf",
+      "sourceSha256": "ac509abae006842ab949cd13180ddb70b13977e4e175be9eba44ddcd21491c34",
+      "soundId": 22,
+      "symbol": "ReadyGoS",
+      "duration": 1.04,
+      "sha256": "209fd0acfd723808b8150c99da543364b41ceb3cafbe1a53a2a481fc0157c29b",
+      "bytes": 2080,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "match.mp3",
+      "sourcePath": "root/module/game/BeatsMain.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/BeatsMain.swf",
+      "sourceSha256": "ac509abae006842ab949cd13180ddb70b13977e4e175be9eba44ddcd21491c34",
+      "soundId": 1,
+      "symbol": "GoodS1",
+      "duration": 2.236,
+      "sha256": "3a855778cef6f3c485d4da558e07dada29fff40ea10c36e0021496952be1cdd4",
+      "bytes": 4472,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "perfect.mp3",
+      "sourcePath": "root/module/game/BeatsMain.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/BeatsMain.swf",
+      "sourceSha256": "ac509abae006842ab949cd13180ddb70b13977e4e175be9eba44ddcd21491c34",
+      "soundId": 2,
+      "symbol": "GoodS0",
+      "duration": 1.664,
+      "sha256": "1eaaf7f75678eef0a3a5c737bf8c457751b01dcf61c57fde5ae1bfda269ddf92",
+      "bytes": 3328,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "combo.mp3",
+      "sourcePath": "root/module/game/TreasureHunt.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/TreasureHunt.swf",
+      "sourceSha256": "c8153ac3eb8996f02e3fea91b588bf147f26beca471fe2090bef6e845d3e44c7",
+      "soundId": 508,
+      "symbol": "fla_s_Diamond",
+      "duration": 1.561,
+      "sha256": "67f7b91d0467ce5d65c4f3e35bceabe92540f891a1f63d30d93269b6422b2706",
+      "bytes": 7805,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "reward.mp3",
+      "sourcePath": "root/module/game/TreasureHunt.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/TreasureHunt.swf",
+      "sourceSha256": "c8153ac3eb8996f02e3fea91b588bf147f26beca471fe2090bef6e845d3e44c7",
+      "soundId": 516,
+      "symbol": "fla_s_Clearance",
+      "duration": 2.9795,
+      "sha256": "a62509a3b6fdd48bcb1d1f6ce7262c49ba268547ee3b5f7c63e1ed511ff01db4",
+      "bytes": 5959,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "purchase.mp3",
+      "sourcePath": "root/module/game/TreasureHunt.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/TreasureHunt.swf",
+      "sourceSha256": "c8153ac3eb8996f02e3fea91b588bf147f26beca471fe2090bef6e845d3e44c7",
+      "soundId": 507,
+      "symbol": "fla_S_Nuggets",
+      "duration": 1.093,
+      "sha256": "51c3f7ef1e85d591e41e08457b4fb4c247181d9676229e1480ae9d84d8d25fad",
+      "bytes": 5465,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    },
+    {
+      "file": "hint.mp3",
+      "sourcePath": "root/module/game/TreasureHunt.swf",
+      "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/game/TreasureHunt.swf",
+      "sourceSha256": "c8153ac3eb8996f02e3fea91b588bf147f26beca471fe2090bef6e845d3e44c7",
+      "soundId": 517,
+      "symbol": "fla_s_Seize",
+      "duration": 1.1075,
+      "sha256": "a697258fb6bd8af04868461b3ddbaad0cb9ae15fd4f7d480f441227085686ec8",
+      "bytes": 2215,
+      "adaptation": "Original MP3 audio stream exported by JPEXS SoundExporter; no synthesized tones or re-encoding. Used as a cue in this desktop game."
+    }
+  ]
+}

@@ -1,0 +1,657 @@
+{
+  "fps": 24,
+  "cell": [
+    192,
+    208
+  ],
+  "columns": 8,
+  "forms": {
+    "senior": {
+      "sourceSprite": 1777,
+      "clips": {
+        "down": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 0,
+              "sourceFrame": 1
+            },
+            {
+              "index": 1,
+              "sourceFrame": 2
+            },
+            {
+              "index": 2,
+              "sourceFrame": 3
+            },
+            {
+              "index": 3,
+              "sourceFrame": 4
+            },
+            {
+              "index": 4,
+              "sourceFrame": 5
+            },
+            {
+              "index": 5,
+              "sourceFrame": 6
+            },
+            {
+              "index": 6,
+              "sourceFrame": 7
+            },
+            {
+              "index": 7,
+              "sourceFrame": 8
+            },
+            {
+              "index": 8,
+              "sourceFrame": 10
+            },
+            {
+              "index": 9,
+              "sourceFrame": 11
+            }
+          ],
+          "emptyControlFrames": [
+            9
+          ]
+        },
+        "right": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 10,
+              "sourceFrame": 1
+            },
+            {
+              "index": 11,
+              "sourceFrame": 2
+            },
+            {
+              "index": 12,
+              "sourceFrame": 3
+            },
+            {
+              "index": 13,
+              "sourceFrame": 4
+            },
+            {
+              "index": 14,
+              "sourceFrame": 5
+            },
+            {
+              "index": 15,
+              "sourceFrame": 6
+            },
+            {
+              "index": 16,
+              "sourceFrame": 7
+            },
+            {
+              "index": 17,
+              "sourceFrame": 8
+            },
+            {
+              "index": 18,
+              "sourceFrame": 10
+            },
+            {
+              "index": 19,
+              "sourceFrame": 11
+            }
+          ],
+          "emptyControlFrames": [
+            9
+          ]
+        },
+        "left": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 20,
+              "sourceFrame": 1
+            },
+            {
+              "index": 21,
+              "sourceFrame": 2
+            },
+            {
+              "index": 22,
+              "sourceFrame": 3
+            },
+            {
+              "index": 23,
+              "sourceFrame": 4
+            },
+            {
+              "index": 24,
+              "sourceFrame": 5
+            },
+            {
+              "index": 25,
+              "sourceFrame": 6
+            },
+            {
+              "index": 26,
+              "sourceFrame": 7
+            },
+            {
+              "index": 27,
+              "sourceFrame": 8
+            },
+            {
+              "index": 28,
+              "sourceFrame": 10
+            },
+            {
+              "index": 29,
+              "sourceFrame": 11
+            }
+          ],
+          "emptyControlFrames": [
+            9
+          ]
+        }
+      },
+      "rows": 4,
+      "registration": {
+        "bodyTarget": [
+          35,
+          103,
+          146,
+          195
+        ],
+        "sourceBodyBounds": [
+          -203.44577804628332,
+          -529.749030028007,
+          195.29543930452778,
+          -193.6195193122761
+        ],
+        "scale": 5.5675207462860605
+      },
+      "bodyIndex": 30,
+      "crownIndex": 31,
+      "crownParts": 8,
+      "bladeCount": 8,
+      "rotor": {
+        "pivot": [
+          103.24578752395307,
+          79.817343473197
+        ],
+        "projectionY": 0.42
+      },
+      "sourceSwfSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "exportBounds": [
+        -85.36961009260881,
+        99.18225480116041,
+        3761.881831619164,
+        3900.0000000000005
+      ]
+    },
+    "classic": {
+      "sourceSprite": 2525,
+      "clips": {
+        "down": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 0,
+              "sourceFrame": 1
+            },
+            {
+              "index": 1,
+              "sourceFrame": 2
+            },
+            {
+              "index": 2,
+              "sourceFrame": 3
+            },
+            {
+              "index": 3,
+              "sourceFrame": 4
+            },
+            {
+              "index": 4,
+              "sourceFrame": 5
+            },
+            {
+              "index": 5,
+              "sourceFrame": 6
+            },
+            {
+              "index": 6,
+              "sourceFrame": 7
+            },
+            {
+              "index": 7,
+              "sourceFrame": 8
+            },
+            {
+              "index": 8,
+              "sourceFrame": 9
+            },
+            {
+              "index": 9,
+              "sourceFrame": 10
+            }
+          ],
+          "emptyControlFrames": [
+            11
+          ]
+        },
+        "right": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 10,
+              "sourceFrame": 1
+            },
+            {
+              "index": 11,
+              "sourceFrame": 2
+            },
+            {
+              "index": 12,
+              "sourceFrame": 3
+            },
+            {
+              "index": 13,
+              "sourceFrame": 4
+            },
+            {
+              "index": 14,
+              "sourceFrame": 5
+            },
+            {
+              "index": 15,
+              "sourceFrame": 6
+            },
+            {
+              "index": 16,
+              "sourceFrame": 7
+            },
+            {
+              "index": 17,
+              "sourceFrame": 8
+            },
+            {
+              "index": 18,
+              "sourceFrame": 9
+            },
+            {
+              "index": 19,
+              "sourceFrame": 10
+            }
+          ],
+          "emptyControlFrames": [
+            11
+          ]
+        },
+        "left": {
+          "sourceFrameCount": 11,
+          "frames": [
+            {
+              "index": 20,
+              "sourceFrame": 1
+            },
+            {
+              "index": 21,
+              "sourceFrame": 2
+            },
+            {
+              "index": 22,
+              "sourceFrame": 3
+            },
+            {
+              "index": 23,
+              "sourceFrame": 4
+            },
+            {
+              "index": 24,
+              "sourceFrame": 5
+            },
+            {
+              "index": 25,
+              "sourceFrame": 6
+            },
+            {
+              "index": 26,
+              "sourceFrame": 7
+            },
+            {
+              "index": 27,
+              "sourceFrame": 8
+            },
+            {
+              "index": 28,
+              "sourceFrame": 9
+            },
+            {
+              "index": 29,
+              "sourceFrame": 10
+            }
+          ],
+          "emptyControlFrames": [
+            11
+          ]
+        }
+      },
+      "rows": 4,
+      "registration": {
+        "bodyTarget": [
+          51,
+          94,
+          139,
+          169
+        ],
+        "sourceBodyBounds": [
+          -208.26108917106833,
+          -607.588129438569,
+          196.10023539481404,
+          -265.93900677191317
+        ],
+        "scale": 4.352542869646388
+      },
+      "sourceSwfSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+      "exportBounds": [
+        325.5900042807533,
+        -3.947518656956831,
+        3864.6887960227796,
+        3518.971377153509
+      ]
+    },
+    "super": {
+      "sourceSprite": 940,
+      "clips": {
+        "down": {
+          "sourceFrameCount": 21,
+          "frames": [
+            {
+              "index": 0,
+              "sourceFrame": 1
+            },
+            {
+              "index": 1,
+              "sourceFrame": 2
+            },
+            {
+              "index": 2,
+              "sourceFrame": 3
+            },
+            {
+              "index": 3,
+              "sourceFrame": 4
+            },
+            {
+              "index": 4,
+              "sourceFrame": 5
+            },
+            {
+              "index": 5,
+              "sourceFrame": 6
+            },
+            {
+              "index": 6,
+              "sourceFrame": 7
+            },
+            {
+              "index": 7,
+              "sourceFrame": 8
+            },
+            {
+              "index": 8,
+              "sourceFrame": 9
+            },
+            {
+              "index": 9,
+              "sourceFrame": 10
+            },
+            {
+              "index": 10,
+              "sourceFrame": 11
+            },
+            {
+              "index": 11,
+              "sourceFrame": 12
+            },
+            {
+              "index": 12,
+              "sourceFrame": 13
+            },
+            {
+              "index": 13,
+              "sourceFrame": 14
+            },
+            {
+              "index": 14,
+              "sourceFrame": 15
+            },
+            {
+              "index": 15,
+              "sourceFrame": 16
+            },
+            {
+              "index": 16,
+              "sourceFrame": 17
+            },
+            {
+              "index": 17,
+              "sourceFrame": 18
+            },
+            {
+              "index": 18,
+              "sourceFrame": 19
+            },
+            {
+              "index": 19,
+              "sourceFrame": 20
+            }
+          ],
+          "emptyControlFrames": [
+            21
+          ]
+        },
+        "right": {
+          "sourceFrameCount": 21,
+          "frames": [
+            {
+              "index": 20,
+              "sourceFrame": 1
+            },
+            {
+              "index": 21,
+              "sourceFrame": 2
+            },
+            {
+              "index": 22,
+              "sourceFrame": 3
+            },
+            {
+              "index": 23,
+              "sourceFrame": 4
+            },
+            {
+              "index": 24,
+              "sourceFrame": 5
+            },
+            {
+              "index": 25,
+              "sourceFrame": 6
+            },
+            {
+              "index": 26,
+              "sourceFrame": 7
+            },
+            {
+              "index": 27,
+              "sourceFrame": 8
+            },
+            {
+              "index": 28,
+              "sourceFrame": 9
+            },
+            {
+              "index": 29,
+              "sourceFrame": 10
+            },
+            {
+              "index": 30,
+              "sourceFrame": 11
+            },
+            {
+              "index": 31,
+              "sourceFrame": 12
+            },
+            {
+              "index": 32,
+              "sourceFrame": 13
+            },
+            {
+              "index": 33,
+              "sourceFrame": 14
+            },
+            {
+              "index": 34,
+              "sourceFrame": 15
+            },
+            {
+              "index": 35,
+              "sourceFrame": 16
+            },
+            {
+              "index": 36,
+              "sourceFrame": 17
+            },
+            {
+              "index": 37,
+              "sourceFrame": 18
+            },
+            {
+              "index": 38,
+              "sourceFrame": 19
+            },
+            {
+              "index": 39,
+              "sourceFrame": 20
+            }
+          ],
+          "emptyControlFrames": [
+            21
+          ]
+        },
+        "left": {
+          "sourceFrameCount": 21,
+          "frames": [
+            {
+              "index": 40,
+              "sourceFrame": 1
+            },
+            {
+              "index": 41,
+              "sourceFrame": 2
+            },
+            {
+              "index": 42,
+              "sourceFrame": 3
+            },
+            {
+              "index": 43,
+              "sourceFrame": 4
+            },
+            {
+              "index": 44,
+              "sourceFrame": 5
+            },
+            {
+              "index": 45,
+              "sourceFrame": 6
+            },
+            {
+              "index": 46,
+              "sourceFrame": 7
+            },
+            {
+              "index": 47,
+              "sourceFrame": 8
+            },
+            {
+              "index": 48,
+              "sourceFrame": 9
+            },
+            {
+              "index": 49,
+              "sourceFrame": 10
+            },
+            {
+              "index": 50,
+              "sourceFrame": 11
+            },
+            {
+              "index": 51,
+              "sourceFrame": 12
+            },
+            {
+              "index": 52,
+              "sourceFrame": 13
+            },
+            {
+              "index": 53,
+              "sourceFrame": 14
+            },
+            {
+              "index": 54,
+              "sourceFrame": 15
+            },
+            {
+              "index": 55,
+              "sourceFrame": 16
+            },
+            {
+              "index": 56,
+              "sourceFrame": 17
+            },
+            {
+              "index": 57,
+              "sourceFrame": 18
+            },
+            {
+              "index": 58,
+              "sourceFrame": 19
+            },
+            {
+              "index": 59,
+              "sourceFrame": 20
+            }
+          ],
+          "emptyControlFrames": [
+            21
+          ]
+        }
+      },
+      "rows": 8,
+      "registration": {
+        "bodyTarget": [
+          50,
+          116,
+          135,
+          187
+        ],
+        "sourceBodyBounds": [
+          193.84854909656949,
+          652.5127559369876,
+          598.1495464118102,
+          993.332886603293
+        ],
+        "scale": 4.204788044770712
+      },
+      "sourceSwfSha256": "4bcaaba6cc71bb956a2e8617ee016c9d1b3cce405afcb823b0947bd9ba4dfa20",
+      "exportBounds": [
+        97.45173632691254,
+        231.8070530514351,
+        3661.423304283474,
+        4949.321270333593
+      ]
+    }
+  }
+}

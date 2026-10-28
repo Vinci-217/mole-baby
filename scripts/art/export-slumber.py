@@ -9,18 +9,22 @@ import argparse,copy,json,subprocess,concurrent.futures,hashlib
 import xml.etree.ElementTree as E
 import numpy as np
 from PIL import Image
-p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--awake',action='store_true');p.add_argument('--yawn',action='store_true');p.add_argument('--relaxed',action='store_true');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True);out=a.repo/('public/assets/original/yawn' if a.yawn else 'public/assets/original/gentle-care' if a.awake else 'public/assets/original/slumber');out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--ordinary-xml',type=Path,required=True);p.add_argument('--sources',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec');p.add_argument('--exporter');p.add_argument('--forms');p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--awake',action='store_true');p.add_argument('--yawn',action='store_true');p.add_argument('--relaxed',action='store_true');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True);out=a.repo/('public/assets/original/yawn' if a.yawn else 'public/assets/original/gentle-care' if a.awake else 'public/assets/original/slumber');out.mkdir(parents=True,exist_ok=True)
 if not a.awake and not a.yawn:a.relaxed=True
 CONFIG={
  'seed':(39,37,1,[4,9],[],None),
  'junior':(936,63,3,[4,7],[5,8],64),
  'middle':(1532,947,1,[3,5],[4,6],958),
  'senior':(1777,1534,1,[3,5],[6,7],1539),
+ 'classic':(2525,1778,1,[3,5],[4,6],1786),
  'super':(940,36,1,[4,8],[6,10],None),
  'water':(538,15,1,[4,8],[6,10],None),
  'wood':(1029,15,1,[4,8],[6,10],None),
  'fire':(898,25,1,[5,9],[7,11],None),
 }
+if not a.ffdec and not a.exporter:p.error('Use --ffdec or --exporter')
+if a.forms:CONFIG={name:CONFIG[name]for name in a.forms.split(',')}
+
 base=E.parse(a.ordinary_xml);base_ns={n.get('spriteId') or n.get('shapeId'):n for n in base.getroot().find('tags') if n.get('spriteId') or n.get('shapeId')}
 
 def active(node,frame):
@@ -63,7 +67,7 @@ def place(shape,depth,sx,sy,tx,ty,move=False):
  return n
 
 def export(job):
- form,probe=job;root_id,body_id,body_frame,eyes,pupils,shadow=CONFIG[form];ordinary=form in ['seed','junior','middle','senior'];tree=copy.deepcopy(base) if ordinary else E.parse(a.sources/f'{form}.xml');tags=tree.getroot().find('tags');ns={n.get('spriteId') or n.get('shapeId'):n for n in tags if n.get('spriteId') or n.get('shapeId')};root=ns[str(root_id)]
+ form,probe=job;root_id,body_id,body_frame,eyes,pupils,shadow=CONFIG[form];ordinary=form in ['seed','junior','middle','senior','classic'];tree=copy.deepcopy(base) if ordinary else E.parse(a.sources/f'{form}.xml');tags=tree.getroot().find('tags');ns={n.get('spriteId') or n.get('shapeId'):n for n in tags if n.get('spriteId') or n.get('shapeId')};root=ns[str(root_id)]
  if form!='seed':
   old=list(root.find('subTags'));i=next(i for i,n in enumerate(old) if n.get('type')=='FrameLabelTag' and n.get('name')=='down');down=copy.deepcopy(next(n for n in old[i+1:] if n.get('characterId')))
   freeze(root,{'1':down})
@@ -126,8 +130,12 @@ def export(job):
     for k,value in zip(['red','green','blue'],v):c.set(k,str(value))
  name=form+('-probe' if probe else '-neutral');xml=a.work/f'{name}.xml';swf=a.work/f'{name}.swf';tree.write(xml,encoding='utf-8',xml_declaration=True)
  with (a.work/f'{name}.log').open('w') as log:
-  subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-xml2swf',str(xml),str(swf)],stdout=log,stderr=log,check=True)
-  subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-selectid',str(root_id),'-select',f'{root_id}:1-8','-zoom','8','-ignorebackground','-export','sprite',str(a.work/name),str(swf)],stdout=log,stderr=log,check=True)
+  if a.exporter:
+   subprocess.run([a.exporter,'xml2swf',str(xml),str(swf)],stdout=log,stderr=log,check=True)
+   subprocess.run([a.exporter,'frames',str(swf),str(a.work/name),str(root_id),'-1','8'],stdout=log,stderr=log,check=True)
+  else:
+   subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-xml2swf',str(xml),str(swf)],stdout=log,stderr=log,check=True)
+   subprocess.run(['java','-Xmx1g','-Djava.awt.headless=true','-jar',a.ffdec,'-selectid',str(root_id),'-select',f'{root_id}:1-8','-zoom','8','-ignorebackground','-export','sprite',str(a.work/name),str(swf)],stdout=log,stderr=log,check=True)
  print(name,'exported',flush=True)
 with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(export,[(f,probe) for f in CONFIG for probe in [False,True]]))
 
@@ -135,6 +143,7 @@ def coverage(n,p):
  a=np.asarray(n);d=a[:,:,:3].astype(float)-np.asarray(p)[:,:,:3].astype(float);g=np.clip((d[:,:,0]+2*d[:,:,2]/3)/170,0,1);b=np.clip((d[:,:,2]+51*g)/153,0,1);w=np.clip((d[:,:,1]+51*g+102*b)/255,0,1);out=np.dstack([w*255,g*255,b*255,a[:,:,3]]).round().astype('uint8');out[a[:,:,3]==0]=0;return Image.fromarray(out)
 metadata={'description':('A finite sleep-entry yawn using source sleepy eyelids and mouth743. Desktop adaptation, not an official standalone clip.' if a.yawn else 'Original normal body, original eyes/pupils and a small source mouth743. Gentle desktop care adaptation, not an official standalone clip.' if a.awake else 'Original sleepy eyelids from boring, original mouth silhouette743; a desktop breathing adaptation, not an official sleep clip.'),'eyes':('original down eyes and pupils' if a.awake else {'seed':35,'junior':1726,'other':1726}),'mouth':743,'eyeSpanRatio':.88 if a.relaxed else .52,'mouthSpanRatio':(.13 if a.yawn else .09 if a.awake else .055 if a.relaxed else .065),'eyeInk':'original' if a.relaxed else [91,56,39],'mouthInk':'original' if a.relaxed else [88,36,28],'forms':{}}
 if a.relaxed:metadata['description']='Original relaxed closed-eye shapes35/1726 at natural spacing and small original mouth743. Upright body and crown; desktop sleep adaptation, not a complete official sleep clip.'
+if a.forms and (out/'source.json').exists():metadata['forms']=json.loads((out/'source.json').read_text())['forms']
 for form,config in CONFIG.items():
  sid=config[0];nd=next((a.work/f'{form}-neutral').glob(f'DefineSprite_{sid}*'));pd=next((a.work/f'{form}-probe').glob(f'DefineSprite_{sid}*'));images=[Image.open(nd/f'{i}.png').convert('RGBA') for i in range(1,9)];masks=[coverage(im,Image.open(pd/f'{i+1}.png').convert('RGBA')) for i,im in enumerate(images)];target=Image.open(a.repo/('public/assets/original/seed/body-mask.png' if form=='seed' else f'public/assets/classic/{form}-mask.png')).convert('RGBA');w,h=(96,99) if form=='seed' else (192,208);target=np.asarray(target.crop((0,0,w,h)));source=np.asarray(masks[0]);sy,sx=np.where((source[:,:,:3].sum(2)>90)&(source[:,:,3]>150));ty,tx=np.where((target[:,:,:3].sum(2)>90)&(target[:,:,3]>150));scale=(tx.max()-tx.min()+1)/(sx.max()-sx.min()+1);dx=(tx.max()+tx.min()+1)/2-(sx.max()+sx.min()+1)/2*scale;dy=(ty.max()+1)-(sy.max()+1)*scale
  for kind,parts in [('neutral',images),('mask',masks)]:
@@ -143,13 +152,16 @@ for form,config in CONFIG.items():
   atlas.save(out/f'{form}-{kind}.png',optimize=True)
  mouth_diff=np.abs(np.asarray(images[7]).astype(int)-np.asarray(images[0]).astype(int)).sum(2)>30;yy,xx=np.where(mouth_diff);mouth_point=[((xx.min()+xx.max())/2*scale+dx)/w*100,((yy.min()+yy.max())/2*scale+dy)/h*100]
  metadata['forms'][form]={'cell':[w,h],'columns':8,'sourceSprite':sid,'scale':scale,'translation':[dx,dy],'mouthPoint':mouth_point,'snorePoint':[(tx.max()+1)/w*100+4,mouth_point[1]]}
-# The Z glyph itself is original shape760, inside original sprite761.
-source_swf=a.ordinary_xml.with_suffix('.swf')
-if not source_swf.exists():
- source_swf=a.work/'original.swf'
- subprocess.run(['java','-Xmx512m','-Djava.awt.headless=true','-jar',a.ffdec,'-xml2swf',str(a.ordinary_xml),str(source_swf)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True)
-subprocess.run(['java','-Xmx512m','-Djava.awt.headless=true','-jar',a.ffdec,'-selectid','761','-zoom','4','-ignorebackground','-export','sprite',str(a.work/'original-z'),str(source_swf)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True)
-Image.open(next((a.work/'original-z').rglob('*.png'))).save(out/'z.png',optimize=True)
+# The existing original Z export is shared by all forms.
+if not (out/'z.png').exists():
+ source_swf=a.ordinary_xml.with_suffix('.swf')
+ if a.exporter:
+  subprocess.run([a.exporter,'frame',str(source_swf),str(a.work/'original-z'),'761','0','4'],check=True,stdout=subprocess.DEVNULL)
+ else:
+  if not source_swf.exists():
+   source_swf=a.work/'original.swf';subprocess.run(['java','-Xmx512m','-Djava.awt.headless=true','-jar',a.ffdec,'-xml2swf',str(a.ordinary_xml),str(source_swf)],check=True,stdout=subprocess.DEVNULL)
+  subprocess.run(['java','-Xmx512m','-Djava.awt.headless=true','-jar',a.ffdec,'-selectid','761','-zoom','4','-ignorebackground','-export','sprite',str(a.work/'original-z'),str(source_swf)],check=True,stdout=subprocess.DEVNULL)
+ Image.open(next((a.work/'original-z').rglob('*.png'))).save(out/'z.png',optimize=True)
 metadata['sourceFiles']=json.loads((a.repo/'public/assets/original/football/source.json').read_text())['sourceFiles']
 metadata['z']={'sourceSprite':761,'shape':760}
 (out/'source.json').write_text(json.dumps(metadata,indent=2)+'\n');(out/'checksums.json').write_text(json.dumps({f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in out.glob('*.png')},indent=2)+'\n')

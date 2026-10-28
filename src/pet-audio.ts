@@ -1,3 +1,5 @@
+import {createOriginalGameAudio,type GameSound} from './game-audio'
+export type {GameSound} from './game-audio'
 import type { Foley, SoundScore } from './pet-sound-score'
 
 export type PetVoice = 'pet' | 'lift' | 'shake' | 'drop' | 'catch' | 'feed' | 'drink' | 'wash' | 'sleep' | 'wake' | 'sick'
@@ -5,9 +7,10 @@ let lastVoiceAt = -Infinity, lastEffectAt = -Infinity
 let lastKind: PetVoice | null = null, context: AudioContext | null = null
 let settings = {enabled: true, volume: .45}
 const channels = new Set<GainNode>()
+const gameAudio=createOriginalGameAudio(url=>new Audio(url))
 const canPlay = (enabled = true) => enabled && settings.enabled && settings.volume > 0 && !document.hidden
 const level = () => canPlay() ? settings.volume : 0
-function syncChannels() { for (const channel of channels) {channel.gain.cancelScheduledValues(0);channel.gain.value=level()} }
+function syncChannels() { gameAudio.configure({...settings,hidden:typeof document!=='undefined'&&document.hidden});for (const channel of channels) {channel.gain.cancelScheduledValues(0);channel.gain.value=level()} }
 export function configurePetSound(next: typeof settings) {
   settings = {...next, volume: Number.isFinite(next.volume) ? Math.max(0,Math.min(1,next.volume)) : .45}
   syncChannels()
@@ -98,24 +101,12 @@ export function playPetVoice(kind: PetVoice, enabled: boolean) {
     note(audio,at+.14,.18,pitch*1.18,pitch*1.04,.025,output)
   })
 }
-export type GameSound = 'flip'|'match'|'catch'|'move'|'perfect'|'purchase'|'reward'|'start'|'countdown'|'miss'|'combo'|'hint'|'pause'|'resume'|'mismatch'
-/** Short event cues, shared by live play and the offline review recording. */
-export function renderGameSound(audio:BaseAudioContext,kind:GameSound,at:number,output:AudioNode){
-    if(kind==='flip'||kind==='move'){renderFoley(audio,'page',at,.7,output);return}
-    if(kind==='catch'){renderFoley(audio,'bubble',at,.7,output);return}
-    if(kind==='countdown'){note(audio,at,.075,440,390,.025,output);return}
-    if(kind==='miss'||kind==='mismatch'){note(audio,at,.16,kind==='miss'?195:230,135,.028,output);return}
-    if(kind==='hint'){renderFoley(audio,'sparkle',at,.45,output);return}
-    const pitches=kind==='reward'?[523,659,784]:kind==='purchase'?[660,880]:kind==='perfect'?[784,1047]:kind==='combo'?[784,1047,1320]:kind==='start'?[392,523,659]:kind==='pause'?[440,330]:kind==='resume'?[330,440]:[659,880]
-    pitches.forEach((pitch,i)=>note(audio,at+i*.09,.19,pitch,pitch,.04,output))
+/** Gameplay cues use original game recordings; pet care foley stays separate. */
+export function playGameSound(kind:GameSound,enabled:boolean){
+ if(!canPlay(enabled)||performance.now()-lastEffectAt<75)return;
+ lastEffectAt=performance.now();gameAudio.play(kind);
 }
-export function playGameSound(kind: GameSound, enabled: boolean) {
-  if(!canPlay(enabled)||performance.now()-lastEffectAt<75)return
-  lastEffectAt=performance.now()
-  oneShot((audio,output)=>{
-    renderGameSound(audio,kind,audio.currentTime,output)
-  })
-}
+export function stopGameSounds(){gameAudio.stop()}
 /** Unlock on the user's Start gesture; never plays on launch. */
 export function prepareReminderSound() {try{void audioContext().resume().catch(()=>{})}catch{/* Optional audio. */}}
 /** The explicit timer's chime has its own switch and bypasses pet mute/TTS. */

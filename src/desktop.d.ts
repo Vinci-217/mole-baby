@@ -44,6 +44,7 @@ declare global {
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
       setRoomFullscreen:(enabled:boolean)=>Promise<boolean>;
+      openManorSite:()=>Promise<void>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
       setPetStatus:(status:{name:string;stage:number;sleeping:boolean;stats:Record<string,number>;activity?:'course'|'restaurant'|'outing'}|null)=>Promise<void>;
       setPetEffectBounds:(bounds:{x:number;y:number;width:number;height:number}|null)=>Promise<DesktopState>;

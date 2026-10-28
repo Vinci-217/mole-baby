@@ -3,7 +3,7 @@ import type { GameReceipt } from './game-receipt';
 import { useEffect, useRef, useState } from 'react';
 import './MemoryGame.css';
 import GameArt from './GameArt';
-import { playGameSound } from '../pet-audio';
+import { playGameSound,stopGameSounds } from '../pet-audio';
 
 type Phase = 'ready' | 'preview' | 'playing' | 'celebrating' | 'finished';
 type Card = { id: number; kind: number; matched: boolean };
@@ -16,6 +16,7 @@ function shuffle(): Card[] {
 }
 
 export default function MemoryGame({ onComplete, onClose, sound=false }: { onComplete: (score: number) => GameReceipt | void; onClose: () => void; sound?: boolean }) {
+  useEffect(()=>()=>stopGameSounds(),[]);
   const [phase, setPhase] = useState<Phase>('ready');
   const [board, setBoard] = useState<Card[]>([]);
   const [selected, setSelected] = useState<number[]>([]);

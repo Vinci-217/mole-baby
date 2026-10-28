@@ -55,11 +55,11 @@ export function affectionFrame(elapsed:number,reduced=false):number {
  return frame
 }
 export function slumberMouth(form:RamForm):readonly number[] {
-  const point=slumber.forms[form==='classic'?'super':form].mouthPoint
+  const point=slumber.forms[form].mouthPoint
   return form==='seed'?[26.56+point[0]*.5,17.31+point[1]*.476]:point
 }
 
 export function slumberEmitter(form:RamForm):readonly number[] {
-  const point=slumber.forms[form==='classic'?'super':form].snorePoint
+  const point=slumber.forms[form].snorePoint
   return form==='seed'?[26.56+point[0]*.5,17.31+point[1]*.476]:point
 }

@@ -1,0 +1,43 @@
+{
+  "archive": "Miigon/RecMoleRes",
+  "commit": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/ui/ui.swf",
+  "files": [
+    {
+      "file": "shop.png",
+      "source": "root/resource/ui/ui.swf",
+      "sourceSha256": "ee86bfb2216a07943bccd7dabd161049548dbaf7758797c68c9e5e85fdfcbb4b",
+      "characterId": 6868,
+      "kind": "DefineButton2",
+      "originalName": "mall_btn",
+      "frame": 1,
+      "zoom": 3,
+      "sha256": "638b6d40a8e844eaf78dcf2ae771dd4ab49cfd66405ddf569f493a67948d035f",
+      "adaptation": "Direct raster export of original UI. Semantic use as desktop room navigation."
+    },
+    {
+      "file": "school.png",
+      "source": "root/resource/ui/ui.swf",
+      "sourceSha256": "ee86bfb2216a07943bccd7dabd161049548dbaf7758797c68c9e5e85fdfcbb4b",
+      "characterId": 6917,
+      "kind": "DefineButton2",
+      "originalName": "class_btn",
+      "frame": 1,
+      "zoom": 3,
+      "sha256": "83a00920ce5629d60c2436b452bb629af4fa34feb76cea829d78f6287c96c168",
+      "adaptation": "Direct raster export of original UI. Semantic use as desktop room navigation."
+    },
+    {
+      "file": "settings.png",
+      "source": "root/resource/ui/ui.swf",
+      "sourceSha256": "ee86bfb2216a07943bccd7dabd161049548dbaf7758797c68c9e5e85fdfcbb4b",
+      "characterId": 6882,
+      "kind": "DefineSprite",
+      "originalName": "quality_mc",
+      "frame": 1,
+      "zoom": 3,
+      "sha256": "e8f0c415baabfff183b8d9a7933d7bbd55d6047924a8b3c4572088de0dbf0491",
+      "adaptation": "Direct raster export of original UI. Semantic use as desktop room navigation."
+    }
+  ]
+}

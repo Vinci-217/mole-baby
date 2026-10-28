@@ -4,7 +4,7 @@ import type { Evolution, PetColor, Stage } from '../game';
 import type { RoomBackground } from '../room-media';
 import type { ScenePhase } from '../scene-time';
 import { sceneSheetPosition } from '../scene-time';
-import { playGameSound } from '../pet-audio';
+import { playGameSound,stopGameSounds } from '../pet-audio';
 import type { GameReceipt } from './game-receipt';
 import Ram from './Ram';
 import { createTreasureRound, findTreasure, treasureHint, treasureScore } from './treasure-rules';
@@ -18,6 +18,7 @@ interface Props {
 type RoundPhase = 'ready' | 'playing' | 'collected' | 'finished' | 'closed';
 
 export default function TreasureGame({ background, phase, color, stage, evolution, costume, sound = false, onClose, onComplete }: Props) {
+  useEffect(()=>()=>stopGameSounds(),[]);
   const [round, setRound] = useState(createTreasureRound);
   const [mode, setMode] = useState<RoundPhase>('ready');
   const [found, setFound] = useState<string[]>([]);

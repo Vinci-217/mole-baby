@@ -1,0 +1,12 @@
+.diary-sections{display:flex;flex-direction:column;gap:18px;max-width:680px;margin:auto}
+.diary-sections .pet-diary{width:100%;padding:0 18px;border:1px solid #e9dcc5;border-radius:12px;background:#fffcf6}
+.pet-diary summary{display:flex;align-items:center;gap:12px;cursor:pointer;padding:17px 0;list-style:none}
+.pet-diary summary::-webkit-details-marker{display:none}
+.pet-diary summary::before{content:'▸';color:#a88450;transition:transform .15s}
+.pet-diary details[open]>summary::before{transform:rotate(90deg)}
+.pet-diary summary h3{font-size:16px;margin:0;flex:1}
+.pet-diary summary>span{font-size:12px;color:#aa9273;white-space:nowrap}
+.pet-diary details>p{font-size:13px;line-height:1.8;padding:0 0 18px;color:#998267}
+.pet-diary details article:last-child{border-bottom:0}
+.pet-diary details article p{font-size:13px;line-height:1.8;margin:8px 0 0}
+.pet-diary summary:focus-visible{outline-offset:3px;border-radius:5px}

@@ -1,6 +1,32 @@
-const{chromium}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true});try{const p=await browser.newPage();await p.goto(process.env.REVIEW_URL||'http://127.0.0.1:5230');const result=await p.evaluate(async()=>{
- const{renderGameSound,configurePetSound,playGameSound}=await import('/src/pet-audio.ts');const kinds=['start','flip','match','mismatch','catch','combo','miss','hint','move','perfect','pause','resume','countdown','purchase','reward'];const sr=48000,slot=.8,audio=new OfflineAudioContext(1,Math.ceil(sr*slot*kinds.length),sr);kinds.forEach((k,i)=>renderGameSound(audio,k,i*slot,audio.destination));const buffer=await audio.startRendering(),samples=buffer.getChannelData(0);const stats=kinds.map((kind,i)=>{const part=samples.subarray(Math.floor(i*slot*sr),Math.floor((i+1)*slot*sr));let energy=0,peak=0;for(const v of part){energy+=v*v;peak=Math.max(peak,Math.abs(v))}return{kind,rms:Math.sqrt(energy/part.length),peak}});
- const wav=new ArrayBuffer(44+samples.length*2),view=new DataView(wav);const text=(at,s)=>{for(let i=0;i<s.length;i++)view.setUint8(at+i,s.charCodeAt(i))};text(0,'RIFF');view.setUint32(4,wav.byteLength-8,true);text(8,'WAVE');text(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sr,true);view.setUint32(28,sr*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);text(36,'data');view.setUint32(40,samples.length*2,true);samples.forEach((v,i)=>view.setInt16(44+i*2,Math.max(-32768,Math.min(32767,Math.round(v*32767))),true));let raw='';const bytes=new Uint8Array(wav);for(let i=0;i<bytes.length;i+=8192)raw+=String.fromCharCode(...bytes.subarray(i,i+8192));
- let notes=0;const gains=[];const Original=window.AudioContext;window.AudioContext=class extends Original{createOscillator(){notes++;return super.createOscillator()}createGain(){const g=super.createGain();gains.push(g);return g}};configurePetSound({enabled:false,volume:.5});playGameSound('start',true);const mutedBefore=notes;configurePetSound({enabled:true,volume:.5});playGameSound('start',true);const liveNotes=notes;configurePetSound({enabled:false,volume:.5});const outputGain=gains[0]?.gain.value;playGameSound('combo',true);return{stats,mutedBefore,liveNotes,mutedAfter:notes,outputGain,wav:btoa(raw)};
- });assert.equal(result.mutedBefore,0);assert.equal(result.liveNotes,3);assert.equal(result.mutedAfter,3);assert.equal(result.outputGain,0);for(const s of result.stats)assert.ok(s.rms>.0001&&s.peak<.95,s.kind);fs.writeFileSync(path.resolve(__dirname,'../artifacts/v26-game-effects.wav'),Buffer.from(result.wav,'base64'));fs.writeFileSync(path.resolve(__dirname,'../artifacts/v26-review/game-effects.json'),JSON.stringify({...result,wav:undefined},null,2));console.log('PASS 15 distinct rendered game effects, non-silent/unclipped, muted before playback and immediately muted in flight');console.log(JSON.stringify(result.stats))}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
+const {chromium}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--autoplay-policy=no-user-gesture-required']});
+ try{
+  const page=await browser.newPage();await page.goto(process.env.REVIEW_URL||'http://127.0.0.1:5230');
+  const result=await page.evaluate(async()=>{
+   const {GAME_SOUND_FILES,gameSoundUrl}=await import('/src/game-audio.ts');
+   const {configurePetSound,playGameSound,stopGameSounds}=await import('/src/pet-audio.ts');
+   const audio=new OfflineAudioContext(1,1,48000),files=[...new Set(Object.values(GAME_SOUND_FILES))],stats=[];
+   for(const file of files){
+    const response=await fetch(`./assets/original/game-audio/${file}.mp3`);if(!response.ok)throw Error('Missing original audio '+file);
+    const buffer=await audio.decodeAudioData(await response.arrayBuffer()),data=buffer.getChannelData(0);let energy=0,peak=0;
+    for(const value of data){energy+=value*value;peak=Math.max(peak,Math.abs(value))}
+    stats.push({file,duration:buffer.duration,rms:Math.sqrt(energy/data.length),peak});
+   }
+   const BaseAudio=window.Audio,BaseContext=window.AudioContext,voices=[];let oscillators=0;
+   window.Audio=class extends BaseAudio{constructor(...args){super(...args);voices.push(this)}};
+   window.AudioContext=class extends BaseContext{createOscillator(){oscillators++;return super.createOscillator()}};
+   configurePetSound({enabled:false,volume:.5});playGameSound('start',true);const mutedBefore=voices.length;
+   configurePetSound({enabled:true,volume:.5});playGameSound('start',true);await new Promise(resolve=>setTimeout(resolve,200));
+   const live=voices.map(a=>({source:a.src,playing:!a.paused,volume:a.volume}));
+   configurePetSound({enabled:false,volume:.5});const stopped=voices.every(a=>a.paused);stopGameSounds();
+   window.Audio=BaseAudio;window.AudioContext=BaseContext;
+   return{stats,events:Object.keys(GAME_SOUND_FILES).length,uniqueFiles:files.length,mutedBefore,live,stopped,oscillators,startUrl:gameSoundUrl('start')};
+  });
+  assert.equal(result.mutedBefore,0);assert.equal(result.oscillators,0);assert.equal(result.stopped,true);assert.equal(result.uniqueFiles,12);assert.equal(result.events,15);
+  assert.equal(result.live.length,1);assert.ok(result.live[0].source.endsWith('/original/game-audio/start.mp3'));assert.equal(result.live[0].playing,true);assert.equal(result.live[0].volume,.5);
+  for(const sample of result.stats)assert.ok(sample.duration>0&&sample.rms>.0001&&Number.isFinite(sample.peak),sample.file);
+  const out=path.resolve(__dirname,'../artifacts/original-game-audio');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'review.json'),JSON.stringify(result,null,2)+'\n');
+  console.log('PASS 12 original game recordings / 15 event mappings, decoded non-silent streams, zero synthesized oscillators, muted before playback and stopped immediately in flight');
+ }finally{await browser.close()}
+})().catch(error=>{console.error(error);process.exitCode=1});

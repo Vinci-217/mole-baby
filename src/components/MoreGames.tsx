@@ -7,7 +7,7 @@ import {
 } from './extra-game-rules';
 import type { BeatJudgment, OrchardFruit } from './extra-game-rules';
 import './MoreGames.css';
-import { playGameSound } from '../pet-audio';
+import { playGameSound,stopGameSounds } from '../pet-audio';
 
 export type ExtraGame = 'rhythm' | 'orchard' | 'puzzle';
 type Props = { kind: ExtraGame; onComplete: (score: number) => GameReceipt | void; onClose: () => void; sound?: boolean };
@@ -24,6 +24,7 @@ const orchardImages = ['180027', '180028', '180030'] as const;
 export default function MoreGames(props: Props) { return <GameSession key={props.kind} {...props}/>; }
 
 function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
+  useEffect(()=>()=>stopGameSounds(),[]);
   const [phase, setPhase] = useState<Phase>('ready');
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused] = useState(false);
