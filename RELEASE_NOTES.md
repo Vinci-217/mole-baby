@@ -1,4 +1,4 @@
-拉姆 v0.30.7 · 魔法不缩小、快速休息与状态托盘
+拉姆 v0.30.8 · 魔法不缩小、快速休息与状态托盘
 
 - 火、水、木18个变身使用完整原版1,711帧，整段固定比例和原点，移除镜头缩放。大特效可以超出原宠物区域；桌面施法时透明窗口临时展开，拉姆屏幕位置保持不变，结束恢复窗口。只有物理屏幕边缘会截断屏幕外部分，不为了塞进窗口缩小角色。
 - 上课、打工和日常活动受状态限制时，显示所需数值、当前数值和恢复方式。上课精力至少30点，打工至少31点（含开工消耗，避免开工后立即困睡），玩球至少12点。
@@ -7,18 +7,20 @@
 - 鼠标悬停系统托盘图标即可查看拉姆名字、阶段、当前活动及六项状态；最小化后继续更新。退出领养后清除旧状态。
 - 原帧图集改为透明裁片打包，坐标独立保存；限制单图集尺寸与解码缓存，继续提供Windows常规与Windows7 SP1/8/8.1的32/64位兼容包。更新仍需用户确认。
 
+- 增加Windows延迟窗口消息后的坐标对齐，保持大型法术的屏幕落点；成品检查以施法前的稳定坐标为基准。
+
 ## 下载与安装
 
 | 你的电脑 | 下载这个文件 |
 | --- | --- |
-| Windows10/11，64位 | `mole-baby-0.30.7-Setup.exe`，双击安装 |
-| Windows7 SP1／8／8.1，64位 | `mole-baby-0.30.7-legacy-x64-Setup.exe` |
-| Windows7 SP1／8／8.1，32位 | `mole-baby-0.30.7-legacy-ia32-Setup.exe` |
-| Mac，Apple芯片（M系列） | `mole-baby-0.30.7-mac-arm64.dmg` |
-| Mac，Intel芯片 | `mole-baby-0.30.7-mac-x64.dmg` |
+| Windows10/11，64位 | `mole-baby-0.30.8-Setup.exe`，双击安装 |
+| Windows7 SP1／8／8.1，64位 | `mole-baby-0.30.8-legacy-x64-Setup.exe` |
+| Windows7 SP1／8／8.1，32位 | `mole-baby-0.30.8-legacy-ia32-Setup.exe` |
+| Mac，Apple芯片（M系列） | `mole-baby-0.30.8-mac-arm64.dmg` |
+| Mac，Intel芯片 | `mole-baby-0.30.8-mac-x64.dmg` |
 
 Mac 打开DMG后，把「拉姆」拖到「应用程序」，覆盖时选择替换；从状态栏退出旧拉姆，再打开新版。遇到Apple验证提示，先看附件 `mole-baby-mac-help.html`。Mac12或更新系统受支持。
 
 ZIP是对应系统的便携/归档包。不要下载底部的Source code ZIP，那是源代码。Windows安装版确认后可更新并重启；当前本地签名Mac版仍需打开DMG手动替换应用。关闭窗口只是缩到托盘，完全退出后启动约8秒检查新版。旧版检测不到时，从本页下载安装包覆盖安装，原存档保留。
 
-[课程与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.30.7/docs/COURSES.md) · [更新说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.7/docs/UPDATES.md) · [动画与预览](https://github.com/Vinci-217/mole-baby/blob/v0.30.7/README.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.30.7-validation.md)
+[课程与玩法](https://github.com/Vinci-217/mole-baby/blob/v0.30.8/docs/COURSES.md) · [更新说明](https://github.com/Vinci-217/mole-baby/blob/v0.30.8/docs/UPDATES.md) · [动画与预览](https://github.com/Vinci-217/mole-baby/blob/v0.30.8/README.md) · [验证记录](https://github.com/Vinci-217/mole-baby/blob/main/research/release-0.30.8-validation.md)

@@ -1,0 +1,67 @@
+{
+  "version": "0.30.7",
+  "tag": "v0.30.7",
+  "sourceSha": "77f651ad9bbc4be63c640b9e0167541ea9d115e4",
+  "buildResult": "failure",
+  "platforms": {
+    "windows": "success",
+    "legacyWindows": "failure",
+    "mac": "success"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40680225357",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.30.7-legacy-ia32.zip",
+      "sha256": "07c928ee8515a59aba1bb61081fb796d6bd29ebf1f188c5a18ebd2e856413105"
+    },
+    {
+      "file": "mole-baby-0.30.7-legacy-ia32-Setup.exe",
+      "sha256": "6803ea44da3499c18d66d8f3968097b2819a875d0db428807d5f4d14426adf60"
+    },
+    {
+      "file": "mole-baby-0.30.7-mac-arm64.dmg",
+      "sha256": "590be8b90005223bfbbbaa2652e619995019eff123d1390257fcd35354e11c4d"
+    },
+    {
+      "file": "mole-baby-0.30.7-mac-arm64.zip",
+      "sha256": "20e7d23e0a6514758f5d85f90a914d5dd1e6184f975e8632337c9c25e681844b"
+    },
+    {
+      "file": "mole-baby-0.30.7-mac-x64.dmg",
+      "sha256": "909d9d5e7c777dff88100e97f3f794da959fdd1f15eb3e6d7a66fea75fdb7f1a"
+    },
+    {
+      "file": "mole-baby-0.30.7-mac-x64.zip",
+      "sha256": "db4e9ce1da627eddf307b4bd9bd6662daf28d336d9a6d697ab1962bbb97f4723"
+    },
+    {
+      "file": "mole-baby-0.30.7-x64.zip",
+      "sha256": "78236d0c9d3b4c59209cf67fe591c1a48f600dab36c96a3b0f5be022ec122696"
+    },
+    {
+      "file": "mole-baby-0.30.7-Setup.exe",
+      "sha256": "a61e60100b7afa131e2f86d4f10f47147b5cc72e197257be709c34c13a53a5e2"
+    }
+  ],
+  "macTrust": {
+    "arm64": {
+      "architecture": "arm64",
+      "sourceSha": "77f651ad9bbc4be63c640b9e0167541ea9d115e4",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "77f651ad9bbc4be63c640b9e0167541ea9d115e4",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "recordedAt": "2026-10-28T11:42:04.192Z"
+}

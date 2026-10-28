@@ -1,0 +1,49 @@
+{
+  "version": "0.30.8",
+  "baseReleaseSource": "77f651ad9bbc4be63c640b9e0167541ea9d115e4",
+  "unitTests": {
+    "vitest": 339,
+    "node": 106
+  },
+  "checks": {
+    "unit": {
+      "exitCode": 0,
+      "logSha256": "dbfdf393078111a58ab68d722177dcc70d8bc0788dedd00292071471136e3afe",
+      "evidence": [
+        "PASS: ten checked downloads and isolated modern/legacy/Mac update channels match size and SHA512 digests",
+        "PASS: ten checked downloads and isolated modern/legacy/Mac update channels match size and SHA512 digests",
+        "ℹ tests 106",
+        "ℹ fail 0"
+      ]
+    },
+    "native": {
+      "exitCode": 0,
+      "logSha256": "6f18938e8a6bcf8b8984250b5c27fcb98736b88b0adf68d96430e49a3f2f9560",
+      "evidence": [
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory"
+      ]
+    },
+    "legacy": {
+      "exitCode": 0,
+      "logSha256": "11e053e323b1e1b2e0e28b5910e2a9cf47f3ee128bb88221d3ec5cf75190b8bd",
+      "evidence": [
+        "Compatibility runtime: { electron: '22.3.27', node: '16.17.1', chrome: '108.0.5359.215' }",
+        "PASS local renderer policy: external scripts blocked before network access",
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory"
+      ]
+    },
+    "browser": {
+      "exitCode": 0,
+      "logSha256": "cc91858f09c8a74e153299ddfb4effa6fe899e3538cd4986e707f7eebd4666da",
+      "evidence": [
+        "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory"
+      ]
+    }
+  },
+  "sourceFiles": {
+    "electron/main.cjs": "0a677af169c9be1f46be12c89a99f7bbbc7f148d30ee82c322589715b83b2309",
+    "electron/desktop-geometry.cjs": "7f1dbdfb4b0b3f13f9f670cf01c9af789586f917e097e1d0f78c65a07da62cc1",
+    "scripts/spell-care-checks.cjs": "c284e2e009bd425588cc265e023111296d1955c51c933fc165cc623af2f0838a"
+  }
+}

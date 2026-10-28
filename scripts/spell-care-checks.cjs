@@ -2,11 +2,12 @@ const assert=require('node:assert/strict'),path=require('node:path'),fs=require(
 const {expect}=require('@playwright/test');
 const {openActions,enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
 const clips=require('../public/assets/original/element-skills/clips.json');
-const out=path.resolve(__dirname,'../artifacts/v307');
+const out=path.resolve(__dirname,`../artifacts/v${require('../package.json').version.split('.').slice(1).join('')}`);
 async function verifySpellCare(page,desktop){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
  const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
  const receipt={spells:[],rewards:[],native:Boolean(desktop)};let clock=false;
+ const originalDesktop=desktop?await page.evaluate(()=>window.desktop.getState()):null;
  const fixture=async energy=>{
   await page.evaluate(energy=>{
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
@@ -24,13 +25,23 @@ async function verifySpellCare(page,desktop){
   fs.mkdirSync(out,{recursive:true});await page.emulateMedia({reducedMotion:'no-preference'});
   await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;
   await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+10000));
+  if(desktop)await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false)});
   await fixture(95);
   for(const id of ['fire-6','water-6','wood-6']){
    const clip=clips[id],character=page.getByTestId('desktop-character');
-   const actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
+   const actions=await openActions(page);
+   // Capture before resizing, from the authoritative native window plus pet
+   // offset. Chromium's screenX/screenY can lag a Windows move notification.
+   let baseline;
+   if(desktop){
+    const state=await page.evaluate(()=>window.desktop.getState());assert.equal(state.companionPanel,false);
+    const bounds=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
+    baseline={x:bounds.x+(state.petOffset?.x??0)+30,y:bounds.y+(state.petOffset?.y??0)+71};
+    await expect.poll(async()=>{const p=await character.evaluate(el=>{const r=el.getBoundingClientRect();return{x:screenX+r.x,y:screenY+r.y}});return Math.max(Math.abs(p.x-baseline.x),Math.abs(p.y-baseline.y))}).toBeLessThan(1);
+   }
+   await actions.getByRole('button',{name:'玩耍',exact:true}).click();
    await page.getByTestId('companion-panel').getByRole('button',{name:clip.name,exact:true}).click();
    const magic=character.locator('.magic-box-performance');await expect(magic).toHaveAttribute('data-ready','true');
-   const baseline=await character.evaluate(el=>{const r=el.getBoundingClientRect();return{x:screenX+r.x,y:screenY+r.y}});
    const started=Number(await magic.getAttribute('data-magic-start'));
    const peak=clip.frameMap.map((index,frame)=>({frame:frame+1,area:clip.rectangles[index][3]*clip.rectangles[index][4]})).sort((a,b)=>b.area-a.area)[0].frame;
    const samples=[];
@@ -53,13 +64,14 @@ async function verifySpellCare(page,desktop){
     const native=await page.evaluate(()=>window.desktop.getState());assert.equal(native.effectExpanded,true);
     const bounds=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());assert.ok(bounds.width>160||bounds.height>240);
     const anchor=await character.evaluate(el=>{const r=el.getBoundingClientRect();return{x:screenX+r.x,y:screenY+r.y}});
-    assert.ok(Math.abs(anchor.x-baseline.x)<1&&Math.abs(anchor.y-baseline.y)<1,'native resize must preserve character position');
+    assert.ok(Math.abs(anchor.x-baseline.x)<1&&Math.abs(anchor.y-baseline.y)<1,`native resize must preserve character position: ${JSON.stringify({id,baseline,anchor,bounds,offset:native.petOffset})}`);
+    receipt.spells.push({id,peak,samples,baseline,anchor});
    }
    await page.clock.runFor(4000);await expect(magic).toHaveCount(0);
    if(desktop)await expect.poll(async()=>{
     const b=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());return[b.width,b.height];
    }).toEqual([160,240]);
-   receipt.spells.push({id,peak,samples});
+   if(!desktop)receipt.spells.push({id,peak,samples});
   }
   // Interrupt through real controls: no target may keep painting after its
   // expanded host is restored or a different interaction surface is opened.
@@ -117,6 +129,7 @@ async function verifySpellCare(page,desktop){
   fs.writeFileSync(path.join(out,`${desktop?'native':'browser'}-checks.json`),JSON.stringify(receipt,null,2)+'\n');
   console.log('PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory');
  }finally{
+  if(originalDesktop)await page.evaluate(async s=>{await window.desktop.setEdgeHiding(s.edgeHiding);await window.desktop.wander(s.wandering)},originalDesktop);
   if(clock)await page.clock.resume();
   await page.evaluate(values=>{localStorage.clear();for(const[k,v]of Object.entries(values))localStorage.setItem(k,v)},snapshot);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});

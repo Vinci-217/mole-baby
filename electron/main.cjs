@@ -89,6 +89,7 @@ let edgeNextPeekAt = null;
 let draggingFromEdge = false;
 let petOffset={x:0,y:0};
 let petEffectBounds=null;
+let petEffectAnchor=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
@@ -420,7 +421,16 @@ function changeMouseThrough(enabled){
  changeMousePassthrough(false);refreshTrayMenu();scheduleSave();publishState();return enabled;
 }
 function currentPetBounds(){
+ if(petMode&&petEffectBounds&&petEffectAnchor)return {...PET_SIZE,...petEffectAnchor};
  const b=mainWindow.getBounds();return {...PET_SIZE,x:b.x+(companionPanel&&panelGeometry?panelGeometry.petX:petOffset.x),y:b.y+(companionPanel&&panelGeometry?panelGeometry.petY:petOffset.y)};
+}
+/** Old Windows can deliver its final placement after setBounds returns. Keep
+ * the effect's screen anchor independent of those asynchronous WM messages. */
+function syncEffectAnchor(){
+ if(changingMode||!petMode||!petEffectBounds||!petEffectAnchor||!mainWindow||mainWindow.isDestroyed())return;
+ const actual=mainWindow.getBounds(),next={x:petEffectAnchor.x-actual.x,y:petEffectAnchor.y-actual.y};
+ if(next.x===petOffset.x&&next.y===petOffset.y)return;
+ petOffset=next;publishState();
 }
 function changePetEffectBounds(effect){
  if(effect!==null&&(!effect||Array.isArray(effect)||['x','y','width','height'].some(key=>typeof effect[key]!=='number'||!Number.isFinite(effect[key]))||Math.abs(effect.x)>4096||Math.abs(effect.y)>4096||effect.width<=0||effect.height<=0||effect.width>4096||effect.height>4096))throw new TypeError('Invalid pet effect bounds');
@@ -431,6 +441,7 @@ function changePetEffectBounds(effect){
  const base=currentPetBounds();
  const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,effect):clampBounds(base,PET_SIZE);
  petEffectBounds=effect?{x:effect.x,y:effect.y,width:effect.width,height:effect.height}:null;
+ petEffectAnchor=effect?{x:base.x,y:base.y}:null;
  changingMode=true;
  if(process.platform==='win32')applyMinimum(target,true);
  mainWindow.setBounds(target);
@@ -851,8 +862,8 @@ function createWindow() {
   window.setMenu(null);
   window.on('show',()=>publishState());
   window.on('hide',()=>publishState());
-  window.on('move', scheduleSave);
-  window.on('resize', scheduleSave);
+  window.on('move',()=>{syncEffectAnchor();scheduleSave()});
+  window.on('resize',()=>{syncEffectAnchor();scheduleSave()});
   window.on('always-on-top-changed', () => publishState());
   window.on('minimize', event => { event.preventDefault(); hideToTray(); });
   window.on('restore', scheduleWander);

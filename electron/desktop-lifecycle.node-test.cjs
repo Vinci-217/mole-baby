@@ -45,7 +45,10 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     isVisible() { return this.visible; }
     getBounds() { return { ...this.bounds }; }
     getNormalBounds() { return this.getBounds(); }
-    setBounds(bounds) { this.bounds = { ...bounds };if(options.clamp){this.bounds.x=Math.max(0,this.bounds.x);this.bounds.y=Math.max(0,this.bounds.y);} }
+    setBounds(bounds) {
+      this.bounds = { ...bounds };if(options.clamp){this.bounds.x=Math.max(0,this.bounds.x);this.bounds.y=Math.max(0,this.bounds.y);}
+      if(options.delayedMove&&bounds.width>160)setImmediate(()=>{this.bounds.x+=11;this.bounds.y+=7;this.emit('move')});
+    }
     setPosition(x, y) { this.bounds.x = options.clamp?Math.max(0,x):x; this.bounds.y = options.clamp?Math.max(0,y):y; }
     setAlwaysOnTop(value) { this.top = value; }
     setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
@@ -120,6 +123,18 @@ for(const platform of ['win32','darwin','linux'])test(`${platform}: expanded spe
  assert.equal(run.invoke('desktop:get-state').effectExpanded,false);
  run.invoke('desktop:set-pet-mode',true);assert.deepEqual(run.window.getBounds(),base);
  for(const bad of [{...effect,width:Infinity},{...effect,x:-5000},{...effect,height:0},[],true])assert.throws(()=>run.invoke('desktop:set-pet-effect-bounds',bad));
+});
+
+test('delayed Windows placement preserves the spell anchor and the position restored afterward',async t=>{
+ const run=await launch(undefined,false,'win32',{delayedMove:true});t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ const base=run.window.getBounds();
+ run.invoke('desktop:set-pet-effect-bounds',{x:-400,y:-600,width:900,height:900});
+ const first=run.window.getBounds();await new Promise(resolve=>setImmediate(resolve));
+ const actual=run.window.getBounds(),state=run.invoke('desktop:get-state');
+ assert.equal(actual.x,first.x+11);assert.equal(actual.y,first.y+7);
+ assert.equal(actual.x+state.petOffset.x,base.x);assert.equal(actual.y+state.petOffset.y,base.y);
+ run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),base);
 });
 
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {

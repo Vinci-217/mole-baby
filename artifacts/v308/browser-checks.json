@@ -1,0 +1,108 @@
+{
+  "spells": [
+    {
+      "id": "fire-6",
+      "peak": 104,
+      "samples": [
+        {
+          "frame": 1,
+          "ratio": 0.5555417495029821,
+          "parentWidth": 100,
+          "inkWidth": 61.10959244532803,
+          "inkHeight": 83.33071608040201
+        },
+        {
+          "frame": 104,
+          "ratio": 0.5555417495029821,
+          "parentWidth": 100,
+          "inkWidth": 533.3200795228628,
+          "inkHeight": 829.4183940536013
+        },
+        {
+          "frame": 150,
+          "ratio": 0.5555417495029821,
+          "parentWidth": 100,
+          "inkWidth": 58.887425447316105,
+          "inkHeight": 83.33071608040201
+        }
+      ]
+    },
+    {
+      "id": "water-6",
+      "peak": 64,
+      "samples": [
+        {
+          "frame": 1,
+          "ratio": 0.5555470032840722,
+          "parentWidth": 100,
+          "inkWidth": 72.22111042692939,
+          "inkHeight": 83.33125
+        },
+        {
+          "frame": 64,
+          "ratio": 0.5555470032840722,
+          "parentWidth": 100,
+          "inkWidth": 595.5463875205254,
+          "inkHeight": 482.76570833333335
+        },
+        {
+          "frame": 141,
+          "ratio": 0.5555470032840722,
+          "parentWidth": 100,
+          "inkWidth": 77.77658045977012,
+          "inkHeight": 91.664375
+        }
+      ]
+    },
+    {
+      "id": "wood-6",
+      "peak": 108,
+      "samples": [
+        {
+          "frame": 1,
+          "ratio": 0.5555468188353703,
+          "parentWidth": 100,
+          "inkWidth": 71.1099928109274,
+          "inkHeight": 83.33202282530553
+        },
+        {
+          "frame": 108,
+          "ratio": 0.5555468188353703,
+          "parentWidth": 100,
+          "inkWidth": 679.4337594356577,
+          "inkHeight": 681.1003998921639
+        },
+        {
+          "frame": 190,
+          "ratio": 0.5555468188353703,
+          "parentWidth": 100,
+          "inkWidth": 71.1099928109274,
+          "inkHeight": 85.55421010064701
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "roll": 0.05,
+      "id": "biscuit",
+      "name": "熊熊饼干"
+    },
+    {
+      "roll": 0.5,
+      "id": "180021",
+      "name": "兔兔胡萝卜汁"
+    },
+    {
+      "roll": 0.95,
+      "id": "180071",
+      "name": "拉姆能量星"
+    }
+  ],
+  "native": false,
+  "interruptions": [
+    "panel",
+    "room",
+    "desktop"
+  ]
+}

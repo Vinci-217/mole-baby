@@ -2,13 +2,13 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮更新 · v0.30.7
+## 本轮更新 · v0.30.8
 
 水、火、木18段魔法移除镜头缩放：按原姿态校准一次，全程固定比例。大特效允许越过原宠物区域；桌面透明窗口临时展开，拉姆位置保持不变，结束还原。
 
 状态不足会显示所需数值和当前值：上课精力至少30点，打工至少31点，玩球至少12点。睡眠每分钟恢复10点，达到85自然醒来，从20恢复约6分半。小游戏随机奖励当前阶段能用的食物、饮品、清洁用品，结算图标和名称对应真实背包。
 
-悬停系统托盘图标可查看六项状态及睡觉、上课、打工等活动，窗口隐藏后继续更新。此前课程、法杖、小屋移动和音乐功能保留。[本轮验收](research/release-0.30.7-validation.md) · [完整更新说明](RELEASE_NOTES.md)。
+悬停系统托盘图标可查看六项状态及睡觉、上课、打工等活动，窗口隐藏后继续更新。此前课程、法杖、小屋移动和音乐功能保留。[本轮验收](research/release-0.30.8-validation.md) · [完整更新说明](RELEASE_NOTES.md)。
 
 ![火系最高技能 · 固定比例，大特效超出原区域](artifacts/v307/fire-6-browser.png)
 
