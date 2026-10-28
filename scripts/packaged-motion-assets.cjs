@@ -13,3 +13,4 @@ async function verifyMotionResources(archive,dist=path.resolve(__dirname,'../dis
  return{files,bytes,coreAsarBytes:fs.statSync(archive).size};
 }
 module.exports={verifyMotionResources};
+if(require.main===module)verifyMotionResources(process.argv[2],process.argv[3]).then(result=>console.log('PASS installed split animation payload',JSON.stringify(result))).catch(error=>{console.error(error);process.exitCode=1});

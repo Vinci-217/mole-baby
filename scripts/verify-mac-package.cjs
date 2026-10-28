@@ -42,10 +42,20 @@ async function main() {
     const diskArchive=path.join(mount,`${build.productName}.app/Contents/Resources/app.asar`);
     const hash=filename=>createHash('sha256').update(fs.readFileSync(filename)).digest('hex');
     assert.equal(hash(diskArchive),hash(archive));
+    await require('./packaged-motion-assets.cjs').verifyMotionResources(diskArchive);
+    execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',path.join(mount,`${build.productName}.app`)],{stdio:'pipe'});
   } finally {
     if(attached) execFileSync('/usr/bin/hdiutil',['detach',mount],{stdio:'pipe'});
     await fs.promises.rm(mount,{recursive:true,force:true});
   }
+  const zipFolder=fs.mkdtempSync(path.join(os.tmpdir(),'mole-zip-check-'));
+  try{
+    execFileSync('/usr/bin/ditto',['-x','-k',path.join(release,files[1]),zipFolder],{stdio:'pipe'});
+    const zipContents=path.join(zipFolder,`${build.productName}.app/Contents`),zipArchive=path.join(zipContents,'Resources/app.asar');
+    for(const [actual,expected]of [[zipArchive,archive],[path.join(zipContents,'MacOS',readPlist('CFBundleExecutable')),executable]])assert.equal(createHash('sha256').update(fs.readFileSync(actual)).digest('hex'),createHash('sha256').update(fs.readFileSync(expected)).digest('hex'),'ZIP payload must match the tested Mac application');
+    await require('./packaged-motion-assets.cjs').verifyMotionResources(zipArchive);
+    console.log('PASS Mac DMG and ZIP original animation resources match every tested source file');
+  }finally{await fs.promises.rm(zipFolder,{recursive:true,force:true})}
   const trust = verifyMacTrust({ app, dmg: path.join(release,files[0]), mode: process.env.MOLE_MAC_DISTRIBUTION || 'local' });
   console.log(`PASS: macOS ${arch} DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=${trust.mode}`);
   await verifyApplication({executable,archive,screenshot:`mac-${arch}-smoke.png`});

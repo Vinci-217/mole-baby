@@ -67,6 +67,8 @@ try {
  if($finish -eq [IntPtr]::Zero){throw 'Installer never reached its real Finish page'}
  if(!$pathConfirmed){throw 'Installer skipped the explicit directory-page path check'}
  if(!(Test-Path (Join-Path $install "$ProductName.exe"))){throw 'Installer did not install in the isolated test folder'}
+ & node (Join-Path $PSScriptRoot 'packaged-motion-assets.cjs') (Join-Path $install 'resources/app.asar')
+ if($LASTEXITCODE -ne 0){throw 'Installed original animation payload differs from the tested build'}
  # Leave the standard, default-checked Run checkbox enabled. A real button
  # message runs the same custom MUI callback as a mouse click on Finish.
  $watch=[Diagnostics.Stopwatch]::StartNew()
