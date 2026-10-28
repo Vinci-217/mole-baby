@@ -105,3 +105,12 @@ test('Mac resolves the published version through GET when HEAD redirects fail',a
  await f.updates.check();assert.equal(metadata,true);assert.equal(f.updates.getState().status,'available');
  assert.equal(await f.updates.download(true),true);assert.equal(f.updates.getState().status,'ready');
 });
+
+test('Mac metadata bypasses stale HTTP caches and opening a DMG explains the remaining installation step',async t=>{
+ const payload=Buffer.from('mac verified image'),base=macFetch(payload),requests=[];
+ const f=fixture(t,{platform:'darwin',arch:'arm64',fetch:async(url,options)=>{requests.push(options);return base(url,options)}});
+ await f.updates.check();await f.updates.download(true);await f.updates.install(true);
+ assert.ok(requests.length>=3&&requests.every(r=>r.cache==='no-store'));
+ assert.match(f.updates.getState().message,/拖到.*应用程序.*替换/);
+ assert.equal(f.updates.getState().status,'ready');assert.equal(f.installs,0);
+});

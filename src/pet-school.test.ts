@@ -15,9 +15,22 @@ describe('persistent school and restaurant activities',()=>{
  it('speaks bibo before language class and Chinese only after graduation',()=>{
   const p=pet();expect(petSpeech(p,'你好')).toContain('bibo');expect(petSpeech(graduate('language'),'你好')).toBe('你好')
  })
- it('requires three complete lessons and does not award early certificates',()=>{
-  let p=pet()
-  for(let i=0;i<3;i++){const start=beginActivity(p,'course','language',now+i+1);expect(start.ok).toBe(true);p=settleActivity(start.state,start.state.activity!.endsAt);expect(learned(p,'language')).toBe(i===2)}
+ it('graduates after one complete lesson, never before its deadline or twice',()=>{
+  const start=beginActivity(pet(),'course','language',now+1),end=start.state.activity!.endsAt
+  expect(learned(settleActivity(start.state,end-1),'language')).toBe(false)
+  const done=settleActivity(start.state,end)
+  expect(learned(done,'language')).toBe(true);expect(done.education?.lessons.language).toBe(1)
+  expect(beginActivity(done,'course','language',end+1).ok).toBe(false)
+  expect(settleActivity(done,end+1000).education).toEqual(done.education)
+ })
+ it('migrates valid old partial and complete progress to one course and preserves certificates',()=>{
+  for(const count of [1,2,3]){
+   const saved=parseSave(JSON.stringify({...pet(),education:{lessons:{language:count,english:count},graduated:{language:now-1}}}),now+1000)!
+   expect(learned(saved,'language')).toBe(true);expect(learned(saved,'english')).toBe(true)
+   expect(saved.education?.lessons).toEqual({language:1,english:1})
+   expect(saved.education?.graduated.language).toBe(now-1)
+   expect(parseSave(JSON.stringify(saved),now+2000)!.education).toEqual(saved.education)
+  }
  })
  it('enforces language and magic prerequisites',()=>{
   expect(beginActivity(pet(),'course','english').ok).toBe(false);expect(beginActivity(pet(),'course','fire').ok).toBe(false)

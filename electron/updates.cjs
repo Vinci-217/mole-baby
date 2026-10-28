@@ -28,7 +28,7 @@ function createUpdates(options){
   const timer=setTimeout(abort,timeout);timer.unref?.();
   const finish=()=>{clearTimeout(timer);shutdown.signal.removeEventListener('abort',abort);requests.delete(finish)};
   shutdown.signal.addEventListener('abort',abort,{once:true});requests.add(finish);
-  try{const response=await fetcher(url,{...settings,signal:controller.signal});ensureActive();return {response,finish}}
+  try{const response=await fetcher(url,{cache:'no-store',...settings,signal:controller.signal});ensureActive();return {response,finish}}
   catch(error){finish();throw error}
  };
  const checking=()=>!disposed&&state.status==='checking';
@@ -115,7 +115,7 @@ function createUpdates(options){
  }
  async function install(confirmed=false){
   if(confirmed!==true||disabled||disposed||state.status!=='ready')return false;
-  if(!automaticInstall){if(!downloadedFile)return false;try{const error=await openPath(downloadedFile);if(error)throw Error(error);return !disposed}catch{publish({message:'安装包暂时无法打开，请稍后重试。'});return false}}
+  if(!automaticInstall){if(!downloadedFile)return false;try{const error=await openPath(downloadedFile);if(error)throw Error(error);if(platform==='darwin')publish({message:'DMG 已打开：将「拉姆」拖到「应用程序」并选择替换，然后退出旧版并重新打开。打开 DMG 本身还没有完成更新。'});return !disposed}catch{publish({message:'安装包暂时无法打开，请稍后重试。'});return false}}
   publish({status:'installing',message:'正在保存拉姆，确认更新后会自动回来。'});
   try{if(!await prepareInstall())throw Error('Save was not acknowledged');ensureActive();loadEngine().quitAndInstall(true,true);return true}
   catch{publish({status:'ready',message:'存档尚未准备好，请稍后重试更新。'});return false}

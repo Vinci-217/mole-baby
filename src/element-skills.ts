@@ -13,4 +13,4 @@ export const ELEMENT_SKILLS=ELEMENT_TYPES.flatMap(type=>[type.basic,...type.name
 export const elementSkillsForCourse=(course:string)=>ELEMENT_SKILLS.filter(skill=>`element-${skill.type}`===course);
 export const elementSkillById=(id:string)=>ELEMENT_SKILLS.find(skill=>skill.id===id);
 
-export function learnedElementSkill(pet:Pick<GameState,'growth'|'evolution'|'education'>,id:string){const skill=elementSkillById(id);return Boolean(skill&&getStage(pet.growth,pet.evolution)===4&&(pet.education?.lessons[`element-${skill.type}`]??0)>=skill.level)}
+export function learnedElementSkill(pet:Pick<GameState,'growth'|'evolution'|'education'>,id:string){const skill=elementSkillById(id);return Boolean(skill&&getStage(pet.growth,pet.evolution)===4&&pet.education?.graduated[`element-${skill.type}`])}

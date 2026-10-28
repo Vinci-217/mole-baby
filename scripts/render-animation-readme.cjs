@@ -18,7 +18,7 @@ const server=spawn(process.execPath,[root+'/node_modules/vite/bin/vite.js','--ho
  const media=(label,file)=>`![${label}](${file})\n\n`;
  let section='## 本轮重点预览（未发布）\n\n**课程、技能、餐厅打工、小屋家具，以及修订后的叶柄绑定。** 原拉姆身体与表情继续使用可核对的页游素材；新书页、餐盘、帽子和四系法术是参考原画风绘制的关键帧，再离线编排成24fps透明图集，不称为官方完整技能原帧。\n\n';
  section+=media('应用内速览：帽子变花、旋风、流火、寒冰、陨石、餐厅服务员','artifacts/animation-gallery/school-preview.gif');
- section+='### 课程与生活玩法\n\n语言课前只会 bibobibo，结业后才说中文；英文课解锁英文问候，魔术课解锁帽子变花及后续四系课程。每门课三节，每节2–4分钟，进度和证书随宠物存档保存。餐厅每班2分钟，完成获得180摩尔豆；中断不结算，重开不会重复领工资。玩耍中可以主动睡觉，也保留困倦后的自动入睡。\n\n';
+ section+='### 课程与生活玩法\n\n语言课前只会 bibobibo，结业后才说中文；英文课解锁英文问候，魔法入门课解锁魔术盒及三系变身课程。每门课只需一节，每节2–4分钟，进度和证书随宠物存档保存。餐厅每班2分钟，完成获得180摩尔豆；中断不结算，重开不会重复领工资。玩耍中可以主动睡觉，也保留困倦后的自动入睡。\n\n';
  section+=media('学习动作：原角色与新绘书页、发音及魔法练习','artifacts/animation-gallery/school.gif');
  section+=media('小屋布置：家具放地面，结业证书挂墙上','artifacts/v38-school/furnished-room.png');
  section+='[课程、技能与玩法说明](docs/COURSES.md) · [动画 skill 与原帧参考](skills/mole-classic-art/SKILL.md)\n\n';

@@ -220,3 +220,5 @@ artifacts/middle-calm-idle/*
 !artifacts/middle-calm-idle/*.gif
 !artifacts/middle-calm-idle/*.png
 !artifacts/middle-calm-idle/*-checks.json
+
+!artifacts/v303-room-moving.png

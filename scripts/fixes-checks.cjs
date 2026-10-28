@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),{expect}=require('@playwright/test');
 const{enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
 async function verifyFixes(page,desktop){
- const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
+ const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));let failed=false;
  await page.addInitScript(()=>{const Base=window.Audio;window.__fixAudio=[];window.Audio=class extends Base{constructor(...args){super(...args);window.__fixAudio.push(this)}}});
  try{
   await page.evaluate(()=>{const k='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(k));Object.assign(p,{growth:60,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,education:undefined,lastTick:Date.now()});p.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};localStorage.setItem(k,JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false}));localStorage.removeItem('ramu-room-media-v1')});
@@ -42,9 +42,10 @@ async function verifyFixes(page,desktop){
    await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];w.show()});
   }
   await expect(page.locator('.compact-bubble:not(.visible)')).toHaveCount(0);
+  await require('./room-upgrade-checks.cjs').verifyRoomUpgrade(page);
   console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
- }catch(error){console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
-  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor();
+ }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
+  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
  }
 }
 module.exports={verifyFixes};

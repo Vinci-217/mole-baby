@@ -27,18 +27,24 @@ describe('original element lessons and save migration',()=>{
   expect(beginActivity(fifth,'course','element-fire',now+10).ok).toBe(false);
   expect(beginActivity(changePetStage(first,4,'water',now).state,'course','element-fire',now+10).ok).toBe(true);
  });
- it('awards exactly one new transformation per completed lesson in each school',()=>{
+ it('unlocks every transformation in a school after one complete lesson',()=>{
   for(const type of ['fire','water','wood']){
    let p=changePetStage(complete(basic(),'magic'),4,'super',now).state;
    const course=`element-${type}` as CourseId,skills=elementSkillsForCourse(course);
-   for(let lesson=1;lesson<=6;lesson++){
-    p=complete(p,course);const repeated=settleActivity(p,now+10_000_000);
-    expect(repeated.education?.lessons[course]).toBe(lesson);
-    for(const skill of skills)expect(learnedElementSkill(p,skill.id)).toBe(skill.level<=lesson);
-    expect(learned(p,course)).toBe(lesson===6);
-    const restored=parseSave(JSON.stringify(p),now+10_000_000)!;
-    expect(restored.education).toEqual(p.education);
-   }
+   p=complete(p,course);const repeated=settleActivity(p,now+10_000_000);
+   expect(repeated.education?.lessons[course]).toBe(1);
+   for(const skill of skills)expect(learnedElementSkill(p,skill.id)).toBe(true);
+   expect(learned(p,course)).toBe(true);expect(beginActivity(p,'course',course,now+20).ok).toBe(false);
+   const restored=parseSave(JSON.stringify(p),now+10_000_000)!;
+   expect(restored.education).toEqual(p.education);
+  }
+ });
+ it('migrates all six old progress levels without losing or repeating any skill',()=>{
+  for(const count of [1,2,3,4,5,6]){
+   const education=normalizeEducation({lessons:{magic:1,'element-fire':count},graduated:{}},now)!
+   const p={...changePetStage(basic(),4,'super',now).state,education}
+   expect(education.lessons['element-fire']).toBe(1)
+   expect(elementSkillsForCourse('element-fire').every(s=>learnedElementSkill(p,s.id))).toBe(true)
   }
  });
  it('keeps learned progress while a lower-stage appearance cannot perform it',()=>{

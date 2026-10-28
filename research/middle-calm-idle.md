@@ -1,6 +1,6 @@
 # 中级待机预览
 
-分支：`preview/middle-calm-idle`，基于 `53ed7d6`，不发布、不改变更新清单。
+最初预览分支：`preview/middle-calm-idle`，基于 `53ed7d6`；预览时未发布或改变更新清单。用户确认后，此效果纳入v0.30.3，见 [本轮验证](release-0.30.3-validation.md)。
 
 ## 观察与参考
 

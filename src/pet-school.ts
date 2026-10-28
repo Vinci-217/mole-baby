@@ -2,16 +2,16 @@ import {getStage,type GameState} from './game'
 import {elementSkillById} from './element-skills'
 
 const COURSE_DEFINITIONS=[
- {id:'language',name:'语言课',skill:'说中文',minutes:2,lessons:3,requires:null,icon:'language'},
- {id:'english',name:'英文课',skill:'英文问候',minutes:3,lessons:3,requires:'language',icon:'english'},
+ {id:'language',name:'语言课',skill:'说中文',minutes:2,lessons:1,requires:null,icon:'language'},
+ {id:'english',name:'英文课',skill:'英文问候',minutes:3,lessons:1,requires:'language',icon:'english'},
  {id:'magic',name:'魔法入门课',skill:'魔术盒变身',minutes:3,lessons:1,requires:null,icon:'magic'},
- {id:'element-fire',name:'火系变身课',skill:'火系变身',minutes:4,lessons:6,requires:'magic',icon:'fire'},
- {id:'element-water',name:'水系变身课',skill:'水系变身',minutes:4,lessons:6,requires:'magic',icon:'water'},
- {id:'element-wood',name:'木系变身课',skill:'木系变身',minutes:4,lessons:6,requires:'magic',icon:'wood'},
- {id:'wind',name:'旋风术',skill:'旋风术',minutes:4,lessons:3,requires:'magic',icon:'wind'},
- {id:'fire',name:'流火术',skill:'流火术',minutes:4,lessons:3,requires:'magic',icon:'fire'},
- {id:'ice',name:'寒冰术',skill:'寒冰术',minutes:4,lessons:3,requires:'magic',icon:'ice'},
- {id:'meteor',name:'陨石术',skill:'陨石术',minutes:4,lessons:3,requires:'magic',icon:'meteor'},
+ {id:'element-fire',name:'火系变身课',skill:'火系变身',minutes:4,lessons:1,requires:'magic',icon:'fire'},
+ {id:'element-water',name:'水系变身课',skill:'水系变身',minutes:4,lessons:1,requires:'magic',icon:'water'},
+ {id:'element-wood',name:'木系变身课',skill:'木系变身',minutes:4,lessons:1,requires:'magic',icon:'wood'},
+ {id:'wind',name:'旋风术',skill:'旋风术',minutes:4,lessons:1,requires:'magic',icon:'wind'},
+ {id:'fire',name:'流火术',skill:'流火术',minutes:4,lessons:1,requires:'magic',icon:'fire'},
+ {id:'ice',name:'寒冰术',skill:'寒冰术',minutes:4,lessons:1,requires:'magic',icon:'ice'},
+ {id:'meteor',name:'陨石术',skill:'陨石术',minutes:4,lessons:1,requires:'magic',icon:'meteor'},
 ] as const
 export type CourseId=typeof COURSE_DEFINITIONS[number]['id']
 export const COURSES=COURSE_DEFINITIONS.map(course=>({...course,minStage:course.id.startsWith('element-')?4:1,legacy:['wind','fire','ice','meteor'].includes(course.id)}))
@@ -20,16 +20,19 @@ export interface Education {lessons:Partial<Record<CourseId,number>>;graduated:P
 export interface PetActivity {id:string;kind:'course'|'restaurant';course?:CourseId;startedAt:number;endsAt:number}
 export const JOB_MS=120_000,JOB_PAY=180
 export const courseById=(id:unknown)=>COURSES.find(c=>c.id===id)
-export const learned=(pet:Pick<GameState,'education'>,id:CourseId)=>id==='magic'&&(pet.education?.lessons.magic??0)>=1||Boolean(pet.education?.graduated[id])
+export const learned=(pet:Pick<GameState,'education'>,id:CourseId)=>Boolean(pet.education?.graduated[id])
 export const isSchoolAction=(action:string)=>Boolean(elementSkillById(action.replace(/^element-/,'')))&&action.startsWith('element-')||action==='school-language'||action==='school-english'||action==='school-magic'||action==='restaurant'||action==='skill-language'||action==='skill-english'||action==='skill-magic'||['wind','fire','ice','meteor'].some(id=>action===`skill-${id}`)
 export function petSpeech(pet:Pick<GameState,'education'>|null,text:string){return pet&&!learned(pet,'language')?'bibo～ bibobibo！':text}
 export function normalizeEducation(value:unknown,now:number):Education|undefined{
  if(!value||typeof value!=='object')return
  const raw=value as Partial<Education>,out:Education={lessons:{},graduated:{}}
  for(const c of COURSES){
-  const n=raw.lessons?.[c.id],limit=c.id==='magic'?3:c.lessons;if(Number.isInteger(n)&&n!>=0&&n!<=limit)out.lessons[c.id]=Math.min(n!,c.lessons)
+  // Old versions required three/six sessions. One completed session now
+  // graduates; retain valid old progress and its certificate timestamp.
+  const n=raw.lessons?.[c.id],limit=c.id.startsWith('element-')?6:3
+  if(Number.isInteger(n)&&n!>=0&&n!<=limit&&(!c.requires||learned({education:out},c.requires)))out.lessons[c.id]=Math.min(n!,c.lessons)
   const at=raw.graduated?.[c.id]
-  if(out.lessons[c.id]===c.lessons&&Number.isSafeInteger(at)&&at!>0&&at!<=now&&(!c.requires||learned({education:out},c.requires)))out.graduated[c.id]=at
+  if(out.lessons[c.id]===c.lessons)out.graduated[c.id]=Number.isSafeInteger(at)&&at!>0&&at!<=now?at!:now
  }
  return out
 }

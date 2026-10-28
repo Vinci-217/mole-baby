@@ -105,6 +105,7 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
   const nativeVisible = useRef(true);
   const customUrl = useRef<string | null>(null);
   const generation = useRef(0);
+  const previouslyInRoom = useRef(inRoom);
   active.current = hasPet && (inRoom || settings.backgroundPlayback) && settings.musicEnabled;
   const backgroundAllowed = useRef(settings.backgroundPlayback); backgroundAllowed.current = settings.backgroundPlayback;
   const update = useCallback((change: Partial<RoomMediaPreferences>) => {
@@ -130,6 +131,9 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     // A room can remain mounted while the native window lives in the tray.
     // Guard every playback entry, including a track change while hidden.
     if (!active.current || (document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !audio.current) { audio.current?.pause(); return; }
+    // Only an actual restart rewinds; pointer/visibility/state notifications
+    // while already playing must not keep jumping the track back to zero.
+    if(audio.current.paused)try{audio.current.currentTime=0}catch{ /* A newly created track already starts at zero. */ }
     void audio.current.play().then(() => setError(null)).catch(reason => {
       if (reason instanceof DOMException && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')) return;
       setError('这首音乐暂时无法播放，可以换一首或重新导入。');
@@ -157,6 +161,8 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     };
   }, [source, customLoaded, resumeMusic]);
   useEffect(() => {
+    const entering=inRoom&&!previouslyInRoom.current;previouslyInRoom.current=inRoom;
+    if(entering&&audio.current)try{audio.current.currentTime=0}catch{ /* Metadata may still be loading. */ }
     if (active.current) resumeMusic();
     else audio.current?.pause();
   }, [inRoom, hasPet, settings.musicEnabled, settings.backgroundPlayback, resumeMusic]);
