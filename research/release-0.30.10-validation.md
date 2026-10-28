@@ -34,14 +34,21 @@
 
 首次浏览器冷加载与素材压缩并行时触发一次加载超时；压缩结束后在稳定产物上重跑通过。旧定位器失败后明确更新区域定位并重测，未放宽功能断言。
 
-五个平台的正式成品与公开发布结果待同一次流水线验收，完成后追加回执。当前云环境没有Windows7／8／8.1真机或虚拟机，不将兼容运行时与现代Windows CI等同于这些操作系统的实测。
+五个平台正式成品及公开发布结果见下文。当前云环境没有Windows7／8／8.1真机或虚拟机，不将兼容运行时与现代Windows CI等同于这些操作系统的实测。
 
 ## Windows透明窗口全屏修复
 
-[v0.30.9正式流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40705592564)在Windows常规x64、兼容x64及ia32发现同一个全屏状态错误，发布被门禁阻止。失败标签保留，未推进更新通道；Mac arm64成品该轮通过。
+[v0.30.9正式流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40705592564)在Windows常规x64、兼容x64及ia32发现同一个全屏状态错误，发布被门禁阻止。失败标签保留，未推进更新通道；Mac arm64／x64成品该轮均通过；[失败回执](release-0.30.9-receipt.json)确认Windows三平台失败且公开发布被跳过。
 
 已核对Electron22.3.27源码 `shell/browser/native_window_views.cc` 中 `NativeWindowViews::SetFullScreen`：透明窗口没有WS_THICKFRAME，它发出全屏事件后直接修改显示器范围，`IsFullscreen`仍查询widget状态，因此会继续返回false。Windows的事件还早于实际SetBounds。修复对Windows按已完成的原生事件单独记录每个窗口的全屏状态，并在setFullScreen返回后才完成同步事件，避免提前保存全屏尺寸和把恢复逻辑错误跳过；Mac／Linux继续使用原生状态。没有打开原生标题或粗边框。
 
 新增精确模拟Windows事件／false原生标志的测试，覆盖重复进入、完成时序、回到桌面及托盘退出。实际Windows成品新增窗口矩形必须等于所在显示器完整bounds的断言，且全屏之后仍验收无caption／thick-frame和透明顶部。新版本不覆盖失败标签。
 
 修复后473项测试（355 Vitest、118 Node）通过。现代Electron及实际Electron22／Chromium108窗口专项复测均通过。渲染业务与已通过完整浏览器／现代和兼容构建的v0.30.9相同，本地专项复用这些逐像素验证的渲染产物；新版由正式流水线重新编译、打包与成品检查。
+
+## 正式发布结果
+
+- 正式源提交 `fda6ac4920a1d4e7d4811a1250f3a6f1d6fda92d`，不可变标签 `v0.30.10`。[同一次流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40708506919)五个平台全部成功，[Release已公开并设为latest](https://github.com/Vinci-217/mole-baby/releases/tag/v0.30.10)。已校验 [发布回执](release-0.30.10-receipt.json) 的源SHA、版本、标签、五个平台状态和相同runUrl，以及十个唯一下载名与SHA256。
+- 五个平台均重新编译、打包，355项Vitest与118项Node通过，且完成真实成品启动及交互。独立状态／用品四类、全屏与Esc／桌面恢复、确认取消、固定／自动进度、重复读档、课程保留及剩余时间提示均通过。Windows常规x64及兼容x64／ia32额外通过全屏原生矩形等于整块显示器bounds的检查，退出后仍无原生caption／thick-frame／可见客户区偏移。
+- Windows升级验收和Mac实际更新下载检查继续通过。发布步骤下载所有成品后再次校验SHA256SUMS，合并并验证大小／SHA512及四个更新通道 `latest.yml`、`legacy-x64.yml`、`legacy-ia32.yml`、`latest-mac.yml`，全部通过后才公开Release。当前云环境未独立重复下载全部公开附件，公开发布以该次正式流水线回执为证。
+- Mac两种架构继续为本地签名，未经过Developer ID及Apple公证，按DMG说明手动替换。Windows7／8／8.1继续提供32／64位兼容包，本轮没有这些操作系统的真机或虚拟机，不将现代Windows运行兼容包的结果视为旧系统实测。

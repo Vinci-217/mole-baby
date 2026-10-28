@@ -1,0 +1,88 @@
+{
+  "version": "0.30.9",
+  "tag": "v0.30.9",
+  "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+  "buildResult": "failure",
+  "platforms": {
+    "windows": "failure",
+    "legacyWindows": "failure",
+    "mac": "success"
+  },
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+  "releaseUrl": null,
+  "downloads": [
+    {
+      "file": "mole-baby-0.30.9-mac-arm64.dmg",
+      "sha256": "a40077a5e70a8bba10cab215d1d5b65ace43d5a9870133f5ce04798380e36480"
+    },
+    {
+      "file": "mole-baby-0.30.9-mac-arm64.zip",
+      "sha256": "fae3dc501f36ce3cfaf59da5521fa1f5f8b4af24488f887031519add958e6287"
+    },
+    {
+      "file": "mole-baby-0.30.9-mac-x64.dmg",
+      "sha256": "10801063fcd5f7510192daf6739be0adb27aa8a1f509f0c832850c162fa9a7ad"
+    },
+    {
+      "file": "mole-baby-0.30.9-mac-x64.zip",
+      "sha256": "197f6be26385dedfb5f65281078c2863040d6ff81189e9efe5f6d4ea036160be"
+    }
+  ],
+  "macTrust": {
+    "arm64": {
+      "architecture": "arm64",
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    "x64": {
+      "architecture": "x64",
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  },
+  "recordedAt": "2026-10-28T14:41:36.136Z",
+  "verifiedPlatformReports": {
+    "windows": {
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "platform": "windows",
+      "status": "failure",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+      "recordedAt": "2026-10-28T14:34:07.108Z"
+    },
+    "legacy-x64": {
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "platform": "legacy-x64",
+      "status": "failure",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+      "recordedAt": "2026-10-28T14:34:51.316Z"
+    },
+    "legacy-ia32": {
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "platform": "legacy-ia32",
+      "status": "failure",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+      "recordedAt": "2026-10-28T14:33:35.749Z"
+    },
+    "mac-arm64": {
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "platform": "mac-arm64",
+      "status": "success",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+      "recordedAt": "2026-10-28T14:36:06.733Z"
+    },
+    "mac-x64": {
+      "sourceSha": "954f7c10107c73f0278ed883402bc8e09ac4afd1",
+      "platform": "mac-x64",
+      "status": "success",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40705592564",
+      "recordedAt": "2026-10-28T14:41:01.241Z"
+    }
+  }
+}
