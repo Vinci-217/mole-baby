@@ -1,0 +1,16 @@
+.status-pocket{min-height:0}
+.status-pocket .pocket-heading-actions button{display:grid;place-items:center;padding:0;line-height:1}
+.status-pocket .pocket-status{min-height:0;grid-template-rows:repeat(6,minmax(0,1fr));align-content:stretch;gap:3px;padding:4px 2px}
+.status-pocket .pocket-status label{min-height:0;gap:6px;line-height:16px}
+.status-pocket .pocket-status label>span{width:27px}
+.status-pocket .pocket-status b{width:23px;flex-shrink:0}
+.status-pocket .pocket-status progress{appearance:none;-webkit-appearance:none;display:block;min-width:0;height:6px;border:0;border-radius:4px;background:#eee5d7;overflow:hidden}
+.status-pocket .pocket-status progress::-webkit-progress-bar{background:#eee5d7;border-radius:4px}
+.status-pocket .pocket-status progress::-webkit-progress-value{background:#c99c53;border-radius:4px}
+.status-pocket .pocket-status progress::-moz-progress-bar{background:#c99c53;border-radius:4px}
+.status-pocket .pocket-pages{height:25px;min-height:25px;margin-top:0;padding-top:4px;border-top:1px solid #eee4d3;justify-content:flex-end}
+.status-pocket .pocket-pages>button{min-height:20px;padding:1px 7px;border:1px solid #ead8b6;border-radius:6px;background:#fbf3e3;line-height:16px;font-size:10px}
+.status-pocket .pocket-pages>.pocket-link{padding:1px 8px;font-size:10px}
+.status-pocket .pocket-pages>button:first-child:not(.pocket-link){margin-right:auto}
+.status-pocket .pocket-pages>button:hover{background:#f6e8ca}
+.status-pocket button:focus-visible{outline:1px solid #b98b4e;outline-offset:1px}

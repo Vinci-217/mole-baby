@@ -1,0 +1,70 @@
+name: Desktop status UI preview
+on:
+  push:
+    branches: ['preview/desktop-status-ui']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-status-ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    name: Status UI ${{ matrix.edition }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: modern
+            runner: windows-latest
+            platform: windows
+            executable: release/win-unpacked/拉姆.exe
+          - edition: legacy
+            runner: windows-2022
+            platform: legacy-x64
+            executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
+    env:
+      ELECTRON_DEV: '0'
+      MOLE_LEGACY_ARCH: x64
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build and verify compact status UI
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/status-ui.log
+          npm test 2>&1 | tee -a artifacts/status-ui.log
+          if [ '${{ matrix.edition }}' = legacy ]; then
+            npm run build:legacy 2>&1 | tee -a artifacts/status-ui.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --x64 --publish never 2>&1 | tee -a artifacts/status-ui.log
+          else
+            npm run build 2>&1 | tee -a artifacts/status-ui.log
+            npx --no-install electron-builder --win --dir --x64 --publish never 2>&1 | tee -a artifacts/status-ui.log
+          fi
+          node scripts/desktop-status-ui.cjs --packaged '${{ matrix.executable }}' 2>&1 | tee -a artifacts/status-ui.log
+      - name: Save status UI screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: status-ui-${{ matrix.edition }}
+          path: |
+            artifacts/desktop-status-ui/
+            artifacts/status-ui.log
+          retention-days: 14
+      - name: Save native diagnostic over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: ${{ matrix.platform }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/status-ui.log
+        run: node scripts/save-ci-diagnostic.cjs
