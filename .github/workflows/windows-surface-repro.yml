@@ -24,18 +24,21 @@ jobs:
             platform: windows
             runtime: '37.10.3'
             arch: x64
+            directory: release/win-unpacked
             executable: release/win-unpacked/拉姆.exe
           - edition: legacy
             runner: windows-2022
             platform: legacy-x64
             legacy: true
             arch: x64
+            directory: release/legacy-x64/win-unpacked
             executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
           - edition: legacy-ia32
             runner: windows-2022
             platform: legacy-ia32
             legacy: true
             arch: ia32
+            directory: release/legacy-ia32/win-ia32-unpacked
             executable: release/legacy-ia32/win-ia32-unpacked/拉姆兼容版.exe
     env:
       ELECTRON_DEV: '0'
@@ -71,6 +74,16 @@ jobs:
         run: |
           set -o pipefail
           node scripts/verify-preview-package.cjs '${{ matrix.executable }}' 2>&1 | tee -a artifacts/surface.log
+      - name: Include preview instructions
+        shell: bash
+        run: cp docs/WINDOWS-PREVIEW.txt '${{ matrix.directory }}/预览说明.txt'
+      - name: Upload tested Windows preview
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mole-baby-preview-${{ matrix.platform }}
+          path: ${{ matrix.directory }}/
+          compression-level: 0
+          retention-days: 7
       - name: Upload physical and renderer captures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -1,0 +1,16 @@
+拉姆 · Windows 白条与玩耍修复预览
+
+这是 preview/windows-surface-play 分支的测试包，版本号仍为 0.31.3。
+它不会创建正式 Release，也没有推进自动更新渠道。
+
+1. 将下载的 ZIP 完整解压，保留所有文件夹。
+2. 在托盘中退出原来运行的拉姆，再打开解压目录中的「拉姆.exe」或「拉姆兼容版.exe」。
+3. 常规版适用于 64 位 Windows 10/11；legacy-x64 适用于 64 位 Windows 7 SP1/8/8.1；legacy-ia32 适用于 32 位系统。
+
+复测方式：进入小屋，再返回桌面，然后切换到其他程序工作。观察上方是否出现白条，拖动或等拉姆自动走动后是否不断变长。可一并检查玩耍栏：自己看书时可以响应手动玩耍；状态不足时显示原因及「查看状态」。
+
+需要独立测试存档时，在 PowerShell 中进入解压目录运行：
+& '.\拉姆.exe' --user-data-dir="$env:LOCALAPPDATA\mole-baby-surface-preview"
+兼容版将命令中的文件名换成「拉姆兼容版.exe」。独立目录可以重新领养，或从小屋设置导入自己的 JSON 存档。
+
+GitHub Actions 的 Artifacts 下载需要登录 GitHub。
