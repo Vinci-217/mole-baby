@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('Bar','Capture')][string]$Mode,
+  [ValidateSet('Bar','Work','Capture')][string]$Mode,
   [string]$Output,
   [string]$Ready,
   [long]$Handle,
@@ -23,6 +23,7 @@ public static class ScreenNative {
   [DllImport("user32.dll",EntryPoint="GetWindowLongPtrW")] static extern IntPtr Style(IntPtr h,int index);
   [DllImport("user32.dll")] static extern bool EnumWindows(Callback callback,IntPtr p);
   [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr h);
+  [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr h,out uint pid);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr h,StringBuilder text,int count);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr h,StringBuilder text,int count);
@@ -57,7 +58,7 @@ if ($Mode -eq 'Capture') {
   } finally { $graphics.Dispose(); $bitmap.Dispose() }
   $ids = @($OwnedIds.Split(',') | Where-Object { $_ } | ForEach-Object { [uint32]$_ })
   $window = @(); if ($Handle -ne 0) { $window = @([ScreenNative]::Inspect($Handle)) }
-  @{ screen=@($screen.X,$screen.Y,$screen.Width,$screen.Height); window=$window; extraWindows=@([ScreenNative]::Windows($ids,$Handle)) } | ConvertTo-Json -Depth 4 -Compress
+  @{ screen=@($screen.X,$screen.Y,$screen.Width,$screen.Height); window=$window; foreground=[ScreenNative]::GetForegroundWindow().ToInt64().ToString(); extraWindows=@([ScreenNative]::Windows($ids,$Handle)) } | ConvertTo-Json -Depth 4 -Compress
   exit
 }
 Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -TypeDefinition @'
@@ -67,12 +68,17 @@ public class ProbeSurface : Form {
   protected override CreateParams CreateParams { get { var p=base.CreateParams; p.ExStyle|=0x08000080; return p; } }
 }
 '@
-$form = New-Object ProbeSurface
-$form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
+if ($Mode -eq 'Work') {
+  $form = New-Object System.Windows.Forms.Form
+  $form.Text = 'Surface regression: other application'
+} else {
+  $form = New-Object ProbeSurface
+  $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
+}
 $form.ShowInTaskbar = $false
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
 $form.Bounds = New-Object System.Drawing.Rectangle($Left,$Top,$Width,$Height)
 $form.BackColor = [System.Drawing.Color]::White
-$form.TopMost = $true
+$form.TopMost = ($Mode -eq 'Bar')
 $form.Add_Shown({ [System.IO.File]::WriteAllText($Ready, 'ready') })
 [System.Windows.Forms.Application]::Run($form)

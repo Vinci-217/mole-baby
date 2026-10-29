@@ -12,4 +12,14 @@ test('platform diagnostics update the receipt branch while preserving the source
  const receipt=saveDiagnostic({cwd,env});assert.equal(git(['rev-parse','HEAD']),head);assert.equal(git(['status','--porcelain']).replace('?? smoke.log','').trim(),before.trim());
  const saved=JSON.parse(git(['show',`build-reports:reports/jobs/${env.GITHUB_SHA}/legacy-ia32.json`],remote));assert.deepEqual(saved,receipt);assert.equal(saved.log.length,64000);assert.equal(git(['show','build-reports:existing.json'],remote),'existing receipt');
  assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_PLATFORM:'../../other'}}),/Invalid/);
+ const mediaDir='artifacts/windows-surface-modern';fs.mkdirSync(path.join(cwd,mediaDir),{recursive:true});
+ const png=fs.readFileSync(path.resolve(__dirname,'../public/icons/tray.png'));fs.writeFileSync(path.join(cwd,mediaDir,'physical.png'),png);
+ const beforeMedia=git(['status','--porcelain']);
+ const withMedia=saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:mediaDir}});
+ assert.equal(git(['status','--porcelain']),beforeMedia,'Physical capture upload must preserve staged and unstaged source work');
+ assert.equal(withMedia.screens.length,1);
+ assert.deepEqual(execFileSync('git',['show',`build-reports:${withMedia.screens[0].path}`],{cwd:remote}),png);
+ assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:'../private'}}),/Invalid/);
+ fs.writeFileSync(path.join(cwd,mediaDir,'not-an-image.png'),'not a screenshot');
+ assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:mediaDir}}),/PNG/);
 });

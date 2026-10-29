@@ -22,6 +22,12 @@ jobs:
           - edition: modern
             runner: windows-latest
             platform: windows
+            runtime: '35.7.5'
+            executable: release/win-unpacked/拉姆.exe
+          - edition: candidate
+            runner: windows-latest
+            platform: windows-candidate
+            runtime: '37.10.3'
             executable: release/win-unpacked/拉姆.exe
           - edition: legacy
             runner: windows-2022
@@ -48,7 +54,7 @@ jobs:
             npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --x64 --publish never 2>&1 | tee -a artifacts/surface.log
           else
             npm run build 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --win --dir --x64 --publish never 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --win --dir --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
           fi
       - name: Reproduce on physical desktop over time
         shell: bash

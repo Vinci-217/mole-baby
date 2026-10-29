@@ -52,7 +52,8 @@ async function capture(desktop,page,out,name,{rendererSnapshot=true}={}){
     }
   }
   const desktopState=await page.evaluate(()=>window.desktop.getState());
-  const measurement={name,...result,viewport,desktopState,longestWhiteRun:longest,whitePixels:white,bodyRed};
+  const nativeState=await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];return{bounds:w.getBounds(),focused:w.isFocused(),runtime:process.versions.electron}});
+  const measurement={name,...result,viewport,nativeState,desktopState,longestWhiteRun:longest,whitePixels:white,bodyRed};
   console.log('PHYSICAL_CAPTURE '+JSON.stringify(measurement));
   assert.ok(bodyRed>20,'Physical screenshot must include the actual visible red pet');
   return measurement;
@@ -64,7 +65,7 @@ async function main(){
   const out=path.join(root,'artifacts/windows-surface-'+edition);fs.mkdirSync(out,{recursive:true});
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-surface-'));const reports=[];
   execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',probe,'-Mode','Capture','-Output',path.join(out,'background-desktop.png')],{stdio:'pipe',timeout:30000,windowsHide:true});
-  let desktop,bar,processOutput='';
+  let desktop,bar,work,processOutput='';
   try{
     for(const scale of scales){
       console.log('START_SCALE '+scale);
@@ -88,6 +89,11 @@ async function main(){
         await enterHome(page);await page.waitForTimeout(500);
         if(cycle===1){await page.evaluate(()=>window.desktop.setRoomFullscreen(true));await page.evaluate(()=>window.desktop.setRoomFullscreen(false))}
         await toDesktop(page);await page.waitForTimeout(1000);
+        // Work in a different, non-overlapping native application. A page-only
+        // screenshot or window.blur() misses WM_NCACTIVATE and DWM focus damage.
+        work=await form('Work',dir,{Left:8,Top:8,Width:200,Height:90});
+        await expect.poll(()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isFocused())).toBe(false);
+        if(cycle===1)await page.evaluate(()=>window.desktop.wander(true));
         const started=Date.now();
         const points=scale===1.25&&cycle===0?[0,15000,45000,90000,180000]:[0,15000,30000,45000,60000,75000];
         for(let point=0;point<points.length;point++){
@@ -97,15 +103,17 @@ async function main(){
           console.log(JSON.stringify(row));
           fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify(reports,null,2)+'\n');
         }
+        await page.evaluate(()=>window.desktop.wander(false));work.kill();work=null;
       }
       await desktop.close();desktop=null;
     }
     assert.ok(reports.every(r=>r.longestWhiteRun<12),'Native white strip reproduced; inspect physical captures and measurements');
-    console.log('PASS physical Windows surface: 100/125/150% Chromium scales, normal/fullscreen room returns, timed captures and movement; native-strip detector calibrated with a separate HWND');
+    assert.ok(reports.every(r=>Math.abs(r.nativeState.bounds.width-160)<=1&&Math.abs(r.nativeState.bounds.height-240)<=1),'Native window dimensions accumulate rounding error during movement; inspect timed bounds');
+    console.log('PASS physical Windows surface: 100/125/150% Chromium scales, normal/fullscreen room returns, real focus loss, autonomous walking, stable window size and timed captures; native-strip detector calibrated with a separate HWND');
   }catch(error){
     console.error('Application output before cleanup:',processOutput);
     if(desktop)try{console.error('Native state before cleanup:',await Promise.race([desktop.evaluate(({app,BrowserWindow})=>({ready:app.isReady(),version:process.versions.electron,windows:BrowserWindow.getAllWindows().map(w=>({bounds:w.getBounds(),visible:w.isVisible(),title:w.getTitle(),loading:w.webContents.isLoadingMainFrame(),url:w.webContents.getURL()}))})),pause(3000).then(()=>'state timeout')]))}catch(e){console.error(e.message)}
     throw error;
-  }finally{bar?.kill();await desktop?.close().catch(()=>{});fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}
+  }finally{bar?.kill();work?.kill();await desktop?.close().catch(()=>{});fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
