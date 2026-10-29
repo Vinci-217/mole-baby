@@ -1,5 +1,7 @@
 # 拉姆 · mole-baby
 
+> **本分支有待确认的动画预览**：[风扇叶片旋转、五个阶段和五种超拉的甩出惯性](docs/previews/rotor-throw/README.md)。只供审阅，尚未接入客户端或发版。
+
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
 ## 本轮更新 · v0.31.4

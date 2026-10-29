@@ -1,0 +1,922 @@
+{
+  "sourceUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
+  "sourceSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "sourceSprite": 1777,
+  "crownSprite": 1538,
+  "sourceLeafKeyFrames": [
+    1,
+    5,
+    7
+  ],
+  "sourceVisibleLoopFrames": 8,
+  "sourceFps": 24,
+  "uniqueSourceCrownKeys": 3,
+  "body": "unchanged original first pose for each direction",
+  "method": "24 offline per-blade affine-polar inbetweens per direction; original shapes, stem, depth order and registration. Desktop adaptation, not newly drawn official frames.",
+  "cell": [
+    192,
+    208
+  ],
+  "columns": 10,
+  "clips": {
+    "down": {
+      "indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "fps": 60,
+      "periodSeconds": 0.4
+    },
+    "left": {
+      "indices": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "fps": 60,
+      "periodSeconds": 0.4
+    },
+    "right": {
+      "indices": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+      ],
+      "fps": 60,
+      "periodSeconds": 0.4
+    }
+  },
+  "exactOriginalIndices": [
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79
+  ],
+  "frames": 80,
+  "candidatePhaseProof": [
+    {
+      "direction": "down",
+      "phase": 0.0,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.041666666666666664,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.08333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.08333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.16666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.125,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.25,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.16666666666666666,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.3333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.20833333333333334,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.4166666666666667,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.25,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.2916666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5833333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.3333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.6666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.375,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.75,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.4166666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.8333333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.4583333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.9166666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.5,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.5416666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.5833333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.625,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.6666666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.7083333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.75,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.7916666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.8333333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.875,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.9166666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "down",
+      "phase": 0.9583333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.0,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.041666666666666664,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.08333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.08333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.16666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.125,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.25,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.16666666666666666,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.3333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.20833333333333334,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.4166666666666667,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.25,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.2916666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5833333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.3333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.6666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.375,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.75,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.4166666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.8333333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.4583333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.9166666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.5,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.5416666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.5833333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.625,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.6666666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.7083333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.75,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.7916666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.8333333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.875,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.9166666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "left",
+      "phase": 0.9583333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.0,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.041666666666666664,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.08333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.08333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.16666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.125,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.25,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.16666666666666666,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.3333333333333333,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.20833333333333334,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.4166666666666667,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.25,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.2916666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.5833333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.3333333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.6666666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.375,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.75,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.4166666666666667,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.8333333333333334,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.4583333333333333,
+      "keys": [
+        1,
+        5
+      ],
+      "mix": 0.9166666666666666,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.5,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.5416666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.5833333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.625,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.6666666666666666,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.7083333333333334,
+      "keys": [
+        5,
+        7
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.75,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.0,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.7916666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.16666666666666652,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.8333333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.3333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.875,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.5,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.9166666666666666,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.6666666666666665,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    },
+    {
+      "direction": "right",
+      "phase": 0.9583333333333334,
+      "keys": [
+        7,
+        1
+      ],
+      "mix": 0.8333333333333335,
+      "bladeParts": 8,
+      "wholeCrownRotation": false
+    }
+  ],
+  "files": {
+    "senior-neutral.png": "0707caf436447bd99ad0d22b0e405c50d08926cee560ee65d005d0e5ebdb58e8",
+    "senior-mask.png": "db4712af96fd132493225d693f43e497186fb3bc739db0e31fb59f83674129fe"
+  }
+}

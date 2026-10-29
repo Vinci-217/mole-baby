@@ -1,0 +1,234 @@
+{
+  "reviewOnly": true,
+  "shippingCodeChanged": false,
+  "releaseCreated": false,
+  "renderFps": 30,
+  "source": {
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
+    "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf"
+  },
+  "referenceMethod": "Existing original source shapes and body/foliage masks; offline independent-blade interpolation, original rigs and new release choreography. No image-model redraw or official throw-performance claim.",
+  "forms": [
+    "seed",
+    "junior",
+    "middle",
+    "senior",
+    "classic",
+    "super",
+    "water",
+    "wood",
+    "fire"
+  ],
+  "checks": {
+    "seed": {
+      "maxX": 307.5297619047619,
+      "minX": 110,
+      "releaseRightTravelPixels": 72.53,
+      "horizontalGrabBaselineRange": null
+    },
+    "junior": {
+      "maxX": 334.7551020408163,
+      "minX": 110,
+      "releaseRightTravelPixels": 99.755,
+      "horizontalGrabBaselineRange": 0
+    },
+    "middle": {
+      "maxX": 334.7551020408163,
+      "minX": 110,
+      "releaseRightTravelPixels": 99.755,
+      "horizontalGrabBaselineRange": 0
+    },
+    "senior": {
+      "maxX": 369.6703296703297,
+      "minX": 110,
+      "releaseRightTravelPixels": 133.256,
+      "horizontalGrabBaselineRange": null
+    },
+    "classic": {
+      "maxX": 375.0571428571429,
+      "minX": 110,
+      "releaseRightTravelPixels": 137.969,
+      "horizontalGrabBaselineRange": null
+    },
+    "super": {
+      "maxX": 375.0571428571429,
+      "minX": 110,
+      "releaseRightTravelPixels": 137.969,
+      "horizontalGrabBaselineRange": null
+    },
+    "water": {
+      "maxX": 375.0571428571429,
+      "minX": 110,
+      "releaseRightTravelPixels": 137.969,
+      "horizontalGrabBaselineRange": null
+    },
+    "wood": {
+      "maxX": 375.0571428571429,
+      "minX": 110,
+      "releaseRightTravelPixels": 137.969,
+      "horizontalGrabBaselineRange": null
+    },
+    "fire": {
+      "maxX": 375.0571428571429,
+      "minX": 110,
+      "releaseRightTravelPixels": 137.969,
+      "horizontalGrabBaselineRange": null
+    }
+  },
+  "renderedImageChecks": {
+    "firstCandidateEqualsOriginalSource": true,
+    "fourPalettesPreserveUntintedRGBA": true,
+    "juniorHorizontalDragBodyBottom": {
+      "min": 153,
+      "max": 153,
+      "unit": "rendered pixels"
+    },
+    "middleHorizontalDragBodyBottom": {
+      "min": 153,
+      "max": 153,
+      "unit": "rendered pixels"
+    },
+    "atlasRepackedWithoutPixelChanges": {
+      "posesCompared": 80,
+      "dimensions": [
+        1920,
+        1664
+      ],
+      "neutralAndMaskEqual": true
+    }
+  },
+  "previews": [
+    {
+      "file": "rotor-comparison.gif",
+      "renderedFrames": 120,
+      "encodedFrames": 120,
+      "durationMs": 4000,
+      "sha256": "9ac096941ddbd4c7039f2e97b4fec64a811b1de651848fcce8ed46d8234b5c91",
+      "bytes": 1255039
+    },
+    {
+      "file": "throw-seed.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "e723a27bfe2c09aba43de0725eba3d2cf47340c2d1b0c304d2d6b1f35dac9038",
+      "bytes": 257415
+    },
+    {
+      "file": "throw-junior.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "2c7190ac9bf1e20a671bb12f1d28a66014a555bed358e383ff5d65d893f27955",
+      "bytes": 202275
+    },
+    {
+      "file": "throw-middle.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "7c7c23b7ce2cf245c25fba1705dfe4e5cf508ac7b5af2be02884e4fdc61531cf",
+      "bytes": 325883
+    },
+    {
+      "file": "throw-senior.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "16ca63caff6e322dd9620e290f5fad7321b3291db447a746f1b7517cbddf1b10",
+      "bytes": 611579
+    },
+    {
+      "file": "throw-classic.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "e0a7e2331b9ce358f2ccb64cbbeddb05534939c0074132097ed2f08ea80643f6",
+      "bytes": 406899
+    },
+    {
+      "file": "throw-super.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "1a42f8ef3bb29b1fb77526eb669872d89e987c726667c17ac7255772e6299f65",
+      "bytes": 424528
+    },
+    {
+      "file": "throw-water.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "bcb00469b44253fdf078b14b8bb7f432dfb09bbf9eb60a8d12a20d2e6c667da1",
+      "bytes": 816303
+    },
+    {
+      "file": "throw-wood.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "965784b4778c236306f17ef74704f9f2243223dac83df699aab1e293ac62c89f",
+      "bytes": 606114
+    },
+    {
+      "file": "throw-fire.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "8502a9e8f809d9a5f2f3bfe5d2c61b74b83d68a699a10f8c2a022cca217e5415",
+      "bytes": 656984
+    },
+    {
+      "file": "throw-stages.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "f379fcafea3c2b824c8e9678fe992f132abf593ecdca43c383be71231c2bca30",
+      "bytes": 1908447
+    },
+    {
+      "file": "throw-evolutions.gif",
+      "renderedFrames": 204,
+      "encodedFrames": 204,
+      "durationMs": 6800,
+      "sha256": "4f575da06cc653a6d60ab6fb889c65321bb1faec8ebe8dbc25e31c89379ac074",
+      "bytes": 2823151
+    },
+    {
+      "file": "rotor-colours-dark.gif",
+      "renderedFrames": 90,
+      "encodedFrames": 90,
+      "durationMs": 3000,
+      "sha256": "02ae3d57b6f1e0a06c2774264064aa9c8168fe9d62a3c3fe7c177e58ffd4bce0",
+      "bytes": 1104209
+    }
+  ],
+  "windowsBlackRectangle": "Not reproduced in this Linux environment; no claimed fix or native Windows acceptance.",
+  "referenceDownload": {
+    "date": "2026-10-29",
+    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
+    "httpStatus": 200,
+    "bytes": 556811,
+    "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+    "matchesRepositoryOriginal": true
+  },
+  "windowsFeedback": {
+    "appearance": "possibly persistent black rectangle",
+    "windowsVersion": null,
+    "clientVersion": null,
+    "nativeReproduced": false,
+    "fixed": false
+  },
+  "modelTests": {
+    "command": "node --test scripts/previews/throw-motion.test.mjs",
+    "passed": 4,
+    "failed": 0
+  },
+  "encodedAssetVerification": {
+    "allGifHashesAndDurations": true,
+    "allNineSingleFormGifsHaveVisibleBodyEveryFrame": true,
+    "gifFiles": 13,
+    "framesDecoded": 2454,
+    "allTextureHashesAndDimensions": true
+  }
+}
