@@ -1,0 +1,107 @@
+{
+  "version": "0.31.3",
+  "sourceSha": "44d62f82cdb6cf0d9ca2495588c7f664163df650",
+  "latestReleaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.3",
+  "feeds": {
+    "latest.yml": {
+      "version": "0.31.3",
+      "files": 1
+    },
+    "legacy-x64.yml": {
+      "version": "0.31.3",
+      "files": 1
+    },
+    "legacy-ia32.yml": {
+      "version": "0.31.3",
+      "files": 1
+    },
+    "latest-mac.yml": {
+      "version": "0.31.3",
+      "files": 4
+    }
+  },
+  "sha256MatchesBuildReceipt": true,
+  "allTenDownloadsAccessible": true,
+  "supplementarySha256Verified": {
+    "latest.yml": "b9adb55c606d182fe987bf09737afd98492c8bf8426dabcaa987a4dd897da708",
+    "legacy-x64.yml": "efe9970f1066ce05634c63936127906d9fd2bc157e61bc4512de9238bb429d0e",
+    "legacy-ia32.yml": "3fd48de1cbaad7e5261d399c931a48cefc87011a1f87c496fa5bef0ebfae1734",
+    "latest-mac.yml": "328b4a897c109018d36620a8a6e674d1017577d27ac8b0b48411292219c813d8",
+    "mole-baby-mac-help.html": "4a4e61c6d8f2a80b4b1402e69246d086ae646915bdc87b16bb0542b5446e8135"
+  },
+  "publishedChecksumEntries": 15,
+  "downloads": [
+    {
+      "file": "mole-baby-0.31.3-legacy-ia32.zip",
+      "status": 200,
+      "bytes": 634410237,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-legacy-ia32.zip?checked=1793234960",
+      "sha256": "eaeec93018ee949fa48a5d0c1dae5e7ac73c56fe83105161beaa408668e24876"
+    },
+    {
+      "file": "mole-baby-0.31.3-legacy-ia32-Setup.exe",
+      "status": 200,
+      "bytes": 611033687,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-legacy-ia32-Setup.exe?checked=1793234960",
+      "sha256": "7d41556f1309c304020c8b4725f3fdaf6101fae44ffc890e4341e83b426cd744"
+    },
+    {
+      "file": "mole-baby-0.31.3-legacy-x64.zip",
+      "status": 200,
+      "bytes": 639927025,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-legacy-x64.zip?checked=1793234960",
+      "sha256": "322d17c8bb05bc784bbe7c29d9f3fea9f56cd7da4d86df359f05d2e08facc597"
+    },
+    {
+      "file": "mole-baby-0.31.3-legacy-x64-Setup.exe",
+      "status": 200,
+      "bytes": 614665847,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-legacy-x64-Setup.exe?checked=1793234960",
+      "sha256": "b3ef9ac1b213f7f6b81e9657c9da2c1ce119983f561e747696cb40902ce22f14"
+    },
+    {
+      "file": "mole-baby-0.31.3-mac-arm64.dmg",
+      "status": 200,
+      "bytes": 653678562,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-mac-arm64.dmg?checked=1793234960",
+      "sha256": "76c85f6bdccacd97313ad3363571cb2ba66afe45da3d528ba5cdab4b39d7987c"
+    },
+    {
+      "file": "mole-baby-0.31.3-mac-arm64.zip",
+      "status": 200,
+      "bytes": 648190371,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-mac-arm64.zip?checked=1793234962",
+      "sha256": "9bf184e08d81ed87a17af1bd0bc1db25b1ee036804ae5f98b58d5d4f115e05ba"
+    },
+    {
+      "file": "mole-baby-0.31.3-mac-x64.dmg",
+      "status": 200,
+      "bytes": 659630150,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-mac-x64.dmg?checked=1793234962",
+      "sha256": "673a3980d9bf363d726b7b0f16fa66a46415f5d779a89510998c04334e5cb8e9"
+    },
+    {
+      "file": "mole-baby-0.31.3-mac-x64.zip",
+      "status": 200,
+      "bytes": 654189781,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-mac-x64.zip?checked=1793234962",
+      "sha256": "a8a618b84deacc67f6a6f40fbcb715f918c212b384a50bbf64b2f85a2acf857b"
+    },
+    {
+      "file": "mole-baby-0.31.3-x64.zip",
+      "status": 200,
+      "bytes": 659604463,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-x64.zip?checked=1793234962",
+      "sha256": "2f23a7ae6f42b64621a8dfd1836c3721db39337e862617e92f5ece611cead5ff"
+    },
+    {
+      "file": "mole-baby-0.31.3-Setup.exe",
+      "status": 200,
+      "bytes": 627862939,
+      "url": "https://github.com/Vinci-217/mole-baby/releases/latest/download/mole-baby-0.31.3-Setup.exe?checked=1793234962",
+      "sha256": "be6f457262651c65ac1dd06deabdf6b3976d2dd3a067fb17c711a2244da99974"
+    }
+  ],
+  "checkedAtUnix": 1793234964.311175,
+  "method": "Independent public latest redirect; all ten binary checksum entries equal the native build receipt; exactly five supplementary entries downloaded and SHA256 verified; four parsed updater manifests; HTTP200 HEAD and available size headers for all ten binary assets. Full large binaries were not independently downloaded again."
+}

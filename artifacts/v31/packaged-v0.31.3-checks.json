@@ -1,0 +1,20 @@
+{
+  "version": "0.31.3",
+  "sourceSha": "44d62f82cdb6cf0d9ca2495588c7f664163df650",
+  "platform": "linux-x64",
+  "execution": "Rebuilt exact tagged version with electron-builder, then launched the actual packaged executable for both new-feature and lively-companion checks.",
+  "vitest": 374,
+  "nodeTests": 121,
+  "coreAsarBytes": 106612229,
+  "externalMotionFiles": 1635,
+  "externalMotionBytes": 463921585,
+  "allExternalBytesVerified": true,
+  "testHelperExcluded": true,
+  "nativeResult": {
+    "code": 0,
+    "finishedAt": 1793233627.3880014
+  },
+  "completedAt": "2026-10-29T00:27:07.388001+00:00",
+  "verificationLog": "PASS packaged split animation bytes and bounded core ASAR {\"files\":1635,\"bytes\":463921585,\"coreAsarBytes\":106612229}\nPASS local renderer policy: external scripts blocked before network access\nPASS colour mixer: original RGB art, keyboard mixing and exact preview, one bottle per brew, no direct recolour/coin reward, medicine inventory consumption and persisted custom palette, cancelled brew grants nothing, retired balance entry absent\nPASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance\nPASS packaged split animation bytes and bounded core ASAR {\"files\":1635,\"bytes\":463921585,\"coreAsarBytes\":106612229}\nPASS local renderer policy: external scripts blocked before network access\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books and reversible illusion; retired balance absent; supplied football entry; persisted outings recall and return once without rewards",
+  "note": "Local Linux packaged proof. Formal Windows/Mac native proof is recorded separately."
+}

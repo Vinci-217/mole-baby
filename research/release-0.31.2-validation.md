@@ -31,3 +31,5 @@ Windows现代64位、兼容64/32位、Mac Apple/Intel五路必须全部打包和
 本轮结果：[v0.31.2流水线](https://github.com/Vinci-217/mole-baby/actions/runs/40790958452)的Windows现代64位、兼容64/32位与Mac Apple四路成品均通过。Windows额外通过真实NSIS升级、重新启动与存档保留；Mac Apple通过真实启动8秒检查、GitHub DMG下载、SHA及挂载版本核验。
 
 Mac Intel通过DMG/ZIP逐文件完整性、本地签名、启动及桌面照料检查，但在后续签到测试等待余额变为1050时超时，因此整个Release仍被拦截，没有公开、没有进入latest。原失败日志的finally已经恢复旧存档，未保留失败时的实际余额，不能由该日志断言用户签到功能存在相同错误。下一版将测试存档放到新页面脚本执行之前注入，排除旧页面自动保存覆盖测试数据的竞争，并增加签到前余额断言及清理前失败存档诊断，保留所有原断言与5秒期限。
+
+[正式失败回执](release-0.31.2-receipt.json)确认Windows三路成功、Mac组失败、发布跳过，失败标签保留。

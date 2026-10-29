@@ -1,0 +1,437 @@
+{
+  "tag": "v0.31.3",
+  "previewCount": 71,
+  "allReadmeEmbedsPresent": true,
+  "allPublicGifHeadsAccessible": true,
+  "localHashesMatchCoverage": true,
+  "method": "README path coverage, exact local GIF hashes, and public GitHub raw HEAD status, GIF content-type and available lengths; full remote files not downloaded again",
+  "checkedAtUnix": 1793233327.4528227,
+  "files": [
+    {
+      "file": "original-180001.gif",
+      "status": 200,
+      "bytes": 1467085,
+      "sha256": "99662cd6e0e88a6655ba728c9ccb123a05225add30ecd846af64c801bf894646"
+    },
+    {
+      "file": "original-180002.gif",
+      "status": 200,
+      "bytes": 1747884,
+      "sha256": "dde1528bd35a0d33e29fe5b9a438060c5c68eb00aafb4ff6947fac9720770ceb"
+    },
+    {
+      "file": "original-180003.gif",
+      "status": 200,
+      "bytes": 1684672,
+      "sha256": "d562d9f79b2ae7b3de0e9a3e6de372d4de6c65ad191d16cadd106754f197a0ad"
+    },
+    {
+      "file": "original-180004.gif",
+      "status": 200,
+      "bytes": 981279,
+      "sha256": "d631ccb18178d60e1f198b7f3cbcdd82b42aabaf3efc6a9590ddd945187e1256"
+    },
+    {
+      "file": "original-180005.gif",
+      "status": 200,
+      "bytes": 1269041,
+      "sha256": "1ad92403bbe2f54f8001373d874478951a0a286a01fe6aa0e502b93325d7bdbf"
+    },
+    {
+      "file": "original-180006.gif",
+      "status": 200,
+      "bytes": 1537503,
+      "sha256": "ca0ed52f90c4ae885d4fbd15356ee3df8c0a621e9301203dafdb342d9377d683"
+    },
+    {
+      "file": "original-180007.gif",
+      "status": 200,
+      "bytes": 1225748,
+      "sha256": "257f74951475453957c0d466abc45d9a1ab49435fb1dadf24292c5180f3b2230"
+    },
+    {
+      "file": "original-180008.gif",
+      "status": 200,
+      "bytes": 1080067,
+      "sha256": "80cdef577ad0cbf415775de3886f9c20bc3e189ff2cb489bf228baf891463dff"
+    },
+    {
+      "file": "original-180009.gif",
+      "status": 200,
+      "bytes": 1026443,
+      "sha256": "5937efe491f2685a78306ab2d3f34c6d223e91464a0a1625f5d9877ce768ec92"
+    },
+    {
+      "file": "original-180010.gif",
+      "status": 200,
+      "bytes": 1197687,
+      "sha256": "1a3e150d5ac8892d8cd21af77f52c17853234ad2bc418fce8713d34f8faa5971"
+    },
+    {
+      "file": "original-180011.gif",
+      "status": 200,
+      "bytes": 2075470,
+      "sha256": "5f3ba1246147406dd1771a7531e3412631b69424adaab870957820c9e5783ecc"
+    },
+    {
+      "file": "original-180012.gif",
+      "status": 200,
+      "bytes": 1414382,
+      "sha256": "4faa14bb67b15826f42489f571cb6923fe9f9b38f87f3f94fdfb152136e20f3f"
+    },
+    {
+      "file": "original-180013.gif",
+      "status": 200,
+      "bytes": 2314039,
+      "sha256": "e51b2e7255dbe5b089ddf169057c5e12f04637b7534d21c7e0a4d899a7f07493"
+    },
+    {
+      "file": "original-180014.gif",
+      "status": 200,
+      "bytes": 1558936,
+      "sha256": "ec90bdcda4d15295ddf34d6a8cc225c4a56e98f9f1008d1783c604be78829a17"
+    },
+    {
+      "file": "original-180015.gif",
+      "status": 200,
+      "bytes": 1073625,
+      "sha256": "3dbe89f6b5ba80f23634ed75e005c53a0c4114b48b73ab42cd8343beb897cf32"
+    },
+    {
+      "file": "original-180016.gif",
+      "status": 200,
+      "bytes": 2137310,
+      "sha256": "13fa86620b1f4c4ef49a0645b63f2cf4a724add755abd1b20ef5b67532517b47"
+    },
+    {
+      "file": "original-180017.gif",
+      "status": 200,
+      "bytes": 612761,
+      "sha256": "b008ae6130709abae2a237b28fd55eb68c94a95ecb8da54dba2fbab0a366b2bb"
+    },
+    {
+      "file": "original-180018.gif",
+      "status": 200,
+      "bytes": 1358968,
+      "sha256": "2d9e4ab5ccecabffdfa34e60d97e072b928bc3d2b027a306d1e1b6df577548f1"
+    },
+    {
+      "file": "original-180019.gif",
+      "status": 200,
+      "bytes": 462640,
+      "sha256": "b71c418b8c3dc120e2acab07be94a07423307095231d5eb2693ec9d5c072109e"
+    },
+    {
+      "file": "original-180020.gif",
+      "status": 200,
+      "bytes": 1491415,
+      "sha256": "a68d509927d0403f7c6018d97f87020599f8f5ef5b38fc69c2cfd2aa6ec08205"
+    },
+    {
+      "file": "original-180021.gif",
+      "status": 200,
+      "bytes": 1317300,
+      "sha256": "47e1e7263d9d5d1a897776e9e31ae5302b4a8dcd388ee30a8b7aad85efbf567d"
+    },
+    {
+      "file": "original-180022.gif",
+      "status": 200,
+      "bytes": 1194058,
+      "sha256": "001ac77d888c2bc0e5634e2c9aa831c01d5889c5b69bfb82289a99fffbb39ff7"
+    },
+    {
+      "file": "original-180023.gif",
+      "status": 200,
+      "bytes": 986609,
+      "sha256": "42cf9aca16bf07fb580733b1f908a56a2fd867b9af3b85850420e2c4f178595d"
+    },
+    {
+      "file": "original-180024.gif",
+      "status": 200,
+      "bytes": 2027257,
+      "sha256": "aa6eb9edad2535b908d5adde3b1185bcc0e425c51d39b04e47e6b77adbacc039"
+    },
+    {
+      "file": "original-180025.gif",
+      "status": 200,
+      "bytes": 761870,
+      "sha256": "62549548f13a699fdf24983da3286e6475fdaf176f91588474faa90cfd7c7f08"
+    },
+    {
+      "file": "original-180026.gif",
+      "status": 200,
+      "bytes": 1302494,
+      "sha256": "6e983f5839f5452022bf495670213218affcfd4a32f363f2779b6201b55ccb56"
+    },
+    {
+      "file": "original-180027.gif",
+      "status": 200,
+      "bytes": 1111620,
+      "sha256": "070c66af6d71377021ade42771f47b74cecf80291659c08775c3c86140273aab"
+    },
+    {
+      "file": "original-180028.gif",
+      "status": 200,
+      "bytes": 1319538,
+      "sha256": "5aba06f4f5ee8d57ac573795b3ccfcc036b767c968381a0bd45b151cd7c7f64e"
+    },
+    {
+      "file": "original-180029.gif",
+      "status": 200,
+      "bytes": 1449602,
+      "sha256": "4e0f5427c4eca7a645d4e028df1677176b3fbbffc493633c311565e8142c22c5"
+    },
+    {
+      "file": "original-180030.gif",
+      "status": 200,
+      "bytes": 1163325,
+      "sha256": "842093cf1f35abbba8203c11566db39eb745434723a40b4943bf9aa5cae6ec9f"
+    },
+    {
+      "file": "original-180041.gif",
+      "status": 200,
+      "bytes": 1215300,
+      "sha256": "2f1511583beffcff76d55402d363043890e7ab413b166bc826dcac07f5d8eb45"
+    },
+    {
+      "file": "original-180042.gif",
+      "status": 200,
+      "bytes": 2225922,
+      "sha256": "ce60f9b82457b6b2d05d931d0817f3db31a108b4a66b533ca37daef30566650b"
+    },
+    {
+      "file": "original-180043.gif",
+      "status": 200,
+      "bytes": 1232711,
+      "sha256": "8d59813413473cf88d00b1c1cb02f469b227c75391782ffb7d749f42387daf67"
+    },
+    {
+      "file": "original-180044.gif",
+      "status": 200,
+      "bytes": 1243380,
+      "sha256": "679f64a80f53ee14b6c27f22531f8d1ed4124a095fe1b257d3e81885a7437092"
+    },
+    {
+      "file": "original-180045.gif",
+      "status": 200,
+      "bytes": 3181279,
+      "sha256": "d5d488fd55cfa47fcc3c6f6f04eb1a295006055ecaf95cc63c20f6f3f510f4b4"
+    },
+    {
+      "file": "original-180046.gif",
+      "status": 200,
+      "bytes": 2649856,
+      "sha256": "a7592347795fc68defc7fd16b4729e489c652c5e681dc45da27732a3f194fac6"
+    },
+    {
+      "file": "original-180047.gif",
+      "status": 200,
+      "bytes": 2402204,
+      "sha256": "969566a3c377bac608d8b41bcd0496f8e1220085752efe4ceee1c00e8ae1637a"
+    },
+    {
+      "file": "original-180048.gif",
+      "status": 200,
+      "bytes": 1414889,
+      "sha256": "edc39435735ffc04cd1ae315e00073b18ba52a010a0821171aa5899f803167a8"
+    },
+    {
+      "file": "original-180049.gif",
+      "status": 200,
+      "bytes": 2202994,
+      "sha256": "31444d7b755bc2946d7da519f3818494217362f96237936b0c17dfd6a02e4fd5"
+    },
+    {
+      "file": "original-180050.gif",
+      "status": 200,
+      "bytes": 928380,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b"
+    },
+    {
+      "file": "original-180051.gif",
+      "status": 200,
+      "bytes": 928380,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b"
+    },
+    {
+      "file": "original-180052.gif",
+      "status": 200,
+      "bytes": 928380,
+      "sha256": "3f73bb28f6fd5a14a723752715f1894b8883877c6e03303ae694f8f6ff546c0b"
+    },
+    {
+      "file": "original-180053.gif",
+      "status": 200,
+      "bytes": 865024,
+      "sha256": "bb66c9615e245b607e97766f28aff0693486f1b5743df075f3e54cebc24ef7fa"
+    },
+    {
+      "file": "original-180054.gif",
+      "status": 200,
+      "bytes": 762035,
+      "sha256": "71c4cee3a69beffea65169b3583135f8d809b4924693066326d6e1dfbcf187e6"
+    },
+    {
+      "file": "original-180055.gif",
+      "status": 200,
+      "bytes": 1612647,
+      "sha256": "c85284ec03d2f3b7a753437f24bd6480028908b8f85ea51f8398a4fd6d96e688"
+    },
+    {
+      "file": "original-180056.gif",
+      "status": 200,
+      "bytes": 1473532,
+      "sha256": "2cfbf8637ff11a2f9e592f2fd432a366716c1c6731fd6b3b343d7dcbc00f3cbd"
+    },
+    {
+      "file": "original-180057.gif",
+      "status": 200,
+      "bytes": 1953652,
+      "sha256": "704c4824fe8caf963f45177172e2933864921573304b443e06f8001f623e4a5d"
+    },
+    {
+      "file": "original-180058.gif",
+      "status": 200,
+      "bytes": 2464238,
+      "sha256": "a9898c5ec3ba00afe0cea45523482de14853d2fe0a44a8b0e6574386761db1fd"
+    },
+    {
+      "file": "original-180059.gif",
+      "status": 200,
+      "bytes": 1048832,
+      "sha256": "323ef91033de6a4f667e65be985f26520300ed5e03cb140af1c3c3fe0201b7f2"
+    },
+    {
+      "file": "original-180060.gif",
+      "status": 200,
+      "bytes": 2419219,
+      "sha256": "a7a65397a4010902d39071522ad10ce3c046794ad18cb8ffe96bba0a388a3044"
+    },
+    {
+      "file": "original-180061.gif",
+      "status": 200,
+      "bytes": 1990117,
+      "sha256": "6d081883e178fc1e26c093c59c91b7affaff0468cff34295891fdfd17120bd82"
+    },
+    {
+      "file": "original-180062.gif",
+      "status": 200,
+      "bytes": 2924388,
+      "sha256": "5acecafcb228db4b71da3cf51be9976772ceafcb88bba38aa08de0a539e53326"
+    },
+    {
+      "file": "original-180063.gif",
+      "status": 200,
+      "bytes": 1860876,
+      "sha256": "0b733d0b826a20fa6fcca7021b3c512cdeee63d9bc1f24cc142f9bf079c004dd"
+    },
+    {
+      "file": "original-180064.gif",
+      "status": 200,
+      "bytes": 2391559,
+      "sha256": "edd25c33ac18bb829f8496b78b8cc92c0b885cfdcf0cfbfb0a8eeb6bcb09ea6f"
+    },
+    {
+      "file": "original-180065.gif",
+      "status": 200,
+      "bytes": 2626866,
+      "sha256": "be074705e5ef948becf251d0e2c53088a53c2b819819330afec44a70f75775fc"
+    },
+    {
+      "file": "original-180066.gif",
+      "status": 200,
+      "bytes": 2543038,
+      "sha256": "03949fda9cf7cfdc387fa87bc6993e4f1f40dea33018382da99f079bf9959002"
+    },
+    {
+      "file": "original-180067.gif",
+      "status": 200,
+      "bytes": 2545486,
+      "sha256": "63c554cfa51a1cde8f8b6271262623dd4e71fe382c32d7de6cafbac4716d1f7b"
+    },
+    {
+      "file": "original-180068.gif",
+      "status": 200,
+      "bytes": 2263791,
+      "sha256": "58597607551b12dd031f0707c84940ebf93dd303e18e00089e10b0658c7d7c12"
+    },
+    {
+      "file": "original-180069.gif",
+      "status": 200,
+      "bytes": 2489123,
+      "sha256": "5d57fb112990239d2070b1b10d9c7ea9a15f1cf563c6694e3955f1f54ab8ada9"
+    },
+    {
+      "file": "original-180070.gif",
+      "status": 200,
+      "bytes": 2359469,
+      "sha256": "6302423d588eb1b50cc3aa22c6fc727f2a16568d2a04d5c576aa4e7ee653da0d"
+    },
+    {
+      "file": "original-tuya1.gif",
+      "status": 200,
+      "bytes": 2426881,
+      "sha256": "8cbe947779d1aeffda53d60abf67c9f3df1682bb2e81ee27c9af25f3637d6c48"
+    },
+    {
+      "file": "original-tuya2.gif",
+      "status": 200,
+      "bytes": 2025052,
+      "sha256": "9579fdf5ee115c681de56459f6522e0b4ae1d61c2de16074eb2bf7757792f394"
+    },
+    {
+      "file": "original-tuya3.gif",
+      "status": 200,
+      "bytes": 2179062,
+      "sha256": "dd03f22b85611f988fe8563ea19e5dc22281d9b725cc00f2d894dad2f0fa74a4"
+    },
+    {
+      "file": "original-tuya4.gif",
+      "status": 200,
+      "bytes": 2297905,
+      "sha256": "9fafa1346a0a33b2cca9883f7c9041c7569d66fafcbddbe87c582a5de4a61a1e"
+    },
+    {
+      "file": "daily-pet.gif",
+      "status": 200,
+      "bytes": 1752180,
+      "sha256": "4ca5b310cd8bc25d147aa30e3f98d8484e488bbd38b2acafdbb4ae07d7032032"
+    },
+    {
+      "file": "daily-focus.gif",
+      "status": 200,
+      "bytes": 5659418,
+      "sha256": "9f5d8e2fe2747a9a025d05b5552a3f0dacea0709105565ddf0ea2e41776ed0fa"
+    },
+    {
+      "file": "daily-sleep.gif",
+      "status": 200,
+      "bytes": 3692386,
+      "sha256": "8a0dfe768516f4b553e8e5e9897907ee0ef4730ba3be3f186d0834c9c3939fa9"
+    },
+    {
+      "file": "daily-watch-butterfly.gif",
+      "status": 200,
+      "bytes": 5459687,
+      "sha256": "8d4258d802f26df7d3432431536642470ea28c51a697313f66cf182e3548dae1"
+    },
+    {
+      "file": "daily-look-around.gif",
+      "status": 200,
+      "bytes": 2349395,
+      "sha256": "3faca0b09c23d26c7a543c1d28254ca00c7d330c6be4e3fd10643fe240a97ce8"
+    },
+    {
+      "file": "daily-wake.gif",
+      "status": 200,
+      "bytes": 1186709,
+      "sha256": "2cba49aea9015c6f3e8fe1d9c184a96f6af4c086c41ef970b838ca1436c012d3"
+    },
+    {
+      "file": "daily-dizzy.gif",
+      "status": 200,
+      "bytes": 2371979,
+      "sha256": "48069343602c0e49610f70049879e8a8264fc0139afe49bf3a993a7417404842"
+    }
+  ]
+}
