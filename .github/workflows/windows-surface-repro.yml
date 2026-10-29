@@ -59,10 +59,10 @@ jobs:
           npm test 2>&1 | tee -a artifacts/surface.log
           if [ '${{ matrix.legacy }}' = true ]; then
             npm run build:legacy 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
           else
             npm run build 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --win --dir --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --win zip --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
           fi
       - name: Reproduce on physical desktop over time
         shell: bash
@@ -134,7 +134,7 @@ jobs:
           npm ci 2>&1 | tee -a artifacts/surface.log
           npm test 2>&1 | tee -a artifacts/surface.log
           npm run build 2>&1 | tee -a artifacts/surface.log
-          npx --no-install electron-builder --config electron-builder.mac.cjs --mac dir --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
+          npx --no-install electron-builder --config electron-builder.mac.cjs --mac zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
           node scripts/verify-preview-package.cjs 'release/${{ matrix.directory }}/拉姆.app/Contents/MacOS/拉姆' 2>&1 | tee -a artifacts/surface.log
       - name: Upload native preview diagnostics
         if: always()
