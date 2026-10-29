@@ -1,7 +1,8 @@
 const{test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto'),YAML=require('yaml');
-const{prepareUpdateMetadata,releaseDownloads}=require('./update-metadata.cjs');
+const{prepareUpdateMetadata,releaseDownloads,releaseBlockmaps}=require('./update-metadata.cjs');
+const{gzipSync}=require('node:zlib');
 function fixture(t){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-update-meta-'));
  t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
@@ -14,7 +15,8 @@ function fixture(t){
  write('latest.yml',[`mole-baby-${version}-Setup.exe`]);
  for(const arch of['x64','ia32'])write(`legacy-${arch}.yml`,[`mole-baby-${version}-legacy-${arch}-Setup.exe`]);
  for(const arch of['arm64','x64'])write(`latest-mac-${arch}.yml`,[`mole-baby-${version}-mac-${arch}.zip`,`mole-baby-${version}-mac-${arch}.dmg`]);
- const sums=releaseDownloads(version).map(name=>`${crypto.createHash('sha256').update(fs.readFileSync(path.join(dir,name))).digest('hex')}  ${name}`);
+ for(const name of releaseBlockmaps(version)){const size=fs.statSync(path.join(dir,name.slice(0,-'.blockmap'.length))).size;fs.writeFileSync(path.join(dir,name),gzipSync(JSON.stringify({version:'2',files:[{name:'file',offset:0,sizes:[size],checksums:[Buffer.alloc(18).toString('base64')]}]})))}
+ const sums=[...releaseDownloads(version),...releaseBlockmaps(version)].map(name=>`${crypto.createHash('sha256').update(fs.readFileSync(path.join(dir,name))).digest('hex')}  ${name}`);
  fs.writeFileSync(path.join(dir,'SHA256SUMS.txt'),sums.join('\n')+'\n');
  return{dir,version,write};
 }
@@ -26,7 +28,7 @@ test('merges Mac architectures and keeps both legacy channels separate and idemp
  const persisted=YAML.parse(fs.readFileSync(path.join(dir,'latest-mac.yml'),'utf8'));
  assert.ok(persisted.files.some(f=>f.url.endsWith('arm64.zip')));assert.ok(persisted.files.some(f=>f.url.endsWith('x64.zip')));
  const first=fs.readFileSync(path.join(dir,'SHA256SUMS.txt'),'utf8');prepareUpdateMetadata(dir,version);
- assert.equal(fs.readFileSync(path.join(dir,'SHA256SUMS.txt'),'utf8'),first);assert.equal(first.trim().split('\n').length,14);
+ assert.equal(fs.readFileSync(path.join(dir,'SHA256SUMS.txt'),'utf8'),first);assert.equal(first.trim().split('\n').length,21);
 });
 test('rejects a stale release version or corrupted installer before publication',t=>{
  const{dir,version}=fixture(t);assert.throws(()=>prepareUpdateMetadata(dir,'1.2.4'),/Missing checked download|version/);
@@ -63,6 +65,10 @@ test('publication waits for modern, legacy and Mac package verification and uplo
  assert.match(upload.with.path,/legacy-\$\{\{ matrix.arch \}\}.yml/);
  const publish=workflow.jobs.release.steps.find(s=>s.name==='Create release or replace its build attachments').run;
  assert.match(publish,/release\/legacy-x64.yml release\/legacy-ia32.yml/);
+ assert.match(publish,/release\/\*\.blockmap/);
+ const check=workflow.jobs.release.steps.find(s=>s.name==='Check artifact checksums').run;
+ assert.ok(check.indexOf('sha256sum --check SHA256SUMS.txt')<check.indexOf('prepare-update-blockmaps.cjs'));
+ assert.ok(check.indexOf('prepare-update-blockmaps.cjs')<check.indexOf('update-metadata.cjs'));
  for(const job of ['build','legacy','mac']){
   for(const step of workflow.jobs[job].steps.filter(s=>s.name.includes('Test ')||s.name==='Build renderer'||s.name==='Build shared renderer')){
    assert.match(step.run,/set -o pipefail/);assert.match(step.run,/tee -a artifacts\//);
@@ -84,4 +90,15 @@ test('Git receipt records ten unique downloads and legacy diagnostics, including
  const receipt=execute();assert.equal(receipt.downloads.length,10);assert.equal(receipt.platforms.legacyWindows,'success');assert.equal(receipt.buildResult,'success');assert.equal(receipt.legacyVerificationLogs.ia32,'PASS legacy ia32');
  fs.unlinkSync(path.join(downloads,'SHA256SUMS-legacy-ia32.txt'));assert.throws(execute,/ten unique/);
  env.LEGACY_RESULT='failure';env.RELEASE_RESULT='skipped';const failure=execute();assert.equal(failure.buildResult,'failure');assert.equal(failure.releaseUrl,null);assert.equal(failure.platforms.legacyWindows,'failure');
+});
+
+test('publication rejects a missing or malformed index and generation checks the final installer bytes',async t=>{
+ const{prepareUpdateBlockmaps}=require('./prepare-update-blockmaps.cjs');
+ const f=fixture(t),index=releaseBlockmaps(f.version)[0];fs.unlinkSync(path.join(f.dir,index));
+ assert.throws(()=>prepareUpdateMetadata(f.dir,f.version),/ENOENT/);
+ await prepareUpdateBlockmaps(f.dir,f.version);prepareUpdateMetadata(f.dir,f.version);
+ const before=fs.readFileSync(path.join(f.dir,'SHA256SUMS.txt'),'utf8');await prepareUpdateBlockmaps(f.dir,f.version);prepareUpdateMetadata(f.dir,f.version);
+ assert.equal(fs.readFileSync(path.join(f.dir,'SHA256SUMS.txt'),'utf8'),before);
+ fs.appendFileSync(path.join(f.dir,releaseDownloads(f.version)[0]),'tamper');
+ await assert.rejects(prepareUpdateBlockmaps(f.dir,f.version),/unchecked installer/);
 });

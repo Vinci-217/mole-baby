@@ -340,6 +340,7 @@ jobs:
           cat SHA256SUMS.txt SHA256SUMS-legacy-x64.txt SHA256SUMS-legacy-ia32.txt SHA256SUMS-mac-arm64.txt SHA256SUMS-mac-x64.txt > combined.sha256
           mv combined.sha256 SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
+          node ../scripts/prepare-update-blockmaps.cjs
           node ../scripts/prepare-release-notes.cjs
           node ../scripts/update-metadata.cjs
           sha256sum --check SHA256SUMS.txt
@@ -352,10 +353,10 @@ jobs:
         shell: bash
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --clobber
             gh release edit "$RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
           gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file release/RELEASE_NOTES.md
 

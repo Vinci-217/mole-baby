@@ -747,7 +747,7 @@ function startUpdates(){
   installed:process.platform==='win32'&&fs.existsSync(path.join(path.dirname(process.execPath),windowsEdition.uninstallerName)),
   macSigned:applicationMetadata.macUpdateSigned===true,
   fetch:(url,options)=>net.fetch(url,options),openPath:file=>shell.openPath(file),
-  engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL({provider:'generic',url:'https://github.com/Vinci-217/mole-baby/releases/latest/download/',...(windowsEdition?.edition==='legacy'?{channel:windowsEdition.channel}:{})});return engine},
+  engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL(require('./update-source.cjs').productionUpdateSource(windowsEdition?.edition==='legacy'?windowsEdition.channel:undefined));return engine},
   prepareInstall:prepareUpdateInstall,isBusy:()=>updateRendererBusy||!hasPet||!petMode||companionPanel||dragging||interacting,
   onChange:state=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('updates:state',state);refreshTrayMenu()},
   onAvailable:()=>{void updatePrompts.offerDownload()},

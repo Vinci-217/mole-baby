@@ -3,6 +3,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const assert=require('node:assert/strict');
 const YAML=require('yaml');
+const {parseBlockMap}=require('../electron/differential-download.cjs');
 
 function releaseDownloads(version){
  return [
@@ -10,6 +11,9 @@ function releaseDownloads(version){
   ...['x64','ia32'].flatMap(arch=>[`mole-baby-${version}-legacy-${arch}-Setup.exe`,`mole-baby-${version}-legacy-${arch}.zip`]),
   ...['arm64','x64'].flatMap(arch=>[`mole-baby-${version}-mac-${arch}.zip`,`mole-baby-${version}-mac-${arch}.dmg`]),
  ];
+}
+function releaseBlockmaps(version){
+ return releaseDownloads(version).filter(name=>name.endsWith('-Setup.exe')||/-mac-(?:arm64|x64)\.(?:zip|dmg)$/.test(name)).map(name=>name+'.blockmap');
 }
 function digest(file,algorithm,encoding='hex'){
  return crypto.createHash(algorithm).update(fs.readFileSync(file)).digest(encoding);
@@ -32,7 +36,11 @@ function prepareUpdateMetadata(directory,version){
  assert.match(version,/^\d+\.\d+\.\d+$/,'Stable release version required');
  // A valid manifest is not enough: every downloadable ZIP/installer must have
  // a checked checksum, including the portable archives outside updater feeds.
- const sums=checkedSums(directory,releaseDownloads(version));
+ const sums=checkedSums(directory,[...releaseDownloads(version),...releaseBlockmaps(version)]);
+ for(const name of releaseBlockmaps(version)){
+  const parsed=parseBlockMap(fs.readFileSync(path.join(directory,name)));
+  assert.equal(parsed.size,fs.statSync(path.join(directory,name.slice(0,-'.blockmap'.length))).size,`${name} indexed file size`);
+ }
  const load=(name,expected)=>{
   const meta=YAML.parse(fs.readFileSync(path.join(directory,name),'utf8'),{maxAliasCount:0});
   assert.equal(meta.version,version,`${name} version`);
@@ -59,8 +67,8 @@ function prepareUpdateMetadata(directory,version){
   sums.set(name,digest(path.join(directory,name),'sha256'));
  }
  fs.writeFileSync(path.join(directory,'SHA256SUMS.txt'),[...sums].map(([name,hash])=>`${hash}  ${name}`).join('\n')+'\n');
- console.log('PASS: ten checked downloads and isolated modern/legacy/Mac update channels match size and SHA512 digests');
+ console.log('PASS: ten checked downloads, seven blockmaps and isolated modern/legacy/Mac update channels match size and digests');
  return{windows,legacy,mac};
 }
 if(require.main===module)prepareUpdateMetadata(path.resolve(__dirname,'../release'),require('../package.json').version);
-module.exports={prepareUpdateMetadata,releaseDownloads};
+module.exports={prepareUpdateMetadata,releaseDownloads,releaseBlockmaps};

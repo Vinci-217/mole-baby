@@ -1,0 +1,125 @@
+name: Incremental update preview
+on:
+  push:
+    branches: ['preview/incremental-updates']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: incremental-update-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    name: Incremental ${{ matrix.platform }}
+    runs-on: windows-2022
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            flags: ''
+          - platform: legacy-x64
+            flags: '--legacy'
+          - platform: legacy-ia32
+            flags: '--legacy --ia32'
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      ELECTRON_DEV: '0'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build and verify actual differential NSIS upgrades
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/incremental.log
+          npm test 2>&1 | tee -a artifacts/incremental.log
+          if [ '${{ matrix.platform }}' = windows ]; then
+            npm run build 2>&1 | tee -a artifacts/incremental.log
+          else
+            npm run build:legacy 2>&1 | tee -a artifacts/incremental.log
+          fi
+          node scripts/verify-windows-update.cjs --full-payload ${{ matrix.flags }} 2>&1 | tee -a artifacts/incremental.log
+      - name: Save incremental test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: incremental-${{ matrix.platform }}
+          path: |
+            artifacts/incremental*.json
+            artifacts/incremental.log
+            artifacts/windows-update-fixture.log
+          retention-days: 14
+      - name: Save native diagnostic over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: ${{ matrix.platform }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/incremental.log
+        shell: bash
+        run: |
+          for native_log in artifacts/windows-update-fixture.log artifacts/mac-incremental-*.log; do
+            if [ -f "$native_log" ]; then tail -n 160 "$native_log" >> artifacts/incremental.log; fi
+          done
+          node scripts/save-ci-diagnostic.cjs
+  mac:
+    name: Incremental Mac ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      MOLE_MAC_DISTRIBUTION: local
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build two full product DMGs and verify native reconstruction
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/incremental.log
+          npm test 2>&1 | tee -a artifacts/incremental.log
+          npm run build 2>&1 | tee -a artifacts/incremental.log
+          node scripts/verify-mac-incremental.cjs '${{ matrix.arch }}' 2>&1 | tee -a artifacts/incremental.log
+      - name: Save incremental test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: incremental-mac-${{ matrix.arch }}
+          path: |
+            artifacts/incremental*.json
+            artifacts/incremental.log
+            artifacts/mac-incremental-*.log
+          retention-days: 14
+      - name: Save native diagnostic over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: mac-${{ matrix.arch }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/incremental.log
+        shell: bash
+        run: |
+          for native_log in artifacts/windows-update-fixture.log artifacts/mac-incremental-*.log; do
+            if [ -f "$native_log" ]; then tail -n 160 "$native_log" >> artifacts/incremental.log; fi
+          done
+          node scripts/save-ci-diagnostic.cjs
