@@ -2,11 +2,17 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-> **增量更新预览，尚未发布：** [实现与原生测试结果](docs/INCREMENTAL-UPDATES-PREVIEW.md) · [国内下载加速方案](docs/CHINA-DOWNLOAD-ACCELERATION.md)。正式版与自动更新 latest 渠道保持不变。
+## 本轮更新 · v0.31.4
 
-> **待确认修复预览：** [名字下方的状态提示与状态小窗修复](docs/DESKTOP-STATUS-UI.md) · [Windows 窗口尺寸累积与玩耍按钮修复](docs/WINDOWS-SURFACE-PLAY.md)。包含界面截图与验收记录；正式发布版仍为 v0.31.3。
+Windows 与 Mac 新增增量下载：优先复用本地旧安装包，只下载变化部分，校验后安装。**旧版首次升级到本版仍可能下载完整包；安装本版后，后续更新才能使用新逻辑。** 新增大量素材或没有匹配缓存时会回退完整下载，下载与安装继续分别确认。[更新方式与安装指引](docs/UPDATES.md) · [增量自测结果](docs/INCREMENTAL-UPDATES-PREVIEW.md)。
 
-## 本轮更新 · v0.31.3
+拉姆名字下方常驻显示具体状态，如“精神不足 · 需要清洁”；点状态可打开状态窗，睡眠时可点“叫醒”。状态小窗改用浅色圆角进度条，底部背包按钮完整显示，计时数字与状态文字各自保留空间。[界面截图](docs/DESKTOP-STATUS-UI.md)。
+
+修正 Windows 从小屋返回桌面后，随走动逐步变大的窗口边界，并更新常规版透明窗口重绘修复。修复初级、中级、高级与经典三叶超拉的原版玩耍入口被自主动作误挡，状态不足时显示具体原因。[窗口与玩耍验证](docs/WINDOWS-SURFACE-PLAY.md)。
+
+原有全部 SWF 动作、换色游戏、商店与物品、课程、小屋、成长、装扮和存档继续保留。当前更新源继续使用 GitHub Releases；本轮不接入国内镜像。[本次更新说明](RELEASE_NOTES.md)。
+
+## v0.31.3 · 原版动作与拉姆换色游戏
 
 新增“小屋游戏 → 拉姆换色游戏”：用原版红绿蓝色瓶和调色锅实时试色，装成独特药水，再从背包单击使用。自调颜色随成长、阶段切换和重启保留；首次领养仍只有原著四种基础色。
 

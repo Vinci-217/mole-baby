@@ -1,6 +1,6 @@
-# Windows 白条与玩耍修复预览
+# Windows 窗口与玩耍修复
 
-分支：`preview/windows-surface-play`。这是待审阅的修复，不更新正式 Release 或自动更新渠道。
+本轮修复已获发布授权，纳入 v0.31.4。正式安装包请到[最新正式版](https://github.com/Vinci-217/mole-baby/releases/latest)下载。下方保留 `preview/windows-surface-play` 的复现、测量和验收历史；预览附件有保留期限。
 
 [已通过的成品验收与 Windows 预览下载](https://github.com/Vinci-217/mole-baby/actions/runs/40819913152)。在页面底部 Artifacts 中选择 `mole-baby-preview-windows`（64 位 Windows 10/11）、`mole-baby-preview-legacy-x64` 或 `mole-baby-preview-legacy-ia32`。完整解压；GitHub 的 Artifacts 下载需要登录，保留 7 天。
 

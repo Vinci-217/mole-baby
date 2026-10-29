@@ -1,0 +1,43 @@
+{
+  "version": "0.31.4",
+  "tests": {
+    "vitestPassed": 381,
+    "nodePassed": 135,
+    "totalPassed": 516,
+    "exitCode": 0
+  },
+  "buildAndNative": {
+    "command": "npm run build && node scripts/desktop-smoke.cjs",
+    "exitCode": 0,
+    "electron": "37.10.3",
+    "platform": "linux",
+    "checks": [
+      "PASS local renderer policy: external scripts blocked before network access",
+      "PASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue",
+      "PASS physical edge left",
+      "PASS physical edge right",
+      "PASS physical edge top",
+      "PASS physical edge bottom",
+      "PASS: real OS cursor dragging in both axes, no vertical drift, all four physical edge docks and peeks, tray pin and explicit mouse-through",
+      "PASS: room-only status, wardrobe, memories and games; retired chat/key UI and bridges absent; care memories migrate and effects switch works",
+      "PASS: elastic stage-specific pulling and settle; real cursor samples during native drag; plate rain, shared bottle/clean gestures and delayed capped gains without loss on rapid clicks; playful butterfly net",
+      "PASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books and reversible illusion; retired balance absent; supplied football entry; persisted outings recall and return once without rewards",
+      "PASS: real dizziness uses orbiting original pupils and recovers; calibrated 30 percent body exposure across eight forms and all four edges",
+      "PASS: packaged updater settings/IPC, persisted toggle and renderer save checkpoint; disabled test contexts never contact live releases",
+      "PASS transparent hover: idle/food/play have no native title tooltips; bounded accessible hints clear on leave, focus, category, use and close; unused renderer top is alpha-transparent",
+      "PASS native update confirmation: download/install prompts render; Escape defers both without network, installer or restart",
+      "PASS: nine actions, help/status, shared magic and outfit restoration, original furniture drag/save and room backgrounds, 3 complete original skills, one lesson per deadline, count-up cancellation and countdown completion records",
+      "PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist",
+      "PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, all 18 scrolling desktop entries, three apex casts with pure-white smoke and restored outfit",
+      "PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory",
+      "PASS independent status/backpack without status category, room fullscreen+Escape+desktop restoration, confirmed auto/fixed growth and repeated reloads, retained progress/identity/course, remaining healthy time and ordered responsive settings",
+      "PASS original room: nine distinct icons, trusted official link, growth-only forms, independent ordered memory folding, original sleep icon, eight-blade rotor with pet boost",
+      "PASS colour mixer: original RGB art, keyboard mixing and exact preview, one bottle per brew, no direct recolour/coin reward, medicine inventory consumption and persisted custom palette, cancelled brew grants nothing, retired balance entry absent",
+      "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+      "PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node",
+      "PASS native compact desktop regression"
+    ]
+  },
+  "completedAtUtc": 1793265849.3191419,
+  "scope": "Exact version source build and native Linux regression; Windows/macOS official package verification is performed by the tagged release workflow"
+}
