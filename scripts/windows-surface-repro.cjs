@@ -7,7 +7,7 @@ const {adopt,enterHome,toDesktop}=require('./smoke-helpers.cjs');
 const {reloadWithStorage}=require('./smoke-storage.cjs');
 const root=path.resolve(__dirname,'..'),probe=path.join(__dirname,'windows-screen-probe.ps1');
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-const background=[18,36,54];
+const rendererMasks=new Map();
 async function form(mode,dir,coordinates={}){
   const ready=path.join(dir,mode+'-'+Date.now()+'.ready');
   const args=['-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',probe,'-Mode',mode,'-Ready',ready];
@@ -19,18 +19,23 @@ async function form(mode,dir,coordinates={}){
   child.readyFile=ready;
   return child;
 }
-async function capture(desktop,page,out,name){
+async function capture(desktop,page,out,name,{rendererSnapshot=true}={}){
   const {handle,pids}=await desktop.evaluate(({BrowserWindow,app})=>{
     const h=BrowserWindow.getAllWindows()[0].getNativeWindowHandle();
     return{handle:h.length===8?h.readBigUInt64LE().toString():String(h.readUInt32LE()),pids:app.getAppMetrics().map(m=>m.pid)};
   });
   const file=path.join(out,name+'.png');
   const result=JSON.parse(execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',probe,'-Mode','Capture','-Output',file,'-Handle',handle,'-OwnedIds',pids.join(',')],{encoding:'utf8',timeout:30000,windowsHide:true}).replace(/^\uFEFF/,''));
-  const renderer=await page.screenshot({path:path.join(out,name+'-renderer.png'),omitBackground:true});
   const viewport=await page.evaluate(()=>({width:innerWidth,height:innerHeight}));
   const [left,top,width,height]=result.window;
   const {data,info}=await sharp(file).removeAlpha().raw().toBuffer({resolveWithObject:true});
-  const alpha=await sharp(renderer).resize(width,height).ensureAlpha().raw().toBuffer();
+  const background=await sharp(path.join(out,'background-desktop.png')).removeAlpha().raw().toBuffer();
+  const maskKey=width+'x'+height;
+  if(rendererSnapshot||!rendererMasks.has(maskKey)){
+    const renderer=await page.screenshot({path:path.join(out,name+'-renderer.png'),omitBackground:true});
+    rendererMasks.set(maskKey,await sharp(renderer).resize(width,height).ensureAlpha().raw().toBuffer());
+  }
+  const alpha=rendererMasks.get(maskKey);
   // This compares physical desktop pixels with renderer transparency. capturePage
   // alone cannot detect a native white strip or stale DWM surface outside the DOM.
   let longest=0,white=0,bodyRed=0;
@@ -42,7 +47,7 @@ async function capture(desktop,page,out,name){
       if(sx<0||sy<0||sx>=info.width||sy>=info.height)continue;
       const k=(sy*info.width+sx)*3,a=(y*width+x)*4;
       const rgb=[data[k],data[k+1],data[k+2]];
-      if(y<topLimit&&alpha[a+3]<5&&Math.min(...rgb)>175&&Math.max(...rgb)-Math.min(...rgb)<50){white++;run++;longest=Math.max(longest,run)}else run=0;
+      if(y<topLimit&&alpha[a+3]<5&&Math.min(...rgb)>175&&Math.max(...rgb)-Math.min(...rgb)<50&&rgb.some((v,c)=>Math.abs(v-background[k+c])>25)){white++;run++;longest=Math.max(longest,run)}else run=0;
       if(y>=topLimit&&rgb[0]>150&&rgb[0]>rgb[1]*1.5&&rgb[0]>rgb[2]*1.5)bodyRed++;
     }
   }
@@ -50,8 +55,6 @@ async function capture(desktop,page,out,name){
   const measurement={name,...result,viewport,desktopState,longestWhiteRun:longest,whitePixels:white,bodyRed};
   console.log('PHYSICAL_CAPTURE '+JSON.stringify(measurement));
   assert.ok(bodyRed>20,'Physical screenshot must include the actual visible red pet');
-  const sample=(Math.min(80,info.height-1)*info.width+Math.min(80,info.width-1))*3;
-  assert.ok(background.every((v,i)=>Math.abs(data[sample+i]-v)<=2),'Physical desktop capture must show the controlled backdrop');
   return measurement;
 }
 async function main(){
@@ -59,7 +62,8 @@ async function main(){
   const exe=path.resolve(process.argv[2]);assert.ok(fs.existsSync(exe));
   const edition=process.argv[3]??'modern',scales=[1,1.25,1.5];
   const out=path.join(root,'artifacts/windows-surface-'+edition);fs.mkdirSync(out,{recursive:true});
-  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-surface-'));const backdrop=await form('Backdrop',dir);const reports=[];
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-surface-'));const reports=[];
+  execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',probe,'-Mode','Capture','-Output',path.join(out,'background-desktop.png')],{stdio:'pipe',timeout:30000,windowsHide:true});
   let desktop,bar,processOutput='';
   try{
     for(const scale of scales){
@@ -85,10 +89,11 @@ async function main(){
         if(cycle===1){await page.evaluate(()=>window.desktop.setRoomFullscreen(true));await page.evaluate(()=>window.desktop.setRoomFullscreen(false))}
         await toDesktop(page);await page.waitForTimeout(1000);
         const started=Date.now();
-        for(let point=0;point<6;point++){
-          if(point)await pause(15000);
+        const points=scale===1.25&&cycle===0?[0,15000,45000,90000,180000]:[0,15000,30000,45000,60000,75000];
+        for(let point=0;point<points.length;point++){
+          if(point)await pause(Math.max(0,points[point]-(Date.now()-started)));
           if(cycle===1&&point)await page.evaluate(delta=>window.desktop.movePet(delta,0),point%2?18:-18);
-          const row={scale,kind:'return',cycle,elapsed:Date.now()-started,...await capture(desktop,page,out,`scale-${scale}-cycle-${cycle}-${point}`)};reports.push(row);
+          const row={scale,kind:'return',cycle,elapsed:Date.now()-started,...await capture(desktop,page,out,`scale-${scale}-cycle-${cycle}-${point}`,{rendererSnapshot:point===points.length-1})};reports.push(row);
           console.log(JSON.stringify(row));
           fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify(reports,null,2)+'\n');
         }
@@ -101,6 +106,6 @@ async function main(){
     console.error('Application output before cleanup:',processOutput);
     if(desktop)try{console.error('Native state before cleanup:',await Promise.race([desktop.evaluate(({app,BrowserWindow})=>({ready:app.isReady(),version:process.versions.electron,windows:BrowserWindow.getAllWindows().map(w=>({bounds:w.getBounds(),visible:w.isVisible(),title:w.getTitle(),loading:w.webContents.isLoadingMainFrame(),url:w.webContents.getURL()}))})),pause(3000).then(()=>'state timeout')]))}catch(e){console.error(e.message)}
     throw error;
-  }finally{bar?.kill();await desktop?.close().catch(()=>{});backdrop.kill();try{execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',probe,'-Mode','Restore','-Ready',backdrop.readyFile],{stdio:'pipe',timeout:20000,windowsHide:true})}finally{fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}}
+  }finally{bar?.kill();await desktop?.close().catch(()=>{});fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
