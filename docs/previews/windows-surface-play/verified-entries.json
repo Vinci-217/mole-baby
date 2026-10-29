@@ -1,0 +1,402 @@
+{
+  "interactions": [
+    {
+      "form": "junior",
+      "id": "180004",
+      "label": "原版踢足球"
+    },
+    {
+      "form": "junior",
+      "id": "180011",
+      "label": "逗逗拉姆 · 一"
+    },
+    {
+      "form": "junior",
+      "id": "180012",
+      "label": "逗逗拉姆 · 二"
+    },
+    {
+      "form": "junior",
+      "id": "180013",
+      "label": "逗逗拉姆 · 三"
+    },
+    {
+      "form": "junior",
+      "id": "180023",
+      "label": "魔法弹簧"
+    },
+    {
+      "form": "junior",
+      "id": "180026",
+      "label": "乐刷刷"
+    },
+    {
+      "form": "junior",
+      "id": "tuya1",
+      "label": "彩色涂鸦 · 一"
+    },
+    {
+      "form": "junior",
+      "id": "tuya2",
+      "label": "彩色涂鸦 · 二"
+    },
+    {
+      "form": "junior",
+      "id": "tuya3",
+      "label": "彩色涂鸦 · 三"
+    },
+    {
+      "form": "junior",
+      "id": "tuya4",
+      "label": "彩色涂鸦 · 四"
+    },
+    {
+      "form": "middle",
+      "id": "180004",
+      "label": "原版踢足球"
+    },
+    {
+      "form": "middle",
+      "id": "180011",
+      "label": "逗逗拉姆 · 一"
+    },
+    {
+      "form": "middle",
+      "id": "180012",
+      "label": "逗逗拉姆 · 二"
+    },
+    {
+      "form": "middle",
+      "id": "180013",
+      "label": "逗逗拉姆 · 三"
+    },
+    {
+      "form": "middle",
+      "id": "180023",
+      "label": "魔法弹簧"
+    },
+    {
+      "form": "middle",
+      "id": "180026",
+      "label": "乐刷刷"
+    },
+    {
+      "form": "middle",
+      "id": "tuya1",
+      "label": "彩色涂鸦 · 一"
+    },
+    {
+      "form": "middle",
+      "id": "tuya2",
+      "label": "彩色涂鸦 · 二"
+    },
+    {
+      "form": "middle",
+      "id": "tuya3",
+      "label": "彩色涂鸦 · 三"
+    },
+    {
+      "form": "middle",
+      "id": "tuya4",
+      "label": "彩色涂鸦 · 四"
+    },
+    {
+      "form": "senior",
+      "id": "180004",
+      "label": "原版踢足球"
+    },
+    {
+      "form": "senior",
+      "id": "180011",
+      "label": "逗逗拉姆 · 一"
+    },
+    {
+      "form": "senior",
+      "id": "180012",
+      "label": "逗逗拉姆 · 二"
+    },
+    {
+      "form": "senior",
+      "id": "180013",
+      "label": "逗逗拉姆 · 三"
+    },
+    {
+      "form": "senior",
+      "id": "180023",
+      "label": "魔法弹簧"
+    },
+    {
+      "form": "senior",
+      "id": "180026",
+      "label": "乐刷刷"
+    },
+    {
+      "form": "senior",
+      "id": "tuya1",
+      "label": "彩色涂鸦 · 一"
+    },
+    {
+      "form": "senior",
+      "id": "tuya2",
+      "label": "彩色涂鸦 · 二"
+    },
+    {
+      "form": "senior",
+      "id": "tuya3",
+      "label": "彩色涂鸦 · 三"
+    },
+    {
+      "form": "senior",
+      "id": "tuya4",
+      "label": "彩色涂鸦 · 四"
+    },
+    {
+      "form": "classic",
+      "id": "180004",
+      "label": "原版踢足球"
+    },
+    {
+      "form": "classic",
+      "id": "180011",
+      "label": "逗逗拉姆 · 一"
+    },
+    {
+      "form": "classic",
+      "id": "180012",
+      "label": "逗逗拉姆 · 二"
+    },
+    {
+      "form": "classic",
+      "id": "180013",
+      "label": "逗逗拉姆 · 三"
+    },
+    {
+      "form": "classic",
+      "id": "180023",
+      "label": "魔法弹簧"
+    },
+    {
+      "form": "classic",
+      "id": "180026",
+      "label": "乐刷刷"
+    },
+    {
+      "form": "classic",
+      "id": "tuya1",
+      "label": "彩色涂鸦 · 一"
+    },
+    {
+      "form": "classic",
+      "id": "tuya2",
+      "label": "彩色涂鸦 · 二"
+    },
+    {
+      "form": "classic",
+      "id": "tuya3",
+      "label": "彩色涂鸦 · 三"
+    },
+    {
+      "form": "classic",
+      "id": "tuya4",
+      "label": "彩色涂鸦 · 四"
+    }
+  ],
+  "supplies": [
+    {
+      "id": "180006",
+      "name": "复活十字架",
+      "category": "medicine",
+      "form": "middle",
+      "clip": "180006"
+    },
+    {
+      "id": "180015",
+      "name": "蔬菜浓汤",
+      "category": "food",
+      "form": "middle",
+      "clip": "180015"
+    },
+    {
+      "id": "180016",
+      "name": "中秋月饼",
+      "category": "food",
+      "form": "middle",
+      "clip": "180016"
+    },
+    {
+      "id": "180041",
+      "name": "珍味八宝饭",
+      "category": "food",
+      "form": "middle",
+      "clip": "180041"
+    },
+    {
+      "id": "180042",
+      "name": "饺子",
+      "category": "food",
+      "form": "middle",
+      "clip": "180042"
+    },
+    {
+      "id": "180046",
+      "name": "黑森林怪味圈",
+      "category": "food",
+      "form": "middle",
+      "clip": "180046"
+    },
+    {
+      "id": "180048",
+      "name": "西瓜解暑冲饮",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180048"
+    },
+    {
+      "id": "180049",
+      "name": "清凉草莓浴液",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180049"
+    },
+    {
+      "id": "180050",
+      "name": "水萤救治药水",
+      "category": "medicine",
+      "form": "middle",
+      "clip": "180050"
+    },
+    {
+      "id": "180051",
+      "name": "炎火救治药水",
+      "category": "medicine",
+      "form": "middle",
+      "clip": "180051"
+    },
+    {
+      "id": "180052",
+      "name": "金沙救治药水",
+      "category": "medicine",
+      "form": "middle",
+      "clip": "180052"
+    },
+    {
+      "id": "180053",
+      "name": "酸甜苹果汁",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180053"
+    },
+    {
+      "id": "180054",
+      "name": "美味花香豆",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180054"
+    },
+    {
+      "id": "180055",
+      "name": "牵牛花洗面啫喱",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180055"
+    },
+    {
+      "id": "180056",
+      "name": "冰酷可乐",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180056"
+    },
+    {
+      "id": "180057",
+      "name": "雪顶椰汁",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180057"
+    },
+    {
+      "id": "180058",
+      "name": "爱心魔魔球",
+      "category": "food",
+      "form": "middle",
+      "clip": "180058"
+    },
+    {
+      "id": "180059",
+      "name": "椰香烤饼",
+      "category": "food",
+      "form": "middle",
+      "clip": "180059"
+    },
+    {
+      "id": "180060",
+      "name": "拉姆魔法洗面奶",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180060"
+    },
+    {
+      "id": "180061",
+      "name": "石榴多多",
+      "category": "drink",
+      "form": "middle",
+      "clip": "180061"
+    },
+    {
+      "id": "180062",
+      "name": "仙桃玉米酥",
+      "category": "food",
+      "form": "middle",
+      "clip": "180062"
+    },
+    {
+      "id": "180063",
+      "name": "石榴甜旋风",
+      "category": "food",
+      "form": "middle",
+      "clip": "180063"
+    },
+    {
+      "id": "180064",
+      "name": "泡泡桃汁浴",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180064"
+    },
+    {
+      "id": "180065",
+      "name": "杰克南瓜酥",
+      "category": "food",
+      "form": "middle",
+      "clip": "180065"
+    },
+    {
+      "id": "180066",
+      "name": "南瓜巫浴液",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180066"
+    },
+    {
+      "id": "180067",
+      "name": "奶油鬼脸匹萨",
+      "category": "food",
+      "form": "junior",
+      "clip": "180067"
+    },
+    {
+      "id": "180068",
+      "name": "怪味南瓜汁",
+      "category": "food",
+      "form": "junior",
+      "clip": "180068"
+    },
+    {
+      "id": "180069",
+      "name": "百合花浴液",
+      "category": "clean",
+      "form": "middle",
+      "clip": "180069"
+    }
+  ]
+}

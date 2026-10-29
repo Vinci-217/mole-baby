@@ -1,0 +1,260 @@
+[
+  {
+    "sourceSha": "b9d2bd73c3993d9689bb7a38d9c05ca54d7537fe",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40817576985",
+    "platform": "windows",
+    "runtime": "35.7.5",
+    "chromiumScale": 1.5,
+    "expectedLogicalSize": {
+      "width": 160,
+      "height": 240
+    },
+    "nativeStripProbeLongestRun": 80,
+    "observations": [
+      {
+        "name": "scale-1.5-cycle-1-0",
+        "bounds": {
+          "x": 342,
+          "y": 240,
+          "width": 161,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-1",
+        "bounds": {
+          "x": 350,
+          "y": 240,
+          "width": 172,
+          "height": 248
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-2",
+        "bounds": {
+          "x": 332,
+          "y": 280,
+          "width": 172,
+          "height": 278
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-3",
+        "bounds": {
+          "x": 350,
+          "y": 280,
+          "width": 172,
+          "height": 278
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-4",
+        "bounds": {
+          "x": 340,
+          "y": 300,
+          "width": 188,
+          "height": 300
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-5",
+        "bounds": {
+          "x": 358,
+          "y": 300,
+          "width": 188,
+          "height": 301
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      }
+    ]
+  },
+  {
+    "sourceSha": "b9d2bd73c3993d9689bb7a38d9c05ca54d7537fe",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40817576985",
+    "platform": "windows-candidate",
+    "runtime": "37.10.3",
+    "chromiumScale": 1.5,
+    "expectedLogicalSize": {
+      "width": 160,
+      "height": 240
+    },
+    "nativeStripProbeLongestRun": 80,
+    "observations": [
+      {
+        "name": "scale-1.5-cycle-1-0",
+        "bounds": {
+          "x": 342,
+          "y": 240,
+          "width": 161,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-1",
+        "bounds": {
+          "x": 360,
+          "y": 240,
+          "width": 162,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-2",
+        "bounds": {
+          "x": 342,
+          "y": 240,
+          "width": 163,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-3",
+        "bounds": {
+          "x": 360,
+          "y": 240,
+          "width": 164,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-4",
+        "bounds": {
+          "x": 342,
+          "y": 240,
+          "width": 165,
+          "height": 240
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-5",
+        "bounds": {
+          "x": 362,
+          "y": 240,
+          "width": 168,
+          "height": 243
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      }
+    ]
+  },
+  {
+    "sourceSha": "b9d2bd73c3993d9689bb7a38d9c05ca54d7537fe",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40817576985",
+    "platform": "legacy-x64",
+    "runtime": "22.3.27",
+    "chromiumScale": 1.5,
+    "expectedLogicalSize": {
+      "width": 160,
+      "height": 240
+    },
+    "nativeStripProbeLongestRun": 80,
+    "observations": [
+      {
+        "name": "scale-1.5-cycle-1-0",
+        "bounds": {
+          "x": 342,
+          "y": 242,
+          "width": 161,
+          "height": 241
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-1",
+        "bounds": {
+          "x": 360,
+          "y": 242,
+          "width": 162,
+          "height": 242
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-2",
+        "bounds": {
+          "x": 342,
+          "y": 242,
+          "width": 163,
+          "height": 243
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-3",
+        "bounds": {
+          "x": 396,
+          "y": 234,
+          "width": 184,
+          "height": 260
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-4",
+        "bounds": {
+          "x": 364,
+          "y": 208,
+          "width": 200,
+          "height": 286
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      },
+      {
+        "name": "scale-1.5-cycle-1-5",
+        "bounds": {
+          "x": 382,
+          "y": 208,
+          "width": 200,
+          "height": 287
+        },
+        "focused": false,
+        "whitePixels": 0,
+        "longestWhiteRun": 0
+      }
+    ]
+  }
+]

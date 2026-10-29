@@ -1,0 +1,72 @@
+[
+  {
+    "platform": "windows",
+    "status": "success",
+    "sourceSha": "2e35329807624d93950ad6dcf791b724ae74555d",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40819913152",
+    "runtime": {
+      "electron": "37.10.3",
+      "node": "22.21.1",
+      "chrome": "138.0.7204.251",
+      "platform": "win32",
+      "arch": "x64"
+    },
+    "receipt": "https://raw.githubusercontent.com/Vinci-217/mole-baby/build-reports/reports/jobs/2e35329807624d93950ad6dcf791b724ae74555d/windows.json"
+  },
+  {
+    "platform": "legacy-x64",
+    "status": "success",
+    "sourceSha": "2e35329807624d93950ad6dcf791b724ae74555d",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40819913152",
+    "runtime": {
+      "electron": "22.3.27",
+      "node": "16.17.1",
+      "chrome": "108.0.5359.215",
+      "platform": "win32",
+      "arch": "x64"
+    },
+    "receipt": "https://raw.githubusercontent.com/Vinci-217/mole-baby/build-reports/reports/jobs/2e35329807624d93950ad6dcf791b724ae74555d/legacy-x64.json"
+  },
+  {
+    "platform": "legacy-ia32",
+    "status": "success",
+    "sourceSha": "2e35329807624d93950ad6dcf791b724ae74555d",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40819913152",
+    "runtime": {
+      "electron": "22.3.27",
+      "node": "16.17.1",
+      "chrome": "108.0.5359.215",
+      "platform": "win32",
+      "arch": "ia32"
+    },
+    "receipt": "https://raw.githubusercontent.com/Vinci-217/mole-baby/build-reports/reports/jobs/2e35329807624d93950ad6dcf791b724ae74555d/legacy-ia32.json"
+  },
+  {
+    "platform": "mac-arm64",
+    "status": "success",
+    "sourceSha": "2e35329807624d93950ad6dcf791b724ae74555d",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40819913152",
+    "runtime": {
+      "electron": "37.10.3",
+      "node": "22.21.1",
+      "chrome": "138.0.7204.251",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "receipt": "https://raw.githubusercontent.com/Vinci-217/mole-baby/build-reports/reports/jobs/2e35329807624d93950ad6dcf791b724ae74555d/mac-arm64.json"
+  },
+  {
+    "platform": "mac-x64",
+    "status": "success",
+    "sourceSha": "2e35329807624d93950ad6dcf791b724ae74555d",
+    "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40819913152",
+    "runtime": {
+      "electron": "37.10.3",
+      "node": "22.21.1",
+      "chrome": "138.0.7204.251",
+      "platform": "darwin",
+      "arch": "x64"
+    },
+    "receipt": "https://raw.githubusercontent.com/Vinci-217/mole-baby/build-reports/reports/jobs/2e35329807624d93950ad6dcf791b724ae74555d/mac-x64.json"
+  }
+]
