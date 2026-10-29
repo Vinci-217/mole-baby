@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('Bar','Work','Capture')][string]$Mode,
+  [ValidateSet('Bar','Black','Work','BackdropLight','BackdropBlue','Capture')][string]$Mode,
   [string]$Output,
   [string]$Ready,
   [long]$Handle,
@@ -71,10 +71,31 @@ public class ProbeSurface : Form {
   protected override bool ShowWithoutActivation { get { return true; } }
   protected override CreateParams CreateParams { get { var p=base.CreateParams; p.ExStyle|=0x08000080; return p; } }
 }
+// A background must cover unrelated runner windows. Unlike the nonactivating
+// positive-control overlay, show this as a normal foreground form first; the
+// application is then raised above it without changing its topmost preference.
+public class DesktopBackdrop : Form {
+  readonly System.Drawing.Color first,second;
+  public DesktopBackdrop(bool blue) {
+    first=blue?System.Drawing.Color.FromArgb(61,159,209):System.Drawing.Color.FromArgb(255,242,199);
+    second=blue?System.Drawing.Color.FromArgb(124,196,197):System.Drawing.Color.FromArgb(195,233,244);
+    DoubleBuffered=true;
+  }
+  protected override void OnPaintBackground(PaintEventArgs e) {
+    e.Graphics.Clear(first);
+    using(var brush=new System.Drawing.SolidBrush(second)) {
+      for(int y=0;y<Height;y+=80)for(int x=0;x<Width;x+=80)
+        if(((x/80+y/80)%2)==0)e.Graphics.FillRectangle(brush,x,y,80,80);
+    }
+  }
+}
 '@
 if ($Mode -eq 'Work') {
   $form = New-Object System.Windows.Forms.Form
   $form.Text = 'Surface regression: other application'
+} elseif ($Mode -like 'Backdrop*') {
+  $form = New-Object -TypeName DesktopBackdrop -ArgumentList ($Mode -eq 'BackdropBlue')
+  $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
 } else {
   $form = New-Object ProbeSurface
   $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
@@ -82,7 +103,11 @@ if ($Mode -eq 'Work') {
 $form.ShowInTaskbar = $false
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
 $form.Bounds = New-Object System.Drawing.Rectangle($Left,$Top,$Width,$Height)
-$form.BackColor = [System.Drawing.Color]::White
-$form.TopMost = ($Mode -eq 'Bar')
-$form.Add_Shown({ [System.IO.File]::WriteAllText($Ready, 'ready') })
+if ($Mode -like 'Backdrop*') { $form.Bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds }
+$form.BackColor = $(if ($Mode -eq 'Black') { [System.Drawing.Color]::Black } else { [System.Drawing.Color]::White })
+$form.TopMost = ($Mode -eq 'Bar' -or $Mode -eq 'Black')
+$form.Add_Shown({
+  if ($Mode -like 'Backdrop*') { $form.Activate(); $form.BringToFront() }
+  [System.IO.File]::WriteAllText($Ready, 'ready')
+})
 [System.Windows.Forms.Application]::Run($form)

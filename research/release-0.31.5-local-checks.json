@@ -1,0 +1,26 @@
+{
+  "version": "0.31.5",
+  "recordedAt": "2026-10-29T14:36:37.854877+00:00",
+  "baseMainSha": "749a51f24e34b0d29fd2e508fae795c82b574325",
+  "runtimeMatchesVerifiedPreview": "b0d830aebc8cbbecfe033b8ed6d3b5e44308e07c",
+  "checks": {
+    "npm test": {
+      "exitCode": 0,
+      "vitestPassed": 381,
+      "nodePassed": 135,
+      "totalPassed": 516
+    },
+    "npm run build": {
+      "exitCode": 0,
+      "losslessAssets": {
+        "count": 1126,
+        "before": 141260716,
+        "after": 92144450,
+        "saved": 49116266,
+        "pixelVerification": "identical visible RGBA and all alpha values"
+      }
+    }
+  },
+  "electronMainSha256": "44c719f0e1214f85fc577e96c78c3726009b99a9e5d9621502e5216eb8fa298f",
+  "scope": "Exact v0.31.5 local unit/contracts and production build. Native Windows/Mac package verification is required by the release workflow; earlier preview results are not substituted."
+}

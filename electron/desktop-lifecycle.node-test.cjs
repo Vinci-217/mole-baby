@@ -108,6 +108,8 @@ test('tray state refreshes while hidden, clears on farewell and rejects untruste
 
 for(const platform of ['win32','darwin','linux'])test(`${platform}: expanded spell host preserves anchor, respects screen edges and restores after completion/interruption`,async t=>{
  const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
+ assert.equal(run.stats.hardwareAccelerationDisabled,platform==='win32'?true:undefined);
+ if(platform!=='win32')assert.equal(run.stats.switches,undefined,'Mac/Linux rendering flags must remain unchanged');
  run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
  const base=run.window.getBounds(),effect={x:-400,y:-800,width:1000,height:1200};
  run.invoke('desktop:set-pet-effect-bounds',effect);
@@ -188,7 +190,8 @@ test('official manor link uses only its fixed HTTPS destination and trusted rend
 test('startup waits for the correctly painted mode, and keeps the old profile through rename', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   assert.equal(run.app.name, '拉姆');
-  assert.equal(run.stats.hardwareAccelerationDisabled,undefined);
+  assert.equal(run.stats.hardwareAccelerationDisabled,true);
+  assert.deepEqual(run.stats.switches,['disable-gpu'],'Modern Windows keeps the GPU service sandbox and its software fallback');
   assert.equal(run.stats.appId,'com.molebaby.ramuhouse');
   assert.equal(path.basename(run.app.userData), 'mole-baby');
   assert.equal(run.window.options.title, '');

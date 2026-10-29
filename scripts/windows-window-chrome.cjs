@@ -1,6 +1,11 @@
 const{execFileSync}=require('node:child_process'),assert=require('node:assert/strict');
 async function verifyWindowsChrome(page,desktop){
  if(process.platform!=='win32')return;
+ const rendering=await desktop.evaluate(({app})=>({softwareRequested:app.commandLine.hasSwitch('disable-gpu'),softwareRasterizerDisabled:app.commandLine.hasSwitch('disable-software-rasterizer'),compositing:app.getGPUFeatureStatus().gpu_compositing}));
+ assert.equal(rendering.softwareRequested,true,'Every Windows package must select compatible composition before startup');
+ assert.equal(rendering.softwareRasterizerDisabled,false,'Transparent pet must retain its software rendering fallback');
+ assert.match(rendering.compositing,/^(disabled|unavailable)/,'Actual packaged Windows GPU composition must be disabled');
+ console.log('PASS: Windows transparent pet compatible rendering '+JSON.stringify(rendering));
  const handle=await desktop.evaluate(({BrowserWindow})=>{const bytes=BrowserWindow.getAllWindows()[0].getNativeWindowHandle();return bytes.length===8?bytes.readBigUInt64LE().toString():String(bytes.readUInt32LE())});
  const script=`Add-Type @'
 using System;using System.Runtime.InteropServices;

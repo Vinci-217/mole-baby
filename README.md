@@ -2,7 +2,15 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 本轮更新 · v0.31.4
+## 本轮更新 · v0.31.5
+
+Windows 常规版启动时主动使用软件合成，处理部分显卡或驱动下透明桌宠周围呈现黑色矩形的兼容问题。兼容版沿用软件绘制；无需自己添加启动参数。Mac 的绘制设置、既有玩法、动画和存档保持不变。
+
+修复预览已通过三个 Windows 构建的原生检查，84 次桌面采样均未检测到黑底或白条；测试机上的旧正式版也没有复现黑底，受影响硬件仍待确认。[实测截图与范围](docs/WINDOWS-TRANSPARENCY.md)。正式发布流程重新验收 Windows 三种构建和 Mac 两种架构，全部通过后公开安装包与更新清单。
+
+已有用户可从托盘或小屋设置检查更新；默认完全退出后重开约 8 秒检查，下载与安装分别确认。[更新说明](docs/UPDATES.md) · [本次更新内容](RELEASE_NOTES.md)。
+
+## v0.31.4 · 增量下载与桌面状态
 
 本版已完成五平台正式成品验收并发布。[下载与安装说明](https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.4) · [正式发布与线上增量验证](research/release-0.31.4-validation.md)。
 
