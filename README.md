@@ -1,5 +1,7 @@
 # 拉姆 · mole-baby
 
+> **Windows 黑色背景兼容修复预览**：[修复说明、原生实测截图与测试包下载](docs/WINDOWS-TRANSPARENCY.md)。三个 Windows 构建已通过检查，受影响设备仍待验证；尚未发版。
+
 > **本分支有待确认的动画预览 v2**：[校正 SWF 循环帧序、鼠标手速驱动叶片、五阶段甩出惯性](docs/previews/rotor-throw/README.md)。只供审阅，尚未接入客户端或发版。
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
