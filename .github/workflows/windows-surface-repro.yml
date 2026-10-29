@@ -68,4 +68,5 @@ jobs:
           CI_DIAGNOSTIC_PLATFORM: ${{ matrix.platform }}
           CI_DIAGNOSTIC_STATUS: ${{ job.status }}
           CI_DIAGNOSTIC_LOG: artifacts/surface.log
+          CI_DIAGNOSTIC_MEDIA_DIR: artifacts/windows-surface-${{ matrix.edition }}
         run: node scripts/save-ci-diagnostic.cjs

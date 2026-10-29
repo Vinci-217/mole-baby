@@ -45,10 +45,12 @@ async function capture(desktop,page,out,name){
       if(y>=topLimit&&rgb[0]>150&&rgb[0]>rgb[1]*1.5&&rgb[0]>rgb[2]*1.5)bodyRed++;
     }
   }
+  const measurement={name,...result,viewport,longestWhiteRun:longest,whitePixels:white,bodyRed};
+  console.log('PHYSICAL_CAPTURE '+JSON.stringify(measurement));
   assert.ok(bodyRed>20,'Physical screenshot must include the actual visible red pet');
   const sample=(Math.min(80,info.height-1)*info.width+Math.min(80,info.width-1))*3;
   assert.ok(background.every((v,i)=>Math.abs(data[sample+i]-v)<=2),'Physical desktop capture must show the controlled backdrop');
-  return{name,...result,viewport,longestWhiteRun:longest,whitePixels:white,bodyRed};
+  return measurement;
 }
 async function main(){
   assert.equal(process.platform,'win32','This reproduction requires an actual Windows display');
@@ -56,10 +58,12 @@ async function main(){
   const edition=process.argv[3]??'modern',scales=[1,1.25,1.5];
   const out=path.join(root,'artifacts/windows-surface-'+edition);fs.mkdirSync(out,{recursive:true});
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-surface-'));const backdrop=await form('Backdrop',dir);const reports=[];
-  let desktop,bar;
+  let desktop,bar,processOutput='';
   try{
     for(const scale of scales){
+      console.log('START_SCALE '+scale);
       desktop=await _electron.launch({executablePath:exe,args:[`--user-data-dir=${path.join(dir,'profile-'+scale)}`,`--force-device-scale-factor=${scale}`],env:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1',ELECTRON_DEV:'0'},timeout:30000});
+      for(const stream of[desktop.process().stdout,desktop.process().stderr])stream?.on('data',c=>{processOutput=(processOutput+c.toString()).slice(-12000)});
       const page=await desktop.firstWindow();page.setDefaultTimeout(20000);await page.waitForFunction(()=>window.desktop?.isElectron);
       await adopt(page,'红色','小红');
       const state=await page.evaluate(()=>{const entries=Object.fromEntries(Object.entries(localStorage)),p=JSON.parse(entries['ramu-house-save-v1']);p.growth=60;p.growthLocked=true;delete p.evolution;p.sleeping=false;p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};p.lastTick=Date.now();entries['ramu-house-save-v1']=JSON.stringify(p);entries['ramu-house-preferences-v2']=JSON.stringify({quiet:true,lively:false,presence:false,sound:false});return entries});
@@ -91,6 +95,10 @@ async function main(){
     }
     assert.ok(reports.every(r=>r.longestWhiteRun<12),'Native white strip reproduced; inspect physical captures and measurements');
     console.log('PASS physical Windows surface: 100/125/150% Chromium scales, normal/fullscreen room returns, timed captures and movement; native-strip detector calibrated with a separate HWND');
+  }catch(error){
+    console.error('Application output before cleanup:',processOutput);
+    if(desktop)try{console.error('Native state before cleanup:',await Promise.race([desktop.evaluate(({app,BrowserWindow})=>({ready:app.isReady(),version:process.versions.electron,windows:BrowserWindow.getAllWindows().map(w=>({bounds:w.getBounds(),visible:w.isVisible(),title:w.getTitle(),loading:w.webContents.isLoadingMainFrame(),url:w.webContents.getURL()}))})),pause(3000).then(()=>'state timeout')]))}catch(e){console.error(e.message)}
+    throw error;
   }finally{bar?.kill();await desktop?.close().catch(()=>{});backdrop.kill();fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
