@@ -1,0 +1,135 @@
+{
+  "version": "0.31.5",
+  "sourceSha": "0defce39e55ddcfa8c3cd1c92d0ac4ff2a17d76a",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400",
+  "platforms": {
+    "windows": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400/job/123515322891",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ],
+      "isolatedUpdateFixture": {
+        "platform": "win32",
+        "arch": "x64",
+        "edition": "modern",
+        "runtime": "37.10.3",
+        "fullProductPayload": false,
+        "fixtureVersions": [
+          "1.0.0",
+          "1.0.1"
+        ],
+        "fullPackageBytes": 87096870,
+        "packageBytesTransferred": 918261,
+        "blockmapBytesTransferred": 182294,
+        "totalUpdateBytesTransferred": 1100895,
+        "savedPercent": 98.74,
+        "rangeRequests": 9,
+        "mode": "differential",
+        "installedVersion": "1.0.1",
+        "savePreserved": true,
+        "applicationRelaunched": true,
+        "limitation": "Two isolated installers contain the current product payload with a test main process and a version change; production release-to-release savings will vary"
+      }
+    },
+    "legacy-x64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400/job/123515322943",
+      "runtime": {
+        "electron": "22.3.27",
+        "node": "16.17.1",
+        "chrome": "108.0.5359.215",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ]
+    },
+    "legacy-ia32": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400/job/123515322936",
+      "runtime": {
+        "electron": "22.3.27",
+        "node": "16.17.1",
+        "chrome": "108.0.5359.215",
+        "platform": "win32",
+        "arch": "ia32"
+      },
+      "applicationPassed": true,
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ]
+    },
+    "mac-arm64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400/job/123515322913",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "applicationPassed": true,
+      "liveUpdateCheck": {
+        "publicVersionAtTest": "0.31.4",
+        "arch": "arm64",
+        "eightSecondStartup": true,
+        "downloadedAndVerifiedDMG": true,
+        "mountedWithoutReplacingApplication": true
+      }
+    },
+    "mac-x64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40893234400/job/123515322955",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "darwin",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "liveUpdateCheck": {
+        "publicVersionAtTest": "0.31.4",
+        "arch": "x64",
+        "eightSecondStartup": true,
+        "downloadedAndVerifiedDMG": true,
+        "mountedWithoutReplacingApplication": true
+      }
+    }
+  },
+  "scope": "Parsed successful final package verification logs. Windows savings relate to the isolated installer fixture, not the full v0.31.4-to-v0.31.5 package transfer. Mac tests mount the then-public DMG and do not replace an installed application."
+}

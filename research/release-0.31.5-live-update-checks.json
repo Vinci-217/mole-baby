@@ -1,0 +1,62 @@
+{
+  "version": "0.31.5",
+  "sourceSha": "0defce39e55ddcfa8c3cd1c92d0ac4ff2a17d76a",
+  "recordedAt": "2026-10-29T15:06:23.474Z",
+  "runtime": "37.10.3",
+  "hostPlatform": "linux",
+  "checks": [
+    {
+      "arch": "arm64",
+      "from": "0.31.4",
+      "discovered": "0.31.5",
+      "status": "available",
+      "elapsedMs": 11428,
+      "requests": [
+        {
+          "path": "/Vinci-217/mole-baby/releases/latest",
+          "method": "HEAD",
+          "status": 200
+        },
+        {
+          "path": "/Vinci-217/mole-baby/releases/latest/download/latest-mac.yml",
+          "method": "GET",
+          "status": 200
+        },
+        {
+          "path": "/Vinci-217/mole-baby/releases/download/v0.31.5/SHA256SUMS.txt",
+          "method": "GET",
+          "status": 200
+        }
+      ],
+      "downloaded": false,
+      "installed": false
+    },
+    {
+      "arch": "x64",
+      "from": "0.31.4",
+      "discovered": "0.31.5",
+      "status": "available",
+      "elapsedMs": 9657,
+      "requests": [
+        {
+          "path": "/Vinci-217/mole-baby/releases/latest",
+          "method": "HEAD",
+          "status": 200
+        },
+        {
+          "path": "/Vinci-217/mole-baby/releases/latest/download/latest-mac.yml",
+          "method": "GET",
+          "status": 200
+        },
+        {
+          "path": "/Vinci-217/mole-baby/releases/download/v0.31.5/SHA256SUMS.txt",
+          "method": "GET",
+          "status": 200
+        }
+      ],
+      "downloaded": false,
+      "installed": false
+    }
+  ],
+  "scope": "Post-publication production GitHub checks using real Electron net.fetch and the production eight-second startup timer for both Mac architectures. Isolated cache, no download/installation/save modification; not native macOS installation testing."
+}
