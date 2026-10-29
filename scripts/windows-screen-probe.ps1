@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('Backdrop','Bar','Capture')][string]$Mode,
+  [ValidateSet('Backdrop','Restore','Bar','Capture')][string]$Mode,
   [string]$Output,
   [string]$Ready,
   [long]$Handle,
@@ -18,6 +18,10 @@ public static class ScreenNative {
   delegate bool Callback(IntPtr h,IntPtr p);
   [DllImport("user32.dll")] static extern bool SetProcessDpiAwarenessContext(IntPtr context);
   [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
+  [DllImport("user32.dll")] static extern uint GetSysColor(int key);
+  [DllImport("user32.dll")] static extern bool SetSysColors(int count,int[] keys,uint[] colors);
+  [DllImport("user32.dll",EntryPoint="SystemParametersInfoW",CharSet=CharSet.Unicode)] static extern bool GetWallpaper(uint action,uint count,StringBuilder text,uint flags);
+  [DllImport("user32.dll",EntryPoint="SystemParametersInfoW",CharSet=CharSet.Unicode)] static extern bool SetWallpaper(uint action,uint count,string text,uint flags);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h,out Rect r);
   [DllImport("user32.dll")] static extern bool ClientToScreen(IntPtr h,ref Point p);
   [DllImport("user32.dll",EntryPoint="GetWindowLongPtrW")] static extern IntPtr Style(IntPtr h,int index);
@@ -28,6 +32,9 @@ public static class ScreenNative {
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr h,StringBuilder text,int count);
   [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr h,int key,out int value,int bytes);
   public static void EnableDpi() { try { if(SetProcessDpiAwarenessContext(new IntPtr(-4))) return; } catch(EntryPointNotFoundException) {} SetProcessDPIAware(); }
+  public static string Wallpaper() { var text=new StringBuilder(32768);GetWallpaper(0x73,32768,text,0);return text.ToString(); }
+  public static uint Background() { return GetSysColor(1); }
+  public static void SetBackground(string wallpaper,uint color) { SetSysColors(1,new[]{1},new[]{color});SetWallpaper(0x14,0,wallpaper,2); }
   public static long[] Inspect(long id) {
     var h=new IntPtr(id); Rect r; Point p=new Point();
     if(!GetWindowRect(h,out r)) throw new Exception("Cannot inspect native window");
@@ -45,6 +52,17 @@ public static class ScreenNative {
 }
 '@
 [ScreenNative]::EnableDpi()
+if ($Mode -eq 'Backdrop') {
+  $saved = @{ wallpaper=[ScreenNative]::Wallpaper(); color=[ScreenNative]::Background() } | ConvertTo-Json -Compress
+  [System.IO.File]::WriteAllText($Ready, $saved)
+  [ScreenNative]::SetBackground('', 0x362412)
+  exit
+}
+if ($Mode -eq 'Restore') {
+  $saved = Get-Content -Raw $Ready | ConvertFrom-Json
+  [ScreenNative]::SetBackground($saved.wallpaper, [uint32]$saved.color)
+  exit
+}
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 if ($Mode -eq 'Capture') {
@@ -70,13 +88,8 @@ $form = New-Object ProbeSurface
 $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
 $form.ShowInTaskbar = $false
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
-if ($Mode -eq 'Backdrop') {
-  $form.Bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-  $form.BackColor = [System.Drawing.Color]::FromArgb(18,36,54)
-} else {
-  $form.Bounds = New-Object System.Drawing.Rectangle($Left,$Top,$Width,$Height)
-  $form.BackColor = [System.Drawing.Color]::White
-  $form.TopMost = $true
-}
+$form.Bounds = New-Object System.Drawing.Rectangle($Left,$Top,$Width,$Height)
+$form.BackColor = [System.Drawing.Color]::White
+$form.TopMost = $true
 $form.Add_Shown({ [System.IO.File]::WriteAllText($Ready, 'ready') })
 [System.Windows.Forms.Application]::Run($form)

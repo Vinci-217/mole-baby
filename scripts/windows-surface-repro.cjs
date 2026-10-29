@@ -16,6 +16,7 @@ async function form(mode,dir,coordinates={}){
   child.stdout.on('data',c=>output+=c);child.stderr.on('data',c=>output+=c);
   for(let i=0;i<200&&!fs.existsSync(ready)&&child.exitCode===null;i++)await pause(100);
   assert.ok(fs.existsSync(ready),'Real Windows surface probe failed: '+output);
+  child.readyFile=ready;
   return child;
 }
 async function capture(desktop,page,out,name){
@@ -45,7 +46,8 @@ async function capture(desktop,page,out,name){
       if(y>=topLimit&&rgb[0]>150&&rgb[0]>rgb[1]*1.5&&rgb[0]>rgb[2]*1.5)bodyRed++;
     }
   }
-  const measurement={name,...result,viewport,longestWhiteRun:longest,whitePixels:white,bodyRed};
+  const desktopState=await page.evaluate(()=>window.desktop.getState());
+  const measurement={name,...result,viewport,desktopState,longestWhiteRun:longest,whitePixels:white,bodyRed};
   console.log('PHYSICAL_CAPTURE '+JSON.stringify(measurement));
   assert.ok(bodyRed>20,'Physical screenshot must include the actual visible red pet');
   const sample=(Math.min(80,info.height-1)*info.width+Math.min(80,info.width-1))*3;
@@ -62,7 +64,7 @@ async function main(){
   try{
     for(const scale of scales){
       console.log('START_SCALE '+scale);
-      desktop=await _electron.launch({executablePath:exe,args:[`--user-data-dir=${path.join(dir,'profile-'+scale)}`,`--force-device-scale-factor=${scale}`],env:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1',ELECTRON_DEV:'0'},timeout:30000});
+      desktop=await _electron.launch({executablePath:exe,args:[`--user-data-dir=${path.join(dir,'profile-'+scale)}`,...(scale===1?[]:[`--force-device-scale-factor=${scale}`])],env:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1',ELECTRON_DEV:'0'},timeout:30000});
       for(const stream of[desktop.process().stdout,desktop.process().stderr])stream?.on('data',c=>{processOutput=(processOutput+c.toString()).slice(-12000)});
       const page=await desktop.firstWindow();page.setDefaultTimeout(20000);await page.waitForFunction(()=>window.desktop?.isElectron);
       await adopt(page,'红色','小红');
@@ -99,6 +101,6 @@ async function main(){
     console.error('Application output before cleanup:',processOutput);
     if(desktop)try{console.error('Native state before cleanup:',await Promise.race([desktop.evaluate(({app,BrowserWindow})=>({ready:app.isReady(),version:process.versions.electron,windows:BrowserWindow.getAllWindows().map(w=>({bounds:w.getBounds(),visible:w.isVisible(),title:w.getTitle(),loading:w.webContents.isLoadingMainFrame(),url:w.webContents.getURL()}))})),pause(3000).then(()=>'state timeout')]))}catch(e){console.error(e.message)}
     throw error;
-  }finally{bar?.kill();await desktop?.close().catch(()=>{});backdrop.kill();fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}
+  }finally{bar?.kill();await desktop?.close().catch(()=>{});backdrop.kill();try{execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',probe,'-Mode','Restore','-Ready',backdrop.readyFile],{stdio:'pipe',timeout:20000,windowsHide:true})}finally{fs.rmSync(dir,{recursive:true,force:true,maxRetries:10,retryDelay:250})}}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

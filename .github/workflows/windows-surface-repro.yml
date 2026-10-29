@@ -11,7 +11,7 @@ concurrency:
 jobs:
   surface:
     name: Physical desktop ${{ matrix.edition }}
-    runs-on: windows-latest
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 40
     permissions:
       contents: write
@@ -20,9 +20,11 @@ jobs:
       matrix:
         include:
           - edition: modern
+            runner: windows-latest
             platform: windows
             executable: release/win-unpacked/拉姆.exe
           - edition: legacy
+            runner: windows-2022
             platform: legacy-x64
             executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
     env:
