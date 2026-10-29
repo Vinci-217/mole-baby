@@ -1,0 +1,24 @@
+{
+  "kind": "archived-public-releases",
+  "versions": [
+    "0.30.10",
+    "0.31.3"
+  ],
+  "platform": "darwin",
+  "arch": "arm64",
+  "originalPublicSha256": {
+    "0.30.10": "79142a4572723de54c654219dd02224f16d47b578dfba4b809e37e99453bd451",
+    "0.31.3": "76c85f6bdccacd97313ad3363571cb2ba66afe45da3d528ba5cdab4b39d7987c"
+  },
+  "fullPackageBytes": 653678562,
+  "packageBytesTransferred": 599632555,
+  "blockmapBytesTransferred": 680475,
+  "totalUpdateBytesTransferred": 600313233,
+  "reusedBytes": 54046007,
+  "savedPercent": 8.16,
+  "rangeRequests": 36,
+  "mode": "differential",
+  "byteIdentical": true,
+  "limitation": "Unmodified public DMGs with verified published checksums; blockmaps generated locally and transfer measured over loopback. No public release change, native mount or application replacement was performed by this script",
+  "implementationCommit": "3f02a32c6fae5c4a69797edb7edd13747d785cdb"
+}

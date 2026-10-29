@@ -2,6 +2,8 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
+> **增量更新预览，尚未发布：** [实现与原生测试结果](docs/INCREMENTAL-UPDATES-PREVIEW.md) · [国内下载加速方案](docs/CHINA-DOWNLOAD-ACCELERATION.md)。正式版与自动更新 latest 渠道保持不变。
+
 > **待确认修复预览：** [名字下方的状态提示与状态小窗修复](docs/DESKTOP-STATUS-UI.md) · [Windows 窗口尺寸累积与玩耍按钮修复](docs/WINDOWS-SURFACE-PLAY.md)。包含界面截图与验收记录；正式发布版仍为 v0.31.3。
 
 ## 本轮更新 · v0.31.3

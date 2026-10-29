@@ -1,0 +1,24 @@
+{
+  "runtime": "37.10.3",
+  "platform": "linux",
+  "results": [
+    {
+      "name": "mole-baby-0.31.3-Setup.exe",
+      "url": "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.3/mole-baby-0.31.3-Setup.exe",
+      "status": 206,
+      "contentRange": "bytes 0-1023/627862939",
+      "bodyBytes": 1024,
+      "responseUrlAvailable": false,
+      "finalHost": null
+    },
+    {
+      "name": "mole-baby-0.31.3-mac-arm64.dmg",
+      "url": "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.3/mole-baby-0.31.3-mac-arm64.dmg",
+      "status": 206,
+      "contentRange": "bytes 0-1023/653678562",
+      "bodyBytes": 1024,
+      "responseUrlAvailable": false,
+      "finalHost": null
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "sourceSha": "3f02a32c6fae5c4a69797edb7edd13747d785cdb",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40844445437",
+  "ciPlatform": "legacy-x64",
+  "ciStatus": "success",
+  "platform": "win32",
+  "arch": "x64",
+  "edition": "legacy",
+  "runtime": "22.3.27",
+  "fullProductPayload": true,
+  "fixtureVersions": [
+    "1.0.0",
+    "1.0.1"
+  ],
+  "fullPackageBytes": 614670575,
+  "packageBytesTransferred": 1564942,
+  "blockmapBytesTransferred": 1281493,
+  "totalUpdateBytesTransferred": 2846776,
+  "savedPercent": 99.54,
+  "rangeRequests": 20,
+  "mode": "differential",
+  "installedVersion": "1.0.1",
+  "savePreserved": true,
+  "applicationRelaunched": true,
+  "limitation": "Two isolated installers contain the current product payload with a test main process and a version change; production release-to-release savings will vary"
+}

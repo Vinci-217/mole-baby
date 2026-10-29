@@ -1,0 +1,28 @@
+{
+  "sourceSha": "3f02a32c6fae5c4a69797edb7edd13747d785cdb",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40844445437",
+  "ciPlatform": "mac-x64",
+  "ciStatus": "success",
+  "platform": "darwin",
+  "arch": "x64",
+  "runtime": "37.10.3",
+  "fullProductPayload": true,
+  "fixtureVersions": [
+    "1.0.0",
+    "1.0.1"
+  ],
+  "fullPackageBytes": 662465339,
+  "packageBytesTransferred": 2360508,
+  "reusedBytes": 660104831,
+  "mode": "differential",
+  "mountedVersion": "1.0.1",
+  "sha256Verified": true,
+  "codeSignatureVerified": true,
+  "savePreserved": true,
+  "applicationReplaced": false,
+  "limitation": "Two full product DMGs with a version change, served from an isolated loopback source; actual release-to-release savings will vary",
+  "rangeRequests": 9,
+  "blockmapBytesTransferred": 688278,
+  "totalUpdateBytesTransferred": 3048983,
+  "savedPercent": 99.54
+}
