@@ -7,7 +7,7 @@
     "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
     "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf"
   },
-  "referenceMethod": "Existing original source shapes and body/foliage masks; offline independent-blade interpolation, original rigs and new release choreography. No image-model redraw or official throw-performance claim.",
+  "referenceMethod": "Original frame scripts verified. Complete source frames 3..8, sorted SWF depth; no blade interpolation. Existing source rigs, velocity-driven playback and new release choreography. No original-client reproduction claim.",
   "forms": [
     "seed",
     "junior",
@@ -76,7 +76,7 @@
     }
   },
   "renderedImageChecks": {
-    "firstCandidateEqualsOriginalSource": true,
+    "originalFrame9Goto3Applied": true,
     "fourPalettesPreserveUntintedRGBA": true,
     "juniorHorizontalDragBodyBottom": {
       "min": 153,
@@ -87,24 +87,16 @@
       "min": 153,
       "max": 153,
       "unit": "rendered pixels"
-    },
-    "atlasRepackedWithoutPixelChanges": {
-      "posesCompared": 80,
-      "dimensions": [
-        1920,
-        1664
-      ],
-      "neutralAndMaskEqual": true
     }
   },
   "previews": [
     {
-      "file": "rotor-comparison.gif",
-      "renderedFrames": 120,
-      "encodedFrames": 120,
-      "durationMs": 4000,
-      "sha256": "9ac096941ddbd4c7039f2e97b4fec64a811b1de651848fcce8ed46d8234b5c91",
-      "bytes": 1255039
+      "file": "rotor-script-and-drag-v2.gif",
+      "renderedFrames": 340,
+      "encodedFrames": 340,
+      "durationMs": 6800,
+      "sha256": "8aa2c980ff6ca2d5d86073a87dc1f5e4f82823efb4a33326fff24840c1147e53",
+      "bytes": 3004394
     },
     {
       "file": "throw-seed.gif",
@@ -135,8 +127,8 @@
       "renderedFrames": 204,
       "encodedFrames": 204,
       "durationMs": 6800,
-      "sha256": "16ca63caff6e322dd9620e290f5fad7321b3291db447a746f1b7517cbddf1b10",
-      "bytes": 611579
+      "sha256": "3a0efb2cedd8f707a05a80657cee3383876342001b9f1dbc4503d612506f85b4",
+      "bytes": 555874
     },
     {
       "file": "throw-classic.gif",
@@ -183,8 +175,8 @@
       "renderedFrames": 204,
       "encodedFrames": 204,
       "durationMs": 6800,
-      "sha256": "f379fcafea3c2b824c8e9678fe992f132abf593ecdca43c383be71231c2bca30",
-      "bytes": 1908447
+      "sha256": "d23ef7fef9d5f55796983d1e43fac9e87864405b3c70214dddb497fcfae7b930",
+      "bytes": 1830412
     },
     {
       "file": "throw-evolutions.gif",
@@ -199,19 +191,24 @@
       "renderedFrames": 90,
       "encodedFrames": 90,
       "durationMs": 3000,
-      "sha256": "02ae3d57b6f1e0a06c2774264064aa9c8168fe9d62a3c3fe7c177e58ffd4bce0",
-      "bytes": 1104209
+      "sha256": "94e8aa21a56b65c6df651bd6566c659b1a360b652e2ed836a2bfe94b8fb9c558",
+      "bytes": 820015
     }
   ],
   "windowsBlackRectangle": "Not reproduced in this Linux environment; no claimed fix or native Windows acceptance.",
-  "referenceDownload": {
-    "date": "2026-10-29",
-    "url": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf",
-    "httpStatus": 200,
-    "bytes": 556811,
-    "sha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
-    "matchesRepositoryOriginal": true
+  "revision": 2,
+  "modelTests": {
+    "command": "node --test scripts/previews/source-rotor-motion.test.mjs scripts/previews/throw-motion.test.mjs",
+    "passed": 8,
+    "failed": 0
   },
+  "independentRasterVerification": "direct-source-check.json",
+  "realPointerVerification": "browser-checks.json",
+  "rejectedPreviousApproach": [
+    "Assumed source loop 1..8 without reading frame9 gotoAndPlay(3)",
+    "Interpolated per-depth leaf matrices without verified continuous blade correspondence",
+    "Fixed rotor speed during a moving hand preview"
+  ],
   "windowsFeedback": {
     "appearance": "possibly persistent black rectangle",
     "windowsVersion": null,
@@ -219,16 +216,11 @@
     "nativeReproduced": false,
     "fixed": false
   },
-  "modelTests": {
-    "command": "node --test scripts/previews/throw-motion.test.mjs",
-    "passed": 4,
-    "failed": 0
-  },
   "encodedAssetVerification": {
-    "allGifHashesAndDurations": true,
-    "allNineSingleFormGifsHaveVisibleBodyEveryFrame": true,
     "gifFiles": 13,
-    "framesDecoded": 2454,
-    "allTextureHashesAndDimensions": true
+    "framesDecoded": 2674,
+    "allGifHashesAndDurations": true,
+    "allTextureHashesMatch": true,
+    "frameScriptHashMatches": true
   }
 }

@@ -1,0 +1,79 @@
+{
+  "reviewOnly": true,
+  "engine": "headless Chromium, standalone HTML via setContent (file navigation blocked by cloud browser policy)",
+  "realMouseInput": true,
+  "fastPointerIncreasesRate": true,
+  "reversalKeepsForwardPhase": true,
+  "releaseCoastsAndKeepsRotorPhase": true,
+  "reducedMotionFreezesAtSourceFrame3": true,
+  "networkRequests": 0,
+  "pageErrors": [],
+  "measurements": {
+    "start": {
+      "ready": true,
+      "held": false,
+      "phase": 2.8579199999999996,
+      "rate": 0.65,
+      "sourceFrame": 5,
+      "position": {
+        "x": 450,
+        "y": 190
+      }
+    },
+    "fast": {
+      "ready": true,
+      "held": true,
+      "phase": 14.278810505178107,
+      "rate": 1.397881862660099,
+      "sourceFrame": 5,
+      "position": {
+        "x": 587.5796178343949,
+        "y": 190
+      }
+    },
+    "reversed": {
+      "ready": true,
+      "held": true,
+      "phase": 26.118354418597182,
+      "rate": 1.572862200877724,
+      "sourceFrame": 5,
+      "position": {
+        "x": 404.140127388535,
+        "y": 190
+      }
+    },
+    "released": {
+      "ready": true,
+      "held": false,
+      "phase": 26.750530372448335,
+      "rate": 1.5815360241363103,
+      "sourceFrame": 5,
+      "position": {
+        "x": 404.140127388535,
+        "y": 190
+      }
+    },
+    "coast": {
+      "ready": true,
+      "held": false,
+      "phase": 32.39395463453009,
+      "rate": 1.5440110224068981,
+      "sourceFrame": 5,
+      "position": {
+        "x": 363.3092633336679,
+        "y": 190
+      }
+    },
+    "settled": {
+      "ready": true,
+      "held": false,
+      "phase": 76.58799016136214,
+      "rate": 0.7649381293974327,
+      "sourceFrame": 7,
+      "position": {
+        "x": 278.64629740907526,
+        "y": 190
+      }
+    }
+  }
+}

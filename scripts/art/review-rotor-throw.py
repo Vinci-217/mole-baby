@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Review assets only. Original SWF vector shapes -> transparent PNG frames.
 
-The senior crown uses EACH original blade's three placement keys and original
-depth order, with affine polar inbetweens. Never rotate a flattened crown.
-No character, eye, mouth or foliage is redrawn. Throw trajectories are new
-desktop choreography, not a claim of an official throw action.
+Read Timeline_315.frame9 gotoAndPlay(3): keep exact source frames 3..8,
+including their holds and complete body/crown depth order. No polar tween,
+no presumed physical-blade identities, no whole-crown bitmap rotation.
+Throw trajectories and velocity-sensitive playback are desktop adaptations.
 """
-import argparse, ast, copy, hashlib, json, math, subprocess, sys
+import argparse, ast, base64, copy, hashlib, io, json, math, subprocess, sys
 from pathlib import Path
 import xml.etree.ElementTree as E
 import numpy as np
@@ -20,26 +20,9 @@ NAMES=dict(zip(FORMS,['种子','初级','中级 · 双叶','高级 · 风扇叶'
 SOURCE_SHA='01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf'
 SOURCE_URL='https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/NPC/lamubone.swf'
 W,H=192,208
-ROTOR_COLUMNS=10  # 80 source/candidate poses fit 1920x1664, below 2048.
+ROTOR_COLUMNS=6
 
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
-def polar_lerp(a,b,t):
-    """Interpolate each source placement, avoiding collapsing a turning blade."""
-    # Left-facing SWF instances include a reflection. Factor the SAME fixed
-    # reflection out of both keys before interpolating their rotations.
-    reflected=np.linalg.det(a[:2,:2])<0
-    assert reflected==(np.linalg.det(b[:2,:2])<0),'Source key handedness changed'
-    flip=np.diag([-1.,1.])if reflected else np.eye(2)
-    def decompose(m):
-        u,s,v=np.linalg.svd(m[:2,:2]@flip);r=u@v
-        if np.linalg.det(r)<0: raise ValueError('Unexpected reflected blade key')
-        return math.atan2(r[1,0],r[0,0]),v.T@np.diag(s)@v
-    aa,sa=decompose(a);ab,sb=decompose(b)
-    angle=aa+((ab-aa+math.pi)%(2*math.pi)-math.pi)*t
-    r=np.array([[math.cos(angle),-math.sin(angle)],[math.sin(angle),math.cos(angle)]])
-    m=np.eye(3);m[:2,:2]=r@((1-t)*sa+t*sb)@flip;m[:2,2]=(1-t)*a[:2,2]+t*b[:2,2]
-    return m
-
 def export_senior(exporter,work):
     raw=ROOT/'research/references/original-flight/lamubone.swf'
     assert sha(raw)==SOURCE_SHA
@@ -49,32 +32,34 @@ def export_senior(exporter,work):
     source=ast.parse((ROOT/'scripts/art/export-registered-outfits.py').read_text())
     scope={'E':E,'np':np,'copy':copy,'re':__import__('re')}
     exec(compile(ast.Module(body=[n for n in source.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))and n.name in ['Timeline','matrix','bounds','union']],type_ignores=[]),'<timeline>', 'exec'),scope)
-    tl=scope['Timeline'](xml);bounds=scope['bounds'];union=scope['union']
+    class OrderedTimeline(scope['Timeline']):
+        # SWF depth, not insertion order: f5 removes depth7 then inserts
+        # depth4. Dictionary insertion order paints that pupil over depth5.
+        def active(self,sid,age):
+            return sorted(super().active(sid,age),key=lambda item:int(item[0].get('depth','0')))
+    tl=OrderedTimeline(xml);bounds=scope['bounds'];union=scope['union']
     tree=E.parse(xml);tags=tree.getroot().find('tags');master=next(n for n in tags if n.get('spriteId')=='1777')
     spec=json.loads((ROOT/'public/assets/original/flight/runtime.json').read_text())['forms']['senior']
     reg=spec['registration'];target=reg['bodyTarget'];b=reg['sourceBodyBounds'];scale=reg['scale']
     registration=np.array([[scale,0,(target[0]+target[2])*10-scale*(b[0]+b[2])/2],[0,scale,target[3]*20-scale*b[3]],[0,0,1.]])
-    def green(sid):return any(int(c.get('green',0))>int(c.get('red',0))*1.2 and int(c.get('green',0))>int(c.get('blue',0))*1.1 for c in tl.ns[sid].iter('color'))
+    as_dir=ROOT/'research/references/original-flight/frame-scripts'
+    as_dir.mkdir(exist_ok=True)
+    subprocess.run([exporter,'scripts',str(raw),str(as_dir),'.*(timeline_315|timeline_314).*'],check=True,stdout=subprocess.DEVNULL)
+    for script in as_dir.rglob('*.as'):
+        # Normalise decompiler whitespace only; preserve all AS statements.
+        script.write_text('\n'.join(line.rstrip()for line in script.read_text().splitlines()).rstrip()+'\n')
+    leaf_script=(as_dir/'lamubone_fla/Timeline_315.as').read_text()
+    assert 'addFrameScript(0,frame1,8,frame9)'in leaf_script and 'gotoAndPlay(3)'in leaf_script
+    assert 'gotoAndPlay(3)'in(as_dir/'lamubone_fla/Timeline_314.as').read_text()
     entries=[];clips={};proof=[]
     for direction in ['down','left','right']:
-        source_parts={f:[(sid,m)for sid,m in tl.action('1777',direction,f,'all')[0]if sid!='41']for f in [1,5,7]}
-        crowns={f:[(sid,m)for sid,m in parts if green(sid)]for f,parts in source_parts.items()}
-        assert all(len(p)==9 for p in crowns.values()),'Original stem + eight blades required'
-        assert all([sid for sid,_ in crowns[1]]==[sid for sid,_ in p]for p in crowns.values())
-        body=[(sid,m)for sid,m in source_parts[1]if not green(sid)]
         frames=[]
-        for i in range(24):
-            phase=i/24
-            start,end,amount=(1,5,phase/.5)if phase<.5 else (5,7,(phase-.5)/.25)if phase<.75 else(7,1,(phase-.75)/.25)
-            crown=[(sid,polar_lerp(ma,mb,amount))for(sid,ma),(_,mb)in zip(crowns[start],crowns[end])]
-            parts=[(sid,registration@m)for sid,m in body+crown]
+        for source_frame in range(3,9):
+            parts=[(sid,registration@m)for sid,m in tl.action('1777',direction,source_frame,'all')[0]if sid!='41']
             frames.append(len(entries));entries.append(parts)
-            proof.append({'direction':direction,'phase':phase,'keys':[start,end],'mix':amount,'bladeParts':8,'wholeCrownRotation':False})
-        clips[direction]={'indices':frames,'fps':60,'periodSeconds':.4}
-    # Separate exact source sequence for comparison, including original holds.
-    originals=[]
-    for i in range(1,9):
-        originals.append(len(entries));entries.append([(sid,registration@m)for sid,m in tl.action('1777','down',i,'all')[0]if sid!='41'])
+            proof.append({'direction':direction,'sourceFrame':source_frame,'wholeCrownRotation':False,'interpolation':False})
+        clips[direction]={'indices':frames,'sourceFrames':list(range(3,9)),'fps':24,'periodSeconds':.25}
+    originals=clips['down']['indices']
     sub=master.find('subTags');master.remove(sub);sub=E.SubElement(master,'subTags');master.set('frameCount',str(len(entries)))
     for parts in entries:
         for depth in range(1,40): E.SubElement(sub,'item',type='RemoveObject2Tag',depth=str(depth))
@@ -98,7 +83,9 @@ def export_senior(exporter,work):
         r.write(target_xml,encoding='utf-8',xml_declaration=True)
         subprocess.run([exporter,'xml2swf',str(target_xml),str(target_swf)],check=True,stdout=subprocess.DEVNULL)
         subprocess.run([exporter,'frames',str(target_swf),str(folder),'1777','-1','2'],check=True,stdout=subprocess.DEVNULL)
-        paths=sorted(folder.rglob('*.png'),key=lambda p:int(p.stem));assert len(paths)==len(entries)
+        paths=sorted(folder.rglob('*.png'),key=lambda p:int(p.stem))
+        # Use a new work directory for changed exports, never stale frames.
+        assert len(paths)==len(entries)
         frames=[]
         for path in paths:
             im=Image.new('RGBA',(384,416));im.alpha_composite(Image.open(path).convert('RGBA'),(math.floor(box[0]/10),math.floor(box[1]/10)))
@@ -113,13 +100,56 @@ def export_senior(exporter,work):
         sheet=Image.new('RGBA',(ROTOR_COLUMNS*W,math.ceil(len(images)/ROTOR_COLUMNS)*H))
         for i,im in enumerate(images):sheet.paste(im,(i%ROTOR_COLUMNS*W,i//ROTOR_COLUMNS*H))
         sheet.save(OUT/f'senior-{kind}.png',optimize=True)
-    meta={'sourceUrl':SOURCE_URL,'sourceSha256':SOURCE_SHA,'sourceSprite':1777,'crownSprite':1538,'sourceLeafKeyFrames':[1,5,7],
-          'sourceVisibleLoopFrames':8,'sourceFps':24,'uniqueSourceCrownKeys':3,'body':'unchanged original first pose for each direction',
-          'method':'24 offline per-blade affine-polar inbetweens per direction; original shapes, stem, depth order and registration. Desktop adaptation, not newly drawn official frames.',
+    meta={'sourceUrl':SOURCE_URL,'sourceSha256':SOURCE_SHA,'sourceSprite':1777,'crownSprite':1538,'sourceLeafKeyFrames':[3,5,7],
+          'sourceVisibleLoopFrames':6,'loopSourceFrames':list(range(3,9)),'sourceFps':24,'uniqueSourceCrownKeys':3,'body':'complete original body and crown in each source frame, sorted by SWF depth',
+          'frameScript':{'class':'lamubone_fla.Timeline_315','frame1':'stop(); dispatch petBone2','frame9':'gotoAndPlay(3)','file':'research/references/original-flight/frame-scripts/lamubone_fla/Timeline_315.as','sha256':sha(as_dir/'lamubone_fla/Timeline_315.as')},
+          'method':'Exact complete source loop frames 3..8 after applying original frame9 gotoAndPlay(3). No blade interpolation. Velocity-sensitive playback is a desktop adaptation.',
           'cell':[W,H],'columns':ROTOR_COLUMNS,'clips':clips,'exactOriginalIndices':originals,'frames':len(entries),
+          'excludedSourceShapes':[41],'excludedSourceReason':'Original ground shadow is not part of the floating desktop character.',
           'candidatePhaseProof':proof,'files':{f'senior-{kind}.png':sha(OUT/f'senior-{kind}.png')for kind in ['neutral','mask']}}
     (OUT/'rotor-source.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
-    print('PASS exported original blade shapes and 72 independent blade composites + 8 source frames',flush=True)
+    print('PASS exported 18 complete original frames: 3 directions x source loop 3..8, no interpolation',flush=True)
+
+def verify_direct_reference(exporter,work):
+    """Independent raster path: render the original nested SWF directly,
+    without our flattening/sorting code, then match all three distinct poses.
+    JPEXS does not execute AS3; the loop selection comes from the verified AS.
+    """
+    folder=work/'direct-source';raw=ROOT/'research/references/original-flight/lamubone.swf'
+    subprocess.run([exporter,'nested',str(raw),str(folder),'1777','6','9','2'],check=True,stdout=subprocess.DEVNULL)
+    source={int(p.stem):Image.open(p).convert('RGBA')for p in folder.rglob('*.png')}
+    assert len(source)==9
+    meta=json.loads((OUT/'rotor-source.json').read_text());atlas=Image.open(OUT/'senior-neutral.png').convert('RGBA')
+    reg=json.loads((ROOT/'public/assets/original/flight/runtime.json').read_text())['forms']['senior']['registration']
+    scale=reg['scale']/2;target=reg['bodyTarget'];frames=[3,5,7]
+    def green(im):
+        a=np.asarray(im).astype(float)
+        return(a[:,:,1]>a[:,:,0]*1.2)&(a[:,:,1]>a[:,:,2]*1.2)&(a[:,:,3]>110)
+    candidate=[green(cell(atlas,i,columns=meta['columns']))for i in [0,2,4]]
+    a=np.array(source[3]);body=(a[:,:,0]==a[:,:,1])&(a[:,:,1]==a[:,:,2])&(a[:,:,0]>=153)&(a[:,:,3]>200)
+    ys,xs=np.where(body)
+    tx=(target[0]+target[2])/2-(xs.min()+xs.max()+1)/2*scale;ty=target[3]-(ys.max()+1)*scale
+    def fit(im,x,y):return im.transform((192,208),Image.Transform.AFFINE,(1/scale,0,-x/scale,0,1/scale,-y/scale),Image.Resampling.BICUBIC)
+    best=(-1,None)
+    # Fit one translation using only frame3. Reuse it unchanged for f4..8.
+    for dx in np.arange(-3,3.01,.5):
+        for dy in np.arange(-3,3.01,.5):
+            g=green(fit(source[3],tx+dx,ty+dy));iou=float((g&candidate[0]).sum()/(g|candidate[0]).sum())
+            if iou>best[0]:best=(iou,(float(tx+dx),float(ty+dy)))
+    tx,ty=best[1];references=[green(fit(source[f],tx,ty))for f in frames]
+    scores=[[float((a&b).sum()/(a|b).sum())for b in references]for a in candidate]
+    assert np.argmax(scores,axis=1).tolist()==[0,1,2],'Candidate pose order disagrees with direct original renderer'
+    assert all(scores[i][i]>.94 for i in range(3)),'Source leaf shape no longer matches direct original rendering'
+    strip=Image.new('RGBA',(192*6,208))
+    for i,f in enumerate(range(3,9)):strip.alpha_composite(fit(source[f],tx,ty),(i*192,0))
+    strip.save(OUT/'direct-source-reference.png',optimize=True)
+    receipt={'sourceSha256':SOURCE_SHA,'sourceExporterJavaSha256':sha(ROOT/'scripts/art/SourceExporter.java'),
+             'method':'Direct original SWF nested-frame JPEXS render; no candidate flattening. Frame script determines 3..8 loop; JPEXS does not execute AS3.',
+             'sprite':1777,'rootFrameZeroBased':6,'exportedFrames':9,'comparedDistinctSourceFrames':frames,
+             'oneFixedRegistration':{'scale':scale,'x':tx,'y':ty},'candidateRowsVsDirectSourceColumnsIoU':scores,
+             'correspondence':[3,5,7],'allDiagonalIoUAbove094':True,'originalFlashClientExecuted':False}
+    (OUT/'direct-source-check.json').write_text(json.dumps(receipt,indent=2)+'\n')
+    print('PASS direct original nested render matches ordered candidate poses 3/5/7, all leaf IoU > .94',flush=True)
 
 def tint(neutral,mask,color='red'):
     offsets={'red':[255,-199,-250],'yellow':[0,-21,-255],'blue':[-215,-57,31],'pink':[51,-148,0],'white':[0,0,0]}[color]
@@ -132,6 +162,46 @@ def cell(sheet,index,w=W,h=H,columns=8):return sheet.crop((index%columns*w,index
 def body_bounds(mask):
     m=np.array(mask);ys,xs=np.where((m[:,:,:3].sum(2)>90)&(m[:,:,3]>100))
     return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+
+def make_interactive(neutral,mask,meta):
+    """Standalone offline preview: no install, network requests or app saves."""
+    png=io.BytesIO();tint(neutral,mask).save(png,format='PNG',optimize=True)
+    controller=(ROOT/'scripts/previews/source-rotor-motion.mjs').read_text().replace('export ','')
+    inertia=(ROOT/'scripts/previews/throw-motion.mjs').read_text().split('\nif (process.argv[1]')[0].replace('export ','')
+    html='''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>拉姆叶片 · 手速预览</title>
+<style>html{background:#f6f3ea;color:#76583b;font:16px/1.7 "Microsoft YaHei",sans-serif}body{max-width:940px;margin:30px auto;padding:0 16px}h1{font-size:24px}canvas{display:block;width:100%;height:auto;background:#fffdf7;border:1px solid #e5d5b3;border-radius:18px;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}button{font:inherit;color:inherit;background:#fff4ce;border:1px solid #ddc389;border-radius:12px;padding:5px 18px;cursor:pointer}p{margin:12px 0}small{color:#93795c}</style>
+<h1>拉姆叶片 · 真实鼠标拖拽预览</h1>
+<p>抓住拉姆左右拖动：滑得快，叶片转得快；停手或松手后逐渐降速。松手也会有短距离惯性。</p>
+<canvas id="preview" width="900" height="330" aria-label="可拖拽的高级拉姆动画预览"></canvas>
+<p><button id="reset">放回中间</button> <span id="state">正在准备原帧…</span></p>
+<small>仅供动作确认：原 SWF 循环 3→4→5→6→7→8；未接入正式桌面窗口，不改存档、不联网。</small>
+<script>(()=>{__CONTROLLER__
+__INERTIA__
+const spec=__META__,image=new Image(),canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d'),status=document.querySelector('#state');
+let rotor=createSourceRotor(),position={x:450,y:190},held=false,last=0,samples=[],grip=null,coast=null,ready=false,painted=sampleSourceRotor(rotor);
+const media=matchMedia('(prefers-reduced-motion: reduce)');
+function point(e){const b=canvas.getBoundingClientRect();return {x:(e.clientX-b.left)*900/b.width,y:(e.clientY-b.top)*330/b.height,at:performance.now()}}
+function record(p){samples.push(p);samples=samples.filter(s=>s.at>=p.at-120)}
+canvas.addEventListener('pointerdown',e=>{if(!ready||e.button!==0)return;const p=point(e);if(Math.abs(p.x-position.x)>60||Math.abs(p.y-position.y)>65)return;e.preventDefault();held=true;coast=null;samples=[];record(p);grip={x:p.x-position.x,y:p.y-position.y};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!held)return;const p=point(e);record(p);position={x:Math.max(52,Math.min(848,p.x-grip.x)),y:Math.max(70,Math.min(265,p.y-grip.y))}});
+function release(e,cancel=false){if(!held)return;if(e&&!cancel)record(point(e));const now=performance.now();const velocity=cancel?{x:0,y:0}:releaseVelocity(samples,now,'senior');held=false;coast={origin:{...position},velocity,at:now};if(e&&canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId)}
+canvas.addEventListener('pointerup',e=>release(e));canvas.addEventListener('pointercancel',e=>release(e,true));canvas.addEventListener('lostpointercapture',e=>release(e,true));window.addEventListener('blur',()=>release(null,true));
+document.querySelector('button').onclick=()=>{held=false;coast=null;samples=[];position={x:450,y:190};rotor=createSourceRotor()};
+function paint(now){let speed=0,vx=0;
+ if(held){const v=releaseVelocity(samples,now,'senior');speed=Math.hypot(v.x,v.y);vx=v.x}
+ else if(coast){const p=sampleThrow('senior',coast.origin,coast.velocity,(now-coast.at)/1000,{left:52,right:848,top:70,bottom:265},media.matches);position={x:p.x,y:p.y};speed=Math.hypot(p.vx,p.vy);vx=p.vx;if(p.done)coast=null}
+ painted=stepSourceRotor(rotor,last?now-last:0,speed,media.matches);last=now;
+ const direction=vx>35?'right':vx<-35?'left':'down',index=spec.clips[direction].indices[painted.index];ctx.clearRect(0,0,900,330);
+ ctx.drawImage(image,index%spec.columns*192,Math.floor(index/spec.columns)*208,192,208,position.x-50,position.y-54,100,108);
+ status.textContent=(held?'正在拖动':coast?'松手滑行':'安静慢转')+' · '+painted.rate.toFixed(2)+'× · 原帧 '+painted.sourceFrame;
+ requestAnimationFrame(paint);
+}
+window.rotorReview={getState:()=>({ready,held,phase:rotor.phase,rate:rotor.rate,sourceFrame:painted.sourceFrame,position:{...position}})};
+image.onload=()=>{ready=true;requestAnimationFrame(paint)};image.src='data:image/png;base64,__IMAGE__';
+})();</script></html>'''
+    html=html.replace('__CONTROLLER__',controller).replace('__INERTIA__',inertia).replace('__META__',json.dumps(meta,separators=(',',':'))).replace('__IMAGE__',base64.b64encode(png.getvalue()).decode())
+    (OUT/'interactive.html').write_text(html)
 
 def make_previews(work):
     OUT.mkdir(parents=True,exist_ok=True)
@@ -171,7 +241,11 @@ def make_previews(work):
             # body always travel together after a release, with no auto-walk.
             canvas.alpha_composite(cell(seedbody,seedindex,96,99),(51,36));return canvas,[36,36,155,198]
         if form=='senior':
-            index=rotor['clips'][direction]['indices'][int(t*60)%24]
+            phase=motion.get('rotor')if motion else None
+            if phase is None and motion:
+                phase=rotor_traces[30]['frames'][min(round(t*30),len(rotor_traces[30]['frames'])-1)]['rotor']
+            frame=phase['index']if phase else int(t*24)%6
+            index=rotor['clips'][direction]['indices'][frame]
             return cell(rotors[color],index,columns=rotor['columns']),body_bounds(cell(rm,index,columns=rotor['columns']))
         if form in ['junior','middle']:
             # Preserve the already accepted shared viscous body and bound
@@ -206,6 +280,7 @@ def make_previews(work):
         im.alpha_composite(layer,(round(x-192*factor),round(py)))
         return py,bb
     traces=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/previews/throw-motion.mjs')],text=True))
+    rotor_traces={fps:json.loads(subprocess.check_output(['node',str(ROOT/'scripts/previews/record-rotor-traces.mjs'),str(fps)],text=True))for fps in [30,50]}
     def encode(name,frames,fps=FPS):
         dest=work/(name+'-frames');dest.mkdir(exist_ok=True)
         for i,im in enumerate(frames):im.convert('RGB').save(dest/f'{i:04}.png')
@@ -220,33 +295,33 @@ def make_previews(work):
         print(f'PASS {name}: {len(frames)} rendered frames; {count} GIF frames; {duration} ms; {target.stat().st_size} bytes',flush=True)
         return {'file':target.name,'renderedFrames':len(frames),'encodedFrames':count,'durationMs':duration,'sha256':sha(target),'bytes':target.stat().st_size}
     records=[];image_checks={}
-    assert cell(rn,0,columns=rotor['columns']).tobytes()==cell(rn,rotor['exactOriginalIndices'][0],columns=rotor['columns']).tobytes(),'First candidate must match original source pose exactly'
+    assert rotor['loopSourceFrames']==[3,4,5,6,7,8]
     assert max(rn.size)<=2048 and rn.size==rm.size,'Preview texture exceeds 2048'
     mask_pixels=np.array(rm);untinted=mask_pixels[:,:,:3].sum(2)==0
     for color,sheet in rotors.items():
         assert np.array_equal(np.array(sheet)[untinted],np.array(rn)[untinted]),'Eyes/foliage outside body mask must retain original RGBA'
-    image_checks['firstCandidateEqualsOriginalSource']=True
+    image_checks['originalFrame9Goto3Applied']=True
     image_checks['fourPalettesPreserveUntintedRGBA']=True
-    # Actual current runtime crown vs exact archived source vs candidate.
-    old,old_mask=read_pair('original/flight','senior');oldmeta=flight['forms']['senior'];oldcrown=cell(old,oldmeta['crownIndex']);oldbody=cell(old,oldmeta['bodyIndex'])
-    def previous_rotor(t):
-        # Current production fan speed at rest: .28 rev/s; baked poses are
-        # sampled directly, not a different look made only for comparison.
-        idx=oldmeta['rotor']['bakedIndices'][round((t*.28)%1*40)%40]
-        p=oldbody.copy();p.alpha_composite(cell(old,idx));return p
+    # Correct original script loop vs velocity-driven playback. No invented
+    # intermediate blade placement is labelled as a source drawing.
     rotor_frames=[]
-    for i in range(120):
-        t=i/FPS;im=Image.new('RGBA',(900,280),'#f6f3ea')
-        label(im,'高级拉姆 · 叶片旋转对照',(450,25),f18)
-        for col,kind in enumerate(['old','source','candidate']):
+    for m in rotor_traces[50]['frames']:
+        t=m['time'];im=Image.new('RGBA',(900,300),'#f6f3ea')
+        label(im,'原帧顺序校正 · 拖动会加速，松手慢慢降速',(450,25),f18)
+        label(im,'原循环：3 → 4 → 5 → 6 → 7 → 8 → 3',(450,51),f14)
+        for col,kind in enumerate(['source','candidate','detail']):
             x=150+300*col
-            if kind=='old':pic=previous_rotor(t)
-            elif kind=='source':pic=cell(rotors['red'],rotor['exactOriginalIndices'][int(t*24)%8],columns=rotor['columns'])
-            else:pic=pose('senior',t,None,'down')[0]
-            im.alpha_composite(pic,(x-96,43))
-            label(im,['当前：整冠投影旋转','公开 SWF：原时序','候选：逐片运动补间'][col],(x,256),f14)
+            pic=pose('senior',t,None,'down')[0]if kind=='source'else pose('senior',t,m,'down')[0]
+            if kind=='candidate':
+                x+=(m['x']-235)*.4
+                d=ImageDraw.Draw(im);hx=450+(m['handX']-235)*.4
+                d.ellipse((hx-4,72,hx+4,80),fill='#d6ad66'if m['held']else'#f6f3ea',outline='#b68d4d')
+            if kind=='detail':im.alpha_composite(pic.crop((0,0,192,112)).resize((230,134),Image.Resampling.LANCZOS),(x-115,107))
+            else:im.alpha_composite(pic,(round(x-96),72))
+            label(im,['原片 · 正常播放','手速驱动 · 直接用原帧','叶片局部 · 同步帧'][col],(150+300*col,273),f14)
+        label(im,('拖动加速'if m['held']else'松手续转'if m['phase'].startswith('release')else'安静慢转')+f"  · {m['rotor']['rate']:.2f}×",(450,294),f12)
         rotor_frames.append(im)
-    records.append(encode('rotor-comparison',rotor_frames))
+    records.append(encode('rotor-script-and-drag-v2',rotor_frames,50))
     # All release examples have the same hand path and marker. Different
     # glide lengths come from each form's drag profile, not another hand path.
     phase_text={'ready':'轻轻拿起','drag-right':'向右拖动','release-right':'松手 → 继续滑行','drag-left':'向左拖动','release-left':'松手 ← 继续滑行','settled':'慢慢停稳'}
@@ -302,17 +377,20 @@ def make_previews(work):
     for r,form in enumerate(['seed','middle','senior']):
         for c,at in enumerate([1.25,1.65,2.6]):contact.alpha_composite(frames_by_form[form][round(at*FPS)],(480*c,210*r))
     contact.convert('RGB').save(OUT/'release-contact-sheet.png')
-    sheet=Image.new('RGBA',(W*6,H*4))
-    for i in range(24):sheet.alpha_composite(pose('senior',i/60,None,'down')[0],((i%6)*W,(i//6)*H))
+    sheet=Image.new('RGBA',(W*6,H))
+    for i in range(6):sheet.alpha_composite(pose('senior',i/24,None,'down')[0],(i*W,0))
     sheet.save(OUT/'rotor-frame-sequence.png',optimize=True)
-    receipt={'reviewOnly':True,'shippingCodeChanged':False,'releaseCreated':False,'renderFps':FPS,'source':{'url':SOURCE_URL,'sha256':SOURCE_SHA},
-             'referenceMethod':'Existing original source shapes and body/foliage masks; offline independent-blade interpolation, original rigs and new release choreography. No image-model redraw or official throw-performance claim.',
+    receipt={'revision':2,'reviewOnly':True,'shippingCodeChanged':False,'releaseCreated':False,'renderFps':FPS,'source':{'url':SOURCE_URL,'sha256':SOURCE_SHA},
+             'referenceMethod':'Original frame scripts verified. Complete source frames 3..8, sorted SWF depth; no blade interpolation. Existing source rigs, velocity-driven playback and new release choreography. No original-client reproduction claim.',
              'forms':FORMS,'checks':clip_proofs,'renderedImageChecks':image_checks,'previews':records,'windowsBlackRectangle':'Not reproduced in this Linux environment; no claimed fix or native Windows acceptance.'}
     (OUT/'checks.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
     (OUT/'motion-traces.json').write_text(json.dumps(traces,separators=(',',':'))+'\n')
+    (OUT/'rotor-motion-traces.json').write_text(json.dumps(rotor_traces[50],separators=(',',':'))+'\n')
+    make_interactive(rn,rm,rotor)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--exporter',required=True);p.add_argument('--work',type=Path,default=Path('/tmp/mole-rotor-throw'));p.add_argument('--reuse-export',action='store_true');a=p.parse_args()
     a.work.mkdir(parents=True,exist_ok=True);OUT.mkdir(parents=True,exist_ok=True)
     if not a.reuse_export:export_senior(a.exporter,a.work)
+    verify_direct_reference(a.exporter,a.work)
     make_previews(a.work)

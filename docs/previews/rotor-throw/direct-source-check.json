@@ -1,0 +1,42 @@
+{
+  "sourceSha256": "01abf65f3e8db098068a830268bd7a7cefefc1edc93a44565788783d23f8a0cf",
+  "sourceExporterJavaSha256": "a378440161ebe5c43dfc76aaa6b8ae442ae1fac7d8d93b098cedda71e11073d3",
+  "method": "Direct original SWF nested-frame JPEXS render; no candidate flattening. Frame script determines 3..8 loop; JPEXS does not execute AS3.",
+  "sprite": 1777,
+  "rootFrameZeroBased": 6,
+  "exportedFrames": 9,
+  "comparedDistinctSourceFrames": [
+    3,
+    5,
+    7
+  ],
+  "oneFixedRegistration": {
+    "scale": 2.7837603731430303,
+    "x": -684.7772639203339,
+    "y": -1380.324610825812
+  },
+  "candidateRowsVsDirectSourceColumnsIoU": [
+    [
+      0.981001524569016,
+      0.7597535934291582,
+      0.6551619124961933
+    ],
+    [
+      0.7528309656166358,
+      0.9677639822303223,
+      0.7050404480398258
+    ],
+    [
+      0.6554219323277619,
+      0.712283251998754,
+      0.9693081761006289
+    ]
+  ],
+  "correspondence": [
+    3,
+    5,
+    7
+  ],
+  "allDiagonalIoUAbove094": true,
+  "originalFlashClientExecuted": false
+}
