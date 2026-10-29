@@ -198,7 +198,7 @@
   "windowsBlackRectangle": "Not reproduced in this Linux environment; no claimed fix or native Windows acceptance.",
   "revision": 2,
   "modelTests": {
-    "command": "node --test scripts/previews/source-rotor-motion.test.mjs scripts/previews/throw-motion.test.mjs",
+    "command": "node --test scripts/previews/source-rotor-motion.node-test.mjs scripts/previews/throw-motion.node-test.mjs",
     "passed": 8,
     "failed": 0
   },

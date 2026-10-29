@@ -72,8 +72,8 @@
 检查入口：[检查回执](checks.json)、[完整位移轨迹](motion-traces.json)、[松手关键帧](release-contact-sheet.png)。原始逐帧 PNG 留在本地工作目录，可用导出脚本重新生成；GIF 和叶片透明图集随预览分支保留，不加入安装包。
 
 ```sh
-node --test scripts/previews/throw-motion.test.mjs
-node --test scripts/previews/source-rotor-motion.test.mjs
+node --test scripts/previews/throw-motion.node-test.mjs
+node --test scripts/previews/source-rotor-motion.node-test.mjs
 python scripts/art/review-rotor-throw.py --exporter /path/to/SourceExporter-wrapper
 node scripts/previews/check-rotor-browser.cjs
 ```
