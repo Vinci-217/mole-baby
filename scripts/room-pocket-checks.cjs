@@ -11,20 +11,26 @@ async function verifyRoomPocket(page,desktop){
  await enterHome(page);const original=await bounds();
  try{
   await expect(page.locator('.room-resize-edge')).toHaveCount(8);
-  await desktop.evaluate(({BrowserWindow,screen})=>{const area=screen.getPrimaryDisplay().workArea;BrowserWindow.getAllWindows()[0].setBounds({x:area.x+10,y:area.y+10,width:900,height:680})});
+  const area=await desktop.evaluate(({BrowserWindow,screen})=>{const area=screen.getPrimaryDisplay().workArea,width=Math.max(Math.min(800,area.width),Math.min(900,area.width-20)),height=Math.max(Math.min(640,area.height),Math.min(680,area.height-20));BrowserWindow.getAllWindows()[0].setBounds({x:area.x+Math.min(10,Math.floor((area.width-width)/2)),y:area.y+Math.min(10,Math.floor((area.height-height)/2)),width,height});return area});
   const b=await bounds();const pointer={x:b.x+b.width-5,y:b.y+b.height-5};
   await warpPointer(desktop,pointer);assert.equal(await page.evaluate(()=>window.desktop.startRoomResize('se')),true);
-  await warpPointer(desktop,{x:pointer.x+40,y:pointer.y+20});
-  await expect.poll(async()=>Math.abs((await bounds()).width-(b.width+40))).toBeLessThanOrEqual(1);await page.evaluate(()=>window.desktop.endRoomResize());
-  const dragged=await bounds();assert.ok(Math.abs(dragged.height-(b.height+20))<=1);
+  // Stay clear of the physical screen edge, which can reveal an auto-hidden
+  // macOS Dock and change the work area while the pointer probe is running.
+  const dx=Math.max(0,Math.min(40,area.x+area.width-pointer.x-8)),dy=Math.max(0,Math.min(20,area.y+area.height-pointer.y-8));
+  const expected={width:Math.min(b.width+dx,area.x+area.width-b.x),height:Math.min(b.height+dy,area.y+area.height-b.y)};
+  console.log('ROOM_RESIZE_ENVIRONMENT '+JSON.stringify({platform:process.platform,area,b,dx,dy,expected}));
+  await warpPointer(desktop,{x:pointer.x+dx,y:pointer.y+dy});
+  await expect.poll(async()=>Math.abs((await bounds()).width-expected.width)).toBeLessThanOrEqual(1);
+  await expect.poll(async()=>Math.abs((await bounds()).height-expected.height)).toBeLessThanOrEqual(1);await page.evaluate(()=>window.desktop.endRoomResize());
+  const dragged=await bounds();assert.ok(dragged.x+dragged.width<=area.x+area.width+1&&dragged.y+dragged.height<=area.y+area.height+1);
   const grip=page.getByRole('button',{name:'调整小屋右下角大小',exact:true});await grip.focus();await grip.press('ArrowLeft');
-  await expect.poll(async()=>Math.abs((await bounds()).width-(dragged.width-16))).toBeLessThanOrEqual(1);
+  await expect.poll(async()=>Math.abs((await bounds()).width-Math.max(Math.min(800,area.width),dragged.width-16))).toBeLessThanOrEqual(1);
   const custom=await bounds();await page.getByRole('button',{name:'全屏查看小屋',exact:true}).click();await expect(page.locator('.room-resize-edge')).toHaveCount(0);
   await page.getByRole('button',{name:'退出小屋全屏',exact:true}).click();await expect(page.locator('.room-resize-edge')).toHaveCount(8);assert.deepEqual(await bounds(),custom);
   await toDesktop(page);assert.equal((await bounds()).width,160);assert.equal(await page.evaluate(()=>window.desktop.adjustRoomSize(16,16)),false);
   await enterHome(page);assert.deepEqual(await bounds(),custom);
   const profile=await desktop.evaluate(({app})=>app.getPath('userData'));assert.deepEqual(JSON.parse(fs.readFileSync(path.join(profile,'window-state.json'))).normalBounds,custom);
-  await page.evaluate(()=>window.desktop.adjustRoomSize(-124,-60));
+  await page.evaluate(()=>window.desktop.adjustRoomSize(-200,-200));
   await page.screenshot({path:path.join(out,label+'-small-room.png')});
   for(const name of ['回到桌面','全屏查看小屋','进入摩尔庄园'])await expect(page.getByRole('button',{name,exact:true})).toBeInViewport();
   await roomTab(page,'背包');await verifyTabs(page.getByRole('region',{name:'拉姆用品背包',exact:true}));

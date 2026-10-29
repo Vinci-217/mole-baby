@@ -1,12 +1,19 @@
 const{execFileSync}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
-let macBinary;
+let macBinary,windowsBinary;
 /** Native cursor coordinates are essential: CDP mouse events alone do not move
  * the OS cursor used by desktop dragging. This helper is never packaged. */
 async function warpPointer(desktop,point){
  const p=process.platform==='win32'?await desktop.evaluate(({screen},p)=>screen.dipToScreenPoint(p),point):point;
  if(process.platform==='win32'){
-  const script=`Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class MouseWarp { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y); }'; [MouseWarp]::SetCursorPos(${Math.round(p.x)},${Math.round(p.y)}) | Out-Null`;
-  execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{stdio:'pipe',timeout:20000,windowsHide:true});
+  if(!windowsBinary){
+   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-pointer-')),source=path.join(dir,'warp.cs'),target=path.join(dir,'warp.exe');
+   const framework=path.join(process.env.WINDIR||'C:\\Windows','Microsoft.NET','Framework64','v4.0.30319','csc.exe');
+   fs.writeFileSync(source,'using System.Runtime.InteropServices; public class MouseWarp { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y); public static int Main(string[] a) { int x,y; if(a.Length!=2 || !int.TryParse(a[0],out x) || !int.TryParse(a[1],out y)) return 2; return SetCursorPos(x,y)?0:1; } }');
+   execFileSync(framework,['/nologo','/target:winexe','/out:'+target,source],{stdio:'pipe',timeout:60000,windowsHide:true});windowsBinary=target;
+  }
+  // Compile once; repeatedly starting PowerShell + C# compilation for every
+  // cursor sample was slow and intermittently timed out on hosted Windows.
+  execFileSync(windowsBinary,[String(Math.round(p.x)),String(Math.round(p.y))],{stdio:'pipe',timeout:10000,windowsHide:true});
  }else if(process.platform==='darwin'){
   if(!macBinary){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-pointer-'));macBinary=path.join(dir,'warp');const source=path.join(dir,'warp.c');fs.writeFileSync(source,'#include <ApplicationServices/ApplicationServices.h>\n#include <stdlib.h>\nint main(int n,char**v){if(n!=3)return 1;CGWarpMouseCursorPosition(CGPointMake(atof(v[1]),atof(v[2])));return 0;}');execFileSync('clang',[source,'-framework','ApplicationServices','-o',macBinary],{stdio:'pipe',timeout:30000});}
   execFileSync(macBinary,[String(p.x),String(p.y)],{stdio:'pipe'});

@@ -1,0 +1,21 @@
+{
+  "candidateVersion": "0.31.6",
+  "sourceSha": "96db0dd4baf605a0f94a95420b0d68de3e641830",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40907496629",
+  "published": false,
+  "latestPreserved": "v0.31.5",
+  "failures": {
+    "windows": {
+      "jobId": 123566147213,
+      "kind": "test-tool timeout",
+      "detail": "PowerShell Add-Type for pointer warping exceeded its 20 second timeout inside existing compact-care checks."
+    },
+    "mac-arm64": {
+      "jobId": 123566147151,
+      "kind": "fixed-height test assertion",
+      "detail": "New room test assumed drag always increases height by 20; native work area constrains the height."
+    }
+  },
+  "correction": "Compile the Windows cursor helper once and assert native room dimensions relative to the actual display work area, keeping all size/persistence/fullscreen/desktop checks. New v0.31.7 tag, no rewritten old tag.",
+  "applicationCodeAndAssetsUnchanged": true
+}
