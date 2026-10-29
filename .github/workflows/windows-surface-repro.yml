@@ -22,20 +22,24 @@ jobs:
           - edition: modern
             runner: windows-latest
             platform: windows
-            runtime: '35.7.5'
-            executable: release/win-unpacked/拉姆.exe
-          - edition: candidate
-            runner: windows-latest
-            platform: windows-candidate
             runtime: '37.10.3'
+            arch: x64
             executable: release/win-unpacked/拉姆.exe
           - edition: legacy
             runner: windows-2022
             platform: legacy-x64
+            legacy: true
+            arch: x64
             executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
+          - edition: legacy-ia32
+            runner: windows-2022
+            platform: legacy-ia32
+            legacy: true
+            arch: ia32
+            executable: release/legacy-ia32/win-ia32-unpacked/拉姆兼容版.exe
     env:
       ELECTRON_DEV: '0'
-      MOLE_LEGACY_ARCH: x64
+      MOLE_LEGACY_ARCH: ${{ matrix.arch }}
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -49,9 +53,10 @@ jobs:
           set -o pipefail
           mkdir -p artifacts
           npm ci 2>&1 | tee -a artifacts/surface.log
-          if [ '${{ matrix.edition }}' = legacy ]; then
+          npm test 2>&1 | tee -a artifacts/surface.log
+          if [ '${{ matrix.legacy }}' = true ]; then
             npm run build:legacy 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --x64 --publish never 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
           else
             npm run build 2>&1 | tee -a artifacts/surface.log
             npx --no-install electron-builder --win --dir --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
@@ -61,6 +66,11 @@ jobs:
         run: |
           set -o pipefail
           node scripts/windows-surface-repro.cjs '${{ matrix.executable }}' '${{ matrix.edition }}' 2>&1 | tee -a artifacts/surface.log
+      - name: Verify packaged interactions and window lifecycle
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/verify-preview-package.cjs '${{ matrix.executable }}' 2>&1 | tee -a artifacts/surface.log
       - name: Upload physical and renderer captures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -77,4 +87,55 @@ jobs:
           CI_DIAGNOSTIC_STATUS: ${{ job.status }}
           CI_DIAGNOSTIC_LOG: artifacts/surface.log
           CI_DIAGNOSTIC_MEDIA_DIR: artifacts/windows-surface-${{ matrix.edition }}
+        run: node scripts/save-ci-diagnostic.cjs
+  mac:
+    name: Native Mac regression ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+            directory: mac-arm64
+          - arch: x64
+            runner: macos-15-intel
+            directory: mac
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build and test native preview application
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/surface.log
+          npm test 2>&1 | tee -a artifacts/surface.log
+          npm run build 2>&1 | tee -a artifacts/surface.log
+          npx --no-install electron-builder --config electron-builder.mac.cjs --mac dir --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
+          node scripts/verify-preview-package.cjs 'release/${{ matrix.directory }}/拉姆.app/Contents/MacOS/拉姆' 2>&1 | tee -a artifacts/surface.log
+      - name: Upload native preview diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: preview-mac-${{ matrix.arch }}
+          path: |
+            artifacts/surface.log
+            artifacts/preview-mac-${{ matrix.arch }}.png
+          retention-days: 14
+      - name: Save native diagnostic over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: mac-${{ matrix.arch }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/surface.log
         run: node scripts/save-ci-diagnostic.cjs

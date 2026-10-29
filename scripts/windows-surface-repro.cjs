@@ -31,11 +31,16 @@ async function capture(desktop,page,out,name,{rendererSnapshot=true}={}){
   const {data,info}=await sharp(file).removeAlpha().raw().toBuffer({resolveWithObject:true});
   const background=await sharp(path.join(out,'background-desktop.png')).removeAlpha().raw().toBuffer();
   const maskKey=width+'x'+height;
-  if(rendererSnapshot||!rendererMasks.has(maskKey)){
+  if(rendererSnapshot||rendererMasks.size===0){
     const renderer=await page.screenshot({path:path.join(out,name+'-renderer.png'),omitBackground:true});
-    rendererMasks.set(maskKey,await sharp(renderer).resize(width,height).ensureAlpha().raw().toBuffer());
+    rendererMasks.set(maskKey,{data:await sharp(renderer).resize(width,height).ensureAlpha().raw().toBuffer(),width,height});
+  }else if(!rendererMasks.has(maskKey)){
+    // A growing native window is itself part of the regression. Do not let a
+    // new size trigger capturePage and repaint away the residue being observed.
+    const previous=rendererMasks.values().next().value;
+    rendererMasks.set(maskKey,{data:await sharp(previous.data,{raw:{width:previous.width,height:previous.height,channels:4}}).resize(width,height).raw().toBuffer(),width,height});
   }
-  const alpha=rendererMasks.get(maskKey);
+  const alpha=rendererMasks.get(maskKey).data;
   // This compares physical desktop pixels with renderer transparency. capturePage
   // alone cannot detect a native white strip or stale DWM surface outside the DOM.
   let longest=0,white=0,bodyRed=0;
@@ -69,9 +74,11 @@ async function main(){
   try{
     for(const scale of scales){
       console.log('START_SCALE '+scale);
+      rendererMasks.clear();
       desktop=await _electron.launch({executablePath:exe,args:[`--user-data-dir=${path.join(dir,'profile-'+scale)}`,...(scale===1?[]:[`--force-device-scale-factor=${scale}`])],env:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1',ELECTRON_DEV:'0'},timeout:30000});
       for(const stream of[desktop.process().stdout,desktop.process().stderr])stream?.on('data',c=>{processOutput=(processOutput+c.toString()).slice(-12000)});
       const page=await desktop.firstWindow();page.setDefaultTimeout(20000);await page.waitForFunction(()=>window.desktop?.isElectron);
+      console.log('SURFACE_ENVIRONMENT '+JSON.stringify({os:os.release(),...await desktop.evaluate(({app,screen})=>({runtime:process.versions.electron,displayScale:screen.getPrimaryDisplay().scaleFactor,gpuFeatures:app.getGPUFeatureStatus()}))}));
       await adopt(page,'红色','小红');
       const state=await page.evaluate(()=>{const entries=Object.fromEntries(Object.entries(localStorage)),p=JSON.parse(entries['ramu-house-save-v1']);p.growth=60;p.growthLocked=true;delete p.evolution;p.sleeping=false;p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};p.lastTick=Date.now();entries['ramu-house-save-v1']=JSON.stringify(p);entries['ramu-house-preferences-v2']=JSON.stringify({quiet:true,lively:false,presence:false,sound:false});return entries});
       await reloadWithStorage(page,state);await expect(page.getByTestId('desktop-character')).toBeVisible();

@@ -2,7 +2,7 @@
 
 | 系统 | 安装包后缀 | 便携包后缀 | 运行时 |
 | --- | --- | --- | --- |
-| Windows 10/11，64位 | `-Setup.exe` | `-x64.zip` | Electron 35 |
+| Windows 10/11，64位 | `-Setup.exe` | `-x64.zip` | Electron 37.10.3（当前修复预览） |
 | Windows 7 SP1 / 8 / 8.1，64位 | `-legacy-x64-Setup.exe` | `-legacy-x64.zip` | Electron 22.3.27 |
 | Windows 7 SP1 / 8 / 8.1，32位；32位Windows10 | `-legacy-ia32-Setup.exe` | `-legacy-ia32.zip` | Electron 22.3.27 |
 

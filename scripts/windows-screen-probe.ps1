@@ -28,6 +28,10 @@ public static class ScreenNative {
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr h,StringBuilder text,int count);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr h,StringBuilder text,int count);
   [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr h,int key,out int value,int bytes);
+  [DllImport("user32.dll")] static extern uint GetDpiForWindow(IntPtr h);
+  [DllImport("dwmapi.dll")] static extern int DwmIsCompositionEnabled(out bool enabled);
+  public static uint Dpi(long id) { try { return GetDpiForWindow(new IntPtr(id)); } catch(EntryPointNotFoundException) { return 0; } }
+  public static bool Compositing() { bool enabled; return DwmIsCompositionEnabled(out enabled)==0&&enabled; }
   public static void EnableDpi() { try { if(SetProcessDpiAwarenessContext(new IntPtr(-4))) return; } catch(EntryPointNotFoundException) {} SetProcessDPIAware(); }
   public static long[] Inspect(long id) {
     var h=new IntPtr(id); Rect r; Point p=new Point();
@@ -58,7 +62,7 @@ if ($Mode -eq 'Capture') {
   } finally { $graphics.Dispose(); $bitmap.Dispose() }
   $ids = @($OwnedIds.Split(',') | Where-Object { $_ } | ForEach-Object { [uint32]$_ })
   $window = @(); if ($Handle -ne 0) { $window = @([ScreenNative]::Inspect($Handle)) }
-  @{ screen=@($screen.X,$screen.Y,$screen.Width,$screen.Height); window=$window; foreground=[ScreenNative]::GetForegroundWindow().ToInt64().ToString(); extraWindows=@([ScreenNative]::Windows($ids,$Handle)) } | ConvertTo-Json -Depth 4 -Compress
+  @{ screen=@($screen.X,$screen.Y,$screen.Width,$screen.Height); window=$window; dpi=[ScreenNative]::Dpi($Handle); compositing=[ScreenNative]::Compositing(); foreground=[ScreenNative]::GetForegroundWindow().ToInt64().ToString(); extraWindows=@([ScreenNative]::Windows($ids,$Handle)) } | ConvertTo-Json -Depth 4 -Compress
   exit
 }
 Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -TypeDefinition @'

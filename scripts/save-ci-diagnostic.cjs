@@ -8,7 +8,7 @@ function saveDiagnostic({cwd=path.resolve(__dirname,'..'),env=process.env}={}){
  const receipt={sourceSha:sha,platform,status,runUrl:`${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,log:fs.existsSync(path.resolve(cwd,log))?fs.readFileSync(path.resolve(cwd,log),'utf8').slice(-64000):null,recordedAt:new Date().toISOString()};
  const media=[];
  if(env.CI_DIAGNOSTIC_MEDIA_DIR){
-  if(!/^artifacts\/windows-surface-(modern|candidate|legacy)$/.test(env.CI_DIAGNOSTIC_MEDIA_DIR))throw Error('Invalid diagnostic media directory');
+  if(!/^artifacts\/windows-surface-(modern|candidate|legacy(?:-ia32)?)$/.test(env.CI_DIAGNOSTIC_MEDIA_DIR))throw Error('Invalid diagnostic media directory');
   const directory=path.resolve(cwd,env.CI_DIAGNOSTIC_MEDIA_DIR);
   if(fs.existsSync(directory))for(const name of fs.readdirSync(directory).filter(n=>/^[a-z0-9.-]+\.png$/.test(n)).sort((a,b)=>fs.statSync(path.join(directory,b)).mtimeMs-fs.statSync(path.join(directory,a)).mtimeMs).slice(0,8)){
    const file=path.join(directory,name),stat=fs.lstatSync(file);if(!stat.isFile()||stat.size>2*1024*1024)throw Error('Invalid diagnostic image');

@@ -24,6 +24,9 @@ async function verifyApplication({executable,archive,screenshot}){
   assert.equal(metadata.version,version);console.log('PASS: complete original pet/outfit payload; retired AI and speech backends absent');
   profile=fs.mkdtempSync(path.join(os.tmpdir(),'mole-package-'));fs.writeFileSync(path.join(profile,'companion-ai-key.json'),'retired-test-key');
   desktop=await _electron.launch({executablePath:executable,args:[`--user-data-dir=${profile}`],env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},cwd:root,timeout:30000});
+  const runtime=await desktop.evaluate(()=>({electron:process.versions.electron,node:process.versions.node,chrome:process.versions.chrome,platform:process.platform,arch:process.arch}));
+  assert.ok(require('semver').satisfies(runtime.electron,metadata.windowsEdition==='legacy'?require('../electron/windows-runtime.cjs').LEGACY_ELECTRON_VERSION:require('../package.json').devDependencies.electron),'Packaged application must run its declared modern or legacy Electron');
+  console.log('PASS packaged runtime '+JSON.stringify(runtime));
   child=desktop.process();for(const stream of[child.stdout,child.stderr])stream?.on('data',chunk=>{mainOutput=(mainOutput+chunk.toString()).slice(-20000)});
   page=await desktop.firstWindow({timeout:30000});page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
   await page.waitForLoadState('domcontentloaded');await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});await verifyRendererPolicy(page);

@@ -19,7 +19,7 @@ import type {PocketCategory} from './CarePocket';
 
 export type CompanionPanel = 'status' | 'food' | 'play';
 interface Props {
-  moodLabel:string;moodBusy:boolean;onMood:()=>void; pocketContent:ReactNode;statusContent:ReactNode;
+  moodLabel:string;moodBusy:boolean;interactionReason:string|null;onMood:()=>void; pocketContent:ReactNode;statusContent:ReactNode;
   onUploadedPlay:(id:string)=>void;onStopUploaded:()=>void;uploadedPlaying:boolean;courseCompletion:string;onElementSkill:(id:string)=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
@@ -178,7 +178,7 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
         <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
-      </div><UploadedActionMenu pet={p.pet} busy={p.moodBusy} onPlay={p.onUploadedPlay} onStop={p.onStopUploaded} playing={p.uploadedPlaying}/>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
+      </div><UploadedActionMenu pet={p.pet} busy={p.moodBusy} busyReason={p.interactionReason} onPlay={p.onUploadedPlay} onStop={p.onStopUploaded} playing={p.uploadedPlaying} onStatus={()=>show('status')}/>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
     </section>}
 
   </div>;

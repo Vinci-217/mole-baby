@@ -313,7 +313,15 @@ function walkAlongDesktop() {
  * remains reachable without asking the OS to put a window above its bounds. */
 function placePetAt(target){
   const previous=currentPetBounds();if(!companionPanel&&previous.x===Math.round(target.x)&&previous.y===Math.round(target.y))return;
-  changingMode=true;mainWindow.setPosition(Math.round(target.x),Math.round(target.y),false);changingMode=false;
+  changingMode=true;
+  const x=Math.round(target.x),y=Math.round(target.y);
+  // setPosition reads the current native rectangle back before moving. On
+  // fractional Windows DPI that enclosing rectangle rounds outwards, so every
+  // drag/walking frame can enlarge a fixed transparent window by another pixel.
+  // Keep the intended logical size instead of feeding rounded OS sizes back in.
+  if(process.platform==='win32')mainWindow.setBounds({...PET_SIZE,x,y},false);
+  else mainWindow.setPosition(x,y,false);
+  changingMode=false;
   const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
   petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
 }

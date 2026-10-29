@@ -3,3 +3,4 @@
 @media(max-width:600px){.uploaded-actions-menu>div{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 .ram-sprite.ram-daily{overflow:visible;animation:none!important;transform:none!important}
+.uploaded-actions-menu .play-block-reason{padding:9px 11px;border-radius:9px;background:#fff1d5;color:#805f36}.play-block-reason>button{display:block;margin-top:5px;padding:2px 0;color:#8a6028;text-decoration:underline;font-size:inherit}

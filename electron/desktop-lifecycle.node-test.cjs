@@ -51,7 +51,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
       this.bounds = { ...bounds };if(options.clamp){this.bounds.x=Math.max(0,this.bounds.x);this.bounds.y=Math.max(0,this.bounds.y);}
       if(options.delayedMove&&bounds.width>160)setImmediate(()=>{this.bounds.x+=11;this.bounds.y+=7;this.emit('move')});
     }
-    setPosition(x, y) { this.bounds.x = options.clamp?Math.max(0,x):x; this.bounds.y = options.clamp?Math.max(0,y):y; }
+    setPosition(x, y) { this.bounds.x = options.clamp?Math.max(0,x):x; this.bounds.y = options.clamp?Math.max(0,y):y; if(options.positionSizeDrift){this.bounds.width+=options.positionSizeDrift;this.bounds.height+=options.positionSizeDrift} }
     setAlwaysOnTop(value) { this.top = value; }
     setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
     setTitle(value) { this.title = value; }
@@ -399,6 +399,18 @@ test('autonomous movement is larger in both axes but stays around the manually p
  t.mock.timers.enable({apis:['setTimeout','setInterval','Date'],now:1_800_000_000_000});
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-edge-hiding',false);run.invoke('desktop:move-pet',-500,-350);run.invoke('desktop:wander',true);const home=run.window.getBounds(),ys=new Set();
  for(let n=0;n<30;n++){t.mock.timers.tick(20000);t.mock.timers.tick(2500);const p=run.window.getBounds();assert.ok(Math.abs(p.x-home.x)<=150&&Math.abs(p.y-home.y)<=100);ys.add(p.y);}assert.ok(ys.size>2);
+});
+test('Windows movement never accumulates the outward-rounded native size after a room return',async t=>{
+ const run=await launch(undefined,false,'win32',{positionSizeDrift:1});t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:set-edge-hiding',false);run.invoke('desktop:wander',false);
+ run.invoke('desktop:set-pet-mode',false);run.invoke('desktop:set-pet-mode',true);
+ const start=run.window.getBounds();
+ for(let n=0;n<120;n++){
+  run.invoke('desktop:move-pet',n%2?3:-3,n%3?2:-4);
+  const bounds=run.window.getBounds();
+  assert.equal(bounds.width,160,'moving must preserve the intended logical width');assert.equal(bounds.height,240,'moving must preserve the intended logical height');
+ }
+ assert.equal(run.window.getBounds().x,start.x);assert.equal(run.window.getBounds().y,start.y);
 });
 test('opening and closing a small pocket repeatedly preserves every pet placement',async t=>{
  const run=await launch();t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
