@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-29",
+  "scope": "Research only; update behavior and releases unchanged",
+  "stableVersion": "0.31.3",
+  "inspectedPreviewCommit": "c005b353583cb423ee6cb79537310ddc2e86e08b",
+  "dependencies": {
+    "electron-updater": "6.8.11",
+    "electron-builder": "26.15.3"
+  },
+  "currentDifferentialDownloadDisabled": true,
+  "publishedBlockmapsInStableRelease": 0,
+  "productionDownloads": [
+    {"name": "mole-baby-0.31.3-Setup.exe", "bytes": 627862939},
+    {"name": "mole-baby-0.31.3-mac-arm64.dmg", "bytes": 653678562},
+    {"name": "mole-baby-0.31.3-mac-x64.dmg", "bytes": 659630150}
+  ],
+  "macArm64PublishedTrustReceipt": {
+    "mode": "local",
+    "developerIdSigned": false,
+    "stapled": false,
+    "gatekeeperAccepted": false
+  },
+  "networkProbes": [
+    {
+      "url": "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.3/mole-baby-0.31.3-Setup.exe",
+      "range": "bytes=0-1023",
+      "status": 206,
+      "contentRange": "bytes 0-1023/627862939",
+      "acceptRanges": "bytes",
+      "receivedBodyBytes": 1024
+    },
+    {
+      "url": "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.3/mole-baby-0.31.3-mac-arm64.dmg",
+      "range": "bytes=0-1023",
+      "status": 206,
+      "contentRange": "bytes 0-1023/653678562",
+      "acceptRanges": "bytes",
+      "receivedBodyBytes": 1024
+    },
+    {
+      "url": "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.3/mole-baby-0.31.3-Setup.exe",
+      "range": "bytes=1024-1535,2048-2559",
+      "status": 501,
+      "limitation": "Observed through this cloud environment network; does not identify whether the origin, CDN or intermediary rejected multiple ranges"
+    }
+  ],
+  "assetSourceComparison": {
+    "command": "git ls-tree -r -l -z <ref> -- public/assets; compare paths, blob object IDs and sizes",
+    "from": "v0.31.2",
+    "to": "v0.31.3",
+    "newAssetCount": 2646,
+    "totalNewSourceBytes": 608772220,
+    "changedOrNewAssetCount": 0,
+    "changedOrNewSourceBytes": 0,
+    "limitation": "Source assets only; not a binary installer delta measurement"
+  },
+  "localProductionBuild": {
+    "distBytes": 567403252,
+    "assetBytes": 566787642,
+    "uploadedActionBytes": 357076544,
+    "dailyFrameBytes": 106845041,
+    "limitation": "Current local optimized build, not extracted from the published installer"
+  },
+  "notYetValidated": [
+    "Actual product differential bytes or percentage saved",
+    "Differential reconstruction of two production installers or DMGs",
+    "Installation or application replacement using a differential product download",
+    "User-network Range or CDN compatibility outside this cloud environment"
+  ]
+}
