@@ -1,0 +1,71 @@
+name: Windows surface reproduction
+on:
+  push:
+    branches: ['preview/windows-surface-play']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-surface-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  surface:
+    name: Physical desktop ${{ matrix.edition }}
+    runs-on: windows-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: modern
+            platform: windows
+            executable: release/win-unpacked/拉姆.exe
+          - edition: legacy
+            platform: legacy-x64
+            executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
+    env:
+      ELECTRON_DEV: '0'
+      MOLE_LEGACY_ARCH: x64
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install and build reproduction package
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/surface.log
+          if [ '${{ matrix.edition }}' = legacy ]; then
+            npm run build:legacy 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win --dir --x64 --publish never 2>&1 | tee -a artifacts/surface.log
+          else
+            npm run build 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --win --dir --x64 --publish never 2>&1 | tee -a artifacts/surface.log
+          fi
+      - name: Reproduce on physical desktop over time
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/windows-surface-repro.cjs '${{ matrix.executable }}' '${{ matrix.edition }}' 2>&1 | tee -a artifacts/surface.log
+      - name: Upload physical and renderer captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-surface-${{ matrix.edition }}
+          path: |
+            artifacts/windows-surface-${{ matrix.edition }}/
+            artifacts/surface.log
+          retention-days: 14
+      - name: Save diagnostic over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: ${{ matrix.platform }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/surface.log
+        run: node scripts/save-ci-diagnostic.cjs
