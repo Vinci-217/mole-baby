@@ -1,0 +1,245 @@
+{
+  "version": "0.31.7",
+  "sourceSha": "e996c47ab73869bad9e296da3da72a8ad875b3f6",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117",
+  "platforms": {
+    "windows": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117/job/123576716277",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "roomPocketChecksPassed": true,
+      "roomResizeEnvironment": {
+        "platform": "win32",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 720
+        },
+        "b": {
+          "x": 10,
+          "y": 10,
+          "width": 900,
+          "height": 680
+        },
+        "dx": 40,
+        "dy": 20,
+        "expected": {
+          "width": 940,
+          "height": 700
+        }
+      },
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ],
+      "isolatedUpdateFixture": {
+        "platform": "win32",
+        "arch": "x64",
+        "edition": "modern",
+        "runtime": "37.10.3",
+        "fullProductPayload": false,
+        "fixtureVersions": [
+          "1.0.0",
+          "1.0.1"
+        ],
+        "fullPackageBytes": 87099251,
+        "packageBytesTransferred": 921350,
+        "blockmapBytesTransferred": 182680,
+        "totalUpdateBytesTransferred": 1104370,
+        "savedPercent": 98.73,
+        "rangeRequests": 7,
+        "mode": "differential",
+        "installedVersion": "1.0.1",
+        "savePreserved": true,
+        "applicationRelaunched": true,
+        "limitation": "Two isolated installers contain the current product payload with a test main process and a version change; production release-to-release savings will vary"
+      }
+    },
+    "legacy-x64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117/job/123576716561",
+      "runtime": {
+        "electron": "22.3.27",
+        "node": "16.17.1",
+        "chrome": "108.0.5359.215",
+        "platform": "win32",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "roomPocketChecksPassed": true,
+      "roomResizeEnvironment": {
+        "platform": "win32",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 728
+        },
+        "b": {
+          "x": 10,
+          "y": 10,
+          "width": 900,
+          "height": 680
+        },
+        "dx": 40,
+        "dy": 20,
+        "expected": {
+          "width": 940,
+          "height": 700
+        }
+      },
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ]
+    },
+    "legacy-ia32": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117/job/123576716663",
+      "runtime": {
+        "electron": "22.3.27",
+        "node": "16.17.1",
+        "chrome": "108.0.5359.215",
+        "platform": "win32",
+        "arch": "ia32"
+      },
+      "applicationPassed": true,
+      "roomPocketChecksPassed": true,
+      "roomResizeEnvironment": {
+        "platform": "win32",
+        "area": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 728
+        },
+        "b": {
+          "x": 10,
+          "y": 10,
+          "width": 900,
+          "height": 680
+        },
+        "dx": 40,
+        "dy": 20,
+        "expected": {
+          "width": 940,
+          "height": 700
+        }
+      },
+      "renderingChecks": [
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        },
+        {
+          "softwareRequested": true,
+          "softwareRasterizerDisabled": false,
+          "compositing": "disabled_software"
+        }
+      ]
+    },
+    "mac-arm64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117/job/123576716668",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "applicationPassed": true,
+      "roomPocketChecksPassed": true,
+      "roomResizeEnvironment": {
+        "platform": "darwin",
+        "area": {
+          "x": 0,
+          "y": 25,
+          "width": 1024,
+          "height": 681
+        },
+        "b": {
+          "x": 10,
+          "y": 35,
+          "width": 900,
+          "height": 661
+        },
+        "dx": 40,
+        "dy": 7,
+        "expected": {
+          "width": 940,
+          "height": 668
+        }
+      },
+      "liveUpdateCheck": {
+        "publicVersionAtTest": "0.31.5",
+        "arch": "arm64",
+        "eightSecondStartup": true,
+        "downloadedAndVerifiedDMG": true,
+        "mountedWithoutReplacingApplication": true
+      }
+    },
+    "mac-x64": {
+      "jobUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40910460117/job/123576716707",
+      "runtime": {
+        "electron": "37.10.3",
+        "node": "22.21.1",
+        "chrome": "138.0.7204.251",
+        "platform": "darwin",
+        "arch": "x64"
+      },
+      "applicationPassed": true,
+      "roomPocketChecksPassed": true,
+      "roomResizeEnvironment": {
+        "platform": "darwin",
+        "area": {
+          "x": 0,
+          "y": 25,
+          "width": 1920,
+          "height": 970
+        },
+        "b": {
+          "x": 10,
+          "y": 35,
+          "width": 900,
+          "height": 680
+        },
+        "dx": 40,
+        "dy": 20,
+        "expected": {
+          "width": 940,
+          "height": 700
+        }
+      },
+      "liveUpdateCheck": {
+        "publicVersionAtTest": "0.31.5",
+        "arch": "x64",
+        "eightSecondStartup": true,
+        "downloadedAndVerifiedDMG": true,
+        "mountedWithoutReplacingApplication": true
+      }
+    }
+  },
+  "scope": "Successful final package logs: real cursor/keyboard room resize, saved/fullscreen/desktop restore, all four inventory categories, square slots and compact fit on each native platform. Windows savings describe an isolated installer fixture, not a full public-release transfer; native Mac tests mount the then-public DMG without replacing an app."
+}

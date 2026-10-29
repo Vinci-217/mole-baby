@@ -1,0 +1,59 @@
+{
+  "from": "0.31.5",
+  "to": "0.31.7",
+  "sourceSha": "e996c47ab73869bad9e296da3da72a8ad875b3f6",
+  "publicBlockmapsSha256Verified": 10,
+  "plans": [
+    {
+      "mode": "differential",
+      "reason": null,
+      "downloadBytes": 96976053,
+      "requests": 6,
+      "fullSize": 635745304,
+      "reusedBytes": 538769251,
+      "target": "mole-baby-0.31.7-Setup.exe",
+      "expectedPackageTransferBytes": 96976053
+    },
+    {
+      "mode": "differential",
+      "reason": null,
+      "downloadBytes": 96970837,
+      "requests": 6,
+      "fullSize": 614676679,
+      "reusedBytes": 517705842,
+      "target": "mole-baby-0.31.7-legacy-x64-Setup.exe",
+      "expectedPackageTransferBytes": 96970837
+    },
+    {
+      "mode": "differential",
+      "reason": null,
+      "downloadBytes": 96955229,
+      "requests": 6,
+      "fullSize": 611044534,
+      "reusedBytes": 514089305,
+      "target": "mole-baby-0.31.7-legacy-ia32-Setup.exe",
+      "expectedPackageTransferBytes": 96955229
+    },
+    {
+      "mode": "differential",
+      "reason": null,
+      "downloadBytes": 184404437,
+      "requests": 80,
+      "fullSize": 656048748,
+      "reusedBytes": 471644311,
+      "target": "mole-baby-0.31.7-mac-arm64.dmg",
+      "expectedPackageTransferBytes": 184404437
+    },
+    {
+      "mode": "differential",
+      "reason": null,
+      "downloadBytes": 187334618,
+      "requests": 79,
+      "fullSize": 662475675,
+      "reusedBytes": 475141057,
+      "target": "mole-baby-0.31.7-mac-x64.dmg",
+      "expectedPackageTransferBytes": 187334618
+    }
+  ],
+  "scope": "Plans from actual published, checksum-verified old/new installer indexes for all three Windows channels and two local-signature Mac DMGs. Estimates, not measured package transfers or installation; cache availability and network can still cause full fallback."
+}

@@ -1,6 +1,6 @@
 {
   "version": "0.31.7",
-  "recordedAt": "2026-10-29T16:19:35.120116+00:00",
+  "recordedAt": "2026-10-29T16:27:37.535174+00:00",
   "baseSha": "42f5f863943a9ddf9d8603674ab47fa86a7c1190",
   "checks": {
     "automatedTests": {
@@ -17,7 +17,7 @@
       "host": "linux",
       "electron": "37.10.3",
       "exitCode": 0,
-      "sourceVersion": "0.31.6",
+      "sourceVersion": "0.31.7",
       "applicationCodeIdentical": true
     },
     "roomPocketRegression": {
@@ -46,5 +46,5 @@
     "docs/previews/v317/small-room.png": "7b9e499f06c8c4bc9540a7847903e0bfbbc5394d043176550bb8efe0b7d1f2f0",
     "docs/previews/v317/desktop-pocket.png": "65dfef316517a4333389a17c10e735db6b726f2529497cb3ed4c37edb7ea1485"
   },
-  "scope": "Exact v0.31.7 unit/build and native room/pocket checks; full Linux application regression initially ran v0.31.6 with identical application code/assets. v0.31.7 full/native platform checks run independently before release."
+  "scope": "Exact v0.31.7 unit/build, full Linux native application regression and room/pocket checks. Final Windows/Mac packages are independently gated by the release workflow."
 }

@@ -8,7 +8,7 @@
 
 小屋允许拖动窗口四边和四角调整大小，也可聚焦边缘后用方向键调整；记住小屋尺寸，全屏或桌面切换后恢复。桌面拉姆继续保持小窗口。背包改为「食物、饮品、清洁、药水」横排分类，保留紧凑的 4×4 正方格和单击使用。
 
-[小屋缩放与背包截图](docs/ROOM-RESIZE-AND-POCKET.md)。本轮通过正式五平台成品验收后发布安装包与更新清单。
+[小屋缩放与背包截图](docs/ROOM-RESIZE-AND-POCKET.md)。已完成正式五平台验收并发布。[下载与安装](https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.7) · [发布与跨版本计划验证](research/release-0.31.7-validation.md)。
 
 ## v0.31.5 · Windows 黑色背景兼容修复
 
