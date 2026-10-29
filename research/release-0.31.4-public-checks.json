@@ -1,0 +1,224 @@
+{
+  "version": "0.31.4",
+  "sourceSha": "5e3d8b1207811e0b0b3406ccf692ddb1174b6ab7",
+  "latest": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.4",
+  "recordedAt": "2026-10-29T09:54:50.950449+00:00",
+  "checkedResponseBodies": 12,
+  "checkedChecksumEntries": 22,
+  "expectedReleaseAssets": 25,
+  "downloads": [
+    {
+      "name": "mole-baby-0.31.4-Setup.exe",
+      "status": 200,
+      "size": 635742706,
+      "matchesMetadataSize": true,
+      "sha256": "591f4888e5a5ba6f3fcd90f343708d28a362fc6fbe2a03252af3ae7ca267d872"
+    },
+    {
+      "name": "mole-baby-0.31.4-x64.zip",
+      "status": 200,
+      "size": 671836995,
+      "matchesMetadataSize": null,
+      "sha256": "e170e27671ee7ec30f42245298637f582f427fcd7b636ab8a15fe2ed3c07fb19"
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-x64-Setup.exe",
+      "status": 200,
+      "size": 614672335,
+      "matchesMetadataSize": true,
+      "sha256": "4d100f82bf06d41d1cd422e02427897ee99009cc9d25907fc61dbc7e80f7db51"
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-x64.zip",
+      "status": 200,
+      "size": 639931347,
+      "matchesMetadataSize": null,
+      "sha256": "925f9c431195bdc96d2294ee4e5f31e839cc33d3c6d05b6a0c045324f50fa246"
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-ia32-Setup.exe",
+      "status": 200,
+      "size": 611040142,
+      "matchesMetadataSize": true,
+      "sha256": "75283bc05f7b59c5e1d91df78205c9d2091c67cb75b721fa123c52664d1f2bb0"
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-ia32.zip",
+      "status": 200,
+      "size": 634414559,
+      "matchesMetadataSize": null,
+      "sha256": "da0b006a7822837a34d41640b67ac6037e51a254dc998fee668e4b9b87e25fc1"
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-arm64.zip",
+      "status": 200,
+      "size": 650632062,
+      "matchesMetadataSize": true,
+      "sha256": "0415bdac29090bfc8587e9c9cdf7353a598e5f7b017c8639d446475c6ef9bdd2"
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-arm64.dmg",
+      "status": 200,
+      "size": 655980231,
+      "matchesMetadataSize": true,
+      "sha256": "fee1d252fb8b8e2b20af0feef603d35860fefa76e8ea1863225adf3e0fea8ca3"
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-x64.zip",
+      "status": 200,
+      "size": 657019256,
+      "matchesMetadataSize": true,
+      "sha256": "807c50b1e92d6c686ddc8230633c23599c96cf5f2fbfad190035cd8b14b989da"
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-x64.dmg",
+      "status": 200,
+      "size": 662466609,
+      "matchesMetadataSize": true,
+      "sha256": "875e177201eb669f9901e59285747b7aa12f1ba36c9b68543464fb49594148c1"
+    }
+  ],
+  "indices": [
+    {
+      "name": "mole-baby-0.31.4-Setup.exe.blockmap",
+      "sha256": "ce6de9e02ea42e5cb993639207e46d3b1a38e4d0b4e19f80bb3fd5d57569eb73",
+      "bytes": 662329,
+      "indexedBytes": 635742706,
+      "blocks": 30441
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-x64-Setup.exe.blockmap",
+      "sha256": "85bd1dae457d2b9d661aa9ffe23c1f437b5ac93e5c3c671d637accfc41cd0fa3",
+      "bytes": 640733,
+      "indexedBytes": 614672335,
+      "blocks": 29471
+    },
+    {
+      "name": "mole-baby-0.31.4-legacy-ia32-Setup.exe.blockmap",
+      "sha256": "1d2a977e31816ab792d67bd02f0d9e5f8cab7f7f3cbf5946bcd81037906a2927",
+      "bytes": 636674,
+      "indexedBytes": 611040142,
+      "blocks": 29263
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-arm64.zip.blockmap",
+      "sha256": "d08cd9bf2c2a41c72333e7e541bea8ea27e3c57899b83dc059e99bb1dae6f628",
+      "bytes": 680643,
+      "indexedBytes": 650632062,
+      "blocks": 31208
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-arm64.dmg.blockmap",
+      "sha256": "efd9f39efe6b8bb58b50034cc4062dd3d054b62d92fa18896d929b7ded2ce8f7",
+      "bytes": 683487,
+      "indexedBytes": 655980231,
+      "blocks": 31370
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-x64.zip.blockmap",
+      "sha256": "a3432fb024e80b9e7977584419e8c1cbdf39829dc8cfd45d19da67f17e50c5d0",
+      "bytes": 687017,
+      "indexedBytes": 657019256,
+      "blocks": 31537
+    },
+    {
+      "name": "mole-baby-0.31.4-mac-x64.dmg.blockmap",
+      "sha256": "e95b45bb5e2b4b07c80d6e7a5db7d21f54fc3ffca452ee21e5be822dfb3e68f2",
+      "bytes": 688224,
+      "indexedBytes": 662466609,
+      "blocks": 31634
+    }
+  ],
+  "metadata": {
+    "latest.yml": {
+      "version": "0.31.4",
+      "files": [
+        {
+          "url": "mole-baby-0.31.4-Setup.exe",
+          "sha512": "1J12TA7EO6BZD5rshAOcD0N/SQcoRzqYg4MjE5LUN50zOuAVDbR3zIua03qSJZ/5NA628khy6yiH+UxIlLwU7Q==",
+          "size": 635742706
+        }
+      ],
+      "path": "mole-baby-0.31.4-Setup.exe",
+      "sha512": "1J12TA7EO6BZD5rshAOcD0N/SQcoRzqYg4MjE5LUN50zOuAVDbR3zIua03qSJZ/5NA628khy6yiH+UxIlLwU7Q==",
+      "releaseDate": "2026-10-29T09:30:44.300Z"
+    },
+    "legacy-x64.yml": {
+      "version": "0.31.4",
+      "files": [
+        {
+          "url": "mole-baby-0.31.4-legacy-x64-Setup.exe",
+          "sha512": "Wu2AxK5Ot8TOKJB5L5NSdIFSDLevz3+eyjsrwKpKEskhh37JqnFJVcPaoTESfBlyHjUjmN/jBk2k8g4zFrKZZg==",
+          "size": 614672335
+        }
+      ],
+      "path": "mole-baby-0.31.4-legacy-x64-Setup.exe",
+      "sha512": "Wu2AxK5Ot8TOKJB5L5NSdIFSDLevz3+eyjsrwKpKEskhh37JqnFJVcPaoTESfBlyHjUjmN/jBk2k8g4zFrKZZg==",
+      "releaseDate": "2026-10-29T09:30:35.622Z"
+    },
+    "legacy-ia32.yml": {
+      "version": "0.31.4",
+      "files": [
+        {
+          "url": "mole-baby-0.31.4-legacy-ia32-Setup.exe",
+          "sha512": "JRUe3xpBxB6OYSF9siKOADCF2LA5mAw8h6+YlVf8UQJ8FR8P5MHnSW1IHkrEDZDjm4OuL6S2oFMO4EGCrwWMOA==",
+          "size": 611040142
+        }
+      ],
+      "path": "mole-baby-0.31.4-legacy-ia32-Setup.exe",
+      "sha512": "JRUe3xpBxB6OYSF9siKOADCF2LA5mAw8h6+YlVf8UQJ8FR8P5MHnSW1IHkrEDZDjm4OuL6S2oFMO4EGCrwWMOA==",
+      "releaseDate": "2026-10-29T09:30:26.153Z"
+    },
+    "latest-mac.yml": {
+      "version": "0.31.4",
+      "files": [
+        {
+          "url": "mole-baby-0.31.4-mac-arm64.zip",
+          "sha512": "SW/M+saPY5d4zs7kI1esxPGlrLvf2qr9gdaGYkn9ZyMen4P9HmVQFGFMXhd9jjMBkuzqGq+/9c/YhqXadAa0Pw==",
+          "size": 650632062
+        },
+        {
+          "url": "mole-baby-0.31.4-mac-arm64.dmg",
+          "sha512": "jBtm6vSGOiAFuvP3AKitKUhiv5hEd5ZH/TL6U6lZWvM0vDj3awmE0vgABHdNW1MutnHsPNqiB7AUUkAL18akbQ==",
+          "size": 655980231
+        },
+        {
+          "url": "mole-baby-0.31.4-mac-x64.zip",
+          "sha512": "4NocFsIGdqNslUGMYuYd7s/Vy1X6A4aiNl2G+jOfhZZh68oHmErD4Zx3dwWRwIQPOYjYXjA5qJrRywIAu1jLKg==",
+          "size": 657019256
+        },
+        {
+          "url": "mole-baby-0.31.4-mac-x64.dmg",
+          "sha512": "XwpvgANgS1mwymk5T7RobrZdXgr3/xHFJOVT4nBas0dapZcSHCztMTG5whPrNrt3+abo3PZ3e9E0DyVEdQbbcw==",
+          "size": 662466609
+        }
+      ],
+      "path": "mole-baby-0.31.4-mac-x64.zip",
+      "sha512": "4NocFsIGdqNslUGMYuYd7s/Vy1X6A4aiNl2G+jOfhZZh68oHmErD4Zx3dwWRwIQPOYjYXjA5qJrRywIAu1jLKg==",
+      "releaseDate": "2026-10-29 09:35:49.861000+00:00"
+    }
+  },
+  "macTrust": [
+    {
+      "architecture": "arm64",
+      "sourceSha": "5e3d8b1207811e0b0b3406ccf692ddb1174b6ab7",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    },
+    {
+      "architecture": "x64",
+      "sourceSha": "5e3d8b1207811e0b0b3406ccf692ddb1174b6ab7",
+      "mode": "local",
+      "developerIdSigned": false,
+      "stapled": false,
+      "gatekeeperAccepted": false
+    }
+  ],
+  "userGuidePresent": true,
+  "scope": "Ten public package links verified by HEAD and metadata size; twelve metadata/index/help response bodies checked against SHA256SUMS. Full package hashes are validated by the build workflow, and will be cross-checked against its receipt. No claim of independently redownloading every full installer.",
+  "checkedAgainstBuildReceipt": true,
+  "packageHashesMatchBuildReceipt": 10,
+  "buildRunUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/40849530318"
+}

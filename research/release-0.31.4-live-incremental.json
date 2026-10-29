@@ -1,0 +1,3077 @@
+{
+  "version": "0.31.4",
+  "updaterImplementationVersion": "0.31.4",
+  "sourceSha": "5e3d8b1207811e0b0b3406ccf692ddb1174b6ab7",
+  "runtime": "37.10.3",
+  "hostPlatform": "linux",
+  "downloadPlatform": "darwin",
+  "arch": "arm64",
+  "baselineVersion": "0.31.3",
+  "baselineSha256": "76c85f6bdccacd97313ad3363571cb2ba66afe45da3d528ba5cdab4b39d7987c",
+  "downloadedSha256": "fee1d252fb8b8e2b20af0feef603d35860fefa76e8ea1863225adf3e0fea8ca3",
+  "fullPackageBytes": 655980231,
+  "packageBytesTransferred": 187766578,
+  "reusedBytes": 468213653,
+  "rangeRequests": 378,
+  "mode": "differential",
+  "requests": [
+    {
+      "path": "/Vinci-217/mole-baby/releases/latest",
+      "method": "HEAD",
+      "range": null,
+      "status": 200,
+      "contentLength": 0,
+      "contentRange": null
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/latest/download/latest-mac.yml",
+      "method": "GET",
+      "range": null,
+      "status": 200,
+      "contentLength": 833,
+      "contentRange": null
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/SHA256SUMS.txt",
+      "method": "GET",
+      "range": null,
+      "status": 200,
+      "contentLength": 2134,
+      "contentRange": null
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg.blockmap",
+      "method": "GET",
+      "range": null,
+      "status": 200,
+      "contentLength": 683487,
+      "contentRange": null
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=0-215090",
+      "status": 206,
+      "contentLength": 215091,
+      "contentRange": "bytes 0-215090/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=553506-944692",
+      "status": 206,
+      "contentLength": 391187,
+      "contentRange": "bytes 553506-944692/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=953407-1972821",
+      "status": 206,
+      "contentLength": 1019415,
+      "contentRange": "bytes 953407-1972821/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=1982423-2316791",
+      "status": 206,
+      "contentLength": 334369,
+      "contentRange": "bytes 1982423-2316791/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=5444350-5850640",
+      "status": 206,
+      "contentLength": 406291,
+      "contentRange": "bytes 5444350-5850640/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=5861348-6684944",
+      "status": 206,
+      "contentLength": 823597,
+      "contentRange": "bytes 5861348-6684944/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=6693886-7543050",
+      "status": 206,
+      "contentLength": 849165,
+      "contentRange": "bytes 6693886-7543050/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=24315977-24565389",
+      "status": 206,
+      "contentLength": 249413,
+      "contentRange": "bytes 24315977-24565389/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=24574317-25079496",
+      "status": 206,
+      "contentLength": 505180,
+      "contentRange": "bytes 24574317-25079496/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=25088744-26730770",
+      "status": 206,
+      "contentLength": 1642027,
+      "contentRange": "bytes 25088744-26730770/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=29798964-30875234",
+      "status": 206,
+      "contentLength": 1076271,
+      "contentRange": "bytes 29798964-30875234/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=31873040-32750355",
+      "status": 206,
+      "contentLength": 877316,
+      "contentRange": "bytes 31873040-32750355/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=69429864-70342333",
+      "status": 206,
+      "contentLength": 912470,
+      "contentRange": "bytes 69429864-70342333/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=72420735-74445964",
+      "status": 206,
+      "contentLength": 2025230,
+      "contentRange": "bytes 72420735-74445964/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=77560658-79613231",
+      "status": 206,
+      "contentLength": 2052574,
+      "contentRange": "bytes 77560658-79613231/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=86913832-88242944",
+      "status": 206,
+      "contentLength": 1329113,
+      "contentRange": "bytes 86913832-88242944/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=88251729-88391160",
+      "status": 206,
+      "contentLength": 139432,
+      "contentRange": "bytes 88251729-88391160/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=88400700-88423382",
+      "status": 206,
+      "contentLength": 22683,
+      "contentRange": "bytes 88400700-88423382/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=88433487-88628373",
+      "status": 206,
+      "contentLength": 194887,
+      "contentRange": "bytes 88433487-88628373/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=98054200-98796646",
+      "status": 206,
+      "contentLength": 742447,
+      "contentRange": "bytes 98054200-98796646/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=98804889-99452504",
+      "status": 206,
+      "contentLength": 647616,
+      "contentRange": "bytes 98804889-99452504/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=99465085-99642208",
+      "status": 206,
+      "contentLength": 177124,
+      "contentRange": "bytes 99465085-99642208/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=148895777-149307860",
+      "status": 206,
+      "contentLength": 412084,
+      "contentRange": "bytes 148895777-149307860/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=149319325-149602585",
+      "status": 206,
+      "contentLength": 283261,
+      "contentRange": "bytes 149319325-149602585/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=149611897-149816665",
+      "status": 206,
+      "contentLength": 204769,
+      "contentRange": "bytes 149611897-149816665/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=149827900-149958224",
+      "status": 206,
+      "contentLength": 130325,
+      "contentRange": "bytes 149827900-149958224/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=170887903-171609517",
+      "status": 206,
+      "contentLength": 721615,
+      "contentRange": "bytes 170887903-171609517/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=171622810-171792754",
+      "status": 206,
+      "contentLength": 169945,
+      "contentRange": "bytes 171622810-171792754/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=171801090-171940386",
+      "status": 206,
+      "contentLength": 139297,
+      "contentRange": "bytes 171801090-171940386/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=179237854-179280825",
+      "status": 206,
+      "contentLength": 42972,
+      "contentRange": "bytes 179237854-179280825/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=179292990-179428953",
+      "status": 206,
+      "contentLength": 135964,
+      "contentRange": "bytes 179292990-179428953/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=179442255-179708094",
+      "status": 206,
+      "contentLength": 265840,
+      "contentRange": "bytes 179442255-179708094/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=179719039-179811256",
+      "status": 206,
+      "contentLength": 92218,
+      "contentRange": "bytes 179719039-179811256/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=179821968-180319392",
+      "status": 206,
+      "contentLength": 497425,
+      "contentRange": "bytes 179821968-180319392/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=183401700-183640964",
+      "status": 206,
+      "contentLength": 239265,
+      "contentRange": "bytes 183401700-183640964/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=183649844-184500541",
+      "status": 206,
+      "contentLength": 850698,
+      "contentRange": "bytes 183649844-184500541/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=195911920-196100117",
+      "status": 206,
+      "contentLength": 188198,
+      "contentRange": "bytes 195911920-196100117/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=196111435-196295685",
+      "status": 206,
+      "contentLength": 184251,
+      "contentRange": "bytes 196111435-196295685/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=196305435-196411496",
+      "status": 206,
+      "contentLength": 106062,
+      "contentRange": "bytes 196305435-196411496/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=196420317-196770198",
+      "status": 206,
+      "contentLength": 349882,
+      "contentRange": "bytes 196420317-196770198/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=196779969-196963480",
+      "status": 206,
+      "contentLength": 183512,
+      "contentRange": "bytes 196779969-196963480/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=218962726-219779193",
+      "status": 206,
+      "contentLength": 816468,
+      "contentRange": "bytes 218962726-219779193/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=219789714-219877756",
+      "status": 206,
+      "contentLength": 88043,
+      "contentRange": "bytes 219789714-219877756/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=219889344-220017944",
+      "status": 206,
+      "contentLength": 128601,
+      "contentRange": "bytes 219889344-220017944/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=221026765-221792999",
+      "status": 206,
+      "contentLength": 766235,
+      "contentRange": "bytes 221026765-221792999/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=221802097-221873552",
+      "status": 206,
+      "contentLength": 71456,
+      "contentRange": "bytes 221802097-221873552/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=221885904-222078762",
+      "status": 206,
+      "contentLength": 192859,
+      "contentRange": "bytes 221885904-222078762/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=223081455-223143416",
+      "status": 206,
+      "contentLength": 61962,
+      "contentRange": "bytes 223081455-223143416/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=223157272-223312884",
+      "status": 206,
+      "contentLength": 155613,
+      "contentRange": "bytes 223157272-223312884/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=223324324-223723493",
+      "status": 206,
+      "contentLength": 399170,
+      "contentRange": "bytes 223324324-223723493/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=223733795-223985100",
+      "status": 206,
+      "contentLength": 251306,
+      "contentRange": "bytes 223733795-223985100/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=223999247-224238249",
+      "status": 206,
+      "contentLength": 239003,
+      "contentRange": "bytes 223999247-224238249/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=224247656-224644121",
+      "status": 206,
+      "contentLength": 396466,
+      "contentRange": "bytes 224247656-224644121/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=224660036-224793103",
+      "status": 206,
+      "contentLength": 133068,
+      "contentRange": "bytes 224660036-224793103/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=224801676-224908011",
+      "status": 206,
+      "contentLength": 106336,
+      "contentRange": "bytes 224801676-224908011/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=224919916-224928723",
+      "status": 206,
+      "contentLength": 8808,
+      "contentRange": "bytes 224919916-224928723/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=224938248-225141270",
+      "status": 206,
+      "contentLength": 203023,
+      "contentRange": "bytes 224938248-225141270/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=226148129-226198235",
+      "status": 206,
+      "contentLength": 50107,
+      "contentRange": "bytes 226148129-226198235/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=226209720-226279977",
+      "status": 206,
+      "contentLength": 70258,
+      "contentRange": "bytes 226209720-226279977/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=226290989-226831845",
+      "status": 206,
+      "contentLength": 540857,
+      "contentRange": "bytes 226290989-226831845/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=226840194-226931369",
+      "status": 206,
+      "contentLength": 91176,
+      "contentRange": "bytes 226840194-226931369/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=226942707-227110924",
+      "status": 206,
+      "contentLength": 168218,
+      "contentRange": "bytes 226942707-227110924/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=227120090-227142198",
+      "status": 206,
+      "contentLength": 22109,
+      "contentRange": "bytes 227120090-227142198/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=227154149-227220990",
+      "status": 206,
+      "contentLength": 66842,
+      "contentRange": "bytes 227154149-227220990/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228216211-228549979",
+      "status": 206,
+      "contentLength": 333769,
+      "contentRange": "bytes 228216211-228549979/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228559761-228634694",
+      "status": 206,
+      "contentLength": 74934,
+      "contentRange": "bytes 228559761-228634694/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228643286-228781175",
+      "status": 206,
+      "contentLength": 137890,
+      "contentRange": "bytes 228643286-228781175/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228793520-228898113",
+      "status": 206,
+      "contentLength": 104594,
+      "contentRange": "bytes 228793520-228898113/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228910293-228977610",
+      "status": 206,
+      "contentLength": 67318,
+      "contentRange": "bytes 228910293-228977610/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=228988634-229145666",
+      "status": 206,
+      "contentLength": 157033,
+      "contentRange": "bytes 228988634-229145666/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=229156712-229278234",
+      "status": 206,
+      "contentLength": 121523,
+      "contentRange": "bytes 229156712-229278234/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=230256545-230906446",
+      "status": 206,
+      "contentLength": 649902,
+      "contentRange": "bytes 230256545-230906446/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=230914714-231019477",
+      "status": 206,
+      "contentLength": 104764,
+      "contentRange": "bytes 230914714-231019477/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231030973-231201240",
+      "status": 206,
+      "contentLength": 170268,
+      "contentRange": "bytes 231030973-231201240/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231210466-231264865",
+      "status": 206,
+      "contentLength": 54400,
+      "contentRange": "bytes 231210466-231264865/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231278833-231339722",
+      "status": 206,
+      "contentLength": 60890,
+      "contentRange": "bytes 231278833-231339722/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231353685-231660510",
+      "status": 206,
+      "contentLength": 306826,
+      "contentRange": "bytes 231353685-231660510/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231669006-231757818",
+      "status": 206,
+      "contentLength": 88813,
+      "contentRange": "bytes 231669006-231757818/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=231766403-232146961",
+      "status": 206,
+      "contentLength": 380559,
+      "contentRange": "bytes 231766403-232146961/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=232155755-232196751",
+      "status": 206,
+      "contentLength": 40997,
+      "contentRange": "bytes 232155755-232196751/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=232205554-232343446",
+      "status": 206,
+      "contentLength": 137893,
+      "contentRange": "bytes 232205554-232343446/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=234381247-234498057",
+      "status": 206,
+      "contentLength": 116811,
+      "contentRange": "bytes 234381247-234498057/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=234509121-234634557",
+      "status": 206,
+      "contentLength": 125437,
+      "contentRange": "bytes 234509121-234634557/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=234644670-234995484",
+      "status": 206,
+      "contentLength": 350815,
+      "contentRange": "bytes 234644670-234995484/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=235004503-235045987",
+      "status": 206,
+      "contentLength": 41485,
+      "contentRange": "bytes 235004503-235045987/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=235056752-235226082",
+      "status": 206,
+      "contentLength": 169331,
+      "contentRange": "bytes 235056752-235226082/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=235237041-235304783",
+      "status": 206,
+      "contentLength": 67743,
+      "contentRange": "bytes 235237041-235304783/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=235314010-235467702",
+      "status": 206,
+      "contentLength": 153693,
+      "contentRange": "bytes 235314010-235467702/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=236445731-236915250",
+      "status": 206,
+      "contentLength": 469520,
+      "contentRange": "bytes 236445731-236915250/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=236929550-236964170",
+      "status": 206,
+      "contentLength": 34621,
+      "contentRange": "bytes 236929550-236964170/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=236974277-236987329",
+      "status": 206,
+      "contentLength": 13053,
+      "contentRange": "bytes 236974277-236987329/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=236995959-237355855",
+      "status": 206,
+      "contentLength": 359897,
+      "contentRange": "bytes 236995959-237355855/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=237366575-237387756",
+      "status": 206,
+      "contentLength": 21182,
+      "contentRange": "bytes 237366575-237387756/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=237398141-237485854",
+      "status": 206,
+      "contentLength": 87714,
+      "contentRange": "bytes 237398141-237485854/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=241646211-242044906",
+      "status": 206,
+      "contentLength": 398696,
+      "contentRange": "bytes 241646211-242044906/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=242056094-242127596",
+      "status": 206,
+      "contentLength": 71503,
+      "contentRange": "bytes 242056094-242127596/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=242136935-242192898",
+      "status": 206,
+      "contentLength": 55964,
+      "contentRange": "bytes 242136935-242192898/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=242201511-242424006",
+      "status": 206,
+      "contentLength": 222496,
+      "contentRange": "bytes 242201511-242424006/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=242435121-242690521",
+      "status": 206,
+      "contentLength": 255401,
+      "contentRange": "bytes 242435121-242690521/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=244744799-245608546",
+      "status": 206,
+      "contentLength": 863748,
+      "contentRange": "bytes 244744799-245608546/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=245618337-245742855",
+      "status": 206,
+      "contentLength": 124519,
+      "contentRange": "bytes 245618337-245742855/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=245751414-245839316",
+      "status": 206,
+      "contentLength": 87903,
+      "contentRange": "bytes 245751414-245839316/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=246793891-247404833",
+      "status": 206,
+      "contentLength": 610943,
+      "contentRange": "bytes 246793891-247404833/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=247413946-247460944",
+      "status": 206,
+      "contentLength": 46999,
+      "contentRange": "bytes 247413946-247460944/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=247472697-247689650",
+      "status": 206,
+      "contentLength": 216954,
+      "contentRange": "bytes 247472697-247689650/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=247701723-247844839",
+      "status": 206,
+      "contentLength": 143117,
+      "contentRange": "bytes 247701723-247844839/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=252004134-252706624",
+      "status": 206,
+      "contentLength": 702491,
+      "contentRange": "bytes 252004134-252706624/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=252714832-253063510",
+      "status": 206,
+      "contentLength": 348679,
+      "contentRange": "bytes 252714832-253063510/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=255100386-255364333",
+      "status": 206,
+      "contentLength": 263948,
+      "contentRange": "bytes 255100386-255364333/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=255375305-255832433",
+      "status": 206,
+      "contentLength": 457129,
+      "contentRange": "bytes 255375305-255832433/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=255840955-256128604",
+      "status": 206,
+      "contentLength": 287650,
+      "contentRange": "bytes 255840955-256128604/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262361303-262436553",
+      "status": 206,
+      "contentLength": 75251,
+      "contentRange": "bytes 262361303-262436553/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262447901-262487260",
+      "status": 206,
+      "contentLength": 39360,
+      "contentRange": "bytes 262447901-262487260/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262496071-262580633",
+      "status": 206,
+      "contentLength": 84563,
+      "contentRange": "bytes 262496071-262580633/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262591007-262905881",
+      "status": 206,
+      "contentLength": 314875,
+      "contentRange": "bytes 262591007-262905881/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262915030-262938975",
+      "status": 206,
+      "contentLength": 23946,
+      "contentRange": "bytes 262915030-262938975/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=262950276-263168394",
+      "status": 206,
+      "contentLength": 218119,
+      "contentRange": "bytes 262950276-263168394/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=263183472-263336162",
+      "status": 206,
+      "contentLength": 152691,
+      "contentRange": "bytes 263183472-263336162/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=263347835-263390414",
+      "status": 206,
+      "contentLength": 42580,
+      "contentRange": "bytes 263347835-263390414/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=272785751-272835377",
+      "status": 206,
+      "contentLength": 49627,
+      "contentRange": "bytes 272785751-272835377/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=272850168-272918173",
+      "status": 206,
+      "contentLength": 68006,
+      "contentRange": "bytes 272850168-272918173/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=272930420-273133667",
+      "status": 206,
+      "contentLength": 203248,
+      "contentRange": "bytes 272930420-273133667/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=273145509-273163573",
+      "status": 206,
+      "contentLength": 18065,
+      "contentRange": "bytes 273145509-273163573/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=273173582-273883568",
+      "status": 206,
+      "contentLength": 709987,
+      "contentRange": "bytes 273173582-273883568/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=273891986-274361822",
+      "status": 206,
+      "contentLength": 469837,
+      "contentRange": "bytes 273891986-274361822/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=274370884-274412541",
+      "status": 206,
+      "contentLength": 41658,
+      "contentRange": "bytes 274370884-274412541/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=274421781-274606418",
+      "status": 206,
+      "contentLength": 184638,
+      "contentRange": "bytes 274421781-274606418/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=274619438-274830870",
+      "status": 206,
+      "contentLength": 211433,
+      "contentRange": "bytes 274619438-274830870/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=280043495-280264170",
+      "status": 206,
+      "contentLength": 220676,
+      "contentRange": "bytes 280043495-280264170/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=280274366-280561661",
+      "status": 206,
+      "contentLength": 287296,
+      "contentRange": "bytes 280274366-280561661/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=280574038-281068496",
+      "status": 206,
+      "contentLength": 494459,
+      "contentRange": "bytes 280574038-281068496/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=282107693-282403306",
+      "status": 206,
+      "contentLength": 295614,
+      "contentRange": "bytes 282107693-282403306/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=282413047-282537554",
+      "status": 206,
+      "contentLength": 124508,
+      "contentRange": "bytes 282413047-282537554/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=282546471-282633058",
+      "status": 206,
+      "contentLength": 86588,
+      "contentRange": "bytes 282546471-282633058/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=282643029-282681970",
+      "status": 206,
+      "contentLength": 38942,
+      "contentRange": "bytes 282643029-282681970/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=282690818-283155964",
+      "status": 206,
+      "contentLength": 465147,
+      "contentRange": "bytes 282690818-283155964/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=295686759-295827830",
+      "status": 206,
+      "contentLength": 141072,
+      "contentRange": "bytes 295686759-295827830/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=295841079-295897580",
+      "status": 206,
+      "contentLength": 56502,
+      "contentRange": "bytes 295841079-295897580/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=295907052-295915800",
+      "status": 206,
+      "contentLength": 8749,
+      "contentRange": "bytes 295907052-295915800/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=295924101-296057992",
+      "status": 206,
+      "contentLength": 133892,
+      "contentRange": "bytes 295924101-296057992/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296072441-296377020",
+      "status": 206,
+      "contentLength": 304580,
+      "contentRange": "bytes 296072441-296377020/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296386085-296490624",
+      "status": 206,
+      "contentLength": 104540,
+      "contentRange": "bytes 296386085-296490624/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296503562-296527140",
+      "status": 206,
+      "contentLength": 23579,
+      "contentRange": "bytes 296503562-296527140/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296538941-296622600",
+      "status": 206,
+      "contentLength": 83660,
+      "contentRange": "bytes 296538941-296622600/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296635189-296655367",
+      "status": 206,
+      "contentLength": 20179,
+      "contentRange": "bytes 296635189-296655367/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=296665500-296722011",
+      "status": 206,
+      "contentLength": 56512,
+      "contentRange": "bytes 296665500-296722011/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=304029388-304054838",
+      "status": 206,
+      "contentLength": 25451,
+      "contentRange": "bytes 304029388-304054838/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=304067327-304998539",
+      "status": 206,
+      "contentLength": 931213,
+      "contentRange": "bytes 304067327-304998539/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=305007761-305071750",
+      "status": 206,
+      "contentLength": 63990,
+      "contentRange": "bytes 305007761-305071750/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=319725150-319836077",
+      "status": 206,
+      "contentLength": 110928,
+      "contentRange": "bytes 319725150-319836077/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=319845752-319863671",
+      "status": 206,
+      "contentLength": 17920,
+      "contentRange": "bytes 319845752-319863671/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=319873670-319913495",
+      "status": 206,
+      "contentLength": 39826,
+      "contentRange": "bytes 319873670-319913495/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=319927049-320769528",
+      "status": 206,
+      "contentLength": 842480,
+      "contentRange": "bytes 319927049-320769528/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=321773251-321875058",
+      "status": 206,
+      "contentLength": 101808,
+      "contentRange": "bytes 321773251-321875058/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=321885806-322189367",
+      "status": 206,
+      "contentLength": 303562,
+      "contentRange": "bytes 321885806-322189367/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=322198417-322405619",
+      "status": 206,
+      "contentLength": 207203,
+      "contentRange": "bytes 322198417-322405619/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=322414058-322618825",
+      "status": 206,
+      "contentLength": 204768,
+      "contentRange": "bytes 322414058-322618825/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=322630977-322704193",
+      "status": 206,
+      "contentLength": 73217,
+      "contentRange": "bytes 322630977-322704193/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=322713966-322822263",
+      "status": 206,
+      "contentLength": 108298,
+      "contentRange": "bytes 322713966-322822263/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=326962530-327041645",
+      "status": 206,
+      "contentLength": 79116,
+      "contentRange": "bytes 326962530-327041645/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327053266-327079659",
+      "status": 206,
+      "contentLength": 26394,
+      "contentRange": "bytes 327053266-327079659/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327088556-327174202",
+      "status": 206,
+      "contentLength": 85647,
+      "contentRange": "bytes 327088556-327174202/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327183883-327274732",
+      "status": 206,
+      "contentLength": 90850,
+      "contentRange": "bytes 327183883-327274732/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327286498-327639494",
+      "status": 206,
+      "contentLength": 352997,
+      "contentRange": "bytes 327286498-327639494/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327648085-327736162",
+      "status": 206,
+      "contentLength": 88078,
+      "contentRange": "bytes 327648085-327736162/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327745605-327823196",
+      "status": 206,
+      "contentLength": 77592,
+      "contentRange": "bytes 327745605-327823196/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=327835974-328028911",
+      "status": 206,
+      "contentLength": 192938,
+      "contentRange": "bytes 327835974-328028911/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=334291507-334379686",
+      "status": 206,
+      "contentLength": 88180,
+      "contentRange": "bytes 334291507-334379686/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=334393822-334477844",
+      "status": 206,
+      "contentLength": 84023,
+      "contentRange": "bytes 334393822-334477844/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=334491758-334689932",
+      "status": 206,
+      "contentLength": 198175,
+      "contentRange": "bytes 334491758-334689932/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=334699699-335037398",
+      "status": 206,
+      "contentLength": 337700,
+      "contentRange": "bytes 334699699-335037398/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=335048523-335127616",
+      "status": 206,
+      "contentLength": 79094,
+      "contentRange": "bytes 335048523-335127616/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=335139303-335314932",
+      "status": 206,
+      "contentLength": 175630,
+      "contentRange": "bytes 335139303-335314932/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=340533957-340883385",
+      "status": 206,
+      "contentLength": 349429,
+      "contentRange": "bytes 340533957-340883385/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=340892264-341051751",
+      "status": 206,
+      "contentLength": 159488,
+      "contentRange": "bytes 340892264-341051751/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=341060482-341265025",
+      "status": 206,
+      "contentLength": 204544,
+      "contentRange": "bytes 341060482-341265025/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=341274777-341510129",
+      "status": 206,
+      "contentLength": 235353,
+      "contentRange": "bytes 341274777-341510129/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=342544141-342646796",
+      "status": 206,
+      "contentLength": 102656,
+      "contentRange": "bytes 342544141-342646796/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=342655616-342875882",
+      "status": 206,
+      "contentLength": 220267,
+      "contentRange": "bytes 342655616-342875882/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=342888155-342960888",
+      "status": 206,
+      "contentLength": 72734,
+      "contentRange": "bytes 342888155-342960888/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=342970401-343437561",
+      "status": 206,
+      "contentLength": 467161,
+      "contentRange": "bytes 342970401-343437561/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=343452328-343640421",
+      "status": 206,
+      "contentLength": 188094,
+      "contentRange": "bytes 343452328-343640421/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=344626566-345034953",
+      "status": 206,
+      "contentLength": 408388,
+      "contentRange": "bytes 344626566-345034953/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=345045128-345211580",
+      "status": 206,
+      "contentLength": 166453,
+      "contentRange": "bytes 345045128-345211580/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=345221989-345244791",
+      "status": 206,
+      "contentLength": 22803,
+      "contentRange": "bytes 345221989-345244791/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=345256173-345312857",
+      "status": 206,
+      "contentLength": 56685,
+      "contentRange": "bytes 345256173-345312857/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=345323006-345400666",
+      "status": 206,
+      "contentLength": 77661,
+      "contentRange": "bytes 345323006-345400666/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=345411001-345680444",
+      "status": 206,
+      "contentLength": 269444,
+      "contentRange": "bytes 345411001-345680444/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=349798869-350007714",
+      "status": 206,
+      "contentLength": 208846,
+      "contentRange": "bytes 349798869-350007714/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=350016285-350372295",
+      "status": 206,
+      "contentLength": 356011,
+      "contentRange": "bytes 350016285-350372295/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=350382817-350785769",
+      "status": 206,
+      "contentLength": 402953,
+      "contentRange": "bytes 350382817-350785769/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=350796557-350883872",
+      "status": 206,
+      "contentLength": 87316,
+      "contentRange": "bytes 350796557-350883872/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=355029391-355494115",
+      "status": 206,
+      "contentLength": 464725,
+      "contentRange": "bytes 355029391-355494115/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=355503637-355609745",
+      "status": 206,
+      "contentLength": 106109,
+      "contentRange": "bytes 355503637-355609745/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=355621513-356043563",
+      "status": 206,
+      "contentLength": 422051,
+      "contentRange": "bytes 355621513-356043563/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=356053926-356085034",
+      "status": 206,
+      "contentLength": 31109,
+      "contentRange": "bytes 356053926-356085034/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=366526195-366661867",
+      "status": 206,
+      "contentLength": 135673,
+      "contentRange": "bytes 366526195-366661867/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=366672573-367241480",
+      "status": 206,
+      "contentLength": 568908,
+      "contentRange": "bytes 366672573-367241480/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=367251666-367277468",
+      "status": 206,
+      "contentLength": 25803,
+      "contentRange": "bytes 367251666-367277468/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=367287640-367327765",
+      "status": 206,
+      "contentLength": 40126,
+      "contentRange": "bytes 367287640-367327765/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=367338629-367460704",
+      "status": 206,
+      "contentLength": 122076,
+      "contentRange": "bytes 367338629-367460704/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=367470939-367506370",
+      "status": 206,
+      "contentLength": 35432,
+      "contentRange": "bytes 367470939-367506370/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=367522438-367566137",
+      "status": 206,
+      "contentLength": 43700,
+      "contentRange": "bytes 367522438-367566137/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=370684339-371332287",
+      "status": 206,
+      "contentLength": 647949,
+      "contentRange": "bytes 370684339-371332287/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=371343146-371402997",
+      "status": 206,
+      "contentLength": 59852,
+      "contentRange": "bytes 371343146-371402997/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=371412394-371583724",
+      "status": 206,
+      "contentLength": 171331,
+      "contentRange": "bytes 371412394-371583724/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=371593967-371704776",
+      "status": 206,
+      "contentLength": 110810,
+      "contentRange": "bytes 371593967-371704776/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=372725638-372753231",
+      "status": 206,
+      "contentLength": 27594,
+      "contentRange": "bytes 372725638-372753231/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=372762033-373046014",
+      "status": 206,
+      "contentLength": 283982,
+      "contentRange": "bytes 372762033-373046014/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=373058511-373080357",
+      "status": 206,
+      "contentLength": 21847,
+      "contentRange": "bytes 373058511-373080357/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=373090741-373129464",
+      "status": 206,
+      "contentLength": 38724,
+      "contentRange": "bytes 373090741-373129464/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=373142062-373209234",
+      "status": 206,
+      "contentLength": 67173,
+      "contentRange": "bytes 373142062-373209234/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=373220180-373777107",
+      "status": 206,
+      "contentLength": 556928,
+      "contentRange": "bytes 373220180-373777107/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=376864500-377077336",
+      "status": 206,
+      "contentLength": 212837,
+      "contentRange": "bytes 376864500-377077336/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=377085797-377952817",
+      "status": 206,
+      "contentLength": 867021,
+      "contentRange": "bytes 377085797-377952817/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=381024881-381453171",
+      "status": 206,
+      "contentLength": 428291,
+      "contentRange": "bytes 381024881-381453171/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=381466076-381516593",
+      "status": 206,
+      "contentLength": 50518,
+      "contentRange": "bytes 381466076-381516593/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=381527884-382045606",
+      "status": 206,
+      "contentLength": 517723,
+      "contentRange": "bytes 381527884-382045606/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=382057266-382091406",
+      "status": 206,
+      "contentLength": 34141,
+      "contentRange": "bytes 382057266-382091406/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=385203610-385227091",
+      "status": 206,
+      "contentLength": 23482,
+      "contentRange": "bytes 385203610-385227091/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=385237639-385306174",
+      "status": 206,
+      "contentLength": 68536,
+      "contentRange": "bytes 385237639-385306174/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=385317220-385620061",
+      "status": 206,
+      "contentLength": 302842,
+      "contentRange": "bytes 385317220-385620061/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=385632184-385933789",
+      "status": 206,
+      "contentLength": 301606,
+      "contentRange": "bytes 385632184-385933789/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=385943071-386000856",
+      "status": 206,
+      "contentLength": 57786,
+      "contentRange": "bytes 385943071-386000856/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=386010236-386262891",
+      "status": 206,
+      "contentLength": 252656,
+      "contentRange": "bytes 386010236-386262891/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=392518324-392549793",
+      "status": 206,
+      "contentLength": 31470,
+      "contentRange": "bytes 392518324-392549793/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=392559571-392844549",
+      "status": 206,
+      "contentLength": 284979,
+      "contentRange": "bytes 392559571-392844549/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=392855327-393505365",
+      "status": 206,
+      "contentLength": 650039,
+      "contentRange": "bytes 392855327-393505365/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=393515377-393596672",
+      "status": 206,
+      "contentLength": 81296,
+      "contentRange": "bytes 393515377-393596672/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=395671018-396521472",
+      "status": 206,
+      "contentLength": 850455,
+      "contentRange": "bytes 395671018-396521472/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=396535649-397386466",
+      "status": 206,
+      "contentLength": 850818,
+      "contentRange": "bytes 396535649-397386466/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=397396183-397520601",
+      "status": 206,
+      "contentLength": 124419,
+      "contentRange": "bytes 397396183-397520601/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=397531336-397720640",
+      "status": 206,
+      "contentLength": 189305,
+      "contentRange": "bytes 397531336-397720640/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=398768227-398983111",
+      "status": 206,
+      "contentLength": 214885,
+      "contentRange": "bytes 398768227-398983111/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=398993296-399236859",
+      "status": 206,
+      "contentLength": 243564,
+      "contentRange": "bytes 398993296-399236859/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=399248852-399257253",
+      "status": 206,
+      "contentLength": 8402,
+      "contentRange": "bytes 399248852-399257253/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=399266103-399807311",
+      "status": 206,
+      "contentLength": 541209,
+      "contentRange": "bytes 399266103-399807311/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=408157640-408516384",
+      "status": 206,
+      "contentLength": 358745,
+      "contentRange": "bytes 408157640-408516384/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=408525554-408597151",
+      "status": 206,
+      "contentLength": 71598,
+      "contentRange": "bytes 408525554-408597151/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=408610026-408797455",
+      "status": 206,
+      "contentLength": 187430,
+      "contentRange": "bytes 408610026-408797455/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=408809179-408965336",
+      "status": 206,
+      "contentLength": 156158,
+      "contentRange": "bytes 408809179-408965336/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=408973577-409196903",
+      "status": 206,
+      "contentLength": 223327,
+      "contentRange": "bytes 408973577-409196903/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=418596771-418961744",
+      "status": 206,
+      "contentLength": 364974,
+      "contentRange": "bytes 418596771-418961744/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=418973765-419257583",
+      "status": 206,
+      "contentLength": 283819,
+      "contentRange": "bytes 418973765-419257583/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=419268026-419309063",
+      "status": 206,
+      "contentLength": 41038,
+      "contentRange": "bytes 419268026-419309063/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=419318156-419624671",
+      "status": 206,
+      "contentLength": 306516,
+      "contentRange": "bytes 419318156-419624671/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=425894906-426034882",
+      "status": 206,
+      "contentLength": 139977,
+      "contentRange": "bytes 425894906-426034882/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=426044607-426215357",
+      "status": 206,
+      "contentLength": 170751,
+      "contentRange": "bytes 426044607-426215357/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=426223654-427916658",
+      "status": 206,
+      "contentLength": 1693005,
+      "contentRange": "bytes 426223654-427916658/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=427927731-428001458",
+      "status": 206,
+      "contentLength": 73728,
+      "contentRange": "bytes 427927731-428001458/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428010541-428031881",
+      "status": 206,
+      "contentLength": 21341,
+      "contentRange": "bytes 428010541-428031881/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428041925-428098997",
+      "status": 206,
+      "contentLength": 57073,
+      "contentRange": "bytes 428041925-428098997/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428107568-428210719",
+      "status": 206,
+      "contentLength": 103152,
+      "contentRange": "bytes 428107568-428210719/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428219707-428357341",
+      "status": 206,
+      "contentLength": 137635,
+      "contentRange": "bytes 428219707-428357341/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428370636-428407103",
+      "status": 206,
+      "contentLength": 36468,
+      "contentRange": "bytes 428370636-428407103/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428421397-428475156",
+      "status": 206,
+      "contentLength": 53760,
+      "contentRange": "bytes 428421397-428475156/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=428486675-429021526",
+      "status": 206,
+      "contentLength": 534852,
+      "contentRange": "bytes 428486675-429021526/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=429035478-429203255",
+      "status": 206,
+      "contentLength": 167778,
+      "contentRange": "bytes 429035478-429203255/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=431261656-431275409",
+      "status": 206,
+      "contentLength": 13754,
+      "contentRange": "bytes 431261656-431275409/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=431287068-431504131",
+      "status": 206,
+      "contentLength": 217064,
+      "contentRange": "bytes 431287068-431504131/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=431520233-431850947",
+      "status": 206,
+      "contentLength": 330715,
+      "contentRange": "bytes 431520233-431850947/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=431859927-432319434",
+      "status": 206,
+      "contentLength": 459508,
+      "contentRange": "bytes 431859927-432319434/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=436479635-436673291",
+      "status": 206,
+      "contentLength": 193657,
+      "contentRange": "bytes 436479635-436673291/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=436686473-437515079",
+      "status": 206,
+      "contentLength": 828607,
+      "contentRange": "bytes 436686473-437515079/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=441639056-441734260",
+      "status": 206,
+      "contentLength": 95205,
+      "contentRange": "bytes 441639056-441734260/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=441745480-441883794",
+      "status": 206,
+      "contentLength": 138315,
+      "contentRange": "bytes 441745480-441883794/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=441895742-442028367",
+      "status": 206,
+      "contentLength": 132626,
+      "contentRange": "bytes 441895742-442028367/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=442036862-442424414",
+      "status": 206,
+      "contentLength": 387553,
+      "contentRange": "bytes 442036862-442424414/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=442433610-442444003",
+      "status": 206,
+      "contentLength": 10394,
+      "contentRange": "bytes 442433610-442444003/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=442452479-442690578",
+      "status": 206,
+      "contentLength": 238100,
+      "contentRange": "bytes 442452479-442690578/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=446847779-447266922",
+      "status": 206,
+      "contentLength": 419144,
+      "contentRange": "bytes 446847779-447266922/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=447276504-447548409",
+      "status": 206,
+      "contentLength": 271906,
+      "contentRange": "bytes 447276504-447548409/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=447561408-447697893",
+      "status": 206,
+      "contentLength": 136486,
+      "contentRange": "bytes 447561408-447697893/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=447706174-447886260",
+      "status": 206,
+      "contentLength": 180087,
+      "contentRange": "bytes 447706174-447886260/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=452030291-452484985",
+      "status": 206,
+      "contentLength": 454695,
+      "contentRange": "bytes 452030291-452484985/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=452496556-452556025",
+      "status": 206,
+      "contentLength": 59470,
+      "contentRange": "bytes 452496556-452556025/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=452565364-452618105",
+      "status": 206,
+      "contentLength": 52742,
+      "contentRange": "bytes 452565364-452618105/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=452627712-452748074",
+      "status": 206,
+      "contentLength": 120363,
+      "contentRange": "bytes 452627712-452748074/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=452759616-453087449",
+      "status": 206,
+      "contentLength": 327834,
+      "contentRange": "bytes 452759616-453087449/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=454086408-455157082",
+      "status": 206,
+      "contentLength": 1070675,
+      "contentRange": "bytes 454086408-455157082/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=457178495-457331163",
+      "status": 206,
+      "contentLength": 152669,
+      "contentRange": "bytes 457178495-457331163/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=457342344-457739408",
+      "status": 206,
+      "contentLength": 397065,
+      "contentRange": "bytes 457342344-457739408/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=457748308-457805636",
+      "status": 206,
+      "contentLength": 57329,
+      "contentRange": "bytes 457748308-457805636/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=457814446-458248554",
+      "status": 206,
+      "contentLength": 434109,
+      "contentRange": "bytes 457814446-458248554/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=462390807-462636009",
+      "status": 206,
+      "contentLength": 245203,
+      "contentRange": "bytes 462390807-462636009/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=462649353-462799210",
+      "status": 206,
+      "contentLength": 149858,
+      "contentRange": "bytes 462649353-462799210/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=462809423-463064086",
+      "status": 206,
+      "contentLength": 254664,
+      "contentRange": "bytes 462809423-463064086/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=463074964-463308111",
+      "status": 206,
+      "contentLength": 233148,
+      "contentRange": "bytes 463074964-463308111/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=471658133-472158069",
+      "status": 206,
+      "contentLength": 499937,
+      "contentRange": "bytes 471658133-472158069/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472169821-472227768",
+      "status": 206,
+      "contentLength": 57948,
+      "contentRange": "bytes 472169821-472227768/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472238580-472388552",
+      "status": 206,
+      "contentLength": 149973,
+      "contentRange": "bytes 472238580-472388552/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472400118-472408377",
+      "status": 206,
+      "contentLength": 8260,
+      "contentRange": "bytes 472400118-472408377/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472417573-472536167",
+      "status": 206,
+      "contentLength": 118595,
+      "contentRange": "bytes 472417573-472536167/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472546158-472601103",
+      "status": 206,
+      "contentLength": 54946,
+      "contentRange": "bytes 472546158-472601103/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472610354-472619133",
+      "status": 206,
+      "contentLength": 8780,
+      "contentRange": "bytes 472610354-472619133/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=472630590-472698852",
+      "status": 206,
+      "contentLength": 68263,
+      "contentRange": "bytes 472630590-472698852/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=473710718-473726910",
+      "status": 206,
+      "contentLength": 16193,
+      "contentRange": "bytes 473710718-473726910/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=473735714-473835710",
+      "status": 206,
+      "contentLength": 99997,
+      "contentRange": "bytes 473735714-473835710/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=473849392-474656860",
+      "status": 206,
+      "contentLength": 807469,
+      "contentRange": "bytes 473849392-474656860/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=474665249-474774434",
+      "status": 206,
+      "contentLength": 109186,
+      "contentRange": "bytes 474665249-474774434/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=479958933-480651629",
+      "status": 206,
+      "contentLength": 692697,
+      "contentRange": "bytes 479958933-480651629/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=480661963-480720443",
+      "status": 206,
+      "contentLength": 58481,
+      "contentRange": "bytes 480661963-480720443/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=480729999-480802139",
+      "status": 206,
+      "contentLength": 72141,
+      "contentRange": "bytes 480729999-480802139/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=480813466-480881639",
+      "status": 206,
+      "contentLength": 68174,
+      "contentRange": "bytes 480813466-480881639/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=480894842-480998935",
+      "status": 206,
+      "contentLength": 104094,
+      "contentRange": "bytes 480894842-480998935/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483053458-483115402",
+      "status": 206,
+      "contentLength": 61945,
+      "contentRange": "bytes 483053458-483115402/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483123709-483146941",
+      "status": 206,
+      "contentLength": 23233,
+      "contentRange": "bytes 483123709-483146941/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483155200-483723440",
+      "status": 206,
+      "contentLength": 568241,
+      "contentRange": "bytes 483155200-483723440/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483732428-483773707",
+      "status": 206,
+      "contentLength": 41280,
+      "contentRange": "bytes 483732428-483773707/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483783642-483803221",
+      "status": 206,
+      "contentLength": 19580,
+      "contentRange": "bytes 483783642-483803221/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=483812057-484129741",
+      "status": 206,
+      "contentLength": 317685,
+      "contentRange": "bytes 483812057-484129741/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=497706116-497978608",
+      "status": 206,
+      "contentLength": 272493,
+      "contentRange": "bytes 497706116-497978608/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=497987847-498173056",
+      "status": 206,
+      "contentLength": 185210,
+      "contentRange": "bytes 497987847-498173056/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=498181457-498259326",
+      "status": 206,
+      "contentLength": 77870,
+      "contentRange": "bytes 498181457-498259326/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=498268073-498336627",
+      "status": 206,
+      "contentLength": 68555,
+      "contentRange": "bytes 498268073-498336627/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=498349877-498387490",
+      "status": 206,
+      "contentLength": 37614,
+      "contentRange": "bytes 498349877-498387490/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=498398297-498585269",
+      "status": 206,
+      "contentLength": 186973,
+      "contentRange": "bytes 498398297-498585269/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=498594274-498756999",
+      "status": 206,
+      "contentLength": 162726,
+      "contentRange": "bytes 498594274-498756999/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=500804505-501394614",
+      "status": 206,
+      "contentLength": 590110,
+      "contentRange": "bytes 500804505-501394614/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=501409697-501482293",
+      "status": 206,
+      "contentLength": 72597,
+      "contentRange": "bytes 501409697-501482293/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=501491336-501894148",
+      "status": 206,
+      "contentLength": 402813,
+      "contentRange": "bytes 501491336-501894148/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=504955844-505069737",
+      "status": 206,
+      "contentLength": 113894,
+      "contentRange": "bytes 504955844-505069737/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505084268-505170598",
+      "status": 206,
+      "contentLength": 86331,
+      "contentRange": "bytes 505084268-505170598/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505181796-505234263",
+      "status": 206,
+      "contentLength": 52468,
+      "contentRange": "bytes 505181796-505234263/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505243349-505539864",
+      "status": 206,
+      "contentLength": 296516,
+      "contentRange": "bytes 505243349-505539864/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505549246-505687713",
+      "status": 206,
+      "contentLength": 138468,
+      "contentRange": "bytes 505549246-505687713/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505696970-505766360",
+      "status": 206,
+      "contentLength": 69391,
+      "contentRange": "bytes 505696970-505766360/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505777828-505850920",
+      "status": 206,
+      "contentLength": 73093,
+      "contentRange": "bytes 505777828-505850920/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505859395-505901556",
+      "status": 206,
+      "contentLength": 42162,
+      "contentRange": "bytes 505859395-505901556/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=505912666-506034373",
+      "status": 206,
+      "contentLength": 121708,
+      "contentRange": "bytes 505912666-506034373/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=509106640-509266284",
+      "status": 206,
+      "contentLength": 159645,
+      "contentRange": "bytes 509106640-509266284/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=509275385-509346743",
+      "status": 206,
+      "contentLength": 71359,
+      "contentRange": "bytes 509275385-509346743/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=509359134-509575419",
+      "status": 206,
+      "contentLength": 216286,
+      "contentRange": "bytes 509359134-509575419/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=509588662-509936349",
+      "status": 206,
+      "contentLength": 347688,
+      "contentRange": "bytes 509588662-509936349/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=509947629-510022725",
+      "status": 206,
+      "contentLength": 75097,
+      "contentRange": "bytes 509947629-510022725/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=510032110-510192011",
+      "status": 206,
+      "contentLength": 159902,
+      "contentRange": "bytes 510032110-510192011/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=514332800-514426580",
+      "status": 206,
+      "contentLength": 93781,
+      "contentRange": "bytes 514332800-514426580/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=514437100-515079937",
+      "status": 206,
+      "contentLength": 642838,
+      "contentRange": "bytes 514437100-515079937/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=515089278-515355021",
+      "status": 206,
+      "contentLength": 265744,
+      "contentRange": "bytes 515089278-515355021/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=515364837-515380259",
+      "status": 206,
+      "contentLength": 15423,
+      "contentRange": "bytes 515364837-515380259/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=517427346-517812072",
+      "status": 206,
+      "contentLength": 384727,
+      "contentRange": "bytes 517427346-517812072/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=517822871-517939639",
+      "status": 206,
+      "contentLength": 116769,
+      "contentRange": "bytes 517822871-517939639/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=517953890-518326845",
+      "status": 206,
+      "contentLength": 372956,
+      "contentRange": "bytes 517953890-518326845/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=518336164-518465107",
+      "status": 206,
+      "contentLength": 128944,
+      "contentRange": "bytes 518336164-518465107/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=520550580-521091756",
+      "status": 206,
+      "contentLength": 541177,
+      "contentRange": "bytes 520550580-521091756/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=521101680-521129365",
+      "status": 206,
+      "contentLength": 27686,
+      "contentRange": "bytes 521101680-521129365/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=521138508-521540056",
+      "status": 206,
+      "contentLength": 401549,
+      "contentRange": "bytes 521138508-521540056/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=521548918-521595799",
+      "status": 206,
+      "contentLength": 46882,
+      "contentRange": "bytes 521548918-521595799/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=522623747-522762398",
+      "status": 206,
+      "contentLength": 138652,
+      "contentRange": "bytes 522623747-522762398/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=522772822-522810084",
+      "status": 206,
+      "contentLength": 37263,
+      "contentRange": "bytes 522772822-522810084/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=522820408-523037185",
+      "status": 206,
+      "contentLength": 216778,
+      "contentRange": "bytes 522820408-523037185/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=523047716-523162824",
+      "status": 206,
+      "contentLength": 115109,
+      "contentRange": "bytes 523047716-523162824/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=523173380-523241848",
+      "status": 206,
+      "contentLength": 68469,
+      "contentRange": "bytes 523173380-523241848/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=523250926-523539130",
+      "status": 206,
+      "contentLength": 288205,
+      "contentRange": "bytes 523250926-523539130/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=523549388-523673424",
+      "status": 206,
+      "contentLength": 124037,
+      "contentRange": "bytes 523549388-523673424/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=526773145-526994721",
+      "status": 206,
+      "contentLength": 221577,
+      "contentRange": "bytes 526773145-526994721/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=527003491-527114501",
+      "status": 206,
+      "contentLength": 111011,
+      "contentRange": "bytes 527003491-527114501/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=527123718-527258844",
+      "status": 206,
+      "contentLength": 135127,
+      "contentRange": "bytes 527123718-527258844/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=527272386-527546293",
+      "status": 206,
+      "contentLength": 273908,
+      "contentRange": "bytes 527272386-527546293/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=527555370-527781623",
+      "status": 206,
+      "contentLength": 226254,
+      "contentRange": "bytes 527555370-527781623/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=530893511-531035491",
+      "status": 206,
+      "contentLength": 141981,
+      "contentRange": "bytes 530893511-531035491/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531043917-531183327",
+      "status": 206,
+      "contentLength": 139411,
+      "contentRange": "bytes 531043917-531183327/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531191839-531312001",
+      "status": 206,
+      "contentLength": 120163,
+      "contentRange": "bytes 531191839-531312001/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531323285-531358962",
+      "status": 206,
+      "contentLength": 35678,
+      "contentRange": "bytes 531323285-531358962/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531370943-531542226",
+      "status": 206,
+      "contentLength": 171284,
+      "contentRange": "bytes 531370943-531542226/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531551244-531791516",
+      "status": 206,
+      "contentLength": 240273,
+      "contentRange": "bytes 531551244-531791516/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=531799954-531987750",
+      "status": 206,
+      "contentLength": 187797,
+      "contentRange": "bytes 531799954-531987750/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=549715919-549826980",
+      "status": 206,
+      "contentLength": 111062,
+      "contentRange": "bytes 549715919-549826980/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=549836068-550022507",
+      "status": 206,
+      "contentLength": 186440,
+      "contentRange": "bytes 549836068-550022507/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=550033386-550105844",
+      "status": 206,
+      "contentLength": 72459,
+      "contentRange": "bytes 550033386-550105844/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=550117064-550758478",
+      "status": 206,
+      "contentLength": 641415,
+      "contentRange": "bytes 550117064-550758478/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=559120762-639473445",
+      "status": 206,
+      "contentLength": 80352684,
+      "contentRange": "bytes 559120762-639473445/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=639766399-640478533",
+      "status": 206,
+      "contentLength": 712135,
+      "contentRange": "bytes 639766399-640478533/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=640567441-640808998",
+      "status": 206,
+      "contentLength": 241558,
+      "contentRange": "bytes 640567441-640808998/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=640881221-640904390",
+      "status": 206,
+      "contentLength": 23170,
+      "contentRange": "bytes 640881221-640904390/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=640930995-641861800",
+      "status": 206,
+      "contentLength": 930806,
+      "contentRange": "bytes 640930995-641861800/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=641950584-643622429",
+      "status": 206,
+      "contentLength": 1671846,
+      "contentRange": "bytes 641950584-643622429/655980231"
+    },
+    {
+      "path": "/Vinci-217/mole-baby/releases/download/v0.31.4/mole-baby-0.31.4-mac-arm64.dmg",
+      "method": "GET",
+      "range": "bytes=643631023-655980230",
+      "status": 206,
+      "contentLength": 12349208,
+      "contentRange": "bytes 643631023-655980230/655980231"
+    }
+  ],
+  "installed": false,
+  "scope": "Live production GitHub release and indexes, using the new updater with a verified archived DMG and locally generated old index in an isolated test cache. This is not a claim that the old v0.31.3 client gains incremental logic remotely; actual old clients may fully download this transition. No app replacement or save modification."
+}
