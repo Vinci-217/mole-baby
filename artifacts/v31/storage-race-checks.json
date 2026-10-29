@@ -1,0 +1,18 @@
+{
+  "purpose": "One-shot pre-render test snapshots survive a forced old-renderer write; rapid double claim and normal reload still award exactly once.",
+  "productionRuntimeVersion": "0.31.2",
+  "note": "Product runtime is unchanged in v0.31.3; this validates the revised harness against the previously built real executable.",
+  "runs": {
+    "storage-race-v313": {
+      "code": 0,
+      "finishedAt": 1793233035.364207,
+      "log": "PASS forced live-autosave collision, one-shot pre-render fixture, double claim and persisted reload, round 1\nPASS forced live-autosave collision, one-shot pre-render fixture, double claim and persisted reload, round 2\nPASS forced live-autosave collision, one-shot pre-render fixture, double claim and persisted reload, round 3\nPASS forced live-autosave collision, one-shot pre-render fixture, double claim and persisted reload, round 4\nPASS forced live-autosave collision, one-shot pre-render fixture, double claim and persisted reload, round 5"
+    },
+    "lively-native-v313": {
+      "code": 0,
+      "finishedAt": 1793233053.1031225,
+      "log": "PASS packaged split animation bytes and bounded core ASAR {\"files\":1635,\"bytes\":463921585,\"coreAsarBytes\":106612229}\nPASS local renderer policy: external scripts blocked before network access\nPASS: daily 1000 beans once across clicks/reload; original clothes with small-mouth care; finite books and reversible illusion; retired balance absent; supplied football entry; persisted outings recall and return once without rewards"
+    }
+  },
+  "helperSha256": "1893382a136e4bcb3ef21c63bbcff4ac8a932838fb99a41ad8338553f0ef5f4f"
+}

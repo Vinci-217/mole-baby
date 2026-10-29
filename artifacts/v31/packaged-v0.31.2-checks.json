@@ -1,0 +1,19 @@
+{
+  "version": "0.31.2",
+  "sourceSha": "fa6f20a3ff32774eb8100941271bed04f97cccb7",
+  "platform": "linux-x64",
+  "execution": "Actual electron-builder packaged executable; --v31-only --packaged",
+  "vitest": 374,
+  "nodeTests": 121,
+  "coreAsarBytes": 106612229,
+  "externalMotionFiles": 1635,
+  "externalMotionBytes": 463921585,
+  "allExternalBytesVerified": true,
+  "nativeResult": {
+    "code": 0,
+    "finishedAt": 1793232428.8805826
+  },
+  "completedAt": "2026-10-29T00:07:08.880583+00:00",
+  "verificationLog": "PASS packaged split animation bytes and bounded core ASAR {\"files\":1635,\"bytes\":463921585,\"coreAsarBytes\":106612229}\nPASS local renderer policy: external scripts blocked before network access\nPASS colour mixer: original RGB art, keyboard mixing and exact preview, one bottle per brew, no direct recolour/coin reward, medicine inventory consumption and persisted custom palette, cancelled brew grants nothing, retired balance entry absent\nPASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+  "note": "Local packaged proof; Windows and Mac native results are recorded separately in the formal release receipt."
+}
