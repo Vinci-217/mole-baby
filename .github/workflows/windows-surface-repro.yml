@@ -59,10 +59,10 @@ jobs:
           npm test 2>&1 | tee -a artifacts/surface.log
           if [ '${{ matrix.legacy }}' = true ]; then
             npm run build:legacy 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --config electron-builder.legacy.cjs --win zip --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win nsis --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/surface.log
           else
             npm run build 2>&1 | tee -a artifacts/surface.log
-            npx --no-install electron-builder --win zip --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
+            npx --no-install electron-builder --win nsis --x64 --publish never --config.electronVersion='${{ matrix.runtime }}' 2>&1 | tee -a artifacts/surface.log
           fi
       - name: Reproduce on physical desktop over time
         shell: bash
