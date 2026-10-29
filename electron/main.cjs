@@ -8,6 +8,7 @@ const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
 const {trayStatusText}=require('./tray-status.cjs');
 const {createRoomFullscreen}=require('./room-fullscreen.cjs');
+const {ROOM_MINIMUM,createRoomResizer}=require('./room-resize.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const {createUpdates}=require('./updates.cjs');
@@ -32,7 +33,7 @@ if(process.platform==='win32'){
 let updates=null,updateRendererBusy=true,updateCheckpoint=null;
 const updatePrompts=createUpdatePrompts({getUpdates:()=>updates,showMessageBox:options=>mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()?dialog.showMessageBox(mainWindow,options):dialog.showMessageBox(options),onError:error=>console.error('Unable to show update confirmation:',error.message)});
 const NORMAL_SIZE = { width: 1180, height: 820 };
-const NORMAL_MINIMUM = { width: 1000, height: 720 };
+const NORMAL_MINIMUM = ROOM_MINIMUM;
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
 const INDEX_PATH = path.join(__dirname, '..', 'dist', 'index.html');
 
@@ -100,6 +101,7 @@ let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
 const roomFullscreen=createRoomFullscreen({platform:process.platform,getWindow:()=>mainWindow,isPetMode:()=>petMode,beforeEnter:()=>rememberBounds(),afterLeave:()=>{
  if(normalBounds&&mainWindow&&!mainWindow.isDestroyed()&&!petMode)mainWindow.setBounds(clampBounds(normalBounds,NORMAL_SIZE));
 },onChange:()=>{publishState();scheduleSave()}});
+const roomResizer=createRoomResizer({getWindow:()=>mainWindow,screen,canResize:()=>Boolean(mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()&&!mainWindow.isMinimized()&&hasPet&&!petMode&&!changingMode&&!roomFullscreen.isFullscreen()&&!roomFullscreen.isChanging()),onResize:()=>scheduleSave(),onEnd:()=>saveWindowState()});
 
 function getDesktopState() {
   return {
@@ -615,6 +617,7 @@ function listen(channel, callback) {
 
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
+  roomResizer.end();
   if(enabled&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
   if (enabled === petMode) return petMode;
   changePetEffectBounds(null);
@@ -666,6 +669,7 @@ function iconPath(filename) {
 
 function hideToTray() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
+  roomResizer.end();
   if(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()){void roomFullscreen.set(false).then(()=>hideToTray()).catch(error=>console.error(error.message));return;}
   dragging = false;clearInterval(dragPoll);dragPoll=null;pointerPress=null;cursorDrag=null;
   stopMovement();
@@ -791,6 +795,7 @@ function registerIPC() {
   handle('updates:download',()=>updatePrompts.download());
   handle('updates:install',()=>updatePrompts.install());
   handle('updates:set-enabled',enabled=>updates?.setEnabled(enabled)??null);
+  handle('updates:set-download-policy',policy=>updates?.setDownloadPolicy(policy)??null);
   listen('updates:busy',busy=>{if(typeof busy!=='boolean')return;updateRendererBusy=busy});
   listen('updates:prepared',(id,ok)=>{const checkpoint=updateCheckpoint;if(!checkpoint||id!==checkpoint.id||typeof ok!=='boolean')return;clearTimeout(checkpoint.timer);updateCheckpoint=null;let saved=ok;try{if(ok){saveWindowState();mainWindow.webContents.session.flushStorageData()}}catch{saved=false}checkpoint.resolve(saved)});
   handle('desktop:toggle-always-on-top',()=>changeAlwaysOnTop(!mainWindow.isAlwaysOnTop()));
@@ -798,7 +803,10 @@ function registerIPC() {
   handle('desktop:prepare-pet-drag',preparePetDrag);
   handle('desktop:drag-pet-to-cursor',dragPetToCursor);
   handle('desktop:set-pet-mode', changePetMode);
-  handle('desktop:set-room-fullscreen',enabled=>roomFullscreen.set(enabled));
+  handle('desktop:set-room-fullscreen',enabled=>{roomResizer.end();return roomFullscreen.set(enabled)});
+  handle('desktop:start-room-resize',edge=>roomResizer.start(edge));
+  handle('desktop:end-room-resize',()=>roomResizer.end());
+  handle('desktop:adjust-room-size',(dx,dy)=>roomResizer.adjust(dx,dy));
   handle('desktop:open-manor-site',()=>shell.openExternal(require('./external-sites.json').manor));
   handle('desktop:set-companion-panel', changeCompanionPanel);
   handle('desktop:set-pet-can-move', changePetCanMove);
@@ -885,6 +893,10 @@ function createWindow() {
   window.on('hide',()=>publishState());
   window.on('move',()=>{syncEffectAnchor();scheduleSave()});
   window.on('resize',()=>{syncEffectAnchor();scheduleSave()});
+  window.on('blur',()=>roomResizer.end());
+  window.on('hide',()=>roomResizer.end());
+  window.on('enter-full-screen',()=>roomResizer.end());
+  window.on('closed',()=>roomResizer.end());
   window.on('always-on-top-changed', () => publishState());
   window.on('enter-full-screen',()=>publishState());
   window.on('leave-full-screen',()=>{publishState();scheduleSave()});
@@ -984,6 +996,7 @@ if (!app.requestSingleInstanceLock()) {
   });
   nativeAutoUpdater?.on('before-quit-for-update',()=>{quitting=true;saveWindowState();try{mainWindow?.webContents.session.flushStorageData()}catch{}});
   app.on('before-quit', () => {
+    roomResizer.end();
     quitting = true;clearInterval(dragPoll);
     try{mainWindow?.webContents.session.flushStorageData()}catch{}
     stopMovement(); clearTimeout(edgeTimer); saveWindowState();

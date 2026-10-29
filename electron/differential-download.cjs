@@ -1,6 +1,7 @@
 const fs=require('node:fs'),fsp=fs.promises,crypto=require('node:crypto'),{gunzipSync}=require('node:zlib');
 // This internal planner is shared with NSIS. Its version is pinned and tested.
-const {computeOperations,OperationKind}=require('electron-updater/out/differentialDownloader/downloadPlanBuilder');
+const {OperationKind}=require('electron-updater/out/differentialDownloader/downloadPlanBuilder');
+const {planUpdate}=require('./update-plan.cjs');
 const MAX_PACKAGE_BYTES=1024*1024*1024,MAX_BLOCKMAP_BYTES=4*1024*1024;
 function parseBlockMap(bytes){
  if(bytes.length>MAX_BLOCKMAP_BYTES)throw Error('Update blockmap too large');
@@ -22,10 +23,10 @@ async function readBlockMapResponse(response){
  return Buffer.concat(chunks);
 }
 function rangeError(){const error=Error('Update server does not support the requested byte range');error.code='ERR_UPDATE_RANGE';return error}
-async function downloadDifferential({oldFile,newFile,oldMap,newMap,url,digest,request,signal,onProgress=()=>{}}){
+async function downloadDifferential({oldFile,newFile,oldMap,newMap,url,digest,request,signal,onProgress=()=>{},plan=planUpdate(oldMap,newMap)}){
  signal.throwIfAborted();
  const stat=await fsp.stat(oldFile);if(!stat.isFile()||stat.size!==oldMap.size)throw Error('Update base package missing or changed');
- const operations=computeOperations(oldMap.map,newMap.map,{info(){},warn(){}});
+ const operations=plan.operations;
  const totalDownload=operations.filter(op=>op.kind===OperationKind.DOWNLOAD).reduce((sum,op)=>sum+op.end-op.start,0);
  let input,output,processed=0,transferred=0;
  const hash=crypto.createHash('sha256');

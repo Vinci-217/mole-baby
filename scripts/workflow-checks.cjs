@@ -18,7 +18,7 @@ async function verifyWorkflow(page,{full=false}={}){
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();
   const panel=page.getByTestId('companion-panel');await expect(panel.locator('.pocket-status progress')).toHaveCount(6);
   await panel.getByRole('button',{name:'状态值变化规则',exact:true}).click();await expect(panel.getByRole('table')).toContainText('每小时');await expect(panel.getByRole('table')).toContainText('+600');
-  await panel.getByRole('button',{name:'状态值变化规则',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await panel.getByLabel('物品分类',{exact:true}).selectOption('food');await expect(panel.locator('.pocket-slot')).toHaveCount(16);await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
+  await panel.getByRole('button',{name:'状态值变化规则',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await panel.getByRole('tab',{name:'食物',exact:true}).click();await expect(panel.locator('.pocket-slot')).toHaveCount(16);await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
   const buttons=panel.locator('.desktop-play>button');await expect(buttons).toHaveCount(9);
   const boxes=await buttons.evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().toJSON()));assert.equal(new Set(boxes.map(b=>Math.round(b.y))).size,3);assert.equal(new Set(boxes.map(b=>Math.round(b.x))).size,3);

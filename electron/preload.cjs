@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   updates:Object.freeze({
     openRelease:()=>ipcRenderer.invoke('updates:open-release'),
     getState:()=>ipcRenderer.invoke('updates:get-state'),check:()=>ipcRenderer.invoke('updates:check'),download:()=>ipcRenderer.invoke('updates:download'),install:()=>ipcRenderer.invoke('updates:install'),setEnabled:enabled=>ipcRenderer.invoke('updates:set-enabled',enabled),
+    setDownloadPolicy:policy=>ipcRenderer.invoke('updates:set-download-policy',policy),
     setBusy:busy=>{if(typeof busy==='boolean')ipcRenderer.send('updates:busy',busy)},
     onStateChanged:callback=>{const listener=(_event,state)=>callback(state);ipcRenderer.on('updates:state',listener);return()=>ipcRenderer.removeListener('updates:state',listener)},
     onPrepare:callback=>{const listener=(_event,id)=>{if(typeof id!=='string')return;Promise.resolve().then(callback).then(ok=>ipcRenderer.send('updates:prepared',id,ok===true)).catch(()=>ipcRenderer.send('updates:prepared',id,false))};ipcRenderer.on('updates:prepare',listener);return()=>ipcRenderer.removeListener('updates:prepare',listener)},
@@ -61,6 +62,9 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   setPetEffectBounds:bounds=>ipcRenderer.invoke('desktop:set-pet-effect-bounds',bounds),
   setPetAppearance:form=>ipcRenderer.invoke('desktop:set-pet-appearance',form),
   setRoomFullscreen:enabled=>ipcRenderer.invoke('desktop:set-room-fullscreen',enabled),
+  startRoomResize:edge=>ipcRenderer.invoke('desktop:start-room-resize',edge),
+  endRoomResize:()=>ipcRenderer.invoke('desktop:end-room-resize'),
+  adjustRoomSize:(dx,dy)=>ipcRenderer.invoke('desktop:adjust-room-size',dx,dy),
   openManorSite:()=>ipcRenderer.invoke('desktop:open-manor-site'),
   setEdgeHiding: (enabled) => {
     if (typeof enabled !== 'boolean') return Promise.reject(new TypeError('Edge hiding must be a boolean'));

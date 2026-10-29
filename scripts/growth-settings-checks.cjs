@@ -27,8 +27,8 @@ async function verifyGrowthSettings(page,desktop){
   const actions=await openActions(page);await actions.getByRole('button',{name:'状态',exact:true}).click();
   const status=page.getByRole('region',{name:'拉姆状态面板',exact:true});await expect(status.getByRole('progressbar')).toHaveCount(6);await expect(status.getByLabel('物品分类',{exact:true})).toHaveCount(0);
   const backpack=await enterBackpack(page);await expect(backpack.locator('.pocket-status')).toHaveCount(0);await expect(backpack.getByRole('button',{name:'状态值变化规则',exact:true})).toHaveCount(0);
-  assert.deepEqual(await backpack.getByLabel('物品分类',{exact:true}).locator('option').evaluateAll(items=>items.map(i=>i.value)),['food','drink','clean','medicine']);
-  for(const category of ['drink','clean','medicine','food']){await backpack.getByLabel('物品分类',{exact:true}).selectOption(category);await expect(backpack.locator('.pocket-slot')).toHaveCount(16)}
+  assert.deepEqual(await backpack.getByRole('tablist',{name:'物品分类',exact:true}).getByRole('tab').evaluateAll(items=>items.map(i=>i.dataset.category)),['food','drink','clean','medicine']);
+  for(const category of ['drink','clean','medicine','food']){await backpack.locator('[role=tab][data-category='+category+']').click();await expect(backpack.locator('.pocket-slot')).toHaveCount(16)}
   await page.getByTestId('companion-panel').getByRole('button',{name:'关闭小窗',exact:true}).click();
   await enterHome(page);let normal;
   if(desktop)normal=await desktop.evaluate(({BrowserWindow})=>{const b=BrowserWindow.getAllWindows()[0].getBounds();return[b.width,b.height]});

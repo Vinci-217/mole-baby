@@ -499,3 +499,17 @@ test('legacy Windows isolates its Chromium profile and keeps architecture-specif
   assert.notEqual(path.basename(run.app.userData),'mole-baby','an older Chromium must not open the modern profile');
  }
 });
+
+for(const platform of ['win32','darwin'])test(`${platform}: room resize is persisted, blocked for pet/fullscreen and keeps fixed Windows frame flags`,async t=>{
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
+ t.mock.timers.enable({apis:['setInterval']});const initial=run.window.getBounds(),cursor={...run.cursor};
+ assert.equal(run.invoke('desktop:start-room-resize','se'),true);run.cursor.x+=70;run.cursor.y+=40;t.mock.timers.tick(16);run.invoke('desktop:end-room-resize');
+ const resized=run.window.getBounds();assert.equal(resized.width,initial.width+70);assert.equal(resized.height,initial.height+40);
+ assert.deepEqual(JSON.parse(fs.readFileSync(path.join(run.app.userData,'window-state.json'))).normalBounds,resized);
+ await run.invoke('desktop:set-pet-mode',true);assert.equal(run.window.getBounds().width,160);assert.equal(run.invoke('desktop:start-room-resize','se'),false);
+ await run.invoke('desktop:set-pet-mode',false);assert.deepEqual(run.window.getBounds(),resized);
+ await run.invoke('desktop:set-room-fullscreen',true);assert.equal(run.invoke('desktop:start-room-resize','se'),false);await run.invoke('desktop:set-room-fullscreen',false);assert.deepEqual(run.window.getBounds(),resized);
+ assert.throws(()=>run.handles.get('desktop:start-room-resize')({sender:{},senderFrame:{}},'se'),/Untrusted/);assert.throws(()=>run.invoke('desktop:adjust-room-size',Infinity,1));
+ if(platform==='win32'){assert.deepEqual(run.window.resizeChanges??[],[]);assert.equal(run.window.options.thickFrame,false)}
+ Object.assign(run.cursor,cursor);
+});

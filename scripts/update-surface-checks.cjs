@@ -7,7 +7,7 @@ async function verifyUpdateSurface(page,desktop){
  const after=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));for(const field of['createdAt','name','color','coins','inventory'])assert.deepEqual(after[field],before[field]);
  await enterHome(page);await roomTab(page,'设置');const updates=page.getByRole('region',{name:'软件更新',exact:true});await expect(updates).toContainText(`v${version}`);await expect(updates.getByRole('button',{name:'检查更新',exact:true})).toBeDisabled();await expect(updates.getByLabel('启动时检查更新',{exact:true})).toBeChecked();
  await page.evaluate(()=>window.desktop.updates.setEnabled(false));await expect(updates.getByLabel('启动时检查更新',{exact:true})).not.toBeChecked();assert.equal((await page.evaluate(()=>window.desktop.updates.getState())).enabled,false);
- await page.evaluate(()=>window.desktop.updates.setEnabled(true));await expect(updates.getByLabel('启动时检查更新',{exact:true})).toBeChecked();await toDesktop(page);
+ await page.evaluate(()=>window.desktop.updates.setEnabled(true));await expect(updates.getByLabel('启动时检查更新',{exact:true})).toBeChecked();await page.evaluate(()=>window.desktop.updates.setDownloadPolicy('full'));await expect(updates.getByRole('button',{name:'完整包',exact:true})).toHaveAttribute('aria-pressed','true');assert.equal((await page.evaluate(()=>window.desktop.updates.getState())).downloadPolicy,'full');await page.evaluate(()=>window.desktop.updates.setDownloadPolicy('auto'));await expect(updates.getByRole('button',{name:'自动选择',exact:true})).toHaveAttribute('aria-pressed','true');await toDesktop(page);
  console.log('PASS: packaged updater settings/IPC, persisted toggle and renderer save checkpoint; disabled test contexts never contact live releases');
 }
 module.exports={verifyUpdateSurface};

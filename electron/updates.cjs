@@ -1,18 +1,20 @@
 const fs=require('node:fs'),fsp=fs.promises,path=require('node:path'),crypto=require('node:crypto'),semver=require('semver');
 const {REPOSITORY}=require('./update-source.cjs');
 const {parseBlockMap,readBlockMapResponse,downloadDifferential,downloadFull}=require('./differential-download.cjs');
+const {planUpdate,fullDownloadMessage}=require('./update-plan.cjs');
+const {downloadWindowsDifference}=require('./windows-update-download.cjs');
 const ACTIVE=new Set(['checking','downloading','installing']);
 function stableNewer(next,current){return Boolean(semver.valid(next)&&!semver.prerelease(next)&&semver.gt(next,current))}
-function readEnabled(file){try{return JSON.parse(fs.readFileSync(file,'utf8')).enabled!==false}catch{return true}}
+function readPreferences(file){try{const v=JSON.parse(fs.readFileSync(file,'utf8'));return{enabled:v.enabled!==false,downloadPolicy:v.downloadPolicy==='full'?'full':'auto'}}catch{return{enabled:true,downloadPolicy:'auto'}}}
 function checksumEntry(text,name){const line=text.split(/\r?\n/).find(line=>line.endsWith(`  ${name}`));if(!line||!new RegExp(`^[a-f0-9]{64}  `).test(line))throw Error('Update checksum missing');return line.slice(0,64)}
 async function hashFile(file){const h=crypto.createHash('sha256');for await(const part of fs.createReadStream(file))h.update(part);return h.digest('hex')}
 /** No renderer-supplied URLs, executable paths, versions or feed overrides. */
 function createUpdates(options){
  const{version,platform,arch,configFile,cacheDirectory,fetch:fetcher,openPath,prepareInstall,onChange=()=>{},onAvailable=()=>{},onReady=()=>{}}=options;
  const supported=['win32','darwin'].includes(platform),disabled=Boolean(options.disabled)||!supported;
- const initiallyEnabled=readEnabled(configFile);
+ const preferences=readPreferences(configFile),initiallyEnabled=preferences.enabled;
  const automaticInstall=platform==='win32'?Boolean(options.installed):platform==='darwin'&&options.macSigned===true;
- let state={downloadMode:null,transferredBytes:0,totalBytes:0,fullSize:0,reusedBytes:0,fallbackReason:null,status:disabled?'disabled':'idle',currentVersion:version,version:null,percent:0,enabled:initiallyEnabled,automaticInstall,checkedAt:null,message:disabled?'当前环境不运行软件更新。':initiallyEnabled?'启动后会检查更新，下载和安装均需你确认。':'启动时检查已关闭，仍可手动检查更新。'};
+ let state={downloadPolicy:preferences.downloadPolicy,downloadMode:null,transferredBytes:0,totalBytes:0,fullSize:0,reusedBytes:0,fallbackReason:null,status:disabled?'disabled':'idle',currentVersion:version,version:null,percent:0,enabled:initiallyEnabled,automaticInstall,checkedAt:null,message:disabled?'当前环境不运行软件更新。':initiallyEnabled?'启动后会检查更新，下载和安装均需你确认。':'启动时检查已关闭，仍可手动检查更新。'};
  let engine=null,downloadedFile=null,checkPromise=null,downloadPromise=null,startTimer=null,retryTimer=null,disposed=false,lastAutomaticCheck=0,manualInfo=null,approvedDownloadVersion=null;
  const shutdown=new AbortController();
  const engineCancellation=new(require('builder-util-runtime').CancellationToken)();
@@ -42,16 +44,13 @@ function createUpdates(options){
  function loadEngine(){
   if(engine)return engine;
   engine=options.engineFactory();
-  engine.autoDownload=false;engine.autoInstallOnAppQuit=false;engine.allowPrerelease=false;engine.allowDowngrade=false;engine.disableDifferentialDownload=false;engine.disableWebInstaller=true;
+  engine.autoDownload=false;engine.autoInstallOnAppQuit=false;engine.allowPrerelease=false;engine.allowDowngrade=false;engine.disableDifferentialDownload=state.downloadPolicy==='full';engine.disableWebInstaller=true;
   // Observe the existing downloader instead of replacing NSIS installation.
   // A true result means its own fallback will download the complete package.
   if(typeof engine.differentialDownloadInstaller==='function'){
-   const differential=engine.differentialDownloadInstaller.bind(engine);
    engine.differentialDownloadInstaller=async(...args)=>{
-    publish({downloadMode:'differential',fullSize:args[0].info.size??0,message:'正在下载更新的变化部分…'});
-    const full=await differential(...args);
-    if(full)publish({downloadMode:'full',transferredBytes:0,totalBytes:args[0].info.size??0,reusedBytes:0,fallbackReason:'incremental-unavailable',message:'增量暂不可用，正在下载完整更新包…'});
-    return full;
+    const selected=plan=>publish({downloadMode:plan.mode,fullSize:args[0].info.size??0,totalBytes:plan.mode==='full'?args[0].info.size:plan.downloadBytes,reusedBytes:plan.mode==='full'?0:plan.reusedBytes,fallbackReason:plan.reason,message:plan.mode==='full'?fullDownloadMessage(plan.reason):'正在下载更新的变化部分…'});
+    try{return await downloadWindowsDifference(engine,args,selected)}catch(error){ensureActive();if(args[1].cancellationToken?.cancelled)throw error;selected({mode:'full',reason:'incremental-unavailable'});return true}
    };
   }
   engine.on('checking-for-update',()=>{if(checking())publish({message:'正在检查 GitHub 最新正式版…'})});
@@ -62,7 +61,7 @@ function createUpdates(options){
    publish({status:'available',version:info.version,checkedAt:Date.now(),percent:0,message:'发现新版本，请确认是否下载更新。'});onAvailable({...state});
   });
   let progressAt=0;
-  engine.on('download-progress',p=>{if(disposed||!approvedDownloadVersion||state.status!=='downloading'||!Number.isFinite(p.percent))return;if(Date.now()-progressAt<400&&p.percent<100)return;progressAt=Date.now();publish({status:'downloading',downloadMode:state.downloadMode==='differential'?'differential':'full',percent:Math.max(0,Math.min(99,Math.floor(p.percent))),transferredBytes:Number.isFinite(p.transferred)?p.transferred:state.transferredBytes,totalBytes:Number.isFinite(p.total)?p.total:state.totalBytes,reusedBytes:state.downloadMode==='differential'&&p.total?Math.max(0,state.fullSize-p.total):0,message:state.downloadMode==='differential'?'正在下载更新的变化部分…':state.fallbackReason?'增量暂不可用，正在下载完整更新包…':'正在后台下载完整更新包…'})});
+  engine.on('download-progress',p=>{if(disposed||!approvedDownloadVersion||state.status!=='downloading'||!Number.isFinite(p.percent))return;if(Date.now()-progressAt<400&&p.percent<100)return;progressAt=Date.now();publish({status:'downloading',downloadMode:state.downloadMode==='differential'?'differential':'full',percent:Math.max(0,Math.min(99,Math.floor(p.percent))),transferredBytes:Number.isFinite(p.transferred)?p.transferred:state.transferredBytes,totalBytes:Number.isFinite(p.total)?p.total:state.totalBytes,reusedBytes:state.downloadMode==='differential'&&p.total?Math.max(0,state.fullSize-p.total):0,message:state.downloadMode==='differential'?'正在下载更新的变化部分…':state.fallbackReason?fullDownloadMessage(state.fallbackReason):'正在后台下载完整更新包…'})});
   engine.on('update-downloaded',info=>{if(!disposed&&state.status==='downloading'&&info.version===state.version&&info.version===approvedDownloadVersion&&stableNewer(info.version,version))ready(info)});
   engine.on('error',fail);
   return engine;
@@ -85,20 +84,21 @@ function createUpdates(options){
    }finally{pending.finish()}
   };
   try{
-   if(blockmapDigest){try{const result=await index(url+'.blockmap',blockmapDigest);newMapBytes=result.bytes;newMap=result.parsed}catch{ensureActive()}}
+   if(blockmapDigest&&state.downloadPolicy!=='full'){try{const result=await index(url+'.blockmap',blockmapDigest);newMapBytes=result.bytes;newMap=result.parsed}catch{ensureActive()}}
    let result;
-   if(newMap){
+   if(newMap&&state.downloadPolicy!=='full'){
     try{
-     ensureActive();await fsp.access(base);
+     ensureActive();try{await fsp.access(base)}catch{const e=Error('Missing baseline');e.code='ERR_UPDATE_BASELINE';throw e}
      let oldMap;
      try{oldMap=parseBlockMap(await fsp.readFile(base+'.blockmap'))}
      catch{ensureActive();oldMap=(await index(`${REPOSITORY}/releases/download/v${version}/${baseName}.blockmap`)).parsed}
-     publish({downloadMode:'differential',fullSize:newMap.size,message:'正在下载更新的变化部分…'});
-     result=await downloadDifferential({oldFile:base,newFile:partial,oldMap,newMap,url,digest,request,signal:shutdown.signal,onProgress:progress});
-    }catch(error){ensureActive();publish({downloadMode:'full',percent:0,transferredBytes:0,totalBytes:0,reusedBytes:0,fallbackReason:error.code==='ERR_UPDATE_RANGE'?'range-unsupported':'incremental-unavailable',message:'增量暂不可用，正在下载完整更新包…'})}
+     const plan=planUpdate(oldMap,newMap);
+     publish({downloadMode:plan.mode,fullSize:newMap.size,totalBytes:plan.mode==='full'?newMap.size:plan.downloadBytes,reusedBytes:plan.mode==='full'?0:plan.reusedBytes,fallbackReason:plan.reason,message:plan.mode==='full'?fullDownloadMessage(plan.reason):'正在下载更新的变化部分…'});
+     if(plan.mode==='differential')result=await downloadDifferential({oldFile:base,newFile:partial,oldMap,newMap,url,digest,request,signal:shutdown.signal,onProgress:progress,plan});
+    }catch(error){ensureActive();const reason=error.code==='ERR_UPDATE_RANGE'?'range-unsupported':error.code==='ERR_UPDATE_BASELINE'?'baseline-missing':'incremental-unavailable';publish({downloadMode:'full',percent:0,transferredBytes:0,totalBytes:0,reusedBytes:0,fallbackReason:reason,message:fullDownloadMessage(reason)})}
    }
    if(!result){
-    ensureActive();publish({downloadMode:'full',message:'正在下载完整更新包…'});progressAt=0;
+    ensureActive();const reason=state.downloadPolicy==='full'?'user-full':state.fallbackReason??'incremental-unavailable';publish({downloadMode:'full',fallbackReason:reason,message:fullDownloadMessage(reason)});progressAt=0;
     result=await downloadFull({url,newFile:partial,digest,request,signal:shutdown.signal,onProgress:progress});
    }
    ensureActive();await fsp.rename(partial,target);ensureActive();
@@ -155,7 +155,7 @@ function createUpdates(options){
   if(confirmed!==true||disabled||disposed)return Promise.resolve(false);if(downloadPromise)return downloadPromise;
   if(state.status!=='available')return Promise.resolve(false);
   approvedDownloadVersion=state.version;
-  publish({status:'downloading',percent:0,message:'正在下载已确认的更新…'});
+  publish({status:'downloading',percent:0,...(state.downloadPolicy==='full'?{downloadMode:'full',fallbackReason:'user-full',message:fullDownloadMessage('user-full')}:{message:'正在比较新旧安装包…'})});
   downloadPromise=Promise.resolve().then(async()=>{try{ensureActive();if(platform==='darwin'&&!options.macSigned)await downloadMac();else{const files=await loadEngine().downloadUpdate(engineCancellation);if(!disposed)downloadedFile=files?.[0]??downloadedFile}return !disposed&&state.status==='ready'}catch(error){fail(error);return false}finally{downloadPromise=null}});return downloadPromise;
  }
  async function install(confirmed=false){
@@ -168,10 +168,12 @@ function createUpdates(options){
  function setEnabled(value){
   if(typeof value!=='boolean')throw new TypeError('Update preference must be a boolean');
   if(disposed)return {...state};
-  fs.mkdirSync(path.dirname(configFile),{recursive:true});fs.writeFileSync(configFile+'.tmp',JSON.stringify({enabled:value}),{mode:0o600});fs.renameSync(configFile+'.tmp',configFile);
+  savePreferences({enabled:value});
   publish({enabled:value});if(engine)engine.autoInstallOnAppQuit=false;
   if(value){if(!['available','ready'].includes(state.status))void check(true)}else{timers.clear(startTimer);timers.clear(retryTimer)}return {...state};
  }
- return {getState:()=>({...state}),check,download,install,setEnabled,start(){if(!disposed&&!disabled&&state.enabled&&startTimer===null)startTimer=later(()=>{startTimer=null;void check(false)},8000)},wake(){void check(false)},dispose(){if(disposed)return;disposed=true;shutdown.abort();engineCancellation.cancel();for(const finish of requests)finish();for(const timer of[startTimer,retryTimer])timers.clear(timer)},repository:REPOSITORY};
+ function savePreferences(patch){fs.mkdirSync(path.dirname(configFile),{recursive:true});fs.writeFileSync(configFile+'.tmp',JSON.stringify({enabled:state.enabled,downloadPolicy:state.downloadPolicy,...patch}),{mode:0o600});fs.renameSync(configFile+'.tmp',configFile)}
+ function setDownloadPolicy(policy){if(!['auto','full'].includes(policy))throw new TypeError('Invalid update download policy');if(disposed)return{...state};if(['downloading','installing'].includes(state.status))throw Error('更新进行中，请结束后再修改下载策略。');savePreferences({downloadPolicy:policy});if(engine)engine.disableDifferentialDownload=policy==='full';publish({downloadPolicy:policy});return{...state}}
+ return {getState:()=>({...state}),check,download,install,setEnabled,setDownloadPolicy,start(){if(!disposed&&!disabled&&state.enabled&&startTimer===null)startTimer=later(()=>{startTimer=null;void check(false)},8000)},wake(){void check(false)},dispose(){if(disposed)return;disposed=true;shutdown.abort();engineCancellation.cancel();for(const finish of requests)finish();for(const timer of[startTimer,retryTimer])timers.clear(timer)},repository:REPOSITORY};
 }
 module.exports={createUpdates,stableNewer,checksumEntry,hashFile,REPOSITORY};

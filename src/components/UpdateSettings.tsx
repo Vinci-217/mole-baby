@@ -10,6 +10,8 @@ export default function UpdateSettings(){
  return <section className="update-settings" aria-label="软件更新">
   <div className="update-heading"><strong>软件更新</strong><span>v{state.currentVersion}{state.version&&` → v${state.version}`}</span></div>
   <label className="update-switch"><span>启动时检查更新</span><input type="checkbox" aria-label="启动时检查更新" checked={state.enabled} disabled={state.status==='disabled'||state.status==='installing'} onChange={e=>run(()=>window.desktop!.updates.setEnabled(e.target.checked))}/></label>
+  <div className="update-policy" role="group" aria-label="更新下载策略"><span>下载方式</span><div>{([['auto','自动选择'],['full','完整包']] as const).map(([id,label])=><button type="button" key={id} aria-pressed={(state.downloadPolicy??'auto')===id} disabled={['disabled','downloading','installing'].includes(state.status)} onClick={()=>run(()=>window.desktop!.updates.setDownloadPolicy(id))}>{label}</button>)}</div></div>
+  <p className="update-note">{state.downloadPolicy==='full'?'使用完整安装包；同一版本的已校验缓存仍可复用。':'自动比较新旧内容：变化少时下载差量，变化多或无法复用时下载完整包。'}</p>
   <p role="status">{failure?'操作暂时未完成，请重试。':state.message}</p>
   {state.status==='downloading'&&<progress aria-label="更新下载进度" max={100} value={state.percent}/>}
   {['downloading','ready'].includes(state.status)&&state.downloadMode&&<p className="update-transfer">{state.downloadMode==='cached'?'使用已校验的本地更新包':`${state.downloadMode==='differential'?'增量下载':'完整下载'} · ${megabytes(state.transferredBytes??0)}${state.totalBytes?` / ${megabytes(state.totalBytes)}`:''}`}{state.status==='ready'&&Boolean(state.reusedBytes)&&` · 复用本地 ${megabytes(state.reusedBytes!)}`}</p>}

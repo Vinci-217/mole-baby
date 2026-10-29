@@ -47,7 +47,7 @@ ConvertTo-Json -Compress -InputObject @([HoverCheck]::Inspect(${desktop.process(
  // Renderer captures cannot see Chromium's separate tooltip HWND. Inspect
  // actual Windows-owned top-level windows after the hover delay and resize.
  const{openActions}=require('./smoke-helpers.cjs');
- await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('.pocket-heading select').selectOption('food');
+ await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('[role=tab][data-category=food]').click();
  await page.locator('.pocket-slot:not(:disabled)[data-item-id]').first().hover();
  await page.waitForTimeout(1300);noHoverWindow('hovering food');
  await page.getByRole('button',{name:'关闭小窗',exact:true}).click();await page.mouse.move(0,0);await page.waitForTimeout(300);noHoverWindow('after closing food');

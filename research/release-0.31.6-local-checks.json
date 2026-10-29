@@ -1,0 +1,47 @@
+{
+  "version": "0.31.6",
+  "recordedAt": "2026-10-29T16:01:16.250130+00:00",
+  "baseSha": "42f5f863943a9ddf9d8603674ab47fa86a7c1190",
+  "checks": {
+    "automatedTests": {
+      "vitestPassed": 381,
+      "nodePassed": 149,
+      "totalPassed": 530,
+      "exitCode": 0
+    },
+    "productionBuild": {
+      "exitCode": 0,
+      "losslessImages": 1126
+    },
+    "nativeFullRegression": {
+      "host": "linux",
+      "electron": "37.10.3",
+      "exitCode": 0
+    },
+    "roomPocketRegression": {
+      "host": "linux",
+      "exitCode": 0,
+      "nativeCursor": true,
+      "keyboard": true,
+      "fullscreenAndDesktopRestore": true,
+      "persistedRoomBounds": true,
+      "categories": [
+        "food",
+        "drink",
+        "clean",
+        "medicine"
+      ],
+      "inventoryFixtureRestored": true,
+      "squareGrid": 16,
+      "desktopPanelSize": [
+        212,
+        216
+      ]
+    }
+  },
+  "screenshots": {
+    "docs/previews/v316/small-room.png": "7b9e499f06c8c4bc9540a7847903e0bfbbc5394d043176550bb8efe0b7d1f2f0",
+    "docs/previews/v316/desktop-pocket.png": "4ca2b8c8eb551dab18b5a856654769a3318553489871f9e81467d56bac3d77e5"
+  },
+  "scope": "Exact-version local unit/build and Linux native tests; final Windows/Mac packages are independently gated by the release workflow."
+}

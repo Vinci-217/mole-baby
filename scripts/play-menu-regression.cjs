@@ -55,7 +55,7 @@ async function main(){
   const supplies=[];
   for(const item of newItems){
     const form=['middle','junior','senior','classic'].find(f=>index[f+'-'+item.sourceId]);assert.ok(form,item.name+' must have a supplied original form');
-    await setup({junior:60,middle:180,senior:420,classic:840}[form],form==='classic'?'classic':undefined,false,item);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();const pocket=await enterBackpack(page);await pocket.getByLabel('物品分类',{exact:true}).selectOption(item.category);await pocket.locator(`[data-item-id="${item.id}"]`).click();
+    await setup({junior:60,middle:180,senior:420,classic:840}[form],form==='classic'?'classic':undefined,false,item);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();const pocket=await enterBackpack(page);await pocket.locator('[role=tab][data-category='+item.category+']').click();await pocket.locator(`[data-item-id="${item.id}"]`).click();
     const frame=page.locator('.ram-uploaded canvas[data-sheet=uploaded]');await expect(frame).toHaveAttribute('data-loaded','true',{timeout:30000});await expect(frame).toHaveAttribute('data-uploaded-id',item.sourceId);await expect(frame).toHaveAttribute('data-form',form);
     const saved=await save();assert.equal(saved.inventory[item.id]??0,0,item.name+' must consume exactly one');assert.ok(['hunger','thirst','cleanliness','happiness','health'].some(key=>saved.stats[key]>(key==='health'?40:20)+.5),item.name+' must apply its care effect');supplies.push({id:item.id,name:item.name,category:item.category,form,clip:item.sourceId});await page.keyboard.press('Escape');
   }

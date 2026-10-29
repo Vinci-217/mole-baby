@@ -41,6 +41,7 @@ import {openManorSite} from './external-sites';
 import SettingsPanel,{SettingsSection} from './components/SettingsPanel';
 import StatusPocket from './components/StatusPocket';
 import {useRoomFullscreen} from './use-room-fullscreen';
+import RoomResizeHandles from './components/RoomResizeHandles';
 import RoomSettings from './components/RoomSettings';
 import RoomWalker from './components/RoomWalker';
 import { useRoomMedia } from './room-media';
@@ -591,6 +592,7 @@ export default function App() {
   if (!pet && waitingForReopen && !window.desktop) return <div className="farewell-page"><img src="./icons/ramu.png" alt=""/><h1>好好说了再见</h1><p>这只拉姆和它的回忆已从本机移除。</p><button className="game-button" onClick={() => location.reload()}>重新打开领养处</button></div>;
 
   return <div className={`classic-app ramu-v6 ${roomScreen.fullscreen?'is-room-fullscreen':''}`}>
+    {pet&&window.desktop&&!roomScreen.fullscreen&&!roomScreen.busy&&<RoomResizeHandles/>}
     <header className="classic-titlebar"><div>拉姆</div><div>{window.desktop && <><button onClick={() => window.desktop?.minimize()} aria-label="最小化到托盘">－</button><button onClick={() => window.desktop?.close()} aria-label="关闭窗口">×</button></>}</div></header>
     <TimeScene media={roomMedia}>
       {pet&&<RoomFurnishingLayer pet={current} edit={panel==='decor'} onPlace={(id,x,y)=>updateFurniture(id,x,y)} hasWall={hasRoomWall(roomMedia.background.id)}/>}

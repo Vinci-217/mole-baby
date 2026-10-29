@@ -42,7 +42,7 @@ async function verifyTransparentHover(page,desktop,options={}){
   if(desktop)await page.evaluate(async()=>{await window.desktop.setPetMode(true);await window.desktop.setEdgeHiding(false)});
   await expect(page.getByTestId('desktop-character').locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:20000});
   await noTitles();await captureClearTop('idle');
-  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('.pocket-heading select').selectOption('food');
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('[role=tab][data-category=food]').click();
   const pocket=page.locator('.pocket-compact'),hint=pocket.getByRole('tooltip'),biscuit=pocket.locator('[data-item-id="biscuit"]');
   await expect(pocket).toBeVisible();await noTitles();
   await biscuit.hover();await expect(hint).toContainText('饱食');
@@ -52,14 +52,14 @@ async function verifyTransparentHover(page,desktop,options={}){
   await page.waitForTimeout(1200);
   await page.screenshot({path:path.join(out,'food-hover.png'),omitBackground:true});
   await pocket.locator('.pocket-heading').hover();await expect(hint).toHaveCount(0);
-  await pocket.getByLabel('物品分类',{exact:true}).focus();await expect(hint).toHaveCount(0);
+  await pocket.getByRole('tab',{name:'食物',exact:true}).focus();await expect(hint).toHaveCount(0);
   await biscuit.focus();await expect(hint).toContainText('饱食');
-  await pocket.getByLabel('物品分类',{exact:true}).selectOption('drink');await expect(hint).toHaveCount(0);
+  await pocket.getByRole('tab',{name:'饮品',exact:true}).click();await expect(hint).toHaveCount(0);
   const juice=pocket.locator('[data-item-id="juice"]');await juice.hover();await expect(hint).toContainText('水分');
   await juice.click();await expect(hint).toHaveCount(0);
   await pocket.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await expect(hint).toHaveCount(0);await noTitles();await captureClearTop('after-pocket-close');
-  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('.pocket-heading select').selectOption('food');
+  await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('[role=tab][data-category=food]').click();
   await expect(pocket).toBeVisible();await expect(hint).toHaveCount(0);await noTitles();
   await pocket.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();

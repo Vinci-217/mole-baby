@@ -114,3 +114,15 @@ test('Mac metadata bypasses stale HTTP caches and opening a DMG explains the rem
  assert.match(f.updates.getState().message,/拖到.*应用程序.*替换/);
  assert.equal(f.updates.getState().status,'ready');assert.equal(f.installs,0);
 });
+
+test('Windows download policy reloads independently of startup consent and controls the existing updater engine',async t=>{
+ const first=fixture(t);first.updates.setDownloadPolicy('full');first.updates.setEnabled(false);
+ const restored=fixture(t,{configFile:first.configFile});assert.equal(restored.updates.getState().downloadPolicy,'full');assert.equal(restored.updates.getState().enabled,false);
+ await restored.updates.check();assert.equal(restored.engine.disableDifferentialDownload,true);assert.equal(restored.downloads,0);assert.equal(restored.installs,0);
+ restored.updates.setDownloadPolicy('auto');assert.equal(restored.engine.disableDifferentialDownload,false);assert.equal(restored.downloads,0);assert.equal(restored.installs,0);
+});
+test('changing download policy cannot alter an in-flight authorized transfer',async t=>{
+ const f=fixture(t);let finish;f.engine.downloadUpdate=()=>new Promise(resolve=>finish=resolve);await f.updates.check();const pending=f.updates.download(true);await Promise.resolve();
+ assert.throws(()=>f.updates.setDownloadPolicy('full'),/更新进行中/);assert.equal(f.updates.getState().downloadPolicy,'auto');
+ f.engine.emit('update-downloaded',{version:'1.1.0',downloadedFile:'installer.exe'});finish(['installer.exe']);assert.equal(await pending,true);f.updates.setDownloadPolicy('full');assert.equal(f.updates.getState().downloadPolicy,'full');
+});

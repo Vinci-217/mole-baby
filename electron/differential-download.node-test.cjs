@@ -4,11 +4,11 @@ const{parseBlockMap}=require('./differential-download.cjs');
 const{createUpdates}=require('./updates.cjs');
 const{createUpdateServer,mappedFetch}=require('../scripts/incremental-test-server.cjs');
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
-async function fixture(t,{baseline=true,corruptBase=false,corruptIndex=false}={}){
+async function fixture(t,{baseline=true,corruptBase=false,corruptIndex=false,unrelated=false}={}){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-delta-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
  const cache=path.join(dir,'cache');fs.mkdirSync(cache);
  const oldName='mole-baby-1.0.0-mac-arm64.dmg',name='mole-baby-1.0.1-mac-arm64.dmg';
- const before=crypto.randomBytes(4*1024*1024),after=Buffer.concat([before.subarray(0,100000),Buffer.from('A real insertion changes offsets'),before.subarray(100000)]);
+ const before=crypto.randomBytes(4*1024*1024),after=unrelated?crypto.randomBytes(before.length):Buffer.concat([before.subarray(0,100000),Buffer.from('A real insertion changes offsets'),before.subarray(100000)]);
  const oldFile=path.join(dir,oldName),file=path.join(dir,name);fs.writeFileSync(oldFile,before);fs.writeFileSync(file,after);
  for(const f of[oldFile,file])await buildBlockMap(f,'gzip',f+'.blockmap');
  const map=fs.readFileSync(file+'.blockmap'),oldMap=fs.readFileSync(oldFile+'.blockmap');
@@ -35,6 +35,19 @@ test('missing cached baseline downloads and verifies the complete package',async
  const f=await fixture(t,{baseline:false});await f.updates.check();assert.equal(await f.updates.download(true),true);
  assert.equal(f.updates.getState().downloadMode,'full');assert.deepEqual(fs.readFileSync(path.join(f.cache,f.name)),f.after);
  assert.deepEqual(f.server.requests.filter(r=>r.path.endsWith('.dmg')).map(r=>[r.range,r.status]),[[null,200]]);
+});
+test('a complete content replacement chooses full transfer without attempting any Range request',async t=>{
+ const f=await fixture(t,{unrelated:true});await f.updates.check();assert.equal(await f.updates.download(true),true);const state=f.updates.getState();
+ assert.equal(state.downloadMode,'full');assert.equal(state.fallbackReason,'large-change');assert.deepEqual(fs.readFileSync(path.join(f.cache,f.name)),f.after);
+ assert.deepEqual(f.server.requests.filter(r=>r.path.endsWith('.dmg')).map(r=>[r.range,r.status]),[[null,200]]);
+});
+test('full download preference persists across check toggles and bypasses differences without granting consent',async t=>{
+ const f=await fixture(t);await f.updates.check();f.updates.setDownloadPolicy('full');f.updates.setEnabled(false);
+ assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.dir,'updates.json'))),{enabled:false,downloadPolicy:'full'});assert.equal(await f.updates.download(false),false);
+ assert.equal(await f.updates.download(true),true);assert.equal(f.updates.getState().fallbackReason,'user-full');assert.equal(f.updates.getState().downloadMode,'full');
+ assert.equal(f.server.requests.some(r=>r.path.endsWith('.blockmap')),false,'Explicit full policy bypasses difference indexes as well as Range transfers');
+ assert.deepEqual(f.server.requests.filter(r=>r.path.endsWith('.dmg')).map(r=>[r.range,r.status]),[[null,200]]);
+ assert.deepEqual(fs.readFileSync(path.join(f.cache,f.name)),f.after);assert.throws(()=>f.updates.setDownloadPolicy('delta-url'));
 });
 test('server without Range support falls back to a complete verified package',async t=>{
  const f=await fixture(t);f.server.behavior.range='unsupported';await f.updates.check();assert.equal(await f.updates.download(true),true);

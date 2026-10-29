@@ -1,6 +1,6 @@
 export {};
 declare global {
-  interface UpdateState {status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string;downloadMode?:'differential'|'full'|'cached'|null;transferredBytes?:number;totalBytes?:number;fullSize?:number;reusedBytes?:number;fallbackReason?:string|null}
+  interface UpdateState {downloadPolicy?:'auto'|'full';status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string;downloadMode?:'differential'|'full'|'cached'|null;transferredBytes?:number;totalBytes?:number;fullSize?:number;reusedBytes?:number;fallbackReason?:string|null}
   interface DesktopState {
     petMode: boolean;
     roomFullscreen?:boolean;
@@ -27,7 +27,7 @@ declare global {
   interface Window {
     desktop?: {
       isElectron: boolean;
-      updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
+      updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setDownloadPolicy:(policy:'auto'|'full')=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
       platform: string;
       setMusicState:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
       onMusicToggle:(callback:(enabled:boolean)=>void)=>()=>void;
@@ -44,6 +44,9 @@ declare global {
       toggleAlwaysOnTop: () => Promise<boolean>;
       setPetMode: (enabled: boolean) => Promise<boolean>;
       setRoomFullscreen:(enabled:boolean)=>Promise<boolean>;
+      startRoomResize:(edge:'n'|'ne'|'e'|'se'|'s'|'sw'|'w'|'nw')=>Promise<boolean>;
+      endRoomResize:()=>Promise<void>;
+      adjustRoomSize:(dx:number,dy:number)=>Promise<boolean>;
       openManorSite:()=>Promise<void>;
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
       setPetStatus:(status:{name:string;stage:number;sleeping:boolean;stats:Record<string,number>;activity?:'course'|'restaurant'|'outing'}|null)=>Promise<void>;
