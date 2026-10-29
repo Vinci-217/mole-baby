@@ -99,9 +99,9 @@ async function main(){
       desktop=await _electron.launch({executablePath:exe,args:[`--user-data-dir=${path.join(dir,'profile-'+scale)}`,...(scale===1?[]:[`--force-device-scale-factor=${scale}`])],env:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1',ELECTRON_DEV:'0'},timeout:30000});
       for(const stream of[desktop.process().stdout,desktop.process().stderr])stream?.on('data',c=>{processOutput=(processOutput+c.toString()).slice(-12000)});
       let page=await desktop.firstWindow();page.setDefaultTimeout(20000);await page.waitForFunction(()=>window.desktop?.isElectron);
-      const environment={os:os.release(),baseline,...await desktop.evaluate(({app,screen})=>({runtime:process.versions.electron,displayScale:screen.getPrimaryDisplay().scaleFactor,hardwareAcceleration:app.isHardwareAccelerationEnabled(),gpuFeatures:app.getGPUFeatureStatus()}))};
+      let environment={os:os.release(),baseline,...await desktop.evaluate(({app,screen})=>({runtime:process.versions.electron,displayScale:screen.getPrimaryDisplay().scaleFactor,disableGpuSwitch:app.commandLine.hasSwitch('disable-gpu'),gpuFeatures:app.getGPUFeatureStatus()}))};
       console.log('SURFACE_ENVIRONMENT '+JSON.stringify(environment));
-      if(blackSurface&&!baseline)assert.equal(environment.hardwareAcceleration,false,'Both Windows editions must start in software mode');
+      if(blackSurface&&!baseline)assert.equal(environment.disableGpuSwitch,true,'Both Windows editions must request software mode before startup');
       await adopt(page,'红色','小红');
       const state=await page.evaluate(seed=>{const entries=Object.fromEntries(Object.entries(localStorage)),p=JSON.parse(entries['ramu-house-save-v1']);p.growth=seed?0:60;p.growthLocked=true;delete p.evolution;p.sleeping=false;p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};p.lastTick=Date.now();entries['ramu-house-save-v1']=JSON.stringify(p);entries['ramu-house-preferences-v2']=JSON.stringify({quiet:true,lively:false,presence:false,sound:false});return entries},blackSurface);
       await reloadWithStorage(page,state);await expect(page.getByTestId('desktop-character')).toBeVisible();
@@ -117,6 +117,14 @@ async function main(){
       const location=await desktop.evaluate(({BrowserWindow,screen})=>({bounds:BrowserWindow.getAllWindows()[0].getBounds(),area:screen.getPrimaryDisplay().workArea}));
       await page.evaluate(async p=>window.desktop.movePet(p.area.x+Math.round(p.area.width/2)-p.bounds.x,p.area.y+Math.round(p.area.height/2)-p.bounds.y),location);
       await page.waitForTimeout(7000);
+      if(blackSurface){
+        environment={os:os.release(),baseline,...await desktop.evaluate(({app,screen})=>({runtime:process.versions.electron,displayScale:screen.getPrimaryDisplay().scaleFactor,disableGpuSwitch:app.commandLine.hasSwitch('disable-gpu'),gpuFeatures:app.getGPUFeatureStatus()}))};
+        console.log('WARM_RENDERING_STATE '+JSON.stringify(environment));
+        if(!baseline){
+          assert.equal(environment.disableGpuSwitch,true,'Cold restart must preserve the software composition policy');
+          assert.match(environment.gpuFeatures.gpu_compositing,/^(disabled|unavailable)/,'Native GPU compositing must actually be disabled');
+        }
+      }
       const initial=await capture(desktop,page,out,`scale-${scale}-initial`);reports.push({scale,kind:'initial',environment,...initial});
       // A separate native HWND deliberately injects a white strip invisible to
       // renderer captures. Verify our detector sees it before trusting a clean run.
