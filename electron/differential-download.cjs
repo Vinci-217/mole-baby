@@ -40,7 +40,9 @@ async function downloadDifferential({oldFile,newFile,oldMap,newMap,url,digest,re
     let offset=op.start;
     while(offset<op.end){const{bytesRead}=await input.read(buffer,0,Math.min(buffer.length,op.end-offset),offset);if(!bytesRead)throw Error('Update base package truncated');await write(buffer.subarray(0,bytesRead));offset+=bytesRead}
    }else{
-    const pending=await request(url,{headers:{Range:`bytes=${op.start}-${op.end-1}`}},2*60000);
+    // A changed range can include hundreds of MB of new animation data.
+    // Use the same transfer deadline as a full download on slower networks.
+    const pending=await request(url,{headers:{Range:`bytes=${op.start}-${op.end-1}`}},20*60000);
     try{
      const response=pending.response,expected=op.end-op.start;
      if(response.status!==206||response.headers.get('content-range')!==`bytes ${op.start}-${op.end-1}/${newMap.size}`||!response.body){await response.body?.cancel?.();throw rangeError()}
