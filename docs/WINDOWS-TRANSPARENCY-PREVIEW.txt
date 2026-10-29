@@ -1,0 +1,19 @@
+拉姆 · Windows 透明背景修复预览
+
+本包是待确认的测试版本，不是新的正式 Release；自动更新渠道没有改变。
+
+Windows 10/11 64 位：选择 mole-baby-transparency-preview-windows。
+老系统 64 位：选择 mole-baby-transparency-preview-legacy-x64。
+老系统或 Windows 10 的 32 位：选择 mole-baby-transparency-preview-legacy-ia32。
+
+先从托盘右键退出正在运行的拉姆，完整解压下载的文件，再启动里面的“拉姆.exe”或“拉姆兼容版.exe”。
+不要只复制 exe。请先在原来的小屋设置中导出存档作备份。
+
+本预览的 Windows 常规版与兼容版都默认选择软件绘制，无需手工添加 --disable-gpu。
+没有更改宠物存档格式、领养或成长数据。Mac/Linux 的绘制设置不变。
+
+验证重点：已领养拉姆后退出重开、进入小屋再返回、隐藏到托盘再显示、拖动和走动。
+正常情况下应直接看到桌面背景，拉姆周围不应有黑色矩形。
+
+云端会验证 Windows Server 2025/2022 上的真实桌面像素；不同显卡、驱动、远程桌面或旧系统的合成环境仍可能不同。
+若仍有黑底，请记录系统版本、拉姆版本，以及是否一启动就出现。

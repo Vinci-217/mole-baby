@@ -15,16 +15,19 @@ const {createUpdatePrompts}=require('./update-prompts.cjs');
 const applicationMetadata=require('../package.json');
 const {windowsRuntime}=require('./windows-runtime.cjs');
 const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetadata,process.arch):null;
-// The compatibility UI uses Canvas2D, not WebGL. Chromium 108's GPU/SwiftShader
-// process can crash with old/virtual drivers; use the CPU compositor instead.
-if(windowsEdition?.edition==='legacy'){
+// This is a transparent Canvas2D desktop pet. Some Windows GPU/driver paths
+// present its alpha surface as an opaque black rectangle even though the DOM
+// and BrowserWindow backgrounds are transparent. Select software composition
+// before app readiness for BOTH Windows editions; do not disable the software
+// rasterizer, which is needed to preserve alpha. Mac/Linux keep their renderer.
+if(process.platform==='win32'){
   app.disableHardwareAcceleration();
   app.commandLine.appendSwitch('disable-gpu');
   // Keep the software renderer available for the legacy display compositor.
   // Chromium still starts a display/GPU service with acceleration disabled.
   // Its old GPU sandbox crashes on newer Windows virtual display drivers.
   // This switch affects that service only; renderer sandboxing stays enabled.
-  app.commandLine.appendSwitch('disable-gpu-sandbox');
+  if(windowsEdition.edition==='legacy')app.commandLine.appendSwitch('disable-gpu-sandbox');
 }
 let updates=null,updateRendererBusy=true,updateCheckpoint=null;
 const updatePrompts=createUpdatePrompts({getUpdates:()=>updates,showMessageBox:options=>mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()?dialog.showMessageBox(mainWindow,options):dialog.showMessageBox(options),onError:error=>console.error('Unable to show update confirmation:',error.message)});

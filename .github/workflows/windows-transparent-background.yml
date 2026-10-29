@@ -1,0 +1,125 @@
+name: Windows transparent background preview
+on:
+  push:
+    branches: ['preview/windows-transparent-background']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-transparent-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    name: Native transparency ${{ matrix.edition }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: modern
+            runner: windows-latest
+            platform: windows
+            arch: x64
+            directory: release/win-unpacked
+            executable: release/win-unpacked/拉姆.exe
+          - edition: legacy
+            runner: windows-2022
+            platform: legacy-x64
+            arch: x64
+            legacy: true
+            directory: release/legacy-x64/win-unpacked
+            executable: release/legacy-x64/win-unpacked/拉姆兼容版.exe
+          - edition: legacy-ia32
+            runner: windows-2022
+            platform: legacy-ia32
+            arch: ia32
+            legacy: true
+            directory: release/legacy-ia32/win-ia32-unpacked
+            executable: release/legacy-ia32/win-ia32-unpacked/拉姆兼容版.exe
+    env:
+      ELECTRON_DEV: '0'
+      MOLE_LEGACY_ARCH: ${{ matrix.arch }}
+      MOLE_TEST_BLACK_SURFACE: '1'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build the Windows preview without publishing
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          npm ci 2>&1 | tee -a artifacts/transparency.log
+          npm test 2>&1 | tee -a artifacts/transparency.log
+          if [ '${{ matrix.legacy }}' = true ]; then
+            npm run build:legacy 2>&1 | tee -a artifacts/transparency.log
+            npx --no-install electron-builder --config electron-builder.legacy.cjs --win nsis --${{ matrix.arch }} --publish never 2>&1 | tee -a artifacts/transparency.log
+          else
+            npm run build 2>&1 | tee -a artifacts/transparency.log
+            npx --no-install electron-builder --win nsis --x64 --publish never 2>&1 | tee -a artifacts/transparency.log
+          fi
+      - name: Compare unchanged public v0.31.4 on the same modern Windows display
+        if: matrix.edition == 'modern'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $file = 'mole-baby-0.31.4-x64.zip'
+          $url = "https://github.com/Vinci-217/mole-baby/releases/download/v0.31.4/$file"
+          curl.exe --fail --location --retry 3 --output "$env:RUNNER_TEMP/$file" $url
+          if ($LASTEXITCODE -ne 0) { throw 'Baseline download failed' }
+          $actual = (Get-FileHash "$env:RUNNER_TEMP/$file" -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne 'e170e27671ee7ec30f42245298637f582f427fcd7b636ab8a15fe2ed3c07fb19') { throw 'Public baseline checksum mismatch' }
+          Expand-Archive "$env:RUNNER_TEMP/$file" "$env:RUNNER_TEMP/mole-public-baseline"
+          $exe = Get-ChildItem "$env:RUNNER_TEMP/mole-public-baseline" -Filter '拉姆.exe' -Recurse | Select-Object -First 1
+          if (-not $exe) { throw 'Baseline executable missing' }
+          node scripts/windows-surface-repro.cjs $exe.FullName modern --baseline 2>&1 | Tee-Object -Append artifacts/transparency.log
+          if ($LASTEXITCODE -ne 0) { throw 'Baseline measurement failed' }
+      - name: Verify real desktop transparency and native black positive controls
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/windows-surface-repro.cjs '${{ matrix.executable }}' '${{ matrix.edition }}' 2>&1 | tee -a artifacts/transparency.log
+      - name: Verify full packaged application behavior
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/verify-preview-package.cjs '${{ matrix.executable }}' 2>&1 | tee -a artifacts/transparency.log
+      - name: Record compact transparency summaries
+        if: always()
+        shell: bash
+        run: |
+          node -e 'for(const name of ["${{ matrix.edition }}","baseline"]){const file=`artifacts/windows-surface-${name}/summary.json`;if(require("fs").existsSync(file))console.log("TRANSPARENCY_SUMMARY "+require("fs").readFileSync(file,"utf8"));}' >> artifacts/transparency.log
+      - name: Include preview instructions
+        shell: bash
+        run: cp docs/WINDOWS-TRANSPARENCY-PREVIEW.txt '${{ matrix.directory }}/透明背景修复预览说明.txt'
+      - name: Upload the tested preview without creating a Release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mole-baby-transparency-preview-${{ matrix.platform }}
+          path: ${{ matrix.directory }}/
+          compression-level: 0
+          retention-days: 7
+      - name: Upload measurement evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: transparency-evidence-${{ matrix.platform }}
+          path: |
+            artifacts/windows-surface-${{ matrix.edition }}/
+            artifacts/windows-surface-baseline/
+            artifacts/transparency.log
+          retention-days: 14
+      - name: Record native test diagnostic
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: ${{ matrix.platform }}
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: artifacts/transparency.log
+          CI_DIAGNOSTIC_MEDIA_DIR: artifacts/windows-surface-${{ matrix.edition }}
+        run: node scripts/save-ci-diagnostic.cjs
