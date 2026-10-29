@@ -143,6 +143,11 @@ async function main(){
           await changeBackdrop('BackdropBlue');
           const entries=await page.evaluate(()=>{const e=Object.fromEntries(Object.entries(localStorage)),p=JSON.parse(e['ramu-house-save-v1']);p.growth=60;e['ramu-house-save-v1']=JSON.stringify(p);return e});
           await reloadWithStorage(page,entries);await expect(page.getByTestId('desktop-character')).toBeVisible();
+          // Reloading intentionally emits the normal white welcome bubble.
+          // Finish that UI transition before reusing the cached clear-margin
+          // mask; otherwise a real speech bubble is mislabelled a native strip.
+          await page.waitForTimeout(7000);
+          await page.waitForFunction(()=>{const b=document.querySelector('.compact-bubble');return !b||Number(getComputedStyle(b).opacity)<.01});
           await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false)});
         }
         await enterHome(page);await page.waitForTimeout(500);
