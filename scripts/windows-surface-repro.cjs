@@ -117,6 +117,7 @@ async function main(){
       const location=await desktop.evaluate(({BrowserWindow,screen})=>({bounds:BrowserWindow.getAllWindows()[0].getBounds(),area:screen.getPrimaryDisplay().workArea}));
       await page.evaluate(async p=>window.desktop.movePet(p.area.x+Math.round(p.area.width/2)-p.bounds.x,p.area.y+Math.round(p.area.height/2)-p.bounds.y),location);
       await page.waitForTimeout(7000);
+      if(blackSurface)await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].moveTop());
       if(blackSurface){
         environment={os:os.release(),baseline,...await desktop.evaluate(({app,screen})=>({runtime:process.versions.electron,displayScale:screen.getPrimaryDisplay().scaleFactor,disableGpuSwitch:app.commandLine.hasSwitch('disable-gpu'),gpuFeatures:app.getGPUFeatureStatus()}))};
         console.log('WARM_RENDERING_STATE '+JSON.stringify(environment));
@@ -147,6 +148,10 @@ async function main(){
         await enterHome(page);await page.waitForTimeout(500);
         if(cycle===1){await page.evaluate(()=>window.desktop.setRoomFullscreen(true));await page.evaluate(()=>window.desktop.setRoomFullscreen(false))}
         await toDesktop(page);await page.waitForTimeout(1000);
+        // Only establish the test z-order once before observation. A normal
+        // backdrop stays below this app and above the runner console; do not
+        // change the user's always-on-top preference or repaint on each shot.
+        if(blackSurface)await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].moveTop());
         // Work in a different, non-overlapping native application. A page-only
         // screenshot or window.blur() misses WM_NCACTIVATE and DWM focus damage.
         work=await form('Work',dir,{Left:8,Top:8,Width:200,Height:90});

@@ -71,7 +71,10 @@ public class ProbeSurface : Form {
   protected override bool ShowWithoutActivation { get { return true; } }
   protected override CreateParams CreateParams { get { var p=base.CreateParams; p.ExStyle|=0x08000080; return p; } }
 }
-public class DesktopBackdrop : ProbeSurface {
+// A background must cover unrelated runner windows. Unlike the nonactivating
+// positive-control overlay, show this as a normal foreground form first; the
+// application is then raised above it without changing its topmost preference.
+public class DesktopBackdrop : Form {
   readonly System.Drawing.Color first,second;
   public DesktopBackdrop(bool blue) {
     first=blue?System.Drawing.Color.FromArgb(61,159,209):System.Drawing.Color.FromArgb(255,242,199);
@@ -103,5 +106,8 @@ $form.Bounds = New-Object System.Drawing.Rectangle($Left,$Top,$Width,$Height)
 if ($Mode -like 'Backdrop*') { $form.Bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds }
 $form.BackColor = $(if ($Mode -eq 'Black') { [System.Drawing.Color]::Black } else { [System.Drawing.Color]::White })
 $form.TopMost = ($Mode -eq 'Bar' -or $Mode -eq 'Black')
-$form.Add_Shown({ [System.IO.File]::WriteAllText($Ready, 'ready') })
+$form.Add_Shown({
+  if ($Mode -like 'Backdrop*') { $form.Activate(); $form.BringToFront() }
+  [System.IO.File]::WriteAllText($Ready, 'ready')
+})
 [System.Windows.Forms.Application]::Run($form)
