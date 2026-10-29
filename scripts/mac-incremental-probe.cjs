@@ -22,7 +22,7 @@ app.whenReady().then(async()=>{
    }finally{if(attached)execFileSync('/usr/bin/hdiutil',['detach',mount],{stdio:'pipe'});fs.rmSync(mount,{recursive:true,force:true})}
    return'';
   }});
-  assert.equal(await updates.check(),true);assert.equal(updates.getState().status,'available');
+  assert.equal(await updates.check(),true,JSON.stringify(updates.getState()));assert.equal(updates.getState().status,'available');
   assert.equal(await updates.download(false),false);assert.equal(await updates.install(true),false);
   assert.equal(await updates.download(true),true);const state=updates.getState();assert.equal(state.status,'ready');assert.equal(state.downloadMode,'differential');assert.ok(state.reusedBytes>0);
   const downloaded=path.join(cache,after.name);assert.equal(await hashFile(downloaded),after.digest);

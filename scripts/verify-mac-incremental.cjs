@@ -21,6 +21,8 @@ async function sha256(file){const hash=crypto.createHash('sha256');for await(con
    console.log(`PASS: built full product Mac ${arch} DMG ${version}, including original animation payload`);
   }
   const next=packages['1.0.1'];files.set('/releases/download/v1.0.1/SHA256SUMS.txt',Buffer.from(`${next.digest}  ${next.name}\n${next.mapDigest}  ${next.name}.blockmap\n`));
+  // The real Mac source supports GET metadata when a HEAD request fails.
+  files.set('/releases/latest/download/latest-mac.yml',Buffer.from('version: 1.0.1\n'));
   service=await createUpdateServer(files);
   const probeConfig=path.join(temp,'probe.json'),reportFile=path.join(temp,'result.json');
   fs.writeFileSync(probeConfig,JSON.stringify({root,temp,origin:service.origin,arch,packages,reportFile}));
@@ -32,5 +34,6 @@ async function sha256(file){const hash=crypto.createHash('sha256');for await(con
   Object.assign(report,{rangeRequests:requests.length,blockmapBytesTransferred:indexBytes,totalUpdateBytesTransferred:service.requests.reduce((sum,r)=>sum+r.bodyBytes,0),savedPercent:Number(((1-(bytes+indexBytes)/report.fullPackageBytes)*100).toFixed(2))});
   fs.writeFileSync(path.join(root,`artifacts/incremental-mac-${arch}.json`),JSON.stringify(report,null,2)+'\n');console.log('INCREMENTAL_REPORT '+JSON.stringify(report));
   console.log('PASS: native Mac DMG incremental reconstruction, exact SHA256, native codesign, disk image mount, bundled version and saved companion data; application replacement was not performed');
- }finally{if(service)await service.close();if(log)fs.closeSync(log);fs.rmSync(temp,{recursive:true,force:true})}
+ }catch(error){if(service)console.error('MAC_UPDATE_REQUESTS '+JSON.stringify(service.requests));throw error}
+ finally{if(service)await service.close();if(log)fs.closeSync(log);fs.rmSync(temp,{recursive:true,force:true})}
 })().catch(error=>{console.error(error);process.exitCode=1});
