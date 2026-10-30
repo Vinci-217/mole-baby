@@ -29,9 +29,14 @@ public final class AndroidSmokeTest {
     static void tap(String expression)throws Exception{
         String script="(()=>{const e="+expression+";if(!e||e.disabled)return null;e.scrollIntoView({block:'nearest',inline:'nearest'});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!hit||!(e===hit||e.contains(hit)))return null;return {x,y,viewport:innerWidth};})()";
         String[] result={null};waitFor(()->{try{result[0]=js(script);return result[0]!=null&&!result[0].equals("null");}catch(Exception e){return false;}},30000,"Button must be usable by a real finger: "+expression);
+        // DOM readiness does not guarantee that WebView has committed its
+        // scroll/layout to the input compositor. Send one tap only, after the
+        // real visual-state callback, then require a trusted click event.
+        drawn();result[0]=js(script);assertNotEquals("The painted button must remain usable", "null",result[0]);
         JSONObject point=new JSONObject(result[0]);int[] location=new int[2],width=new int[1];ui(()->{host().web.getLocationOnScreen(location);width[0]=host().web.getWidth();});double scale=width[0]/point.getDouble("viewport");
-        js("window.__moleTestPointer=null;document.addEventListener('pointerdown',e=>window.__moleTestPointer={x:e.clientX,y:e.clientY,target:e.target.closest('button,input')?.outerHTML?.slice(0,300)},{once:true})");
+        js("window.__moleTestInput?.abort();window.__moleTestInput=new AbortController();window.__moleTestPointer={};for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>window.__moleTestPointer[type]={x:e.clientX,y:e.clientY,trusted:e.isTrusted,target:e.target.closest('button,input')?.outerHTML?.slice(0,300)},{once:true,capture:true,signal:window.__moleTestInput.signal})");
         assertTrue(UiDevice.getInstance(instrumentation).click(location[0]+(int)Math.round(point.getDouble("x")*scale),location[1]+(int)Math.round(point.getDouble("y")*scale)));SystemClock.sleep(180);
+        waitFor(()->{try{return "true".equals(js("window.__moleTestPointer?.click?.trusted===true"));}catch(Exception e){return false;}},5000,"One physical tap must dispatch a trusted click: "+expression);
     }
     static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
