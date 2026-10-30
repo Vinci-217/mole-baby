@@ -8,5 +8,13 @@
   "packagedApplicationPassed": true,
   "installerFinishUnobserved": true,
   "androidResult": "success",
-  "publicationBlockedByGate": true
+  "publicationBlockedByGate": true,
+  "buildResult": "failure",
+  "platforms": {
+    "windows": "success",
+    "legacyWindows": "failure",
+    "mac": "success"
+  },
+  "releaseResult": "skipped",
+  "releaseUrl": null
 }

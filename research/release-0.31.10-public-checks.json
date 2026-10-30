@@ -1,0 +1,203 @@
+{
+  "version": "0.31.10",
+  "sourceSha": "d84ea32f61b00372426b805e7f4722f977d07903",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.10",
+  "checkedAt": "2026-10-30T10:57:34.947Z",
+  "desktopDownloads": [
+    {
+      "name": "mole-baby-0.31.10-x64.zip",
+      "size": 671850350,
+      "sha256": "fa433d05152b31bfc2847854d40592ff4e28680f16426e450c5ddc8893ad7197",
+      "updateTarget": false
+    },
+    {
+      "name": "mole-baby-0.31.10-Setup.exe",
+      "size": 635750355,
+      "sha256": "6ba9aba5c9adddae74b7a90e967fa894e9895ee9f355e6025a7b971984043ebb",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-x64.zip",
+      "size": 639943536,
+      "sha256": "cab1422cb87210184be483bad1ae0a3380a81541f0a741090120f8875bf58d36",
+      "updateTarget": false
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-x64-Setup.exe",
+      "size": 614679261,
+      "sha256": "419e303f809f6c2a4cfa5bc1afb4fa56070c66d32be58564806ffdd69effe5a1",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-ia32.zip",
+      "size": 634426751,
+      "sha256": "438fbde89772b944ffa2c51020d68fcf75b77551a47cb36ada00ee65e96db5f3",
+      "updateTarget": false
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-ia32-Setup.exe",
+      "size": 611047159,
+      "sha256": "23a005edd6a33c4ffeb1364982c899fdfb7b4caf0fe5f3772157692f7541f0b9",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-arm64.dmg",
+      "size": 656093091,
+      "sha256": "9002a69fd0a89195055836fa46d0a296ba0cff2ba0a909bbdb6f91254bc20e6d",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-arm64.zip",
+      "size": 650642678,
+      "sha256": "1a2a54ce247a067bd26f7322fd4673b2db4d4ddb5dc1b50abccf9f9a41a22b01",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-x64.dmg",
+      "size": 662355743,
+      "sha256": "31143705620761f59dbaa6d4cf3e4e4c5b1c00559ad420709c9d3914f54a33eb",
+      "updateTarget": true
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-x64.zip",
+      "size": 657029869,
+      "sha256": "1f6aa054105d4aa4adcf292ce8fcbb7a788164839ec084f3741ddea6d47d8558",
+      "updateTarget": true
+    }
+  ],
+  "smallFiles": [
+    {
+      "name": "latest.yml",
+      "sha256": "8a3b4b60b6440f40eb1d3772c131ca7eafdbb48525c62cc8485493e634c3c901"
+    },
+    {
+      "name": "legacy-x64.yml",
+      "sha256": "1754e09a53be635b49dea963add0abfc3077d8176c468afb27af190b3125a7df"
+    },
+    {
+      "name": "legacy-ia32.yml",
+      "sha256": "beb3d99bc75a1ce2426f1f02acc7d3fba9663a8593c957043790a19cf8ec2693"
+    },
+    {
+      "name": "latest-mac.yml",
+      "sha256": "e50cd8fc0fb68ca737899bd156404c8ff984ca20132b2cbb0ef0710b08aee47b"
+    },
+    {
+      "name": "mole-baby-0.31.10-Setup.exe.blockmap",
+      "sha256": "5a8490bcce092b6c38362fd361e2f301a757c8c3f932a02440fe40a15e2578d2"
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-x64-Setup.exe.blockmap",
+      "sha256": "0e3471885df063ef526563d7f62e5ce42523f3d94a88fadef24cb763de2328b7"
+    },
+    {
+      "name": "mole-baby-0.31.10-legacy-ia32-Setup.exe.blockmap",
+      "sha256": "1296b0256a253b9174537da3b216b8955bd53f92de6919101ae30f3564c67687"
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-arm64.zip.blockmap",
+      "sha256": "f6c7bbed005ebe85ae07af784b6b8227f54aea65deda1dae91a276ab4777187d"
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-arm64.dmg.blockmap",
+      "sha256": "d29ed2dfaa8108003232bbfc8130d529ae65d389451bd4a02368962b85bbdacf"
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-x64.zip.blockmap",
+      "sha256": "911daa5872a52abd396e6131d47d4b75d76fb2b33535dd108952ca5be0b313e9"
+    },
+    {
+      "name": "mole-baby-0.31.10-mac-x64.dmg.blockmap",
+      "sha256": "703d9d72614fba3fad4d0d230c63fd2bb11e09f1a8f35d31e3aea6cc82a21cf1"
+    },
+    {
+      "name": "mole-baby-mac-help.html",
+      "sha256": "4a4e61c6d8f2a80b4b1402e69246d086ae646915bdc87b16bb0542b5446e8135"
+    }
+  ],
+  "android": {
+    "manifest": {
+      "schema": 1,
+      "channel": "android-preview",
+      "packageName": "com.molebaby.ramu.preview",
+      "versionCode": 1311000,
+      "versionName": "0.31.10",
+      "minSdk": 26,
+      "apk": {
+        "url": "https://github.com/Vinci-217/mole-baby/releases/download/android-preview/mole-baby-android-1311000.apk",
+        "size": 555359216,
+        "sha256": "da6f82cb046080dd34c2c91657034f92f7a643761898e2c4c2af7804b1246423",
+        "signerSha256": "1b70d9c8d28ee3c9fbf162ffc0530f7b296714b0ac350f5f215c7dcc322b888c",
+        "blockmap": {
+          "url": "https://github.com/Vinci-217/mole-baby/releases/download/android-preview/mole-baby-android-1311000.apk.blockmap",
+          "size": 578244,
+          "sha256": "985e9c729f8a377e2b0a55f268061bcd20dbe503d4e7fd5091ebf2e79028f3ca"
+        }
+      },
+      "bases": [],
+      "resources": {
+        "url": "https://github.com/Vinci-217/mole-baby/releases/download/android-preview/resources-6690d4f8916d94d17da4466f.zip",
+        "size": 550417006,
+        "sha256": "93855e6242dce83aa9e286a05af0e80975bd784a3fe2f02db13aeefd787f683b",
+        "revision": "6690d4f8916d94d17da4466f",
+        "minAppCode": 1311000,
+        "maxAppCode": 1311000,
+        "index": {
+          "url": "https://github.com/Vinci-217/mole-baby/releases/download/android-preview/resources-6690d4f8916d94d17da4466f.json",
+          "size": 412381,
+          "sha256": "bba258b961bf20c65ddb2399155c3f9cf0178fbfaaf30798c666f896900eb273"
+        },
+        "blockmap": {
+          "url": "https://github.com/Vinci-217/mole-baby/releases/download/android-preview/resources-6690d4f8916d94d17da4466f.zip.blockmap",
+          "size": 573607,
+          "sha256": "5bc647d97813d8cb0ab23a719729686558de06a219ab0dd21bfac2dcbb531300"
+        }
+      }
+    },
+    "fixedSignerMatchesBackup": true,
+    "versionedApkHeadSize": 555359216,
+    "channelApkHeadSize": 555359216,
+    "channelAssetDigests": {
+      "latest-android.json": "a588724d2e93999ea26759362c64912695ae7338e6ec7141f1db90e44f8c6164",
+      "mole-baby-android-1311000.apk": "da6f82cb046080dd34c2c91657034f92f7a643761898e2c4c2af7804b1246423",
+      "mole-baby-android-1311000.apk.blockmap": "985e9c729f8a377e2b0a55f268061bcd20dbe503d4e7fd5091ebf2e79028f3ca",
+      "resources-6690d4f8916d94d17da4466f.json": "bba258b961bf20c65ddb2399155c3f9cf0178fbfaaf30798c666f896900eb273",
+      "resources-6690d4f8916d94d17da4466f.zip": "93855e6242dce83aa9e286a05af0e80975bd784a3fe2f02db13aeefd787f683b",
+      "resources-6690d4f8916d94d17da4466f.zip.blockmap": "5bc647d97813d8cb0ab23a719729686558de06a219ab0dd21bfac2dcbb531300",
+      "SHA256SUMS-android.txt": "941e730f1d343af165cde888731034ea37a2c11b40091b04087b13fdbd5eb453"
+    }
+  },
+  "uploadedAssetDigests": {
+    "latest-mac.yml": "e50cd8fc0fb68ca737899bd156404c8ff984ca20132b2cbb0ef0710b08aee47b",
+    "latest.yml": "8a3b4b60b6440f40eb1d3772c131ca7eafdbb48525c62cc8485493e634c3c901",
+    "legacy-ia32.yml": "beb3d99bc75a1ce2426f1f02acc7d3fba9663a8593c957043790a19cf8ec2693",
+    "legacy-x64.yml": "1754e09a53be635b49dea963add0abfc3077d8176c468afb27af190b3125a7df",
+    "macos-trust-arm64.json": "86d9a216ae32483c57a2de16dc538b11f12a1f6467ac4f79c37adce786f4fe40",
+    "macos-trust-x64.json": "02d8e464929677082cbcd92242c17ab6c617968be1677d34bc63d4a3f1f4fb83",
+    "mole-baby-0.31.10-legacy-ia32-Setup.exe": "23a005edd6a33c4ffeb1364982c899fdfb7b4caf0fe5f3772157692f7541f0b9",
+    "mole-baby-0.31.10-legacy-ia32-Setup.exe.blockmap": "1296b0256a253b9174537da3b216b8955bd53f92de6919101ae30f3564c67687",
+    "mole-baby-0.31.10-legacy-ia32.zip": "438fbde89772b944ffa2c51020d68fcf75b77551a47cb36ada00ee65e96db5f3",
+    "mole-baby-0.31.10-legacy-x64-Setup.exe": "419e303f809f6c2a4cfa5bc1afb4fa56070c66d32be58564806ffdd69effe5a1",
+    "mole-baby-0.31.10-legacy-x64-Setup.exe.blockmap": "0e3471885df063ef526563d7f62e5ce42523f3d94a88fadef24cb763de2328b7",
+    "mole-baby-0.31.10-legacy-x64.zip": "cab1422cb87210184be483bad1ae0a3380a81541f0a741090120f8875bf58d36",
+    "mole-baby-0.31.10-mac-arm64.dmg": "9002a69fd0a89195055836fa46d0a296ba0cff2ba0a909bbdb6f91254bc20e6d",
+    "mole-baby-0.31.10-mac-arm64.dmg.blockmap": "d29ed2dfaa8108003232bbfc8130d529ae65d389451bd4a02368962b85bbdacf",
+    "mole-baby-0.31.10-mac-arm64.zip": "1a2a54ce247a067bd26f7322fd4673b2db4d4ddb5dc1b50abccf9f9a41a22b01",
+    "mole-baby-0.31.10-mac-arm64.zip.blockmap": "f6c7bbed005ebe85ae07af784b6b8227f54aea65deda1dae91a276ab4777187d",
+    "mole-baby-0.31.10-mac-x64.dmg": "31143705620761f59dbaa6d4cf3e4e4c5b1c00559ad420709c9d3914f54a33eb",
+    "mole-baby-0.31.10-mac-x64.dmg.blockmap": "703d9d72614fba3fad4d0d230c63fd2bb11e09f1a8f35d31e3aea6cc82a21cf1",
+    "mole-baby-0.31.10-mac-x64.zip": "1f6aa054105d4aa4adcf292ce8fcbb7a788164839ec084f3741ddea6d47d8558",
+    "mole-baby-0.31.10-mac-x64.zip.blockmap": "911daa5872a52abd396e6131d47d4b75d76fb2b33535dd108952ca5be0b313e9",
+    "mole-baby-0.31.10-Setup.exe": "6ba9aba5c9adddae74b7a90e967fa894e9895ee9f355e6025a7b971984043ebb",
+    "mole-baby-0.31.10-Setup.exe.blockmap": "5a8490bcce092b6c38362fd361e2f301a757c8c3f932a02440fe40a15e2578d2",
+    "mole-baby-0.31.10-x64.zip": "fa433d05152b31bfc2847854d40592ff4e28680f16426e450c5ddc8893ad7197",
+    "mole-baby-android-1311000.apk": "da6f82cb046080dd34c2c91657034f92f7a643761898e2c4c2af7804b1246423",
+    "mole-baby-android-1311000.apk.blockmap": "985e9c729f8a377e2b0a55f268061bcd20dbe503d4e7fd5091ebf2e79028f3ca",
+    "mole-baby-mac-help.html": "4a4e61c6d8f2a80b4b1402e69246d086ae646915bdc87b16bb0542b5446e8135",
+    "resources-6690d4f8916d94d17da4466f.zip.blockmap": "5bc647d97813d8cb0ab23a719729686558de06a219ab0dd21bfac2dcbb531300",
+    "SHA256SUMS-android.txt": "941e730f1d343af165cde888731034ea37a2c11b40091b04087b13fdbd5eb453",
+    "SHA256SUMS.txt": "eae4a749be61989f4d92dedb48091a736c4da272045973fe4654e680e5cb5d1f"
+  },
+  "ciDownloadDigestsMatchPublicUploads": true,
+  "desktopLatestVersion": "0.31.10"
+}

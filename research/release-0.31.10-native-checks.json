@@ -1,0 +1,103 @@
+{
+  "version": "0.31.10",
+  "sourceSha": "d84ea32f61b00372426b805e7f4722f977d07903",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+  "macInfrastructureRetry": "release-0.31.10-mac-retry.json",
+  "platforms": {
+    "windows": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:21:28.940Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS packaged runtime {\"electron\":\"37.10.3\",\"node\":\"22.21.1\",\"chrome\":\"138.0.7204.251\",\"platform\":\"win32\",\"arch\":\"x64\"}",
+        "PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+        "PASS: Windows installer real Finish click hides wizard in 37ms and launches installed application in 1304ms"
+      ]
+    },
+    "legacy-x64": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:18:54.155Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS packaged runtime {\"electron\":\"22.3.27\",\"node\":\"16.17.1\",\"chrome\":\"108.0.5359.215\",\"platform\":\"win32\",\"arch\":\"x64\"}",
+        "PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+        "PASS: Windows installer real Finish click hides wizard in 31ms and launches installed application in 1492ms"
+      ]
+    },
+    "legacy-ia32": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:15:52.160Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS packaged runtime {\"electron\":\"22.3.27\",\"node\":\"16.17.1\",\"chrome\":\"108.0.5359.215\",\"platform\":\"win32\",\"arch\":\"ia32\"}",
+        "PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS: Windows transparent pet compatible rendering {\"softwareRequested\":true,\"softwareRasterizerDisabled\":false,\"compositing\":\"disabled_software\"}",
+        "PASS: Windows native caption/thick-frame bits and visible client insets stay absent across eight room, pocket and desktop cycles",
+        "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+        "PASS: Windows installer real Finish click hides wizard in 9ms and launches installed application in 1943ms"
+      ]
+    },
+    "mac-arm64": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:21:10.545Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS packaged runtime {\"electron\":\"37.10.3\",\"node\":\"22.21.1\",\"chrome\":\"138.0.7204.251\",\"platform\":\"darwin\",\"arch\":\"arm64\"}",
+        "PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories",
+        "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+        "PASS Mac live updater: real 8s startup check fetched v0.31.7 arm64; decline/confirm prompts, DMG download + SHA256 and mounted app v0.31.7 verified; application replacement not performed"
+      ]
+    },
+    "mac-x64": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:46:04.411Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS packaged runtime {\"electron\":\"37.10.3\",\"node\":\"22.21.1\",\"chrome\":\"138.0.7204.251\",\"platform\":\"darwin\",\"arch\":\"x64\"}",
+        "PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories",
+        "PASS uploaded motion: original full frames and custom palette; room/desktop entries and native anchor; interrupted/stalled play no reward; completion settles once without growth/coins; five one-click supplies, four supplied forms, finite daily reading and removed balance",
+        "PASS Mac live updater: real 8s startup check fetched v0.31.7 x64; decline/confirm prompts, DMG download + SHA256 and mounted app v0.31.7 verified; application replacement not performed"
+      ]
+    },
+    "android": {
+      "status": "success",
+      "recordedAt": "2026-10-30T10:17:56.468Z",
+      "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+      "checks": [
+        "PASS phone: adoption, mobile layouts, shop/use, native save rollback, course deadline/settlement, back, timer restore and overlay bridge",
+        "PASS phone-small: adoption, mobile layouts, shop/use, native save rollback, course deadline/settlement, back, timer restore and overlay bridge",
+        "PASS phone-landscape: adoption, mobile layouts, shop/use, native save rollback, course deadline/settlement, back, timer restore and overlay bridge",
+        "PASS tablet: adoption, mobile layouts, shop/use, native save rollback, course deadline/settlement, back, timer restore and overlay bridge",
+        "PASS fixed-signed release APK: real adoption and higher-version installation retain the pet"
+      ],
+      "actual-apk-delta.json": {
+        "mode": "differential",
+        "httpRequests": 4,
+        "downloadBytes": 216974,
+        "sha256": "19cd1932a45bfb96f95f5b4a7ddc88c32ff1433e2f95b66da037055de872010b",
+        "fullSize": 556407390,
+        "reusedBytes": 556190416,
+        "verified": true
+      },
+      "fixed-signed-upgrade.json": {
+        "package": "com.molebaby.ramu.preview",
+        "adoptedName": "SignedRamu",
+        "fixedSignedInstall": true,
+        "higherSignedApkInstalled": true,
+        "petRetained": true
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "version": "0.31.10",
+  "sourceSha": "d84ea32f61b00372426b805e7f4722f977d07903",
+  "applicationCodeAndAssetsIdenticalTo": "v0.31.9",
+  "checkedRuntimePaths": [
+    "src",
+    "electron",
+    "public",
+    "android",
+    "scripts/android"
+  ],
+  "inheritedApplicationValidation": "release-0.31.9-local-checks.json",
+  "additionalChange": "Install requested once; await and verify Finish without clicking transient Next",
+  "nativeInstallerValidation": "Required in all three Windows release jobs; no assertions or timeouts removed"
+}

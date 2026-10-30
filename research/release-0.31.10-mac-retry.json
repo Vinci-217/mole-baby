@@ -1,0 +1,21 @@
+{
+  "version": "0.31.10",
+  "sourceSha": "d84ea32f61b00372426b805e7f4722f977d07903",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41038156962",
+  "firstAttempt": {
+    "platform": "mac-x64",
+    "status": "failure",
+    "recordedAt": "2026-10-30T10:14:09.747Z",
+    "error": "DMG build: hdiutil could not detach disk2; resource busy"
+  },
+  "retryLimit": 1,
+  "retryWorkflowCommit": "d495385df8a84891b6a57c1dc6de52ae58194596",
+  "retryWorkflowUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41039773039",
+  "sameImmutableReleaseTag": true,
+  "otherFivePlatformsPassed": true,
+  "retryOutcome": "success",
+  "retryRequestedAt": "2026-10-30T10:24:07Z",
+  "originalDiagnosticCommit": "646ffbf8595c4f45525cacb52163e7a4f3afa7ca",
+  "workflowAttempt": 2,
+  "retryPassedAt": "2026-10-30T10:46:04.411Z"
+}
