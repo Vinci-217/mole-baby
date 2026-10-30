@@ -10,12 +10,12 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .game-panel{width:min(720px,100%);min-width:0;max-height:calc(100dvh - 16px);display:flex;flex-direction:column;overflow:hidden}
 .android-host .game-panel .panel-paper{overflow:auto;min-height:0;padding:10px}
 .android-host .game-panel .panel-header{flex-shrink:0;min-height:52px}
-.android-host .classic-dock.room-dock{bottom:34px;left:8px;right:8px;width:auto;min-width:0;transform:none}
+.android-host .classic-dock.room-dock{bottom:34px;left:8px;right:8px;width:auto;min-width:0;max-width:none;transform:none}
 .android-host .classic-footer{font-size:11px;gap:8px;padding:7px 12px}
 .android-host .classic-footer span{font-size:10px}
 .android-host .cottage-top{display:flex;height:auto;min-height:60px;flex-wrap:wrap;gap:8px;padding:12px}
 .android-host .classic-logo{font-size:22px}
-.android-host .cottage-top .scene-top-actions{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.android-host .classic-app .cottage-top .scene-top-actions{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:none}
 .android-host .scene-top-actions button{min-height:40px;font-size:13px}
 .android-host .scene-top-actions .manor-site-button{display:none}
 .android-host .cottage{min-width:0}
@@ -57,6 +57,14 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host.pet-mode .pocket-compact .pocket-categories>button{min-height:30px;font-size:12px;line-height:24px}
 .android-host.pet-mode .pocket-compact .pocket-heading{min-height:28px;height:28px;font-size:14px}
 .android-host.pet-mode .pocket-compact .pocket-heading button{width:32px;min-height:28px}
+/* Short landscape screens have space beside the pet, rather than above it.
+   Pick the inward side as it walks so speech stays clear of the top controls. */
+@media(max-height:500px) and (min-width:600px){
+ .android-host .classic-app .room-pet-position .scene-pet>.scene-bubble{bottom:40px;left:calc(100% + 12px);right:auto;transform:none;min-width:120px;max-width:min(220px,calc(50vw - 100px))}
+ .android-host .classic-app .room-pet-position .scene-bubble:after{left:-8px;bottom:15px;transform:rotate(135deg)}
+ .android-host .classic-app .room-pet-position[data-speech-side=left] .scene-pet>.scene-bubble{left:auto;right:calc(100% + 12px)}
+ .android-host .classic-app .room-pet-position[data-speech-side=left] .scene-bubble:after{left:auto;right:-8px;transform:rotate(-45deg)}
+}
 @media(max-width:600px){
  .android-host .classic-app .scene-top-actions{justify-content:center;width:100%}
  .android-host .cottage-top .classic-logo{width:100%;justify-content:center}

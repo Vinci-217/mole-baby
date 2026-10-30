@@ -5,7 +5,10 @@ const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n))
  * Keep the complete 150px pet clear of walls, screen edges and the room dock. */
 export function roomWalkArea(width:number,height:number,dockTop=height-145):RoomWalkArea {
  const left=Math.min(90,width/2),bottom=clamp(Math.min(height*.82,dockTop-76),0,height)
- return {width,height,left,right:Math.max(left,width-left),top:Math.min(bottom,Math.max(190,height*.52)),bottom}
+ // A short landscape viewport must keep a touchable strip. Clamping top to
+ // bottom collapsed it to zero height and disabled all floor taps.
+ const top=Math.min(Math.max(0,bottom-48),Math.max(190,height*.52))
+ return {width,height,left,right:Math.max(left,width-left),top,bottom}
 }
 export function roomWalkTarget(point:RoomPoint,area:RoomWalkArea):RoomPoint {
  return {x:clamp(point.x,area.left,area.right),y:clamp(point.y,area.top,area.bottom)}

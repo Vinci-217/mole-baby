@@ -9,6 +9,14 @@ describe('room floor travel',()=>{
    expect(roomWalkTarget({x:width+500,y:height+500},area)).toEqual({x:area.right,y:area.bottom})
   }
  })
+ it('keeps a usable floor strip on a short landscape phone',()=>{
+  const area=roomWalkArea(852,393,278)
+  expect(area.bottom-area.top).toBeGreaterThanOrEqual(44)
+  expect(area.top).toBeGreaterThan(60)
+  expect(area.bottom).toBeLessThan(278)
+  const target=roomWalkTarget({x:760,y:200},area)
+  expect(target.x).toBe(760);expect(target.y).toBe(200)
+ })
  it('travels at the same speed diagonally and never overshoots a nearby destination',()=>{
   const straight=stepRoomWalk({x:0,y:0},{x:100,y:0},40),diagonal=stepRoomWalk({x:0,y:0},{x:100,y:100},40)
   expect(Math.hypot(straight.point.x,straight.point.y)).toBeCloseTo(5)

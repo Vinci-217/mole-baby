@@ -56,6 +56,6 @@ export default function RoomWalker({stage,evolution,blocked,children}:{stage:Sta
   <button className="room-walk-surface" aria-label="小屋地面，点击让拉姆走过去" disabled={blocked} onPointerDown={down} onKeyDown={key}
    style={{left:area.left,top:area.top,width:area.right-area.left,height:area.bottom-area.top}}/>
   {!blocked&&target&&<span className="room-walk-target" aria-hidden="true" style={{left:target.x,top:target.y}}/>}
-  <div className="room-pet-position" style={{left:position?.x??'50%',top:position?position.y+footOffset:'72%'}} data-x={position?.x.toFixed(2)} data-y={position?.y.toFixed(2)}>{children(motion)}</div>
+  <div className="room-pet-position" style={{left:position?.x??'50%',top:position?position.y+footOffset:'72%'}} data-speech-side={(position?.x??area.width/2)>area.width/2?'left':'right'} data-x={position?.x.toFixed(2)} data-y={position?.y.toFixed(2)}>{children(motion)}</div>
  </div>
 }
