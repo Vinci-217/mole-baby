@@ -46,13 +46,17 @@
 
 公开更新还需要固定签名。`android/app/build.gradle` 已接入 `MOLE_ANDROID_KEYSTORE`、`MOLE_ANDROID_STORE_PASSWORD`、`MOLE_ANDROID_KEY_ALIAS`、`MOLE_ANDROID_KEY_PASSWORD`。私钥与密码不能提交仓库。开发包的临时签名不应用于正式渠道。
 
+CI 支持从 GitHub Actions Secrets 读取 `ANDROID_PREVIEW_KEYSTORE_BASE64`、`ANDROID_PREVIEW_STORE_PASSWORD`，以及可选的 `ANDROID_PREVIEW_KEY_PASSWORD`；别名由仓库变量 `ANDROID_PREVIEW_KEY_ALIAS` 指定，默认 `mole-preview`。未配置时只生成开发测试包；配置后也只生成固定签名产物，仍不自动发布。
+
 生成更新产物（只生成文件，不发布）：
 
 ```sh
 npm run android:manifest -- --apk android/app/build/outputs/apk/release/app-release.apk --previous previous-android.json
 ```
 
-首次构建可以省略 `--previous`。上传 APK、素材包、索引、blockmap 后，最后更新渠道清单，避免客户端先看到不存在的文件。桌面版的 `latest.yml` / `latest-mac.yml` 不参与安卓更新。
+首次构建可以省略 `--previous`；也可用 `--fetch-previous` 从既有安卓渠道读取历史基线。上传 APK、素材包、索引、blockmap 后，最后更新渠道清单，避免客户端先看到不存在的文件。保留清单引用的历史 blockmap，后续版本才可以跨版本复用。
+
+**只有用户确认后才发布安卓渠道。** `android-preview` Release 必须是 prerelease，并设置 `--latest=false`，避免推进桌面版的 GitHub latest。桌面版的 `latest.yml` / `latest-mac.yml` 不参与安卓更新。
 
 ## 本地构建
 
@@ -73,6 +77,8 @@ cd android
 ```
 
 Windows 使用 `gradlew.bat`。构建所需的 JDK / SDK、私钥、生成的素材和 APK 均不提交 Git。
+
+云环境可使用 `node scripts/android/gradle.cjs testDebugUnitTest lintDebug`：自动识别本项目已有的 JDK / SDK 缓存，并沿用平台代理与受信 CA，保持 TLS 校验开启，不读取或打印代理凭据。
 
 ## 工程边界与验证
 

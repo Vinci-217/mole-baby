@@ -4,7 +4,7 @@ ANDROID_PREVIEW_CODE="${ANDROID_PREVIEW_CODE:-320001}"
 mkdir -p mobile-release
 mobile_artifacts="$(pwd)/mobile-release"
 adb logcat -c
-trap 'adb logcat -d > "$mobile_artifacts/android-logcat.txt"; adb pull /sdcard/Android/data/com.molebaby.ramu.preview.dev/files/android-house.png "$mobile_artifacts/android-house.png" || true' EXIT
+trap 'adb logcat -d > "$mobile_artifacts/android-logcat.txt"; for f in android-house.png android-last-screen.png android-ui-state.txt; do adb pull "/sdcard/Android/data/com.molebaby.ramu.preview.dev/files/$f" "$mobile_artifacts/$f" || true; done' EXIT
 cd android
 ./gradlew assembleDebugAndroidTest -PmoleVersion="0.32.0-preview.${GITHUB_RUN_NUMBER:-1}" -PmoleVersionCode="$ANDROID_PREVIEW_CODE" --no-daemon
 # UTP normally uninstalls target packages after connected tests. Run the same

@@ -3,10 +3,11 @@
 // Generates reviewable artifacts only. This command never creates a tag or Release.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),cp=require('node:child_process');
 const{buildBlockMap}=require('app-builder-lib/out/targets/blockmap/blockmap');
+const{environment}=require('./gradle.cjs');
 const root=path.resolve(__dirname,'../..'),base='https://github.com/Vinci-217/mole-baby/releases/download/android-preview/';
 const arg=name=>{const at=process.argv.indexOf(name);return at<0?undefined:process.argv[at+1]};
 function hash(file){const digest=crypto.createHash('sha256'),buffer=Buffer.allocUnsafe(1024*1024),fd=fs.openSync(file,'r');try{let size;while((size=fs.readSync(fd,buffer,0,buffer.length,null)))digest.update(buffer.subarray(0,size));return digest.digest('hex');}finally{fs.closeSync(fd);}}
-function signer(apk){const sdk=process.env.ANDROID_HOME||process.env.ANDROID_SDK_ROOT;if(!sdk)throw Error('设置 ANDROID_HOME 后再生成更新清单。');const jar=path.join(sdk,'build-tools','36.0.0','lib','apksigner.jar'),binary=process.env.JAVA_HOME?path.join(process.env.JAVA_HOME,'bin',process.platform==='win32'?'java.exe':'java'):'java';const result=cp.execFileSync(binary,['-jar',jar,'verify','--print-certs',apk],{encoding:'utf8'});const fingerprints=[...result.matchAll(/Signer #\d+ certificate SHA-256 digest: ([a-fA-F0-9]{64})/g)].map(m=>m[1].toLowerCase());if(fingerprints.length!==1)throw Error('需要单一且固定的 APK 签名。');return {fingerprint:fingerprints[0],debug:result.includes('CN=Android Debug')};}
+function signer(apk){const env=environment(),sdk=env.ANDROID_HOME||env.ANDROID_SDK_ROOT;if(!sdk)throw Error('设置 ANDROID_HOME 后再生成更新清单。');const jar=path.join(sdk,'build-tools','36.0.0','lib','apksigner.jar'),binary=env.JAVA_HOME?path.join(env.JAVA_HOME,'bin',process.platform==='win32'?'java.exe':'java'):'java';const result=cp.execFileSync(binary,['-jar',jar,'verify','--print-certs',apk],{encoding:'utf8',env});const fingerprints=[...result.matchAll(/Signer #\d+ certificate SHA-256 digest: ([a-fA-F0-9]{64})/g)].map(m=>m[1].toLowerCase());if(fingerprints.length!==1)throw Error('需要单一且固定的 APK 签名。');return {fingerprint:fingerprints[0],debug:result.includes('CN=Android Debug')};}
 function previousBases(previous,packageName,code,signerSha256){
  if(!previous)return [];
  if(previous.schema!==1||previous.channel!=='android-preview'||previous.packageName!==packageName||!Number.isInteger(previous.versionCode)||previous.versionCode>=code)throw Error('上一版本清单的渠道、包名或版本不匹配。');

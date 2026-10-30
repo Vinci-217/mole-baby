@@ -245,4 +245,7 @@ android/local.properties
 android/app/src/main/assets/
 android/*.jks
 android/*.keystore
+android/**/*.p12
+android/**/*.jks
+android/**/*.keystore
 mobile-release/

@@ -17,7 +17,7 @@ public final class RamuActivity extends Activity {
     FrameLayout root;
     TextView progress;
     String exportText,exportRequest,pendingPanel;
-    @Override public void onCreate(Bundle state){super.onCreate(state);host=((RamuApplication)getApplication()).host();host.activity=this;root=new FrameLayout(this);root.setBackgroundColor(Color.rgb(255,248,232));setContentView(root);
+    @Override public void onCreate(Bundle state){super.onCreate(state);androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(),false);host=((RamuApplication)getApplication()).host();host.activity=this;root=new FrameLayout(this);root.setBackgroundColor(Color.rgb(255,248,232));setContentView(root);
         root.setOnApplyWindowInsetsListener((view,insets)->{if(Build.VERSION.SDK_INT>=30){var bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout()|WindowInsets.Type.ime());view.setPadding(bars.left,bars.top,bars.right,bars.bottom);}else view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());return insets;});
         progress=new TextView(this);progress.setGravity(Gravity.CENTER);progress.setTextSize(18);progress.setTextColor(Color.rgb(120,87,55));showProgress(host.prepareProgress);pendingPanel=getIntent().getStringExtra("panel");host.ensure();
     }

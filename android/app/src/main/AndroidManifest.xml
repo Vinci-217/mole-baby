@@ -13,7 +13,7 @@
     <application android:name=".RamuApplication" android:label="拉姆·预览版" android:icon="@drawable/ramu_icon"
         android:theme="@style/RamuTheme" android:allowBackup="false" android:supportsRtl="true"
         android:usesCleartextTraffic="false" android:enableOnBackInvokedCallback="false">
-        <activity android:name=".RamuActivity" android:exported="true" android:launchMode="singleTask"
+        <activity android:name=".RamuActivity" android:exported="true" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density|fontScale">
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity>

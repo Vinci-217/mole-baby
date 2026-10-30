@@ -22,7 +22,7 @@ public final class AndroidSmokeTest {
     static Context context(){return instrumentation.getTargetContext();}
     static RamuHost host(){return ((RamuApplication)context().getApplicationContext()).host();}
     static void ui(Runnable run){instrumentation.runOnMainSync(run);}
-    static void waitFor(BooleanSupplier ready)throws Exception{long until=SystemClock.elapsedRealtime()+TIMEOUT;while(!ready.getAsBoolean()){if(SystemClock.elapsedRealtime()>until)throw new AssertionError("Timed out waiting for Android state");SystemClock.sleep(100);}}
+    static void waitFor(BooleanSupplier ready)throws Exception{waitFor(ready,30000,"Timed out waiting for Android state");}
     static void waitFor(BooleanSupplier ready,long timeout,String expected)throws Exception{long until=SystemClock.elapsedRealtime()+timeout;while(!ready.getAsBoolean()){if(SystemClock.elapsedRealtime()>until)throw new AssertionError(expected);SystemClock.sleep(100);}}
     static String js(String expression)throws Exception{CountDownLatch latch=new CountDownLatch(1);String[] value={null};ui(()->host().web.evaluateJavascript(expression,result->{value[0]=result;latch.countDown();}));assertTrue("JS callback",latch.await(20,TimeUnit.SECONDS));return value[0];}
     static boolean has(String selector){try{return "true".equals(js("Boolean(document.querySelector("+JSONObject.quote(selector)+"))"));}catch(Exception e){return false;}}
@@ -40,9 +40,9 @@ public final class AndroidSmokeTest {
         if(Build.VERSION.SDK_INT>=33)shell("pm grant "+context().getPackageName()+" android.permission.POST_NOTIFICATIONS");
         instrumentation.startActivitySync(new Intent(context(),RamuActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try{
-            waitFor(()->host().loaded&&has("[aria-label='选择蓝色拉姆']"));assertFalse(host().controller.petMode);assertFalse(host().controller.attached);
+            waitFor(()->host().loaded&&has("[aria-label='选择蓝色拉姆']"),TIMEOUT,"First offline asset preparation and page load");assertFalse(host().controller.petMode);assertFalse(host().controller.attached);
             click("[aria-label='选择蓝色拉姆']");textButton("给它起名");waitFor(()->has("#pet-name"));
-            js("(()=>{const input=document.querySelector('#pet-name');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'安卓小蓝');input.dispatchEvent(new Event('input',{bubbles:true}));})()");textButton("带拉姆回家！");waitFor(()->has(".room-dock"));
+            js("(()=>{const input=document.querySelector('#pet-name');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'安卓小蓝');input.dispatchEvent(new Event('input',{bubbles:true}));input.blur();})()");ui(()->context().getSystemService(android.view.inputmethod.InputMethodManager.class).hideSoftInputFromWindow(host().web.getWindowToken(),0));SystemClock.sleep(300);textButton("带拉姆回家！");waitFor(()->has(".room-dock"));
             assertFalse("Adoption opens the house without starting an overlay",host().controller.petMode);
             waitFor(()->host().store.pet().optString("name").equals("安卓小蓝"));long petId=host().store.pet().getLong("createdAt");WebView runtime=host().web;
             click(".room-dock [aria-label='打开背包']");waitFor(()->has(".pocket-items"));assertEquals("true",js("document.documentElement.scrollWidth<=innerWidth"));
@@ -66,6 +66,9 @@ public final class AndroidSmokeTest {
             context().getSharedPreferences("upgrade-fixture",0).edit().putLong("petId",petId).putInt("code",context().getPackageManager().getPackageInfo(context().getPackageName(),0).versionCode).commit();host().store.flush();
             File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
             RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
-        }finally{ui(()->{if(host().activity!=null)host().activity.finish();});}
+        }finally{
+            try{UiDevice.getInstance(instrumentation).takeScreenshot(new File(context().getExternalFilesDir(null),"android-last-screen.png"));if(host().web!=null){String diagnostic=js("JSON.stringify({text:document.body.innerText.slice(0,5000),visible:document.visibilityState,viewport:[innerWidth,innerHeight],audio:(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return a?{ready:a.readyState,paused:a.paused,error:a.error?.code}:null})()})");SafeFiles.writeText(new File(context().getExternalFilesDir(null),"android-ui-state.txt"),diagnostic);}}catch(Exception ignored){}
+            ui(()->{if(host().activity!=null)host().activity.finish();});
+        }
     }
 }
