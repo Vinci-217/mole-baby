@@ -93,11 +93,15 @@ def run(entry):
     viewport=[math.ceil((x1-x0)*scale)+4,math.ceil((y1-y0)*scale)+4]
     registration={'scale':scale,'cssPixelsPerAtlasPixel':1/RASTER,'centerX':((reference[0]+reference[2])/2-x0)*scale+2,'baseY':(reference[3]-y0)*scale+2}
     unique=[];lookup={};frame_map=[];poses=[];pose_lookup={}
-    for n,m,dx,dy in pieces:
+    for frame_index,(n,m,dx,dy) in enumerate(pieces):
         x=round((dx-x0)*scale)+2;y=round((dy-y0)*scale)+2
         right=round((dx+n.width-x0)*scale)+2;bottom=round((dy+n.height-y0)*scale)+2
         size=(max(1,right-x),max(1,bottom-y))
         pair=[im.resize(size,Image.Resampling.LANCZOS)for im in [n,m]]
+        if frame_index==0 and entry['id'].startswith('tuya'):
+            first=np.asarray(pair[1]);ys,xs=np.where((first[:,:,:3].astype(int).sum(2)>115)&(first[:,:,3]>150))
+            if not len(xs):raise ValueError('Missing first-pose body: '+key)
+            registration['displayScale']=(visibility[2]-visibility[0])/((int(xs.max())-int(xs.min())+1)/RASTER)
         labels,_=ndimage.label(np.asarray(pair[0])[:,:,3]>0,np.ones((3,3)))
         boxes=ndimage.find_objects(labels);parts=[]
         for region in boxes:

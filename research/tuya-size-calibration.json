@@ -1,0 +1,133 @@
+{
+  "method": "One fixed display scale per clip, from isolated original first-pose body; complete timelines and atlas bytes unchanged",
+  "records": [
+    {
+      "key": "middle-tuya1",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 89,
+      "originalCssWidth": 59.33333333333333,
+      "targetCssWidth": 59.72948,
+      "displayScale": 1.0066766292134832
+    },
+    {
+      "key": "middle-tuya2",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 90,
+      "originalCssWidth": 60,
+      "targetCssWidth": 59.72948,
+      "displayScale": 0.9954913333333334
+    },
+    {
+      "key": "middle-tuya3",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 89,
+      "originalCssWidth": 59.33333333333333,
+      "targetCssWidth": 59.72948,
+      "displayScale": 1.0066766292134832
+    },
+    {
+      "key": "middle-tuya4",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 89,
+      "originalCssWidth": 59.33333333333333,
+      "targetCssWidth": 59.72948,
+      "displayScale": 1.0066766292134832
+    },
+    {
+      "key": "junior-tuya1",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 191,
+      "originalCssWidth": 127.33333333333333,
+      "targetCssWidth": 64.91612,
+      "displayScale": 0.5098124607329844
+    },
+    {
+      "key": "junior-tuya2",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 191,
+      "originalCssWidth": 127.33333333333333,
+      "targetCssWidth": 64.91612,
+      "displayScale": 0.5098124607329844
+    },
+    {
+      "key": "junior-tuya3",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 101,
+      "originalCssWidth": 67.33333333333333,
+      "targetCssWidth": 64.91612,
+      "displayScale": 0.9641007920792081
+    },
+    {
+      "key": "junior-tuya4",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 101,
+      "originalCssWidth": 67.33333333333333,
+      "targetCssWidth": 64.91612,
+      "displayScale": 0.9641007920792081
+    },
+    {
+      "key": "classic-tuya1",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 77,
+      "originalCssWidth": 51.33333333333333,
+      "targetCssWidth": 45.834,
+      "displayScale": 0.89287012987013
+    },
+    {
+      "key": "classic-tuya2",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 77,
+      "originalCssWidth": 51.33333333333333,
+      "targetCssWidth": 45.834,
+      "displayScale": 0.89287012987013
+    },
+    {
+      "key": "classic-tuya3",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 82,
+      "originalCssWidth": 54.666666666666664,
+      "targetCssWidth": 45.834,
+      "displayScale": 0.8384268292682928
+    },
+    {
+      "key": "classic-tuya4",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 82,
+      "originalCssWidth": 54.666666666666664,
+      "targetCssWidth": 45.834,
+      "displayScale": 0.8384268292682928
+    },
+    {
+      "key": "senior-tuya1",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 87,
+      "originalCssWidth": 58,
+      "targetCssWidth": 57.292,
+      "displayScale": 0.9877931034482759
+    },
+    {
+      "key": "senior-tuya2",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 87,
+      "originalCssWidth": 58,
+      "targetCssWidth": 57.292,
+      "displayScale": 0.9877931034482759
+    },
+    {
+      "key": "senior-tuya3",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 86,
+      "originalCssWidth": 57.33333333333333,
+      "targetCssWidth": 57.292,
+      "displayScale": 0.999279069767442
+    },
+    {
+      "key": "senior-tuya4",
+      "referenceFrame": 1,
+      "bodyAtlasWidth": 86,
+      "originalCssWidth": 57.33333333333333,
+      "targetCssWidth": 57.292,
+      "displayScale": 0.999279069767442
+    }
+  ]
+}

@@ -1,8 +1,9 @@
 name: Android preview (no release)
 on:
   push:
-    branches: ['preview/android-mobile']
+    branches: ['preview/android-mobile', 'release/v0.31.8']
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 concurrency:
@@ -24,6 +25,19 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Record fixed signing availability without exposing keys
+        env:
+          PREVIEW_KEYSTORE_BASE64: ${{ secrets.ANDROID_PREVIEW_KEYSTORE_BASE64 }}
+          CI_DIAGNOSTIC_PLATFORM: android
+          CI_DIAGNOSTIC_PHASE: signing
+          CI_DIAGNOSTIC_STATUS: success
+          CI_DIAGNOSTIC_LOG: mobile-release/signing-state.json
+        run: |
+          mkdir -p mobile-release
+          node - <<'NODE'
+          require('fs').writeFileSync('mobile-release/signing-state.json',JSON.stringify({fixedSigningConfigured:Boolean(process.env.PREVIEW_KEYSTORE_BASE64&&process.env.MOLE_ANDROID_STORE_PASSWORD)}));
+          NODE
+          node scripts/save-ci-diagnostic.cjs
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin

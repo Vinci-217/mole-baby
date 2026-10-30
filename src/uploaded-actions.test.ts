@@ -7,8 +7,22 @@ import {ITEMS,getItem} from './catalog'
 import {UPLOADED_TOYS,uploadedMotion,uploadedEffectRect,uploadedSpec} from './uploaded-actions'
 import {getItemMotion} from './item-motion'
 import {DAILY_FRAME_ACTIONS} from './daily-frames'
+import calibration from '../research/tuya-size-calibration.json'
+import visibility from '../electron/edge-visibility.json'
 
 describe('complete supplied motion library',()=>{
+ it('registers graffiti to the first body pose instead of its shrinking ending',()=>{
+  expect(calibration.records).toHaveLength(16)
+  for(const record of calibration.records){
+   const spec=uploadedSpec(...record.key.split('-')as [string,string])!;
+   const rect=uploadedEffectRect(spec,spec.form as 'middle');
+   const width=record.bodyAtlasWidth/spec.width*rect.width;
+   const body=visibility.forms[spec.form as 'middle'].body;
+   expect(width).toBeCloseTo(body[2]-body[0],5);
+   expect(JSON.parse(fs.readFileSync(`public/assets/original/uploaded-actions/${spec.assetKey}/clip.json`,'utf8')).registration).toEqual(spec.registration)
+  }
+  expect(uploadedSpec('junior','tuya1')!.registration.displayScale).toBeLessThan(.6)
+ })
  it('routes all 247 supplied files to a consumable or a play entry without losing alias identity',()=>{
   expect(Object.keys(index)).toHaveLength(247)
   expect(new Set(Object.values(index).map(s=>s.assetKey)).size).toBe(238)
