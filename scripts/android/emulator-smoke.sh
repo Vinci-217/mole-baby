@@ -6,7 +6,13 @@ mobile_artifacts="$(pwd)/mobile-release"
 adb logcat -c
 trap 'adb logcat -d > "$mobile_artifacts/android-logcat.txt"; adb pull /sdcard/Android/data/com.molebaby.ramu.preview.dev/files/android-house.png "$mobile_artifacts/android-house.png" || true' EXIT
 cd android
-./gradlew connectedDebugAndroidTest -PmoleVersion="0.32.0-preview.${GITHUB_RUN_NUMBER:-1}" -PmoleVersionCode="$ANDROID_PREVIEW_CODE" -Pandroid.testInstrumentationRunnerArguments.class=com.molebaby.ramu.AndroidSmokeTest --no-daemon
+./gradlew assembleDebugAndroidTest -PmoleVersion="0.32.0-preview.${GITHUB_RUN_NUMBER:-1}" -PmoleVersionCode="$ANDROID_PREVIEW_CODE" --no-daemon
+# UTP normally uninstalls target packages after connected tests. Run the same
+# instrumentation directly so the real installation and save survive phase one.
+adb install -r "$mobile_artifacts/mole-baby-android-preview-dev.apk"
+adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w -e class com.molebaby.ramu.AndroidSmokeTest com.molebaby.ramu.preview.dev.test/androidx.test.runner.AndroidJUnitRunner | tee "$mobile_artifacts/native-smoke-test.txt"
+node -e 'const s=require("fs").readFileSync(process.argv[1],"utf8");if(!/OK \(1 test\)/.test(s)||/FAILURES|INSTRUMENTATION_FAILED/.test(s))process.exit(1)' "$mobile_artifacts/native-smoke-test.txt"
 adb pull /sdcard/Android/data/com.molebaby.ramu.preview.dev/files/android-house.png ../mobile-release/android-house.png
 ./gradlew assembleDebug -PmoleVersionCode="$((ANDROID_PREVIEW_CODE+1))" --no-daemon
 node ../scripts/android/apk-blockmaps.cjs "$mobile_artifacts/mole-baby-android-preview-dev.apk" "$(pwd)/app/build/outputs/apk/debug/app-debug.apk"

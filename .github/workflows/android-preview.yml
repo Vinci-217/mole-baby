@@ -26,6 +26,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle
+            android/gradle/wrapper/gradle-wrapper.properties
       - name: Build the complete offline game and resource blockmap
         run: |
           npm ci
@@ -34,6 +38,8 @@ jobs:
           node scripts/android/prepare-assets.cjs
           echo "ANDROID_PREVIEW_CODE=$((320000 + GITHUB_RUN_NUMBER * 10))" >> "$GITHUB_ENV"
       - name: Phone and tablet browser interactions
+        id: mobile-browser
+        continue-on-error: true
         env:
           CHROMIUM_PATH: /usr/bin/google-chrome
         run: node scripts/android/browser-smoke.cjs
@@ -43,6 +49,7 @@ jobs:
           ./gradlew assembleDebug testDebugUnitTest lintDebug -PmoleVersion="0.32.0-preview.${GITHUB_RUN_NUMBER}" -PmoleVersionCode="$ANDROID_PREVIEW_CODE" --no-daemon
           mkdir -p ../mobile-release
           cp app/build/outputs/apk/debug/app-debug.apk ../mobile-release/mole-baby-android-preview-dev.apk
+          cp -R app/build/test-results/testDebugUnitTest ../mobile-release/unit-tests
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -60,6 +67,9 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: bash scripts/android/emulator-smoke.sh
+      - name: Require successful browser verification
+        if: always()
+        run: test '${{ steps.mobile-browser.outcome }}' = success
       - name: Load optional fixed preview signing key
         env:
           PREVIEW_KEYSTORE_BASE64: ${{ secrets.ANDROID_PREVIEW_KEYSTORE_BASE64 }}

@@ -26,8 +26,14 @@ public final class AndroidSmokeTest {
     static void waitFor(BooleanSupplier ready,long timeout,String expected)throws Exception{long until=SystemClock.elapsedRealtime()+timeout;while(!ready.getAsBoolean()){if(SystemClock.elapsedRealtime()>until)throw new AssertionError(expected);SystemClock.sleep(100);}}
     static String js(String expression)throws Exception{CountDownLatch latch=new CountDownLatch(1);String[] value={null};ui(()->host().web.evaluateJavascript(expression,result->{value[0]=result;latch.countDown();}));assertTrue("JS callback",latch.await(20,TimeUnit.SECONDS));return value[0];}
     static boolean has(String selector){try{return "true".equals(js("Boolean(document.querySelector("+JSONObject.quote(selector)+"))"));}catch(Exception e){return false;}}
-    static void click(String selector)throws Exception{waitFor(()->has(selector));js("document.querySelector("+JSONObject.quote(selector)+").click()");}
-    static void textButton(String text)throws Exception{js("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")?.click()");}
+    static void tap(String expression)throws Exception{
+        String script="(()=>{const e="+expression+";if(!e||e.disabled)return null;e.scrollIntoView({block:'nearest',inline:'nearest'});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!hit||!(e===hit||e.contains(hit)))return null;return {x,y,viewport:innerWidth};})()";
+        String[] result={null};waitFor(()->{try{result[0]=js(script);return result[0]!=null&&!result[0].equals("null");}catch(Exception e){return false;}},30000,"Button must be usable by a real finger: "+expression);
+        JSONObject point=new JSONObject(result[0]);int[] location=new int[2],width=new int[1];ui(()->{host().web.getLocationOnScreen(location);width[0]=host().web.getWidth();});double scale=width[0]/point.getDouble("viewport");
+        assertTrue(UiDevice.getInstance(instrumentation).click(location[0]+(int)Math.round(point.getDouble("x")*scale),location[1]+(int)Math.round(point.getDouble("y")*scale)));SystemClock.sleep(120);
+    }
+    static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
+    static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
     static void shell(String command)throws Exception{try(ParcelFileDescriptor fd=instrumentation.getUiAutomation().executeShellCommand(command);InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){while(in.read()!=-1){}}}
     @Test public void adoptionCareOverlayAndRecoveryKeepOnePet()throws Exception{
         shell("appops set "+context().getPackageName()+" SYSTEM_ALERT_WINDOW allow");
