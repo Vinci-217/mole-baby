@@ -1,0 +1,485 @@
+{
+  "sourceSha": "bdc4c3be8f8f6c4bad340ef97cce6b50420d0ed1",
+  "unitTests": {
+    "vitest": 388,
+    "node": 152,
+    "total": 540
+  },
+  "additionalReleaseTests": 9,
+  "productionBuild": {
+    "passed": true,
+    "losslessImages": 1126,
+    "alphaAndVisiblePixelsVerified": true
+  },
+  "graffitiDprChecks": {
+    "cases": 64,
+    "results": [
+      {
+        "form": "junior",
+        "id": "tuya1",
+        "dpr": 1,
+        "bodyWidth": 64.91465380107167,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya1",
+        "dpr": 1.25,
+        "bodyWidth": 64.91465380107167,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya1",
+        "dpr": 1.5,
+        "bodyWidth": 64.91465380107167,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya1",
+        "dpr": 2,
+        "bodyWidth": 64.91465380107167,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya2",
+        "dpr": 1,
+        "bodyWidth": 64.91459434897556,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya2",
+        "dpr": 1.25,
+        "bodyWidth": 64.91459434897556,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya2",
+        "dpr": 1.5,
+        "bodyWidth": 64.91459434897556,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya2",
+        "dpr": 2,
+        "bodyWidth": 64.91459434897556,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya3",
+        "dpr": 1,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya3",
+        "dpr": 1.25,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya3",
+        "dpr": 1.5,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya3",
+        "dpr": 2,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya4",
+        "dpr": 1,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya4",
+        "dpr": 1.25,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya4",
+        "dpr": 1.5,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "junior",
+        "id": "tuya4",
+        "dpr": 2,
+        "bodyWidth": 64.9150554556355,
+        "target": 64.91612
+      },
+      {
+        "form": "middle",
+        "id": "tuya1",
+        "dpr": 1,
+        "bodyWidth": 59.72768967661691,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya1",
+        "dpr": 1.25,
+        "bodyWidth": 59.72768967661691,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya1",
+        "dpr": 1.5,
+        "bodyWidth": 59.72768967661691,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya1",
+        "dpr": 2,
+        "bodyWidth": 59.72768967661691,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya2",
+        "dpr": 1,
+        "bodyWidth": 59.727399093904445,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya2",
+        "dpr": 1.25,
+        "bodyWidth": 59.727399093904445,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya2",
+        "dpr": 1.5,
+        "bodyWidth": 59.727399093904445,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya2",
+        "dpr": 2,
+        "bodyWidth": 59.727399093904445,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya3",
+        "dpr": 1,
+        "bodyWidth": 59.72903963414634,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya3",
+        "dpr": 1.25,
+        "bodyWidth": 59.72903963414634,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya3",
+        "dpr": 1.5,
+        "bodyWidth": 59.72903963414634,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya3",
+        "dpr": 2,
+        "bodyWidth": 59.72903963414634,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya4",
+        "dpr": 1,
+        "bodyWidth": 59.72891212406015,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya4",
+        "dpr": 1.25,
+        "bodyWidth": 59.72891212406015,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya4",
+        "dpr": 1.5,
+        "bodyWidth": 59.72891212406015,
+        "target": 59.72948
+      },
+      {
+        "form": "middle",
+        "id": "tuya4",
+        "dpr": 2,
+        "bodyWidth": 59.72891212406015,
+        "target": 59.72948
+      },
+      {
+        "form": "senior",
+        "id": "tuya1",
+        "dpr": 1,
+        "bodyWidth": 57.29050164473684,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya1",
+        "dpr": 1.25,
+        "bodyWidth": 57.29050164473684,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya1",
+        "dpr": 1.5,
+        "bodyWidth": 57.29050164473684,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya1",
+        "dpr": 2,
+        "bodyWidth": 57.29050164473684,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya2",
+        "dpr": 1,
+        "bodyWidth": 57.290714073634206,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya2",
+        "dpr": 1.25,
+        "bodyWidth": 57.290714073634206,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya2",
+        "dpr": 1.5,
+        "bodyWidth": 57.290714073634206,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya2",
+        "dpr": 2,
+        "bodyWidth": 57.290714073634206,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya3",
+        "dpr": 1,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya3",
+        "dpr": 1.25,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya3",
+        "dpr": 1.5,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya3",
+        "dpr": 2,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya4",
+        "dpr": 1,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya4",
+        "dpr": 1.25,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya4",
+        "dpr": 1.5,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "senior",
+        "id": "tuya4",
+        "dpr": 2,
+        "bodyWidth": 57.291853112840464,
+        "target": 57.292
+      },
+      {
+        "form": "classic",
+        "id": "tuya1",
+        "dpr": 1,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya1",
+        "dpr": 1.25,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya1",
+        "dpr": 1.5,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya1",
+        "dpr": 2,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya2",
+        "dpr": 1,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya2",
+        "dpr": 1.25,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya2",
+        "dpr": 1.5,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya2",
+        "dpr": 2,
+        "bodyWidth": 45.83182565789474,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya3",
+        "dpr": 1,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya3",
+        "dpr": 1.25,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya3",
+        "dpr": 1.5,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya3",
+        "dpr": 2,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya4",
+        "dpr": 1,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya4",
+        "dpr": 1.25,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya4",
+        "dpr": 1.5,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      },
+      {
+        "form": "classic",
+        "id": "tuya4",
+        "dpr": 2,
+        "bodyWidth": 45.83363140060241,
+        "target": 45.834
+      }
+    ]
+  },
+  "nativeChecks": [
+    {
+      "electron": "35.7.5",
+      "platform": "linux",
+      "uploadedMotion": true,
+      "roomPocket": true
+    },
+    {
+      "electron": "22.3.27",
+      "platform": "linux",
+      "uploadedMotion": true
+    }
+  ],
+  "sourcePreservation": {
+    "clips": 16,
+    "onlyNewClipField": "registration.displayScale",
+    "allOriginalAtlasFilesUnchanged": true
+  }
+}

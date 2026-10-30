@@ -1,10 +1,12 @@
 # 安卓手机与平板预览
 
-安卓实现位于 `preview/android-mobile`，沿用现有 React 游戏与原版动作帧，原生宿主使用 Java / Android WebView。Windows、Mac 的版本号和更新渠道保持独立。本分支的构建任务只生成测试产物，不创建 Release。
+安卓实现已随 v0.31.9 合入主线，沿用现有 React 游戏与原版动作帧，原生宿主使用 Java / Android WebView。安卓使用独立的预览更新渠道，桌面版更新清单保持隔离；普通分支构建只生成测试产物，正式标签在六平台验收通过后发布。
 
 ## 下载与使用
 
-在本分支的 **Actions → Android preview (no release)** 中打开成功的构建，下载底部 `android-preview-*` 附件，解压后将 `mole-baby-android-preview-dev.apk` 传到手机安装。这是开发测试包，包名带 `.dev`，不会覆盖今后的固定签名版本。不同 CI 构建的开发签名可能不同，跨构建试用前请导出存档。
+直接[下载 v0.31.9 固定签名 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.9/mole-baby-android-1310900.apk)，传到手机后按系统提示允许此来源并安装。包名 `com.molebaby.ramu.preview`，固定签名支持后续覆盖升级并保留存档。
+
+此前 Actions 中的 `mole-baby-android-preview-dev.apk` 是开发包，包名带 `.dev`，与固定签名版独立。请先在旧包导出存档，再到预览版导入；不同 CI 构建的开发签名可能不同，开发包不作为公开更新渠道。
 
 - Android 8.0 及以上；手机、安卓平板均可。Android System WebView / Chrome 需要 108 或更新版本（布局使用动态视口尺寸）；版本过旧时会提示升级。
 - 第一次打开先解压原版素材，有进度提示。首次 APK 约 531 MiB，解压素材约 534 MiB，建议至少预留 2 GiB 可用空间，供安装和解压临时文件使用；差量更新减少后续下载，不会减少首次安装的素材总量。
@@ -34,7 +36,7 @@
 
 ## 更新策略
 
-安卓渠道为 `android-preview`，入口是本仓库对应 Release 下的 `latest-android.json`。在用户确认发布前，本分支不会发布该入口。开发测试包不能据此宣称已完成公开渠道升级验证。
+安卓渠道为 [`android-preview`](https://github.com/Vinci-217/mole-baby/releases/tag/android-preview)，入口是该 Release 下的 `latest-android.json`。v0.31.9 首次公开固定签名渠道，没有更早的公开安卓基线；受控安装／差量测试不等于已验证任意未来公开版本之间的升级。
 
 1. 启动约 8 秒后检查，可在设置中关闭。Wi-Fi 自动下载默认关闭；开启后仅在非计费 Wi-Fi 下载。
 2. APK 升级比较新旧 blockmap v2，复用已安装 APK 的相同块。新清单包含最多 12 个历史基线，因此允许跨版本升级。缺少基线、变化过大或不支持 Range 时完整下载。
@@ -46,7 +48,9 @@
 
 公开更新还需要固定签名。`android/app/build.gradle` 已接入 `MOLE_ANDROID_KEYSTORE`、`MOLE_ANDROID_STORE_PASSWORD`、`MOLE_ANDROID_KEY_ALIAS`、`MOLE_ANDROID_KEY_PASSWORD`。私钥与密码不能提交仓库。开发包的临时签名不应用于正式渠道。
 
-CI 支持从 GitHub Actions Secrets 读取 `ANDROID_PREVIEW_KEYSTORE_BASE64`、`ANDROID_PREVIEW_STORE_PASSWORD`，以及可选的 `ANDROID_PREVIEW_KEY_PASSWORD`；别名由仓库变量 `ANDROID_PREVIEW_KEY_ALIAS` 指定，默认 `mole-preview`。未配置时只生成开发测试包；配置后也只生成固定签名产物，仍不自动发布。
+CI 从 GitHub Actions Secrets 读取 `ANDROID_PREVIEW_KEYSTORE_BASE64`、`ANDROID_PREVIEW_STORE_PASSWORD`，以及可选的 `ANDROID_PREVIEW_KEY_PASSWORD`；别名由仓库变量 `ANDROID_PREVIEW_KEY_ALIAS` 指定，默认 `mole-preview`。未配置时分支只能生成开发包；正式版本标签缺少固定签名会直接失败。固定密钥需要长期备份，后续版本保持同一签名。
+
+正式标签依赖全部桌面和安卓检查。安卓还会安装固定签名的 release APK、真实点击领养，再安装更高 versionCode 的同签名夹具，检查名字和小屋控件保留；该夹具不发布。通过后先上传 APK、素材及索引，最后上传清单，安卓渠道保持 prerelease／非 latest。
 
 生成更新产物（只生成文件，不发布）：
 
@@ -94,6 +98,6 @@ Windows 使用 `gradlew.bat`。构建所需的 JDK / SDK、私钥、生成的素
 
 ## 本轮接手验收（2026-10-30）
 
-已修复通知栏回小屋时的特效／背包锚点恢复、手机横屏地面无法点击及提示气泡遮挡。四种屏幕布局、539项前端／Node测试和Android15模拟器原生流程通过；更高版本APK实际覆盖安装后存档保留。本次受控APK差量测试复用约556MB数据，下载约266KB，不能据此保证每次升级的下载量。
+已修复通知栏回小屋时的特效／背包锚点恢复、手机横屏地面无法点击及提示气泡遮挡。v0.31.8 预发布检查通过，但正式候选发现长按被当作右键误开背包、阻止收纳，因此没有公开。v0.31.9 修复该问题并增加移动浏览器菜单和实际手指长按检查；发布仍要求完整 Android 15 模拟器流程、固定签名 APK 更高版本覆盖安装与存档保留全部成功。此前受控 APK 差量测试复用约 556 MB 数据，下载约 256 KB，不能据此保证每次升级的下载量。
 
-[修复、截图与验证范围](../research/android-takeover-validation.md) · [成功构建与开发APK](https://github.com/Vinci-217/mole-baby/actions/runs/41012609568)。
+[v0.31.9 发布与签名验证](../research/release-0.31.9-validation.md) · [接手修复与早期验证范围](../research/android-takeover-validation.md)。

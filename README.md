@@ -1,12 +1,12 @@
 # 拉姆 · mole-baby
 
-> **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
+> **Windows 与 Mac 桌面拉姆，现提供安卓预览版。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
-## 安卓手机与平板 · 开发预览
+## 安卓手机与平板 · 固定签名预览版
 
-新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。当前为独立预览分支，尚未公开安卓更新渠道。
+新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。固定签名，后续可以覆盖升级并保留存档。需要 Android 8+、WebView／Chrome 108+。
 
-[安装、构建与更新说明](docs/ANDROID.md) · [安卓测试包与验证进度](https://github.com/Vinci-217/mole-baby/actions/workflows/android-preview.yml)。
+[下载安卓 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.9/mole-baby-android-1310900.apk) · [安装、构建与更新说明](docs/ANDROID.md) · [六平台验证](research/release-0.31.9-validation.md)。首次离线包较大，建议预留 2 GiB 空间。此前 `.dev` 开发包请先导出存档，再导入固定签名预览版。
 
 <details>
 <summary>查看手机与平板界面预览</summary>
@@ -19,7 +19,13 @@
 
 </details>
 
-## 本轮更新 · v0.31.7
+## 本轮更新 · v0.31.9
+
+修复初级拉姆前两种涂鸦开场接近平时两倍的问题，校准四种形态的全部四种涂鸦。原帧、时长和动作内的伸缩全部保留；100%、125%、150%、200% 缩放及特效窗口扩展均检查身体比例。背包切换分类时的短暂空白同步修复。
+
+附带安卓固定签名预览版，修复旋转、悬浮返回小屋、横屏点击及长按误开背包问题。实际 APK 安装、更高版本覆盖升级与存档保留是发布必需检查。[下载与安装](https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.9) · [对比截图、验证结果与范围](research/release-0.31.9-validation.md)。
+
+## v0.31.7 · 更新策略、小屋缩放与横排背包
 
 软件更新新增「自动选择 / 完整包」：自动比较新旧内容，变化少时下载差量，变化多或无法复用时完整下载；可直接跨版本升级，下载和安装继续分别确认。[更新策略](docs/UPDATES.md)。
 

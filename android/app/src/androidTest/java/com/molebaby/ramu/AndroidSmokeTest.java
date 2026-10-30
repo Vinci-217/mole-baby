@@ -26,7 +26,9 @@ public final class AndroidSmokeTest {
     static void waitFor(BooleanSupplier ready,long timeout,String expected)throws Exception{long until=SystemClock.elapsedRealtime()+timeout;while(!ready.getAsBoolean()){if(SystemClock.elapsedRealtime()>until)throw new AssertionError(expected);SystemClock.sleep(100);}}
     static String js(String expression)throws Exception{CountDownLatch latch=new CountDownLatch(1);String[] value={null};ui(()->host().web.evaluateJavascript(expression,result->{value[0]=result;latch.countDown();}));assertTrue("JS callback",latch.await(20,TimeUnit.SECONDS));return value[0];}
     static boolean has(String selector){try{return "true".equals(js("Boolean(document.querySelector("+JSONObject.quote(selector)+"))"));}catch(Exception e){return false;}}
-    static void tap(String expression)throws Exception{
+    static void tap(String expression)throws Exception{gesture(expression,false);}
+    static void hold(String expression)throws Exception{gesture(expression,true);}
+    static void gesture(String expression,boolean longPress)throws Exception{
         String script="(()=>{const e="+expression+";if(!e||e.disabled)return null;e.scrollIntoView({block:'nearest',inline:'nearest'});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!hit||!(e===hit||e.contains(hit)))return null;return {x,y,viewport:innerWidth};})()";
         String[] result={null};waitFor(()->{try{result[0]=js(script);return result[0]!=null&&!result[0].equals("null");}catch(Exception e){return false;}},30000,"Button must be usable by a real finger: "+expression);
         // DOM readiness does not guarantee that WebView has committed its
@@ -35,8 +37,11 @@ public final class AndroidSmokeTest {
         drawn();result[0]=js(script);assertNotEquals("The painted button must remain usable", "null",result[0]);
         JSONObject point=new JSONObject(result[0]);int[] location=new int[2],width=new int[1];ui(()->{host().web.getLocationOnScreen(location);width[0]=host().web.getWidth();});double scale=width[0]/point.getDouble("viewport");
         js("window.__moleTestInput?.abort();window.__moleTestInput=new AbortController();window.__moleTestPointer={};for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>window.__moleTestPointer[type]={x:e.clientX,y:e.clientY,trusted:e.isTrusted,target:e.target.closest('button,input')?.outerHTML?.slice(0,300)},{once:true,capture:true,signal:window.__moleTestInput.signal})");
-        assertTrue(UiDevice.getInstance(instrumentation).click(location[0]+(int)Math.round(point.getDouble("x")*scale),location[1]+(int)Math.round(point.getDouble("y")*scale)));SystemClock.sleep(180);
-        waitFor(()->{try{return "true".equals(js("window.__moleTestPointer?.click?.trusted===true"));}catch(Exception e){return false;}},5000,"One physical tap must dispatch a trusted click: "+expression);
+        int x=location[0]+(int)Math.round(point.getDouble("x")*scale),y=location[1]+(int)Math.round(point.getDouble("y")*scale);
+        UiDevice device=UiDevice.getInstance(instrumentation);
+        assertTrue(longPress?device.swipe(x,y,x,y,180):device.click(x,y));SystemClock.sleep(180);
+        String event=longPress?"pointerdown":"click";
+        waitFor(()->{try{return "true".equals(js("window.__moleTestPointer?."+event+"?.trusted===true"));}catch(Exception e){return false;}},5000,"Physical gesture must dispatch a trusted "+event+": "+expression);
     }
     static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
@@ -73,6 +78,11 @@ public final class AndroidSmokeTest {
             device.swipe(location[0]+host().controller.px(80),location[1]+host().controller.px(125),location[0]+host().controller.px(150),location[1]+host().controller.px(140),18);
             waitFor(()->host().controller.x>beforeDrag+10,10000,"A real finger drag should move the seed pet window");
             SystemClock.sleep(1000);
+            js("window.__moleLongPressMenus=0;document.addEventListener('contextmenu',()=>window.__moleLongPressMenus++,{capture:true})");
+            hold("document.querySelector('[data-testid=desktop-character]')");
+            assertFalse("A real Android long press must not open the desktop right-click backpack",host().controller.panel);
+            assertFalse("The renderer must stay out of a companion panel after a long press",has("[data-testid=companion-panel]"));
+            System.out.println("PASS trusted Android long press without backpack; contextmenu events="+js("window.__moleLongPressMenus"));
             drawn();device.takeScreenshot(new File(context().getExternalFilesDir(null),"android-floating.png"));
             // The house Activity may be destroyed while its retained pet lives
             // in the service. Rotation must still keep the overlay on screen.

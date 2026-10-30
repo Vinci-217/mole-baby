@@ -33,4 +33,8 @@ Windows 的动作位置断言原本在原生窗口完成变化、React 尚未消
 
 安卓最低 Android 8、WebView 108；厂商后台策略和具体真机的长时间锁屏仍需要对应设备验证。本地签名 Mac 未进行 Apple 公证。旧 Windows 检查使用 Electron 22 及 Windows 构建机，不能据此宣称已在实体 Windows 7 电脑全面验证。
 
-正式发布结果在全部门槛完成后补入本文件。
+## 正式候选被阻止，未公开发布
+
+源提交 `bdc4c3be8f8f6c4bad340ef97cce6b50420d0ed1` 的[六平台预发布](https://github.com/Vinci-217/mole-baby/actions/runs/41017874764)全部通过，包括固定签名 APK 安装／覆盖升级。不可变标签 v0.31.8 的[正式流程](https://github.com/Vinci-217/mole-baby/actions/runs/41032580469)在 Android 旋转后收纳步骤失败，因此发布门槛阻止创建 Release，未推进 latest 或公开安卓渠道。
+
+失败现场显示悬浮背包意外打开，使边缘收纳不能开始。移动浏览器增加 `contextmenu` 回归后，旧版稳定复现打开背包：Android 长按被桌面右键快捷逻辑接收。后续修复改为移动端忽略该快捷菜单，并增加真实 Android 手指长按验收。v0.31.8 标签保留作为失败候选，不改写；修复后的发布使用 v0.31.9。[后续验证](release-0.31.9-validation.md)。

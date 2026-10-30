@@ -2,7 +2,7 @@ import UploadedActionMenu from './UploadedActionMenu';
 import {isUploadedAction} from '../uploaded-actions';
 import {ramForm} from '../original-actions';
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties, PointerEvent, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
@@ -140,6 +140,14 @@ export default function DesktopCompanion(p: Props) {
     else if (!cancelled) touchPet();
   }
   const show = (panel: CompanionPanel) => { setTools(true); p.onPanel(panel); };
+  function contextMenu(e: ReactMouseEvent<HTMLDivElement>) {
+    e.preventDefault();
+    // Android emits contextmenu for a long press, including a held drag.
+    // The desktop right-click shortcut must not interrupt that gesture.
+    if (window.mobile || drag.current?.moved) return;
+    if (dockedRef.current) { peek(true); return; }
+    void window.desktop?.revealPet(); setTools(true); p.onPanel('food');
+  }
   const side = p.native ? p.desktopState.panelSide : 'right';
   const classicOpen=false;
   const bookGeometry=p.desktopState.panelGeometry;
@@ -154,7 +162,7 @@ export default function DesktopCompanion(p: Props) {
   const toolsVisible=!dragging&&!docked&&(tools||p.panel!==null);
   const condition=desktopCondition(p.pet,p.moodLabel);
   return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
-    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={e => { e.preventDefault();if(docked){peek(true);return;} void window.desktop?.revealPet(); setTools(true); p.onPanel('food'); }}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={contextMenu}>
       <CareFeedback feedback={docked||classicOpen?null:p.careFeedback}/>{p.bubbleVisible&&!docked&&!p.pet.activity&&!p.courseCompletion&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.name}</button>
       <button className="compact-pet-condition" data-testid="desktop-condition" data-condition={condition.id} data-attention={condition.attention} aria-label={p.pet.sleeping?'叫醒拉姆：睡梦中':`查看拉姆状态：${condition.label}`} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={()=>p.pet.sleeping?p.onCare('sleep'):show('status')}>{condition.label}</button>
