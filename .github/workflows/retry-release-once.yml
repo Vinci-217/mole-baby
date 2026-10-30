@@ -1,0 +1,59 @@
+name: Retry temporary Mac packaging failure once
+on:
+  push:
+    branches: ['maintenance/retry-v03110']
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: retry-release-0.31.10-once
+  cancel-in-progress: false
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Retry only failed Mac jobs from the unchanged release source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python3 -u - <<'PY'
+          import json,os,subprocess,time
+          repo=os.environ['GH_REPO'];run='41038156962'
+          source='d84ea32f61b00372426b805e7f4722f977d07903'
+          def api(path,method='GET'):
+              result=subprocess.run(['gh','api','--method',method,'repos/'+repo+path],capture_output=True,text=True)
+              if result.returncode:raise RuntimeError(result.stderr.strip())
+              return json.loads(result.stdout) if result.stdout.strip() else None
+          until=time.monotonic()+1200
+          while True:
+              current=api('/actions/runs/'+run)
+              if current['head_sha']!=source:raise RuntimeError('Unexpected release source')
+              if current['run_attempt']>1:
+                  print('A retry already exists; do not schedule another');raise SystemExit(0)
+              if current['status']=='completed':break
+              if time.monotonic()>until:raise RuntimeError('Original run still active; no retry requested')
+              print('Waiting for the original run to finish');time.sleep(15)
+          jobs=api('/actions/runs/'+run+'/jobs?filter=latest&per_page=100')['jobs']
+          failed=[job for job in jobs if job['conclusion'] in ['failure','cancelled']]
+          if not failed:print('No failed jobs remain');raise SystemExit(0)
+          if any('mac' not in job['name'].lower() for job in failed):
+              raise RuntimeError('A non-Mac job failed; investigate instead of retrying')
+          names=set()
+          for job in failed:
+              name=job['name'].lower()
+              arch='arm64' if 'arm64' in name else 'x64' if 'x64' in name else None
+              if not arch:raise RuntimeError('Unknown failed Mac architecture')
+              names.update(['mole-baby-mac-'+arch,'mac-smoke-'+arch])
+              print('Retry candidate:',job['id'],job['name'],job['conclusion'])
+          # Preserve successful platform artifacts. Failed diagnostics are also
+          # retained in the job logs and immutable build-reports Git history.
+          artifacts=api('/actions/runs/'+run+'/artifacts?per_page=100')['artifacts']
+          for artifact in artifacts:
+              if artifact['name'] in names:
+                  api('/actions/artifacts/'+str(artifact['id']),'DELETE')
+                  print('Removed failed-attempt artifact to avoid rerun name collision:',artifact['name'])
+          api('/actions/runs/'+run+'/rerun-failed-jobs','POST')
+          print('Requested one rerun of failed Mac jobs and their dependent release gates; source unchanged')
+          PY
