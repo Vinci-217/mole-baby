@@ -34,7 +34,6 @@ final class RamuHost {
     int prepareProgress;
     String prepareError;
     ValueCallback<Uri[]> chooser;
-    private AudioFocusRequest audioFocus;
     private String alarmActivity="";
     private final ConcurrentHashMap<String,CompletableFuture<Boolean>> saveWaiters=new ConcurrentHashMap<>();
     RamuHost(Context context){this.context=context;store=new PetStore(context);resources=new ResourcePack(context);controller=new PetController(this);updates=new AndroidUpdates(this);}
@@ -88,16 +87,16 @@ final class RamuHost {
     void startService(){ContextCompat.startForegroundService(context,new Intent(context,PetService.class));}
     void refreshService(){main.post(()->{boolean needed=controller.petMode||backgroundMusic&&musicEnabled&&musicPlaying;if(needed){if(service==null){if(activityVisible||controller.petMode)try{startService();}catch(RuntimeException ignored){}}else service.refresh();}else if(service!=null)service.finishService();});}
     void music(JSONObject state){musicPlaying=state.optBoolean("playing");musicEnabled=state.optBoolean("enabled");backgroundMusic=state.optBoolean("background");
-        AudioManager manager=context.getSystemService(AudioManager.class);
-        if(musicPlaying&&audioFocus==null){audioFocus=new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).setOnAudioFocusChangeListener(change->{if(change==AudioManager.AUDIOFOCUS_LOSS||change==AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)event("music",Json.of("enabled",false));},main).build();int result=manager.requestAudioFocus(audioFocus);if(result!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED)event("music",Json.of("enabled",false));}
-        if(!musicPlaying&&audioFocus!=null){manager.abandonAudioFocusRequest(audioFocus);audioFocus=null;}refreshService();
+        // Chromium owns the HTML media session and its AudioFocusRequest. A
+        // second native request would take focus from our own WebView player.
+        refreshService();
     }
-    JSONObject permissions(){boolean notifications=Build.VERSION.SDK_INT<33||ContextCompat.checkSelfPermission(context,android.Manifest.permission.POST_NOTIFICATIONS)==android.content.pm.PackageManager.PERMISSION_GRANTED;
+    JSONObject permissions(){boolean notifications=androidx.core.app.NotificationManagerCompat.from(context).areNotificationsEnabled()&&(Build.VERSION.SDK_INT<33||ContextCompat.checkSelfPermission(context,android.Manifest.permission.POST_NOTIFICATIONS)==android.content.pm.PackageManager.PERMISSION_GRANTED);
         return Json.of("overlay",controller.permission(),"notifications",notifications,"exactAlarms",Build.VERSION.SDK_INT<31||context.getSystemService(AlarmManager.class).canScheduleExactAlarms(),"installPackages",context.getPackageManager().canRequestPackageInstalls(),"batteryOptimized",!context.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(context.getPackageName()),"touchThrough",controller.mouseThrough,"autoDownloadWifi",store.prefs.getBoolean("updates-wifi",false),"api",Build.VERSION.SDK_INT,"version",BuildConfig.VERSION_NAME,"channel",BuildConfig.UPDATE_CHANNEL);
     }
     void openPermission(String kind){Intent intent;
         switch(kind){case"overlay":intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:"+context.getPackageName()));break;
-            case"notifications":if(Build.VERSION.SDK_INT>=33&&activity!=null){activity.requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},41);return;}intent=new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.getPackageName());break;
+            case"notifications":if(Build.VERSION.SDK_INT>=33&&activity!=null&&ContextCompat.checkSelfPermission(context,android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED){boolean asked=store.prefs.getBoolean("notifications-requested",false);if(!asked||activity.shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)){store.prefs.edit().putBoolean("notifications-requested",true).apply();activity.requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},41);return;}}intent=new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.getPackageName());break;
             case"alarms":intent=Build.VERSION.SDK_INT>=31?new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,Uri.parse("package:"+context.getPackageName())):new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+context.getPackageName()));break;
             case"install":intent=new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+context.getPackageName()));break;
             case"battery":intent=new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);break;

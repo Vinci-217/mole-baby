@@ -210,7 +210,7 @@ export default function App() {
   const timer = useRestReminder(pet?.createdAt, prefs.reminders, prefs.reminderMinutes, (alreadyNotified) => {
     const text = '计时结束啦！站起来伸伸懒腰，喝口水，看看远处吧。';
     speak(text, 15000); notify(text);if(!alreadyNotified){playReminderSound(prefs.reminderSound);window.desktop?.notify('拉姆 · 计时结束', text);}
-  },prefs.timerDirection,record=>setMemory(m=>m?.petId===String(record.petId)?recordEvent(m,{kind:'focus-timer',detail:timerRecordDetail(record),at:record.endedAt}):m));
+  },prefs.timerDirection,record=>setMemory(m=>m?.petId===String(record.petId)?recordEvent(m,{kind:'focus-timer',detail:timerRecordDetail(record),at:record.endedAt}):m),prefs.reminderSound);
   const interactionReason = animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});
   const interactionBusy = Boolean(current.activity) || current.sleeping || Boolean(current.outing) || interactionReason !== null;
   const schoolBusy = timer.running || Date.now()<careUntil.current || ['play','dizzy'].includes(action);

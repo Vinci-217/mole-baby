@@ -1,5 +1,6 @@
 import UploadedActionMenu from './UploadedActionMenu';
 import {isUploadedAction} from '../uploaded-actions';
+import {ramForm} from '../original-actions';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
@@ -145,7 +146,7 @@ export default function DesktopCompanion(p: Props) {
   const edge = p.native ? p.desktopState.edgePose : 'visible';
   const edgeSide = p.native ? p.desktopState.edgeSide : null;
   const entering = docked && edge === 'tucking' && !dragging;
-  const targetOffset = edgeTargetOffset(edgeSide, edge, p.desktopState.edgeOffset);
+  const targetOffset = edgeTargetOffset(edgeSide, edge, p.desktopState.edgeOffset,ramForm(p.stage,p.pet.evolution));
   const paintedOffset = docked && dragging ? heldEdgeOffset : targetOffset;
   const edgeAction = entering ? edgeEntryAction(p.stage, edgeSide) : edge === 'hidden' ? 'still' : edge === 'peek' ? 'idle' : p.action;
   const displayAction = docked && !p.itemId && !p.pet.sleeping ? edgeAction : p.action;

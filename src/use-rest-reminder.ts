@@ -15,7 +15,7 @@ export function reminderTime(seconds: number): string {
 
 /** A manual, one-shot timer. Pet sleep/quiet mode never changes its deadline.
  * Reopening, changing pets/duration or disabling reminders returns to idle. */
-export function useRestReminder(petId: number | undefined, enabled: boolean, minutes: number, onDue: (alreadyNotified?:boolean) => void, direction:TimerDirection='countdown',onRecord?:(record:TimerRecord)=>void) {
+export function useRestReminder(petId: number | undefined, enabled: boolean, minutes: number, onDue: (alreadyNotified?:boolean) => void, direction:TimerDirection='countdown',onRecord?:(record:TimerRecord)=>void,nativeSound=true) {
   const duration = validReminderMinutes(minutes) * 60000;
   const callback = useRef(onDue); callback.current = onDue;
   const recorder=useRef(onRecord);recorder.current=onRecord;
@@ -31,7 +31,7 @@ export function useRestReminder(petId: number | undefined, enabled: boolean, min
     if (petId === undefined || !enabled) return;
     if(session.current)return;
     const now=Date.now();session.current={petId,startedAt:now,direction,plannedMinutes:validReminderMinutes(minutes)};
-    if(window.mobile){localStorage.setItem(MOBILE_FOCUS_KEY,JSON.stringify({...session.current,deadline:now+duration}));void window.mobile.scheduleReminder(focusReminderId(session.current),now+duration,'拉姆 · 计时结束','站起来伸伸懒腰，喝口水，看看远处吧。').catch(()=>{});}
+    if(window.mobile)localStorage.setItem(MOBILE_FOCUS_KEY,JSON.stringify({...session.current,deadline:now+duration}));
     generation.current++; setFinished(false); setSeconds(timerDisplaySeconds(direction,duration/1000,duration/1000)); setDeadline(now + duration);
   };
   useEffect(() => {
@@ -46,6 +46,7 @@ export function useRestReminder(petId: number | undefined, enabled: boolean, min
   }, [petId, enabled, duration,direction]);
   useEffect(() => {
     if (deadline === null) return;
+    if(window.mobile&&session.current&&deadline>Date.now())void window.mobile.scheduleReminder(focusReminderId(session.current),deadline,'拉姆 · 计时结束','站起来伸伸懒腰，喝口水，看看远处吧。',nativeSound).catch(()=>{});
     const token = generation.current;
     let fired = false;
     const due = () => {
@@ -59,6 +60,6 @@ export function useRestReminder(petId: number | undefined, enabled: boolean, min
     const timeout = setTimeout(due, Math.max(0, deadline - Date.now()));
     const off=window.mobile?.on('resume',update);
     return () => { clearTimeout(timeout); clearInterval(interval);off?.(); };
-  }, [deadline]);
+  }, [deadline,nativeSound]);
   return { seconds, running: deadline !== null, finished, start, cancel };
 }

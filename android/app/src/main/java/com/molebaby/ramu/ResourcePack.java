@@ -17,7 +17,7 @@ final class ResourcePack {
     volatile JSONObject index;
     volatile String rendererHash;
     ResourcePack(Context context) { this.context=context;root=new File(context.getFilesDir(),"resources"); }
-    void prepare(Consumer<Integer> progress) throws Exception {
+    synchronized void prepare(Consumer<Integer> progress) throws Exception {
         root.mkdirs();
         JSONObject bundled=new JSONObject(new String(SafeFiles.readLimited(context.getAssets().open("web/resource-index.json"),4*1024*1024),java.nio.charset.StandardCharsets.UTF_8));
         rendererHash=bundled.getString("rendererHash");
@@ -66,7 +66,7 @@ final class ResourcePack {
             Files.move(staging.toPath(),destination.toPath(),StandardCopyOption.ATOMIC_MOVE);
         }finally{SafeFiles.delete(staging);}
     }
-    void apply(File zip,JSONObject next,Consumer<Integer> progress)throws Exception{
+    synchronized void apply(File zip,JSONObject next,Consumer<Integer> progress)throws Exception{
         if(!rendererHash.equals(next.optString("rendererHash")))throw new IOException("素材需要不同的程序版本，请先安装对应的 APK。");
         File destination=SafeFiles.child(root,next.getString("revision"));
         try(InputStream in=new FileInputStream(zip)){extract(in,next,destination,progress);}
@@ -76,7 +76,7 @@ final class ResourcePack {
     private void activate(File directory,JSONObject next)throws Exception{
         SafeFiles.atomicJson(new File(root,"active.json"),new JSONObject().put("owner",BuildConfig.VERSION_CODE).put("revision",next.getString("revision")));active=directory;index=next;
     }
-    void prune() {File[] dirs=root.listFiles();if(dirs!=null)for(File dir:dirs)if(dir.isDirectory()&&!dir.equals(active))try{SafeFiles.delete(dir);}catch(IOException ignored){}}
+    synchronized void prune() {File[] dirs=root.listFiles();if(dirs!=null)for(File dir:dirs)if(dir.isDirectory()&&!dir.equals(active))try{SafeFiles.delete(dir);}catch(IOException ignored){}}
     UpdateTransport.Base base()throws IOException{
         File external=new File(root,"base.zip");
         if(external.isFile() && new File(root,"base-revision").isFile() && SafeFiles.readText(new File(root,"base-revision")).equals(index.optString("revision")))return new UpdateTransport.Base(external,0,external.length());

@@ -32,8 +32,13 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .android-settings p{font-size:14px;line-height:1.7;color:#856d51}
 .android-host .game-button{min-height:42px}
 .android-host .paper-dialog input:not([type=range]):not([type=checkbox]){font-size:16px}
-.android-host .game-overlay{padding:8px;overflow:auto;align-items:flex-start}
+.android-host .game-overlay{inset:0;padding:8px;overflow:hidden;align-items:flex-start}
 .android-host .game-overlay>*{min-width:0;max-width:100%;max-height:calc(100dvh - 16px);overflow:auto}
+.android-host .game-overlay>.game-panel{overflow:hidden;margin:0;max-height:calc(100dvh - 16px)}
+.android-host .classic-app .game-panel .panel-header{height:52px;min-height:52px;margin:0;padding:10px 48px 10px 14px;justify-content:flex-start}
+.android-host .classic-app .game-panel .round-close{top:6px;right:8px;min-width:40px;min-height:40px;line-height:40px;font-size:26px}
+.android-host .classic-app .game-panel .paper-tabs{flex-wrap:nowrap;flex-shrink:0;overflow-x:auto}
+.android-host .adoption-screen{inset:0;padding:12px}
 .android-host .fruit-game,.android-host .berry-game{width:min(100%,720px);touch-action:none}
 .android-host .classic-dock{display:flex;align-items:center;overflow-x:auto;gap:6px;justify-content:flex-start;padding:8px;scrollbar-width:none;max-height:88px;border:1px solid #dbc291;border-image:none;border-radius:18px;background:#fffdf4;box-shadow:0 2px 10px #65452318}
 .android-host .classic-dock button{min-width:60px;flex-shrink:0;font-size:14px}

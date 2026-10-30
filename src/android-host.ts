@@ -13,7 +13,7 @@ declare global {
       permissions:()=>Promise<AndroidPermissions>;
       requestPermission:(kind:'overlay'|'notifications'|'alarms'|'battery'|'install')=>Promise<boolean>;
       exportSave:(text:string,name:string)=>Promise<boolean>;
-      scheduleReminder:(id:string,at:number,title:string,body:string)=>Promise<boolean>;
+      scheduleReminder:(id:string,at:number,title:string,body:string,sound?:boolean)=>Promise<boolean>;
       cancelReminder:(id:string)=>Promise<boolean>;
       wasNotified:(id:string)=>Promise<boolean>;
       cancelUpdate:()=>Promise<boolean>;
@@ -55,7 +55,7 @@ export function installAndroidHost(){
     if(type==='prepare')void(async()=>{let ok=true;for(const callback of prepare)try{if(!await callback())ok=false;}catch{ok=false;}send('prepared',{token:payload.token,ok});})();
     for(const callback of listeners.get(type)??[])callback(payload);
   };
-  window.mobile={permissions:()=>rpc('permissions'),requestPermission:kind=>rpc('permission',{kind}),exportSave:(text,name)=>rpc('exportSave',{text,name},300000),scheduleReminder:(id,at,title,body)=>rpc('scheduleReminder',{id,at,title,body}),cancelReminder:id=>rpc('cancelReminder',{id}),wasNotified:id=>rpc('wasNotified',{id}),cancelUpdate:()=>rpc('updatesCancel'),setAutoDownloadWifi:enabled=>rpc('updatesWifi',{enabled}),on};
+  window.mobile={permissions:()=>rpc('permissions'),requestPermission:kind=>rpc('permission',{kind}),exportSave:(text,name)=>rpc('exportSave',{text,name},300000),scheduleReminder:(id,at,title,body,sound=true)=>rpc('scheduleReminder',{id,at,title,body,sound}),cancelReminder:id=>rpc('cancelReminder',{id}),wasNotified:id=>rpc('wasNotified',{id}),cancelUpdate:()=>rpc('updatesCancel'),setAutoDownloadWifi:enabled=>rpc('updatesWifi',{enabled}),on};
   window.desktop={
     platform:'android',isElectron:false,
     getState:()=>rpc('getState'),

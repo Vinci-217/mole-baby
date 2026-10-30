@@ -41,11 +41,11 @@ public final class NativeBridge {
             case"minimize":case"close":case"hideToTray":host.background();return true;
             case"openManorSite":host.openUrl("https://www.61.com/");return true;
             case"setMusicState":host.music(a);return true;
-            case"notify":if(!host.activityVisible)Notifications.reminder(host.context,876,a.optString("title","拉姆"),a.optString("body"));return true;
+            case"notify":if(!host.activityVisible)Notifications.reminder(host.context,876,a.optString("title","拉姆"),a.optString("body"),Json.parse(host.store.prefs.getString("ramu-house-preferences-v2","{}")).optBoolean("reminderSound",true));return true;
             case"permissions":return host.permissions();
             case"permission":host.openPermission(a.optString("kind"));return true;
             case"exportSave":if(host.activity==null)throw new IllegalStateException("请先回到小屋导出存档");host.activity.export(a.getString("text"),a.optString("name","ramu.json"),id);return Deferred.INSTANCE;
-            case"scheduleReminder":ReminderReceiver.schedule(host.context,a.getString("id"),a.getLong("at"),a.getString("title"),a.getString("body"));return true;
+            case"scheduleReminder":ReminderReceiver.schedule(host.context,a.getString("id"),a.getLong("at"),a.getString("title"),a.getString("body"),a.optBoolean("sound",true));return true;
             case"cancelReminder":ReminderReceiver.cancel(host.context,a.getString("id"));return true;
             case"wasNotified":return host.context.getSharedPreferences("fired",0).contains(a.getString("id"));
             case"prepared":host.saved(a.optString("token"),a.optBoolean("ok"));return true;

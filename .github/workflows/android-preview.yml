@@ -81,7 +81,7 @@ jobs:
           cd android
           ./gradlew assembleRelease -PmoleVersion="0.32.0-preview.${GITHUB_RUN_NUMBER}" -PmoleVersionCode="$ANDROID_PREVIEW_CODE" --no-daemon
           cd ..
-          node scripts/android/prepare-update.cjs
+          node scripts/android/prepare-update.cjs --fetch-previous
       - name: Save APK, screenshots and test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
