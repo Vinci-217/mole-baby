@@ -58,7 +58,9 @@ test('rejects duplicate checksum names and stale manifest sizes or SHA512 values
 
 test('publication waits for modern, legacy and Mac package verification and uploads isolated feeds',()=>{
  const workflow=YAML.parse(fs.readFileSync(path.join(__dirname,'../.github/workflows/windows-build.yml'),'utf8'));
- assert.deepEqual(workflow.jobs.release.needs,['build','legacy','mac']);
+ assert.deepEqual(workflow.jobs.release.needs,['build','legacy','mac','android']);
+ assert.equal(workflow.jobs.android.uses,'./.github/workflows/android-preview.yml');
+ assert.match(workflow.jobs.release.steps.find(s=>s.name==='Check artifact checksums').run,/SHA256SUMS-android/);
  assert.deepEqual(workflow.jobs.legacy.strategy.matrix.arch,['x64','ia32']);
  assert.match(workflow.jobs.release.if,/refs\/tags\/v/);
  const upload=workflow.jobs.legacy.steps.find(s=>s.name==='Upload checked legacy downloads');

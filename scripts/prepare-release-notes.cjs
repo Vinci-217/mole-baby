@@ -15,6 +15,13 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
     ? '**Mac 信任状态：已通过 Developer ID 签名、Apple 公证、票据装订和 Gatekeeper 验证。**'
     : '**Mac 信任状态：本地签名，尚未经过 Apple 公证；首次打开需要在“隐私与安全”选择“仍要打开”。**';
   const download = name => `https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-${version}-${name}`;
+  const androidManifest=path.join(directory,'latest-android.json');
+  let androidRow='';
+  if(fs.existsSync(androidManifest)){
+    const m=JSON.parse(fs.readFileSync(androidManifest,'utf8'));
+    if(m.packageName!=='com.molebaby.ramu.preview'||!Number.isInteger(m.versionCode))throw Error('Invalid fixed-signed Android release');
+    androidRow=`\n| **安卓手机／平板 · Android 8+** | **[⬇ 下载安卓固定签名预览版 .apk](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.apk)** | WebView 108+；按系统提示安装，后续可覆盖升级 |`;
+  }
   const guide = `# 下载与安装 · 拉姆 v${version}
 
 **第一次安装？直接点击下表的「下载」即可，无需注册或登录 GitHub，也不用下载源码。**
@@ -25,7 +32,7 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
 | **Windows 7 SP1 / 8 / 8.1 · 64 位** | **[⬇ 下载老系统 64 位兼容版 .exe](${download('legacy-x64-Setup.exe')})** | 兼容版，双击安装 |
 | **Windows 7 SP1 / 8 / 8.1 · 32 位**，或 32 位 Windows 10 | **[⬇ 下载老系统 32 位兼容版 .exe](${download('legacy-ia32-Setup.exe')})** | 兼容版，双击安装 |
 | **Mac · Apple 芯片**（M1、M2、M3、M4、M5 及后续 M 系列） | **[⬇ 下载 Apple 芯片 Mac 版 .dmg](${download('mac-arm64.dmg')})** | 打开 → 拖入「应用程序」 |
-| **Mac · Intel 芯片** | **[⬇ 下载 Intel Mac 版 .dmg](${download('mac-x64.dmg')})** | 打开 → 拖入「应用程序」 |
+| **Mac · Intel 芯片** | **[⬇ 下载 Intel Mac 版 .dmg](${download('mac-x64.dmg')})** | 打开 → 拖入「应用程序」 |${androidRow}
 
 **不知道 Mac 选哪个？** 点击屏幕左上角苹果菜单 →「关于本机」：显示「芯片 Apple M…」选 Apple 芯片版，显示「处理器 Intel…」选 Intel 版。Mac 需要 **macOS 12 或更高版本**。
 

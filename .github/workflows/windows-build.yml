@@ -2,7 +2,7 @@ name: Desktop build
 
 on:
   push:
-    branches: [main, 'next/art-direction', 'preview/proportion-polish', 'preview/companion-workflow']
+    branches: [main, 'release/v0.31.8', 'next/art-direction', 'preview/proportion-polish', 'preview/companion-workflow']
     tags: ['v*']
   pull_request:
     branches: [main]
@@ -106,7 +106,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
+        if: always() && (github.ref == 'refs/heads/release/v0.31.8' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: windows
@@ -191,7 +191,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
+        if: always() && (github.ref == 'refs/heads/release/v0.31.8' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: legacy-${{ matrix.arch }}
@@ -300,7 +300,7 @@ jobs:
           retention-days: 14
 
       - name: Save platform diagnostic before other platforms finish
-        if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
+        if: always() && (github.ref == 'refs/heads/release/v0.31.8' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
         continue-on-error: true
         env:
           CI_DIAGNOSTIC_PLATFORM: mac-${{ matrix.arch }}
@@ -308,10 +308,18 @@ jobs:
           CI_DIAGNOSTIC_LOG: artifacts/mac-${{ matrix.arch }}-smoke.log
         run: node scripts/save-ci-diagnostic.cjs
 
+  android:
+    name: Build and verify fixed-signed Android preview
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/release/v0.31.8'
+    uses: ./.github/workflows/android-preview.yml
+    permissions:
+      contents: write
+    secrets: inherit
+
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, legacy, mac]
+    needs: [build, legacy, mac, android]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -344,6 +352,7 @@ jobs:
           node ../scripts/prepare-release-notes.cjs
           node ../scripts/update-metadata.cjs
           sha256sum --check SHA256SUMS.txt
+          sha256sum --check SHA256SUMS-android.txt
 
       - name: Create release or replace its build attachments
         env:
@@ -352,18 +361,28 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         shell: bash
         run: |
+          # Every native job, including the fixed-signed Android install and
+          # upgrade, has passed before either public channel becomes visible.
+          if gh release view android-preview >/dev/null 2>&1; then
+            gh release upload android-preview release/*.apk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
+          else
+            gh release create android-preview release/*.apk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/SHA256SUMS-android.txt --target "$GITHUB_SHA" --prerelease --latest=false --title "安卓固定签名预览版" --notes "Android 8+，WebView 108+。固定签名，支持后续覆盖升级；APK 安装仍需用户确认。"
+          fi
+          gh release upload android-preview release/latest-android.json --clobber
+          gh release edit android-preview --prerelease --latest=false
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --clobber
+            gh release upload "$RELEASE_TAG" release/*.dmg release/mole-baby-*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --clobber
             gh release edit "$RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release/*.dmg release/*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release/*.dmg release/mole-baby-*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
+          gh release upload "$RELEASE_TAG" release/*.apk release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
           gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file release/RELEASE_NOTES.md
 
   report:
     name: Save build receipt
-    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
-    needs: [build, legacy, mac, release]
+    if: always() && (github.ref == 'refs/heads/release/v0.31.8' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/preview/proportion-polish' || github.ref == 'refs/heads/preview/companion-workflow')
+    needs: [build, legacy, mac, android, release]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -396,6 +415,7 @@ jobs:
           BUILD_RESULT: ${{ needs.build.result }}
           MAC_RESULT: ${{ needs.mac.result }}
           LEGACY_RESULT: ${{ needs.legacy.result }}
+          ANDROID_RESULT: ${{ needs.android.result }}
           RELEASE_RESULT: ${{ needs.release.result }}
         shell: bash
         run: |
@@ -420,6 +440,7 @@ jobs:
             sourceSha: env.GITHUB_SHA,
             buildResult: allBuilt ? 'success' : 'failure',
             platforms: { windows: env.BUILD_RESULT, legacyWindows: env.LEGACY_RESULT, mac: env.MAC_RESULT },
+            androidResult: env.ANDROID_RESULT,
             releaseResult: env.RELEASE_RESULT,
             runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
             releaseUrl: env.RELEASE_RESULT === 'success' ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/releases/tag/${encodeURIComponent(env.GITHUB_REF_NAME)}` : null,
