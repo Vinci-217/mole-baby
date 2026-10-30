@@ -1,0 +1,8 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp" android:background="@drawable/widget_background">
+ <ImageView android:id="@+id/widget_pet" android:layout_width="56dp" android:layout_height="56dp" android:src="@drawable/ramu_icon" android:contentDescription="拉姆"/>
+ <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="10dp">
+  <TextView android:id="@+id/widget_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="拉姆" android:textColor="#79583B" android:textStyle="bold" android:textSize="16sp"/>
+  <TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="点我回小屋" android:textColor="#927956" android:textSize="12sp"/>
+  <TextView android:id="@+id/widget_feed" android:layout_width="match_parent" android:layout_height="36dp" android:gravity="center_vertical" android:text="打开背包 ›" android:textColor="#96703D" android:textSize="13sp"/>
+ </LinearLayout>
+</LinearLayout>

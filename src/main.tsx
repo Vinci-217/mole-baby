@@ -4,4 +4,7 @@ import App from './App';
 import './styles.css';
 import './original-theme.css';
 import './components/DesktopCompanion.css';
+import './android.css';
+import {installAndroidHost} from './android-host';
+installAndroidHost();
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

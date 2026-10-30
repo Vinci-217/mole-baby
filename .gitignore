@@ -237,3 +237,12 @@ artifacts/original-game-audio/*
 !artifacts/original-game-audio/review.json
 artifacts/v31/failed*.png
 artifacts/original-room/failed*.png
+
+# Android build outputs and private signing material.
+android/.gradle/
+android/**/build/
+android/local.properties
+android/app/src/main/assets/
+android/*.jks
+android/*.keystore
+mobile-release/

@@ -24,7 +24,10 @@
     "clean:previews": "node scripts/clean-preview-frames.cjs --apply",
     "build:legacy": "tsc -b && vite build --config vite.legacy.config.ts",
     "dist:win:legacy:x64": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch x64",
-    "dist:win:legacy:ia32": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch ia32"
+    "dist:win:legacy:ia32": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch ia32",
+    "android:build": "node scripts/android/build.cjs",
+    "android:assets": "node scripts/android/prepare-assets.cjs",
+    "android:manifest": "node scripts/android/prepare-update.cjs"
   },
   "dependencies": {
     "electron-updater": "6.8.11",

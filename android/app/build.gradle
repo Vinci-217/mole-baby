@@ -1,0 +1,53 @@
+plugins { id 'com.android.application' }
+
+def androidVersion = providers.gradleProperty('moleVersion').getOrElse('0.32.0-preview.1')
+def androidCode = providers.gradleProperty('moleVersionCode').getOrElse('320001').toInteger()
+android {
+    namespace 'com.molebaby.ramu'
+    compileSdk 36
+    buildToolsVersion '36.0.0'
+    defaultConfig {
+        applicationId 'com.molebaby.ramu.preview'
+        minSdk 26
+        targetSdk 36
+        versionCode androidCode
+        versionName androidVersion
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'String', 'UPDATE_FEED', '"https://github.com/Vinci-217/mole-baby/releases/download/android-preview/latest-android.json"'
+        buildConfigField 'String', 'UPDATE_CHANNEL', '"android-preview"'
+    }
+    signingConfigs {
+        preview {
+            def keyPath = System.getenv('MOLE_ANDROID_KEYSTORE')
+            if (keyPath) {
+                storeFile file(keyPath)
+                storePassword System.getenv('MOLE_ANDROID_STORE_PASSWORD')
+                keyAlias System.getenv('MOLE_ANDROID_KEY_ALIAS') ?: 'mole-preview'
+                keyPassword System.getenv('MOLE_ANDROID_KEY_PASSWORD') ?: System.getenv('MOLE_ANDROID_STORE_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.dev'; versionNameSuffix '-dev' }
+        release {
+            signingConfig System.getenv('MOLE_ANDROID_KEYSTORE') ? signingConfigs.preview : null
+            minifyEnabled false
+        }
+    }
+    buildFeatures { buildConfig true }
+    compileOptions { coreLibraryDesugaringEnabled true; sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    androidResources { noCompress 'zip', 'mp3', 'ogg', 'webp' }
+    testOptions { unitTests.includeAndroidResources = true }
+    packaging { resources.excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*'] }
+}
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation 'androidx.webkit:webkit:1.14.0'
+    implementation 'androidx.core:core:1.16.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20250517'
+    testImplementation 'org.robolectric:robolectric:4.15.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+}

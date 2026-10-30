@@ -2,6 +2,12 @@
 
 > **Windows 与 Mac 桌面拉姆。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
+## 安卓手机与平板 · 开发预览
+
+新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。当前为独立预览分支，尚未公开安卓更新渠道。
+
+[安装、构建与更新说明](docs/ANDROID.md) · [安卓测试包与验证进度](https://github.com/Vinci-217/mole-baby/actions/workflows/android-preview.yml)。
+
 ## 本轮更新 · v0.31.7
 
 软件更新新增「自动选择 / 完整包」：自动比较新旧内容，变化少时下载差量，变化多或无法复用时完整下载；可直接跨版本升级，下载和安装继续分别确认。[更新策略](docs/UPDATES.md)。

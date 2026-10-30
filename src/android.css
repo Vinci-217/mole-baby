@@ -1,0 +1,78 @@
+/* Mobile layout is opt-in; desktop windows retain their existing geometry. */
+html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+.android-host body,.android-host #root{margin:0;min-width:0;width:100%;min-height:100dvh;overscroll-behavior:none}
+.android-host button,.android-host input,.android-host select{touch-action:manipulation}
+.android-host:not(.pet-mode) .classic-app{min-height:100dvh;height:auto;min-width:0;padding:0 0 12px;overflow-x:clip}
+.android-host .window-bar,.android-host .window-controls,.android-host .room-resize-handles{display:none!important}
+.android-host .classic-titlebar{display:none!important}
+.android-host .cottage-scene{min-height:100dvh;height:100dvh;min-width:0;overflow:hidden}
+.android-host .game-backdrop{padding:8px;align-items:center}
+.android-host .game-panel{width:min(720px,100%);min-width:0;max-height:calc(100dvh - 16px);display:flex;flex-direction:column;overflow:hidden}
+.android-host .game-panel .panel-paper{overflow:auto;min-height:0;padding:10px}
+.android-host .game-panel .panel-header{flex-shrink:0;min-height:52px}
+.android-host .classic-dock.room-dock{bottom:34px;left:8px;right:8px;width:auto;min-width:0;transform:none}
+.android-host .classic-footer{font-size:11px;gap:8px;padding:7px 12px}
+.android-host .classic-footer span{font-size:10px}
+.android-host .cottage-top{display:flex;height:auto;min-height:60px;flex-wrap:wrap;gap:8px;padding:12px}
+.android-host .classic-logo{font-size:22px}
+.android-host .scene-top-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.android-host .scene-top-actions button{min-height:40px;font-size:13px}
+.android-host .scene-top-actions .manor-site-button{display:none}
+.android-host .cottage{min-width:0}
+.android-host .room-scene{min-height:300px;height:clamp(300px,50dvh,540px)}
+.android-host .game-dialog,.android-host .paper-dialog{max-width:calc(100vw - 16px);max-height:calc(100dvh - 20px);margin:8px;overflow:auto;min-width:0}
+.android-host .paper-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;scrollbar-width:none;flex-shrink:0}
+.android-host .paper-tabs button{white-space:nowrap;min-height:44px;min-width:52px}
+.android-host .settings-panel{min-width:0;max-width:100%;padding:10px}
+.android-host .settings-row{gap:10px;min-height:48px;flex-wrap:wrap}
+.android-host .settings-row>span:first-child{flex:1;min-width:120px}
+.android-host .settings-row input[type=checkbox]{width:24px;height:24px}
+.android-host .settings-row select,.android-host .settings-row input[type=number]{min-height:40px;max-width:160px}
+.android-host .android-settings{border-top:1px solid #dbc8a2;padding:14px 0;margin-top:14px}
+.android-host .android-settings p{font-size:14px;line-height:1.7;color:#856d51}
+.android-host .game-button{min-height:42px}
+.android-host .paper-dialog input:not([type=range]):not([type=checkbox]){font-size:16px}
+.android-host .game-overlay{padding:8px;overflow:auto;align-items:flex-start}
+.android-host .game-overlay>*{min-width:0;max-width:100%;max-height:calc(100dvh - 16px);overflow:auto}
+.android-host .fruit-game,.android-host .berry-game{width:min(100%,720px);touch-action:none}
+.android-host .classic-dock{display:flex;align-items:center;overflow-x:auto;gap:6px;justify-content:flex-start;padding:8px;scrollbar-width:none;max-height:88px;border:1px solid #dbc291;border-image:none;border-radius:18px;background:#fffdf4;box-shadow:0 2px 10px #65452318}
+.android-host .classic-dock button{min-width:60px;flex-shrink:0;font-size:14px}
+.android-host .classic-dock button img{width:42px;height:42px}
+.android-host .classic-dock.room-dock button{height:64px;min-width:60px;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;padding:2px;grid-row:auto}
+.android-host .care-pocket{max-width:100%}
+.android-host:not(.pet-mode) .care-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.android-host:not(.pet-mode) .care-cell{min-width:0;aspect-ratio:1}
+.android-host.pet-mode,.android-host.pet-mode body,.android-host.pet-mode #root{background:transparent!important;min-height:0}
+.android-host.pet-mode .desktop-character{touch-action:none}
+.android-host.pet-mode .pet-actions button{min-width:34px;min-height:34px}
+.android-host.pet-mode .companion-panel{left:var(--pocket-x,8px)!important;top:var(--pocket-y,230px)!important;width:var(--pocket-width,324px)!important;height:var(--pocket-height,272px)!important}
+.android-host.pet-mode .companion-panel button{touch-action:manipulation}
+.android-host.pet-mode .companion-panel.panel-play{overflow-y:auto}
+.android-host.pet-mode .pocket-compact .pocket-items{width:clamp(128px,calc(var(--pocket-height,338px) - 88px),232px);height:auto;aspect-ratio:1;flex-shrink:0}
+.android-host.pet-mode .pocket-compact .pocket-categories>button{min-height:30px;font-size:12px;line-height:24px}
+.android-host.pet-mode .pocket-compact .pocket-heading{min-height:28px;height:28px;font-size:14px}
+.android-host.pet-mode .pocket-compact .pocket-heading button{width:32px;min-height:28px}
+@media(max-width:600px){
+ .android-host .classic-app .scene-top-actions{justify-content:center;width:100%}
+ .android-host .cottage-top .classic-logo{width:100%;justify-content:center}
+ .android-host .shop-book,.android-host .school-content,.android-host .wardrobe-content{max-width:100%;min-width:0}
+ .android-host .settings-identity{flex-wrap:wrap}
+ .android-host .settings-actions{flex-wrap:wrap}
+ .android-host .school-course-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .android-host .school-course-grid article{min-width:0}
+ .android-host .school-panel>header{gap:10px;padding:10px 0}
+ .android-host .open-shop-book{grid-template-columns:1fr;display:grid}
+ .android-host .book-left-page,.android-host .book-right-page{min-width:0;border:0}
+ .android-host .bookshop-shelf{overflow-x:auto;justify-content:flex-start}
+ .android-host .bookshop-cover{min-width:80px;flex-shrink:0}
+ .android-host .book-item-detail{display:flex;flex-direction:column;align-items:center;padding:10px}
+ .android-host .book-item-portrait{width:70px;height:70px}
+ .android-host .color-mixer-game{padding:14px}
+ .android-host .color-mixer-stage{gap:4px;min-height:170px}
+ .android-host .mixing-preview{min-width:100px;width:110px}
+ .android-host .adoption-panel{width:calc(100vw - 24px);max-height:calc(100dvh - 32px);overflow:auto}
+ .android-host .adoption-header h1{font-size:26px}
+ .android-host .pet-plaque{left:10px;top:140px;width:116px;height:auto;min-height:70px;padding:9px;border:1px solid #dbc291;border-image:none;border-radius:12px;background:#fffdf2}
+ .android-host .pet-plaque strong{font-size:17px}
+ .android-host .pet-plaque small,.android-host .pet-plaque>span{font-size:11px}
+}
