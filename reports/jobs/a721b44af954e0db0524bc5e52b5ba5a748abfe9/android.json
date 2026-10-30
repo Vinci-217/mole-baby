@@ -1,0 +1,20 @@
+{
+  "sourceSha": "a721b44af954e0db0524bc5e52b5ba5a748abfe9",
+  "platform": "android",
+  "status": "failure",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41004851096",
+  "log": "native-smoke-test.txt\n\ncom.molebaby.ramu.AndroidSmokeTest:\nError in adoptionCareOverlayAndRecoveryKeepOnePet(com.molebaby.ramu.AndroidSmokeTest):\njava.lang.AssertionError: The floating service must reposition after rotation even without an Activity\n\tat com.molebaby.ramu.AndroidSmokeTest.waitFor(AndroidSmokeTest.java:26)\n\tat com.molebaby.ramu.AndroidSmokeTest.adoptionCareOverlayAndRecoveryKeepOnePet(AndroidSmokeTest.java:67)\n\n\nTime: 44.86\nThere was 1 failure:\n1) adoptionCareOverlayAndRecoveryKeepOnePet(com.molebaby.ramu.AndroidSmokeTest)\njava.lang.AssertionError: The floating service must reposition after rotation even without an Activity\n\tat com.molebaby.ramu.AndroidSmokeTest.waitFor(AndroidSmokeTest.java:26)\n\tat com.molebaby.ramu.AndroidSmokeTest.adoptionCareOverlayAndRecoveryKeepOnePet(AndroidSmokeTest.java:67)\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n\nandroid-ui-state.txt\n\"{\\\"text\\\":\\\"安卓小蓝\\\\n安心陪伴\\\",\\\"pointer\\\":{\\\"x\\\":190.85714721679688,\\\"y\\\":131.42857360839844,\\\"target\\\":\\\"\\u003Cbutton class=\\\\\\\"game-button\\\\\\\">悬浮陪伴\\u003C/button>\\\"},\\\"visible\\\":\\\"visible\\\",\\\"viewport\\\":[160,240],\\\"audio\\\":{\\\"ready\\\":4,\\\"paused\\\":true}}\"",
+  "recordedAt": "2026-10-30T04:54:55.365Z",
+  "screens": [
+    {
+      "name": "android-last-screen.png",
+      "path": "reports/media/a721b44af954e0db0524bc5e52b5ba5a748abfe9/android/android-last-screen.png",
+      "bytes": 1078090
+    },
+    {
+      "name": "android-floating.png",
+      "path": "reports/media/a721b44af954e0db0524bc5e52b5ba5a748abfe9/android/android-floating.png",
+      "bytes": 1100821
+    }
+  ]
+}
