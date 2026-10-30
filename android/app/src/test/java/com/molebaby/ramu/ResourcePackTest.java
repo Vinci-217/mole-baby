@@ -17,4 +17,12 @@ public final class ResourcePackTest {
     @Test public void scriptsAndTraversalAreRejected()throws Exception{for(String name:new String[]{"assets/evil.js","assets/page.html","../save","assets/native.dex","assets/lib.so"}){byte[] bytes="data".getBytes();assertThrows(IOException.class,()->ResourcePack.extract(new ByteArrayInputStream(zip(name,bytes)),index(name,bytes),out(),p->{}));}assertFalse(new File(out(),"complete").exists());}
     @Test public void unknownAndMissingEntriesAreRejected()throws Exception{byte[] bytes="data".getBytes();assertThrows(IOException.class,()->ResourcePack.extract(new ByteArrayInputStream(zip("assets/other.json",bytes)),index("assets/frame.json",bytes),out(),p->{}));}
     @Test public void decompressionBombIsBoundedByIndex()throws Exception{byte[] bytes=new byte[100000];JSONObject index=index("assets/frame.json",bytes);index.getJSONArray("files").getJSONObject(0).put("size",1);assertThrows(IOException.class,()->ResourcePack.extract(new ByteArrayInputStream(zip("assets/frame.json",bytes)),index,out(),p->{}));}
+    @Test public void androidStyleDirectoryAliasesCannotDeleteTheActivePack()throws Exception{
+        File real=temporary.newFolder("real"),active=new File(real,"active"),stale=new File(real,"old");active.mkdirs();stale.mkdirs();SafeFiles.writeText(new File(active,"complete"),"keep");
+        File alias=new File(temporary.getRoot(),"alias");Files.createSymbolicLink(alias.toPath(),real.toPath());File canonical=SafeFiles.child(alias,"active");assertNotEquals(new File(alias,"active"),canonical);
+        ResourcePack.pruneDirectories(alias,canonical);assertTrue(new File(active,"complete").isFile());assertFalse(stale.exists());
+    }
+    @Test public void cleanupUnlinksASymlinkWithoutRecursingIntoItsTarget()throws Exception{
+        File real=temporary.newFolder("keep");SafeFiles.writeText(new File(real,"save"),"pet");File link=new File(temporary.getRoot(),"old-link");Files.createSymbolicLink(link.toPath(),real.toPath());SafeFiles.delete(link);assertFalse(link.exists());assertEquals("pet",SafeFiles.readText(new File(real,"save")));
+    }
 }

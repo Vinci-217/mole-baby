@@ -76,7 +76,13 @@ final class ResourcePack {
     private void activate(File directory,JSONObject next)throws Exception{
         SafeFiles.atomicJson(new File(root,"active.json"),new JSONObject().put("owner",BuildConfig.VERSION_CODE).put("revision",next.getString("revision")));active=directory;index=next;
     }
-    synchronized void prune() {File[] dirs=root.listFiles();if(dirs!=null)for(File dir:dirs)if(dir.isDirectory()&&!dir.equals(active))try{SafeFiles.delete(dir);}catch(IOException ignored){}}
+    synchronized void prune(){pruneDirectories(root,active);}
+    static void pruneDirectories(File root,File active){
+        if(active==null)return;final File keep;try{keep=active.getCanonicalFile();}catch(IOException e){return;}
+        // Android /data/user/0 and /data/data may name the same directory.
+        // Comparing File path strings here would delete the active pack.
+        File[] dirs=root.listFiles();if(dirs!=null)for(File dir:dirs)if(dir.isDirectory())try{if(!dir.getCanonicalFile().equals(keep))SafeFiles.delete(dir);}catch(IOException ignored){}
+    }
     UpdateTransport.Base base()throws IOException{
         File external=new File(root,"base.zip");
         if(external.isFile() && new File(root,"base-revision").isFile() && SafeFiles.readText(new File(root,"base-revision")).equals(index.optString("revision")))return new UpdateTransport.Base(external,0,external.length());

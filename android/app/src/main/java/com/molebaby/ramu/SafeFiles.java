@@ -45,7 +45,7 @@ final class SafeFiles {
         Files.move(temp.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
     static void delete(File file) throws IOException {
-        if (file.isDirectory()) { File[] files = file.listFiles(); if (files != null) for (File child : files) delete(child); }
+        if (file.isDirectory()&&!Files.isSymbolicLink(file.toPath())) { File[] files = file.listFiles(); if (files != null) for (File child : files) delete(child); }
         if (file.exists() && !file.delete()) throw new IOException("无法清理临时文件");
     }
 }
