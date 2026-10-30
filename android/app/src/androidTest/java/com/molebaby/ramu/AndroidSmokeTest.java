@@ -37,6 +37,11 @@ public final class AndroidSmokeTest {
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
     static void drawn()throws Exception{CountDownLatch latch=new CountDownLatch(1);ui(()->{host().web.postVisualStateCallback(SystemClock.uptimeMillis(),new WebView.VisualStateCallback(){@Override public void onComplete(long requestId){latch.countDown();}});host().web.postInvalidateOnAnimation();});assertTrue("The real WebView compositor must present its current page",latch.await(20,TimeUnit.SECONDS));SystemClock.sleep(600);}
     static void shell(String command)throws Exception{try(ParcelFileDescriptor fd=instrumentation.getUiAutomation().executeShellCommand(command);InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){while(in.read()!=-1){}}}
+    static void rotateDisplay(UiDevice device,boolean landscape)throws Exception{
+        context().startActivity(new Intent().setClassName(instrumentation.getContext().getPackageName(),RotationFixtureActivity.class.getName())
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("landscape",landscape));
+        waitFor(()->(device.getDisplayWidth()>device.getDisplayHeight())==landscape,15000,"The foreground test app must actually rotate the physical display");
+    }
     @Test public void adoptionCareOverlayAndRecoveryKeepOnePet()throws Exception{
         shell("appops set "+context().getPackageName()+" SYSTEM_ALERT_WINDOW allow");
         if(Build.VERSION.SDK_INT>=33)shell("pm grant "+context().getPackageName()+" android.permission.POST_NOTIFICATIONS");
@@ -63,11 +68,13 @@ public final class AndroidSmokeTest {
             // The house Activity may be destroyed while its retained pet lives
             // in the service. Rotation must still keep the overlay on screen.
             waitFor(()->host().service!=null);ui(()->host().activity.finish());waitFor(()->host().activity==null);assertTrue(host().controller.attached);
-            // AOSP Launcher locks itself to portrait. Make the emulator honor
-            // the requested display rotation, as another landscape app would.
-            shell("wm set-ignore-orientation-request true");ui(()->host().controller.position(80,host().controller.area().y-180));device.setOrientationLeft();
+            // Run another real app: AOSP Launcher's portrait lock prevents a
+            // UiDevice rotation request from exercising the service at all.
+            ui(()->host().controller.position(80,host().controller.area().y-180));rotateDisplay(device,true);
             waitFor(()->host().controller.area().x>host().controller.area().y&&host().controller.y<=host().controller.area().y-178,10000,"The floating service must reposition after rotation even without an Activity");
-            device.setOrientationNatural();waitFor(()->host().controller.area().y>host().controller.area().x);device.unfreezeRotation();shell("wm set-ignore-orientation-request false");
+            assertNull("Rotation must not recreate the house Activity",host().activity);assertSame(runtime,host().web);assertTrue(host().controller.attached);
+            drawn();device.takeScreenshot(new File(context().getExternalFilesDir(null),"android-floating-landscape.png"));
+            rotateDisplay(device,false);waitFor(()->host().controller.area().y>host().controller.area().x);device.pressHome();
             // Seed pets can be dragged and docked, even though they cannot wander.
             ui(()->{host().controller.interacting=false;host().controller.position(-30,200);host().controller.dock();});waitFor(()->"hidden".equals(host().controller.edgePose));assertEquals("left",host().controller.edgeSide);
             ui(()->host().controller.peek(true));assertEquals("left",host().controller.edgeSide);assertEquals("peek",host().controller.edgePose);
@@ -81,7 +88,7 @@ public final class AndroidSmokeTest {
             drawn();
         }finally{
             try{UiDevice.getInstance(instrumentation).takeScreenshot(new File(context().getExternalFilesDir(null),"android-last-screen.png"));if(host().web!=null){JSONObject diagnostic=Json.parse(js("({text:document.body.innerText.slice(0,5000),pointer:window.__moleTestPointer,visible:document.visibilityState,viewport:[innerWidth,innerHeight],audio:(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return a?{ready:a.readyState,paused:a.paused,error:a.error?.code}:null})()})"));diagnostic.put("native",host().controller.state());diagnostic.put("display",Json.of("width",host().controller.area().x,"height",host().controller.area().y,"petX",host().controller.x,"petY",host().controller.y));SafeFiles.writeText(new File(context().getExternalFilesDir(null),"android-ui-state.txt"),diagnostic.toString());}}catch(Exception ignored){}
-            try{UiDevice.getInstance(instrumentation).setOrientationNatural();UiDevice.getInstance(instrumentation).unfreezeRotation();shell("wm set-ignore-orientation-request false");}catch(Exception ignored){}
+            try{rotateDisplay(UiDevice.getInstance(instrumentation),false);UiDevice.getInstance(instrumentation).pressHome();}catch(Exception ignored){}
             ui(()->{if(host().activity!=null)host().activity.finish();});
         }
     }

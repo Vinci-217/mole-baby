@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- A real foreground app changes display orientation while the target
+         house Activity is gone. This fixture is only in the test APK. -->
+    <application>
+        <activity android:name="com.molebaby.ramu.RotationFixtureActivity"
+            android:exported="true" android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize" />
+    </application>
+</manifest>
