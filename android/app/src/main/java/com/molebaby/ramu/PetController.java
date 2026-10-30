@@ -52,8 +52,23 @@ final class PetController {
     boolean mode(boolean value)throws Exception{
         if(value&&!permission()){host.openPermission("overlay");throw new IllegalStateException("请先允许拉姆显示在其他应用上层，再点击悬浮陪伴。");}
         if(value){petMode=true;host.startService();if(host.loaded)attach();if(host.activity!=null)host.activity.moveTaskToBack(true);}
-        else{clearEffect();petMode=false;panel=false;width=160;height=240;edgeSide=null;edgePose="visible";detach();if(host.activity!=null&&host.activityVisible)host.activity.attachWeb();else host.context.startActivity(new Intent(host.context,RamuActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));host.refreshService();}
+        else{leaveOverlay();if(host.activity!=null&&host.activityVisible)host.activity.attachWeb();else host.context.startActivity(new Intent(host.context,RamuActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));host.refreshService();}
         emit();return petMode;
+    }
+    /** Both the in-game home button and the notification resume the same pet.
+     * Restore its anchor before discarding a panel or expanded effect frame. */
+    void leaveOverlay(){
+        cancelMotion();
+        dragging=false;
+        clearEffect();
+        if(panel){x+=panelPetX;y+=panelPetY;}
+        petMode=false;
+        panel=false;
+        widePanel=false;
+        panelPetX=panelPetY=panelTop=0;
+        width=160;height=240;
+        edgeSide=null;edgePose="visible";peekAt=0;
+        detach();
     }
     void applyTouch(){if(params!=null){params.flags=mouseThrough?params.flags|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE:params.flags&~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;params.alpha=mouseThrough?.75f:1f;update();}host.refreshService();emit();}
     void through(boolean enabled){if(enabled&&!host.permissions().optBoolean("notifications"))throw new IllegalStateException("请先允许通知，穿透后需要从通知栏恢复触摸。");mouseThrough=enabled;applyTouch();}

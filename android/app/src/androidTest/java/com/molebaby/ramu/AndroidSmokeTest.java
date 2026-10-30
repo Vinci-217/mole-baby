@@ -81,7 +81,22 @@ public final class AndroidSmokeTest {
             ui(()->{host().controller.downX=0;host().controller.downY=200;host().controller.startDrag(Json.of("x",-30,"y",0));host().controller.rawX=150;host().controller.rawY=230;host().controller.drag();host().controller.endDrag();});assertNull(host().controller.edgeSide);assertTrue(host().controller.x>0);
             ui(()->host().controller.through(true));assertTrue(host().controller.mouseThrough);
             device.openNotification();UiObject recover=device.findObject(new UiSelector().text("恢复触摸"));assertTrue("Notification must expose recovery",recover.waitForExists(10000));recover.click();waitFor(()->!host().controller.mouseThrough);
+            // A notification can interrupt an expanded original spell window.
+            // Returning home must restore the body anchor and clear its offset.
+            float anchorX=host().controller.x,anchorY=host().controller.y;
+            ui(()->host().controller.effect(Json.of("x",-80,"y",-50,"width",400,"height",330)));
+            assertTrue(host().controller.effectExpanded);
             device.openNotification();UiObject home=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue("Notification body opens the house",home.waitForExists(10000));home.click();waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));assertSame(runtime,host().web);assertEquals(petId,host().store.pet().getLong("createdAt"));
+            assertFalse("Home must discard the interrupted effect frame",host().controller.effectExpanded);
+            assertEquals(0,host().controller.effectX);assertEquals(0,host().controller.effectY);
+            assertEquals(anchorX,host().controller.x,.01f);assertEquals(anchorY,host().controller.y,.01f);
+            textButton("悬浮陪伴");waitFor(()->host().controller.attached&&host().controller.petMode);
+            assertEquals(160,host().controller.width);assertEquals(240,host().controller.height);
+            ui(()->host().controller.panel(true));waitFor(()->host().controller.panel);
+            float panelAnchorX=host().controller.x+host().controller.panelPetX,panelAnchorY=host().controller.y+host().controller.panelPetY;
+            device.openNotification();home=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue(home.waitForExists(10000));home.click();waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));
+            assertFalse(host().controller.panel);assertEquals(160,host().controller.width);assertEquals(240,host().controller.height);
+            assertEquals(panelAnchorX,host().controller.x,.01f);assertEquals(panelAnchorY,host().controller.y,.01f);assertSame(runtime,host().web);
             context().getSharedPreferences("upgrade-fixture",0).edit().putLong("petId",petId).putInt("code",context().getPackageManager().getPackageInfo(context().getPackageName(),0).versionCode).commit();host().store.flush();
             drawn();File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
             RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
