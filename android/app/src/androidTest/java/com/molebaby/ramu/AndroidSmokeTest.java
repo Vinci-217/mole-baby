@@ -58,7 +58,11 @@ public final class AndroidSmokeTest {
             try{waitFor(()->host().musicPlaying,30000,"Built-in music should play in the house");}catch(AssertionError error){throw new AssertionError("Audio diagnostic: "+js("(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return {audio:!!a,ready:a?.readyState,network:a?.networkState,paused:a?.paused,error:a?.error?.code,visible:document.visibilityState,prefs:localStorage.getItem('ramu-room-media-v1')}})()"));}SystemClock.sleep(1000);assertTrue("Native audio focus must not pause our own WebView",host().musicPlaying);
             click("[aria-label='允许后台播放音乐']");waitFor(()->host().backgroundMusic&&host().service!=null,10000,"Enabling background music should start its foreground service");UiDevice device=UiDevice.getInstance(instrumentation);device.pressHome();SystemClock.sleep(1200);assertTrue("Opted-in music should continue when the house is backgrounded",host().musicPlaying);
             device.openNotification();UiObject musicHome=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue(musicHome.waitForExists(10000));musicHome.click();waitFor(()->host().activityVisible&&has("[aria-label='允许后台播放音乐']"));click("[aria-label='允许后台播放音乐']");waitFor(()->!host().backgroundMusic);
+            // A saved position from a larger display can already be outside
+            // the current screen before the first overlay is attached.
+            ui(()->{host().controller.x=80;host().controller.y=host().controller.area().y;});
             click("[aria-label='关闭面板']");textButton("悬浮陪伴");waitFor(()->host().controller.attached&&host().controller.petMode);assertSame(runtime,host().web);assertEquals(petId,host().store.pet().getLong("createdAt"));
+            assertTrue("First attach must fit an old out-of-screen position",host().controller.y>=0&&host().controller.y+host().controller.height<=host().controller.area().y+1);
             waitFor(()->has("[data-testid='desktop-character']"));
             int[] location=new int[2];ui(()->host().controller.position(60,120));SystemClock.sleep(250);ui(()->host().web.getLocationOnScreen(location));float beforeDrag=host().controller.x;
             device.swipe(location[0]+host().controller.px(80),location[1]+host().controller.px(125),location[0]+host().controller.px(150),location[1]+host().controller.px(140),18);

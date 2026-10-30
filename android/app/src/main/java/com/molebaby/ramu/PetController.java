@@ -42,7 +42,7 @@ final class PetController {
     void emit(){host.event("state",state());}
     void attach(){
         if(attached||!petMode||!permission()||host.web==null)return;
-        host.detachWeb();Point area=area();x=Math.max(-28,Math.min(area.x-132,x));y=Math.max(-65,Math.min(area.y-180,y));
+        host.detachWeb();onConfigurationChanged();
         if(host.webContext!=null)host.webContext.setBaseContext(host.context);
         params=new WindowManager.LayoutParams(px(width),px(height),WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL|WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS|WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,android.graphics.PixelFormat.TRANSLUCENT);
         params.gravity=Gravity.TOP|Gravity.LEFT;params.x=px(x);params.y=px(y);params.setTitle("mole-baby pet");
