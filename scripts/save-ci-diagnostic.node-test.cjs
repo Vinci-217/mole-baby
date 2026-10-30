@@ -20,6 +20,11 @@ test('platform diagnostics update the receipt branch while preserving the source
  assert.equal(withMedia.screens.length,1);
  assert.deepEqual(execFileSync('git',['show',`build-reports:${withMedia.screens[0].path}`],{cwd:remote}),png);
  assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:'../private'}}),/Invalid/);
+ const mobileDir=path.join(cwd,'mobile-release');fs.mkdirSync(mobileDir);fs.writeFileSync(path.join(mobileDir,'android-house.png'),png);fs.writeFileSync(path.join(mobileDir,'preview.apk'),'not a screenshot');
+ const mobile=saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_PLATFORM:'android',CI_DIAGNOSTIC_MEDIA_DIR:'mobile-release'}});
+ assert.equal(mobile.platform,'android');assert.equal(mobile.screens.length,1);assert.equal(mobile.screens[0].name,'android-house.png');
+ assert.deepEqual(execFileSync('git',['show',`build-reports:${mobile.screens[0].path}`],{cwd:remote}),png);
+ assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:'mobile-release'}}),/Invalid/);
  fs.writeFileSync(path.join(cwd,mediaDir,'not-an-image.png'),'not a screenshot');
  assert.throws(()=>saveDiagnostic({cwd,env:{...env,CI_DIAGNOSTIC_MEDIA_DIR:mediaDir}}),/PNG/);
 });

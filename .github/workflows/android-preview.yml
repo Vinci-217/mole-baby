@@ -12,6 +12,8 @@ jobs:
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 55
+    permissions:
+      contents: write
     env:
       MOLE_ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_PREVIEW_STORE_PASSWORD }}
       MOLE_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_PREVIEW_KEY_PASSWORD }}
@@ -105,3 +107,18 @@ jobs:
             artifacts/android/
           retention-days: 14
           compression-level: 0
+      - name: Save native verification over Git
+        if: always()
+        env:
+          CI_DIAGNOSTIC_PLATFORM: android
+          CI_DIAGNOSTIC_STATUS: ${{ job.status }}
+          CI_DIAGNOSTIC_LOG: mobile-release/android-verification.log
+          CI_DIAGNOSTIC_MEDIA_DIR: mobile-release
+        run: |
+          mkdir -p mobile-release
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const files=['native-smoke-test.txt','android-ui-state.txt','actual-apk-delta.json','apk-upgrade-test.txt'];
+          fs.writeFileSync('mobile-release/android-verification.log',files.filter(f=>fs.existsSync('mobile-release/'+f)).map(f=>f+'\n'+fs.readFileSync('mobile-release/'+f,'utf8')).join('\n'));
+          NODE
+          node scripts/save-ci-diagnostic.cjs
