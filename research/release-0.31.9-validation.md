@@ -18,4 +18,18 @@ Android 长按会产生 `contextmenu`，旧版把它当成桌面右键，意外�
 
 发布仍依赖 Windows 常规版、兼容 x64／ia32、Mac ARM／Intel、Android 全部成功；固定签名安装与覆盖升级后保留存档是安卓必需检查。开发／测试夹具不发布。正式结果与公开下载、签名指纹验证在完成后追加。
 
+## 安卓正式验收
+
+源提交 `0168faf0c80b6a922fb6b71a75c0ad3c4faae7ee` 的[正式流程](https://github.com/Vinci-217/mole-baby/actions/runs/41035372957)已完成 Android 检查：新增真实手指长按与既有拖动、无 Activity 旋转、边缘收纳、通知恢复、小屋往返全部通过。实际 APK 差量重建经过 SHA256 校验，再真实覆盖安装验证原生与页面存档。受控实验完整包 556,407,394 字节，复用 556,190,416 字节、下载 216,978 字节；这只代表该测试夹具，不代表未来公开版本的固定节省量。
+
+固定签名 release APK 另行安装，实际领养名为 `SignedRamu` 的拉姆；更高 versionCode 的同签名 APK 覆盖安装后，名字及小屋控件均保留。下面为该次升级后截图，来自 Android 15 模拟器，未重绘。
+
+<img src="../docs/previews/v0319/android-signed-upgraded.png" width="240" alt="固定签名安卓 APK 覆盖升级后保留 SignedRamu 的小屋" />
+
 安卓最低 Android 8、WebView 108。Android 15 模拟器通过不代表已覆盖所有品牌的后台策略、来电中断或长时间锁屏。本地签名 Mac 未 Apple 公证；兼容 Windows 的原生检查不等于实体 Windows 7 全面验收。
+
+## 候选未发布
+
+Android 和 Windows 常规／兼容 64 位验收通过；兼容 32 位也通过完整应用运行检查，但随后安装器自动测试没有观察到 Finish 页，发布门槛因此阻止公开 Release。日志先记录 Install，随后又点击了 Next。测试会在安装启动后继续发送导航点击，而 NSIS 的共享按钮可能在转换到 Finish 时短暂保留 Next 标题，存在提前误点完成页的竞态。
+
+后续测试修正为发送一次 Install 后只等待 Finish，不再点击进度期间的 Next；仍要求独立目录、原素材哈希、真实 Finish、向导隐藏和安装后的应用可见启动全部通过。未改写 v0.31.9 标签，后续以 v0.31.10 重新完整验收。[后续记录](release-0.31.10-validation.md)。

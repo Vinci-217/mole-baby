@@ -1,0 +1,16 @@
+{
+  "version": "0.31.8",
+  "tag": "v0.31.8",
+  "sourceSha": "bdc4c3be8f8f6c4bad340ef97cce6b50420d0ed1",
+  "buildResult": "success",
+  "platforms": {
+    "windows": "success",
+    "legacyWindows": "success",
+    "mac": "success"
+  },
+  "androidResult": "failure",
+  "releaseResult": "skipped",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41032580469",
+  "releaseUrl": null,
+  "recordedAt": "2026-10-30T09:44:56.022Z"
+}

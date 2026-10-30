@@ -6,7 +6,7 @@
 
 新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。固定签名，后续可以覆盖升级并保留存档。需要 Android 8+、WebView／Chrome 108+。
 
-[下载安卓 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.9/mole-baby-android-1310900.apk) · [安装、构建与更新说明](docs/ANDROID.md) · [六平台验证](research/release-0.31.9-validation.md)。首次离线包较大，建议预留 2 GiB 空间。此前 `.dev` 开发包请先导出存档，再导入固定签名预览版。
+[下载安卓 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.10/mole-baby-android-1311000.apk) · [安装、构建与更新说明](docs/ANDROID.md) · [六平台验证](research/release-0.31.10-validation.md)。首次离线包较大，建议预留 2 GiB 空间。此前 `.dev` 开发包请先导出存档，再导入固定签名预览版。
 
 <details>
 <summary>查看手机与平板界面预览</summary>
@@ -19,11 +19,11 @@
 
 </details>
 
-## 本轮更新 · v0.31.9
+## 本轮更新 · v0.31.10
 
 修复初级拉姆前两种涂鸦开场接近平时两倍的问题，校准四种形态的全部四种涂鸦。原帧、时长和动作内的伸缩全部保留；100%、125%、150%、200% 缩放及特效窗口扩展均检查身体比例。背包切换分类时的短暂空白同步修复。
 
-附带安卓固定签名预览版，修复旋转、悬浮返回小屋、横屏点击及长按误开背包问题。实际 APK 安装、更高版本覆盖升级与存档保留是发布必需检查。[下载与安装](https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.9) · [对比截图、验证结果与范围](research/release-0.31.9-validation.md)。
+附带安卓固定签名预览版，修复旋转、悬浮返回小屋、横屏点击及长按误开背包问题。实际 APK 安装、更高版本覆盖升级与存档保留是发布必需检查。[下载与安装](https://github.com/Vinci-217/mole-baby/releases/tag/v0.31.10) · [对比截图、验证结果与范围](research/release-0.31.10-validation.md)。
 
 ## v0.31.7 · 更新策略、小屋缩放与横排背包
 

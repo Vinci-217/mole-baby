@@ -1,0 +1,34 @@
+{
+  "sourceSha": "0168faf0c80b6a922fb6b71a75c0ad3c4faae7ee",
+  "unitTests": {
+    "vitest": 388,
+    "node": 152,
+    "total": 540
+  },
+  "productionBuild": {
+    "passed": true,
+    "losslessImages": 1126,
+    "alphaAndVisiblePixelsVerified": true
+  },
+  "mobileBrowser": {
+    "viewports": [
+      "phone",
+      "phone-small",
+      "phone-landscape",
+      "tablet"
+    ],
+    "passed": true,
+    "addedRegression": "Touch contextmenu must not open companion-panel",
+    "oldImplementationFailed": true
+  },
+  "nativeDesktop": {
+    "platform": "linux",
+    "electron": "35.7.5",
+    "physicalRightClickOpensBackpack": true
+  },
+  "inheritedGraffitiEvidence": {
+    "file": "release-0.31.8-local-checks.json",
+    "sourceSha": "bdc4c3be8f8f6c4bad340ef97cce6b50420d0ed1",
+    "atlasMetadataAndRuntimeRectCodeIdentical": true
+  }
+}

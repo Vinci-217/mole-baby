@@ -1,10 +1,10 @@
 # 安卓手机与平板预览
 
-安卓实现已随 v0.31.9 合入主线，沿用现有 React 游戏与原版动作帧，原生宿主使用 Java / Android WebView。安卓使用独立的预览更新渠道，桌面版更新清单保持隔离；普通分支构建只生成测试产物，正式标签在六平台验收通过后发布。
+安卓实现已随 v0.31.10 合入主线，沿用现有 React 游戏与原版动作帧，原生宿主使用 Java / Android WebView。安卓使用独立的预览更新渠道，桌面版更新清单保持隔离；普通分支构建只生成测试产物，正式标签在六平台验收通过后发布。
 
 ## 下载与使用
 
-直接[下载 v0.31.9 固定签名 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.9/mole-baby-android-1310900.apk)，传到手机后按系统提示允许此来源并安装。包名 `com.molebaby.ramu.preview`，固定签名支持后续覆盖升级并保留存档。
+直接[下载 v0.31.10 固定签名 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.10/mole-baby-android-1311000.apk)，传到手机后按系统提示允许此来源并安装。包名 `com.molebaby.ramu.preview`，固定签名支持后续覆盖升级并保留存档。
 
 此前 Actions 中的 `mole-baby-android-preview-dev.apk` 是开发包，包名带 `.dev`，与固定签名版独立。请先在旧包导出存档，再到预览版导入；不同 CI 构建的开发签名可能不同，开发包不作为公开更新渠道。
 
@@ -36,7 +36,7 @@
 
 ## 更新策略
 
-安卓渠道为 [`android-preview`](https://github.com/Vinci-217/mole-baby/releases/tag/android-preview)，入口是该 Release 下的 `latest-android.json`。v0.31.9 首次公开固定签名渠道，没有更早的公开安卓基线；受控安装／差量测试不等于已验证任意未来公开版本之间的升级。
+安卓渠道为 [`android-preview`](https://github.com/Vinci-217/mole-baby/releases/tag/android-preview)，入口是该 Release 下的 `latest-android.json`。v0.31.10 首次公开固定签名渠道，没有更早的公开安卓基线；受控安装／差量测试不等于已验证任意未来公开版本之间的升级。
 
 1. 启动约 8 秒后检查，可在设置中关闭。Wi-Fi 自动下载默认关闭；开启后仅在非计费 Wi-Fi 下载。
 2. APK 升级比较新旧 blockmap v2，复用已安装 APK 的相同块。新清单包含最多 12 个历史基线，因此允许跨版本升级。缺少基线、变化过大或不支持 Range 时完整下载。
@@ -98,6 +98,10 @@ Windows 使用 `gradlew.bat`。构建所需的 JDK / SDK、私钥、生成的素
 
 ## 本轮接手验收（2026-10-30）
 
-已修复通知栏回小屋时的特效／背包锚点恢复、手机横屏地面无法点击及提示气泡遮挡。v0.31.8 预发布检查通过，但正式候选发现长按被当作右键误开背包、阻止收纳，因此没有公开。v0.31.9 修复该问题并增加移动浏览器菜单和实际手指长按检查；发布仍要求完整 Android 15 模拟器流程、固定签名 APK 更高版本覆盖安装与存档保留全部成功。此前受控 APK 差量测试复用约 556 MB 数据，下载约 256 KB，不能据此保证每次升级的下载量。
+已修复通知栏回小屋时的特效／背包锚点恢复、手机横屏地面无法点击及提示气泡遮挡。v0.31.8 正式候选发现长按误开背包、阻止收纳，因此没有公开。v0.31.9 修复后安卓验收通过，但 Windows 32 位安装器测试的导航竞态阻止了发布。v0.31.10 修正测试导航并重新验收六平台；发布仍要求完整 Android 15 模拟器流程、固定签名 APK 更高版本覆盖安装与存档保留全部成功。受控 APK 差量实验不能代表未来公开版本的固定节省量。
 
-[v0.31.9 发布与签名验证](../research/release-0.31.9-validation.md) · [接手修复与早期验证范围](../research/android-takeover-validation.md)。
+[v0.31.10 发布与签名验证](../research/release-0.31.10-validation.md) · [接手修复与早期验证范围](../research/android-takeover-validation.md)。
+
+v0.31.9 已通过 Android 15 模拟器的真实手指长按、旋转收纳与存档检查，固定签名 release APK 也已实际覆盖升级并保留测试拉姆 `SignedRamu`。具体品牌的后台策略仍需在对应设备验证。
+
+<img src="previews/v0319/android-signed-upgraded.png" width="240" alt="实际固定签名 APK 覆盖升级后的小屋" />

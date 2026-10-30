@@ -38,6 +38,7 @@ try {
  $dialog = [IntPtr]::Zero
  $lastClick = [DateTime]::MinValue
  $pathConfirmed = $false
+ $installRequested = $false
  while([DateTime]::UtcNow -lt $deadline) {
   $dialog = [InstallerUI]::Find($installerProcess.Id)
   if($dialog -ne [IntPtr]::Zero){
@@ -45,7 +46,10 @@ try {
    $label = [InstallerUI]::Text($button)
    if([InstallerUI]::IsWindowVisible($button) -and [InstallerUI]::IsWindowEnabled($button)){
     if($label -match 'Finish|完成'){$finish=$button;break}
-    if($label -match 'Next|Install|下一步|安装' -and ([DateTime]::UtcNow-$lastClick).TotalSeconds -gt 1){
+    # Once Install is posted, NSIS owns the progress -> Finish transition.
+    # The shared button can briefly be enabled with its stale Next caption.
+    # Clicking it again would queue Finish before we can verify that page.
+    if(!$installRequested -and $label -match 'Next|Install|下一步|安装' -and ([DateTime]::UtcNow-$lastClick).TotalSeconds -gt 1){
      if($label -match 'Install|安装' -and !$pathConfirmed){
       $edit=[InstallerUI]::DirectoryEdit($dialog)
       if($edit -eq [IntPtr]::Zero){throw 'Installer directory page has no visible path field'}
@@ -56,6 +60,7 @@ try {
       Start-Sleep -Milliseconds 100
      }
      Write-Output "Installer page: $label"
+     if($label -match 'Install|安装'){$installRequested=$true}
      [InstallerUI]::SetForegroundWindow($dialog) | Out-Null
      [InstallerUI]::PostMessage($button,0xF5,[IntPtr]::Zero,[IntPtr]::Zero) | Out-Null
      $lastClick=[DateTime]::UtcNow
@@ -64,7 +69,12 @@ try {
   }
   Start-Sleep -Milliseconds 100
  }
- if($finish -eq [IntPtr]::Zero){throw 'Installer never reached its real Finish page'}
+ if($finish -eq [IntPtr]::Zero){
+  $installedFile=Test-Path (Join-Path $install "$ProductName.exe")
+  $lastLabel=if($dialog -ne [IntPtr]::Zero){[InstallerUI]::Text([InstallerUI]::GetDlgItem($dialog,1))}else{'<no visible dialog>'}
+  Write-Output "Installer diagnostic: installRequested=$installRequested, processExited=$($installerProcess.HasExited), executableExists=$installedFile, lastButton=$lastLabel"
+  throw 'Installer never reached its real Finish page'
+ }
  if(!$pathConfirmed){throw 'Installer skipped the explicit directory-page path check'}
  if(!(Test-Path (Join-Path $install "$ProductName.exe"))){throw 'Installer did not install in the isolated test folder'}
  & node (Join-Path $PSScriptRoot 'packaged-motion-assets.cjs') (Join-Path $install 'resources/app.asar')

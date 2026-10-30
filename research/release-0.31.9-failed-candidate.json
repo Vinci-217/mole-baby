@@ -1,0 +1,12 @@
+{
+  "sourceSha": "0168faf0c80b6a922fb6b71a75c0ad3c4faae7ee",
+  "platform": "legacy-ia32",
+  "status": "failure",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41035372957",
+  "recordedAt": "2026-10-30T09:58:33.555Z",
+  "tag": "v0.31.9",
+  "packagedApplicationPassed": true,
+  "installerFinishUnobserved": true,
+  "androidResult": "success",
+  "publicationBlockedByGate": true
+}
