@@ -63,9 +63,11 @@ public final class AndroidSmokeTest {
             // The house Activity may be destroyed while its retained pet lives
             // in the service. Rotation must still keep the overlay on screen.
             waitFor(()->host().service!=null);ui(()->host().activity.finish());waitFor(()->host().activity==null);assertTrue(host().controller.attached);
-            ui(()->host().controller.position(80,host().controller.area().y-180));device.setOrientationLeft();
+            // AOSP Launcher locks itself to portrait. Make the emulator honor
+            // the requested display rotation, as another landscape app would.
+            shell("wm set-ignore-orientation-request true");ui(()->host().controller.position(80,host().controller.area().y-180));device.setOrientationLeft();
             waitFor(()->host().controller.area().x>host().controller.area().y&&host().controller.y<=host().controller.area().y-178,10000,"The floating service must reposition after rotation even without an Activity");
-            device.setOrientationNatural();waitFor(()->host().controller.area().y>host().controller.area().x);device.unfreezeRotation();
+            device.setOrientationNatural();waitFor(()->host().controller.area().y>host().controller.area().x);device.unfreezeRotation();shell("wm set-ignore-orientation-request false");
             // Seed pets can be dragged and docked, even though they cannot wander.
             ui(()->{host().controller.interacting=false;host().controller.position(-30,200);host().controller.dock();});waitFor(()->"hidden".equals(host().controller.edgePose));assertEquals("left",host().controller.edgeSide);
             ui(()->host().controller.peek(true));assertEquals("left",host().controller.edgeSide);assertEquals("peek",host().controller.edgePose);
@@ -78,7 +80,8 @@ public final class AndroidSmokeTest {
             RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
             drawn();
         }finally{
-            try{UiDevice.getInstance(instrumentation).takeScreenshot(new File(context().getExternalFilesDir(null),"android-last-screen.png"));if(host().web!=null){String diagnostic=js("JSON.stringify({text:document.body.innerText.slice(0,5000),pointer:window.__moleTestPointer,visible:document.visibilityState,viewport:[innerWidth,innerHeight],audio:(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return a?{ready:a.readyState,paused:a.paused,error:a.error?.code}:null})()})");SafeFiles.writeText(new File(context().getExternalFilesDir(null),"android-ui-state.txt"),diagnostic);}}catch(Exception ignored){}
+            try{UiDevice.getInstance(instrumentation).takeScreenshot(new File(context().getExternalFilesDir(null),"android-last-screen.png"));if(host().web!=null){JSONObject diagnostic=Json.parse(js("({text:document.body.innerText.slice(0,5000),pointer:window.__moleTestPointer,visible:document.visibilityState,viewport:[innerWidth,innerHeight],audio:(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return a?{ready:a.readyState,paused:a.paused,error:a.error?.code}:null})()})"));diagnostic.put("native",host().controller.state());diagnostic.put("display",Json.of("width",host().controller.area().x,"height",host().controller.area().y,"petX",host().controller.x,"petY",host().controller.y));SafeFiles.writeText(new File(context().getExternalFilesDir(null),"android-ui-state.txt"),diagnostic.toString());}}catch(Exception ignored){}
+            try{UiDevice.getInstance(instrumentation).setOrientationNatural();UiDevice.getInstance(instrumentation).unfreezeRotation();shell("wm set-ignore-orientation-request false");}catch(Exception ignored){}
             ui(()->{if(host().activity!=null)host().activity.finish();});
         }
     }
