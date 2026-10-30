@@ -35,6 +35,7 @@ public final class AndroidSmokeTest {
     }
     static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
+    static void drawn()throws Exception{CountDownLatch latch=new CountDownLatch(1);ui(()->{host().web.postVisualStateCallback(SystemClock.uptimeMillis(),new WebView.VisualStateCallback(){@Override public void onComplete(long requestId){latch.countDown();}});host().web.postInvalidateOnAnimation();});assertTrue("The real WebView compositor must present its current page",latch.await(20,TimeUnit.SECONDS));SystemClock.sleep(600);}
     static void shell(String command)throws Exception{try(ParcelFileDescriptor fd=instrumentation.getUiAutomation().executeShellCommand(command);InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){while(in.read()!=-1){}}}
     @Test public void adoptionCareOverlayAndRecoveryKeepOnePet()throws Exception{
         shell("appops set "+context().getPackageName()+" SYSTEM_ALERT_WINDOW allow");
@@ -58,6 +59,13 @@ public final class AndroidSmokeTest {
             device.swipe(location[0]+host().controller.px(80),location[1]+host().controller.px(125),location[0]+host().controller.px(150),location[1]+host().controller.px(140),18);
             waitFor(()->host().controller.x>beforeDrag+10,10000,"A real finger drag should move the seed pet window");
             SystemClock.sleep(1000);
+            drawn();device.takeScreenshot(new File(context().getExternalFilesDir(null),"android-floating.png"));
+            // The house Activity may be destroyed while its retained pet lives
+            // in the service. Rotation must still keep the overlay on screen.
+            waitFor(()->host().service!=null);ui(()->host().activity.finish());waitFor(()->host().activity==null);assertTrue(host().controller.attached);
+            ui(()->host().controller.position(80,host().controller.area().y-180));device.setOrientationLeft();
+            waitFor(()->host().controller.area().x>host().controller.area().y&&host().controller.y<=host().controller.area().y-178,10000,"The floating service must reposition after rotation even without an Activity");
+            device.setOrientationNatural();waitFor(()->host().controller.area().y>host().controller.area().x);device.unfreezeRotation();
             // Seed pets can be dragged and docked, even though they cannot wander.
             ui(()->{host().controller.interacting=false;host().controller.position(-30,200);host().controller.dock();});waitFor(()->"hidden".equals(host().controller.edgePose));assertEquals("left",host().controller.edgeSide);
             ui(()->host().controller.peek(true));assertEquals("left",host().controller.edgeSide);assertEquals("peek",host().controller.edgePose);
@@ -66,8 +74,9 @@ public final class AndroidSmokeTest {
             device.openNotification();UiObject recover=device.findObject(new UiSelector().text("恢复触摸"));assertTrue("Notification must expose recovery",recover.waitForExists(10000));recover.click();waitFor(()->!host().controller.mouseThrough);
             device.openNotification();UiObject home=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue("Notification body opens the house",home.waitForExists(10000));home.click();waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));assertSame(runtime,host().web);assertEquals(petId,host().store.pet().getLong("createdAt"));
             context().getSharedPreferences("upgrade-fixture",0).edit().putLong("petId",petId).putInt("code",context().getPackageManager().getPackageInfo(context().getPackageName(),0).versionCode).commit();host().store.flush();
-            File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
+            drawn();File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
             RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
+            drawn();
         }finally{
             try{UiDevice.getInstance(instrumentation).takeScreenshot(new File(context().getExternalFilesDir(null),"android-last-screen.png"));if(host().web!=null){String diagnostic=js("JSON.stringify({text:document.body.innerText.slice(0,5000),pointer:window.__moleTestPointer,visible:document.visibilityState,viewport:[innerWidth,innerHeight],audio:(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return a?{ready:a.readyState,paused:a.paused,error:a.error?.code}:null})()})");SafeFiles.writeText(new File(context().getExternalFilesDir(null),"android-ui-state.txt"),diagnostic);}}catch(Exception ignored){}
             ui(()->{if(host().activity!=null)host().activity.finish();});

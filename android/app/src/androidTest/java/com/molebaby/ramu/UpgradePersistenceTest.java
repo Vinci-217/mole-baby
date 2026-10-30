@@ -15,8 +15,11 @@ public final class UpgradePersistenceTest {
         AndroidSmokeTest.instrumentation.startActivitySync(new android.content.Intent(context,RamuActivity.class).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
         try{
             AndroidSmokeTest.waitFor(()->AndroidSmokeTest.host().loaded&&AndroidSmokeTest.has(".room-dock"));assertEquals(petId,AndroidSmokeTest.host().store.pet().getLong("createdAt"));assertEquals("安卓小蓝",AndroidSmokeTest.host().store.pet().getString("name"));
-            assertEquals(String.valueOf(petId),AndroidSmokeTest.js("JSON.parse(localStorage.getItem('ramu-house-save-v1')).createdAt"));
+            // WebView may serialize the same JS number in scientific notation.
+            // Compare its value in JS, not the spelling of its JSON response.
+            assertEquals("true",AndroidSmokeTest.js("JSON.parse(localStorage.getItem('ramu-house-save-v1')).createdAt === "+petId));
             assertFalse(AndroidSmokeTest.host().controller.petMode);
+            AndroidSmokeTest.waitFor(()->{try{return "true".equals(AndroidSmokeTest.js("Array.from(document.images).filter(im=>im.getBoundingClientRect().width>0&&im.getBoundingClientRect().height>0).every(im=>im.complete&&im.naturalWidth>0)"));}catch(Exception e){return false;}},30000,"Original artwork must remain available after the APK upgrade");
         }finally{AndroidSmokeTest.ui(()->{if(AndroidSmokeTest.host().activity!=null)AndroidSmokeTest.host().activity.finish();});}
     }
 }

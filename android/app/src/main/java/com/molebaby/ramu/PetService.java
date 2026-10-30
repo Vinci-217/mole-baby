@@ -19,6 +19,7 @@ public final class PetService extends Service {
         if(host.controller.petMode&&host.loaded)host.controller.attach();refresh();return START_NOT_STICKY;
     }
     void finishService(){stopForeground(STOP_FOREGROUND_REMOVE);stopSelf();}
+    @Override public void onConfigurationChanged(android.content.res.Configuration configuration){super.onConfigurationChanged(configuration);if(host!=null&&host.controller.petMode)host.controller.onConfigurationChanged();}
     @Override public void onDestroy(){if(host!=null){host.service=null;host.controller.detach();host.store.flush();}super.onDestroy();}
     @Override public IBinder onBind(Intent intent){return null;}
 }

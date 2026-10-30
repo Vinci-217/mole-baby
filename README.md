@@ -8,6 +8,17 @@
 
 [安装、构建与更新说明](docs/ANDROID.md) · [安卓测试包与验证进度](https://github.com/Vinci-217/mole-baby/actions/workflows/android-preview.yml)。
 
+<details>
+<summary>查看手机与平板界面预览</summary>
+
+下面是移动浏览器回归中的实际游戏画面；原生悬浮窗与升级结果另见测试记录，不将浏览器画面当作设备验收。
+
+<img src="docs/previews/android/phone-house.png" width="220" alt="安卓手机小屋布局预览" /> <img src="docs/previews/android/phone-shop.png" width="220" alt="安卓手机商店布局预览" />
+
+<img src="docs/previews/android/tablet-school.png" width="760" alt="安卓平板横屏布局预览" />
+
+</details>
+
 ## 本轮更新 · v0.31.7
 
 软件更新新增「自动选择 / 完整包」：自动比较新旧内容，变化少时下载差量，变化多或无法复用时完整下载；可直接跨版本升级，下载和安装继续分别确认。[更新策略](docs/UPDATES.md)。
