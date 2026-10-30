@@ -1,0 +1,20 @@
+{
+  "sourceSha": "c3e57e911787bf9fce9e5ab4e7598b41aa171532",
+  "platform": "android",
+  "status": "failure",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41005746354",
+  "log": "native-smoke-test.txt\n\ncom.molebaby.ramu.AndroidSmokeTest:\nError in adoptionCareOverlayAndRecoveryKeepOnePet(com.molebaby.ramu.AndroidSmokeTest):\njava.lang.AssertionError: The floating service must reposition after rotation even without an Activity\n\tat com.molebaby.ramu.AndroidSmokeTest.waitFor(AndroidSmokeTest.java:26)\n\tat com.molebaby.ramu.AndroidSmokeTest.adoptionCareOverlayAndRecoveryKeepOnePet(AndroidSmokeTest.java:69)\n\n\nTime: 45.865\nThere was 1 failure:\n1) adoptionCareOverlayAndRecoveryKeepOnePet(com.molebaby.ramu.AndroidSmokeTest)\njava.lang.AssertionError: The floating service must reposition after rotation even without an Activity\n\tat com.molebaby.ramu.AndroidSmokeTest.waitFor(AndroidSmokeTest.java:26)\n\tat com.molebaby.ramu.AndroidSmokeTest.adoptionCareOverlayAndRecoveryKeepOnePet(AndroidSmokeTest.java:69)\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n\nandroid-ui-state.txt\n{\"audio\":{\"paused\":true,\"ready\":4},\"pointer\":{\"target\":\"<button class=\\\"game-button\\\">悬浮陪伴<\\/button>\",\"x\":190.85714721679688,\"y\":131.42857360839844},\"text\":\"安卓小蓝\\n安心陪伴\",\"viewport\":[160,240],\"visible\":\"visible\",\"native\":{\"petMode\":true,\"alwaysOnTop\":true,\"wandering\":true,\"companionPanel\":false,\"panelSide\":\"right\",\"panelLayout\":\"compact\",\"panelGeometry\":null,\"petOffset\":{\"x\":0,\"y\":0},\"edgeHiding\":true,\"edgeSide\":null,\"edgePose\":\"visible\",\"motion\":\"idle\",\"mouseThrough\":false,\"mousePassthrough\":false,\"roomFullscreen\":false,\"windowVisible\":true,\"effectExpanded\":false},\"display\":{\"width\":411,\"height\":731,\"petX\":80,\"petY\":551}}",
+  "recordedAt": "2026-10-30T05:05:28.357Z",
+  "screens": [
+    {
+      "name": "android-last-screen.png",
+      "path": "reports/media/c3e57e911787bf9fce9e5ab4e7598b41aa171532/android/android-last-screen.png",
+      "bytes": 1078372
+    },
+    {
+      "name": "android-floating.png",
+      "path": "reports/media/c3e57e911787bf9fce9e5ab4e7598b41aa171532/android/android-floating.png",
+      "bytes": 1101034
+    }
+  ]
+}
