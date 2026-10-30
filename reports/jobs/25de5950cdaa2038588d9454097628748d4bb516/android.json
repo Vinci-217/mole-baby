@@ -1,0 +1,20 @@
+{
+  "sourceSha": "25de5950cdaa2038588d9454097628748d4bb516",
+  "platform": "android",
+  "status": "failure",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41003759203",
+  "log": "native-smoke-test.txt\n\ncom.molebaby.ramu.AndroidSmokeTest:.\n\nTime: 34.16\n\nOK (1 test)\n\n\n\nandroid-ui-state.txt\n\"{\\\"text\\\":\\\"拉姆\\\\n布置小屋\\\\n全屏查看\\\\n签到 +1000 豆\\\\n100 摩尔豆\\\\n悬浮陪伴\\\\n安卓小蓝\\\\n安心陪伴\\\\n状态\\\\n背包\\\\n商店\\\\n游戏\\\\n学院\\\\n成长\\\\n回忆\\\\n衣橱\\\\n设置\\\\nmole-baby · 本地自动保存\\\\n非官方同人桌宠\\\",\\\"pointer\\\":{\\\"x\\\":190.85714721679688,\\\"y\\\":131.42857360839844,\\\"target\\\":\\\"\\u003Cbutton class=\\\\\\\"game-button\\\\\\\">悬浮陪伴\\u003C/button>\\\"},\\\"visible\\\":\\\"visible\\\",\\\"viewport\\\":[412,660],\\\"audio\\\":{\\\"ready\\\":4,\\\"paused\\\":false}}\"\nactual-apk-delta.json\n{\"mode\":\"differential\",\"httpRequests\":4,\"downloadBytes\":227078,\"sha256\":\"23d6f753ab28ded85d9b27a665dda833fd2178b06fad23e8bf4fe516310dc262\",\"fullSize\":556405926,\"reusedBytes\":556178848,\"verified\":true}\napk-upgrade-test.txt\n\ncom.molebaby.ramu.UpgradePersistenceTest:\nError in installingHigherApkPreservesNativeAndWebStorage(com.molebaby.ramu.UpgradePersistenceTest):\norg.junit.ComparisonFailure: expected:<1[793335319314]> but was:<1[.793335319314e+12]>\n\tat org.junit.Assert.assertEquals(Assert.java:117)\n\tat org.junit.Assert.assertEquals(Assert.java:146)\n\tat com.molebaby.ramu.UpgradePersistenceTest.installingHigherApkPreservesNativeAndWebStorage(UpgradePersistenceTest.java:18)\n\n\nTime: 1.757\nThere was 1 failure:\n1) installingHigherApkPreservesNativeAndWebStorage(com.molebaby.ramu.UpgradePersistenceTest)\norg.junit.ComparisonFailure: expected:<1[793335319314]> but was:<1[.793335319314e+12]>\n\tat org.junit.Assert.assertEquals(Assert.java:117)\n\tat org.junit.Assert.assertEquals(Assert.java:146)\n\tat com.molebaby.ramu.UpgradePersistenceTest.installingHigherApkPreservesNativeAndWebStorage(UpgradePersistenceTest.java:18)\n\nFAILURES!!!\nTests run: 1,  Failures: 1\n\n\n",
+  "recordedAt": "2026-10-30T04:43:47.503Z",
+  "screens": [
+    {
+      "name": "android-last-screen.png",
+      "path": "reports/media/25de5950cdaa2038588d9454097628748d4bb516/android/android-last-screen.png",
+      "bytes": 15941
+    },
+    {
+      "name": "android-house.png",
+      "path": "reports/media/25de5950cdaa2038588d9454097628748d4bb516/android/android-house.png",
+      "bytes": 47791
+    }
+  ]
+}
