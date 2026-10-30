@@ -91,3 +91,9 @@ Windows 使用 `gradlew.bat`。构建所需的 JDK / SDK、私钥、生成的素
 - CI 的 Android 模拟器脚本检查原生 WebView、小屋 / 悬浮往返、种子拖动收纳、恢复触摸，并实际安装更高版本 APK 后核对原生和网页存档。
 - 原生测试结束后，复用工程已有的 `build-reports` 分支记录日志与测试截图，路径为 `reports/jobs/<源代码 SHA>/android.json`。Actions API 不可用时仍可通过 Git 核对这份记录；失败或缺失的记录不能解释为通过。
 - 模拟器通过不等于真机通过。发布前仍需在目标品牌设备验证悬浮窗、触摸穿透、长时间后台、来电音频中断和用户点击系统安装器的完整流程。
+
+## 本轮接手验收（2026-10-30）
+
+已修复通知栏回小屋时的特效／背包锚点恢复、手机横屏地面无法点击及提示气泡遮挡。四种屏幕布局、539项前端／Node测试和Android15模拟器原生流程通过；更高版本APK实际覆盖安装后存档保留。本次受控APK差量测试复用约556MB数据，下载约266KB，不能据此保证每次升级的下载量。
+
+[修复、截图与验证范围](../research/android-takeover-validation.md) · [成功构建与开发APK](https://github.com/Vinci-217/mole-baby/actions/runs/41012609568)。
