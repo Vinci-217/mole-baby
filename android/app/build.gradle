@@ -37,7 +37,14 @@ android {
     buildFeatures { buildConfig true }
     compileOptions { coreLibraryDesugaringEnabled true; sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     androidResources { noCompress 'zip', 'mp3', 'ogg', 'webp' }
-    testOptions { unitTests.includeAndroidResources = true }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            systemProperty 'mole.delta.old', providers.gradleProperty('moleDeltaOld').getOrElse('')
+            systemProperty 'mole.delta.next', providers.gradleProperty('moleDeltaNext').getOrElse('')
+            systemProperty 'mole.delta.output', providers.gradleProperty('moleDeltaOutput').getOrElse('')
+        }
+    }
     packaging { resources.excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*'] }
 }
 dependencies {

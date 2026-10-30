@@ -47,11 +47,11 @@ public final class AndroidSmokeTest {
             ui(()->host().controller.peek(true));assertEquals("left",host().controller.edgeSide);assertEquals("peek",host().controller.edgePose);
             ui(()->{host().controller.downX=0;host().controller.downY=200;host().controller.startDrag(Json.of("x",-30,"y",0));host().controller.rawX=150;host().controller.rawY=230;host().controller.drag();host().controller.endDrag();});assertNull(host().controller.edgeSide);assertTrue(host().controller.x>0);
             ui(()->host().controller.through(true));assertTrue(host().controller.mouseThrough);
-            UiDevice device=UiDevice.getInstance(instrumentation);device.openNotification();UiObject recover=device.findObject(new UiSelector().text("恢复触摸"));if(recover.waitForExists(10000))recover.click();else{device.pressBack();ui(()->host().controller.through(false));}waitFor(()->!host().controller.mouseThrough);
-            device.openNotification();UiObject home=device.findObject(new UiSelector().text("回小屋"));if(home.waitForExists(10000))home.click();else{device.pressBack();ui(()->{try{host().controller.mode(false);}catch(Exception e){throw new RuntimeException(e);}});}waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));assertSame(runtime,host().web);assertEquals(petId,host().store.pet().getLong("createdAt"));
+            UiDevice device=UiDevice.getInstance(instrumentation);device.openNotification();UiObject recover=device.findObject(new UiSelector().text("恢复触摸"));assertTrue("Notification must expose recovery",recover.waitForExists(10000));recover.click();waitFor(()->!host().controller.mouseThrough);
+            device.openNotification();UiObject home=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue("Notification body opens the house",home.waitForExists(10000));home.click();waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));assertSame(runtime,host().web);assertEquals(petId,host().store.pet().getLong("createdAt"));
             context().getSharedPreferences("upgrade-fixture",0).edit().putLong("petId",petId).putInt("code",context().getPackageManager().getPackageInfo(context().getPackageName(),0).versionCode).commit();host().store.flush();
             File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
-            scenario.recreate();waitFor(()->host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
+            RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);
         }
     }
 }

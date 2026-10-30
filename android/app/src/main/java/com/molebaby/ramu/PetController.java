@@ -56,7 +56,7 @@ final class PetController {
         emit();return petMode;
     }
     void applyTouch(){if(params!=null){params.flags=mouseThrough?params.flags|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE:params.flags&~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;params.alpha=mouseThrough?.75f:1f;update();}host.refreshService();emit();}
-    void through(boolean enabled){mouseThrough=enabled;applyTouch();}
+    void through(boolean enabled){if(enabled&&!host.permissions().optBoolean("notifications"))throw new IllegalStateException("请先允许通知，穿透后需要从通知栏恢复触摸。");mouseThrough=enabled;applyTouch();}
     void position(float nx,float ny){Point a=area();x=Math.max(-30,Math.min(a.x-130,nx));y=Math.max(-70,Math.min(a.y-178,ny));update();}
     private void update(){if(attached&&params!=null){params.x=px(x);params.y=px(y);params.width=px(width);params.height=px(height);try{windows.updateViewLayout(host.web,params);}catch(IllegalArgumentException ignored){}}}
     void touch(android.view.MotionEvent event){

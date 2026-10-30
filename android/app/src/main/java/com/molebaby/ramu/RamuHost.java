@@ -39,7 +39,7 @@ final class RamuHost {
     private final ConcurrentHashMap<String,CompletableFuture<Boolean>> saveWaiters=new ConcurrentHashMap<>();
     RamuHost(Context context){this.context=context;store=new PetStore(context);resources=new ResourcePack(context);controller=new PetController(this);updates=new AndroidUpdates(this);}
     void ensure(){if(web!=null){if(activity!=null)activity.attachWeb();return;}if(preparing)return;preparing=true;prepareError=null;
-        io.execute(()->{try{resources.prepare(progress->{prepareProgress=progress;main.post(()->{if(activity!=null)activity.showProgress(progress);});});main.post(()->{preparing=false;createWeb();});}catch(Exception e){prepareError=e.getMessage();main.post(()->{preparing=false;if(activity!=null)activity.showFailure("素材准备失败："+prepareError);});}});
+        io.execute(()->{try{resources.prepare(progress->{prepareProgress=progress;main.post(()->{if(activity!=null)activity.showProgress(progress);});});main.post(()->{preparing=false;try{android.content.pm.PackageInfo provider=WebView.getCurrentWebViewPackage();if(provider!=null&&Integer.parseInt(provider.versionName.split("\\.")[0])<100)throw new IllegalStateException("WebView 版本过旧");createWeb();}catch(Exception error){web=null;if(activity!=null)activity.showFailure("系统 WebView 无法打开。请在应用管理中启用或升级 Android System WebView / Chrome，再回来重试。");}});}catch(Exception e){prepareError=e.getMessage();main.post(()->{preparing=false;if(activity!=null)activity.showFailure("素材准备失败："+prepareError);});}});
     }
     @android.annotation.SuppressLint({"SetJavaScriptEnabled","JavascriptInterface"})
     void createWeb(){

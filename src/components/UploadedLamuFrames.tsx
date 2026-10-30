@@ -16,7 +16,7 @@ function raster(spec:UploadedSpec,color:PetColor){
  entry.ready=loadUploadedClip(spec).then(async clip=>{
   // Large SWF tile atlases can exceed 130 MiB before recolouring. The mobile
   // renderer keeps every original frame, but paints a smaller backing atlas.
-  const rasterScale=window.mobile?.5:1;
+  const rasterScale=window.mobile ? .5 : 1;
   if(window.mobile)for(const cached of cache.keys())if(cached!==key)cache.delete(cached);
   const offsets=petColorOffsets(color),deltas=[255,204,153].map(base=>offsets.map(v=>Math.max(0,Math.min(255,base+v))-base))
   const pages:HTMLCanvasElement[]=[]
@@ -24,8 +24,8 @@ function raster(spec:UploadedSpec,color:PetColor){
    const read=async(name:string)=>{const im=new Image();im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;await im.decode();return im}
    const[neutral,mask]=await Promise.all([read(page.neutral),read(page.mask)]),canvas=document.createElement('canvas');canvas.width=Math.ceil(page.width*rasterScale);canvas.height=Math.ceil(page.height*rasterScale)
    const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('无法打开原版动作图集。')
-   ctx.drawImage(neutral,0,0,canvas.width,canvas.height);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
-   ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(mask,0,0,canvas.width,canvas.height);const m=ctx.getImageData(0,0,canvas.width,canvas.height).data
+   ctx.drawImage(neutral,0,0,page.width*rasterScale,page.height*rasterScale);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
+   ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(mask,0,0,page.width*rasterScale,page.height*rasterScale);const m=ctx.getImageData(0,0,canvas.width,canvas.height).data
    for(let i=0;i<pixels.data.length;i+=4){pixels.data[i+3]=m[i+3];if(!(m[i]||m[i+1]||m[i+2]))continue;for(let c=0;c<3;c++)pixels.data[i+c]=Math.max(0,Math.min(255,pixels.data[i+c]+deltas[0][c]*m[i]/255+deltas[1][c]*m[i+1]/255+deltas[2][c]*m[i+2]/255))}
    ctx.putImageData(pixels,0,0);neutral.src='';mask.src='';pages.push(canvas)
   }
