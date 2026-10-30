@@ -1,4 +1,4 @@
-import {useEffect,useId,useState} from 'react';
+import {useEffect,useId,useMemo,useState} from 'react';
 import {getStage,getItem} from '../game';
 import type {Action,GameState,ItemCategory,PetItem} from '../game';
 import './CarePocket.css';
@@ -12,8 +12,9 @@ export default function CarePocket({pet,initialCategory='food',visit,onCare,onVi
  const[category,setCategory]=useState(initialCategory),[page,setPage]=useState(0);
  const hintId=useId(),[hovered,setHovered]=useState<string|null>(null),[focused,setFocused]=useState<string|null>(null);
  const clearHint=()=>{setHovered(null);setFocused(null)};
- const[slots,setSlots]=useState(()=>inventoryItems(pet.inventory).filter(item=>item.category===initialCategory&&(pet.inventory[item.id]??0)>0).map(item=>item.id));
- useEffect(()=>{setSlots(inventoryItems(pet.inventory).filter(item=>item.category===category&&(pet.inventory[item.id]??0)>0).map(item=>item.id));setPage(0)},[category,visit,pet.createdAt]);
+ // Keep consumed slots in place during this visit, but change the category and
+ // its contents together. A passive-effect refresh briefly showed an empty tab.
+ const slots=useMemo(()=>inventoryItems(pet.inventory).filter(item=>item.category===category&&(pet.inventory[item.id]??0)>0).map(item=>item.id),[category,visit,pet.createdAt]);
  useEffect(()=>{setCategory(initialCategory);setPage(0)},[initialCategory,visit]);
  const owned=slots.map(id=>getItem(id)!).filter(item=>item&&item.category===category),pages=Math.max(1,Math.ceil(owned.length/16)),currentPage=Math.min(page,pages-1),visible=owned.slice(currentPage*16,currentPage*16+16),stage=getStage(pet.growth,pet.evolution);
  const reasonFor=(item:PetItem)=>!(pet.inventory[item.id]??0)?'已经用完':pet.sleeping?'先叫醒拉姆':stage<item.minStage?'长大一点再用':item.changesColor===pet.color?'已经是这个颜色':undefined;
