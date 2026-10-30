@@ -143,9 +143,11 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     if(!nativeVisible.current&&!backgroundAllowed.current)audio.current?.pause();else resumeMusic();
   }),[resumeMusic]);
   const source = settings.musicId === 'custom' && custom ? custom.url : (ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0]).src;
+  const awaitingCustom=settings.musicId==='custom'&&!customLoaded;
   useEffect(() => {
-    if (!customLoaded) return;
+    if (awaitingCustom) return;
     const element = new Audio(source); element.loop = true; element.preload = 'metadata';
+    if(window.mobile){element.hidden=true;element.dataset.ramuBgm='true';document.body.appendChild(element);}
     audio.current = element;
     const started = () => {
       if ((document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !active.current) { element.pause(); return; }
@@ -156,9 +158,9 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     if (active.current) resumeMusic();
     return () => {
       element.pause(); element.removeEventListener('playing', started); element.removeEventListener('pause', stopped); element.removeEventListener('error', failed);
-      element.removeAttribute('src'); element.load(); if (audio.current === element) audio.current = null; setPlaying(false);
+      element.removeAttribute('src'); element.load();element.remove(); if (audio.current === element) audio.current = null; setPlaying(false);
     };
-  }, [source, customLoaded, resumeMusic]);
+  }, [source, awaitingCustom, resumeMusic]);
   useEffect(() => {
     if (active.current) resumeMusic();
     else audio.current?.pause();

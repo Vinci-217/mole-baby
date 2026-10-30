@@ -52,7 +52,7 @@ final class RamuHost {
         WebViewAssetLoader loader=new WebViewAssetLoader.Builder().addPathHandler("/",this::asset).build();
         web.addJavascriptInterface(new NativeBridge(this),"MoleAndroid");
         web.setWebViewClient(new WebViewClient(){
-            @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){WebResourceResponse response=loader.shouldInterceptRequest(request.getUrl());return response!=null?response:blocked();}
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){WebResourceResponse media=media(request);if(media!=null)return media;WebResourceResponse response=loader.shouldInterceptRequest(request.getUrl());return response!=null?response:blocked();}
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){String value=request.getUrl().toString();if(value.startsWith(ORIGIN)&&!request.isForMainFrame())return false;if(request.hasGesture()&&request.isForMainFrame()&&value.startsWith("https://"))openUrl(value);return true;}
             @Override public void onPageFinished(WebView view,String url){if(!url.equals(ORIGIN+"index.html"))return;loaded=true;event("state",controller.state());event("permissions",permissions());if(controller.petMode)controller.attach();else if(activity!=null)activity.attachWeb();main.postDelayed(()->{io.execute(resources::prune);if(updates.enabled())updates.check();},8000);}
             @Override public boolean onRenderProcessGone(WebView view,RenderProcessGoneDetail detail){controller.detach();detachWeb();view.destroy();web=null;loaded=false;store.flush();if(activity!=null){activity.showFailure("系统回收了画面，存档仍然保留。点击重新打开。");}return true;}
@@ -78,6 +78,15 @@ final class RamuHost {
         }catch(Exception e){return blocked();}
     }
     private static WebResourceResponse blocked(){return new WebResourceResponse("text/plain","UTF-8",403,"Forbidden",Map.of("X-Content-Type-Options","nosniff"),new ByteArrayInputStream(new byte[0]));}
+    private WebResourceResponse media(WebResourceRequest request){
+        String url=request.getUrl().toString(),path=request.getUrl().getPath();if(!url.startsWith(ORIGIN)||path==null||!path.matches("(?i)/assets/.+\\.(mp3|ogg|wav)"))return null;
+        try{if(resources.active==null)return blocked();File file=SafeFiles.child(resources.active,path.substring(1));if(!file.isFile())return blocked();String range=null;for(var header:request.getRequestHeaders().entrySet())if(header.getKey().equalsIgnoreCase("Range"))range=header.getValue();MediaRange.Slice slice=MediaRange.parse(range,file.length());
+            String mime=path.endsWith(".mp3")?"audio/mpeg":path.endsWith(".ogg")?"audio/ogg":"audio/wav";Map<String,String> headers=new HashMap<>();headers.put("Accept-Ranges","bytes");headers.put("Content-Length",String.valueOf(slice.length()));headers.put("Cache-Control","no-cache");headers.put("X-Content-Type-Options","nosniff");
+            if(slice.status()==416){headers.put("Content-Range","bytes */"+file.length());return new WebResourceResponse(mime,null,416,"Range Not Satisfiable",headers,new ByteArrayInputStream(new byte[0]));}
+            if(slice.status()==206)headers.put("Content-Range","bytes "+slice.start()+"-"+(slice.start()+slice.length()-1)+"/"+slice.total());
+            return new WebResourceResponse(mime,null,slice.status(),slice.status()==206?"Partial Content":"OK",headers,MediaRange.open(file,slice));
+        }catch(IOException e){return blocked();}
+    }
     void detachWeb(){if(web!=null&&web.getParent() instanceof ViewGroup group)group.removeView(web);}
     void event(String type,JSONObject value){main.post(()->{if(web!=null&&loaded)web.evaluateJavascript("window.__moleAndroidEvent?.("+JSONObject.quote(type)+","+value+")",null);});}
     void reply(String id,Object value,String error){main.post(()->{if(web!=null)web.evaluateJavascript("window.__moleAndroidReceive?.("+JSONObject.quote(id)+","+(value==null?"null":value instanceof String?JSONObject.quote((String)value):value.toString())+","+(error==null?"null":JSONObject.quote(error))+")",null);});}
