@@ -46,7 +46,7 @@ jobs:
             python3 - <<'PY'
           import os,base64,pathlib
           p=pathlib.Path(os.environ['RUNNER_TEMP'])/'ramu-preview.p12'
-          p.write_bytes(base64.b64decode(os.environ['PREVIEW_KEYSTORE_BASE64'],validate=True))
+          p.write_bytes(base64.b64decode(''.join(os.environ['PREVIEW_KEYSTORE_BASE64'].split()),validate=True))
           p.chmod(0o600)
           with open(os.environ['GITHUB_ENV'],'a') as f:f.write('MOLE_ANDROID_KEYSTORE='+str(p)+'\n')
           PY
@@ -142,6 +142,7 @@ jobs:
           name: android-preview-${{ github.run_number }}
           path: |
             mobile-release/
+            !mobile-release/android-release/**
             android/app/build/reports/
             android/app/build/test-results/
             android/app/build/outputs/androidTest-results/
