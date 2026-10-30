@@ -111,7 +111,24 @@ final class PetController {
             if(Double.isFinite(bx)&&Double.isFinite(by)&&Double.isFinite(bw)&&Double.isFinite(bh)&&bw>0&&bh>0&&bw<=1000&&bh<=1000){effectX=(int)Math.ceil(Math.max(0,-bx));effectY=(int)Math.ceil(Math.max(0,-by));width=(int)Math.ceil(Math.max(160,bx+bw))+effectX;height=(int)Math.ceil(Math.max(240,by+bh))+effectY;x-=effectX;y-=effectY;effectExpanded=true;}
         }update();emit();
     }
-    void onConfigurationChanged(){if(panel)panel(true);else position(x,y);emit();}
+    void onConfigurationChanged(){
+        cancelMotion();
+        if(panel)panel(true);
+        else{
+            Point a=area();
+            // Dragging may intentionally expose only part of the pet at an
+            // edge. Rotation must keep a visible pet's entire base viewport
+            // inside the new display, without shrinking large spell frames.
+            float anchorX=Math.max(0,Math.min(Math.max(0,a.x-160),x+effectX));
+            float anchorY=Math.max(0,Math.min(Math.max(0,a.y-240),y+effectY));
+            if("left".equals(edgeSide))anchorX=-30;
+            else if("right".equals(edgeSide))anchorX=a.x-130;
+            else if("top".equals(edgeSide))anchorY=-70;
+            else if("bottom".equals(edgeSide))anchorY=a.y-178;
+            x=anchorX-effectX;y=anchorY-effectY;update();
+        }
+        emit();
+    }
     private final Runnable ambient=new Runnable(){public void run(){
         if(petMode&&attached&&!dragging&&!panel&&!interacting&&!host.locked()){
             if(edgeSide!=null&&peekAt>0&&System.currentTimeMillis()>=peekAt){peek(true);peekAt=System.currentTimeMillis()+(120+random.nextInt(181))*1000L;}

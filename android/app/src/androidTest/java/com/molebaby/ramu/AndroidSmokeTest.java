@@ -71,12 +71,15 @@ public final class AndroidSmokeTest {
             // Run another real app: AOSP Launcher's portrait lock prevents a
             // UiDevice rotation request from exercising the service at all.
             ui(()->host().controller.position(80,host().controller.area().y-180));rotateDisplay(device,true);
-            waitFor(()->host().controller.area().x>host().controller.area().y&&host().controller.y<=host().controller.area().y-178,10000,"The floating service must reposition after rotation even without an Activity");
+            waitFor(()->host().controller.area().x>host().controller.area().y&&host().controller.y>=0&&host().controller.y+host().controller.height<=host().controller.area().y+1,10000,"The complete visible pet viewport must fit after rotation even without an Activity");
             assertNull("Rotation must not recreate the house Activity",host().activity);assertSame(runtime,host().web);assertTrue(host().controller.attached);
             drawn();device.takeScreenshot(new File(context().getExternalFilesDir(null),"android-floating-landscape.png"));
             rotateDisplay(device,false);waitFor(()->host().controller.area().y>host().controller.area().x);device.pressHome();
             // Seed pets can be dragged and docked, even though they cannot wander.
             ui(()->{host().controller.interacting=false;host().controller.position(-30,200);host().controller.dock();});waitFor(()->"hidden".equals(host().controller.edgePose));assertEquals("left",host().controller.edgeSide);
+            rotateDisplay(device,true);waitFor(()->host().controller.area().x>host().controller.area().y);
+            assertEquals("left",host().controller.edgeSide);assertEquals("hidden",host().controller.edgePose);assertEquals(-30f,host().controller.x,.01f);
+            rotateDisplay(device,false);waitFor(()->host().controller.area().y>host().controller.area().x);device.pressHome();
             ui(()->host().controller.peek(true));assertEquals("left",host().controller.edgeSide);assertEquals("peek",host().controller.edgePose);
             ui(()->{host().controller.downX=0;host().controller.downY=200;host().controller.startDrag(Json.of("x",-30,"y",0));host().controller.rawX=150;host().controller.rawY=230;host().controller.drag();host().controller.endDrag();});assertNull(host().controller.edgeSide);assertTrue(host().controller.x>0);
             ui(()->host().controller.through(true));assertTrue(host().controller.mouseThrough);
