@@ -431,7 +431,7 @@ export default function App() {
     careUntil.current = itemId ? Date.now() + duration + 50 : 0;
     if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
     else if(!itemId)finishCareFeedback();
-    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, duration + (next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||original||recorded||isEmotionClip(next)?15000:50));
+    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, duration + (next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||original||recorded||isEmotionClip(next)?15000:50)));
   }
   function finishPerformance(completed=true){if(action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(ramForm(stage,pet?.evolution),action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {

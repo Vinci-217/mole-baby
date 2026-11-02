@@ -49,7 +49,7 @@ export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion
   // Start the hard deadline when the action starts. Atlas decoding can take
   // seconds on Electron 22/older WebViews; waiting to schedule the deadline
   // until decoding finishes would leave a stale canvas mounted indefinitely.
-  deadline=setTimeout(finish,limit??spec.durationMs)
+  if(limit!==undefined)deadline=setTimeout(finish,limit)
   const prepared=Promise.all([raster(spec,color),fromColor&&fromColor!==color?raster(spec,fromColor):null])
   void prepared.then(([current,old])=>{
    if(!live)return;const began=performance.now(),canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return
@@ -67,6 +67,7 @@ export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion
     if(limit!==undefined?elapsed>=limit:!loop&&elapsed>=spec.durationMs){finish();return}
    if(!media.matches||!loop||limit!==undefined)frame=requestAnimationFrame(draw)
    };redraw=()=>{frame=requestAnimationFrame(draw)};redraw()
+   if(limit===undefined&&!loop)deadline=setTimeout(finish,spec.durationMs)
   }).catch(error=>{if(live){if(ref.current){ref.current.dataset.failed='true';ref.current.dataset.failureReason=error instanceof Error?error.message:String(error);}end.current?.(false)}})
   return()=>{live=false;cancelAnimationFrame(frame);clearTimeout(deadline);document.removeEventListener('visibilitychange',visibility);audio?.stop()}
  },[spec,color,fromColor,itemMotion,loop,limit,action])
