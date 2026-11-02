@@ -43,9 +43,13 @@ async function verifyRoomUpgrade(page){
   await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.click(box.x+box.width-20,box.y+20);await expect.poll(()=>position.getAttribute('data-x')).not.toBe(settled);await expect(walker).toHaveAttribute('data-moving','false');await page.emulateMedia({reducedMotion:'no-preference'});
   const audio=()=>page.evaluate(()=>window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src'))?.currentTime);
   await expect.poll(()=>page.evaluate(()=>window.__roomAudio.some(a=>a.src.includes('/audio/castle.mp3')&&!a.paused))).toBe(true);
-  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=12});await toDesktop(page);await enterHome(page);await expect.poll(audio).toBeLessThan(3);
-  // Toggling playback also restarts; ordinary clicks must not reset it.
-  await roomTab(page,'设置');const music=page.getByRole('checkbox',{name:'播放背景音乐',exact:true});await music.uncheck();await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.check();await expect.poll(audio).toBeLessThan(3);
+  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=12});await toDesktop(page);
+  await expect.poll(()=>page.evaluate(()=>window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).paused)).toBe(true);
+  const pausedAt=await audio();await page.waitForTimeout(200);assert.equal(await audio(),pausedAt,'Disabled background playback must stay paused');
+  await enterHome(page);await expect.poll(audio).toBeGreaterThanOrEqual(pausedAt);
+  // Pausing or leaving the room preserves the track position. Ordinary clicks
+  // must not reset it either; background playback remains a separate setting.
+  await roomTab(page,'设置');const music=page.getByRole('checkbox',{name:'播放背景音乐',exact:true});await music.uncheck();await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.check();await expect.poll(audio).toBeGreaterThanOrEqual(18);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'声音与音乐',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
   const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await background.check();await toDesktop(page);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=14});await enterHome(page);await expect.poll(audio).toBeGreaterThanOrEqual(14);
@@ -57,7 +61,7 @@ async function verifyRoomUpgrade(page){
   await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await page.reload();await enterHome(page);await roomTab(page,'学院');await language.getByRole('button',{name:'上这一课',exact:true}).click();await page.clock.fastForward(180150);
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).education?.lessons.language)).toBe(1);
   await page.reload();await enterHome(page);await roomTab(page,'学院');await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);
-  console.log('PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music restarts without click resets; one language lesson and old-save graduation persist');
+  console.log('PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; real music pauses/resumes without click resets; one language lesson and old-save graduation persist');
  }catch(error){failed=true;console.error('Room upgrade error:',error);console.error('Room geometry:',await page.evaluate(()=>({width:innerWidth,height:innerHeight,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,click:window.__roomWalkClick,position:document.querySelector('.room-pet-position')?.dataset,floor:document.querySelector('.room-walk-surface')?.getBoundingClientRect().toJSON(),blocked:document.querySelector('.room-walk-surface')?.disabled})));throw error;}finally{
   if(clock)await page.clock.resume();await page.emulateMedia({reducedMotion:'no-preference'});
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});

@@ -75,7 +75,17 @@
       "target": "nsis",
       "artifactName": "mole-baby-${version}-${arch}.${ext}",
       "signAndEditExecutable": true,
-      "icon": "public/icons/ramu.ico"
+      "icon": "public/icons/ramu.ico",
+      "extraFiles": [
+        {
+          "from": "docs/WINDOWS-START.txt",
+          "to": "先看这里-启动说明.txt"
+        },
+        {
+          "from": "docs/start-windows.cmd",
+          "to": "启动拉姆.cmd"
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -140,16 +150,6 @@
     "asarUnpack": [
       "dist/assets/original/uploaded-actions/**/*",
       "dist/assets/original/daily-frames/**/*"
-    ],
-    "extraFiles": [
-      {
-        "from": "docs/WINDOWS-START.txt",
-        "to": "先看这里-启动说明.txt"
-      },
-      {
-        "from": "docs/start-windows.cmd",
-        "to": "启动拉姆.cmd"
-      }
     ]
   }
 }
