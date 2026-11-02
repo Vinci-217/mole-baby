@@ -1,5 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {care,configureGrowth,createPet,legacyUnlockedGrowth,parseSave,STAGES,tick,unlockedStage} from './game';
+import {beginActivity} from './pet-school';
 import {normalizeNotes,recordStatChange} from './pet-records';
 const NOW=1_800_000_000_000;
 describe('earned forms and existing companion saves',()=>{
@@ -43,6 +44,11 @@ describe('recovery items and status receipts',()=>{
   for(let i=1;i<=120;i++){const next=tick(p,NOW+i*15000);p=recordStatChange(p,next,'自然消耗与休息',NOW+i*15000);}
   expect(p.statHistory?.length).toBe(2);expect(p.statHistory?.[1].delta.hunger).toBeLessThan(0);
   const restored=parseSave(JSON.stringify(p),p.lastTick)!;expect(restored.statHistory).toEqual(p.statHistory);
+ });
+ it('separates earned work rewards from natural decay in status reasons',()=>{
+  const pet={...createPet('小叶','blue',NOW),growth:60},working=beginActivity(pet,'restaurant',undefined,NOW).state;
+  const done=tick(working,working.activity!.endsAt),recorded=recordStatChange(working,done,'自然消耗与休息',done.lastTick);
+  expect(recorded.statHistory?.at(-1)?.reason).toContain('餐厅工作完成');expect(recorded.statHistory?.at(-1)?.delta.happiness).toBeGreaterThan(0);
  });
  it('bounds memo text and ignores malformed optional records without rejecting the pet',()=>{
   expect(normalizeNotes([{id:'ok',text:'x'.repeat(500),createdAt:NOW},{id:'ok',text:'duplicate',createdAt:NOW},null])).toHaveLength(1);

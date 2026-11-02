@@ -23,6 +23,7 @@ export function normalizeStatHistory(value:unknown):StatChange[]{
  * records remain readable and the v1 save stays below its validation limit. */
 export function recordStatChange(before:GameState,after:GameState,reason:string,at=Date.now()):GameState{
  if(before.createdAt!==after.createdAt)return after;
+ if(reason==='自然消耗与休息'&&before.activity&&!after.activity&&after.lastTick>=before.activity.endsAt)reason=before.activity.kind==='restaurant'?'餐厅工作完成与日常消耗':'课程完成与日常消耗';
  const delta:Partial<PetStats>={};
  for(const key of fields){const d=Math.round((after.stats[key]-before.stats[key])*1000)/1000;if(d)delta[key]=d;}
  if(!Object.keys(delta).length)return after;

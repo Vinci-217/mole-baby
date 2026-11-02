@@ -86,7 +86,7 @@ function readSave() {
   const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;
   const stored=JSON.parse(raw);let selected=false;
   try{const history=JSON.parse(localStorage.getItem(memoryKey(stored))??'null');selected=history?.version===1&&history.petId===String(stored.createdAt)&&Array.isArray(history.events)&&history.events.some((event:{kind?:string})=>event?.kind==='stage-choice');if(history?.petId===String(stored.createdAt))stored.highestGrowth=Math.max(typeof stored.highestGrowth==='number'&&Number.isFinite(stored.highestGrowth)?stored.highestGrowth:0,legacyUnlockedGrowth(history.events))}catch{}
-  const restored=parseSave(JSON.stringify(stored),Date.now(),selected);return restored&&stored.stats?recordStatChange(stored,restored,'离线期间的消耗与休息',restored.lastTick):restored;
+  const restored=parseSave(JSON.stringify(stored),Date.now(),selected);return restored&&stored.stats?recordStatChange(stored,restored,'离线期间的消耗、休息与活动结算',restored.lastTick):restored;
  }catch{return null}
 }
 function readPrefs(): Preferences { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}'); return { roomWander:p.roomWander!==false, sound: p.sound !== false, soundVolume: typeof p.soundVolume === 'number' && Number.isFinite(p.soundVolume) ? Math.max(0,Math.min(1,p.soundVolume)) : .45, lively: p.lively !== false, outings: p.outings !== false, quiet: p.quiet === true, reminders: p.reminders !== false, reminderMinutes: validReminderMinutes(p.reminderMinutes), reminderSound: p.reminderSound !== false, timerDirection: p.timerDirection==='countup'?'countup':'countdown', presence: p.presence !== false, presenceMinutes: [10,20,40].includes(p.presenceMinutes)?p.presenceMinutes:20 }; } catch { return { roomWander:true, sound: true, soundVolume: .45, lively: true, outings: true, quiet: false, reminders: true, reminderMinutes: 40, reminderSound: true, timerDirection:'countdown', presence: true, presenceMinutes: 20 }; } }
@@ -541,7 +541,7 @@ export default function App() {
       careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
       pendingCareFeedback.current=null;setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
-      petRef.current = restored; setPet(restored);
+      petRef.current = restored; setPet(restored,'导入存档恢复数值');
       setMemory(restoredMemory);
       setUnreadableSave(false);setName(restored.name); notify('存档已恢复，欢迎回来！');
     } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); }
