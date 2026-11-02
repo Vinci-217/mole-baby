@@ -29,7 +29,7 @@ async function verifyApplication({executable,archive,screenshot}){
   console.log('PASS packaged runtime '+JSON.stringify(runtime));
   child=desktop.process();for(const stream of[child.stdout,child.stderr])stream?.on('data',chunk=>{mainOutput=(mainOutput+chunk.toString()).slice(-20000)});
   page=await desktop.firstWindow({timeout:30000});page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
-  await page.waitForLoadState('domcontentloaded');await page.waitForFunction(()=>window.desktop?.isElectron===true,undefined,{polling:100,timeout:30000});await verifyRendererPolicy(page);
+  await page.waitForLoadState('domcontentloaded');await page.waitForFunction(()=>Boolean(window.desktop&&typeof window.desktop.getState==='function'),undefined,{polling:100,timeout:30000});await verifyRendererPolicy(page);
   assert.ok(!fs.existsSync(path.join(profile,'companion-ai-key.json')));assert.equal(await page.evaluate(()=>typeof window.companionAI+':'+typeof window.companionSpeech),'undefined:undefined');assert.equal(await desktop.evaluate(({app})=>app.getName()),metadata.windowsEdition==='legacy'?'拉姆兼容版':'拉姆');
   if(process.platform==='darwin'){
    assert.equal(await desktop.evaluate(({app})=>app.dock.isVisible()),false);
