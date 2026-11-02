@@ -6,7 +6,7 @@ import {ramForm} from '../original-actions'
 import {roomWalkArea,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-walk'
 import './RoomWalker.css'
 
-export default function RoomWalker({stage,evolution,blocked,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;children:(action:string|null)=>ReactNode}) {
+export default function RoomWalker({stage,evolution,blocked,randomWalk=true,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;children:(action:string|null)=>ReactNode}) {
  const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),placedByUser=useRef(false)
  const [area,setArea]=useState(()=>roomWalkArea(1000,750)),[position,setPosition]=useState<RoomPoint|null>(null)
  const [target,setTarget]=useState<RoomPoint|null>(null),[moving,setMoving]=useState(false),[direction,setDirection]=useState('walk-right')
@@ -39,6 +39,14 @@ export default function RoomWalker({stage,evolution,blocked,children}:{stage:Sta
   frame=requestAnimationFrame(tick)
   return()=>{cancelled=true;cancelAnimationFrame(frame)}
  },[target,blocked,stage])
+ useEffect(()=>{
+  if(!randomWalk||blocked||target||stage===0||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const timer=window.setInterval(()=>{
+   if(document.hidden)return;
+   setTarget(roomWalkTarget({x:area.left+Math.random()*(area.right-area.left),y:area.top+Math.random()*(area.bottom-area.top)},area));
+  },10000+Math.random()*8000);
+  return()=>window.clearInterval(timer);
+ },[randomWalk,blocked,target,stage,area]);
  const go=(next:RoomPoint)=>{if(!blocked){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
  const down=(e:PointerEvent<HTMLButtonElement>)=>{
   if(e.button!==0)return

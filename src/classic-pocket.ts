@@ -8,7 +8,7 @@ export function pocketItems(pet: GameState, retained?: string) {
   return ITEMS.filter(item => (pet.inventory[item.id] ?? 0) > 0 || item.id === retained);
 }
 export function itemUseReason(pet: GameState, item: PetItem, busy: boolean) {
-  if (pet.sleeping) return '先叫醒拉姆';
+  if (pet.sleeping&&!['180006','energy-drink'].includes(item.id)) return '先叫醒拉姆';
   if (busy) return '正在照料…';
   if (!(pet.inventory[item.id] > 0)) return '已经用完啦';
   if (getStage(pet.growth, pet.evolution) < item.minStage) return `${['种子期','初级','中级','高级'][item.minStage]}可用`;

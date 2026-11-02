@@ -22,6 +22,7 @@ export interface PetItem {
   cleanliness: number;
   happiness: number;
   health: number;
+  energy?: number;
   minStage: 0 | 1 | 2 | 3;
   description: string;
   changesColor?: PetColor;
@@ -59,6 +60,9 @@ export const ITEMS: PetItem[] = [
 ];
 
 ITEMS.push(...UPLOADED_ITEMS);
+// Keep the original ID/icon/animation and stock in existing players' backpacks.
+Object.assign(ITEMS.find(item=>item.id==='180006')!,{hunger:100,thirst:100,cleanliness:100,happiness:100,health:100,energy:100,description:'一键将饱食、水分、清洁、心情、健康、精力全部恢复到100（桌宠适配）。'});
+ITEMS.push({id:'energy-drink',sourceId:'energy-drink',name:'满满精力饮料',category:'drink',image:'./assets/original/items/180014.png',emoji:'🥛',price:70,originalPrice:0,localPrice:true,hunger:0,thirst:20,cleanliness:0,happiness:0,health:0,energy:100,minStage:0,description:'精力立即恢复到100，水分+20；沿用运动可乐原图与喝饮料动作，效果为桌宠设定。'});
 
 // Original petfood.xml has Tool=2 colour-changing items. These four bottled
 // variants and their bean price are this desktop adaptation, not official IDs.

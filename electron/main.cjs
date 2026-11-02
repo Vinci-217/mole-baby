@@ -1,8 +1,20 @@
 const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, nativeImage, shell, net, autoUpdater:nativeAutoUpdater } = require('electron');
 const fs = require('node:fs');
+const {nativePosition,movementProgress}=require('./native-position.cjs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget, compactPanelBounds, effectWindowBounds } = require('./desktop-geometry.cjs');
+const geometry=require('./desktop-geometry.cjs');
+const {canAnimateDesktop}=geometry;
+let petScale=1,PET_SIZE=geometry.PET_SIZE,PET_PADDING=geometry.PET_PADDING;
+const fitPetBounds=(b,a)=>geometry.fitPetBounds(b,a,petScale);
+const cornerSide=(b,a)=>geometry.cornerSide(b,a,petScale);
+const cornerBounds=(b,a,s)=>geometry.cornerBounds(b,a,s,petScale);
+const edgeOffset=(s,p,f)=>geometry.edgeOffset(s,p,f,petScale);
+const nearbyWanderTarget=(b,a,h)=>geometry.nearbyWanderTarget(b,a,h,Math.random,petScale);
+const compactPanelBounds=(b,a)=>geometry.compactPanelBounds(b,a,petScale);
+const effectWindowBounds=(b,a,e)=>geometry.effectWindowBounds(b,a,e,petScale);
+function applyPetMetrics(scale){petScale=scale;const metrics=geometry.scaledPetMetrics(scale);PET_SIZE=metrics.size;PET_PADDING=metrics.padding;}
+
 const { edgeDelay } = require('./edge-timing.cjs');
 const { createMacHelp } = require('./mac-settings.cjs');
 const { createTrayIcon } = require('./tray-icon.cjs');
@@ -108,7 +120,7 @@ function getDesktopState() {
     petMode,
     roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&roomFullscreen.isFullscreen()),
     windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
-    petOffset,mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
+    petScale,petOffset:{x:petOffset.x/petScale,y:petOffset.y/petScale},mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
@@ -116,10 +128,10 @@ function getDesktopState() {
     companionPanel,
     panelSide,
     panelLayout,
-    panelGeometry,
+    panelGeometry:panelGeometry?Object.fromEntries(Object.entries(panelGeometry).map(([key,value])=>[key,key==='scale'?1:value/petScale])):null,
     edgeSide,
     edgePose,
-    edgeOffset: edgeOffset(edgeSide, edgePose,petAppearance),
+    edgeOffset: geometry.edgeOffset(edgeSide, edgePose,petAppearance),
     edgeHiding,
     edgeNextPeekAt,
   };
@@ -267,7 +279,8 @@ function walkToCorner() {
   changeMotion(target.x < start.x ? 'left' : 'right');
   movementTimer = setInterval(() => {
     if (!canHideAtEdge()) { stopMovement(); return; }
-    const progress = Math.min(1, (Date.now() - startedAt) / duration);
+    const progress = movementProgress(startedAt,duration);
+    if(progress===null){stopMovement();scheduleWander();return;}
     const eased = progress * progress * (3 - 2 * progress);
     placePetAt({...PET_SIZE,x:Math.round(start.x+(target.x-start.x)*eased),y:Math.round(start.y+(target.y-start.y)*eased)});
     if (progress === 1) { stopMovement(); tuckIntoCorner(); }
@@ -297,7 +310,8 @@ function walkAlongDesktop() {
   changeMotion(target.x < start.x ? 'left' : 'right');
   movementTimer = setInterval(() => {
     if (!canWander()) { stopMovement(); return; }
-    const progress = Math.min(1, (Date.now() - startedAt) / duration);
+    const progress = movementProgress(startedAt,duration);
+    if(progress===null){stopMovement();scheduleWander();return;}
     const eased = progress * progress * (3 - 2 * progress);
     const x = Math.round(start.x + (target.x - start.x) * eased);
     const y = Math.round(start.y + (target.y - start.y) * eased);
@@ -317,6 +331,10 @@ function walkAlongDesktop() {
  * The renderer offsets the body by the actual OS displacement, so every edge
  * remains reachable without asking the OS to put a window above its bounds. */
 function placePetAt(target){
+  if(!mainWindow||mainWindow.isDestroyed()||quitting)return;
+  const point=nativePosition(target);
+  if(!point){stopMovement();scheduleWander();return;}
+  target={...target,...point};
   const previous=currentPetBounds();if(!companionPanel&&previous.x===Math.round(target.x)&&previous.y===Math.round(target.y))return;
   changingMode=true;
   const x=Math.round(target.x),y=Math.round(target.y);
@@ -324,9 +342,10 @@ function placePetAt(target){
   // fractional Windows DPI that enclosing rectangle rounds outwards, so every
   // drag/walking frame can enlarge a fixed transparent window by another pixel.
   // Keep the intended logical size instead of feeding rounded OS sizes back in.
-  if(process.platform==='win32')mainWindow.setBounds({...PET_SIZE,x,y},false);
-  else mainWindow.setPosition(x,y,false);
-  changingMode=false;
+  try{
+    if(process.platform==='win32')mainWindow.setBounds({...PET_SIZE,x,y},false);
+    else mainWindow.setPosition(x,y,false);
+  }finally{changingMode=false;}
   const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
   petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
 }
@@ -337,7 +356,7 @@ function preparePetDrag(){
 function startPetDrag(paintedOffset){
   if(paintedOffset!==undefined&&(!paintedOffset||Array.isArray(paintedOffset)||typeof paintedOffset.x!=='number'||typeof paintedOffset.y!=='number'||!Number.isFinite(paintedOffset.x)||!Number.isFinite(paintedOffset.y)||Math.abs(paintedOffset.x)>82||Math.abs(paintedOffset.y)>92))throw new TypeError('Painted pet offset must be a finite bounded screen-coordinate vector');
   if(!petMode||mouseThrough||petEffectBounds)return false;
-  const offset=paintedOffset??(edgeSide?edgeOffset(edgeSide,edgePose,petAppearance):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
+  const offset=paintedOffset?{x:paintedOffset.x*petScale,y:paintedOffset.y*petScale}:(edgeSide?edgeOffset(edgeSide,edgePose,petAppearance):{x:0,y:0});draggingFromEdge=Boolean(edgeSide)||Boolean(offset.x||offset.y);
   if(companionPanel)changeCompanionPanel(false);
   const base=currentPetBounds();revealPet();dragging=true;stopMovement();
   const painted={...base,x:base.x+Math.round(offset.x),y:base.y+Math.round(offset.y)};placePetAt(painted);
@@ -349,7 +368,7 @@ function dragPetToCursor(){
   const point=screen.getCursorScreenPoint(),desired={...PET_SIZE,x:cursorDrag.base.x+point.x-cursorDrag.point.x,y:cursorDrag.base.y+point.y-cursorDrag.point.y};
   const area=screen.getDisplayNearestPoint?screen.getDisplayNearestPoint(point).workArea:screen.getDisplayMatching(desired).workArea;
   const target=fitPetBounds(desired,area);
-  if(draggingFromEdge){target.x=Math.max(area.x-PET_PADDING.left-82,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82,desired.x));target.y=Math.max(area.y-PET_PADDING.top-92,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92,desired.y));}
+  if(draggingFromEdge){target.x=Math.max(area.x-PET_PADDING.left-82*petScale,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82*petScale,desired.x));target.y=Math.max(area.y-PET_PADDING.top-92*petScale,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92*petScale,desired.y));}
   placePetAt(target);return true;
 }
 function endPetDrag(){
@@ -377,8 +396,8 @@ function movePet(dx, dy) {
   if(dragging&&draggingFromEdge){
     const area=screen.getDisplayMatching(current).workArea;
     // Keep the painted body under the pointer while pulling it out of any edge.
-    target.x=Math.max(area.x-PET_PADDING.left-82,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82,desired.x));
-    target.y=Math.max(area.y-PET_PADDING.top-92,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92,desired.y));
+    target.x=Math.max(area.x-PET_PADDING.left-82*petScale,Math.min(area.x+area.width-PET_SIZE.width+PET_PADDING.right+82*petScale,desired.x));
+    target.y=Math.max(area.y-PET_PADDING.top-92*petScale,Math.min(area.y+area.height-PET_SIZE.height+PET_PADDING.bottom+92*petScale,desired.y));
   }
   placePetAt(target);
   wanderAnchor = { ...target };
@@ -457,7 +476,8 @@ function changePetEffectBounds(effect){
  stopMovement();
  if(effect)revealPet();
  const base=currentPetBounds();
- const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,effect):clampBounds(base,PET_SIZE);
+ const physicalEffect=effect?Object.fromEntries(Object.entries(effect).map(([key,value])=>[key,value*petScale])):null;
+ const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physicalEffect):clampBounds(base,PET_SIZE);
  petEffectBounds=effect?{x:effect.x,y:effect.y,width:effect.width,height:effect.height}:null;
  petEffectAnchor=effect?{x:base.x,y:base.y}:null;
  changingMode=true;
@@ -497,6 +517,29 @@ function changeCompanionPanel(open, layout = 'compact') {
   return getDesktopState();
 }
 
+function changePetScale(scale){
+ if(typeof scale!=='number'||!Number.isFinite(scale)||scale<.5||scale>3)throw new TypeError('请输入50到300之间的大小百分比');
+ if(petEffectBounds||dragging)throw new Error('请等当前动作结束后再调整大小');
+ const base=petMode?currentPetBounds():petBounds,oldSize=PET_SIZE,open=companionPanel;
+ if(open)changeCompanionPanel(false);
+ stopMovement();revealPet();applyPetMetrics(Math.round(scale*100)/100);
+ if(base)petBounds=fitPetBounds({x:base.x+(oldSize.width-PET_SIZE.width)/2,y:base.y+oldSize.height-PET_SIZE.height},screen.getDisplayMatching(base).workArea);
+ if(petMode){
+  const target=clampBounds(petBounds,PET_SIZE);changingMode=true;
+  try{applyMinimum(target,true);mainWindow.setBounds(target);mainWindow.webContents.setZoomFactor?.(petScale);const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};}finally{changingMode=false;}
+  if(open)changeCompanionPanel(true);
+ }
+ wanderAnchor=null;saveWindowState();publishState();scheduleWander();return petScale;
+}
+let sizeWindow=null;
+function openSizeEditor(){
+ if(!mainWindow||mainWindow.isDestroyed()||quitting)return;
+ if(sizeWindow&&!sizeWindow.isDestroyed()){sizeWindow.show();sizeWindow.focus();return;}
+ sizeWindow=new BrowserWindow({width:390,height:280,resizable:false,minimizable:false,maximizable:false,title:'拉姆大小变换',parent:mainWindow.isVisible()?mainWindow:undefined,alwaysOnTop:true,autoHideMenuBar:true,webPreferences:{partition:'ramu-size-editor',preload:path.join(__dirname,'size-preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
+ const editor=sizeWindow;editor.on('closed',()=>{if(sizeWindow===editor)sizeWindow=null;});
+ editor.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+ void editor.loadFile(path.join(__dirname,'size.html')).catch(error=>console.warn('Unable to open size editor:',error.message));
+}
 function settingsPath() {
   return path.join(app.getPath('userData'), 'window-state.json');
 }
@@ -510,6 +553,7 @@ function validBounds(value) {
 function loadWindowState() {
   try {
     const state = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'));
+    if(typeof state.petScale==='number'&&Number.isFinite(state.petScale)&&state.petScale>=.5&&state.petScale<=3)applyPetMetrics(state.petScale);
     normalBounds = validBounds(state.normalBounds) ? state.normalBounds : null;
     petBounds = validBounds(state.petBounds) ? {
       // Older releases used a large transparent frame. Keep its bottom centre
@@ -539,7 +583,7 @@ function saveWindowState() {
   try {
     const filename = settingsPath();
     fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ normalBounds, petBounds, normalAlwaysOnTop,petAlwaysOnTop,mouseThrough, wandering: wanderPreference, edgeHiding }));
+    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ petScale, normalBounds, petBounds, normalAlwaysOnTop,petAlwaysOnTop,mouseThrough, wandering: wanderPreference, edgeHiding }));
     fs.renameSync(`${filename}.tmp`, filename);
   } catch (error) {
     console.warn('Unable to save window position:', error.code || error.name);
@@ -635,6 +679,7 @@ function changePetMode(enabled) {
   if (enabled) {
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
     const target = clampBounds(petBounds, PET_SIZE);
+    mainWindow.webContents.setZoomFactor?.(petScale);
     petMode = true;
     applyMinimum(target, true);
     if(process.platform!=='win32')mainWindow.setResizable(false);
@@ -643,6 +688,7 @@ function changePetMode(enabled) {
     mainWindow.setAlwaysOnTop(petAlwaysOnTop, 'floating');
     petBounds = target;
   } else {
+    mainWindow.webContents.setZoomFactor?.(1);
     petMode = false;petOffset={x:0,y:0};
     const target = clampBounds(normalBounds, NORMAL_SIZE);
     if(process.platform!=='win32')mainWindow.setResizable(true);
@@ -707,13 +753,14 @@ function markRendererReady(adopted) {
 }
 
 function refreshTrayMenu() {
-  if (!tray || tray.isDestroyed()) return;
+  if (!tray || tray.isDestroyed() || !mainWindow || mainWindow.isDestroyed() || quitting) return;
   const movable = hasPet && petCanMove;
-  const key=JSON.stringify([hasPet,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
+  const key=JSON.stringify([hasPet,petScale,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
-    { label: '播放背景音乐',type:'checkbox',checked:musicState.playing,enabled:hasPet,click:item=>mainWindow.webContents.send('desktop:music-toggle',item.checked) },
+    { label: `大小变换（${Math.round(petScale*100)}%）`,enabled:hasPet,click:openSizeEditor },
+    { label: '后台播放背景音乐',type:'checkbox',checked:musicState.background,enabled:hasPet,click:item=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('desktop:music-toggle',item.checked)} },
     { type: 'separator' },
     { label: '拉姆置顶',type:'checkbox',checked:petMode?mainWindow.isAlwaysOnTop():petAlwaysOnTop,click:item=>changeAlwaysOnTop(item.checked,true)},
     { label: '鼠标穿透',type:'checkbox',checked:mouseThrough,click:item=>changeMouseThrough(item.checked)},
@@ -782,7 +829,12 @@ function updateTrayStatus(status){
 }
 
 function registerIPC() {
+ const sizeSender=event=>{if(!sizeWindow||sizeWindow.isDestroyed()||event.sender!==sizeWindow.webContents||event.senderFrame!==sizeWindow.webContents.mainFrame)throw new Error('Untrusted size editor');};
+ ipcMain.handle('desktop:size-dialog-get',event=>{sizeSender(event);return petScale;});
+ ipcMain.handle('desktop:size-dialog-save',(event,percent)=>{sizeSender(event);changePetScale(percent/100);sizeWindow.close();return true;});
   handle('desktop:set-pet-status',updateTrayStatus);
+  handle('desktop:set-pet-scale',changePetScale);
+  handle('desktop:open-size-editor',openSizeEditor);
   handle('desktop:set-pet-effect-bounds',changePetEffectBounds);
   handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
   handle('updates:open-release',()=>shell.openExternal('https://github.com/Vinci-217/mole-baby/releases/latest'));

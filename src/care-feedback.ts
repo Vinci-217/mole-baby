@@ -3,7 +3,7 @@ import { getItem, type GameState } from './game'
 export interface CareGain { key:string; label:string; amount?:number; image:string }
 export interface CareFeedbackData { id:number; petId:number; gains:CareGain[] }
 const NEEDS = [
-  ['hunger','饱食','icon-food'],['thirst','水分','icon-water'],['cleanliness','清洁','icon-clean'],['happiness','心情','icon-happy'],['health','健康','status-health'],
+  ['hunger','饱食','icon-food'],['thirst','水分','icon-water'],['cleanliness','清洁','icon-clean'],['happiness','心情','icon-happy'],['health','健康','status-health'],['energy','精力','icon-clock'],
 ] as const
 /** Only the item's actual, capped change. Natural growth is never an item XP reward. */
 export function careGains(before:GameState,after:GameState,itemId:string):CareGain[] {
@@ -12,7 +12,7 @@ export function careGains(before:GameState,after:GameState,itemId:string):CareGa
   if(item.changesColor)return before.color===after.color?[]:[{key:'color',label:`变为${petColorName(after.color)}`,image:item.image}]
   return NEEDS.flatMap(([key,label,icon])=>{
     const amount=Math.round(after.stats[key])-Math.round(before.stats[key])
-    return item[key]>0&&amount>0?[{key,label,amount,image:`./assets/original/ui/${icon}.png`}]:[]
+    return (item[key]??0)>0&&amount>0?[{key,label,amount,image:`./assets/original/ui/${icon}.png`}]:[]
   })
 }
 

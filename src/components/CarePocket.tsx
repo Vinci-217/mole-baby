@@ -5,7 +5,7 @@ import './CarePocket.css';
 import {inventoryItems} from '../catalog';
 import {petColorName} from '../pet-color';
 export type PocketCategory=ItemCategory;
-export function itemEffectLine(item:PetItem){if(item.changesColor)return `变为${petColorName(item.changesColor)}`;return ([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康']] as const).filter(([key])=>item[key]>0).map(([key,label])=>`${label} +${item[key]}`).join(' · ')}
+export function itemEffectLine(item:PetItem){if(item.changesColor)return `变为${petColorName(item.changesColor)}`;return ([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).filter(([key])=>(item[key]??0)>0).map(([key,label])=>`${label} +${item[key]}`).join(' · ')}
 export interface CarePocketProps{pet:GameState;initialCategory?:PocketCategory;visit?:number;onCare:(action:Action,id?:string)=>void;onVisitShop?:()=>void;busy?:boolean;busyItemId?:string;compact?:boolean;onClose?:()=>void}
 const categories=[['food','食物'],['drink','饮品'],['clean','清洁'],['medicine','药水']] as const;
 export default function CarePocket({pet,initialCategory='food',visit,onCare,onVisitShop,busy: _busy=false,busyItemId,compact=false,onClose}:CarePocketProps){
@@ -17,7 +17,7 @@ export default function CarePocket({pet,initialCategory='food',visit,onCare,onVi
  const slots=useMemo(()=>inventoryItems(pet.inventory).filter(item=>item.category===category&&(pet.inventory[item.id]??0)>0).map(item=>item.id),[category,visit,pet.createdAt]);
  useEffect(()=>{setCategory(initialCategory);setPage(0)},[initialCategory,visit]);
  const owned=slots.map(id=>getItem(id)!).filter(item=>item&&item.category===category),pages=Math.max(1,Math.ceil(owned.length/16)),currentPage=Math.min(page,pages-1),visible=owned.slice(currentPage*16,currentPage*16+16),stage=getStage(pet.growth,pet.evolution);
- const reasonFor=(item:PetItem)=>!(pet.inventory[item.id]??0)?'已经用完':pet.sleeping?'先叫醒拉姆':stage<item.minStage?'长大一点再用':item.changesColor===pet.color?'已经是这个颜色':undefined;
+ const reasonFor=(item:PetItem)=>!(pet.inventory[item.id]??0)?'已经用完':pet.sleeping&&!['180006','energy-drink'].includes(item.id)?'先叫醒拉姆':stage<item.minStage?'长大一点再用':item.changesColor===pet.color?'已经是这个颜色':undefined;
  const describe=(item:PetItem)=>`${item.name} ×${pet.inventory[item.id]??0} · ${reasonFor(item)??itemEffectLine(item)}`;
  const hintItem=visible.find(item=>item.id===(hovered??focused));
  useEffect(clearHint,[category,currentPage,visit,pet.createdAt,compact,pet.inventory]);

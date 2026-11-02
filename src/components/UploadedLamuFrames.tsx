@@ -21,7 +21,7 @@ function raster(spec:UploadedSpec,color:PetColor){
   const offsets=petColorOffsets(color),deltas=[255,204,153].map(base=>offsets.map(v=>Math.max(0,Math.min(255,base+v))-base))
   const pages:HTMLCanvasElement[]=[]
   for(const page of clip.pages){
-   const read=async(name:string)=>{const im=new Image();im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;await im.decode();return im}
+   const read=(name:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>{im.onload=im.onerror=null;resolve(im)};im.onerror=()=>{im.onload=im.onerror=null;reject(new Error(`无法读取原版动画图集：${spec.assetKey}/${name}`))};im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;})
    const[neutral,mask]=await Promise.all([read(page.neutral),read(page.mask)]),canvas=document.createElement('canvas');canvas.width=Math.ceil(page.width*rasterScale);canvas.height=Math.ceil(page.height*rasterScale)
    const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('无法打开原版动作图集。')
    ctx.drawImage(neutral,0,0,page.width*rasterScale,page.height*rasterScale);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
@@ -64,7 +64,7 @@ export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion
     if(!media.matches||!loop||limit!==undefined)frame=requestAnimationFrame(draw)
    };redraw=()=>{frame=requestAnimationFrame(draw)};redraw()
    if(limit!==undefined||!loop)deadline=setTimeout(finish,limit??spec.durationMs)
-  }).catch(()=>{if(live){if(ref.current)ref.current.dataset.failed='true';end.current?.(false)}})
+  }).catch(error=>{if(live){if(ref.current){ref.current.dataset.failed='true';ref.current.dataset.failureReason=error instanceof Error?error.message:String(error);}end.current?.(false)}})
   return()=>{live=false;cancelAnimationFrame(frame);clearTimeout(deadline);document.removeEventListener('visibilitychange',visibility);audio?.stop()}
  },[spec,color,fromColor,itemMotion,loop,limit,action])
  const rect=uploadedEffectRect(spec,form)

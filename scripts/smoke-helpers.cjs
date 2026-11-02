@@ -217,6 +217,13 @@ async function verifyStageSettings(page,desktop){
   const memoryKey=`ramu-companion-memory-v1:${before.createdAt}`;
   const memoryBefore=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'null'),memoryKey);
   const settings=page.getByRole('region',{name:'当前成长阶段',exact:true});
+  // New companions cannot skip growth. Seed only this test profile's earned
+  // progress after checking the real locked controls, then verify all forms.
+  if((before.highestGrowth??before.growth)<840){
+    await expect(settings.getByRole('button',{name:'切换到神力拉姆',exact:true})).toBeDisabled();
+    await page.evaluate(()=>{const key='ramu-house-save-v1',saved=JSON.parse(localStorage.getItem(key));saved.highestGrowth=840;localStorage.setItem(key,JSON.stringify(saved));});
+    await page.reload();await enterHome(page);await roomTab(page,'成长');
+  }
   const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
   for(const [stage,label] of ['种子期','初级拉姆','中级拉姆','高级拉姆','神力拉姆'].entries()){
     await settings.getByRole('button',{name:`切换到${label}`,exact:true}).click();await applyGrowthSettings(page,{mode:'fixed'});

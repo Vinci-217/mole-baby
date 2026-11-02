@@ -6,6 +6,7 @@ export interface RoomBackground { id: string; label: string; src: string; phaseS
 export const ROOM_BACKGROUNDS: readonly RoomBackground[] = [
   { id: 'morning', label: '晨光书桌', src: './assets/generated/morning-study.png' },
   { id: 'ramu-home', label: '拉姆小屋', src: './assets/original/scenes/ramu-home.png' },
+  { id:'mystery-flower-sea',label:'神秘花海',src:'./assets/original/scenes/mystery-flower-sea.png' },
   { id: 'lake-cabin', label: '神秘湖木屋', src: './assets/original/scenes/lake-cabin.png' },
   { id: 'earthen-home', label: '树洞房', src: './assets/original/scenes/original-earthen-home.png' },
   { id: 'original-160419', label: '魔法拉姆双层小屋', src: './assets/original/scenes/room-160419.png' },
@@ -20,6 +21,7 @@ export const ROOM_BACKGROUNDS: readonly RoomBackground[] = [
   { id: 'sky-observatory', label: '晴空观星阁', src: './assets/generated/v18-sky-observatory.png', phaseSheet: true },
 ];
 export const ROOM_MUSIC = [
+  { id:'mystery-flower-sea',label:'神秘花海',src:'./assets/original/audio/mystery-flower-sea.mp3' },
   { id: 'castle', label: '摩尔城堡', also: '淘淘乐街 · 粒粒小广场', src: './assets/original/audio/castle.mp3' },
   { id: 'pet-shop', label: '宠物店', also: '摩尔餐厅 · 游戏小屋', src: './assets/original/audio/pet-shop.mp3' },
   { id: 'mystery-lake', label: '神秘湖', src: './assets/original/audio/mystery-lake.mp3' },
@@ -38,6 +40,7 @@ export interface RoomMediaPreferences {
   musicId: string;
   musicEnabled: boolean;
   backgroundPlayback: boolean;
+  shuffle: boolean;
   volume: number;
 }
 export interface RoomMediaController {
@@ -55,15 +58,17 @@ export interface RoomMediaController {
   importMusic: (file: File) => Promise<void>;
   removeMusic: () => Promise<void>;
   resumeMusic: () => void;
+  nextMusic: () => void;
 }
 const STORAGE = 'ramu-room-media-v1';
-const DEFAULTS: RoomMediaPreferences = { backgroundId: 'ramu-home', musicId: 'castle', musicEnabled: true, backgroundPlayback: false, volume: .18 };
+const DEFAULTS: RoomMediaPreferences = { backgroundId: 'ramu-home', musicId: 'castle', musicEnabled: true, backgroundPlayback: false, shuffle:false, volume: .18 };
 function normalize(value: Partial<RoomMediaPreferences>): RoomMediaPreferences {
   return {
     backgroundId: ROOM_BACKGROUNDS.some(b => b.id === value.backgroundId) ? value.backgroundId! : DEFAULTS.backgroundId,
     musicId: value.musicId === 'custom' || ROOM_MUSIC.some(m => m.id === value.musicId) ? value.musicId! : DEFAULTS.musicId,
     musicEnabled: typeof value.musicEnabled === 'boolean' ? value.musicEnabled : DEFAULTS.musicEnabled,
     backgroundPlayback: value.backgroundPlayback === true,
+    shuffle:value.shuffle===true,
     volume: typeof value.volume === 'number' && Number.isFinite(value.volume) ? Math.max(0, Math.min(1, value.volume)) : DEFAULTS.volume,
   };
 }
@@ -105,7 +110,7 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
   const nativeVisible = useRef(true);
   const customUrl = useRef<string | null>(null);
   const generation = useRef(0);
-  active.current = hasPet && (inRoom || settings.backgroundPlayback) && settings.musicEnabled;
+  active.current = hasPet && (inRoom ? settings.musicEnabled : settings.backgroundPlayback);
   const backgroundAllowed = useRef(settings.backgroundPlayback); backgroundAllowed.current = settings.backgroundPlayback;
   const update = useCallback((change: Partial<RoomMediaPreferences>) => {
     setSettings(previous => normalize({ ...previous, ...change }));
@@ -130,9 +135,7 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     // A room can remain mounted while the native window lives in the tray.
     // Guard every playback entry, including a track change while hidden.
     if (!active.current || (document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !audio.current) { audio.current?.pause(); return; }
-    // Only an actual restart rewinds; pointer/visibility/state notifications
-    // while already playing must not keep jumping the track back to zero.
-    if(audio.current.paused)try{audio.current.currentTime=0}catch{ /* A newly created track already starts at zero. */ }
+    // Resume the existing position after a mode/visibility change.
     void audio.current.play().then(() => setError(null)).catch(reason => {
       if (reason instanceof DOMException && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')) return;
       setError('这首音乐暂时无法播放，可以换一首或重新导入。');
@@ -143,10 +146,16 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     if(!nativeVisible.current&&!backgroundAllowed.current)audio.current?.pause();else resumeMusic();
   }),[resumeMusic]);
   const source = settings.musicId === 'custom' && custom ? custom.url : (ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0]).src;
+  const nextMusic=useCallback(()=>{
+    setSettings(previous=>{
+      const pool=[...ROOM_MUSIC.map(track=>track.id as string),...(custom?['custom']:[])].filter(id=>id!==previous.musicId);
+      return {...previous,musicId:pool[Math.min(pool.length-1,Math.floor(Math.random()*pool.length))]??previous.musicId};
+    });
+  },[custom]);
   const awaitingCustom=settings.musicId==='custom'&&!customLoaded;
   useEffect(() => {
     if (awaitingCustom) return;
-    const element = new Audio(source); element.loop = true; element.preload = 'metadata';
+    const element = new Audio(source); element.loop = !settings.shuffle; element.preload = 'metadata';
     if(window.mobile){element.hidden=true;element.dataset.ramuBgm='true';document.body.appendChild(element);}
     audio.current = element;
     const started = () => {
@@ -154,13 +163,15 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
       setPlaying(true);
     }, stopped = () => setPlaying(false);
     const failed = () => { setPlaying(false); setError('这首音乐暂时无法播放，可以换一首或重新导入。'); };
+    const ended=()=>{if(settings.shuffle)nextMusic()};
+    element.addEventListener('ended',ended);
     element.addEventListener('playing', started); element.addEventListener('pause', stopped); element.addEventListener('error', failed);
     if (active.current) resumeMusic();
     return () => {
-      element.pause(); element.removeEventListener('playing', started); element.removeEventListener('pause', stopped); element.removeEventListener('error', failed);
+      element.pause(); element.removeEventListener('ended',ended); element.removeEventListener('playing', started); element.removeEventListener('pause', stopped); element.removeEventListener('error', failed);
       element.removeAttribute('src'); element.load();element.remove(); if (audio.current === element) audio.current = null; setPlaying(false);
     };
-  }, [source, awaitingCustom, resumeMusic]);
+  }, [source, awaitingCustom, resumeMusic, settings.shuffle, nextMusic]);
   useEffect(() => {
     if (active.current) resumeMusic();
     else audio.current?.pause();
@@ -212,5 +223,5 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     if (customUrl.current) URL.revokeObjectURL(customUrl.current);
     customUrl.current = null; setCustom(null); update({ musicId: 'castle' }); setError(null);
   }, [update]);
-  return { inRoom, settings, background: ROOM_BACKGROUNDS.find(background => background.id === settings.backgroundId) ?? ROOM_BACKGROUNDS[0], phase: timeMode === 'auto' ? localPhase : timeMode, localPhase, timeMode, setTimeMode, customName: custom?.name ?? null, playing, error, update, importMusic, removeMusic, resumeMusic };
+  return { inRoom, settings, background: ROOM_BACKGROUNDS.find(background => background.id === settings.backgroundId) ?? ROOM_BACKGROUNDS[0], phase: timeMode === 'auto' ? localPhase : timeMode, localPhase, timeMode, setTimeMode, customName: custom?.name ?? null, playing, error, update, importMusic, removeMusic, resumeMusic, nextMusic };
 }

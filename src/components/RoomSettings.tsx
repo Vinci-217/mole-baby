@@ -63,6 +63,8 @@ export default function RoomSettings({ media }: { media: RoomMediaController }) 
         <label className="room-music-switch"><span>进入小屋时播放</span><input type="checkbox" aria-label="小屋背景音乐" checked={media.settings.musicEnabled} onChange={event => media.update({ musicEnabled: event.target.checked })}/></label>
       </div>
       <label className="room-music-switch"><span>允许后台播放（桌面和托盘）</span><input type="checkbox" aria-label="允许后台播放音乐" checked={media.settings.backgroundPlayback} onChange={event=>media.update({backgroundPlayback:event.target.checked})}/></label>
+      <label className="room-music-switch"><span>随机播放（每曲结束换一首，不连续重复）</span><input type="checkbox" aria-label="随机播放背景音乐" checked={media.settings.shuffle} onChange={event=>media.update({shuffle:event.target.checked})}/></label>
+      <button className="game-button small" onClick={media.nextMusic}>下一首</button>
       <div className="room-track-list" role="group" aria-label="选择背景音乐">
         {ROOM_MUSIC.map(track => <button type="button" key={track.id} aria-label={track.label} aria-pressed={media.settings.musicId === track.id} aria-description={'also' in track ? `${track.label} · ${track.also}` : track.label} onClick={() => media.update({ musicId: track.id })}><span aria-hidden="true">{media.settings.musicId === track.id ? '♪' : '♩'}</span><span className="room-track-name">{track.label}</span></button>)}
         {media.customName && <button type="button" className="room-custom-track" aria-label={media.customName} aria-pressed={media.settings.musicId === 'custom'} onClick={() => media.update({ musicId: 'custom' })}><span aria-hidden="true">♪</span><span className="room-track-name">{media.customName}</span></button>}

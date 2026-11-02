@@ -3,6 +3,7 @@ declare global {
   interface UpdateState {downloadPolicy?:'auto'|'full';status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string;downloadMode?:'differential'|'full'|'cached'|null;transferredBytes?:number;totalBytes?:number;fullSize?:number;reusedBytes?:number;fallbackReason?:string|null}
   interface DesktopState {
     petMode: boolean;
+    petScale?:number;
     roomFullscreen?:boolean;
     effectExpanded?:boolean;
     trayTooltip?:string;
@@ -34,6 +35,8 @@ declare global {
       openMacSettings: (kind:'security')=>Promise<boolean>;
       openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;
+      openSizeEditor?:()=>Promise<void>;
+      setPetScale?:(scale:number)=>Promise<number>;
       minimize: () => void;
       close: () => void;
       hideToTray: () => void;

@@ -33,6 +33,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
       this.webContents = new EventEmitter();
       this.webContents.mainFrame = { url: '' };
       this.webContents.send = () => {};
+      this.webContents.setZoomFactor=value=>{this.zoom=value;};
       this.webContents.setWindowOpenHandler = () => {};
       this.webContents.session = { setPermissionRequestHandler() {}, setPermissionCheckHandler() {} };
       windows.push(this);
@@ -512,4 +513,20 @@ for(const platform of ['win32','darwin'])test(`${platform}: room resize is persi
  assert.throws(()=>run.handles.get('desktop:start-room-resize')({sender:{},senderFrame:{}},'se'),/Untrusted/);assert.throws(()=>run.invoke('desktop:adjust-room-size',Infinity,1));
  if(platform==='win32'){assert.deepEqual(run.window.resizeChanges??[],[]);assert.equal(run.window.options.thickFrame,false)}
  Object.assign(run.cursor,cursor);
+});
+
+for(const platform of ['win32','darwin'])test(`${platform}: proportional desktop size preserves the pet anchor, panel coordinates and preferences`,async t=>{
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-mode',true);run.invoke('desktop:set-edge-hiding',false);
+ for(const scale of [.5,1,1.25,2,3]){
+  assert.equal(run.invoke('desktop:set-pet-scale',scale),scale);const b=run.window.getBounds();
+  assert.equal(b.width,Math.round(160*scale));assert.equal(b.height,Math.round(240*scale));assert.equal(run.window.zoom,scale);
+  const state=run.invoke('desktop:set-companion-panel',true),g=state.panelGeometry;
+  assert.equal(g.panelWidth,212);assert.equal(g.panelHeight,216);assert.equal(state.petScale,scale);
+  assert.ok(Number.isFinite(g.petX)&&Number.isFinite(g.petY));run.invoke('desktop:set-companion-panel',false);
+  assert.equal(run.window.getBounds().width,Math.round(160*scale));
+  run.invoke('desktop:set-pet-mode',false);assert.equal(run.window.zoom,1);run.invoke('desktop:set-pet-mode',true);assert.equal(run.window.zoom,scale);
+  run.send('desktop:hide-to-tray');assert.equal(JSON.parse(fs.readFileSync(path.join(run.app.userData,'window-state.json'))).petScale,scale);run.send('desktop:ready-to-show',true);
+ }
+ for(const value of [NaN,Infinity,.49,3.01,'2'])assert.throws(()=>run.invoke('desktop:set-pet-scale',value));
+ const before=run.window.getBounds();run.invoke('desktop:set-pet-effect-bounds',{x:-20,y:-30,width:200,height:200});assert.throws(()=>run.invoke('desktop:set-pet-scale',1));run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),before);
 });

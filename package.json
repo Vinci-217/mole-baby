@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.31.10",
+  "version": "0.32.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -30,6 +30,7 @@
     "android:manifest": "node scripts/android/prepare-update.cjs"
   },
   "dependencies": {
+    "core-js": "^3.51.0",
     "electron-updater": "6.8.11",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
@@ -139,6 +140,16 @@
     "asarUnpack": [
       "dist/assets/original/uploaded-actions/**/*",
       "dist/assets/original/daily-frames/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "docs/WINDOWS-START.txt",
+        "to": "先看这里-启动说明.txt"
+      },
+      {
+        "from": "docs/start-windows.cmd",
+        "to": "启动拉姆.cmd"
+      }
     ]
   }
 }

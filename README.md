@@ -2,9 +2,15 @@
 
 > **Windows 与 Mac 桌面拉姆，现提供安卓预览版。** [下载与安装](https://github.com/Vinci-217/mole-baby/releases/latest) · [自动更新说明](docs/UPDATES.md)。修正比例、更新确认与Windows老系统兼容，玩法与动画见下方，构建进度见 [GitHub Actions](https://github.com/Vinci-217/mole-baby/actions/workflows/windows-build.yml)。
 
+## v0.32 · 兼容修复与陪伴升级
+
+安卓兼容华为 HarmonyOS 4.x 的 WebView 版本识别，Mac 修复定时移动的无效坐标异常；Windows 包内增加启动说明与入口。小屋新增待办留言、神秘花海背景/BGM、随机配乐与随机走动；形态成长解锁后可固定，桌面托盘支持 50%～300% 等比缩放。十字架六项补满，新增精力饮料，自然消耗减半并显示数值变化记录。
+
+[存档位置与升级保护](docs/SAVE-DATA.md) · [本次更新](RELEASE_NOTES.md) · [验证记录](research/release-0.32.0-validation.md)。原存档和回忆继续沿用，升级无需删除旧数据。留言入口复用原玩具猫画板，待办为本地功能。
+
 ## 安卓手机与平板 · 固定签名预览版
 
-新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。固定签名，后续可以覆盖升级并保留存档。需要 Android 8+、WebView／Chrome 108+。
+新增安卓原生宿主，复用现有养成、道具、课程、小屋、小游戏和原版动作帧；支持悬浮陪伴、拖动收纳、通知提醒、存档及 APK / 素材差量更新。固定签名，后续可以覆盖升级并保留存档。需要 Android 8+、可用的系统 WebView（已补齐兼容构建）。
 
 [下载安卓 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.10/mole-baby-android-1311000.apk) · [安装、构建与更新说明](docs/ANDROID.md) · [六平台验证](research/release-0.31.10-validation.md)。首次离线包较大，建议预留 2 GiB 空间。此前 `.dev` 开发包请先导出存档，再导入固定签名预览版。
 

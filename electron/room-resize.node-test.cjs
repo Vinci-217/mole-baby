@@ -1,12 +1,12 @@
 const{test}=require('node:test'),assert=require('node:assert/strict');
-const{resizedRoomBounds,createRoomResizer}=require('./room-resize.cjs');
+const{ROOM_MINIMUM,resizedRoomBounds,createRoomResizer}=require('./room-resize.cjs');
 test('eight-direction room resizing anchors opposite edges and respects negative-origin displays and small work areas',()=>{
  const area={x:-1920,y:32,width:1920,height:1040},b={x:-1700,y:100,width:1100,height:800};
  for(const edge of ['n','ne','e','se','s','sw','w','nw']){
-  const r=resizedRoomBounds(b,edge,120,80,area);assert.ok(r.width>=800&&r.height>=640);assert.ok(r.x>=area.x&&r.y>=area.y);assert.ok(r.x+r.width<=0&&r.y+r.height<=1072);
+  const r=resizedRoomBounds(b,edge,120,80,area);assert.ok(r.width>=ROOM_MINIMUM.width&&r.height>=ROOM_MINIMUM.height);assert.ok(r.x>=area.x&&r.y>=area.y);assert.ok(r.x+r.width<=0&&r.y+r.height<=1072);
   if(edge.includes('w'))assert.equal(r.x+r.width,b.x+b.width);if(edge.includes('n'))assert.equal(r.y+r.height,b.y+b.height);
  }
- const tiny={x:0,y:0,width:760,height:600};assert.deepEqual(resizedRoomBounds(b,'se',-5000,-5000,tiny),tiny);
+ const tiny={x:0,y:0,width:760,height:600};assert.deepEqual(resizedRoomBounds(b,'se',-5000,-5000,tiny),{x:0,y:0,...ROOM_MINIMUM});
  assert.throws(()=>resizedRoomBounds(b,'bad',0,0,area));assert.throws(()=>resizedRoomBounds(b,'e',NaN,0,area));
 });
 test('native cursor drag uses its initial DIP bounds, ends on mode change and never touches native frame style',t=>{

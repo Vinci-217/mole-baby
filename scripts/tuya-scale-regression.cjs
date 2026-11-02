@@ -5,14 +5,15 @@ const visibility=require('../electron/edge-visibility.json'),proof=require('../r
  const results=[],out=path.resolve(__dirname,'../artifacts/tuya-size');fs.mkdirSync(out,{recursive:true});
  try{
   {
-   const page=await browser.newPage({viewport:{width:1600,height:1400}}),cdp=await page.context().newCDPSession(page);
+   const page=await browser.newPage({viewport:{width:1600,height:1400},reducedMotion:'reduce'}),cdp=await page.context().newCDPSession(page);
    await page.goto(process.env.TUYA_REVIEW_URL||'http://127.0.0.1:5241');
    await page.evaluate(async()=>window.tuyaReview=(await import('/scripts/tuya-scale-fixture.tsx')).mountTuyaReview());
-   await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+500));
+   // Freeze the original opening pose through the supported motion preference.
+   // Do not replace browser clocks while its image decoder is preparing atlases.
    for(const form of ['junior','middle','senior','classic'])for(const id of ['tuya1','tuya2','tuya3','tuya4']){
     const {rect,spec}=await page.evaluate(({form,id})=>window.tuyaReview.show(form,id),{form,id});
     const canvas=page.locator('.tuya-review canvas[data-sheet=uploaded]');
-    await expect.poll(async()=>{await page.clock.runFor(20);return canvas.getAttribute('data-loaded')},{timeout:45000}).toBe('true');
+    await expect.poll(()=>canvas.getAttribute('data-loaded'),{timeout:45000}).toBe('true');
     for(const dpr of [1,1.25,1.5,2]){
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:1600,height:1400,deviceScaleFactor:dpr,mobile:false});
     assert.equal(await page.evaluate(()=>devicePixelRatio),dpr);

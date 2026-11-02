@@ -1,5 +1,5 @@
 const EDGES=new Set(['n','ne','e','se','s','sw','w','nw']);
-const ROOM_MINIMUM={width:800,height:640};
+const ROOM_MINIMUM={width:360,height:320};
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 function resizedRoomBounds(bounds,edge,dx,dy,area){
  if(!EDGES.has(edge)||![dx,dy].every(Number.isFinite))throw new TypeError('Invalid room resize');

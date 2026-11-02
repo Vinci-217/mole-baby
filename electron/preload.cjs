@@ -34,6 +34,8 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   openMacSettings: kind=>ipcRenderer.invoke('desktop:open-mac-settings',kind),
   openMacGuide: ()=>ipcRenderer.invoke('desktop:open-mac-guide'),
   getState: () => ipcRenderer.invoke('desktop:get-state'),
+  openSizeEditor:()=>ipcRenderer.invoke('desktop:open-size-editor'),
+  setPetScale:scale=>ipcRenderer.invoke('desktop:set-pet-scale',scale),
   minimize: () => ipcRenderer.send('desktop:minimize'),
   close: () => ipcRenderer.send('desktop:close'),
   hideToTray: () => ipcRenderer.send('desktop:hide-to-tray'),

@@ -20,7 +20,7 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
   if(fs.existsSync(androidManifest)){
     const m=JSON.parse(fs.readFileSync(androidManifest,'utf8'));
     if(m.packageName!=='com.molebaby.ramu.preview'||!Number.isInteger(m.versionCode))throw Error('Invalid fixed-signed Android release');
-    androidRow=`\n| **安卓手机／平板 · Android 8+** | **[⬇ 下载安卓固定签名预览版 .apk](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.apk)** | WebView 108+；按系统提示安装，后续可覆盖升级 |`;
+    androidRow=`\n| **安卓手机／平板 · Android 8+** | **[⬇ 下载安卓固定签名预览版 .apk](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.apk)** | 兼容华为 HarmonyOS 4.x 等安卓系统；按提示安装，可覆盖升级 |`;
   }
   const guide = `# 下载与安装 · 拉姆 v${version}
 
@@ -76,7 +76,7 @@ Windows 安装版确认安装后保存存档并更新重启；${verified ? 'Mac 
 
 - **Windows 现代便携版**：[下载 x64.zip](${download('x64.zip')})。
 - **Windows 老系统便携版**：[下载64位兼容版ZIP](${download('legacy-x64.zip')}) / [下载32位兼容版ZIP](${download('legacy-ia32.zip')})。
-- 所有Windows ZIP都先右键「全部解压」，在完整解压后的文件夹里打开「拉姆.exe」或「拉姆兼容版.exe」；不要直接在压缩包中运行，也不要只复制exe。便携版更新会提供对应渠道的安装包入口，想要确认后直接更新并重启请选择上面的安装版。
+- 所有Windows ZIP内含「先看这里-启动说明.txt」和「启动拉姆.cmd」；先右键「全部解压」，在完整解压后的文件夹里打开「拉姆.exe」或「拉姆兼容版.exe」；不要直接在压缩包中运行，也不要只复制exe。便携版更新会提供对应渠道的安装包入口，想要确认后直接更新并重启请选择上面的安装版。
 - **Mac ZIP 备用包**：[Apple 芯片 ZIP](${download('mac-arm64.zip')}) / [Intel ZIP](${download('mac-x64.zip')})。解压后把应用移入「应用程序」再打开；普通用户优先下载上面的 DMG。
 - **Source code (zip / tar.gz)** 是开发者用的源码，不能直接运行；普通用户不用下载。
 - **latest.yml、legacy-x64.yml、legacy-ia32.yml、latest-mac.yml、*.blockmap、SHA256SUMS.txt、macos-trust-*.json** 供更新程序或校验使用，不是安装包。

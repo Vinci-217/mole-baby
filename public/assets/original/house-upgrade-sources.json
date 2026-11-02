@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-11-02",
+  "scene": {
+    "name": "神秘花海",
+    "mapId": 362,
+    "url": "https://mole.61.com/resource/map/Map_10362.swf",
+    "archiveUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/map/Map_10362.swf",
+    "sha256": "888e35139f42a295fd8e73d0d35b938b032096418c3ab98ee9fc1d91fdf1ca26",
+    "symbol": "RES_Map362 (sprite 131), bg_mc (sprite 7), bitmap character 5",
+    "image": "scenes/mystery-flower-sea.png",
+    "imageSha256": "a08e36fcffa30179949f6371a0c3ce8854e2f6c9b7cc88abd59b6aa756ace261",
+    "adaptation": "Original embedded JPEG decoded to PNG without redraw. Omit runtime controls, guides, transition shadows and empty registration space."
+  },
+  "music": {
+    "name": "神秘花海",
+    "url": "https://mole.61.com/resource/bgSounds/BGM_131.mp3",
+    "nameEvidence": "audio/map-sounds.xml map 362 musicId BGM_131, original annotation 神秘花海",
+    "file": "audio/mystery-flower-sea.mp3",
+    "sha256": "c1bd59defb6d5b507408f0126dab3ef8d281403992231c254e97167a17b9acd9",
+    "durationSeconds": 60.10775,
+    "adaptation": "Original MP3 bytes, no re-encoding."
+  },
+  "board": {
+    "name": "玩具猫画板",
+    "sourceId": 160541,
+    "url": "https://mole.61.com/resource/goods/swf/160541.swf",
+    "nameEvidence": "https://mole.61.com/resource/xml/JDGoodsXmlData.xml",
+    "sha256": "9e37e344abb78431100ba1970156b0811969ab75326f5f816cc62f91527b0008",
+    "sprite": 54,
+    "frame": 1,
+    "rasterScale": 2,
+    "file": "message-board/board.png",
+    "imageSha256": "53c0613e2a06ac07a1cb5f29f6d0e31b4d89d3b8dd59d67366746d1d2f00da61",
+    "adaptation": "Original drawing-board artwork reused as the local wall memo entry. Not a claim that this is the official guestbook module; memo/to-do UI is authored for this app."
+  }
+}

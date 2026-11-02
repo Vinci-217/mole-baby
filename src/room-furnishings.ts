@@ -4,7 +4,7 @@ import originalFurniture from '../public/assets/original/furniture/catalog.json'
 export type Surface='wall'|'floor'
 export interface Placement {id:string;x:number;y:number}
 export interface RoomFurnishings {owned:string[];placed:Placement[]}
-export const hasRoomWall=(backgroundId:string)=>!['berry-picnic','sky-observatory'].includes(backgroundId)
+export const hasRoomWall=(backgroundId:string)=>!['berry-picnic','sky-observatory','mystery-flower-sea'].includes(backgroundId)
 export interface FurnitureDefinition {id:string;name:string;surface:Surface;price:number;width:number;image?:string;sourceId?:string}
 export const FURNITURE:readonly FurnitureDefinition[]=[
  ...originalFurniture.map(item=>({...item,surface:(item.surface==='wall'?'wall':'floor') as Surface})),

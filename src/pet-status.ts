@@ -6,8 +6,8 @@ export const STATUS_FIELDS: readonly [keyof PetStats,string][] = [
 ];
 // The simulation and help text share these values so rules cannot drift.
 export const NEED_RATES = {
- awake: {hunger:5,thirst:6,happiness:3,cleanliness:3.5,energy:4},
- asleep: {hunger:3,thirst:3,happiness:1,cleanliness:1.5,energy:-600},
+ awake: {hunger:2.5,thirst:3,happiness:1.5,cleanliness:1.75,energy:2},
+ asleep: {hunger:1.5,thirst:1.5,happiness:.5,cleanliness:.75,energy:-600},
 } as const;
 export const HEALTH_RECOVERY_PER_HOUR = 2;
 export const HEALTH_LOSS_PER_HOUR = 6;

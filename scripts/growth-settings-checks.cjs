@@ -14,13 +14,13 @@ async function verifyGrowthSettings(page,desktop){
   await page.clock.install({time:new Date(originalTime)});clock=true;await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+10000));
   await page.evaluate(()=>{
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
-   Object.assign(p,{growth:230,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,lastTick:now,coins:3000});
+   Object.assign(p,{growth:230,highestGrowth:230,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,lastTick:now,coins:3000});
    p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};p.inventory.biscuit=3;
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
    localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false}));
    localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:false}));
    const key='ramu-companion-memory-v1:'+p.createdAt,m=JSON.parse(localStorage.getItem(key));
-   if(m?.events?.[0]){m.events.push({...m.events[0],id:m.events[0].id+'-stage',kind:'stage-choice',detail:'曾经手动选择过阶段。'});localStorage.setItem(key,JSON.stringify(m))}
+   if(m?.events?.[0]){m.events=m.events.filter(event=>!['stage-choice','growth'].includes(event.kind));m.events.push({...m.events[0],id:m.events[0].id+'-stage',kind:'stage-choice',detail:'曾经手动选择过阶段。'});localStorage.setItem(key,JSON.stringify(m))}
   });
   if(desktop)await page.evaluate(async()=>{await window.desktop.setRoomFullscreen(false);await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
   await page.reload();await page.getByTestId('desktop-character').waitFor();
@@ -57,7 +57,7 @@ async function verifyGrowthSettings(page,desktop){
   const baseline=(await save()).growth;
   await stagePanel().getByRole('button',{name:'固定形态',exact:true}).click();assert.equal((await save()).growthLocked,false);
   await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();const confirm=page.getByRole('alertdialog',{name:'确认切换成长设置？',exact:true});
-  await expect(confirm).toContainText('当前阶段的成长进度会保留');assert.equal((await save()).growthLocked,false);
+  await expect(confirm).toContainText('已有成长进度和已解锁形态都会保留');assert.equal((await save()).growthLocked,false);
   await page.keyboard.press('Escape');await expect(confirm).toHaveCount(0);await expect(stagePanel()).toBeVisible();assert.equal((await save()).growthLocked,false);
   await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growthLocked,false);
   await applyGrowthSettings(page);assert.equal((await save()).growthLocked,true);assert.equal((await save()).growth,baseline);
@@ -68,10 +68,10 @@ async function verifyGrowthSettings(page,desktop){
   for(let n=0;n<2;n++){await page.reload();await enterHome(page);await roomTab(page,'成长');assert.equal((await save()).growthLocked,false);assert.ok((await save()).growth>=grown)}
 
   const identity=await save();await stagePanel().getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();
-  await expect(confirm).toContainText('从所选阶段的起点重新计算');await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growth,grown);
-  await applyGrowthSettings(page);assert.equal((await save()).growth,60);assert.equal((await save()).growthLocked,false);
+  await expect(confirm).toContainText('已有成长进度和已解锁形态都会保留');await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growth,grown);
+  await applyGrowthSettings(page,{mode:'fixed'});assert.equal((await save()).growth,60);assert.equal((await save()).growthLocked,true);assert.ok((await save()).highestGrowth>=grown);
   for(const key of ['createdAt','name','color','inventory','coins'])assert.deepEqual((await save())[key],identity[key]);
-  await page.clock.fastForward(3600000);assert.ok(Math.abs((await save()).growth-(60+120/72))<.001);
+  await page.clock.fastForward(3600000);assert.equal((await save()).growth,60);await applyGrowthSettings(page,{mode:'auto'});assert.ok(Math.abs((await save()).growth-grown)<.001);await page.clock.fastForward(3600000);assert.ok(Math.abs((await save()).growth-(grown+240/168))<.001);
   await roomTab(page,'学院');const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
   if(await language.getByRole('button',{name:'上这一课',exact:true}).count()){
    await language.getByRole('button',{name:'上这一课',exact:true}).click();const activity=(await save()).activity;
@@ -82,7 +82,7 @@ async function verifyGrowthSettings(page,desktop){
   // unloaded canvas looking blank even when the surrounding controls work.
   await page.clock.resume();await page.clock.setSystemTime(new Date(originalTime+Date.now()-wallStart));clock=false;
   await page.evaluate(()=>{
-   const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:230,growthLocked:false,sleeping:false,activity:undefined,outing:undefined,lastTick:Date.now()});
+   const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:230,highestGrowth:230,growthLocked:false,sleeping:false,activity:undefined,outing:undefined,lastTick:Date.now()});
    p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
   });
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});

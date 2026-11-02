@@ -1,0 +1,4 @@
+'use strict';
+const { _electron }=require('playwright'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),profile=fs.mkdtempSync(path.join(os.tmpdir(),'mole-v32-native-'));let desktop;
+(async()=>{desktop=await _electron.launch({executablePath:require('electron'),args:['--no-sandbox',root,`--user-data-dir=${profile}`],env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},cwd:root,timeout:30000});const page=await desktop.firstWindow();page.setDefaultTimeout(20000);const errors=[];page.on('pageerror',error=>errors.push(error.message));await require('./smoke-helpers.cjs').adopt(page,'蓝色','升级验证');await require('./v32-native-checks.cjs').verifyV32Native(page,desktop);if(errors.length)throw Error(JSON.stringify(errors));})().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await desktop?.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});});

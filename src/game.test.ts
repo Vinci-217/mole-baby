@@ -34,8 +34,8 @@ describe('time and sleep', () => {
   it('decays needs and grows only during healthy time without mutating input', () => {
     const original = fresh();
     const result = tick(original, NOW + HOUR);
-    expect(result.stats.hunger).toBe(77);
-    expect(result.stats.energy).toBe(81);
+    expect(result.stats.hunger).toBe(79.5);
+    expect(result.stats.energy).toBe(83);
     expect(result.growth).toBe(2.5);
     expect(original.stats.hunger).toBe(82);
     expect(original.growth).toBe(0);
@@ -78,10 +78,10 @@ describe('time and sleep', () => {
 
 describe('autonomous rest',()=>{
   it('sleeps at low energy, recovers while asleep and naturally wakes without user input',()=>{
-    const p={...fresh(),stats:{...fresh().stats,energy:24}};
+    const p={...fresh(),stats:{...fresh().stats,energy:22}};
     const asleep=tick(p,NOW+HOUR);expect(asleep.sleeping).toBe(true);expect(asleep.stats.energy).toBe(20);
     const resting=tick(asleep,NOW+HOUR+60_000);expect(resting.sleeping).toBe(true);expect(resting.stats.energy).toBe(30);
-    const awake=tick(resting,NOW+HOUR+7*60_000);expect(awake.sleeping).toBe(false);expect(awake.stats.energy).toBeCloseTo(84.966667,5);
+    const awake=tick(resting,NOW+HOUR+7*60_000);expect(awake.sleeping).toBe(false);expect(awake.stats.energy).toBeCloseTo(84.983333,5);
     expect(p.sleeping).toBe(false);
   });
   it('gives a manually woken pet a persisted grace period without forcing energy to refill',()=>{
@@ -167,7 +167,7 @@ describe('save validation', () => {
   it('round-trips a save and applies the time spent offline', () => {
     expect(parseSave(JSON.stringify(fresh()), NOW)).toEqual(fresh());
     const restored = parseSave(JSON.stringify(fresh()), NOW + HOUR);
-    expect(restored?.stats.hunger).toBe(77);
+    expect(restored?.stats.hunger).toBe(79.5);
     expect(restored?.growth).toBe(2.5);
   });
 
@@ -221,12 +221,13 @@ describe('original item catalogue', () => {
     expect(new Set(ITEMS.map(item => item.category))).toEqual(new Set(['food', 'drink', 'clean', 'medicine']));
     for (const item of ITEMS) {
       if(item.changesColor){expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);expect(item.localPrice).toBe(true);expect(item.originalPrice).toBe(0);expect(COLORS.some(c=>c.id===item.changesColor)).toBe(true);continue;}
+      if(item.id==='energy-drink'){expect(item.energy).toBe(100);expect(item.localPrice).toBe(true);expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);continue;}
       const original = source.get(item.sourceId)!;
       expect(original.Name).toBe(item.name);
-      expect(item.hunger).toBe(Number(original.Hungry));
-      expect(item.thirst).toBe(Number(original.Thirsty));
-      expect(item.cleanliness).toBe(Number(original.Sanitary));
-      expect(item.happiness).toBe(Number(original.Spirit));
+      expect(item.hunger).toBe(item.id==='180006'?100:Number(original.Hungry));
+      expect(item.thirst).toBe(item.id==='180006'?100:Number(original.Thirsty));
+      expect(item.cleanliness).toBe(item.id==='180006'?100:Number(original.Sanitary));
+      expect(item.happiness).toBe(item.id==='180006'?100:Number(original.Spirit));
       expect(item.price).toBeGreaterThan(0);
       expect(item.originalPrice).toBe(Number(original.Price));
       if (item.originalPrice > 0) expect(item.price).toBe(item.originalPrice);
@@ -347,7 +348,7 @@ describe('old saves and original needs', () => {
   });
 
   it('dehydrates, loses health under neglect without dying and recovers with sustained care', () => {
-    expect(tick(fresh(), NOW + HOUR).stats.thirst).toBe(76);
+    expect(tick(fresh(), NOW + HOUR).stats.thirst).toBe(79);
     const neglected = tick(fresh(), NOW + 24 * HOUR);
     expect(neglected.stats.health).toBeGreaterThanOrEqual(1);
     expect(neglected.stats.health).toBeLessThan(100);
@@ -416,7 +417,7 @@ describe('four original god-power evolution choices', () => {
       const ready = { ...createPet('小芽', color.id, NOW), growth: GROWTH_MAX };
       const result = evolvePet(ready, form.id, NOW);
       expect(result.ok).toBe(true);
-      expect(result.state).toEqual({ ...ready, evolution: form.id });
+      expect(result.state).toEqual({ ...ready, evolution: form.id,highestGrowth:GROWTH_MAX });
       expect(getStage(result.state.growth, result.state.evolution)).toBe(4);
       expect(parseSave(JSON.stringify(result.state), NOW)).toEqual(result.state);
       expect(evolvePet(result.state, 'fire', NOW).ok).toBe(false);
@@ -444,7 +445,8 @@ describe('deliberate settings stage selection', () => {
     const locked=changePetStage(current,2).state;expect(locked.growth).toBe(current.growth);expect(locked.growthLocked).toBe(true);expect(changePetStage(locked,2).state).toBe(locked);
     for(const stage of [-1,5,1.5,NaN])expect(changePetStage(current,stage as 0).ok).toBe(false);
     expect(changePetStage(current,4,'invalid' as 'super').ok).toBe(false);
-    expect(changePetStage(current,4).state.evolution).toBe('super');
+    expect(changePetStage(current,4).ok).toBe(false);
+    expect(changePetStage({...current,growth:GROWTH_MAX},4).state.evolution).toBe('super');
   });
 });
 
@@ -483,7 +485,7 @@ describe('manual stage selection stays fixed',()=>{
  it('preserves natural growth unless settings explicitly selected a stage',()=>{
   const time=1_700_000_000_000,p=createPet('豆','red',time);
   expect(tick(p,time+3_600_000).growth).toBeGreaterThan(0);
-  const locked=changePetStage(p,2,undefined,time).state;
+  const locked=changePetStage({...p,growth:STAGES[2].threshold},2,undefined,time).state;
   expect(tick(locked,time+3_600_000).growth).toBe(STAGES[2].threshold);
  });
  it('migrates recorded old manual choices before applying offline growth',()=>{

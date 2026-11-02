@@ -1,4 +1,6 @@
 import { ITEMS, getItem } from './catalog';
+import {normalizeNotes,normalizeStatHistory} from './pet-records';
+import type {PetNote,StatChange} from './pet-records';
 import {normalizeWardrobe} from './wardrobe';
 import {reconcileCourseRewards} from './course-rewards';
 import type {OutfitId} from './wardrobe';
@@ -47,6 +49,10 @@ export interface GameState {
   createdAt: number;
   lastTick: number;
   growth: number;
+  /** Highest earned progress; changing appearance never removes unlocks. */
+  highestGrowth?: number;
+  notes?: PetNote[];
+  statHistory?: StatChange[];
   /** Set only by an explicit stage choice in settings. */
   growthLocked?: boolean;
   evolution?: Evolution;
@@ -137,6 +143,7 @@ export function createPet(name: string, color: PetColor, now = Date.now()): Game
     createdAt: now,
     lastTick: now,
     growth: 0,
+    highestGrowth:0,notes:[],statHistory:[],
     coins: 100,
     stats: { hunger: 82, thirst: 82, happiness: 78, cleanliness: 88, health: 100, energy: 85 },
     inventory: Object.fromEntries(ITEMS.map(item => [item.id, 0])),
@@ -163,16 +170,33 @@ function validStageChoice(stage:Stage,evolution?:Evolution){
   return Number.isInteger(stage)&&stage>=0&&stage<=4&&(evolution===undefined||EVOLUTIONS.some(form=>form.id===evolution));
 }
 
-/** Deliberate local stage selection, separate from the slow natural growth clock. */
+/** Older releases recorded deliberate choices in companion memories. Recover
+ * those already visited milestones without changing or rewriting the memory. */
+export function legacyUnlockedGrowth(events:unknown):number{
+ if(!Array.isArray(events))return 0;
+ let highest=0;
+ for(const event of events.slice(-1000)){
+  if(!event||!['stage-choice','growth'].includes(event.kind)||typeof event.detail!=='string')continue;
+  for(const stage of STAGES)if(event.detail.includes(stage.name))highest=Math.max(highest,stage.threshold);
+  if(EVOLUTIONS.some(form=>event.detail.includes(form.name)))highest=GROWTH_MAX;
+ }
+ return highest;
+}
+export function earnedGrowth(state:GameState):number{return Math.max(state.growth,state.highestGrowth??0)}
+export function unlockedStage(state:GameState):Stage{
+ const progress=earnedGrowth(state);return (STAGES.reduce<number>((highest,stage,index)=>progress>=stage.threshold?index:highest,0)) as Stage;
+}
+/** Deliberate selection of an earned appearance, separate from progress. */
 export function changePetStage(state: GameState, stage: Stage, evolution?: Evolution, now = Date.now()): CareResult {
   if (!validStageChoice(stage,evolution)) {
     return { state, ok: false, message: '请选择一个拉姆阶段。' };
   }
+  if(stage>unlockedStage(state))return {state,ok:false,message:'这个形态还没有解锁，健康成长到达后就能固定，也能回到之前的形态。'};
   const form = stage === 4 ? evolution ?? state.evolution ?? 'super' : undefined;
   if (state.growthLocked && getStage(state.growth, state.evolution) === stage && state.evolution === form) {
     return { state, ok: true, message: `现在就是${STAGES[stage].name}啦。` };
   }
-  const next = { ...state, growth: getStage(state.growth,state.evolution)===stage && state.evolution===form ? state.growth : STAGES[stage].threshold, growthLocked: true, lastTick: Math.max(now,state.lastTick) };
+  const next = { ...state, highestGrowth:earnedGrowth(state), growth: getStage(state.growth,state.evolution)===stage && state.evolution===form ? state.growth : STAGES[stage].threshold, growthLocked: true, lastTick: Math.max(now,state.lastTick) };
   if (form) next.evolution = form; else delete next.evolution;
   return { state: next, ok: true, message: `已经切换为${form ? EVOLUTIONS.find(v => v.id === form)!.name : STAGES[stage].name}。` };
 }
@@ -183,11 +207,11 @@ export function evolvePet(state: GameState, evolution: Evolution, now = Date.now
   if(current.growthLocked)return {state:current,ok:false,message:'当前形态已在设置中固定，请在设置里选择神力形态。'};
   if (!form || current.evolution || current.growth < GROWTH_MAX) return { state: current, ok: false, message: '继续健康成长，等高级阶段的陪伴进度积满后再选择进化吧。' };
   if (current.sleeping) return { state: current, ok: false, message: '先轻轻叫醒拉姆，再一起选择成长的方向。' };
-  return { state: { ...current, evolution }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
+  return { state: { ...current, evolution,highestGrowth:earnedGrowth(current) }, ok: true, message: `${current.name}进化成了${form.name}！身体仍是最初领养时的颜色。` };
 }
 
 /** Settle elapsed time under the OLD mode before changing it. A mode-only
- * switch never resets growth; choosing another stage starts at its threshold. */
+ * switch never resets earned progress; fixed appearances use their threshold. */
 export function configureGrowth(state:GameState,selection:GrowthSelection,now=Date.now()):CareResult{
   if(!selection||!['auto','fixed'].includes(selection.mode)||!validStageChoice(selection.stage,selection.evolution)||!Number.isFinite(now))return {state,ok:false,message:'请选择有效的成长设置。'};
   const current=tick(state,Math.max(now,state.lastTick));
@@ -198,6 +222,8 @@ export function configureGrowth(state:GameState,selection:GrowthSelection,now=Da
   const changed=changePetStage(current,targetStage,sameAppearance?current.evolution:selection.evolution,current.lastTick);
   if(!changed.ok)return changed;
   const next={...changed.state,growthLocked:selection.mode==='fixed'};
+  if(selection.mode==='auto'){next.growth=earnedGrowth(current);if(next.growth<GROWTH_MAX)delete next.evolution;else next.evolution??=current.evolution;}
+  next.highestGrowth=earnedGrowth(next);
   const label=next.evolution?EVOLUTIONS.find(form=>form.id===next.evolution)!.name:STAGES[getStage(next.growth,next.evolution)].name;
   return {state:next,ok:true,message:selection.mode==='auto'?`已从${label}继续自动成长，进度会保存。`:`已固定为${label}，成长进度已保留。`};
 }
@@ -232,6 +258,7 @@ function advanceStats(state: GameState, now: number): GameState {
     ...state,
     lastTick: now,
     growth: state.growthLocked ? state.growth : growForHours(state.growth, healthyHours),
+    highestGrowth: Math.max(earnedGrowth(state),state.growthLocked?state.growth:growForHours(state.growth,healthyHours)),
     stats: {
       hunger: rounded(clamp(state.stats.hunger - hours * rates.hunger)),
       thirst: rounded(clamp(state.stats.thirst - hours * rates.thirst)),
@@ -278,7 +305,8 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
       ok: true,
     };
   }
-  if (current.sleeping) return { state: current, message: '小拉姆正在休息，先轻轻叫醒它吧。', ok: false };
+  const restorative=['180006','energy-drink'].includes(foodId??'')&&['feed','drink','wash','use'].includes(action);
+  if (current.sleeping&&!restorative) return { state: current, message: '小拉姆正在休息，先轻轻叫醒它吧。', ok: false };
   const stats = { ...current.stats };
 
   if (action === 'feed' || action === 'drink' || action === 'wash' || action === 'use') {
@@ -294,16 +322,16 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
       if (current.color === item.changesColor) return {state:current,ok:false,message:'已经是这个颜色啦，药水先收好。'};
       return {state:{...current,color:item.changesColor,inventory:{...current.inventory,[item.id]:current.inventory[item.id]-1}},ok:true,message:`咕嘟～换成${petColorName(item.changesColor)}啦，还是陪着你的我。`};
     }
-    const keys = ['hunger', 'thirst', 'cleanliness', 'happiness', 'health'] as const;
-    if (!keys.some(key => item[key] > 0 && stats[key] < 100)) {
+    const keys = ['hunger', 'thirst', 'cleanliness', 'happiness', 'health', 'energy'] as const;
+    if (!keys.some(key => (item[key]??0) > 0 && stats[key] < 100)) {
       const message = item.category === 'food' ? '肚子饱饱的，留着等会儿再吃吧。'
         : item.category === 'drink' ? '已经喝饱啦，饮品先留在背包里。'
           : item.category === 'clean' ? '已经洗得香喷喷啦，清洁用品先收好。' : '身体很健康，药水先留着吧。';
       return { state: current, message, ok: false };
     }
-    for (const key of keys) stats[key] = clamp(stats[key] + item[key]);
+    for (const key of keys) stats[key] = clamp(stats[key] + (item[key]??0));
     return {
-      state: { ...current, stats, inventory: { ...current.inventory, [item.id]: current.inventory[item.id] - 1 } },
+      state: { ...current, stats,...(restorative?{sleeping:false,sleepUntil:0,awakeUntil:now+WAKE_GRACE_MS}:{}), inventory: { ...current.inventory, [item.id]: current.inventory[item.id] - 1 } },
       message: item.category === 'clean' ? `${item.name}的泡泡香香的，洗干净啦！`
         : item.category === 'drink' ? `咕嘟咕嘟，${item.name}真解渴！`
           : item.category === 'medicine' ? '喝过药水，身体舒服多啦。谢谢你照顾我！' : `啊呜！${item.name}真好吃，谢谢你。`,
@@ -436,6 +464,8 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       createdAt: value.createdAt,
       lastTick: value.lastTick,
       growth: value.growth,
+      highestGrowth:Math.max(value.growth,isNumberIn(value.highestGrowth,0,GROWTH_MAX)?value.highestGrowth:0),
+      notes:normalizeNotes(value.notes),statHistory:normalizeStatHistory(value.statHistory),
       ...(typeof value.growthLocked==='boolean'?{growthLocked:value.growthLocked}:manualStageSelected?{growthLocked:true}:{}),
       ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,

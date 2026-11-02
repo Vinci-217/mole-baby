@@ -1,8 +1,13 @@
 const PET_SIZE = Object.freeze({ width: 160, height: 240 });
 const PET_PADDING = Object.freeze({ left: 30, right: 30, top: 71, bottom: 61 });
 
+function scaledPetMetrics(scale=1){
+ return {size:{width:Math.round(160*scale),height:Math.round(240*scale)},padding:Object.fromEntries(Object.entries(PET_PADDING).map(([key,n])=>[key,n*scale]))};
+}
+module.exports.scaledPetMetrics=scaledPetMetrics;
 /** Transparent margins may leave the work area; the 100×108 pet body may not. */
-function fitPetBounds(bounds, area) {
+function fitPetBounds(bounds, area,scale=1) {
+  const {size:PET_SIZE,padding:PET_PADDING}=scaledPetMetrics(scale);
   const left = area.x - PET_PADDING.left;
   const right = area.x + area.width - PET_SIZE.width + PET_PADDING.right;
   const top = area.y - PET_PADDING.top;
@@ -17,7 +22,8 @@ function fitPetBounds(bounds, area) {
 }
 
 // Only an actual body touch docks. Order resolves an exact corner tie stably.
-function cornerSide(bounds, area) {
+function cornerSide(bounds, area,scale=1) {
+  const {size:PET_SIZE,padding:PET_PADDING}=scaledPetMetrics(scale);
   const distances = [
     ['left', Math.abs(bounds.x + PET_PADDING.left - area.x)],
     ['right', Math.abs(area.x + area.width - bounds.x - PET_SIZE.width + PET_PADDING.right)],
@@ -30,20 +36,21 @@ function cornerSide(bounds, area) {
   return closest;
 }
 
-function cornerBounds(bounds, area, side) {
+function cornerBounds(bounds, area, side,scale=1) {
+  const {size:PET_SIZE,padding:PET_PADDING}=scaledPetMetrics(scale);
   const next = { ...bounds };
   if (side === 'left') next.x = area.x - PET_PADDING.left;
   if (side === 'right') next.x = area.x + area.width - PET_SIZE.width + PET_PADDING.right;
   if (side === 'top') next.y = area.y - PET_PADDING.top;
   if (side === 'bottom') next.y = area.y + area.height - PET_SIZE.height + PET_PADDING.bottom;
-  return fitPetBounds(next, area);
+  return fitPetBounds(next, area,scale);
 }
 
 /** Renderer target translation; native bounds remain anchored to the body edge. */
-function edgeOffset(side,pose,form='junior') {
+function edgeOffset(side,pose,form='junior',scale=1) {
  if(pose==='visible'||!['tucking','hidden','peek'].includes(pose))return{x:0,y:0};
  const profile=require('./edge-visibility.json').forms[form]??require('./edge-visibility.json').forms.junior;
- const amount=profile[pose==='peek'?'peek':'hidden'][side];if(!Number.isFinite(amount))return{x:0,y:0};
+ const amount=profile[pose==='peek'?'peek':'hidden'][side]*scale;if(!Number.isFinite(amount))return{x:0,y:0};
  return {x:side==='left'?-amount:side==='right'?amount:0,y:side==='top'?-amount:side==='bottom'?amount:0};
 }
 
@@ -52,23 +59,24 @@ function canAnimateDesktop(state) {
 }
 
 /** Deliberate roaming in a wider, bounded area around the last manual placement. */
-function nearbyWanderTarget(bounds,area,anchor=bounds,random=Math.random){
- const start=fitPetBounds(bounds,area),home=fitPetBounds(anchor,area);
+function nearbyWanderTarget(bounds,area,anchor=bounds,random=Math.random,scale=1){
+ const start=fitPetBounds(bounds,area,scale),home=fitPetBounds(anchor,area,scale);
  const distance=28+Math.round(random()*36),angle=random()*Math.PI*2;
  const x=Math.max(home.x-150,Math.min(home.x+150,start.x+Math.cos(angle)*distance));
  const y=Math.max(home.y-100,Math.min(home.y+100,start.y+Math.sin(angle)*distance*.65));
- return fitPetBounds({...start,x,y},area);
+ return fitPetBounds({...start,x,y},area,scale);
 }
 
-module.exports = { PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget };
+module.exports = { scaledPetMetrics, PET_SIZE, PET_PADDING, fitPetBounds, cornerSide, cornerBounds, edgeOffset, canAnimateDesktop, nearbyWanderTarget };
 
 /** A 216px pocket follows the pet without changing its physical anchor. */
-function compactPanelBounds(base, area) {
-  const width=212,height=216,gap=20,margin=4;
-  const right=base.x+PET_PADDING.left+100+gap,left=base.x+PET_PADDING.left-width-gap;
+function compactPanelBounds(base, area,scale=1) {
+  const {size:PET_SIZE,padding:PET_PADDING}=scaledPetMetrics(scale);
+  const width=Math.round(212*scale),height=Math.round(216*scale),gap=20*scale,margin=4;
+  const right=base.x+PET_PADDING.left+100*scale+gap,left=base.x+PET_PADDING.left-width-gap;
   const side=right+width<=area.x+area.width-margin?'right':'left';
   const x=Math.round(Math.max(area.x+margin,Math.min(side==='right'?right:left,area.x+area.width-width-margin)));
-  const y=Math.round(Math.max(area.y+margin,Math.min(base.y+PET_PADDING.top-54,area.y+area.height-height-margin)));
+  const y=Math.round(Math.max(area.y+margin,Math.min(base.y+PET_PADDING.top-54*scale,area.y+area.height-height-margin)));
   const hostX=Math.min(base.x,x),hostY=Math.min(base.y,y);
   return {bounds:{x:hostX,y:hostY,width:Math.max(base.x+PET_SIZE.width,x+width)-hostX,height:Math.max(base.y+PET_SIZE.height,y+height)-hostY},panelSide:side,geometry:{petX:base.x-hostX,petY:base.y-hostY,panelX:x-hostX,panelY:y-hostY,panelWidth:width,panelHeight:height,scale:1}};
 }
@@ -76,9 +84,10 @@ module.exports.compactPanelBounds=compactPanelBounds;
 
 /** Expand the transparent host, keeping the pet's screen anchor unchanged.
  * Only the physical display clips effects; their scale never depends on it. */
-function effectWindowBounds(base,area,effect){
+function effectWindowBounds(base,area,effect,scale=1){
+ const {size:PET_SIZE}=scaledPetMetrics(scale);
  // Reserve a few pixels for fractional CSS registration and antialiased ink.
- const margin=4;
+ const margin=4*scale;
  const x=Math.floor(Math.min(base.x,Math.max(area.x,base.x+effect.x-margin)));
  const y=Math.floor(Math.min(base.y,Math.max(area.y,base.y+effect.y-margin)));
  const right=Math.ceil(Math.max(base.x+PET_SIZE.width,Math.min(area.x+area.width,base.x+effect.x+effect.width+margin)));

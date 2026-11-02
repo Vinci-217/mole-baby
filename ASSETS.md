@@ -279,3 +279,15 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 `public/assets/original/color-mixer/`导出自原调色模块`colorEditor.swf`。官网请求被环境拒绝，实际文件来自固定提交的Miigon/RecMoleRes社区归档；下载记录、原SWF、原客户端控制类见`research/references/color-mixing/`。原玩法给摩尔玩家调色，本项目新增装瓶、背包与拉姆持久换色流程。
 
 中性WebP纹理允许最多1级RGB压缩差，无损遮罩恢复精确透明度；全纹理校验、952个源整帧透明度重建和每页散列见转换/核验脚本及来源目录。`docs/previews/v31/`的71组GIF从同一帧表重建，全部原件和日常动作可在README预览；GIF、SWF、研究目录不进入安装包。完整覆盖与限制见[本轮调研](research/v31-original-actions-and-colour-mixing.md)。
+
+## v0.32 · 神秘花海与留言板入口
+
+本轮核对官网可公开读取的客户端文件，并与既有社区存档比对。逐文件 SHA-256、名称依据、原 URL、导出字符和适配范围见 [house-upgrade-sources.json](public/assets/original/house-upgrade-sources.json)。
+
+- 神秘花海：官网 `resource/map/Map_10362.swf`，导出符号 `RES_Map362` 的背景位图 character 5（`bg_mc`），原 JPEG 解码成 PNG；未重绘，未把控制区域、引导图层、过场遮罩和空白定位范围烘焙进背景。
+- 花海 BGM：官网 `resource/bgSounds/BGM_131.mp3` 原字节。名称按既有 `audio/map-sounds.xml` 的地图362注释核对，音频实际解码检查通过。
+- 留言入口：官网 `resource/goods/swf/160541.swf` 的「玩具猫画板」，名称对照官网 `JDGoodsXmlData.xml`。原 sprite54 第一帧2倍栅格化并裁掉透明留白，复用作墙上待办入口；这是原画板的本地用途适配，并非声称已经找到官方留言板完整模块。便签文本、完成状态、编辑和删除由 React 编写，保存在本机。
+
+本轮参考观察：画板外轮廓为深粉短折线与弧线；猫耳框和叶形夹子夸张；粉、白、紫用少量实色；金属/塑料仅保留短高光；小屋墙面入口避开中央拉姆和底栏，弹窗留出正文与操作空间。新增待办 UI 沿用原橙黄/白面板，角色、眼睛、身体和动作帧保持原资源。
+
+精力饮料复用运动可乐的原图和对应喝饮料动作，名称、70豆价格和精力补满效果为桌宠设计；原十字架180006保留原图/库存ID/原片，六项补满为本地适配。没有把未经确认身份的音频冒充「拉姆比伯」录音；原小游戏音效来源继续见 `game-audio/sources.json`。

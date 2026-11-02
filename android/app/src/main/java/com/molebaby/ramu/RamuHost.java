@@ -38,7 +38,7 @@ final class RamuHost {
     private final ConcurrentHashMap<String,CompletableFuture<Boolean>> saveWaiters=new ConcurrentHashMap<>();
     RamuHost(Context context){this.context=context;store=new PetStore(context);resources=new ResourcePack(context);controller=new PetController(this);updates=new AndroidUpdates(this);}
     void ensure(){if(web!=null){if(activity!=null)activity.attachWeb();return;}if(preparing)return;preparing=true;prepareError=null;
-        io.execute(()->{try{resources.prepare(progress->{prepareProgress=progress;main.post(()->{if(activity!=null)activity.showProgress(progress);});});main.post(()->{preparing=false;try{android.content.pm.PackageInfo provider=WebView.getCurrentWebViewPackage();if(provider!=null&&Integer.parseInt(provider.versionName.split("\\.")[0])<108)throw new IllegalStateException("WebView 版本过旧");createWeb();}catch(Exception error){web=null;if(activity!=null)activity.showFailure("系统 WebView 无法打开。请在应用管理中启用或升级 Android System WebView / Chrome 到 108 或更新版本，再回来重试。");}});}catch(Exception e){prepareError=e.getMessage();main.post(()->{preparing=false;if(activity!=null)activity.showFailure("素材准备失败："+prepareError);});}});
+        io.execute(()->{try{resources.prepare(progress->{prepareProgress=progress;main.post(()->{if(activity!=null)activity.showProgress(progress);});});main.post(()->{preparing=false;try{createWeb();}catch(RuntimeException|LinkageError error){android.util.Log.e("RamuHost","WebView startup failed",error);detachWeb();if(web!=null){web.destroy();web=null;}loaded=false;if(activity!=null)activity.showFailure("小屋暂时没能打开（"+error.getClass().getSimpleName()+"）。点击重试即可；存档不会删除。无需修改系统 WebView 设置。");}});}catch(Exception e){prepareError=e.getMessage();main.post(()->{preparing=false;if(activity!=null)activity.showFailure("素材准备失败："+prepareError);});}});
     }
     @android.annotation.SuppressLint({"SetJavaScriptEnabled","JavascriptInterface"})
     void createWeb(){
@@ -47,8 +47,13 @@ final class RamuHost {
         web=new WebView(webContext){@Override public boolean onTouchEvent(MotionEvent event){controller.touch(event);return super.onTouchEvent(event);}};
         web.setBackgroundColor(Color.TRANSPARENT);web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         WebSettings settings=web.getSettings();settings.setJavaScriptEnabled(true);settings.setDomStorageEnabled(true);settings.setAllowFileAccess(false);settings.setAllowContentAccess(false);settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);settings.setMediaPlaybackRequiresUserGesture(false);settings.setSupportMultipleWindows(false);settings.setSupportZoom(false);settings.setTextZoom(100);
-        if(Build.VERSION.SDK_INT>=29)settings.setForceDark(WebSettings.FORCE_DARK_OFF);
-        if(WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING))WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings,false);
+        // Huawei/other OEM providers use their own package version scheme.
+        // A provider's app version is not its Chromium version. Optional colour
+        // features must never prevent the game from opening.
+        try{
+            if(WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING))WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings,false);
+            else if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK))WebSettingsCompat.setForceDark(settings,WebSettingsCompat.FORCE_DARK_OFF);
+        }catch(RuntimeException|LinkageError optionalFeature){android.util.Log.w("RamuHost","Provider does not support optional darkening control",optionalFeature);}
         WebViewAssetLoader loader=new WebViewAssetLoader.Builder().addPathHandler("/",this::asset).build();
         web.addJavascriptInterface(new NativeBridge(this),"MoleAndroid");
         web.setWebViewClient(new WebViewClient(){
@@ -87,6 +92,7 @@ final class RamuHost {
             return new WebResourceResponse(mime,null,slice.status(),slice.status()==206?"Partial Content":"OK",headers,MediaRange.open(file,slice));
         }catch(IOException e){return blocked();}
     }
+    void retryWeb(){store.flush();controller.detach();detachWeb();if(web!=null){web.destroy();web=null;}loaded=false;ensure();}
     void detachWeb(){if(web!=null&&web.getParent() instanceof ViewGroup group)group.removeView(web);}
     void event(String type,JSONObject value){main.post(()->{if(web!=null&&loaded)web.evaluateJavascript("window.__moleAndroidEvent?.("+JSONObject.quote(type)+","+value+")",null);});}
     void reply(String id,Object value,String error){main.post(()->{if(web!=null)web.evaluateJavascript("window.__moleAndroidReceive?.("+JSONObject.quote(id)+","+(value==null?"null":value instanceof String?JSONObject.quote((String)value):value.toString())+","+(error==null?"null":JSONObject.quote(error))+")",null);});}

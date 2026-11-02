@@ -17,6 +17,7 @@ async function main() {
   const unpacked=path.join(release,arch==='ia32'?'win-ia32-unpacked':'win-unpacked');
   const name=`${legacy?runtime.productName:build.productName}.exe`,executable=path.join(unpacked,name);
   const architectures=[arch==='ia32'?'x86':'x64'];
+  for(const guide of ['先看这里-启动说明.txt','启动拉姆.cmd'])requireFile(path.join(unpacked,guide));
   inspectPe(requireFile(executable),{architectures,label:name});
   inspectPe(requireFile(path.join(release,files[1])),{architectures:['x86','x64'],label:'NSIS installer'});
   const zip=await verifyPortableZip(path.join(release,files[0]),unpacked,name,architectures);

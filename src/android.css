@@ -1,13 +1,13 @@
 /* Mobile layout is opt-in; desktop windows retain their existing geometry. */
 html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
-.android-host body,.android-host #root{margin:0;min-width:0;width:100%;min-height:100dvh;overscroll-behavior:none}
+.android-host body,.android-host #root{margin:0;min-width:0;width:100%;min-height:var(--app-height,100vh);overscroll-behavior:none}
 .android-host button,.android-host input,.android-host select{touch-action:manipulation}
-.android-host:not(.pet-mode) .classic-app{min-height:100dvh;height:auto;min-width:0;padding:0 0 12px;overflow-x:clip}
+.android-host:not(.pet-mode) .classic-app{min-height:var(--app-height,100vh);height:auto;min-width:0;padding:0 0 12px;overflow-x:clip}
 .android-host .window-bar,.android-host .window-controls,.android-host .room-resize-handles{display:none!important}
 .android-host .classic-titlebar{display:none!important}
-.android-host .cottage-scene{position:relative;inset:0;min-height:100dvh;height:100dvh;min-width:0;overflow:hidden}
+.android-host .cottage-scene{position:relative;inset:0;min-height:var(--app-height,100vh);height:var(--app-height,100vh);min-width:0;overflow:hidden}
 .android-host .game-backdrop{padding:8px;align-items:center}
-.android-host .game-panel{width:min(720px,100%);min-width:0;max-height:calc(100dvh - 16px);display:flex;flex-direction:column;overflow:hidden}
+.android-host .game-panel{width:min(720px,100%);min-width:0;max-height:calc(var(--app-height,100vh) - 16px);display:flex;flex-direction:column;overflow:hidden}
 .android-host .game-panel .panel-paper{overflow:auto;min-height:0;padding:10px}
 .android-host .game-panel .panel-header{flex-shrink:0;min-height:52px}
 .android-host .classic-dock.room-dock{bottom:34px;left:8px;right:8px;width:auto;min-width:0;max-width:none;transform:none}
@@ -19,8 +19,8 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .scene-top-actions button{min-height:40px;font-size:13px}
 .android-host .scene-top-actions .manor-site-button{display:none}
 .android-host .cottage{min-width:0}
-.android-host .room-scene{min-height:300px;height:clamp(300px,50dvh,540px)}
-.android-host .game-dialog,.android-host .paper-dialog{max-width:calc(100vw - 16px);max-height:calc(100dvh - 20px);margin:8px;overflow:auto;min-width:0}
+.android-host .room-scene{min-height:300px;height:clamp(300px,calc(var(--app-height,100vh) * .5),540px)}
+.android-host .game-dialog,.android-host .paper-dialog{max-width:calc(100vw - 16px);max-height:calc(var(--app-height,100vh) - 20px);margin:8px;overflow:auto;min-width:0}
 .android-host .classic-app .paper-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;scrollbar-width:none;flex-shrink:0}
 .android-host .paper-tabs button{white-space:nowrap;min-height:44px;min-width:52px}
 .android-host .settings-panel{min-width:0;max-width:100%;padding:10px}
@@ -33,8 +33,8 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .game-button{min-height:42px}
 .android-host .paper-dialog input:not([type=range]):not([type=checkbox]){font-size:16px}
 .android-host .game-overlay{inset:0;padding:8px;overflow:hidden;align-items:flex-start}
-.android-host .game-overlay>*{min-width:0;max-width:100%;max-height:calc(100dvh - 16px);overflow:auto}
-.android-host .game-overlay>.game-panel{overflow:hidden;margin:0;max-height:calc(100dvh - 16px)}
+.android-host .game-overlay>*{min-width:0;max-width:100%;max-height:calc(var(--app-height,100vh) - 16px);overflow:auto}
+.android-host .game-overlay>.game-panel{overflow:hidden;margin:0;max-height:calc(var(--app-height,100vh) - 16px)}
 .android-host .classic-app .game-panel .panel-header{height:52px;min-height:52px;margin:0;padding:10px 48px 10px 14px;justify-content:flex-start}
 .android-host .classic-app .game-panel .round-close{top:6px;right:8px;min-width:40px;min-height:40px;line-height:40px;font-size:26px}
 .android-host .classic-app .game-panel .paper-tabs{flex-wrap:nowrap;flex-shrink:0;overflow-x:auto}
@@ -83,7 +83,7 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
  .android-host .color-mixer-game{padding:14px}
  .android-host .color-mixer-stage{gap:4px;min-height:170px}
  .android-host .mixing-preview{min-width:100px;width:110px}
- .android-host .adoption-panel{width:calc(100vw - 24px);max-height:calc(100dvh - 32px);overflow:auto}
+ .android-host .adoption-panel{width:calc(100vw - 24px);max-height:calc(var(--app-height,100vh) - 32px);overflow:auto}
  .android-host .adoption-header h1{font-size:26px}
  .android-host .pet-plaque{left:10px;top:140px;width:116px;height:auto;min-height:70px;padding:9px;border:1px solid #dbc291;border-image:none;border-radius:12px;background:#fffdf2}
  .android-host .pet-plaque strong{font-size:17px}

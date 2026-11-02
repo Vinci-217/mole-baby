@@ -3,7 +3,7 @@ import {createPet,changePetStage,parseSave,type GameState} from './game';
 import {beginActivity,settleActivity,cancelActivity,learned,normalizeEducation,type CourseId} from './pet-school';
 import {ELEMENT_SKILLS,elementSkillsForCourse,learnedElementSkill} from './element-skills';
 const now=1_700_000_000_000;
-const basic=()=>changePetStage(createPet('豆豆','blue',now),1,undefined,now).state;
+const basic=()=>changePetStage({...createPet('豆豆','blue',now),growth:60,highestGrowth:840},1,undefined,now).state;
 function complete(pet:GameState,course:CourseId){const start=beginActivity({...pet,stats:{...pet.stats,energy:95}},'course',course,pet.lastTick+1);expect(start.ok).toBe(true);return settleActivity(start.state,start.state.activity!.endsAt)}
 describe('original element lessons and save migration',()=>{
  it('unlocks the reusable magic box after one completed introductory lesson',()=>{

@@ -16,11 +16,11 @@ describe('confirmed growth configuration',()=>{
   expect(auto.growth).toBe(fixed.growth);expect(auto.growthLocked).toBe(false);
   expect(tick(auto,NOW+4*HOUR).growth).toBeCloseTo(auto.growth+240/168,5);
  });
- it('starts a different stage at its threshold while retaining identity and possessions',()=>{
+ it('restores earned progress when returning to automatic growth while retaining possessions',()=>{
   const start={...pet(),coins:651,inventory:{...pet().inventory,biscuit:7}};
   const changed=configureGrowth(start,{mode:'auto',stage:1},NOW);
-  expect(changed.ok).toBe(true);expect(changed.state).toMatchObject({growth:60,growthLocked:false,name:start.name,color:start.color,coins:651,inventory:start.inventory});
-  expect(tick(changed.state,NOW+HOUR).growth).toBeCloseTo(60+120/72,5);expect(start.growth).toBe(240);
+  expect(changed.ok).toBe(true);expect(changed.state).toMatchObject({growth:240,growthLocked:false,name:start.name,color:start.color,coins:651,inventory:start.inventory});
+  expect(tick(changed.state,NOW+HOUR).growth).toBeCloseTo(240+240/168,5);expect(start.growth).toBe(240);
  });
  it('round-trips auto mode despite old manual-stage history over repeated restarts',()=>{
   let state=configureGrowth({...pet(),growthLocked:true},{mode:'auto',stage:2},NOW).state;
@@ -49,8 +49,8 @@ describe('confirmed growth configuration',()=>{
  });
  it.each(['auto','fixed'] as const)('supports every stage in %s mode without consuming items',mode=>{
   for(const [stage,definition] of STAGES.entries()){
-   const next=configureGrowth(pet(),{mode,stage:stage as 0,evolution:stage===4?'water':undefined},NOW).state;
-   expect(next.growth).toBe(stage===2?240:definition.threshold);expect(next.growthLocked).toBe(mode==='fixed');
+   const next=configureGrowth({...pet(),highestGrowth:840},{mode,stage:stage as 0,evolution:stage===4?'water':undefined},NOW).state;
+   expect(next.growth).toBe(mode==='auto'?840:stage===2?240:definition.threshold);expect(next.growthLocked).toBe(mode==='fixed');
    expect(next.evolution).toBe(stage===4?'water':undefined);expect(next.inventory).toEqual(pet().inventory);
   }
  });
