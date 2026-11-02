@@ -195,7 +195,15 @@ export default function App() {
     const desktop = window.desktop; if (!desktop) return;
     if (awaitingAdoption.current) { desktop.readyToShow(false); return; }
     let cancelled = false;
-    void desktop.setPetMode(desktop.platform==='android'?false:hasPet).then(() => requestAnimationFrame(() => requestAnimationFrame(() => { if (!cancelled) desktop.readyToShow(hasPet); }))).catch(() => notify(desktop.platform==='android'?'小屋暂时未能打开，请重试。':'窗口暂时未能准备好，请从托盘重试。'));
+    const ready = () => requestAnimationFrame(() => requestAnimationFrame(() => { if (!cancelled) desktop.readyToShow(hasPet); }));
+    void desktop.setPetMode(desktop.platform==='android'?false:hasPet).then(ready).catch(() => {
+      // A native window can reject a mode change while it is still restoring
+      // its first bounds. The renderer is already usable; reveal it so the
+      // user can retry from the tray instead of leaving a permanently hidden
+      // adoption/normal window.
+      notify(desktop.platform==='android'?'小屋暂时未能打开，请重试。':'窗口暂时未能准备好，请从托盘重试。');
+      ready();
+    });
     if (hasPet && petRef.current) speak(welcomeLine(petRef.current, loadMemory(petRef.current)));
     return () => { cancelled = true; };
   }, [hasPet, notify, speak]);
