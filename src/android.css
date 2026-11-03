@@ -44,6 +44,8 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .classic-dock button{min-width:60px;flex-shrink:0;font-size:14px}
 .android-host .classic-dock button img{width:42px;height:42px}
 .android-host .classic-dock.room-dock button{height:64px;min-width:60px;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;padding:2px;grid-row:auto}
+.android-host .classic-app .scene-top-actions{max-width:100%;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;scrollbar-width:none;padding-bottom:3px}
+.android-host .classic-app .scene-top-actions::-webkit-scrollbar{display:none}
 .android-host .care-pocket{max-width:100%}
 .android-host:not(.pet-mode) .care-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .android-host:not(.pet-mode) .care-cell{min-width:0;aspect-ratio:1}

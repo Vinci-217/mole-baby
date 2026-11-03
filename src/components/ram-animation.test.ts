@@ -78,7 +78,7 @@ describe('continuous original airborne posture',()=>{
   const step=1000/24;
   for(const form of ['senior','super','water','wood','fire']){
    const starts=form==='super'?[1,4,6,9,11,14,16,19]:form==='senior'?[1,2,3,4,5,6,7,8]:[1,2,3,4,6,7,8,9];
-   const count=form==='super'?21:11;
+   const count=form==='super'?20:11;
    for(let source=1;source<=count;source++){
     const t=(source-1)*step+.1,frame=starts.filter(s=>s<=source).length-1;
     expect(sampleFlyingPose('walk-left',0,false,form,t)).toEqual({row:2,frame,finished:false});

@@ -11,10 +11,6 @@
 .status-history time{font-size:10px;color:#8b7967}
 .status-pocket .status-history{font-size:10px;margin:5px 0}
 .status-pocket:has(.pocket-rules){overflow:auto}
-.room-message-board{position:absolute;left:59%;top:25%;width:110px;max-width:21%;z-index:4;display:flex;flex-direction:column;align-items:center;color:#6a431b;font-size:13px;text-shadow:0 1px #fff2b9}
-.room-message-board img{width:100%;height:84px;object-fit:contain}
-.room-message-board small{font-size:10px;background:#fff9df;padding:2px 6px;border-radius:6px}
-.room-message-board.outdoors{left:20px;top:40%;}
 .message-board{color:#765131;line-height:1.7}
 .message-board header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .message-board header span{font-size:12px}
@@ -31,6 +27,20 @@
 .message-board li button{text-decoration:underline;padding:4px}
 .board-empty{text-align:center;padding:24px}
 .board-save-note{font-size:12px;color:#8b7762}
+.official-memo-board{max-width:720px;margin:0 auto;padding:18px 20px 16px;background:linear-gradient(180deg,#fff8db,#fffdf1 28%,#fff8df);border:3px solid #e2a849;border-radius:14px;box-shadow:inset 0 0 0 3px #fff2b4,0 5px 14px #70431e1f;color:#70451f}
+.memo-board-title{padding:4px 6px 12px;border-bottom:2px solid #e9bc63}
+.memo-board-kicker{display:block;color:#b26a20;font-size:11px;letter-spacing:1px}
+.memo-board-title h3{margin:0;color:#a3481c;font-size:28px;letter-spacing:3px;text-shadow:1px 1px #ffe7a7}
+.memo-board-count{font-size:12px;color:#8c6231;white-space:nowrap}
+.memo-board-intro{margin:10px 6px 14px;font-size:13px;color:#8b6b42}
+.memo-board-compose{background:#fffdf2;border:1px solid #e5c687;border-radius:10px;box-shadow:0 2px 0 #e9d5ab;padding:12px}
+.official-memo-board ul{margin:18px 2px;padding:0;list-style:none}
+.official-memo-board li{position:relative;padding:12px 12px 9px 13px;margin:0 0 9px;border:1px solid #e4c783;border-radius:6px;background:#fffef7;box-shadow:0 2px 0 #ecdcb7}
+.official-memo-board li:before{content:'';position:absolute;left:-1px;top:-1px;bottom:-1px;width:5px;background:#f0ad48;border-radius:6px 0 0 6px}
+.official-memo-board li.is-done{background:#f3f0e5}
+.warehouse-drag-card{cursor:grab;outline:1px dashed #dfaa4a;outline-offset:-4px}
+.warehouse-drag-card:active{cursor:grabbing}
+.warehouse-drag-hint{font-size:11px;color:#ad6d25;text-align:center}
 @media(max-width:700px),(max-height:600px){
  .classic-app .cottage-top{padding:12px;gap:8px;flex-wrap:wrap}
  .classic-app .classic-logo{width:70px;flex-shrink:0}
@@ -39,23 +49,20 @@
  .classic-app .scene-top-actions button{min-width:0;font-size:11px;padding:5px 8px;min-height:30px}
  .classic-app .scene-top-actions .coin-sign{font-size:10px}
  .classic-app .pet-plaque{top:100px;left:12px;min-width:112px;font-size:11px;max-width:43%}
- .classic-app .room-message-board{top:31%;left:67%;width:82px;font-size:11px}
- .classic-app .room-message-board img{height:60px}
- .classic-app .room-dock{left:6px;right:6px;min-width:0;width:auto;max-width:none;transform:none;gap:3px;bottom:23px;padding:5px 3px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));}
- .classic-app .room-dock button{min-width:0;padding:1px;font-size:10px}
+ .classic-app .room-dock{left:6px;right:6px;min-width:0;width:auto;max-width:none;transform:none;gap:6px;bottom:23px;padding:5px 8px;display:flex;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
+ .classic-app .room-dock::-webkit-scrollbar{display:none}
+ .classic-app .room-dock button{min-width:58px;flex:0 0 58px;padding:1px;font-size:10px}
  .classic-app .room-dock button img{width:24px;height:24px;object-fit:contain}
  .classic-app .room-dock button b{font-size:10px}
  .classic-app .game-panel{max-height:calc(var(--app-height,100vh) - 12px);width:calc(100% - 12px)}
  .classic-app .game-panel .panel-paper{padding:10px}
- .classic-app .paper-tabs{gap:4px}
- .classic-app .paper-tabs button{min-width:0;flex:0 1 auto;padding:5px 7px;font-size:11px}
+ .classic-app .paper-tabs{gap:5px;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;padding-bottom:4px}
+ .classic-app .paper-tabs::-webkit-scrollbar{display:none}
+ .classic-app .paper-tabs button{min-width:58px;flex:0 0 auto;padding:5px 8px;font-size:11px;white-space:nowrap}
 }
 @media(max-height:420px){
  .classic-app .classic-logo,.classic-app .pet-plaque{display:none}
  .classic-app .cottage-top{padding:5px 12px}
- .classic-app .room-message-board{top:18%;width:64px}
- .classic-app .room-message-board img{height:40px}
- .classic-app .room-message-board small{display:none}
  .classic-app .room-dock{bottom:17px;padding:2px}
  .classic-app .room-dock button img{width:20px;height:20px}
 }

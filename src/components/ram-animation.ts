@@ -168,7 +168,11 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   const sourceFrames = direction
     ? form === 'super' ? [1,4,6,9,11,14,16,19] : form === 'senior' ? [1,2,3,4,5,6,7,8] : [1,2,3,4,6,7,8,9]
     : form === 'super' ? [1,5,8,12,15,19] : form === 'senior' ? [1,3,4,6,7,8] : [1,3,4,6,7,9];
-  const count = form === 'super' ? 21 : 11;
+  // The super source timeline has 21 control frames, but its last control
+  // frame is empty. The painted atlas contains 20 real idle poses. Cycling
+  // over 21 made the last pose hold for an extra tick and looked like a
+  // missing frame in the normal Super Ram animation.
+  const count = form === 'super' ? 20 : 11;
   const phase = Math.floor(Math.max(0,flightTime) / (1000/24)) % count + 1;
   let frame = 0;
   for (let i = 1; i < sourceFrames.length; i++) if (phase >= sourceFrames[i]) frame = i;
