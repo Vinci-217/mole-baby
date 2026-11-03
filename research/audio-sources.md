@@ -1,5 +1,7 @@
 # 小屋音乐与拉姆音效来源
 
+2026-11-03 补充：用户确认所需角色叫声为 **BIBO**。新增原客户端声音库、拉姆面板、脚本及299个现存SWF的核对结果见 [bibo-audio-check.md](bibo-audio-check.md)；仍未取得可确认身份的原录音，角色叫声继续为本地合成。
+
 核对日期：2026-10-18。使用公开社区存档 [Miigon/RecMoleRes](https://github.com/Miigon/RecMoleRes)，固定提交 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff`。不是官方经营的代码仓库；其中保存的原客户端音频仍属于原权利方。
 
 ## 实际核对与保存的原版音乐
