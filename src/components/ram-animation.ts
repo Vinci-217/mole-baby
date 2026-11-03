@@ -8,6 +8,11 @@ import { getItemMotionByAction, sampleItemMotion } from '../item-motion'
 import {footballDuration,footballPose,sleepPose,dozyPose} from '../original-actions'
 import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
 import {isPastime,pastimeBody} from '../pet-pastimes'
+import flightRuntime from '../../public/assets/original/flight/runtime.json'
+
+// The archived Super Ram timeline has 21 control frames; the final control
+// frame is intentionally empty, leaving 20 painted poses in the normal loop.
+export const SUPER_FLIGHT_FRAME_COUNT = flightRuntime.forms.super.clips.down.frames.length
 
 export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'yawn' | 'football' | 'grounded' }
 export const CARE_COLUMNS = 16
@@ -172,7 +177,7 @@ export function sampleFlyingPose(action: string, elapsed: number, reduced = fals
   // frame is empty. The painted atlas contains 20 real idle poses. Cycling
   // over 21 made the last pose hold for an extra tick and looked like a
   // missing frame in the normal Super Ram animation.
-  const count = form === 'super' ? 20 : 11;
+  const count = form === 'super' ? SUPER_FLIGHT_FRAME_COUNT : 11;
   const phase = Math.floor(Math.max(0,flightTime) / (1000/24)) % count + 1;
   let frame = 0;
   for (let i = 1; i < sourceFrames.length; i++) if (phase >= sourceFrames[i]) frame = i;

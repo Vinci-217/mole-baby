@@ -638,7 +638,7 @@ export default function App() {
       {adoptionStep === 'name' && <button type="button" className="adoption-back" onClick={() => setAdoptionStep('color')}>重新选颜色</button>}
       <p className="adoption-note">从一颗种子慢慢养大。赠送 100 摩尔豆，用品到小屋挑选。</p>
     </form></section></div>}
-    {panel && panel!=='decor' && pet && <GameDialog title={titles[panel]} wide={['shop','growth','games','settings','wardrobe','status','food','memories','school','notes'].includes(panel)} onClose={() => setPanel(null)}>
+    {panel && panel!=='decor' && panel!=='notes' && pet && <GameDialog title={titles[panel]} wide={['shop','growth','games','settings','wardrobe','status','food','memories','school'].includes(panel)} onClose={() => setPanel(null)}>
       <nav className="paper-tabs" aria-label="小屋页面">{(['status','food','shop','wardrobe','games','growth','school','memories','settings'] as const).map(p => <button key={p} onClick={() => setPanel(p)} className={panel === p ? 'active' : ''}>{({status:'状态',food:'背包',shop:'商店',games:'游戏',growth:'成长',memories:'回忆',decor:'布置',wardrobe:'衣橱',school:'学院',settings:'设置'})[p]}</button>)}</nav>
       {toast && toast !== bubble && <p className="panel-feedback" role="status">{toast}</p>}
       {panel === 'shop' && <ShopBook pet={current} onBuy={buy}/>}
@@ -657,13 +657,13 @@ export default function App() {
         <StageSettings pet={current} onChange={chooseGrowth}/>
         <SettingsSection title="怎样慢慢长大"><p className="settings-hint">自动成长只累计状态良好时的清醒陪伴。种子到初级约1天，初级到中级约3天，之后两个阶段分别约7天。睡眠或状态不足时暂停；照料和小游戏不会让成长跳级。</p><p className="settings-hint">可自由选择五个阶段及全部神力形态。固定形态暂停成长；切回自动成长保留当前阶段进度。更换阶段从该阶段起点开始，课程与装扮收藏仍会保留。</p></SettingsSection>
       </div>}
-      {panel === 'notes' && <MessageBoard pet={current} onChange={notes=>setPet(previous=>previous?{...previous,notes}:previous)}/>}
       {panel === 'status' && <RoomPetPanel pet={current} memory={currentMemory} onRename={renamePet} onWake={()=>doCare('sleep')} onMood={respondMood}/>}
       {panel === 'food' && pocket}
       {panel === 'memories' && <PetDiary memory={currentMemory}/>}
       {panel === 'play' && <>{playInvitation}<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" disabled={current.sleeping} onClick={respondMood}>看看我的心情</button><button className="game-button" onClick={() => startActivity('restaurant')}>餐厅打工</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping?'轻轻叫醒':'睡一会儿'}</button><button className="game-button" onClick={() => setPanel('school')}>去学院</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div></>}
       {panel === 'settings' && settingsContent}
     </GameDialog>}
+    {panel==='notes'&&pet&&<MessageBoard pet={current} onChange={notes=>setPet(previous=>previous?{...previous,notes}:previous)} onClose={()=>setPanel(null)}/>}
     {reset && pet && <GameDialog title="和拉姆说再见？" onClose={() => setReset(false)}><div className="farewell-confirm"><div><Ram costume={current.wearing} color={current.color} stage={stage} evolution={current.evolution}/></div><h3>送别 {current.name}</h3><p>这会删除它的成长、物品和本机回忆。重新打开后，可以领养一颗新的种子。</p><div className="confirm-buttons"><button className="game-button" onClick={exportSave}>先导出存档</button><button className="game-button" onClick={() => void abandonPet()}>确认送别</button></div></div></GameDialog>}
     {gameOverlay}
   </div>;

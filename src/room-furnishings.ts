@@ -16,7 +16,10 @@ export const FURNITURE:readonly FurnitureDefinition[]=[
  {id:'lamp',name:'暖光小灯',surface:'floor',price:220,width:8},
  {id:'leaf-clock',name:'双叶挂钟',surface:'wall',price:200,width:9},
  {id:'picture',name:'庄园风景画',surface:'wall',price:240,width:14},
- {id:'message-board',name:'小屋留言板',surface:'wall',price:0,width:14,image:'./assets/original/message-board/board.png',sourceId:'160541',dragOnly:true},
+ // The original client opens this furnishing through module/external/GuestBook.swf.
+ // The archive does not ship that SWF, so this small vector plaque follows the
+ // official hanging-board silhouette instead of the unrelated 160541 toy board.
+ {id:'message-board',name:'小屋留言板',surface:'wall',price:0,width:14,image:'./assets/original/message-board/board.svg',sourceId:'GuestBook.swf',dragOnly:true},
 ] as const
 export function furnitureById(id:string){
  const f=FURNITURE.find(f=>f.id===id);if(f)return f

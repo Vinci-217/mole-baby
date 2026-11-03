@@ -566,7 +566,7 @@ function OriginalFlightFrames({form,color,action,actionId,startedAt,onError,onAc
    }
    paintWear(canvas,source,index%8,Math.floor(index/8),192,208,false,pose.sourceFrame);
    paintSocialCue(canvas,form==='senior'?3:4,action,elapsed,reduced,form==='senior'?undefined:form);
-   canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(index);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.row=String(Math.floor(index/8));canvas.dataset.direction=direction;
+   canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(index);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.frameCount=String(clip.frames.length);canvas.dataset.row=String(Math.floor(index/8));canvas.dataset.direction=direction;
    if(split){canvas.dataset.fanSpeed=fan.current.speed.toFixed(3);canvas.dataset.fanAngle=fan.current.angle.toFixed(3);canvas.dataset.fanBlades=String(senior.bladeCount)}
    const duration=getRamActionDuration(action,form);
    if(duration!==null&&elapsed>=duration&&!finished){finished=true;end.current?.()}

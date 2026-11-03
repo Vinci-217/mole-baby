@@ -10,3 +10,22 @@
 .pocket-categories{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:4px 0 2px;flex:none}.pocket-categories>button{min-width:0;padding:7px 0;border-radius:8px;color:#997b55;background:#f5ecdc;border:1px solid transparent;font-size:13px;white-space:nowrap}.pocket-categories>button[aria-selected=true]{color:#775332;background:#f6dfad;border-color:#dbb66c;box-shadow:inset 0 1px #fff8e6}.pocket-categories>button:hover{background:#f3e2bf}.pocket-categories>button:focus-visible{outline:2px solid #c38c45;outline-offset:1px}.pocket-compact .pocket-categories{gap:3px;padding:0 0 3px}.pocket-compact .pocket-categories>button{font-size:10px;line-height:18px;padding:0;border-radius:5px}
 
 .pocket-compact .pocket-heading{height:20px}.pocket-compact .pocket-items{width:144px;height:144px;margin:1px auto}.pocket-compact .pocket-categories{padding-bottom:2px}.pocket-compact .pocket-categories>button{line-height:16px}
+
+/* The original care pouch keeps its four tabs on the right edge. This is
+   shared by the full cottage pouch and the compact desktop/mobile pouch so
+   the interaction remains identical in both windows. */
+.care-pocket:not(.pocket-compact){display:grid;grid-template-columns:minmax(0,1fr) 76px;grid-template-areas:'heading heading' 'items categories' 'hint hint' 'pages pages';column-gap:12px;align-items:start}
+.care-pocket:not(.pocket-compact)>.pocket-heading{grid-area:heading}
+.care-pocket:not(.pocket-compact)>.pocket-items{grid-area:items;width:100%;margin:10px 0}
+.care-pocket:not(.pocket-compact)>.pocket-categories{grid-area:categories;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(0,1fr));align-self:stretch;gap:7px;padding:10px 0}
+.care-pocket:not(.pocket-compact)>.pocket-categories>button{min-height:34px;padding:5px 2px}
+.care-pocket:not(.pocket-compact)>.pocket-item-hint{grid-area:hint}
+.care-pocket:not(.pocket-compact)>.pocket-pages{grid-area:pages}
+.pocket-compact{display:grid;grid-template-columns:minmax(0,1fr) 44px;grid-template-rows:20px minmax(0,1fr) 18px;grid-template-areas:'heading heading' 'items categories' 'pages pages';column-gap:4px;align-items:start}
+.pocket-compact>.pocket-heading{grid-area:heading}
+.pocket-compact>.pocket-categories{grid-area:categories;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(0,1fr));align-self:stretch;gap:3px;padding:1px 0 2px}
+.pocket-compact>.pocket-categories>button{min-height:0;padding:0;line-height:16px}
+.pocket-compact>.pocket-items{grid-area:items;width:100%;height:auto;aspect-ratio:1;margin:1px 0;align-self:start}
+.pocket-compact>.pocket-pages{grid-area:pages}
+.pocket-compact>.pocket-item-hint{grid-column:1/-1;grid-row:2;align-self:end}
+@media(max-width:700px){.care-pocket:not(.pocket-compact){grid-template-columns:minmax(0,1fr) 62px;column-gap:8px}.care-pocket:not(.pocket-compact)>.pocket-categories{gap:5px}.care-pocket:not(.pocket-compact)>.pocket-categories>button{font-size:11px}}
