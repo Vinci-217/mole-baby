@@ -38,3 +38,13 @@ describe('original RGB mixing adapted to bottled pet colours',()=>{
   }
  })
 })
+
+it('keeps Windows-style purple potion colour, inventory, identity and notes after an offline day',()=>{
+ const before={...pet(),color:'blue' as const,notes:[{id:'remember',text:'保留原有回忆',done:false,createdAt:NOW}]};
+ const changed=care(brewColourPotion(before,'#9955cc',NOW).state,'use',customPotionId('#9955cc'),NOW).state;
+ for(const elapsed of [0,1,86400000,2*86400000]){
+  const restored=parseSave(JSON.stringify(changed),NOW+elapsed)!;
+  expect(restored.color).toBe('#9955cc');expect(restored.createdAt).toBe(before.createdAt);
+  expect(restored.inventory[customPotionId('#9955cc')]).toBe(0);expect(restored.notes).toEqual(before.notes);
+ }
+});

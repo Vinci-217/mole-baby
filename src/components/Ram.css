@@ -186,3 +186,4 @@
 
 .ram-sprite.is-sleeping .ram-flight-layer,.ram-sprite.is-sleeping .ram-pose-layer{animation:none!important;transform:none!important}
 .ram-sprite.is-flying.is-sleeping .ram-flight-layer{transform:translateY(-5%)!important}
+.ram-reading>.reading-pet-source{position:absolute;inset:0;display:block}.reading-pet-source>.ram-sprite{width:100%;height:100%}.ram-reading .reading-book{position:absolute;height:auto;display:block;pointer-events:none;z-index:5}.ram-reading .reading-pet-source .ram-artwork{transform:none!important;transition:none}.ram-reading .reading-pet-source .ram-flight-layer,.ram-reading .reading-pet-source .ram-pose-layer{animation:none!important;transform:none!important}

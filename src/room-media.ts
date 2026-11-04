@@ -108,6 +108,7 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
   const audio = useRef<HTMLAudioElement | null>(null);
   const active = useRef(false);
   const nativeVisible = useRef(true);
+  const previousRoom=useRef(inRoom);
   const customUrl = useRef<string | null>(null);
   const generation = useRef(0);
   active.current = hasPet && (inRoom ? settings.musicEnabled : settings.backgroundPlayback);
@@ -135,7 +136,8 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     // A room can remain mounted while the native window lives in the tray.
     // Guard every playback entry, including a track change while hidden.
     if (!active.current || (document.visibilityState === 'hidden' || !nativeVisible.current) && !backgroundAllowed.current || !audio.current) { audio.current?.pause(); return; }
-    // Resume the existing position after a mode/visibility change.
+    // Ordinary clicks and visibility changes resume; explicit room re-entry
+    // rewinds below when background playback is disabled.
     void audio.current.play().then(() => setError(null)).catch(reason => {
       if (reason instanceof DOMException && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')) return;
       setError('这首音乐暂时无法播放，可以换一首或重新导入。');
@@ -173,6 +175,10 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     };
   }, [source, awaitingCustom, resumeMusic, settings.shuffle, nextMusic]);
   useEffect(() => {
+    const returning=inRoom&&!previousRoom.current;previousRoom.current=inRoom;
+    if(returning&&!settings.backgroundPlayback&&audio.current){
+      audio.current.pause();try{audio.current.currentTime=0}catch{/* Metadata can still be loading. A new source already starts at zero. */}
+    }
     if (active.current) resumeMusic();
     else audio.current?.pause();
   }, [inRoom, hasPet, settings.musicEnabled, settings.backgroundPlayback, resumeMusic]);

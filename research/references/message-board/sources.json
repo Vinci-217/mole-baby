@@ -1,0 +1,33 @@
+{
+  "retrievedAt": "2026-11-04",
+  "files": [
+    {
+      "file": "GuestBook.swf",
+      "url": "https://mole.61.com/module/external/GuestBook.swf",
+      "bytes": 32392,
+      "sha256": "f1cfba01fa623890a5ecf96ae763e4ded38bb31544ed81708fad65e9aa306c8e"
+    },
+    {
+      "file": "160131.swf",
+      "url": "https://mole.61.com/resource/goods/swf/160131.swf",
+      "bytes": 4857,
+      "sha256": "563e1c3b37c78394d9d16325f2e04c3586384b30886b0618cd6d02973004862a"
+    }
+  ],
+  "exporter": "JPEXS Free Flash Decompiler 26.4.0",
+  "exports": {
+    "board.png": "160131.swf sprite 9 frame 1 at 4x",
+    "window.png": "GuestBook.swf sprite 68 frame 1 at 2x, with book0..5 hidden as in GuestBook.showMsg",
+    "card.png": "GuestBook.swf sprite 54 frame 1 at 2x",
+    "compose.png": "GuestBook.swf sprite 92 frame 1 at 2x",
+    "card-plain.png": "GuestBook.swf sprite 54 frame 1 at 2x, reply_mc hidden until a reply exists"
+  },
+  "adaptation": [
+    "Removed SWF placeholder text; names, dates and messages are rendered as local HTML.",
+    "Removed remote player-report controls and one duplicate visibility control.",
+    "Original wood, paper, title, blue avatars and button artwork preserved.",
+    "Private notes reuse the existing save; reply is an optional field.",
+    "Compose title is local HTML; original submit/cancel artwork uses aligned click targets.",
+    "Cards and reply paper are separate original sprite states; only real messages occupy a slot (six per page)."
+  ]
+}

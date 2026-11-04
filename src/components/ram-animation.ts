@@ -9,10 +9,13 @@ import {footballDuration,footballPose,sleepPose,dozyPose} from '../original-acti
 import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
 import {isPastime,pastimeBody} from '../pet-pastimes'
 import flightRuntime from '../../public/assets/original/flight/runtime.json'
+import seedSource from '../../public/assets/original/seed/source.json'
 
 // The archived Super Ram timeline has 21 control frames; the final control
 // frame is intentionally empty, leaving 20 painted poses in the normal loop.
 export const SUPER_FLIGHT_FRAME_COUNT = flightRuntime.forms.super.clips.down.frames.length
+export const SEED_IDLE_FRAME_COUNT = seedSource.body.originalFrames
+export const SEED_IDLE_FPS = seedSource.body.sourceTimelineFps
 
 export interface Pose { row: number; frame: number; finished: boolean; sheet?: 'care' | 'item' | 'slumber' | 'yawn' | 'football' | 'grounded' }
 export const CARE_COLUMNS = 16
@@ -138,8 +141,9 @@ export function sampleSeedPose(action: string, elapsed: number, reduced = false)
     // A short portion of the original body squash/sway, once per interaction.
     return { frame: Math.min(24, Math.floor(elapsed / 42)), finished: false }
   }
-  const phase = elapsed % 9000
-  return { frame: phase < 7600 ? 0 : [0,1,2,1,0][Math.min(4,Math.floor((phase-7600)/280))], finished: false }
+  // Restore the complete original blink/squash/hop loop. The appended closed-eye
+  // atlas cell belongs to sleep; the pot remains a separate stationary layer.
+  return { frame: Math.floor(Math.max(0,elapsed)*SEED_IDLE_FPS/1000)%SEED_IDLE_FRAME_COUNT, finished: false }
 }
 
 /** Elemental atlases retain their own body/crown during every interaction.

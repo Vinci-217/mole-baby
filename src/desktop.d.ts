@@ -4,6 +4,7 @@ declare global {
   interface DesktopState {
     petMode: boolean;
     petScale?:number;
+    petResizing?:boolean;
     roomFullscreen?:boolean;
     effectExpanded?:boolean;
     trayTooltip?:string;
@@ -30,12 +31,25 @@ declare global {
       isElectron: boolean;
       updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setDownloadPolicy:(policy:'auto'|'full')=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
       platform: string;
+      flushSave?:()=>Promise<boolean>;
+      messageBoard?:{
+        open:(snapshot:import('./components/MessageBoard').BoardSnapshot)=>Promise<boolean>;
+        publish:(snapshot:import('./components/MessageBoard').BoardSnapshot|null)=>Promise<unknown>;
+        get:()=>Promise<import('./components/MessageBoard').BoardSnapshot|null>;
+        change:(change:{petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>Promise<import('./components/MessageBoard').BoardSnapshot>;
+        close:()=>Promise<void>;
+        onSnapshot:(callback:(snapshot:import('./components/MessageBoard').BoardSnapshot|null)=>void)=>()=>void;
+        onPatch:(callback:(request:{id:number;petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>{ok:boolean;snapshot?:import('./components/MessageBoard').BoardSnapshot})=>()=>void;
+      };
       setMusicState:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
       onMusicToggle:(callback:(enabled:boolean)=>void)=>()=>void;
       openMacSettings: (kind:'security')=>Promise<boolean>;
       openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;
-      openSizeEditor?:()=>Promise<void>;
+      openSizeEditor?:()=>Promise<boolean>;
+      startPetResize?:(corner:'nw'|'ne'|'sw'|'se')=>Promise<boolean>;
+      stopPetResizeDrag?:()=>Promise<void>;
+      finishPetResize?:(commit:boolean)=>Promise<boolean>;
       setPetScale?:(scale:number)=>Promise<number>;
       minimize: () => void;
       close: () => void;

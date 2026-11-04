@@ -49,6 +49,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     getBounds() { return { ...this.bounds }; }
     getNormalBounds() { return this.getBounds(); }
     setBounds(bounds) {
+      if(this.rejectNextBounds){this.rejectNextBounds=false;throw new TypeError('Error processing argument, conversion failure');}
       this.bounds = { ...bounds };if(options.clamp){this.bounds.x=Math.max(0,this.bounds.x);this.bounds.y=Math.max(0,this.bounds.y);}
       if(options.delayedMove&&bounds.width>160)setImmediate(()=>{this.bounds.x+=11;this.bounds.y+=7;this.emit('move')});
     }
@@ -95,6 +96,18 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     cleanup() { app.emit('before-quit'); app.emit('will-quit'); fs.rmSync(profile, { recursive: true, force: true }); },
   };
 }
+
+test('Mac movement avoids positional argument conversion and keeps its anchor after a native failure',async t=>{
+ const run=await launch(undefined,false,'darwin');t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.window.setPosition=()=>{throw new TypeError('setPosition conversion failure at index 1')};
+ const before=run.window.getBounds();
+ run.invoke('desktop:move-pet',-25,-25);assert.equal(run.window.bounds.x,before.x-25);
+ const valid=run.window.getBounds();run.window.rejectNextBounds=true;
+ assert.doesNotThrow(()=>run.invoke('desktop:move-pet',-10,-10));
+ assert.deepEqual(run.window.getBounds(),valid);
+ run.invoke('desktop:move-pet',-10,-10);assert.equal(run.window.bounds.y,valid.y-10);
+});
 
 test('tray state refreshes while hidden, clears on farewell and rejects untrusted senders',async t=>{
  const run=await launch();t.after(()=>run.cleanup());
@@ -529,4 +542,22 @@ for(const platform of ['win32','darwin'])test(`${platform}: proportional desktop
  }
  for(const value of [NaN,Infinity,.49,3.01,'2'])assert.throws(()=>run.invoke('desktop:set-pet-scale',value));
  const before=run.window.getBounds();run.invoke('desktop:set-pet-effect-bounds',{x:-20,y:-30,width:200,height:200});assert.throws(()=>run.invoke('desktop:set-pet-scale',1));run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),before);
+});
+
+for(const platform of ['win32','darwin'])test(`${platform}: direct corner resizing previews, cancels and persists without a separate editor`,async t=>{
+ t.mock.timers.enable({apis:['setInterval']});
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
+ run.send('desktop:ready-to-show',true);run.invoke('desktop:set-pet-mode',true);run.invoke('desktop:set-edge-hiding',false);
+ run.invoke('desktop:set-mouse-through',true);
+ const original=run.window.getBounds();await run.invoke('desktop:open-size-editor');
+ assert.equal(run.invoke('desktop:get-state').petResizing,true);
+ run.send('desktop:set-mouse-passthrough',true);assert.equal(run.invoke('desktop:get-state').mousePassthrough,false,'Resize retains pointer capture outside the handles');
+ assert.equal(run.invoke('desktop:start-pet-resize','se'),true);run.cursor.x+=55;run.cursor.y+=60;t.mock.timers.tick(16);
+ assert.equal(run.invoke('desktop:get-state').petScale,1.5);assert.equal(run.window.getBounds().width,240);assert.equal(run.window.zoom,1.5);
+ run.invoke('desktop:stop-pet-resize-drag');const paused=run.window.getBounds();run.cursor.x+=100;t.mock.timers.tick(100);assert.deepEqual(run.window.getBounds(),paused);
+ run.invoke('desktop:finish-pet-resize',false);assert.equal(run.invoke('desktop:get-state').petScale,1);assert.deepEqual(run.window.getBounds(),original);assert.equal(run.invoke('desktop:get-state').mouseThrough,true,'Explicit passthrough is restored after resizing');
+ await run.invoke('desktop:open-size-editor');run.invoke('desktop:start-pet-resize','nw');run.cursor.x-=55;run.cursor.y-=60;t.mock.timers.tick(16);run.invoke('desktop:finish-pet-resize',true);
+ assert.equal(run.invoke('desktop:get-state').petScale,1.5);assert.equal(run.invoke('desktop:get-state').petResizing,false);
+ assert.equal(JSON.parse(fs.readFileSync(path.join(run.app.userData,'window-state.json'))).petScale,1.5);
+ assert.equal(run.invoke('desktop:start-pet-resize','se'),false);
 });

@@ -341,7 +341,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
 
   if (action === 'pet') {
     stats.happiness = clamp(stats.happiness + 6);
-    return { state: { ...current, stats }, message: '咕噜咕噜～最喜欢你摸摸我啦！', ok: true };
+    return { state: { ...current, stats }, message: 'bibobibo～最喜欢你摸摸我啦！', ok: true };
   }
   if (stats.energy < 12) return { state: current, message: `玩球至少需要 12 点精力（当前 ${Math.floor(stats.energy*10)/10} 点），睡一会儿恢复后再玩吧。`, ok: false };
   stats.happiness = clamp(stats.happiness + 16);

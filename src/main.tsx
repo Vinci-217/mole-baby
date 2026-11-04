@@ -3,6 +3,7 @@ import 'core-js/stable';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import StandaloneMessageBoard from './components/StandaloneMessageBoard';
 import './styles.css';
 import './original-theme.css';
 import './components/DesktopCompanion.css';
@@ -13,4 +14,4 @@ const viewport=()=>document.documentElement.style.setProperty('--app-height',`${
 viewport();window.addEventListener('resize',viewport);
 import {installAndroidHost} from './android-host';
 installAndroidHost();
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.hash==='#message-board'?<StandaloneMessageBoard/>:<App />}</React.StrictMode>);

@@ -11,44 +11,19 @@
 .status-history time{font-size:10px;color:#8b7967}
 .status-pocket .status-history{font-size:10px;margin:5px 0}
 .status-pocket:has(.pocket-rules){overflow:auto}
-.message-board{color:#765131;line-height:1.7}
-.message-board header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.message-board header span{font-size:12px}
-.message-board form{background:#fff7d3;padding:14px;border:1px solid #e4c483;border-radius:10px}
-.message-board textarea{display:block;resize:vertical;width:100%;max-height:200px;font:inherit;padding:10px;border:1px solid #ccb687;border-radius:6px;background:#fffdf4;color:#65462d;margin:6px 0}
-.message-board form>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.message-board form small{margin-right:auto}
-.message-board ul{list-style:none;margin:16px 0;padding:0}
-.message-board li{padding:14px;margin-bottom:10px;border:1px solid #e3d3ae;background:#fffdf3;border-radius:8px}
-.message-board li label{display:flex;gap:10px;align-items:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
-.message-board li input{width:20px;height:20px;flex-shrink:0;accent-color:#82a743}
-.message-board li.is-done label span{text-decoration:line-through;color:#8f8a7a}
-.message-board li>div{display:flex;justify-content:flex-end;gap:16px;font-size:12px}
-.message-board li button{text-decoration:underline;padding:4px}
-.board-empty{text-align:center;padding:24px}
-.board-save-note{font-size:12px;color:#8b7762}
-.official-memo-board{max-width:720px;margin:0 auto;padding:18px 20px 16px;background:linear-gradient(180deg,#fff8db,#fffdf1 28%,#fff8df);border:3px solid #e2a849;border-radius:14px;box-shadow:inset 0 0 0 3px #fff2b4,0 5px 14px #70431e1f;color:#70451f}
-.memo-board-title{padding:4px 6px 12px;border-bottom:2px solid #e9bc63}
-.memo-board-kicker{display:block;color:#b26a20;font-size:11px;letter-spacing:1px}
-.memo-board-title h3{margin:0;color:#a3481c;font-size:28px;letter-spacing:3px;text-shadow:1px 1px #ffe7a7}
-.memo-board-count{font-size:12px;color:#8c6231;white-space:nowrap}
-.memo-board-intro{margin:10px 6px 14px;font-size:13px;color:#8b6b42}
-.memo-board-compose{background:#fffdf2;border:1px solid #e5c687;border-radius:10px;box-shadow:0 2px 0 #e9d5ab;padding:12px}
-.official-memo-board ul{margin:18px 2px;padding:0;list-style:none}
-.official-memo-board li{position:relative;padding:12px 12px 9px 13px;margin:0 0 9px;border:1px solid #e4c783;border-radius:6px;background:#fffef7;box-shadow:0 2px 0 #ecdcb7}
-.official-memo-board li:before{content:'';position:absolute;left:-1px;top:-1px;bottom:-1px;width:5px;background:#f0ad48;border-radius:6px 0 0 6px}
-.official-memo-board li.is-done{background:#f3f0e5}
 .warehouse-drag-card{cursor:grab;outline:1px dashed #dfaa4a;outline-offset:-4px}
 .warehouse-drag-card:active{cursor:grabbing}
 .warehouse-drag-hint{font-size:11px;color:#ad6d25;text-align:center}
 @media(max-width:700px),(max-height:600px){
- .classic-app .cottage-top{padding:12px;gap:8px;flex-wrap:wrap}
- .classic-app .classic-logo{width:70px;flex-shrink:0}
- .classic-app .classic-logo span{font-size:22px}
- .classic-app .scene-top-actions{gap:5px;flex-wrap:wrap;justify-content:flex-end}
+ .classic-app.ramu-v6 .cottage-top{padding:8px;gap:8px;flex-wrap:nowrap;align-items:center}
+ .classic-app.ramu-v6 .cottage-top .classic-logo{width:auto;flex:0 0 auto;display:flex;align-items:center;gap:4px;white-space:nowrap}
+ .classic-app.ramu-v6 .classic-logo>img{width:32px;height:32px}
+ .classic-app.ramu-v6 .classic-logo span{font-size:22px}
+ .classic-app.ramu-v6 .cottage-top .scene-top-actions{display:flex;flex-direction:row;align-items:center;gap:5px;flex-wrap:nowrap;justify-content:flex-start;flex:1;min-width:0;width:auto;max-width:100%;overflow-x:auto;scrollbar-width:thin;padding-bottom:3px}
+ .classic-app.ramu-v6 .scene-top-actions>*{flex:0 0 auto}
  .classic-app .scene-top-actions button{min-width:0;font-size:11px;padding:5px 8px;min-height:30px}
  .classic-app .scene-top-actions .coin-sign{font-size:10px}
- .classic-app .pet-plaque{top:100px;left:12px;min-width:112px;font-size:11px;max-width:43%}
+ .classic-app.ramu-v6 .pet-plaque{display:none}
  .classic-app .room-dock{left:6px;right:6px;min-width:0;width:auto;max-width:none;transform:none;gap:6px;bottom:23px;padding:5px 8px;display:flex;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
  .classic-app .room-dock::-webkit-scrollbar{display:none}
  .classic-app .room-dock button{min-width:58px;flex:0 0 58px;padding:1px;font-size:10px}
@@ -61,10 +36,37 @@
  .classic-app .paper-tabs button{min-width:58px;flex:0 0 auto;padding:5px 8px;font-size:11px;white-space:nowrap}
 }
 @media(max-height:420px){
- .classic-app .classic-logo,.classic-app .pet-plaque{display:none}
+ .classic-app.ramu-v6 .cottage-top .classic-logo,.classic-app .pet-plaque{display:none}
  .classic-app .cottage-top{padding:5px 12px}
  .classic-app .room-dock{bottom:17px;padding:2px}
  .classic-app .room-dock button img{width:20px;height:20px}
 }
 
 .save-recovery{max-width:720px;padding:32px;margin:auto;background:#fff9e9;color:#765131;line-height:1.9}.save-recovery h1{font-size:23px}.save-recovery button{margin:16px 8px 0 0}
+
+/* Small navigation controls scroll as one row, including in narrow rooms. */
+.classic-app.ramu-v6 .game-panel .paper-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;gap:4px;padding-bottom:8px;margin-bottom:12px}
+.classic-app.ramu-v6 .game-panel .paper-tabs>button{flex:0 0 auto;min-width:42px;min-height:26px;height:26px;padding:3px 9px;font-size:11px;line-height:20px;white-space:nowrap}
+.android-host.pet-mode .care-inventory.pocket-compact{grid-template-columns:minmax(0,1fr) 42px;grid-template-rows:28px minmax(0,1fr) 24px}
+.android-host.pet-mode .care-inventory.pocket-compact>.pocket-items{width:100%;max-width:232px}
+.android-host.pet-mode .care-inventory.pocket-compact>.pocket-categories>button{height:30px;min-height:30px;font-size:11px;line-height:24px}
+.status-pocket{display:flex;flex-direction:column}
+.status-pocket>.pocket-status{width:100%;flex:1}
+.status-pocket>.pocket-heading,.status-pocket>.pocket-pages{width:100%;flex-shrink:0}
+.pet-at-work .desktop-character,.pet-at-work .scene-character{visibility:hidden;pointer-events:none}
+.pet-at-work .scene-pet-name,.pet-at-work .compact-pet-name,.pet-at-work .compact-pet-condition{visibility:hidden;pointer-events:none}
+.companion-layout .pet-work-note{animation:none;top:66px;min-height:86px}
+.pet-work-actions{display:flex;flex-direction:column;align-items:stretch;width:100%}
+.pet-work-note .pet-work-actions button{font-size:10px;line-height:14px;padding:2px 4px}
+.pet-work-note .activity-countdown{display:flex;flex-direction:column;align-items:center;font-size:10px;gap:3px;width:100%}
+.pet-work-note .activity-countdown strong{display:none}
+.pet-work-note .activity-countdown span{width:100%;text-align:center}
+.pet-work-note progress{width:86px;height:4px}
+.room-work-note{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:min(290px,76vw);padding:16px;border:1px solid #d9c5a1;border-radius:14px;background:#fffaf0;color:#79583b;text-align:center;pointer-events:auto}
+.room-work-note>img{display:block;width:42px;height:42px;object-fit:contain;margin:0 auto 8px}
+.room-work-note>strong{font-size:14px}
+.room-work-note .school-activity{margin:12px 0 0;padding:8px;white-space:normal}
+.room-work-note .school-activity>img{display:none}
+.room-work-note .school-activity strong{font-size:11px}
+.room-work-note .school-activity button{font-size:11px;white-space:nowrap}
+.game-sound-toggle{position:fixed;right:18px;bottom:14px;z-index:260;min-height:28px;padding:5px 12px;border:1px solid #cba675;border-radius:16px;background:#fff6df;color:#80562e;font-size:12px;box-shadow:0 2px 7px #432b1720}

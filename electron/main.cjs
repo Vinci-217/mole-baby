@@ -5,6 +5,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const geometry=require('./desktop-geometry.cjs');
 const {canAnimateDesktop}=geometry;
+const {resizeScale,resizeAnchor,anchoredPetBounds}=require('./pet-resize.cjs');
 let petScale=1,PET_SIZE=geometry.PET_SIZE,PET_PADDING=geometry.PET_PADDING;
 const fitPetBounds=(b,a)=>geometry.fitPetBounds(b,a,petScale);
 const cornerSide=(b,a)=>geometry.cornerSide(b,a,petScale);
@@ -21,6 +22,7 @@ const { createTrayIcon } = require('./tray-icon.cjs');
 const {trayStatusText}=require('./tray-status.cjs');
 const {createRoomFullscreen}=require('./room-fullscreen.cjs');
 const {ROOM_MINIMUM,createRoomResizer}=require('./room-resize.cjs');
+const {createMessageBoard}=require('./message-board.cjs');
 const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join(__dirname,'Mac 打开说明.html'),guideDirectory:()=>path.join(app.getPath('userData'),'help')});
 
 const {createUpdates}=require('./updates.cjs');
@@ -110,6 +112,7 @@ let petEffectAnchor=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
+const messageBoard=createMessageBoard({ipcMain,BrowserWindow,getMain:()=>mainWindow,isMain:event=>isOurSender(event),preload:path.join(__dirname,'preload.cjs'),indexPath:INDEX_PATH,getURL:()=>process.env.ELECTRON_DEV==='1'?DEVELOPMENT_URL:null});
 const roomFullscreen=createRoomFullscreen({platform:process.platform,getWindow:()=>mainWindow,isPetMode:()=>petMode,beforeEnter:()=>rememberBounds(),afterLeave:()=>{
  if(normalBounds&&mainWindow&&!mainWindow.isDestroyed()&&!petMode)mainWindow.setBounds(clampBounds(normalBounds,NORMAL_SIZE));
 },onChange:()=>{publishState();scheduleSave()}});
@@ -120,7 +123,7 @@ function getDesktopState() {
     petMode,
     roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&roomFullscreen.isFullscreen()),
     windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
-    petScale,petOffset:{x:petOffset.x/petScale,y:petOffset.y/petScale},mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
+    petScale,petResizing,petOffset:{x:petOffset.x/petScale,y:petOffset.y/petScale},mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
@@ -159,11 +162,11 @@ function changeMotion(next) {
 }
 
 function canWander() {
-  return !petEffectBounds && canMoveOnDesktop() && wandering && edgeSide === null;
+  return !petResizing && !petEffectBounds && canMoveOnDesktop() && wandering && edgeSide === null;
 }
 
 function canMoveOnDesktop() {
-  return Boolean(mainWindow && !mainWindow.isDestroyed() && canAnimateDesktop({
+  return Boolean(!petResizing && mainWindow && !mainWindow.isDestroyed() && canAnimateDesktop({
     visible: mainWindow.isVisible() && !mainWindow.isMinimized(), petMode,
     petCanMove, panel: companionPanel, dragging, interacting,
   }));
@@ -171,7 +174,7 @@ function canMoveOnDesktop() {
 
 function canHideAtEdge() {
   return Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()
-    && !mainWindow.isMinimized() && petMode && hasPet && !companionPanel && !petEffectBounds && !dragging && !interacting);
+    && !mainWindow.isMinimized() && !petResizing && petMode && hasPet && !companionPanel && !petEffectBounds && !dragging && !interacting);
 }
 
 function revealPet() {
@@ -343,8 +346,14 @@ function placePetAt(target){
   // drag/walking frame can enlarge a fixed transparent window by another pixel.
   // Keep the intended logical size instead of feeding rounded OS sizes back in.
   try{
-    if(process.platform==='win32')mainWindow.setBounds({...PET_SIZE,x,y},false);
-    else mainWindow.setPosition(x,y,false);
+    // Use one rectangle conversion on every platform. macOS setPosition can
+    // reject a numeric argument after wake/display changes; setBounds also
+    // preserves the fixed logical pet size and canonical integer coordinates.
+    mainWindow.setBounds({...PET_SIZE,x,y},false);
+  }catch(error){
+    // A monitor/window may change while a movement timer is queued. Preserve
+    // the last valid anchor and stop this walk instead of throwing in a timer.
+    stopMovement();console.error('Unable to move pet window:',error);return;
   }finally{changingMode=false;}
   const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
   petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
@@ -434,7 +443,7 @@ function changePetCanMove(enabled) {
 
 function changeMousePassthrough(ignore) {
   if (typeof ignore !== 'boolean') throw new TypeError('Mouse passthrough must be a boolean');
-  const enabled = petMode && (mouseThrough||ignore);
+  const enabled = petMode && !petResizing && (mouseThrough||ignore);
   if (enabled === mousePassthrough) return;
   // Forward mouse movement so the renderer can make the pet interactive again
   // when the cursor returns from transparent pixels. X11 forwarding differs
@@ -517,29 +526,47 @@ function changeCompanionPanel(open, layout = 'compact') {
   return getDesktopState();
 }
 
-function changePetScale(scale){
- if(typeof scale!=='number'||!Number.isFinite(scale)||scale<.5||scale>3)throw new TypeError('请输入50到300之间的大小百分比');
+function changePetScale(scale,anchor=null){
+ if(typeof scale!=='number'||!Number.isFinite(scale)||scale<.5||scale>3)throw new TypeError('拉姆大小须在 0.5 到 3 倍之间');
  if(petEffectBounds||dragging)throw new Error('请等当前动作结束后再调整大小');
  const base=petMode?currentPetBounds():petBounds,oldSize=PET_SIZE,open=companionPanel;
  if(open)changeCompanionPanel(false);
  stopMovement();revealPet();applyPetMetrics(Math.round(scale*100)/100);
- if(base)petBounds=fitPetBounds({x:base.x+(oldSize.width-PET_SIZE.width)/2,y:base.y+oldSize.height-PET_SIZE.height},screen.getDisplayMatching(base).workArea);
+ if(base)petBounds=fitPetBounds(anchor?anchoredPetBounds(anchor,petScale,PET_SIZE):{x:base.x+(oldSize.width-PET_SIZE.width)/2,y:base.y+oldSize.height-PET_SIZE.height},screen.getDisplayMatching(base).workArea);
  if(petMode){
   const target=clampBounds(petBounds,PET_SIZE);changingMode=true;
-  try{applyMinimum(target,true);mainWindow.setBounds(target);mainWindow.webContents.setZoomFactor?.(petScale);const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};}finally{changingMode=false;}
+  try{applyMinimum(target,true);mainWindow.setBounds({...target,...nativePosition(target)});mainWindow.webContents.setZoomFactor?.(petScale);const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};}finally{changingMode=false;}
   if(open)changeCompanionPanel(true);
  }
- wanderAnchor=null;saveWindowState();publishState();scheduleWander();return petScale;
+ wanderAnchor=null;if(!petResizing)saveWindowState();publishState();if(!petResizing)scheduleWander();return petScale;
 }
-let sizeWindow=null;
-function openSizeEditor(){
- if(!mainWindow||mainWindow.isDestroyed()||quitting)return;
- if(sizeWindow&&!sizeWindow.isDestroyed()){sizeWindow.show();sizeWindow.focus();return;}
- sizeWindow=new BrowserWindow({width:390,height:280,resizable:false,minimizable:false,maximizable:false,title:'拉姆大小变换',parent:mainWindow.isVisible()?mainWindow:undefined,alwaysOnTop:true,autoHideMenuBar:true,webPreferences:{partition:'ramu-size-editor',preload:path.join(__dirname,'size-preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
- const editor=sizeWindow;editor.on('closed',()=>{if(sizeWindow===editor)sizeWindow=null;});
- editor.webContents.setWindowOpenHandler(()=>({action:'deny'}));
- void editor.loadFile(path.join(__dirname,'size.html')).catch(error=>console.warn('Unable to open size editor:',error.message));
+let petResizing=false,petResizeTimer=null,petResizeOriginal=null;
+async function openSizeEditor(){
+ if(!mainWindow||mainWindow.isDestroyed()||quitting||!hasPet)return false;
+ if(petEffectBounds||dragging)return false;
+ if(!petMode)await changePetMode(true);
+ changeCompanionPanel(false);revealPet();stopMovement();
+ if(!petResizing)petResizeOriginal={scale:petScale,bounds:{...currentPetBounds()},mouseThrough};
+ petResizing=true;mouseThrough=false;changeMousePassthrough(false);mainWindow.setIgnoreMouseEvents(false);publishState();return true;
 }
+function stopPetResizeDrag(){clearInterval(petResizeTimer);petResizeTimer=null;}
+function startPetResize(corner){
+ if(!petResizing||!mainWindow||mainWindow.isDestroyed())return false;
+ stopPetResizeDrag();const start=screen.getCursorScreenPoint(),scale=petScale,anchor=resizeAnchor(currentPetBounds(),scale,corner);
+ petResizeTimer=setInterval(()=>{
+  if(!mainWindow||mainWindow.isDestroyed()||!petMode){stopPetResizeDrag();return}
+  const cursor=screen.getCursorScreenPoint();
+  try{changePetScale(resizeScale(scale,corner,cursor.x-start.x,cursor.y-start.y),anchor)}catch(error){stopPetResizeDrag();console.warn('Unable to resize pet:',error.message)}
+ },16);petResizeTimer.unref?.();return true;
+}
+function finishPetResize(commit=true){
+ if(typeof commit!=='boolean')throw new TypeError('Invalid resize confirmation');
+ stopPetResizeDrag();if(!petResizing)return false;
+ const original=petResizeOriginal;
+ if(!commit&&original){const anchor={x:original.bounds.x,y:original.bounds.y,local:{x:0,y:0}};changePetScale(original.scale,anchor)}
+ petResizing=false;petResizeOriginal=null;changeMouseThrough(original?.mouseThrough??false);saveWindowState();publishState();scheduleWander();return true;
+}
+
 function settingsPath() {
   return path.join(app.getPath('userData'), 'window-state.json');
 }
@@ -661,7 +688,7 @@ function listen(channel, callback) {
 
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
-  roomResizer.end();
+  roomResizer.end();if(petResizing)finishPetResize(true);
   if(enabled&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
   if (enabled === petMode) return petMode;
   changePetEffectBounds(null);
@@ -802,7 +829,7 @@ function startUpdates(){
   macSigned:applicationMetadata.macUpdateSigned===true,
   fetch:(url,options)=>net.fetch(url,options),openPath:file=>shell.openPath(file),
   engineFactory:()=>{const engine=require('electron-updater').autoUpdater;engine.setFeedURL(require('./update-source.cjs').productionUpdateSource(windowsEdition?.edition==='legacy'?windowsEdition.channel:undefined));return engine},
-  prepareInstall:prepareUpdateInstall,isBusy:()=>updateRendererBusy||!hasPet||!petMode||companionPanel||dragging||interacting,
+  prepareInstall:prepareUpdateInstall,isBusy:()=>messageBoard.isOpen()||petResizing||updateRendererBusy||!hasPet||!petMode||companionPanel||dragging||interacting,
   onChange:state=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('updates:state',state);refreshTrayMenu()},
   onAvailable:()=>{void updatePrompts.offerDownload()},
   onReady:()=>{void updatePrompts.offerInstall()},
@@ -829,11 +856,14 @@ function updateTrayStatus(status){
 }
 
 function registerIPC() {
- const sizeSender=event=>{if(!sizeWindow||sizeWindow.isDestroyed()||event.sender!==sizeWindow.webContents||event.senderFrame!==sizeWindow.webContents.mainFrame)throw new Error('Untrusted size editor');};
- ipcMain.handle('desktop:size-dialog-get',event=>{sizeSender(event);return petScale;});
- ipcMain.handle('desktop:size-dialog-save',(event,percent)=>{sizeSender(event);changePetScale(percent/100);sizeWindow.close();return true;});
   handle('desktop:set-pet-status',updateTrayStatus);
-  handle('desktop:set-pet-scale',changePetScale);
+  handle('desktop:flush-save',()=>{mainWindow.webContents.session.flushStorageData();return true});
+  handle('desktop:open-board',snapshot=>messageBoard.open(snapshot));
+  handle('desktop:board-snapshot',snapshot=>messageBoard.update(snapshot));
+  handle('desktop:set-pet-scale',scale=>changePetScale(scale));
+  handle('desktop:start-pet-resize',startPetResize);
+  handle('desktop:stop-pet-resize-drag',stopPetResizeDrag);
+  handle('desktop:finish-pet-resize',finishPetResize);
   handle('desktop:open-size-editor',openSizeEditor);
   handle('desktop:set-pet-effect-bounds',changePetEffectBounds);
   handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
@@ -945,10 +975,10 @@ function createWindow() {
   window.on('hide',()=>publishState());
   window.on('move',()=>{syncEffectAnchor();scheduleSave()});
   window.on('resize',()=>{syncEffectAnchor();scheduleSave()});
-  window.on('blur',()=>roomResizer.end());
-  window.on('hide',()=>roomResizer.end());
+  window.on('blur',()=>{roomResizer.end();stopPetResizeDrag()});
+  window.on('hide',()=>{roomResizer.end();if(petResizing)finishPetResize(false)});
   window.on('enter-full-screen',()=>roomResizer.end());
-  window.on('closed',()=>roomResizer.end());
+  window.on('closed',()=>{roomResizer.end();stopPetResizeDrag()});
   window.on('always-on-top-changed', () => publishState());
   window.on('enter-full-screen',()=>publishState());
   window.on('leave-full-screen',()=>{publishState();scheduleSave()});
@@ -1048,7 +1078,7 @@ if (!app.requestSingleInstanceLock()) {
   });
   nativeAutoUpdater?.on('before-quit-for-update',()=>{quitting=true;saveWindowState();try{mainWindow?.webContents.session.flushStorageData()}catch{}});
   app.on('before-quit', () => {
-    roomResizer.end();
+    roomResizer.end();stopPetResizeDrag();
     quitting = true;clearInterval(dragPoll);
     try{mainWindow?.webContents.session.flushStorageData()}catch{}
     stopMovement(); clearTimeout(edgeTimer); saveWindowState();

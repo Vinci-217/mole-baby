@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import {sleepPose,dozyPose} from '../original-actions'
-import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose, sampleFlyingPose } from './ram-animation'
+import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose, sampleFlyingPose, SEED_IDLE_FRAME_COUNT, SEED_IDLE_FPS } from './ram-animation'
 
 describe('original Ram care animation contract', () => {
+  it('plays every original seed idle frame, loops before the extra sleep cell and respects static/reduced motion',()=>{
+    expect(SEED_IDLE_FRAME_COUNT).toBe(61);expect(SEED_IDLE_FPS).toBe(24);
+    const frames=Array.from({length:61},(_,i)=>sampleSeedPose('idle',(i+.25)*1000/24).frame);
+    expect(frames).toEqual(Array.from({length:61},(_,i)=>i));
+    expect(sampleSeedPose('idle',61*1000/24+1)).toEqual({frame:0,finished:false});
+    expect(sampleSeedPose('waiting',1000).frame).toBe(24);
+    for(const time of [0,800,1800,6100]){
+      expect(sampleSeedPose('idle',time,true)).toEqual({frame:0,finished:false});
+      expect(sampleSeedPose('still',time)).toEqual({frame:0,finished:false});
+      expect(sampleSeedPose('drag',time)).toEqual({frame:0,finished:false});
+    }
+  });
   it.each([
     ['feed', 0, 1200], ['eat', 0, 1200], ['drink', 1, 1200],
     ['wash', 2, 1500], ['use', 3, 900], ['medical', 3, 900],

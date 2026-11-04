@@ -1,5 +1,6 @@
 import {dailyFrameSpec} from '../daily-frames';
 import UploadedLamuFrames from './UploadedLamuFrames';
+import ReadingBook from './ReadingBook';
 import {uploadedMotion,UPLOADED_TOYS} from '../uploaded-actions';
 import {petColorName,petColorOffsets,isCustomPetColor} from '../pet-color';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -641,7 +642,8 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume, compani
   if(clock.current.key!==eventKey)clock.current={key:eventKey,startedAt:performance.now()}
   if(playClock.current.key!==eventKey)playClock.current={key:eventKey,began:undefined}
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
-  const daily=!_rawDaily&&!costume&&!dragging&&!shaking?dailyFrameSpec(stage===0?'seed':form,sleeping||action==='sleep'?'sleep':action):undefined
+  const reading=!_rawDaily&&!sleeping&&!dragging&&!shaking&&(action==='focus'||action==='read-alone');
+  const daily=!reading&&!_rawDaily&&!costume&&!dragging&&!shaking?dailyFrameSpec(stage===0?'seed':form,sleeping||action==='sleep'?'sleep':action):undefined
   const uploaded=!sleeping&&!dragging&&!shaking?uploadedMotion(stage===0?'seed':form,action,itemId):undefined
   const lifeAction=!sleeping&&!dragging&&!shaking&&isPastime(action)?action:undefined
   const schoolAction=!sleeping&&!dragging&&!shaking&&isSchoolAction(action)?action:undefined
@@ -675,6 +677,9 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume, compani
   // the native window offset and drag-out placement stay unchanged.
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
   const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  if(reading)return <span className="ram-sprite ram-classic ram-reading" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action="focus" data-life-action={lifeAction} data-color={color} data-sleeping="false" data-art-style="classic">
+    <span className="reading-pet-source" aria-hidden="true"><Ram color={color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></span><ReadingBook form={stage===0?'seed':form} sound={sound}/>
+  </span>;
   if(daily)return <span className="ram-sprite ram-classic ram-daily" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>
     <UploadedLamuFrames key={eventKey} spec={daily} form={stage===0?'seed':form} color={color} sound={sound} loop={daily.id==='focus'||daily.id==='sleep'} limit={action==='read-alone'?18000:undefined} action={daily.id} onEnd={onActionEnd} fallback={<Ram color={color} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
   </span>

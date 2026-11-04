@@ -11,21 +11,25 @@
 
 .pocket-compact .pocket-heading{height:20px}.pocket-compact .pocket-items{width:144px;height:144px;margin:1px auto}.pocket-compact .pocket-categories{padding-bottom:2px}.pocket-compact .pocket-categories>button{line-height:16px}
 
-/* The original care pouch keeps its four tabs on the right edge. This is
-   shared by the full cottage pouch and the compact desktop/mobile pouch so
-   the interaction remains identical in both windows. */
-.care-pocket:not(.pocket-compact){display:grid;grid-template-columns:minmax(0,1fr) 76px;grid-template-areas:'heading heading' 'items categories' 'hint hint' 'pages pages';column-gap:12px;align-items:start}
-.care-pocket:not(.pocket-compact)>.pocket-heading{grid-area:heading}
-.care-pocket:not(.pocket-compact)>.pocket-items{grid-area:items;width:100%;margin:10px 0}
-.care-pocket:not(.pocket-compact)>.pocket-categories{grid-area:categories;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(0,1fr));align-self:stretch;gap:7px;padding:10px 0}
-.care-pocket:not(.pocket-compact)>.pocket-categories>button{min-height:34px;padding:5px 2px}
-.care-pocket:not(.pocket-compact)>.pocket-item-hint{grid-area:hint}
-.care-pocket:not(.pocket-compact)>.pocket-pages{grid-area:pages}
-.pocket-compact{display:grid;grid-template-columns:minmax(0,1fr) 44px;grid-template-rows:20px minmax(0,1fr) 18px;grid-template-areas:'heading heading' 'items categories' 'pages pages';column-gap:4px;align-items:start}
-.pocket-compact>.pocket-heading{grid-area:heading}
-.pocket-compact>.pocket-categories{grid-area:categories;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(0,1fr));align-self:stretch;gap:3px;padding:1px 0 2px}
-.pocket-compact>.pocket-categories>button{min-height:0;padding:0;line-height:16px}
-.pocket-compact>.pocket-items{grid-area:items;width:100%;height:auto;aspect-ratio:1;margin:1px 0;align-self:start}
-.pocket-compact>.pocket-pages{grid-area:pages}
-.pocket-compact>.pocket-item-hint{grid-column:1/-1;grid-row:2;align-self:end}
-@media(max-width:700px){.care-pocket:not(.pocket-compact){grid-template-columns:minmax(0,1fr) 62px;column-gap:8px}.care-pocket:not(.pocket-compact)>.pocket-categories{gap:5px}.care-pocket:not(.pocket-compact)>.pocket-categories>button{font-size:11px}}
+/* Only inventory uses a side rail; the status pocket keeps its full width. */
+.care-inventory{display:grid;grid-template-columns:minmax(0,1fr) 48px;grid-template-rows:auto auto auto auto;grid-template-areas:'heading heading' 'items categories' 'hint hint' 'pages pages';column-gap:8px;align-items:start;max-width:360px}
+.care-inventory>.pocket-heading{grid-area:heading}
+.care-inventory>.pocket-items{grid-area:items;width:100%;height:auto;aspect-ratio:1;margin:6px 0}
+.care-inventory>.pocket-categories{grid-area:categories;display:flex;flex-direction:column;gap:5px;align-self:start;padding:6px 0 0}
+.care-inventory>.pocket-categories>button{flex:none;width:100%;height:28px;min-height:0;padding:2px 4px;font-size:12px;line-height:20px;border-radius:6px}
+.care-inventory>.pocket-item-hint{grid-area:hint}
+.care-inventory>.pocket-pages{grid-area:pages;min-width:0;gap:7px;font-size:12px}
+.care-inventory>.pocket-pages>.pocket-link{white-space:nowrap;font-size:11px}
+.care-inventory.pocket-compact{max-width:none;height:100%;grid-template-columns:minmax(0,1fr) 36px;grid-template-rows:24px minmax(0,1fr) 20px;grid-template-areas:'heading heading' 'items categories' 'pages pages';column-gap:6px}
+.care-inventory.pocket-compact>.pocket-heading{height:24px;min-height:24px;align-items:center}
+.care-inventory.pocket-compact>.pocket-items{margin:2px 0;max-width:154px;justify-self:center}
+.care-inventory.pocket-compact>.pocket-categories{gap:4px;padding:2px 0 0}
+.care-inventory.pocket-compact>.pocket-categories>button{height:24px;min-height:24px;font-size:10px;line-height:18px;padding:2px 0}
+.care-inventory.pocket-compact>.pocket-item-hint{grid-area:auto}
+.care-pocket .pocket-heading-actions>.pocket-close{display:grid;place-items:center;padding:0;line-height:1;min-width:22px;min-height:22px}
+.care-inventory .pocket-categories>button{position:relative;display:grid;place-items:center}
+.pocket-categories>button>img{display:block;width:20px;height:20px;object-fit:contain;pointer-events:none}
+.pocket-compact .pocket-categories>button>img{width:18px;height:18px}
+.pocket-category-label{position:absolute;right:calc(100% + 5px);top:50%;transform:translateY(-50%);padding:3px 7px;border:1px solid #ddc79c;border-radius:5px;background:#fff9e9;color:#79583b;font-size:10px;line-height:16px;white-space:nowrap;visibility:hidden;pointer-events:none}
+.pocket-categories>button:hover,.pocket-categories>button:focus-visible{z-index:3}
+.pocket-categories>button:hover>.pocket-category-label,.pocket-categories>button:focus-visible>.pocket-category-label{visibility:visible}

@@ -239,3 +239,18 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .tool-countdown{position:static;transform:none;font-size:10px;line-height:14px;text-shadow:none}
 .companion-layout.is-edge-docked .compact-pet-condition,
 .companion-layout .compact-pet:has(.ram-football-frame) .compact-pet-condition{opacity:0;pointer-events:none}
+.companion-layout .desktop-play{grid-template-rows:none;grid-auto-rows:49px}
+.companion-layout .desktop-play>button>span{font-size:24px;line-height:26px}
+.companion-layout .pet-actions{left:8px;width:144px}.companion-layout .compact-hover-bridge{left:8px;width:144px}
+.pet-resize-ui{position:absolute;inset:0;z-index:20;pointer-events:none;font:10px/1.4 'Microsoft YaHei',sans-serif}
+.pet-resize-frame{position:absolute;left:25px;top:65px;width:110px;height:120px;border:1px dashed #5a9cba;border-radius:4px}
+.pet-resize-hint{position:absolute;top:38px;left:9px;width:142px;padding:3px;background:#fff9e9f5;border-radius:6px;color:#765331;text-align:center}
+.companion-layout .pet-resize-handle{position:absolute;width:12px;height:12px;min-height:12px;margin:-6px 0 0 -6px;padding:0;pointer-events:auto;touch-action:none;translate:none;border:1px solid #4387aa;border-radius:3px;background:#effbff}
+.resize-nw{left:25px;top:65px;cursor:nwse-resize}.resize-ne{left:135px;top:65px;cursor:nesw-resize}.resize-sw{left:25px;top:185px;cursor:nesw-resize}.resize-se{left:135px;top:185px;cursor:nwse-resize}
+.pet-resize-confirm{position:absolute;left:20px;top:211px;width:120px;display:flex;justify-content:center;gap:7px;pointer-events:auto}
+.companion-layout .pet-resize-confirm button{min-height:20px;height:20px;padding:0 9px;border:1px solid #c8af83;border-radius:5px;background:#fff9e9;color:#795c35;font-size:10px;translate:none}
+.is-pet-resizing .compact-bubble{visibility:hidden}.is-pet-resizing .desktop-character{cursor:default}
+.companion-layout .pet-actions{left:17px;width:126px}.companion-layout .compact-hover-bridge{left:17px;width:126px}
+.companion-layout .pet-actions .timer-tool.running{width:25px;flex-basis:25px;background:#f8eed7;box-shadow:inset 0 0 0 1px #d3b882}.companion-layout .timer-tool.running>img{display:block}
+.pet-focus-time{position:absolute;left:26px;top:37px;width:108px;height:27px;display:flex;align-items:center;justify-content:center;gap:5px;padding:3px 7px;border:1px solid #d4c09a;border-radius:10px;background:#fffaf0ee;color:#795b36;box-shadow:0 2px 6px #49321714;font:600 14px/20px 'Microsoft YaHei',sans-serif;font-variant-numeric:tabular-nums;pointer-events:none;z-index:5}
+.pet-focus-time>img{width:19px;height:19px;object-fit:contain}.companion-layout .desktop-play>button>svg{width:24px;height:24px;flex-shrink:0}

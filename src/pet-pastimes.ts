@@ -33,7 +33,7 @@ export function spellCostume(petId: number, now = Date.now()): OutfitId {
   const date=new Date(now), day=Math.floor(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())/86400000)
   return (['wizard-cap','rabbit-hood','leaf-hood','warm-scarf'] as const)[(Math.abs(Math.floor(petId/1000))+day)%4]
 }
-export interface PetOuting { id: string; place: string; startedAt: number; returnsAt: number; story: string }
+export interface PetOuting { id: string; place: string; startedAt: number; returnsAt: number; story: string; manual?:boolean }
 const MINUTE=60000
 const PLACES=[
   {place:'浆果林',stage:1,story:'我去浆果林看了看，发现树荫下的叶子也有好多种绿。没带回食物，倒是带回了好心情。'},
@@ -47,7 +47,7 @@ export function beginOuting(pet: GameState, sequence=0, now=Date.now(), manual=f
   if (!manual && now-(pet.lastOutingAt??pet.createdAt)<90*MINUTE) return null
   const choices=PLACES.filter(p=>getStage(pet.growth,pet.evolution)>=p.stage&&(p.place!=='拉姆学院 · 魔法课'||learned(pet,'wind')))
   const seed=Math.abs(Math.floor(pet.createdAt/1000)+Math.floor(now/86400000)+sequence),choice=choices[seed%choices.length]
-  const outing:PetOuting={id:`${pet.createdAt}:${now}`,place:choice.place,startedAt:now,returnsAt:now+(2+seed%4)*MINUTE,story:choice.story}
+  const outing:PetOuting={manual,id:`${pet.createdAt}:${now}`,place:choice.place,startedAt:now,returnsAt:now+(2+seed%4)*MINUTE,story:choice.story}
   return {...pet,outing,lastOutingAt:now}
 }
 export function normalizeOuting(value: unknown, now: number,petId?:number): PetOuting | undefined {

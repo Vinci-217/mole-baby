@@ -1,5 +1,7 @@
 .room-furnishing-layer{position:absolute;inset:0;pointer-events:none;z-index:0}.room-placed-item{position:absolute;padding:0;border:0;background:none;pointer-events:none;translate:none!important;transform:translate(-50%,-100%);touch-action:none}.room-placed-item.on-wall{transform:translate(-50%,-100%)}.room-placed-item>img{display:block;width:100%;height:auto;filter:drop-shadow(0 3px 2px #5e371624)}.room-placed-item>span{position:absolute;left:18%;right:18%;top:34%;font-size:clamp(7px,1.2vw,15px);font-weight:bold;color:#805126;text-align:center;line-height:1.3}.room-furnishing-layer.is-editing{pointer-events:auto}.is-editing .room-placed-item{pointer-events:auto;cursor:grab}.is-editing .room-placed-item:active{cursor:grabbing}.furnishing-editor>header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 14px}.furnishing-editor h3{font-size:21px;margin:0}.furnishing-editor>header>span{font-size:14px}.furnishing-canvas{position:relative;aspect-ratio:16/9;overflow:hidden;border:2px solid #d5b581;border-radius:17px;background:#f7efd7;isolation:isolate}.furnishing-background{position:absolute;inset:0;background-size:cover;background-position:center}.furnishing-background.is-sheet{background-size:200% 200%;background-position:var(--scene-x) var(--scene-y)}.furnishing-wall-zone,.furnishing-floor-zone{position:absolute;left:5%;right:5%;border:1px dashed #fff8c5a0;background:#fff8dd24;color:white;text-shadow:0 1px 3px #553c1c;font-size:13px;padding:5px;pointer-events:none}.furnishing-wall-zone{top:14%;height:26%;border-radius:9px}.furnishing-floor-zone{top:63%;height:21%;border-radius:50%}.furnishing-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 0}.furnishing-tools button{font-size:15px;border-radius:15px;padding:7px 15px;border:1px solid #d3b786}.furnishing-tools button[aria-pressed=true]{background:#e5edcf;border-color:#a9ba7c}.furnishing-tools>span{margin-left:auto;font-size:13px;color:#957c58}.furnishing-catalogue{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px}.furnishing-catalogue article{padding:12px 6px;border:1px solid #e2d2b2;background:#fffcf3;border-radius:15px;display:flex;flex-direction:column;align-items:center;gap:8px}.furnishing-catalogue img{width:70px;height:72px;object-fit:contain}.furnishing-catalogue strong{font-size:15px}.furnishing-catalogue span{font-size:13px;color:#9a7d57}.furnishing-editor>p{font-size:14px;margin-bottom:18px}.room-dock{gap:3px!important}.room-dock>button{min-width:0!important}@media(max-width:650px){.furnishing-catalogue{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .room-placed-item[data-furniture="message-board"]{pointer-events:auto;cursor:pointer}
+.warehouse-drag-card{touch-action:none;user-select:none;-webkit-user-select:none}
+.warehouse-drag-preview{position:fixed;z-index:200;width:54px;height:auto;transform:translate(-50%,-80%);pointer-events:none;filter:drop-shadow(0 3px 3px #39210d70)}
 
 .furnishing-canvas{width:min(100%,560px);margin-inline:auto}.furnishing-canvas,.room-furnishing-layer.is-editing{user-select:none;-webkit-user-select:none}
 
@@ -9,3 +11,34 @@
 /* Empty editing space passes clicks to the room controls; only placed items
    capture drags. The scene's isolated stack keeps this header below dialogs. */
 .room-furnishing-layer.is-editing{pointer-events:auto}.time-scene>.cottage-top{position:relative;z-index:80}
+@media(max-width:700px){
+ .classic-app.ramu-v6 .room-decor-drawer{right:8px;top:66px;bottom:104px;width:min(240px,56vw);padding:10px}
+ .room-decor-drawer>header{gap:8px;font-size:13px;white-space:nowrap}
+ .room-decor-drawer>header button{padding:4px 10px;font-size:12px}
+ .room-decor-drawer .furnishing-editor>header{align-items:flex-start;gap:6px;padding-bottom:8px}
+ .room-decor-drawer .furnishing-editor>header h3{font-size:12px;min-width:0}
+ .room-decor-drawer .furnishing-editor>header>span{font-size:11px;flex:0 0 auto}
+ .room-decor-drawer .furnishing-tools{gap:6px;padding:10px 0}
+ .room-decor-drawer .furnishing-tools button{font-size:11px;padding:6px 8px}
+ .room-decor-drawer .furnishing-tools>span{font-size:10px;line-height:1.6}
+ .room-decor-drawer .furnishing-catalogue{grid-template-columns:minmax(0,1fr);gap:8px}
+ .room-decor-drawer .furnishing-catalogue article{padding:8px 6px}
+}
+.room-piece{position:absolute;transform:translate(-50%,-100%);pointer-events:none}
+.room-piece .room-placed-item{position:relative;inset:0;width:100%;height:100%;transform:none;border:0;border-radius:2px;display:block;overflow:visible}
+.furniture-art-crop{position:absolute;inset:0;display:block;overflow:hidden;pointer-events:none}
+.furniture-art-crop>img{display:block;max-width:none;pointer-events:none}.furniture-art-crop>span{position:absolute;left:18%;right:18%;top:34%;font-size:clamp(6px,1vw,12px);font-weight:bold;text-align:center;color:#805126;line-height:1.3}
+.is-editing .room-piece.is-selected .room-placed-item{outline:1px solid #318caa;outline-offset:2px;background:#bde7ee0a}
+.is-editing .room-piece .room-placed-item:hover{outline:1px dashed #5295a9aa;outline-offset:2px}
+.furniture-handle{position:absolute;width:10px;height:10px;min-height:10px;padding:0;border:1px solid #32829d;border-radius:2px;background:#f1fbff;pointer-events:auto;touch-action:none;translate:none!important;z-index:2}
+.handle-nw{left:-6px;top:-6px;cursor:nwse-resize}.handle-ne{right:-6px;top:-6px;cursor:nesw-resize}.handle-sw{left:-6px;bottom:-6px;cursor:nesw-resize}.handle-se{right:-6px;bottom:-6px;cursor:nwse-resize}
+.furnishing-free-hint{position:absolute;left:18px;bottom:112px;padding:5px 10px;border:1px solid #cbb28280;border-radius:7px;background:#fff9e7df;color:#795b36;font-size:11px;pointer-events:none}
+.furniture-controls{position:absolute;left:18px;bottom:112px;width:282px;max-width:calc(100% - 36px);padding:10px 12px;border:1px solid #d3b888;border-radius:9px;background:#fffaf0f5;box-shadow:0 3px 14px #67472320;z-index:11000;pointer-events:auto;color:#795b36;font-size:12px}
+.furniture-controls>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.furniture-controls>header>button{width:22px;height:22px;font-size:20px;line-height:22px;padding:0}
+.furniture-controls>label{display:flex;align-items:center;gap:8px}.furniture-controls input[type=range]{width:100%;min-width:0;accent-color:#ad7c3c}.furniture-controls output{min-width:35px;text-align:right;font-variant-numeric:tabular-nums}
+.furniture-controls>div{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.furniture-controls>div>button{padding:4px 8px;border:1px solid #dfc79f;border-radius:5px;background:#fbefd9;font-size:11px}
+.furnishing-tools input[type=search]{width:100%;padding:6px 9px;border:1px solid #d8c4a0;border-radius:6px;background:#fffdf5;font-size:12px}.furnishing-tools>label{display:flex;gap:5px;align-items:center;font-size:12px}.furnishing-tools>span{font-size:11px!important;line-height:1.6;margin:0!important}.furnishing-catalogue article:not(.warehouse-drag-card)>img{touch-action:none}.furnishing-catalogue article[draggable=true]{cursor:grab}.furnishing-catalogue article[draggable=true]:active{cursor:grabbing}
+@media(max-width:700px){.furniture-controls{left:8px;bottom:104px;width:230px;padding:8px 10px;max-width:calc(100% - 16px)}.furnishing-free-hint{left:8px;bottom:104px;max-width:58%;font-size:10px}.furniture-controls>div>button{padding:4px 6px;font-size:10px}.room-decor-drawer .furnishing-catalogue img{height:56px;width:62px}.room-decor-drawer .furnishing-catalogue strong{font-size:12px}.room-decor-drawer .furnishing-catalogue span{font-size:10px}}
+.furniture-controls>label>span{white-space:nowrap;flex-shrink:0}.furniture-controls input[type=range]{flex:1;width:0;min-width:30px}.furniture-controls output{flex-shrink:0}
+.room-decor-drawer>header{gap:7px}.room-decor-drawer>header>strong{margin-right:auto}.room-decor-drawer>header>.warehouse-collapse{padding:4px 8px;font-size:11px;background:#f4ead5}
+.room-decor-drawer.is-collapsed{width:auto!important;bottom:auto!important;padding:8px 10px}.room-decor-drawer.is-collapsed>header{padding:0}.room-decor-drawer.is-collapsed>.furnishing-editor,.room-decor-drawer.is-collapsed>.room-settings{display:none}

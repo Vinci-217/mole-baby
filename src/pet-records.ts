@@ -1,5 +1,5 @@
 import type {GameState,PetStats} from './game';
-export interface PetNote {id:string;text:string;done:boolean;createdAt:number}
+export interface PetNote {id:string;text:string;done:boolean;createdAt:number;reply?:string}
 export interface StatChange {at:number;reason:string;delta:Partial<PetStats>}
 const fields=['hunger','thirst','cleanliness','happiness','health','energy'] as const;
 export function normalizeNotes(value:unknown):PetNote[]{
@@ -7,7 +7,7 @@ export function normalizeNotes(value:unknown):PetNote[]{
  const ids=new Set<string>();
  return value.slice(0,40).flatMap(note=>{
   if(!note||typeof note.id!=='string'||note.id.length>80||ids.has(note.id)||typeof note.text!=='string'||!note.text.trim()||!Number.isSafeInteger(note.createdAt)||note.createdAt<0)return [];
-  ids.add(note.id);return [{id:note.id,text:note.text.slice(0,240),done:note.done===true,createdAt:note.createdAt}];
+  ids.add(note.id);return [{id:note.id,text:note.text.slice(0,240),done:note.done===true,createdAt:note.createdAt,...(typeof note.reply==='string'&&note.reply.trim()?{reply:note.reply.slice(0,240)}:{})}];
  });
 }
 export function normalizeStatHistory(value:unknown):StatChange[]{

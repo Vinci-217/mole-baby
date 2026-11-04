@@ -34,6 +34,10 @@ async function applyGrowthSettings(page,{mode}={}){
 }
 async function enterHome(page) {
   if (await page.locator('.cottage-scene').isVisible()) return;
+  const workHome=page.locator('.pet-work-note').getByRole('button',{name:'进入小屋',exact:true});
+  if(await workHome.isVisible()){
+    await workHome.click();await expect(page.locator('.cottage-scene')).toBeVisible();return;
+  }
   const actions = await openActions(page);
   await actions.getByRole('button', { name: '进入小屋', exact: true }).click();
   await expect(page.locator('.cottage-scene')).toBeVisible();
@@ -56,7 +60,7 @@ async function toDesktop(page) {
   const close = page.getByRole('button', { name: '关闭面板', exact: true });
   while (await close.isVisible()) await close.click();
   await page.getByRole('button', { name: '回到桌面', exact: true }).click();
-  await page.getByTestId('desktop-character').waitFor();
+  await page.locator('[data-testid="desktop-character"]:visible,.pet-work-note').first().waitFor();
 }
 async function selectPocket(page, id, label) {
   const pocket = page.locator('.classic-pet-book');

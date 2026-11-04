@@ -3,6 +3,10 @@ const {nativePosition,movementProgress}=require('./native-position.cjs');
 test('native position conversion rejects nonfinite and overflowing coordinates and rounds fractional DIP positions',()=>{
  for(const value of [NaN,Infinity,-Infinity,2**40,'23',undefined])assert.equal(nativePosition({x:value,y:10}),null);
  assert.deepEqual(nativePosition({x:-318.75,y:100.49}),{x:-319,y:100});
+ for(const value of [-0,-.1,-.49]){
+  const point=nativePosition({x:value,y:value});
+  assert.equal(Object.is(point.x,-0),false);assert.equal(Object.is(point.y,-0),false);
+ }
 });
 test('sleep, timer delays and clock corrections never produce an invalid animation position',()=>{
  assert.equal(movementProgress(10000,3000,9999),null);

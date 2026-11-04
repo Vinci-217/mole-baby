@@ -5,12 +5,12 @@ import type { Foley, SoundScore } from './pet-sound-score'
 export type PetVoice = 'pet' | 'lift' | 'shake' | 'drop' | 'catch' | 'feed' | 'drink' | 'wash' | 'sleep' | 'wake' | 'sick'
 let lastVoiceAt = -Infinity, lastEffectAt = -Infinity
 let lastKind: PetVoice | null = null, context: AudioContext | null = null
-let settings = {enabled: true, volume: .45}
+let settings = {enabled: true, gameEnabled:true, volume: .45}
 const channels = new Set<GainNode>()
 const gameAudio=createOriginalGameAudio(url=>new Audio(url))
 const canPlay = (enabled = true) => enabled && settings.enabled && settings.volume > 0 && !document.hidden
 const level = () => canPlay() ? settings.volume : 0
-function syncChannels() { gameAudio.configure({...settings,hidden:typeof document!=='undefined'&&document.hidden});for (const channel of channels) {channel.gain.cancelScheduledValues(0);channel.gain.value=level()} }
+function syncChannels() { gameAudio.configure({enabled:settings.gameEnabled,volume:settings.volume,hidden:typeof document!=='undefined'&&document.hidden});for (const channel of channels) {channel.gain.cancelScheduledValues(0);channel.gain.value=level()} }
 export function configurePetSound(next: typeof settings) {
   settings = {...next, volume: Number.isFinite(next.volume) ? Math.max(0,Math.min(1,next.volume)) : .45}
   syncChannels()
@@ -103,7 +103,7 @@ export function playPetVoice(kind: PetVoice, enabled: boolean) {
 }
 /** Gameplay cues use original game recordings; pet care foley stays separate. */
 export function playGameSound(kind:GameSound,enabled:boolean){
- if(!canPlay(enabled)||performance.now()-lastEffectAt<75)return;
+ if(!enabled||!settings.gameEnabled||settings.volume<=0||document.hidden||performance.now()-lastEffectAt<75)return;
  lastEffectAt=performance.now();gameAudio.play(kind);
 }
 export function stopGameSounds(){gameAudio.stop()}

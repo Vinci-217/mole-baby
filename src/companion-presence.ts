@@ -54,7 +54,7 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
     '摩尔城堡、淘淘乐街……这些名字一念，就有小时候的感觉呢。',
     '小拉姆也有自己的小日子：吃饱、洗干净，再陪你发一会儿呆。',
     '小时候在庄园里忙来忙去，现在也可以一起慢慢过日子。',
-    stage===0?'小花盆里也有好多新鲜事。你忙你的，我在这里陪着。':'咕噜？我把身子轻轻一晃，就当和你打过招呼啦。',
+    stage===0?'小花盆里也有好多新鲜事。你忙你的，我在这里陪着。':'bibo？我把身子轻轻一晃，就当和你打过招呼啦。',
   ].forEach((text,i)=>add(`ram-life-${i}`,'life',text));
  GROWTH[stage].forEach((text,i)=>add(`growth-${stage}-${i}`,'growth',text));
  for(const [topic,texts] of Object.entries(BANK))texts.forEach((text,i)=>{if(stage===0&&text.includes('晃晃叶子'))return;add(`${topic}-${i}`,topic as PresenceTopic,text);});
@@ -77,7 +77,7 @@ export function presenceCandidates(pet:GameState,memory:CompanionMemory,now=Date
  if(completed.count)add('memory-timer-today','memory',`今天我们一起等完了${completed.count}段计时。我把这${completed.minutes}分钟的小约定记住啦。`);
  const lastUser=memory.messages.filter(m=>m.role==='user'&&m.at<=now&&now-m.at<2*60*MINUTE).at(-1);
  if(companionFeeling(lastUser?.content??'')==='low')add('feeling-tired','feeling','听你说最近不太轻松，不用急着把自己撑好。我陪着你，想说话时就叫我。');
- if(companionFeeling(lastUser?.content??'')==='bright')add('feeling-bright','feeling','你刚才分享的那件开心事，我还记着。咕噜，替你开心。');
+ if(companionFeeling(lastUser?.content??'')==='bright')add('feeling-bright','feeling','你刚才分享的那件开心事，我还记着。bibo，替你开心。');
  const lastFood=memory.events.filter(e=>e.kind==='feed'&&e.at<=now&&now-e.at<7*86400000).at(-1);
  const sharedFood=lastFood&&ITEMS.find(item=>item.category==='food'&&lastFood.detail===`你用${item.name}照料了我。`);
  if(sharedFood)add('memory-food','memory',`你给我吃过的${sharedFood.name}，我记着呢。下次等肚子饿了再慢慢吃。`);

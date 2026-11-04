@@ -56,3 +56,13 @@ describe('recovery items and status receipts',()=>{
   expect(restored?.name).toBe('小叶');expect(restored?.notes).toEqual([]);expect(restored?.statHistory).toEqual([]);
  });
 });
+
+describe('official message board notes',()=>{
+ it('retains an old note identity and optional local reply through reload and sanitizes malformed reply data',()=>{
+  const p=createPet('小叶','blue',NOW);
+  const note={id:'old-note',text:'照顾拉姆',done:true,createdAt:NOW,reply:'已经洗澡了'};
+  const saved=parseSave(JSON.stringify({...p,notes:[note]}),NOW)!;
+  expect(saved.notes).toEqual([note]);
+  expect(normalizeNotes([{...note,reply:{text:'bad'}}])).toEqual([{id:note.id,text:note.text,done:true,createdAt:NOW}]);
+ });
+});
