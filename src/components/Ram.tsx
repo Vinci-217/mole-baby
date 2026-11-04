@@ -106,9 +106,14 @@ function sheetSpec(form: Form, kind: SheetKind) {
   return { width: CELL_WIDTH * 8, height: CELL_HEIGHT * 9, neutral: `./assets/classic/${form}-neutral.png`, mask: `./assets/classic/${form}-mask.png` }
 }
 async function loadPng(path: string, width: number, height: number) {
-  const image = new Image()
-  image.src = path
-  await image.decode()
+  // Valid atlases can reject decode() on some Chromium builds. Keep dimension
+  // validation, and use the same load events as the original frame player.
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const source = new Image()
+    source.onload = () => { source.onload = source.onerror = null; resolve(source) }
+    source.onerror = () => { source.onload = source.onerror = null; reject(new Error('拉姆图集加载失败')) }
+    source.src = path
+  })
   if (image.naturalWidth !== width || image.naturalHeight !== height) throw new Error('经典拉姆图集尺寸不正确')
   return image
 }
