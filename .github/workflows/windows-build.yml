@@ -368,7 +368,12 @@ jobs:
           test "$RELEASE_TAG" = "v$(node -p 'require("./package.json").version')"
           # A release branch can publish only after the same six platform
           # gates. Never move an existing tag or publish a different commit.
-          tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha' 2>/dev/null || true)
+          tag_sha=''
+          if tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha' 2>/dev/null); then
+            :
+          else
+            tag_sha=''
+          fi
           if [ -n "$tag_sha" ]; then
             test "$tag_sha" = "$GITHUB_SHA" || { echo 'Release tag points to another commit'; exit 1; }
           else
