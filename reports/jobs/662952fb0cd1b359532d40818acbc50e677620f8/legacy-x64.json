@@ -1,0 +1,8 @@
+{
+  "sourceSha": "662952fb0cd1b359532d40818acbc50e677620f8",
+  "platform": "legacy-x64",
+  "status": "cancelled",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/41890383906",
+  "log": "npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.\nnpm warn deprecated rimraf@2.6.3: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn deprecated boolean@3.2.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.\n\nadded 450 packages, and audited 451 packages in 19s\n\n72 packages are looking for funding\n  run `npm fund` for details\n\n16 vulnerabilities (9 moderate, 5 high, 2 critical)\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n",
+  "recordedAt": "2026-11-04T18:47:36.020Z"
+}
