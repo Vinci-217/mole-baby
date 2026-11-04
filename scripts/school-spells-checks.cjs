@@ -7,7 +7,7 @@ async function verifySchoolSpells(page){
  try{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:840,evolution:'super',growthLocked:true,sleeping:false,activity:undefined,outing:undefined,education:undefined,wardrobe:[],wearing:undefined,lastTick:Date.now(),coins:10000});p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false}));localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:false}));});
-  await page.reload();await enterHome(page);await roomTab(page,'衣橱');
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await enterHome(page);await roomTab(page,'衣橱');
   await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await expect(page.getByRole('button',{name:'魔法课结业获得',exact:true})).toBeDisabled();
   await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
   await roomTab(page,'学院');const course=name=>page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name,exact:true})});
@@ -33,7 +33,7 @@ async function verifySchoolSpells(page){
   await panel.evaluate(p=>p.scrollTop=p.scrollHeight);await page.clock.runFor(50);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v305-spells-pocket.png'),omitBackground:true});
   for(const [id,name]of[['fire-6','星火涅槃'],['water-6','水上狂舞'],['wood-6','上天入地']]){
    if(!await panel.count()){actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click()}
-   await panel.getByRole('button',{name,exact:true}).click();const magic=page.getByTestId('desktop-character').locator('.magic-box-performance');await expect(magic).toHaveAttribute('data-ready','true');
+   await panel.getByRole('button',{name,exact:true}).click();const magic=page.getByTestId('desktop-character').locator('.magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
    await page.clock.runFor(950);const smoke=magic.locator('.magic-box-smoke');await expect(smoke).toHaveCount(1);
    const white=await smoke.evaluate(im=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const ctx=c.getContext('2d');ctx.filter=getComputedStyle(im).filter;ctx.drawImage(im,0,0);const d=ctx.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+3]>200){if(d[i]!==255||d[i+1]!==255||d[i+2]!==255)return false;n++}return n>100});assert.equal(white,true,'Transformation smoke must be pure white');
    await page.clock.runFor(1700);await expect(magic.locator(`canvas[data-element-skill="${id}"]`)).toBeVisible();await expect(panel).toHaveCount(0);
@@ -41,7 +41,7 @@ async function verifySchoolSpells(page){
   }
   console.log('PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, all 18 scrolling desktop entries, three apex casts with pure-white smoke and restored outfit');
  }catch(error){failed=true;console.error('School/spells error:',error);throw error;}finally{
-  if(clock)await page.clock.resume();await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(e=>{if(!failed)throw e});
+  if(clock)await page.clock.resume();await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(e=>{if(!failed)throw e});
  }
 }
 module.exports={verifySchoolSpells};

@@ -13,7 +13,7 @@ async function verifyRoomUpgrade(page){
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false}));
    localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:true,backgroundPlayback:false,musicId:'castle',volume:.1}));
   });
-  await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();await enterHome(page);
   const walker=page.locator('.room-walker'),floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),position=page.locator('.room-pet-position');
   await expect(floor).toBeEnabled();
   // A native window first paints at compact dimensions. Until the first user
@@ -59,13 +59,13 @@ async function verifyRoomUpgrade(page){
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));delete p.education;p.lastTick=Date.now();localStorage.setItem('ramu-house-save-v1',JSON.stringify(p))});
   // Earlier workflow checks may already have advanced this page's clock.
   // Reinstalling at wall time would make its saved lastTick look future-dated.
-  await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await page.reload();await enterHome(page);await roomTab(page,'学院');await language.getByRole('button',{name:'上这一课',exact:true}).click();await page.clock.fastForward(180150);
+  await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;await require('./smoke-storage.cjs').reloadStoredFixture(page);await enterHome(page);await roomTab(page,'学院');await language.getByRole('button',{name:'上这一课',exact:true}).click();await page.clock.fastForward(180150);
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).education?.lessons.language)).toBe(1);
   await page.reload();await enterHome(page);await roomTab(page,'学院');await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);
   console.log('PASS room upgrade: smooth floor travel, wall exclusion, keyboard, touch interruption, reduced motion; room re-entry restarts music, background playback stays continuous, ordinary clicks do not reset; one language lesson and old-save graduation persist');
  }catch(error){failed=true;console.error('Room upgrade error:',error);console.error('Room geometry:',await page.evaluate(()=>({width:innerWidth,height:innerHeight,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,click:window.__roomWalkClick,position:document.querySelector('.room-pet-position')?.dataset,floor:document.querySelector('.room-walk-surface')?.getBoundingClientRect().toJSON(),blocked:document.querySelector('.room-walk-surface')?.disabled})));throw error;}finally{
   if(clock)await page.clock.resume();await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
+  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
  }
 }
 module.exports={verifyRoomUpgrade};

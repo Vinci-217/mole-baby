@@ -23,4 +23,11 @@ async function reloadWithStorage(page, snapshot) {
   await page.reload();
 }
 
-module.exports = { reloadWithStorage };
+// Only explicit test-fixture reloads use this helper. Ordinary reloads continue
+// to exercise the real pagehide checkpoint and user-data persistence.
+async function reloadStoredFixture(page) {
+  const snapshot = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
+  await reloadWithStorage(page, snapshot);
+}
+
+module.exports = { reloadWithStorage, reloadStoredFixture };

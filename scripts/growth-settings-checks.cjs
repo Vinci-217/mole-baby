@@ -23,7 +23,7 @@ async function verifyGrowthSettings(page,desktop){
    if(m?.events?.[0]){m.events=m.events.filter(event=>!['stage-choice','growth'].includes(event.kind));m.events.push({...m.events[0],id:m.events[0].id+'-stage',kind:'stage-choice',detail:'曾经手动选择过阶段。'});localStorage.setItem(key,JSON.stringify(m))}
   });
   if(desktop)await page.evaluate(async()=>{await window.desktop.setRoomFullscreen(false);await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
   const actions=await openActions(page);await actions.getByRole('button',{name:'状态',exact:true}).click();
   const status=page.getByRole('region',{name:'拉姆状态面板',exact:true});await expect(status.getByRole('progressbar')).toHaveCount(6);await expect(status.getByLabel('物品分类',{exact:true})).toHaveCount(0);
   const backpack=await enterBackpack(page);await expect(backpack.locator('.pocket-status')).toHaveCount(0);await expect(backpack.getByRole('button',{name:'状态值变化规则',exact:true})).toHaveCount(0);
@@ -86,7 +86,7 @@ async function verifyGrowthSettings(page,desktop){
    p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
   });
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
   const painted=async selector=>{
    const canvases=page.locator(selector);await expect(canvases.first()).toBeVisible();
    await expect.poll(()=>canvases.evaluateAll(items=>items.every(c=>c.dataset.loaded==='true'&&c.getContext('2d').getImageData(0,0,c.width,c.height).data.some((v,i)=>i%4===3&&v>0))),{timeout:30000}).toBe(true);
@@ -109,7 +109,7 @@ async function verifyGrowthSettings(page,desktop){
   if(clock){await page.clock.resume();await page.clock.setSystemTime(new Date(originalTime+Date.now()-wallStart))}
   await page.evaluate(values=>{localStorage.clear();for(const[k,v]of Object.entries(values))localStorage.setItem(k,v)},snapshot);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setRoomFullscreen(false);await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  }
 }
 module.exports={verifyGrowthSettings};

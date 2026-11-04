@@ -95,7 +95,7 @@ async function makeTired(page) {
     p.stats.energy=15;p.sleeping=false;delete p.awakeUntil;p.lastTick=Math.max(p.createdAt,Date.now()-1000);
     localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
   });
-  await page.reload();await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-sleeping','true');
 }
 async function verifyEdgePeek(page,desktop,side,{onPose}={}){
   expect(['left','right','top','bottom']).toContain(side);

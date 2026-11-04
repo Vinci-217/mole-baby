@@ -7,7 +7,7 @@ async function verifyRoomPocket(page,desktop){
  const label=process.platform+'-'+process.arch;
  const bounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
- await page.evaluate(()=>{const key='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(key));p.inventory={biscuit:5,berry:2,'180001':4,'180007':2,'180010':1,juice:3,'180002':2,'180003':2,'180009':1,'180005':1};p.lastTick=Date.now();localStorage.setItem(key,JSON.stringify(p))});await page.reload();await page.getByTestId('desktop-character').waitFor();
+ await page.evaluate(()=>{const key='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(key));p.inventory={biscuit:5,berry:2,'180001':4,'180007':2,'180010':1,juice:3,'180002':2,'180003':2,'180009':1,'180005':1};p.lastTick=Date.now();localStorage.setItem(key,JSON.stringify(p))});await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  await enterHome(page);const original=await bounds();
  try{
   await expect(page.locator('.room-resize-edge')).toHaveCount(8);
@@ -42,12 +42,16 @@ async function verifyRoomPocket(page,desktop){
   console.log('PASS: native DIP room drag/keyboard resize, fullscreen/desktop size restore, persisted bounds and four inline square-grid pocket categories');
  }finally{
   await page.evaluate(async()=>{await window.desktop.endRoomResize();await window.desktop.setRoomFullscreen(false)});await enterHome(page);await desktop.evaluate(({BrowserWindow},b)=>BrowserWindow.getAllWindows()[0].setBounds(b),original);await toDesktop(page);
-  await page.evaluate(snapshot=>{localStorage.clear();for(const [key,value]of Object.entries(snapshot))localStorage.setItem(key,value)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await page.evaluate(snapshot=>{localStorage.clear();for(const [key,value]of Object.entries(snapshot))localStorage.setItem(key,value)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  }
 }
 async function verifyTabs(pocket){
  const tabs=pocket.getByRole('tablist',{name:'物品分类',exact:true}).getByRole('tab');assert.deepEqual(await tabs.allTextContents(),['食物','饮品','清洁','药水']);await expect(pocket.locator('select')).toHaveCount(0);
- const rows=await tabs.evaluateAll(ns=>ns.map(n=>n.getBoundingClientRect().top));assert.ok(Math.max(...rows)-Math.min(...rows)<1,'All four categories share one row');
+ const boxes=await tabs.evaluateAll(ns=>ns.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height}}));
+ assert.ok(Math.max(...boxes.map(b=>b.x))-Math.min(...boxes.map(b=>b.x))<1,'Categories form one column on the right');
+ assert.ok(boxes.every((b,i)=>i===0||b.y>=boxes[i-1].y+boxes[i-1].height),'Category icons do not overlap vertically');
+ const slot=await pocket.locator('.pocket-slot').last().boundingBox();assert.ok(boxes[0].x>=slot.x+slot.width,'Categories stay to the right of inventory slots');
+ await expect(tabs.locator('img')).toHaveCount(4);
  for(const name of ['食物','饮品','清洁','药水']){
   const tab=pocket.getByRole('tab',{name,exact:true});await tab.click();await expect(tab).toHaveAttribute('aria-selected','true');await expect(pocket.locator('.pocket-slot')).toHaveCount(16);
   const squares=await pocket.locator('.pocket-slot').evaluateAll(ns=>ns.every(n=>{const b=n.getBoundingClientRect();return Math.abs(b.width-b.height)<1}));assert.equal(squares,true);

@@ -4,7 +4,7 @@ async function verifyV32Native(page,desktop){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
  try{
   await page.evaluate(async()=>{await window.desktop.setPetScale(1);await window.desktop.wander(false);await window.desktop.setEdgeHiding(false);const key='ramu-house-save-v1',pet=JSON.parse(localStorage.getItem(key));Object.assign(pet,{growth:420,highestGrowth:420,growthLocked:true,evolution:undefined,activity:undefined,outing:undefined,sleeping:false,lastTick:Date.now()});localStorage.setItem(key,JSON.stringify(pet));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false,roomWander:false}));localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:false,backgroundPlayback:false}));});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'设置');
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'设置');
   await page.getByRole('button',{name:'大小变换',exact:true}).click();
   await expect(page.getByRole('group',{name:'拖动边角调整拉姆大小',exact:true})).toBeVisible();
   assert.equal(desktop.windows().length,1,'Direct resizing uses the existing pet window');
@@ -31,7 +31,7 @@ async function verifyV32Native(page,desktop){
  }finally{
   await page.evaluate(async values=>{await window.desktop.setPetScale(1);localStorage.clear();for(const[key,value]of Object.entries(values))localStorage.setItem(key,value)},snapshot);
   await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0],b=w.getBounds();w.setBounds({...b,width:1180,height:820})});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  }
 }
 module.exports={verifyV32Native};

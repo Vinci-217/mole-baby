@@ -5,7 +5,7 @@ async function verifyFixes(page,desktop){
  await page.addInitScript(()=>{const Base=window.Audio;window.__fixAudio=[];window.Audio=class extends Base{constructor(...args){super(...args);window.__fixAudio.push(this)}}});
  try{
   await page.evaluate(()=>{const k='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(k));Object.assign(p,{growth:60,highestGrowth:840,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,education:undefined,lastTick:Date.now()});p.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};localStorage.setItem(k,JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false}));localStorage.removeItem('ramu-room-media-v1')});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'学院');
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'学院');
   const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
   await expect(language.getByRole('button',{name:'上这一课',exact:true})).toBeEnabled();await language.getByRole('button',{name:'上这一课',exact:true}).click();
   await expect(page.locator('.school-scene-status')).toContainText('语言课');
@@ -51,7 +51,7 @@ async function verifyFixes(page,desktop){
   await require('./uploaded-motion-checks.cjs').verifyUploadedMotion(page,desktop);
   console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
-  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await page.reload();await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
+  await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
  }
 }
 module.exports={verifyFixes};

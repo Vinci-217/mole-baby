@@ -11,7 +11,12 @@ function cached(id:string){
  const clip=originalElementClip(id);if(!clip)throw new Error('Unknown original transformation');
  let entry=images.get(id);
  if(!entry){
-  const pages=Promise.all(clip.pages.map(page=>new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.src=`./assets/original/element-skills/${id}/${page}`;void image.decode().then(()=>resolve(image),()=>reject(new Error('原版变身素材加载失败')))})));
+  const pages=Promise.all(clip.pages.map(page=>new Promise<HTMLImageElement>((resolve,reject)=>{
+   const image=new Image();
+   image.onload=()=>{image.onload=image.onerror=null;resolve(image)};
+   image.onerror=()=>{image.onload=image.onerror=null;reject(new Error('原版变身素材加载失败'))};
+   image.src=`./assets/original/element-skills/${id}/${page}`;
+  })));
   entry={pages,ready:pages.then(()=>undefined)};
   const current=entry;void entry.ready.catch(()=>{if(images.get(id)===current)images.delete(id)});
  }

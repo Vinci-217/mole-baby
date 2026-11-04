@@ -19,7 +19,7 @@ async function verifySpellCare(page,desktop){
    localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:false}));
   },energy);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  };
  try{
   fs.mkdirSync(out,{recursive:true});await page.emulateMedia({reducedMotion:'no-preference'});
@@ -41,7 +41,7 @@ async function verifySpellCare(page,desktop){
    }
    await actions.getByRole('button',{name:'玩耍',exact:true}).click();
    await page.getByTestId('companion-panel').getByRole('button',{name:clip.name,exact:true}).click();
-   const magic=character.locator('.magic-box-performance');await expect(magic).toHaveAttribute('data-ready','true');
+   const magic=character.locator('.magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
    const started=Number(await magic.getAttribute('data-magic-start'));
    const peak=clip.frameMap.map((index,frame)=>({frame:frame+1,area:clip.rectangles[index][3]*clip.rectangles[index][4]})).sort((a,b)=>b.area-a.area)[0].frame;
    const samples=[];
@@ -84,7 +84,7 @@ async function verifySpellCare(page,desktop){
     const tools=await openActions(page);await tools.getByRole('button',{name:'玩耍',exact:true}).click();
     await page.getByTestId('companion-panel').getByRole('button',{name:clips['fire-1'].name,exact:true}).click();
    }
-   await expect(page.locator('.magic-box-performance')).toHaveAttribute('data-ready','true');await page.clock.runFor(2100);
+   await expect.poll(async()=>{await page.clock.runFor(16);return page.locator('.magic-box-performance').getAttribute('data-ready')},{timeout:15000}).toBe('true');await page.clock.runFor(2100);
    if(route==='panel'){
     const tools=await openActions(page);await tools.getByRole('button',{name:'状态',exact:true}).click();
     await expect(page.locator('.magic-box-performance')).toHaveCount(0);
@@ -133,7 +133,7 @@ async function verifySpellCare(page,desktop){
   if(clock)await page.clock.resume();
   await page.evaluate(values=>{localStorage.clear();for(const[k,v]of Object.entries(values))localStorage.setItem(k,v)},snapshot);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  }
 }
 module.exports={verifySpellCare};
