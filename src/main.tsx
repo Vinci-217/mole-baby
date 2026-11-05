@@ -15,4 +15,4 @@ const viewport=()=>document.documentElement.style.setProperty('--app-height',`${
 viewport();window.addEventListener('resize',viewport);
 import {installAndroidHost} from './android-host';
 installAndroidHost();
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='restaurant'?<RestaurantPreview/>:<App />}</React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);

@@ -1,4 +1,5 @@
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
+import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
 import MessageBoard from './components/MessageBoard';
 import GameSoundToggle from './components/GameSoundToggle';
 import {normalizeNotes,recordStatChange} from './pet-records';
@@ -146,6 +147,7 @@ export default function App() {
   const [memorySaveError, setMemorySaveError] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const petRef = useRef(pet); petRef.current = pet;
+  const workHeartbeat = useRef(Date.now());
   const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout>; feedback?: ReturnType<typeof setTimeout>;course?:ReturnType<typeof setTimeout> }>({});
   const ambient = useRef<{line:PresenceLine;at:number}|null>(null);
   const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
@@ -202,7 +204,7 @@ export default function App() {
     return()=>{window.removeEventListener('pagehide',checkpoint);window.removeEventListener('blur',checkpoint)};
   },[]);
   useEffect(() => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* Pet save has its own error notice. */ } }, [prefs]);
-  useEffect(() => { const timer = setInterval(() => setPet(p => p ? tick(p, Date.now()) : p), 15000); return () => clearInterval(timer); }, []);
+  useEffect(() => { const timer = setInterval(() => setPet(p => p ? advancePresentPet(p) : p), 15000); return () => clearInterval(timer); }, []);
   useEffect(() => {
     const desktop = window.desktop; if (!desktop) return;
     const unsubscribe = desktop.onStateChanged(state => { setDesktopState(state); setPetMode(state.petMode); document.documentElement.classList.toggle('pet-mode', state.petMode); });
@@ -224,7 +226,7 @@ export default function App() {
     if (hasPet && petRef.current) speak(welcomeLine(petRef.current, loadMemory(petRef.current)));
     return () => { cancelled = true; };
   }, [hasPet, notify, speak]);
-  useEffect(()=>window.mobile?.on('resume',()=>setPet(p=>p?tick(p,Date.now()):p)),[]);
+  useEffect(()=>window.mobile?.on('resume',()=>setPet(p=>p?advancePresentPet(p):p)),[]);
   useEffect(()=>window.mobile?.on('back',()=>{
     if(reset){setReset(false);return;}
     if(game){setGame(null);return;}
@@ -263,9 +265,28 @@ export default function App() {
     return()=>clearTimeout(reading);
   },[action,actionId,prefs.presence,prefs.quiet,speak]);
   const previousActivity=useRef(pet?.activity);
+  function advancePresentPet(saved:GameState){
+    const now=Date.now(),gap=now-workHeartbeat.current;
+    if(saved.activity?.kind==='restaurant'&&(document.hidden||navigator.onLine===false||gap>5000||gap<0)){
+      previousActivity.current=undefined;return tick(cancelActivity(saved),now);
+    }
+    return tick(saved,now);
+  }
+  useEffect(()=>{
+    const cancelWork=()=>{
+      const saved=petRef.current;if(saved?.activity?.kind!=='restaurant')return;
+      previousActivity.current=undefined;const next=cancelActivity(saved);petRef.current=next;setPet(next,'餐厅工作中止');
+      try{localStorage.setItem(SAVE_KEY,JSON.stringify(next));void window.desktop?.flushSave?.().catch(()=>{})}catch{setSaveError(true)}
+    };
+    const visibility=()=>{if(document.hidden)cancelWork()};
+    const heartbeat=setInterval(()=>{const now=Date.now();if(document.hidden||navigator.onLine===false||now-workHeartbeat.current>5000)cancelWork();workHeartbeat.current=now;},1000);
+    const unsubscribe=window.desktop?.onStateChanged(state=>{if(state.windowVisible===false)cancelWork()});
+    window.addEventListener('offline',cancelWork);window.addEventListener('pagehide',cancelWork);document.addEventListener('visibilitychange',visibility);
+    return()=>{clearInterval(heartbeat);unsubscribe?.();window.removeEventListener('offline',cancelWork);window.removeEventListener('pagehide',cancelWork);document.removeEventListener('visibilitychange',visibility)};
+  },[]);
   useEffect(()=>{
     if(!pet?.activity)return;
-    const id=pet.activity.id,due=setTimeout(()=>setPet(p=>p?.activity?.id===id?tick(p,Date.now()):p),Math.max(0,pet.activity.endsAt-Date.now()+5));
+    const id=pet.activity.id,due=setTimeout(()=>setPet(p=>p?.activity?.id===id?advancePresentPet(p):p),Math.max(0,pet.activity.endsAt-Date.now()+5));
     return()=>clearTimeout(due);
   },[pet?.activity?.id]);
   useEffect(()=>{
@@ -285,10 +306,11 @@ export default function App() {
     await enterHome();setGame('restaurant');
   }
   function startActivity(kind:'course'|'restaurant',id?:CourseId){
-    if(kind==='restaurant'){void enterRestaurant();return;}
     const saved=petRef.current;if(!saved)return;
+    if(kind==='restaurant'&&navigator.onLine===false){notify('联网后再让拉姆去打工吧。');return;}
     if(schoolBusy){notify('先结束正在进行的互动或专注计时吧。');return;}
     const result=beginActivity(tick(saved),kind,id);if(!result.ok){notify(result.message);return;}
+    if(kind==='restaurant'){workHeartbeat.current=Date.now();petRef.current=result.state;setGame(null);setBubbleVisible(false);void window.desktop?.setCompanionPanel(false);}
     setCourseCompletion('');clearInvitation();pastimeRun.current=null;clearTimeout(timers.current.animation);setActionId(n=>n+1);setPanel(null);apply(result);setAction('idle');
   }
   function stopActivity(){
@@ -417,8 +439,8 @@ export default function App() {
     const interrupted=Boolean((effectId||importedEffect)&&(changedMode||panel!==null||game!==null));
     if(interrupted){if(importedEffect)stopUploaded();else finishPerformance()}
     const rect=!interrupted&&petMode?(importedEffect?uploadedEffectRect(importedEffect,ramForm(stage,pet?.evolution)):effectId?elementEffectRect(effectId,ramForm(stage,pet?.evolution)):null):null;
-    void window.desktop?.setPetEffectBounds?.(rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
-  },[effectId,importedEffect,actionItemId,petMode,stage,pet?.evolution,floating,panel,game]);
+    void window.desktop?.setPetEffectBounds?.(workingAway&&petMode?DESKTOP_WORK_BOUNDS:rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
+  },[effectId,importedEffect,actionItemId,petMode,stage,pet?.evolution,floating,panel,game,workingAway]);
   useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(ramForm(stage,pet?.evolution));},[hasPet,stage,pet?.evolution]);
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !pet?.sleeping && !pet?.outing && !pet?.activity); }, [hasPet,pet?.sleeping,pet?.outing,pet?.activity,stage]);
   useEffect(()=>{
@@ -659,7 +681,7 @@ export default function App() {
     <DesktopCompanion statusContent={<StatusPocket pet={current} onClose={()=>void openPanel(null)} onBackpack={()=>{setPocketCategory('food');void openPanel('food')}} onWake={()=>doCare('sleep')}/>} pocketContent={pocket} moodBusy={interactionBusy} interactionReason={interactionReason} moodLabel={mood.label} onMood={respondMood} onActionEnd={finishPerformance} pet={current} stage={stage} action={timer.running && action === 'idle' ? 'focus' : renderedAction} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} bubble={spokenBubble} bubbleVisible={bubbleVisible} careFeedback={careFeedback?.petId===current.createdAt?careFeedback:null}
       panel={panel && ['status','food','play'].includes(panel) ? panel as CompanionPanel : null} native={petMode} desktopState={desktopState}
       sound={prefs.sound} timerDirection={prefs.timerDirection} reminderSeconds={timer.seconds} reminders={prefs.reminders} timerRunning={timer.running} saveError={saveError || memorySaveError} pocketCategory={pocketCategory} pocketVisit={pocketVisit} playInvitation={playInvitation}
-      onBoard={()=>void openBoard()} onOuting={()=>startOuting(true)} onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onWork={()=>startActivity('restaurant')} onStopWork={stopActivity} onSchool={()=>void enterHome('school')} onUploadedPlay={startUploaded} onStopUploaded={stopUploaded} uploadedPlaying={isUploadedAction(action)} courseCompletion={courseCompletion} onElementSkill={showElementSkill} magicLearned={learned(current,'magic')} onMagic={()=>showSkill('magic')} onShop={visitShop} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
+      onBoard={()=>void openBoard()} onOuting={()=>startOuting(true)} onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onWork={()=>startActivity('restaurant')} onViewRestaurant={()=>void enterRestaurant()} onStopWork={stopActivity} onSchool={()=>void enterHome('school')} onUploadedPlay={startUploaded} onStopUploaded={stopUploaded} uploadedPlaying={isUploadedAction(action)} courseCompletion={courseCompletion} onElementSkill={showElementSkill} magicLearned={learned(current,'magic')} onMagic={()=>showSkill('magic')} onShop={visitShop} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
     {panel==='notes'&&<MessageBoard pet={current} onChange={updateNotes} onClose={()=>setPanel(null)}/>}
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;

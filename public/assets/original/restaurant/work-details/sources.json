@@ -1,0 +1,20 @@
+{
+  "rights": "Original artwork belongs to Taomee and the original rights holders.",
+  "props": {
+    "source": "root/resource/oneBigStree/swf/1330004.swf",
+    "stove": "DefineShape 39",
+    "burner": "DefineSprite 41",
+    "table": "DefineSprite 74"
+  },
+  "guests": {
+    "source": "public/assets/classic/junior-neutral.png and junior-mask.png; original lamubone body",
+    "frames": "0–7 walk right; 8–15 walk left; first direction frame for standing",
+    "cell": [
+      100,
+      112
+    ],
+    "ground": 80,
+    "colour": "Existing original additive body palette, retaining eye whites and shadows"
+  },
+  "adaptation": "Standalone prop arrangement, routes and phase timings are local choreography."
+}

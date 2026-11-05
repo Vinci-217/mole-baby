@@ -1,36 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Images, X } from 'lucide-react';
-import type { GameState, PetColor } from '../game';
-import { petColorOffsets } from '../pet-color';
+import type { GameState } from '../game';
 import { restaurantWorkFrame, RESTAURANT_BACKGROUNDS, WORK_PHASE_LABELS, type WorkPhase } from '../restaurant-work';
-import workerArt from '../restaurant-worker-art.json';
+import {loadRestaurantImage as loadImage, loadRestaurantWorkers, paintRestaurantWorker, RESTAURANT_ASSET as ASSET, GUEST_COLORS} from '../restaurant-painter';
 import './RestaurantWorkShowcase.css';
 
-const ASSET = './assets/original/restaurant/';
 const BACKGROUND_KEY = 'ramu-restaurant-background-v1';
-const GUEST_COLORS = ['pink', 'yellow', 'blue', 'red'];
-
-async function loadImage(src: string) {
-  const img = new Image();
-  await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = () => reject(new Error(src)); img.src = src; });
-  return img;
-}
-
-/** Only tint the cyan body below the uniform; keep eyes, red hat and tray intact. */
-function workerPalette(img: HTMLImageElement, color: PetColor): CanvasImageSource {
-  if (color === 'blue') return img;
-  const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
-  const ctx = canvas.getContext('2d')!; ctx.drawImage(img, 0, 0);
-  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height), p = pixels.data;
-  const offsets = petColorOffsets(color), blue = petColorOffsets('blue');
-  for (let y = 128; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
-    const i = (y * canvas.width + x) * 4;
-    if (p[i + 3] && p[i + 2] - p[i] > 40 && p[i + 1] - p[i] > 25) {
-      for (let channel = 0; channel < 3; channel++) p[i + channel] = Math.max(0, Math.min(255, p[i + channel] + offsets[channel] - blue[channel]));
-    }
-  }
-  ctx.putImageData(pixels, 0, 0); return canvas;
-}
 
 function initialBackground(pet: GameState) {
   let id = String(pet.restaurant?.interior ?? RESTAURANT_BACKGROUNDS[0]);
@@ -71,7 +46,7 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
     const loadRoom = (id: string) => {
       if (neededRooms.has(id)) return;
       neededRooms.add(id);
-      void loadImage(`${ASSET}rooms/${id}.webp`).then(img => {
+      void loadImage(`${ASSET}classic/rooms/${id}/0.webp`).then(img => {
         if (!disposed) { rooms.set(id, img); if (latest.current.roomId === id) setLoading(false); }
       }).catch(() => { if (!disposed) { neededRooms.delete(id); if (latest.current.roomId === id) { setLoading(false); setError(true); } } });
     };
@@ -79,15 +54,14 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
     window.addEventListener('online', connectivity); window.addEventListener('offline', connectivity);
     const unsubscribe = window.desktop?.onStateChanged(state => { nativeVisible = state.windowVisible !== false && !state.petMode; });
     const load = async () => {
-      const keys = Object.keys(workerArt);
-      const [workers, guests, dishes, background] = await Promise.all([
-        Promise.all(keys.map(async key => [key, workerPalette(await loadImage(`${ASSET}workers/${key}.webp`), pet.color)] as const)),
+      const [workerImages, guests, walkingGuests, dishes, background] = await Promise.all([
+        loadRestaurantWorkers(pet.color),
         Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}guests/${color}.webp`))),
+        Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}work-details/guest-${color}.webp`))),
         Promise.all([1340001, 1340002, 1340003].map(id => loadImage(`${ASSET}dishes/${id}.webp`))),
-        loadImage(`${ASSET}rooms/${previousRoom}.webp`),
+        loadImage(`${ASSET}classic/rooms/${previousRoom}/0.webp`),
       ]);
       if (disposed) return;
-      const workerImages = Object.fromEntries(workers);
       rooms.set(previousRoom, background); neededRooms.add(previousRoom); setLoading(false);
       const paint = (now: number) => {
         if (disposed) return;
@@ -104,26 +78,30 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
         ctx.clearRect(0, 0, 960, 560);
         const room = rooms.get(id);
         if (room) ctx.drawImage(room, 0, 0, 960, 560);
-        const guestImage = guests[frame.cycle % guests.length];
-        if (frame.guest) {
-          const guestFrame = frame.eating ? Math.floor(elapsed * 24 / 1000) % 16 : frame.guestMoving ? Math.floor(elapsed * 12 / 1000) % 6 : 0;
-          ctx.save(); ctx.translate(frame.guest.x, frame.guest.y);
-          if (frame.guest.x > frame.table.x) ctx.scale(-1, 1);
-          ctx.drawImage(guestImage, guestFrame * 100, 0, 100, 96, -42, -67, 84, 81); ctx.restore();
-        }
         const dish = dishes[frame.cycle % dishes.length];
         if (frame.dishVisible) {
           const width = 40, height = width * dish.height / dish.width;
           ctx.save(); ctx.globalAlpha = frame.dishOpacity;
           ctx.drawImage(dish, frame.table.x - width / 2, frame.table.y - height - 2, width, height); ctx.restore();
         }
-        const worker = frame.worker, dx = worker.to.x - worker.from.x, dy = worker.to.y - worker.from.y;
-        const key = worker.carrying ? '1200042-rightdown' : worker.moving && dy < -15 ? '1200043-leftup' : dx < -10 ? '1200043-left' : '1200043-rightdown';
-        const spec = (workerArt as Record<string, { moving: number[] }>)[key];
-        const cell = worker.moving ? spec.moving[Math.floor(elapsed * 24 / 1000) % spec.moving.length] : 1;
-        ctx.save(); ctx.translate(worker.position.x, worker.position.y);
-        if (worker.carrying && dx < 0 || key === '1200043-leftup' && dx > 0) ctx.scale(-1, 1);
-        ctx.drawImage(workerImages[key], cell * 200, 0, 200, 240, -110, -198, 220, 264); ctx.restore();
+        const actors: {y:number;paint:()=>void}[] = [{y:frame.worker.position.y,paint:()=>paintRestaurantWorker(ctx,workerImages,frame.worker,elapsed)}];
+        if (frame.guest) {
+          const guest = frame.guest;
+          actors.push({y:guest.y,paint:()=>{
+            ctx.save();ctx.translate(guest.x,guest.y);
+            if(frame.eating){
+              if(guest.x>frame.table.x)ctx.scale(-1,1);
+              const cell=Math.floor((elapsed % 26000-14500)*24/1000)%16;
+              ctx.drawImage(guests[frame.cycle%guests.length],cell*100,0,100,96,-42,-67,84,81);
+            }else{
+              const left=frame.guestDirection<0;
+              const cell=(left?8:0)+(frame.guestMoving?Math.floor(elapsed*16/1000)%8:0);
+              ctx.drawImage(walkingGuests[frame.cycle%walkingGuests.length],cell*100,0,100,112,-42,-67.2,84,94.08);
+            }
+            ctx.restore();
+          }});
+        }
+        actors.sort((a,b)=>a.y-b.y).forEach(actor=>actor.paint());
         raf = requestAnimationFrame(paint);
       };
       raf = requestAnimationFrame(paint);
