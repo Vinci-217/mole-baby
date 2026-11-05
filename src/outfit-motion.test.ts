@@ -10,8 +10,8 @@ describe('original wardrobe source registration',()=>{
    expect(outfitFrame(outfit.id,form,'yawn',frame,0,8)).toEqual(outfitFrame(outfit.id,form,form==='seed'?'seed':'slumber',0,0,8))
   }
  })
- it('offers nine real original items without losing the three saved identifiers',()=>{
-  expect(OUTFITS).toHaveLength(9);expect(OUTFITS.slice(0,3).map(i=>i.id)).toEqual(['party-cap','gold-feather','wizard-cap'])
+ it('offers twelve real original items without losing the three saved identifiers',()=>{
+  expect(OUTFITS).toHaveLength(12);expect(OUTFITS.slice(0,3).map(i=>i.id)).toEqual(['party-cap','gold-feather','wizard-cap'])
   for(const outfit of OUTFITS.slice(1))expect(hasAuthoredOutfit(outfit.id)).toBe(true)
   expect(outfitCoversCrown('wizard-cap')).toBe(true);expect(outfitCoversCrown('magic-book')).toBe(false)
  })
@@ -26,6 +26,13 @@ describe('original wardrobe source registration',()=>{
   const first=outfitFrame('wizard-cap','junior','football',0,0,8,1)!,later=outfitFrame('wizard-cap','junior','football',0,0,8,112)!
   expect(first.sheet.lookup['1']).toBeDefined();expect(later.sheet.lookup['112']).toBeDefined();expect(later.index).not.toBe(first.index)
   expect(outfitFrame('wizard-cap','junior','football',0,0,8,9999)).toBeNull()
+ })
+ it('keeps the new original costumes on the complete flight loops, including the separate senior body',()=>{
+  for(const id of ['flower-crown','knight-shield','angel-wings'])for(const [form,count] of [['senior',31],['super',60]] as const)for(let cell=0;cell<count;cell++){
+   const pose=outfitFrame(id,form,'flight',cell%8,Math.floor(cell/8),8)
+   expect(pose,`${id}:${form}:${cell}`).not.toBeNull()
+   expect(pose!.sheet.rects[pose!.index][2]).toBeGreaterThan(1)
+  }
  })
  it('keeps mild frowns out of the stretched-eye section of the original performance',()=>{
   expect(Math.max(...emotionSpec('junior','grumpy')!.sourceFrames)).toBe(8)

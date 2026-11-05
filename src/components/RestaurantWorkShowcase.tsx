@@ -14,6 +14,7 @@ function initialBackground(pet: GameState) {
 }
 
 export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameState; onClose: () => void }) {
+  const working=pet.activity?.kind==='restaurant';
   const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const [roomId, setRoomId] = useState(() => initialBackground(pet));
   const [phase, setPhase] = useState<WorkPhase>('ready');
@@ -39,6 +40,7 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
 
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d'); if (!ctx) return;
+    ctx.clearRect(0,0,960,560);setLoading(true);setPhase('ready');
     let raf = 0, disposed = false, elapsed = 0, last = 0, previousRoom = latest.current.roomId;
     let currentPhase: WorkPhase = 'ready', nativeVisible = true;
     const rooms = new Map<string, HTMLImageElement>();
@@ -55,10 +57,10 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
     const unsubscribe = window.desktop?.onStateChanged(state => { nativeVisible = state.windowVisible !== false && !state.petMode; });
     const load = async () => {
       const [workerImages, guests, walkingGuests, dishes, background] = await Promise.all([
-        loadRestaurantWorkers(pet.color),
-        Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}guests/${color}.webp`))),
-        Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}work-details/guest-${color}.webp`))),
-        Promise.all([1340001, 1340002, 1340003].map(id => loadImage(`${ASSET}dishes/${id}.webp`))),
+        working ? loadRestaurantWorkers(pet.color) : null,
+        working ? Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}guests/${color}.webp`))) : [],
+        working ? Promise.all(GUEST_COLORS.map(color => loadImage(`${ASSET}work-details/guest-${color}.webp`))) : [],
+        working ? Promise.all([1340001, 1340002, 1340003].map(id => loadImage(`${ASSET}dishes/${id}.webp`))) : [],
         loadImage(`${ASSET}classic/rooms/${previousRoom}/0.webp`),
       ]);
       if (disposed) return;
@@ -68,16 +70,17 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
         const id = latest.current.roomId;
         if (id !== previousRoom) { previousRoom = id; elapsed = 0; setError(false); setLoading(!rooms.has(id)); loadRoom(id); }
         const ready = rooms.has(id);
-        const active = !document.hidden && nativeVisible && navigator.onLine !== false && ready;
+        const active = working && !document.hidden && nativeVisible && navigator.onLine !== false && ready;
         if (last && active) elapsed += Math.min(100, now - last);
         last = now;
         const frame = restaurantWorkFrame(id, elapsed);
         if (frame.phase !== currentPhase) { currentPhase = frame.phase; setPhase(frame.phase); }
         const element = canvas.current;
-        if (element) { element.dataset.phase = frame.phase; element.dataset.cycle = String(frame.cycle); element.dataset.background = id; element.dataset.paused = String(!active); element.dataset.loadedColor = pet.color; }
+        if (element) { element.dataset.phase = working?frame.phase:'closed'; element.dataset.cycle = String(frame.cycle); element.dataset.background = id; element.dataset.paused = String(!active); element.dataset.loadedColor = pet.color; }
         ctx.clearRect(0, 0, 960, 560);
         const room = rooms.get(id);
         if (room) ctx.drawImage(room, 0, 0, 960, 560);
+        if(!working||!workerImages){raf=requestAnimationFrame(paint);return;}
         const dish = dishes[frame.cycle % dishes.length];
         if (frame.dishVisible) {
           const width = 40, height = width * dish.height / dish.width;
@@ -108,7 +111,7 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
     };
     void load().catch(() => { if (!disposed) { setLoading(false); setError(true); } });
     return () => { disposed = true; cancelAnimationFrame(raf); window.removeEventListener('online', connectivity); window.removeEventListener('offline', connectivity); unsubscribe?.(); };
-  }, [pet.color]);
+  }, [pet.color,working]);
 
   const changeBackground = () => {
     const next = RESTAURANT_BACKGROUNDS[(RESTAURANT_BACKGROUNDS.indexOf(roomId) + 1) % RESTAURANT_BACKGROUNDS.length];
@@ -119,19 +122,20 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
     <section ref={root} className="restaurant-work-dialog" role="dialog" aria-modal="true" aria-label="拉姆餐厅" tabIndex={-1}>
       <header className="restaurant-work-header">
         <img src="./assets/original/restaurant/dock.png" alt="" />
-        <div><h1>拉姆餐厅</h1><p>{pet.name}正在餐厅打工</p></div>
+        <div><h1>拉姆餐厅</h1><p>{working?`${pet.name}正在餐厅打工`:'今天的餐厅静悄悄'}</p></div>
         <button className="restaurant-work-close" type="button" onClick={onClose} aria-label="离开餐厅"><X size={20} /></button>
       </header>
       <div className="restaurant-work-stage">
-        <canvas ref={canvas} width={960} height={560} role="img" aria-label="拉姆取餐、端盘送餐，客人进店、用餐、离开的循环动画" />
-        {(loading || error) && <div className="restaurant-work-loading" role="status">{error ? '餐厅素材暂时未能加载，请退出后重试。' : '拉姆正在系好围裙…'}</div>}
+        <canvas ref={canvas} width={960} height={560} role="img" aria-label={working?'拉姆取餐、端盘送餐，客人进店、用餐、离开的循环动画':'已打烊的空餐厅'} />
+        {!working&&!loading&&!error&&<div className="restaurant-closed" role="status"><img src="./assets/original/restaurant/dock.png" alt=""/><strong>餐厅已经打烊了</strong><span>拉姆去餐厅打工后，再来看看吧。</span></div>}
+        {(loading || error) && <div className="restaurant-work-loading" role="status">{error ? '餐厅素材暂时未能加载，请退出后重试。' : working?'拉姆正在系好围裙…':'正在打开餐厅…'}</div>}
         <aside className="restaurant-work-controls" aria-label="餐厅背景控制">
           <button type="button" onClick={changeBackground} aria-label="切换餐厅背景" title={`切换背景 · ${RESTAURANT_BACKGROUNDS.indexOf(roomId) + 1}/${RESTAURANT_BACKGROUNDS.length}`}>
             <Images size={26} aria-hidden="true" /><span>换背景</span>
           </button>
         </aside>
       </div>
-      <p className="restaurant-work-status" role="status"><span aria-hidden="true" />{online ? WORK_PHASE_LABELS[phase] : '网络已断开，打工暂停'}</p>
+      <p className="restaurant-work-status" role="status"><span aria-hidden="true" />{!working?'拉姆正在休息':online ? WORK_PHASE_LABELS[phase] : '网络已断开，打工暂停'}</p>
     </section>
   </div>;
 }

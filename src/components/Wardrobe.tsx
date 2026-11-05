@@ -8,7 +8,7 @@ import './Wardrobe.css'
 
 export default function Wardrobe({pet,onBuy,onWear}:{pet:GameState;onBuy:(id:string)=>void;onWear:(id?:string)=>void}) {
   const [selected,setSelected]=useState<string>(pet.wearing??'')
-  const [page,setPage]=useState(0),[action,setAction]=useState('idle'),[actionId,setActionId]=useState(0)
+  const [page,setPage]=useState(()=>Math.floor((OUTFITS.findIndex(item=>item.id===pet.wearing)+1)/9)),[action,setAction]=useState('idle'),[actionId,setActionId]=useState(0)
   const outfit=getOutfit(selected),owned=outfit?pet.wardrobe?.includes(outfit.id)??false:true
   const reward=outfit?.id===MAGIC_WAND_ID
   const pages=Math.ceil((OUTFITS.length+1)/9),cards=[null,...OUTFITS].slice(page*9,(page+1)*9)

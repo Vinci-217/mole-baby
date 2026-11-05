@@ -1,6 +1,6 @@
 # 原客户端服饰动画
 
-图形来自 Miigon/RecMoleRes 固定提交 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff` 下的 `root/resource/petcloth/swf2/`。不是从商品缩略图制作变形动画，也没有生成或重画角色。8件、8形态共360张压缩透明图集；源文件SHA256见 `runtime.json` 的 `sourceSha256`，PNG校验见 `checksums.json`，完整源URL见相邻 `wardrobe/source.json`。
+图形来自 Miigon/RecMoleRes 固定提交 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff` 下的 `root/resource/petcloth/swf2/`。不是从商品缩略图制作变形动画，也没有生成或重画角色。11件、8形态共501张压缩透明图集；源文件SHA256见 `runtime.json` 的 `sourceSha256`，PNG校验见 `checksums.json`，完整源URL见相邻 `wardrobe/source.json`。
 
 原 `ClientAppDLL.swf` 的 `com/module/npc/uiManage/LamuUIManage.as`：`loadCloth()` 加载 swf2；`synchroCloth()` 让 ActionMC0/1/2/3 跟随身体帧；`petCloth()` 将 ActionMC3 放回身体父层。商品预览 `swf/cloth` 只适合作为图标。一部分服饰是替换全身的骨骼，并非可直接叠到身体上的透明衣服。
 
@@ -33,3 +33,9 @@ python scripts/art/export-registered-outfits.py \
 v0.26种子采用独立的高眼位校准，兜帽开口对齐眼睛；温和吃喝用中性挂接，保留正常原脸。查看 `research/v26-lively-pet.md` 的实际100px复核与原素材适配限制。
 
 玩球的头饰使用相邻football/head-poses.json，把原中性服饰挂到原身体的头部位置/朝向；缺少可见眼睛时插值。手持书与魔杖先放旁边，看书不叠放第二本穿戴书。此分支明确属于桌宠适配，不宣称全部服饰都有官方football姿态。
+
+本轮扩充 `1200006` 鲜花花冠、`1200024` 骑士盾牌、`1200040` 天使羽翼。原矢量形状和独立 `petBone3` 时间轴保持不变；通过一次中性姿态校准挂接到桌宠身体。部分原阶段标签在更换骨骼之前一帧，导出器按该标签范围内实际放置的新骨骼读取，避免误取上一阶段。原模块没有单独的种子动作时，沿用原正面配饰适配，不宣称官方曾提供对应的种子服装动作。棒棒糖、花盆与机器人整身替换模块已留在本地库，但带独立脸部，本轮未强行叠穿。
+
+三件新增配饰另含高级/超级飞行图集，按完整原 down/right/left 源帧及高级独立身体格挂接；不将会飞形态降成静态商品图。
+
+原服饰控制帧或嵌套显示列表导出为空时，保持上一张可见的原服饰图形，避免角色仍可见时服饰闪烁；逐项记录在 runtime.json 的 controlFrameHolds / transparentPoseHolds 中。这是兼容桌宠动作的播放适配，不是补画原客户端缺失的动作。增量导出合并到形态下的动作类型，不覆盖该形态已有图集。

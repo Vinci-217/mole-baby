@@ -72,6 +72,31 @@
       "sha256": "b48ff72e3f8a4c29915b696040c57b3e9db8d38a26ce4031281ccfe527aaf9bc",
       "thumbnail": "Original animated clothing: complete registered front-pose crop",
       "originalAdditiveRig": false
+    },
+    {
+      "id": "flower-crown",
+      "sourceId": "1200006",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200006.swf",
+      "sha256": "4a3e9efb2984ab4b83190d117fed85fb492c05442ea98ad4503b8a79a9d54a3f",
+      "thumbnail": "Complete registered original petBone3 accessory frame, trimmed transparently; no face or newly drawn shapes.",
+      "originalAdditiveRig": true
+    },
+    {
+      "id": "knight-shield",
+      "sourceId": "1200024",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200024.swf",
+      "sha256": "aed922cf8b95b8e72c41f68bb0649fdb26acf6be588b40761439f24e867fc32a",
+      "thumbnail": "Complete registered original petBone3 accessory frame, trimmed transparently; no face or newly drawn shapes.",
+      "originalAdditiveRig": true
+    },
+    {
+      "id": "angel-wings",
+      "sourceId": "1200040",
+      "animationUrl": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200040.swf",
+      "sha256": "8c8ebdc311a413509a45aa76efd75a60a378abffd92b687f3d15d677d50add2d",
+      "thumbnail": "Complete registered original petBone3 accessory frame, trimmed transparently; no face or newly drawn shapes.",
+      "originalAdditiveRig": true
     }
-  ]
+  ],
+  "expanded": "2026-11-05"
 }

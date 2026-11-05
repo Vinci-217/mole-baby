@@ -238,7 +238,9 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
   }
   delete wear.dataset.stowed;
   const rig=football&&sourceFrame?footballOutfitRig(form,sourceFrame):null;
-  const headRig=rig&&!['magic-book','star-wand'].includes(outfit.id)?rig:null;
+  // These three original modules include a separable football costume rig.
+  // Play those source poses rather than treating wings or a shield as a hat.
+  const headRig=rig&&!['magic-book','star-wand','flower-crown','knight-shield','angel-wings'].includes(outfit.id)?rig:null;
   const authored=headRig?outfitFrame(outfit.id,form,'slumber',0,0,8):outfitFrame(outfit.id,form,kind,frame,row,source.neutral.width/width,sourceFrame)
   if(!headRig){wear.style.transformOrigin='50% 100%';delete wear.dataset.headRegistration}
   const scaleX=football?1.666666667:1,scaleY=football?1.846153846:1

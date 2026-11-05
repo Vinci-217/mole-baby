@@ -1,5 +1,4 @@
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
-import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
 import MessageBoard from './components/MessageBoard';
 import GameSoundToggle from './components/GameSoundToggle';
 import {normalizeNotes,recordStatChange} from './pet-records';
@@ -71,7 +70,7 @@ import {isPastime,playBlockReason,beginOuting,finishOuting,PASTIME_LINES,PASTIME
 import type {Pastime} from './pet-pastimes';
 import PetPastimes from './components/PetPastimes';
 import {elementSkillById,learnedElementSkill} from './element-skills';
-import RamSchoolPanel,{RestaurantCard,ActivityCard} from './components/RamSchoolPanel';
+import RamSchoolPanel,{ActivityCard} from './components/RamSchoolPanel';
 import {activityAction,beginActivity,cancelActivity,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
 import {RoomFurnishingLayer,RoomFurnishingEditor} from './components/RoomFurnishings';
 import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup} from './pet-backup';
@@ -168,7 +167,7 @@ export default function App() {
   const spokenBubble=petSpeech(current,bubble);
   const workingAway = current.activity?.kind==='restaurant';
   const renderedAction = (workingAway?'still':activityAction(current.activity)) ?? (action !== 'idle' ? action : desktopState.motion === 'left' ? 'walk-left' : desktopState.motion === 'right' ? 'walk-right' : condition.action);
-  const roomMedia = useRoomMedia(hasPet && !floating, hasPet, game==='restaurant'?'./assets/original/restaurant/audio/bgSound.mp3':undefined);
+  const roomMedia = useRoomMedia(hasPet && !floating, hasPet, game==='restaurant'&&workingAway?'./assets/original/restaurant/audio/bgSound.mp3':undefined);
   useEffect(()=>window.desktop?.onMusicToggle?.(enabled=>roomMedia.update({backgroundPlayback:enabled})),[roomMedia.update]);
   useEffect(()=>{void window.desktop?.setMusicState?.({playing:roomMedia.playing,enabled:roomMedia.settings.musicEnabled||roomMedia.settings.backgroundPlayback,background:roomMedia.settings.backgroundPlayback})?.catch(()=>{})},[roomMedia.playing,roomMedia.settings.musicEnabled,roomMedia.settings.backgroundPlayback]);
   useEffect(()=>{configurePetSound({enabled:prefs.sound,gameEnabled:prefs.gameSound,volume:prefs.soundVolume})},[prefs.sound,prefs.gameSound,prefs.soundVolume]);
@@ -439,7 +438,7 @@ export default function App() {
     const interrupted=Boolean((effectId||importedEffect)&&(changedMode||panel!==null||game!==null));
     if(interrupted){if(importedEffect)stopUploaded();else finishPerformance()}
     const rect=!interrupted&&petMode?(importedEffect?uploadedEffectRect(importedEffect,ramForm(stage,pet?.evolution)):effectId?elementEffectRect(effectId,ramForm(stage,pet?.evolution)):null):null;
-    void window.desktop?.setPetEffectBounds?.(workingAway&&petMode?DESKTOP_WORK_BOUNDS:rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
+    void window.desktop?.setPetEffectBounds?.(rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
   },[effectId,importedEffect,actionItemId,petMode,stage,pet?.evolution,floating,panel,game,workingAway]);
   useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(ramForm(stage,pet?.evolution));},[hasPet,stage,pet?.evolution]);
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !pet?.sleeping && !pet?.outing && !pet?.activity); }, [hasPet,pet?.sleeping,pet?.outing,pet?.activity,stage]);
@@ -715,7 +714,7 @@ export default function App() {
       {panel === 'shop' && <ShopBook pet={current} onBuy={buy}/>}
       {panel === 'wardrobe' && <Wardrobe pet={current} onBuy={id=>changeOutfit('buy',id)} onWear={id=>changeOutfit('wear',id)}/>}
       {panel==='school'&&<RamSchoolPanel busy={schoolBusy} pet={current} onLearn={id=>startActivity('course',id)} onSkill={showSkill} onElementSkill={showElementSkill} onCancel={stopActivity}/>}
-      {panel === 'games' && <><RestaurantCard pet={current} onStart={()=>startActivity('restaurant')} onCancel={stopActivity}/><PetPastimes pet={current} busy={interactionBusy} onPlay={startPastime} onSleep={()=>doCare('sleep')} onOuting={()=>startOuting(true)} onRecall={()=>recallPet()}/><UploadedActionMenu pet={current} busy={interactionBusy} busyReason={interactionReason} onPlay={startUploaded} onStop={stopUploaded} playing={isUploadedAction(action)} onStatus={()=>setPanel('status')}/><div className="room-game-grid">{([
+      {panel === 'games' && <><PetPastimes pet={current} busy={interactionBusy} onPlay={startPastime} onSleep={()=>doCare('sleep')} onOuting={()=>startOuting(true)} onRecall={()=>recallPet()}/><UploadedActionMenu pet={current} busy={interactionBusy} busyReason={interactionReason} onPlay={startUploaded} onStop={stopUploaded} playing={isUploadedAction(action)} onStatus={()=>setPanel('status')}/><div className="room-game-grid">{([
         { id:'color-mixer',name:'拉姆换色游戏',icon:'180005',detail:'调配颜色 · 装瓶收藏',button:'拉姆换色游戏',grown:false },
         { id:'fruit',name:'拉姆接果子',icon:'180027',detail:'20 秒 · 接住果子',button:'开始接果子',grown:true },
         { id:'memory',name:'口袋翻翻乐',icon:'180017',detail:'45 秒 · 找到相同图案',button:'开始翻牌',grown:false },
@@ -731,7 +730,7 @@ export default function App() {
       {panel === 'status' && <RoomPetPanel pet={current} memory={currentMemory} onRename={renamePet} onWake={()=>doCare('sleep')}/>}
       {panel === 'food' && pocket}
       {panel === 'memories' && <PetDiary memory={currentMemory}/>}
-      {panel === 'play' && <>{playInvitation}<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" onClick={() => startActivity('restaurant')}>餐厅打工</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping?'轻轻叫醒':'睡一会儿'}</button><button className="game-button" onClick={() => setPanel('school')}>去学院</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div></>}
+      {panel === 'play' && <>{playInvitation}<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping?'轻轻叫醒':'睡一会儿'}</button><button className="game-button" onClick={() => setPanel('school')}>去学院</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div></>}
       {panel === 'settings' && settingsContent}
     </GameDialog>}
     {panel==='notes'&&pet&&<MessageBoard pet={current} onChange={updateNotes} onClose={()=>setPanel(null)}/>}

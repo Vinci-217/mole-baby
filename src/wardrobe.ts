@@ -12,6 +12,9 @@ export const OUTFITS=[
   {id:'leaf-hood',name:'火焰羽翼',sourceId:'1200036',price:55,coversCrown:true,width:.6,x:0,y:0},
   {id:'sport-goggles',name:'彩虹眼罩',sourceId:'1200047',price:45,width:.6,x:0,y:0},
   {id:'warm-scarf',name:'皇冠猫耳',sourceId:'1200052',price:50,coversCrown:true,width:.6,x:0,y:0},
+  {id:'flower-crown',name:'鲜花花冠',sourceId:'1200006',price:55,coversCrown:true,width:1.15,x:0,y:0},
+  {id:'knight-shield',name:'骑士盾牌',sourceId:'1200024',price:65,width:.64,x:0,y:0},
+  {id:'angel-wings',name:'天使羽翼',sourceId:'1200040',price:75,width:1.85,x:0,y:0},
 ] as const
 export type OutfitId=typeof OUTFITS[number]['id']
 export function outfitCoversCrown(id?:string){const outfit=getOutfit(id);return Boolean(outfit&&'coversCrown'in outfit&&outfit.coversCrown)}

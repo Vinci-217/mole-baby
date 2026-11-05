@@ -94,14 +94,19 @@ class Timeline:
  def stage(self,form):
   candidates=[sid for sid in self.ns if 'level2'in self.labels(sid)];root=candidates[-1];labels=self.labels(root);label=FORMS[form][1]
   if label not in labels:label='level101' if form=='super' and 'level101'in labels else 'level2'
-  for v,_ in reversed(self.active(root,labels[label])):
-   cid=v.get('characterId')
-   if cid and 'down'in self.labels(cid):return cid,matrix(v.find('matrix'))
-  if label!='level2':
-   for v,_ in reversed(self.active(root,labels['level2'])):
-    cid=v.get('characterId')
-    if cid and 'down'in self.labels(cid):return cid,matrix(v.find('matrix'))
-  return None,np.eye(3)
+  def placed(stageLabel):
+   # Some original labels precede the new rig by one ShowFrame. Selecting the
+   # inherited display list at the label picks the previous stage instead.
+   inside=False
+   for v in self.ns[root].find('subTags'):
+    if v.get('type')=='FrameLabelTag':
+     if inside:break
+     inside=v.get('name')==stageLabel
+    if inside and v.get('type','').startswith('PlaceObject'):
+     cid=v.get('characterId')
+     if cid and 'down'in self.labels(cid):return cid,matrix(v.find('matrix'))
+   return None
+  return placed(label) or placed('level2') or (None,np.eye(3))
 
 base={}
 for f,(_,_,sid) in FORMS.items():base[f]=Timeline(a.ordinary if f in ['seed','junior','middle','senior'] else a.evolutions/(f+'.xml'))
@@ -131,6 +136,11 @@ def specs(form):
  add('slumber',192,208,8,[(i,'down',3 if f=='junior' else 1,i) for i in range(8)])
  rowActions=['down','right','left','dance','woter','angry','food','drenk','happy'];rows=classic.get(f,{}).get('rows',[])
  add('classic',192,208,8,[(r*8+i,(rows[r].get('gameAction') if r<len(rows) else rowActions[r]),(rows[r]['actionFrames'][min(i,len(rows[r]['actionFrames'])-1)] if r<len(rows) else i*2+1),r*8+i) for r in range(9) for i in range(8)])
+ flight=json.loads((a.repo/'public/assets/original/flight/runtime.json').read_text())['forms'].get(f)
+ if flight:
+  poses=[(pose['index'],direction,pose['sourceFrame'],pose['index']) for direction,clip in flight['clips'].items() for pose in clip['frames']]
+  if 'bodyIndex' in flight:poses.append((flight['bodyIndex'],'down',3,flight['bodyIndex']))
+  add('flight',192,208,8,poses)
  if f in ['junior','middle','senior']:
   for kind,rs in [('care',care[f]['rows']),('item-motion',items['forms'][f])]:
    add(kind,192,208,16,[(r*16+i,s['action'],s['actionFrames'][min(i,len(s['actionFrames'])-1)],r*16+i) for r,s in enumerate(rs) for i in range(16)])
@@ -172,24 +182,33 @@ def export(pair):
   adjustment=None
   if cb and bb:
    bw,bh=bb[2]-bb[0],bb[3]-bb[1];cx=(bb[0]+bb[2])/2;top=bb[1]
-   ratio={'wizard-cap':1.22,'rabbit-hood':1.23,'warm-scarf':1.16,'sport-goggles':1.08,'gold-feather':.48,'leaf-hood':1.60,'magic-book':.55,'star-wand':.62}.get(name,1.10)
+   ratio={'wizard-cap':1.22,'rabbit-hood':1.23,'warm-scarf':1.16,'sport-goggles':1.08,'gold-feather':.48,'leaf-hood':1.60,'magic-book':.55,'star-wand':.62,'flower-crown':1.15,'knight-shield':.64,'angel-wings':1.85}.get(name,1.10)
    if form=='seed':ratio=1.1 if name=='rabbit-hood' else ratio*.72
    factor=bw*ratio/max(1,cb[2]-cb[0])
    if name=='star-wand':
     factor=min(factor,bh*1.25/max(1,cb[3]-cb[1]));dx=bb[2]-bw*.05-cb[0]*factor;dy=bb[3]+bh*.08-cb[3]*factor
    elif name=='magic-book':
     dx=bb[2]-bw*.08-cb[0]*factor;dy=top+bh*.72-cb[1]*factor
+   elif name=='knight-shield':
+    dx=bb[2]-bw*.12-cb[0]*factor;dy=top+bh*.35-cb[1]*factor
    else:
-    bottom=top+bh*({'rabbit-hood':1.00,'warm-scarf':.40,'sport-goggles':.32,'gold-feather':-.02,'leaf-hood':.34}.get(name,.13))
+    bottom=top+bh*({'rabbit-hood':1.00,'warm-scarf':.40,'sport-goggles':.32,'gold-feather':-.02,'leaf-hood':.34,'flower-crown':.12,'angel-wings':.72}.get(name,.13))
     if form=='seed':bottom=top+bh*.54 if name=='rabbit-hood' else top-bh*.04
     dx=cx-(cb[0]+cb[2])/2*factor;dy=bottom-cb[3]*factor
    adjustment=(factor,dx-(1-factor)*cx,dy-(1-factor)*top)
   runtime.setdefault('registrations',{})[form]={'method':'neutral-fit-shared-source-motion','canonicalBody':bb,'canonicalCloth':cb,'adjustment':adjustment}
 
   for kind,w,h,entries in allSpecs[form]:
-   cw,ch=256,384;node=E.Element('item',type='DefineSpriteTag',forceWriteAsLong='true',spriteId=str(identifier),frameCount=str(len(entries)),hasEndTag='true');sub=E.SubElement(node,'subTags');lookup={};maxDepth=0
+   cw,ch=256,384;node=E.Element('item',type='DefineSpriteTag',forceWriteAsLong='true',spriteId=str(identifier),frameCount=str(len(entries)),hasEndTag='true');sub=E.SubElement(node,'subTags');lookup={};holds={};maxDepth=0
    for index,(key,action,sourceFrame,tbox) in enumerate(entries):
-    shapes,actual=tl.action(dirs,action,sourceFrame,'cloth');shapes=[(s,outer@m) for s,m in shapes]
+    shapes,actual=tl.action(dirs,action,sourceFrame,'cloth')
+    if kind=='flight' and not shapes:
+     # Old costume rigs can have an empty stop/control frame while the body
+     # keeps flying. Hold the nearest original pose, never flash the outfit off.
+     for heldFrame in range(sourceFrame-1,0,-1):
+      shapes,actual=tl.action(dirs,action,heldFrame,'cloth')
+      if shapes:holds[key]={'requested':sourceFrame,'held':heldFrame};sourceFrame=heldFrame;break
+    shapes=[(s,outer@m) for s,m in shapes]
     body,_=tl.action(dirs,actual,sourceFrame if actual==action else 3,'body');body=[(s,outer@m) for s,m in body];bbox=union(bounds(tl.ns[s],m) for s,m in body)
     if bbox is None:
      body,_=btl.action(bsid,actual,sourceFrame if actual==action else 3,'body');bbox=union(bounds(btl.ns[s],m) for s,m in body)
@@ -222,6 +241,7 @@ def export(pair):
       maxDepth=depth
     E.SubElement(sub,'item',type='ShowFrameTag',forceWriteAsLong='false');lookup[key]=index
    tags.append(node);exports.append((identifier,form,kind,cw,ch,len(entries)));runtime['forms'][form][kind]={'cell':[cw,ch],'bodyCell':[w,h],'origin':[(cw-w)/2,(ch-h)/2],'columns':8,'lookup':lookup,'file':f'{name}-{form}-{kind}.png'};identifier+=1
+   if holds:runtime['forms'][form][kind]['controlFrameHolds']=holds
  if not exports:return name,runtime
  # One original SWF frame per pose. A fixed export stage preserves registration
  # and clips only pixels outside the generous costume viewport.
@@ -241,6 +261,12 @@ def export(pair):
   path=dest/'render';meta=runtime['forms'][form][kind]
   # Fixed-stage exports preserve the same transparent costume registration.
   ims=[Image.open(path/f'{offset+i+1}.png').convert('RGBA') for i in range(count)];unique=[];seen={};fm=[]
+  # An old costume control frame can also render empty after nested masks or
+  # transforms. Keep the nearest visible original drawing; record every hold.
+  visible=[i for i,im in enumerate(ims) if im.getbbox()]
+  for i,im in enumerate(ims):
+   if not im.getbbox() and visible:
+    held=max((j for j in visible if j<i),default=visible[0]);ims[i]=ims[held].copy();meta.setdefault('transparentPoseHolds',{})[str(i)]=held
   for im in ims:
    assert im.size==(cw,ch),(name,form,kind,im.size,(cw,ch))
    key=hashlib.sha256(im.tobytes()).digest()
@@ -257,7 +283,8 @@ results=copy.deepcopy(previous)
 for pair in a.ids.split(','):
  k,v=export(pair)
  if k in results:
-  registrations={**results[k].get('registrations',{}),**v.get('registrations',{})};results[k].update({key:value for key,value in v.items() if key!='forms'});results[k]['registrations']=registrations;results[k]['forms'].update(v['forms'])
+  registrations={**results[k].get('registrations',{}),**v.get('registrations',{})};results[k].update({key:value for key,value in v.items() if key!='forms'});results[k]['registrations']=registrations
+  for form,sheets in v['forms'].items():results[k]['forms'].setdefault(form,{}).update(sheets)
  else:results[k]=v
 (out/'runtime.json').write_text(json.dumps({'fps':24,'registration':'Original SWF2 poses with one neutral fit per outfit/form, body-source registration and shared action frame. No per-frame garment-bounds fitting; source eye/mouth/body remain independent. Missing-action fallbacks are explicit adaptations.','outfits':results},separators=(',',':'))+'\n')
 (out/'checksums.json').write_text(json.dumps({f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in out.glob('*.png')},indent=2)+'\n')

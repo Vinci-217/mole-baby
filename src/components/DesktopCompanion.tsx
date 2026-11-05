@@ -10,7 +10,7 @@ import {useElasticDrag} from '../use-elastic-drag';
 import {isPastime} from '../pet-pastimes';
 import {isSchoolAction,learned,type CourseId} from '../pet-school';
 import ActivityCountdown from './ActivityCountdown';
-import DesktopRestaurantWork from './DesktopRestaurantWork';
+import DesktopRestaurantStatus from './DesktopRestaurantStatus';
 import {ELEMENT_TYPES,elementSkillsForCourse,learnedElementSkill} from '../element-skills';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
@@ -195,7 +195,7 @@ export default function DesktopCompanion(p: Props) {
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
       </button>
-      {working&&<DesktopRestaurantWork pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
+      {working&&<DesktopRestaurantStatus pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
                 <button aria-label="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>
@@ -221,7 +221,8 @@ export default function DesktopCompanion(p: Props) {
         <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.onCare('sleep')}><Icon path="ui/status-sleep"/>{p.pet.sleeping?'轻轻叫醒':'睡一会儿'}</button>
         {(!p.native||Boolean(window.desktop?.openSizeEditor))&&<button aria-label="放大缩小" onClick={beginResize}><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 3H3v6m12 12h6v-6M3 3l7 7m11 11-7-7"/></svg>调整大小</button>}
         <button onClick={p.onBoard}><img alt="" src="./assets/original/message-board/board.png"/>留言板</button>
-        <button disabled={p.moodBusy||p.stage===0} onClick={p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>餐厅打工</button>
+        <button disabled={p.moodBusy||p.stage===0} onClick={p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>去餐厅打工</button>
+        <button onClick={p.onViewRestaurant}><img alt="" src="./assets/original/restaurant/dock.png"/>进入餐厅</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
         <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
