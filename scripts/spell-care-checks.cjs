@@ -99,9 +99,11 @@ async function verifySpellCare(page,desktop){
   const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
   await expect(language).toContainText('30 点');await expect(language).toContainText('当前');
   await expect(language.getByRole('button',{name:'上这一课',exact:true})).toBeDisabled();
-  await roomTab(page,'游戏');await expect(page.getByRole('region',{name:'餐厅打工'})).toContainText('31 点');
+  await roomTab(page,'游戏');await expect(page.getByRole('region',{name:'餐厅打工',exact:true})).toHaveCount(0);
   await expect(page.getByRole('region',{name:'拉姆的小日常'})).toContainText('30 点');
   await toDesktop(page);let actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
+  await page.getByTestId('companion-panel').getByRole('button',{name:'去餐厅打工',exact:true}).click();
+  await expect(page.locator('.compact-toast')).toContainText('31 点');assert.equal((await save()).activity,undefined,'insufficient energy cannot start restaurant work');
   await page.getByTestId('companion-panel').getByRole('button',{name:'睡一会儿',exact:true}).click();
   const before=(await save()).stats.energy;await page.clock.fastForward(60000);
   assert.ok(Math.abs((await save()).stats.energy-before-10)<.01,'sleep recovers ten points per minute');

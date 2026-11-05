@@ -47,7 +47,8 @@ async function swipeDock(page){
 }
 async function fitLandscapeSpeech(page,label){
  if(page.viewportSize().height>500||page.viewportSize().width<600)return;
- await page.getByRole('button',{name:'摸摸拉姆',exact:true}).tap();
+ const pet=page.getByRole('button',{name:'摸摸拉姆',exact:true});
+ await pet.tap({position:await require('../smoke-helpers.cjs').ramBodyPosition(pet)});
  const speech=page.getByRole('button',{name:'收起拉姆提示',exact:true});await expect(speech).toBeVisible();
  const check=async()=>{
   const bubble=await speech.boundingBox(),top=await page.locator('.cottage-top').boundingBox(),dock=await page.locator('.room-dock').boundingBox();
@@ -56,7 +57,9 @@ async function fitLandscapeSpeech(page,label){
  };
  await check();
  const floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),bounds=await floor.boundingBox();
- await floor.tap({position:{x:bounds.width/2+110,y:bounds.height/2}});
+ // The expanded room surface also spans the speech bubble's height. Tap a
+ // clear floor point, rather than waiting for that bubble to expire first.
+ await floor.tap({position:{x:bounds.width*.82,y:bounds.height*.86}});
  await expect(page.locator('.room-pet-position')).toHaveAttribute('data-speech-side','left');
  await expect(page.locator('.room-walker')).toHaveAttribute('data-moving','false');
  await check();await page.screenshot({path:path.join(output,`${label}-speech.png`)});

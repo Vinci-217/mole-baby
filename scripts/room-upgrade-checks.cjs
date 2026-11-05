@@ -10,7 +10,7 @@ async function verifyRoomUpgrade(page){
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
    Object.assign(p,{growth:180,growthLocked:true,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,wearing:undefined,lastTick:now,education:{lessons:{language:1},graduated:{}}});
    p.stats={hunger:95,thirst:95,happiness:95,cleanliness:95,health:100,energy:95};
-   localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false}));
+   localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false,roomWander:false}));
    localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:true,backgroundPlayback:false,musicId:'castle',volume:.1}));
   });
   await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();await enterHome(page);

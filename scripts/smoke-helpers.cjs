@@ -1,6 +1,27 @@
 const { expect } = require('@playwright/test');
 const {PET_SIZE}=require('../electron/desktop-geometry.cjs');
 
+/** Real pointer tests must target painted body pixels, not transparent padding. */
+async function ramBodyPosition(character) {
+  await expect(character.locator('canvas[data-loaded="true"]:visible').first()).toBeVisible({timeout:20000});
+  return character.evaluate(root=>{
+    const host=root.getBoundingClientRect();let best=null,distance=Infinity;
+    for(const c of root.querySelectorAll('canvas.ram-classic-frame,canvas.seed-body-frame')){
+      const r=c.getBoundingClientRect();if(!r.width||!r.height||getComputedStyle(c).visibility==='hidden')continue;
+      const data=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+      for(let y=0;y<c.height;y+=2)for(let x=0;x<c.width;x+=2){
+        if(data[(y*c.width+x)*4+3]<120)continue;
+        const px=r.x+(x+.5)/c.width*r.width,py=r.y+(y+.5)/c.height*r.height;
+        if(px<=host.left||px>=host.right||py<=host.top||py>=host.bottom||!root.contains(document.elementFromPoint(px,py)))continue;
+        const d=(px-host.x-host.width/2)**2+(py-host.y-host.height/2)**2;
+        if(d<distance){distance=d;best={x:px-host.x,y:py-host.y};}
+      }
+    }
+    if(!best)throw Error('No visible painted Ram body pixel can receive a pointer');
+    return best;
+  });
+}
+
 async function adopt(page, color = '蓝色', name = '小蓝') {
   const colors = page.getByRole('button', { name: /^选择.+色拉姆$/ });
   await expect(colors).toHaveCount(4);
@@ -480,4 +501,4 @@ async function verifyMoodWardrobe(page) {
   }
 }
 
-module.exports = { enterBackpack,applyGrowthSettings,adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };
+module.exports = { ramBodyPosition,enterBackpack,applyGrowthSettings,adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };
