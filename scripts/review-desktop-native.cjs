@@ -8,7 +8,13 @@ function nativeMouse(x,y,button){
 }
 let app;
 async function launch(){
- app=await _electron.launch({args:['--no-sandbox','--disable-dev-shm-usage','--disable-gpu',`--user-data-dir=${profile}`,root],cwd:root,env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},timeout:30000});const p=await app.firstWindow();p.setDefaultTimeout(15000);return p;
+ app=await _electron.launch({args:['--no-sandbox','--disable-dev-shm-usage','--disable-gpu',`--user-data-dir=${profile}`,root],cwd:root,env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},timeout:30000});const p=await app.firstWindow();p.setDefaultTimeout(15000);
+ await p.context().addInitScript(()=>{
+  if(location.hash!=='#message-board')return;
+  window.boardOpeningFrames=[];
+  function sample(){const stage=document.querySelector('.message-board-stage');if(stage){const r=stage.getBoundingClientRect();window.boardOpeningFrames.push([r.x,r.y,r.width,r.height])}if(window.boardOpeningFrames.length<60)requestAnimationFrame(sample)}
+  requestAnimationFrame(sample);
+ });return p;
 }
 async function captureNative(name){const encoded=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString('base64'));fs.writeFileSync(path.join(out,name),Buffer.from(encoded,'base64'))}
 const snapshot=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
@@ -26,6 +32,9 @@ const snapshot=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-sav
  await (await openActions(p)).getByRole('button',{name:'开始计时',exact:true}).click();await expect(p.locator('.pet-focus-time')).toBeVisible();await expect(p.locator('.reading-book')).toHaveAttribute('data-loaded','true');
  const timerRect=await p.locator('.pet-focus-time').boundingBox(),petRect=await p.getByTestId('desktop-character').boundingBox();assert.ok(timerRect.y+timerRect.height<=petRect.y,'Native timer is above the pet');await captureNative('native-book-timer.png');await (await openActions(p)).getByRole('button',{name:'取消计时',exact:true}).click();
  const menu=await openActions(p);await menu.getByRole('button',{name:'玩耍',exact:true}).click();const next=app.waitForEvent('window');await p.locator('.desktop-play').getByRole('button',{name:'留言板',exact:true}).click();const board=await next;board.setDefaultTimeout(15000);board.on('pageerror',e=>errors.push(e.message));await expect(board.getByRole('dialog',{name:'小屋留言板',exact:true})).toBeVisible();assert.match(board.url(),/#message-board$/);assert.equal(await board.locator('.desktop-character,.cottage-scene').count(),0);assert.equal(await p.evaluate(async()=>(await window.desktop.getState()).petMode),true);
+ await board.waitForFunction(()=>window.boardOpeningFrames?.length===60);
+ const openingStates=await board.evaluate(()=>[...new Set(window.boardOpeningFrames.map(JSON.stringify))]);
+ assert.equal(openingStates.length,1,`Native board changes size on first display: ${openingStates.join('; ')}`);
  await board.getByRole('button',{name:'我要留言',exact:true}).click();await board.locator('#board-note').fill('桌面窗口里的第一条留言');await board.getByRole('button',{name:'保存',exact:true}).click();await expect.poll(async()=>(await snapshot(p)).notes.length).toBe(1);await expect(board.locator('.message-card')).toHaveCount(1);
  // Leave the board open while changing the pet. A later notes edit must merge
  // into the current save and must never restore the old blue colour.

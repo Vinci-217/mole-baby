@@ -5,7 +5,7 @@ const {chromium,expect}=require('@playwright/test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),origin=process.env.MOLE_REVIEW_URL||'http://127.0.0.1:5173';
-const label=process.env.MOLE_BOARD_REVIEW_LABEL||'after',out=path.join(root,'artifacts/board-jitter-review',label);
+const label=process.env.MOLE_BOARD_REVIEW_LABEL||'after-initial-sizing',out=path.join(root,'artifacts/board-jitter-review',label);
 const cases=[
  {width:980,height:711,deviceScaleFactor:1},
  ...[1,1.25,1.5,2].flatMap(deviceScaleFactor=>[710,720,740].map(height=>({width:980,height,deviceScaleFactor}))),
@@ -21,6 +21,15 @@ function fixture(){
  const listeners=new Set();
  window.desktop={messageBoard:{get:async()=>snapshot,onSnapshot:cb=>{listeners.add(cb);return()=>listeners.delete(cb)},close:async()=>{},change:async change=>{snapshot={...snapshot,notes:change.notes};for(const cb of listeners)cb(snapshot);return snapshot}}};
  window.boardErrors=[];window.addEventListener('error',event=>window.boardErrors.push(event.message));
+ // Register before React mounts. Waiting for images or a settling delay can
+ // miss an incorrect first visible size even when every later frame is still.
+ window.boardOpeningFrames=[];
+ function openingFrame(){
+  const stage=document.querySelector('.message-board-stage');
+  if(stage){const r=stage.getBoundingClientRect();window.boardOpeningFrames.push([r.x,r.y,r.width,r.height])}
+  if(window.boardOpeningFrames.length<60)requestAnimationFrame(openingFrame);
+ }
+ requestAnimationFrame(openingFrame);
 }
 async function measure(page){
  return page.evaluate(async()=>{
@@ -38,14 +47,18 @@ async function measure(page){
 async function settled(page){await page.waitForTimeout(150);return measure(page)}
 async function record(page){
  const session=await page.context().newCDPSession(page),frames=[];
- session.on('Page.screencastFrame',event=>{frames.push(event);void session.send('Page.screencastFrameAck',{sessionId:event.sessionId})});
+ session.on('Page.screencastFrame',event=>{frames.push(event);void session.send('Page.screencastFrameAck',{sessionId:event.sessionId}).catch(()=>{})});
  await session.send('Page.startScreencast',{format:'jpeg',quality:90,maxWidth:980,maxHeight:711,everyNthFrame:1});
  return async()=>{
+  const endedAt=Date.now()/1000;
   await session.send('Page.stopScreencast');await session.detach();
   const directory=path.join(out,'frames');fs.mkdirSync(directory,{recursive:true});const lines=[];
-  frames.forEach((frame,i)=>{const file=`${String(i).padStart(4,'0')}.jpg`;fs.writeFileSync(path.join(directory,file),Buffer.from(frame.data,'base64'));lines.push(`file '${file}'`,`duration ${Math.max(1/120,frames[i+1]?frames[i+1].metadata.timestamp-frame.metadata.timestamp:1/60)}`)});
+  frames.forEach((frame,i)=>{const file=`${String(i).padStart(4,'0')}.jpg`;fs.writeFileSync(path.join(directory,file),Buffer.from(frame.data,'base64'));lines.push(`file '${file}'`,`duration ${Math.max(1/120,(frames[i+1]?.metadata.timestamp??endedAt)-frame.metadata.timestamp)}`)});
+  // The final unchanged screen remains on screen until recording stops.
+  // Preserve that actual duration instead of looping a short opening clip.
+  lines.push(`file '${String(frames.length-1).padStart(4,'0')}.jpg'`);
   fs.writeFileSync(path.join(directory,'frames.txt'),lines.join('\n')+'\n');
-  execFileSync('ffmpeg',['-y','-loglevel','error','-f','concat','-safe','0','-i',path.join(directory,'frames.txt'),'-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2','-c:v','libx264','-pix_fmt','yuv420p','-an',path.join(out,'board.mp4')]);
+  execFileSync('ffmpeg',['-y','-loglevel','error','-f','concat','-safe','0','-i',path.join(directory,'frames.txt'),'-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2','-vsync','vfr','-enc_time_base','1/1000','-c:v','libx264','-pix_fmt','yuv420p','-an',path.join(out,'board.mp4')]);
  };
 }
 (async()=>{
@@ -57,11 +70,14 @@ async function record(page){
    const context=await browser.newContext({viewport,deviceScaleFactor});
    const page=await context.newPage();await page.addInitScript(fixture);
    try{
+    const recordingStarted=Date.now(),stopRecording=index===0?await record(page):null;
     await page.goto(`${origin}/#message-board`);await page.getByRole('dialog',{name:'小屋留言板',exact:true}).waitFor();
     await page.locator('.message-board-original-art').evaluate(image=>image.decode());await page.evaluate(()=>document.fonts.ready);
-    const stopRecording=index===0?await record(page):null;
-    const result={...config,...await settled(page)};results.push(result);
-    if(index===0){await page.screenshot({path:path.join(out,'board.png')});await stopRecording()}
+    await page.waitForFunction(()=>window.boardOpeningFrames.length===60);
+    const openingStates=await page.evaluate(()=>[...new Set(window.boardOpeningFrames.map(value=>JSON.stringify(value)))].map(JSON.parse));
+    const result={...config,openingStates,...await settled(page)};results.push(result);
+    if(index===0){await page.waitForTimeout(Math.max(0,6000-(Date.now()-recordingStarted)));await page.screenshot({path:path.join(out,'board.png')});await stopRecording()}
+    assert.equal(openingStates.length,1,`Board changes size on first display at ${JSON.stringify(config)}: ${JSON.stringify(openingStates)}`);
     assert.equal(result.changes,0,`Board moves while idle at ${JSON.stringify(config)}: ${JSON.stringify(result.states)}`);
     assert.deepEqual(result.errors,[]);
     if(index===0){
@@ -81,13 +97,18 @@ async function record(page){
      await page.addStyleTag({content:'.message-board-scroll{scrollbar-gutter:auto;overflow-y:scroll}'});
      assert.equal((await settled(page)).changes,0,'Legacy scrollbar fallback stays still');
      assert.ok(await page.locator('.message-board-scroll').evaluate(e=>e.offsetWidth-e.clientWidth>0),'Test must use scrollbars that consume width');
+     for(let opening=0;opening<5;opening++){
+      await page.reload();await page.waitForFunction(()=>window.boardOpeningFrames.length===60);
+      const sizes=await page.evaluate(()=>[...new Set(window.boardOpeningFrames.map(JSON.stringify))]);
+      assert.equal(sizes.length,1,`Warm opening ${opening+1} changes size: ${sizes.join('; ')}`);
+     }
     }
     if(viewport.width===360){
      const scroll=page.locator('.message-board-scroll');assert.ok(await scroll.evaluate(e=>e.scrollWidth>e.clientWidth),'Phone keeps horizontal scrolling');
      const before=await scroll.evaluate(e=>e.scrollLeft);await scroll.evaluate(e=>{e.scrollLeft=e.scrollWidth});assert.ok(await scroll.evaluate(e=>e.scrollLeft)>before);
      await expect(page.locator('.message-board-mobile-bar').getByRole('button',{name:'关闭留言板',exact:true})).toBeInViewport();
     }
-    console.log(`PASS board stable ${viewport.width}x${viewport.height} @ ${deviceScaleFactor}x`);
+    console.log(`PASS board stable from first visible frame ${viewport.width}x${viewport.height} @ ${deviceScaleFactor}x`);
    }finally{
     await context.close();
    }

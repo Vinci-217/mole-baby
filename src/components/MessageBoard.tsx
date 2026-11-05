@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useLayoutEffect,useRef,useState} from 'react';
 import type {CSSProperties} from 'react';
 import type {GameState} from '../game';
 import type {PetNote} from '../pet-records';
@@ -15,8 +15,8 @@ export default function MessageBoard({pet,onChange,onClose}:{pet:BoardSnapshot;o
  const [saving,setSaving]=useState(false),[width,setWidth]=useState(770),[page,setPage]=useState(0),[compose,setCompose]=useState<Compose|null>(null),[text,setText]=useState(''),[removing,setRemoving]=useState<string|null>(null);
  const notes=pet.notes??[],pages=Math.max(1,Math.ceil(notes.length/PAGE_SIZE)),currentPage=Math.min(page,pages-1);
  const visible=notes.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(currentPage*PAGE_SIZE,(currentPage+1)*PAGE_SIZE);
- useEffect(()=>{
-  const previous=document.activeElement as HTMLElement|null;dialog.current?.focus();
+ useLayoutEffect(()=>{
+  const previous=document.activeElement as HTMLElement|null;dialog.current?.focus({preventScroll:true});
   const key=(event:KeyboardEvent)=>{
    if(event.key==='Escape'){event.preventDefault();close.current();}
    if(event.key==='Tab'){
@@ -24,8 +24,13 @@ export default function MessageBoard({pet,onChange,onClose}:{pet:BoardSnapshot;o
     const first=items[0],last=items[items.length-1];if(event.shiftKey&&(document.activeElement===first||document.activeElement===dialog.current)){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
    }
   };
-  document.addEventListener('keydown',key);const observer=new ResizeObserver(entries=>setWidth(Math.max(700,Math.min(940,entries[0].contentRect.width))));if(scroll.current)observer.observe(scroll.current);
-  return()=>{document.removeEventListener('keydown',key);observer.disconnect();previous?.focus();};
+  // Resolve the real size before the first paint. A passive effect exposes
+  // the default 770px board for one frame before enlarging it to the window.
+  // Use the same measurement initially and in the observer to avoid a second
+  // fractional-width correction on displays with non-integer scaling.
+  const resize=()=>{if(scroll.current)setWidth(Math.max(700,Math.min(940,scroll.current.clientWidth)))};
+  resize();document.addEventListener('keydown',key);const observer=new ResizeObserver(resize);if(scroll.current)observer.observe(scroll.current);
+  return()=>{document.removeEventListener('keydown',key);observer.disconnect();previous?.focus({preventScroll:true});};
  },[]);
  function open(kind:Compose['kind'],note?:PetNote){setCompose({kind,id:note?.id});setText(kind==='edit'?note!.text:kind==='reply'?note?.reply??'':'');}
  async function save(){
