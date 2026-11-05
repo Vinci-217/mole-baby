@@ -1,3 +1,4 @@
+import RestaurantGame from './components/RestaurantGame';
 import MessageBoard from './components/MessageBoard';
 import GameSoundToggle from './components/GameSoundToggle';
 import {normalizeNotes,recordStatChange} from './pet-records';
@@ -78,8 +79,8 @@ import {buyFurniture,placeFurniture,removeFurniture} from './room-furnishings';
 const SAVE_KEY = PET_SAVE_KEY;
 const PREFS_KEY = 'ramu-house-preferences-v2';
 type Panel = CompanionPanel | 'shop' | 'games' | 'growth' | 'settings' | 'decor' | 'wardrobe' | 'status' | 'memories' | 'school' | 'notes' | null;
-type GameKind = 'fruit' | 'memory' | 'treasure' | ExtraGame | 'color-mixer';
-const GAME_LABELS: Record<GameKind, string> = {'color-mixer':'拉姆换色游戏', fruit:'拉姆接果子',memory:'口袋翻翻乐',rhythm:'拉姆拍拍乐',orchard:'草地采果',puzzle:'小屋拼拼乐',treasure:'小屋寻宝' };
+type GameKind = 'fruit' | 'memory' | 'treasure' | ExtraGame | 'color-mixer' | 'restaurant';
+const GAME_LABELS: Record<GameKind, string> = {restaurant:'拉姆餐厅','color-mixer':'拉姆换色游戏', fruit:'拉姆接果子',memory:'口袋翻翻乐',rhythm:'拉姆拍拍乐',orchard:'草地采果',puzzle:'小屋拼拼乐',treasure:'小屋寻宝' };
 type Preferences = { roomWander:boolean; gameSound:boolean; sound: boolean; soundVolume: number; lively: boolean; outings: boolean; quiet: boolean; reminders: boolean; reminderMinutes: number; reminderSound: boolean; timerDirection:TimerDirection; presence: boolean; presenceMinutes: number };
 type Result = { state: GameState; message: string; ok: boolean };
 const titles = { notes:'小屋留言板',status:'我的拉姆',food:'拉姆的背包',play:'一起玩耍',shop:'拉姆用品商店',games:'小屋游戏',growth:'一起长大',memories:'回忆',settings:'小屋设置',decor:'布置小屋',wardrobe:'拉姆小衣橱',school:'拉姆学院' };
@@ -165,7 +166,7 @@ export default function App() {
   const spokenBubble=petSpeech(current,bubble);
   const workingAway = current.activity?.kind==='restaurant';
   const renderedAction = (workingAway?'still':activityAction(current.activity)) ?? (action !== 'idle' ? action : desktopState.motion === 'left' ? 'walk-left' : desktopState.motion === 'right' ? 'walk-right' : condition.action);
-  const roomMedia = useRoomMedia(hasPet && !floating, hasPet);
+  const roomMedia = useRoomMedia(hasPet && !floating, hasPet, game==='restaurant'?'./assets/original/restaurant/audio/bgSound.mp3':undefined);
   useEffect(()=>window.desktop?.onMusicToggle?.(enabled=>roomMedia.update({backgroundPlayback:enabled})),[roomMedia.update]);
   useEffect(()=>{void window.desktop?.setMusicState?.({playing:roomMedia.playing,enabled:roomMedia.settings.musicEnabled||roomMedia.settings.backgroundPlayback,background:roomMedia.settings.backgroundPlayback})?.catch(()=>{})},[roomMedia.playing,roomMedia.settings.musicEnabled,roomMedia.settings.backgroundPlayback]);
   useEffect(()=>{configurePetSound({enabled:prefs.sound,gameEnabled:prefs.gameSound,volume:prefs.soundVolume})},[prefs.sound,prefs.gameSound,prefs.soundVolume]);
@@ -278,7 +279,18 @@ export default function App() {
     }
     setMemory(m=>m?recordEvent(m,{kind:before.kind==='restaurant'?'job-complete':'course-complete',detail:text}):m);
   },[pet?.activity,pet?.education]);
+  async function enterRestaurant(){
+    if(!petRef.current)return;
+    if(schoolBusy){notify('先结束正在进行的互动或专注计时吧。');return;}
+    await enterHome();setGame('restaurant');
+  }
+  function saveRestaurant(next:GameState){
+    // Commit wallet and restaurant together, including pagehide/background shutdown.
+    petRef.current=next;setPet(next,'餐厅营业与备菜');
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(next));setSaveError(false)}catch{setSaveError(true)}
+  }
   function startActivity(kind:'course'|'restaurant',id?:CourseId){
+    if(kind==='restaurant'){void enterRestaurant();return;}
     const saved=petRef.current;if(!saved)return;
     if(schoolBusy){notify('先结束正在进行的互动或专注计时吧。');return;}
     const result=beginActivity(tick(saved),kind,id);if(!result.ok){notify(result.message);return;}
@@ -645,7 +657,7 @@ export default function App() {
     <SettingsSection title="存档与送别"><p className="settings-hint">备份包含拉姆、成长进度、物品与回忆。送别前可以先导出存档。</p><div className="settings-actions"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={()=>setReset(true)}>送别拉姆</button></div>{memorySaveError&&<p role="alert">回忆暂未保存，请导出备份。</p>}</SettingsSection>
     {window.desktop&&<SettingsSection title="软件与帮助"><UpdateSettings/><MacHelp/></SettingsSection>}
   </SettingsPanel>;
-  const gameOverlay = <>{game&&<GameSoundToggle game={game} enabled={prefs.gameSound} onToggle={()=>setPrefs(p=>({...p,gameSound:!p.gameSound}))}/>}{game==='color-mixer'&&<ColorMixerGame pet={current} sound={prefs.gameSound} onBrew={color=>{const saved=petRef.current;if(!saved)return {ok:false,message:'先领养一只拉姆吧。'};const result=brewColourPotion(saved,color);apply(result);if(result.ok)setMemory(m=>m?recordEvent(m,{kind:'craft-potion',detail:`你调制了${color.toUpperCase()}颜色的药水，装进了背包。`}):m);return result}} onClose={()=>setGame(null)} onBackpack={()=>{setGame(null);setPocketCategory('medicine');setPanel('food')}}/>}{game === 'fruit' && <FruitGame costume={current.wearing} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'memory' && <MemoryGame sound={prefs.gameSound} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'treasure' && <TreasureGame costume={current.wearing} background={roomMedia.background} phase={roomMedia.phase} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game && !['fruit','memory','treasure','color-mixer'].includes(game) && <MoreGames sound={prefs.gameSound} kind={game as ExtraGame} onClose={() => setGame(null)} onComplete={completeGame}/>}</>;
+  const gameOverlay = <>{game==='restaurant'&&<RestaurantGame pet={current} getPet={()=>petRef.current!} onChange={saveRestaurant} onClose={()=>setGame(null)} sound={prefs.gameSound} volume={prefs.soundVolume} onToggleSound={()=>setPrefs(p=>({...p,gameSound:!p.gameSound}))}/>}{game&&game!=='restaurant'&&<GameSoundToggle game={game} enabled={prefs.gameSound} onToggle={()=>setPrefs(p=>({...p,gameSound:!p.gameSound}))}/>}{game==='color-mixer'&&<ColorMixerGame pet={current} sound={prefs.gameSound} onBrew={color=>{const saved=petRef.current;if(!saved)return {ok:false,message:'先领养一只拉姆吧。'};const result=brewColourPotion(saved,color);apply(result);if(result.ok)setMemory(m=>m?recordEvent(m,{kind:'craft-potion',detail:`你调制了${color.toUpperCase()}颜色的药水，装进了背包。`}):m);return result}} onClose={()=>setGame(null)} onBackpack={()=>{setGame(null);setPocketCategory('medicine');setPanel('food')}}/>}{game === 'fruit' && <FruitGame costume={current.wearing} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'memory' && <MemoryGame sound={prefs.gameSound} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'treasure' && <TreasureGame costume={current.wearing} background={roomMedia.background} phase={roomMedia.phase} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game && !['fruit','memory','treasure','color-mixer','restaurant'].includes(game) && <MoreGames sound={prefs.gameSound} kind={game as ExtraGame} onClose={() => setGame(null)} onComplete={completeGame}/>}</>;
 
   if (floating && pet) return <div className={petMode ? 'transparent-stage' : 'desktop-preview companion-preview'}>
     {!petMode && <div className="preview-description"><strong>拉姆 · 桌面预览</strong><span>移上来互动，点击摸摸，按住拖动。</span></div>}
@@ -669,7 +681,7 @@ export default function App() {
       {pet && panel!=='decor' && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
         <RoomWalker randomWalk={prefs.roomWander} stage={stage} evolution={current.evolution} blocked={interactionBusy||current.sleeping||Boolean(current.outing)||panel!==null||game!==null||reset}>{walkAction=><div className={`scene-pet ${current.outing?"pet-is-away":""} ${workingAway?"pet-at-work":""}`}><CareFeedback feedback={workingAway||panel==='food'||panel==='status'?null:careFeedback?.petId===current.createdAt?careFeedback:null}/>{bubbleVisible && !workingAway && <button type="button" className="scene-bubble visible" aria-label="收起拉姆提示" onClick={respondToBubble}><span role="status">{spokenBubble}</span></button>}<button className="scene-character" aria-label="摸摸拉姆" onClick={() => doCare('pet')}><Ram companionId={current.createdAt} costume={current.wearing} onActionEnd={finishPerformance} sound={prefs.sound} color={current.color} stage={stage} evolution={current.evolution} action={walkAction??(timer.running && action === 'idle' ? 'focus' : renderedAction)} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button>{workingAway&&<div className="room-work-note" role="status"><img src="./assets/generated/school/icons/restaurant.png" alt=""/><strong>拉姆去餐厅打工了</strong><ActivityCard pet={current} onCancel={stopActivity}/></div>}<span className="scene-pet-name">{current.outing&&<button className="game-button small" onClick={()=>recallPet()}>去{current.outing.place}了 · 叫回来</button>}{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>}</RoomWalker>
         {(!workingAway&&current.activity||courseCompletion)&&<div className="school-scene-status">{current.activity?<ActivityCard pet={current} onCancel={stopActivity}/>:<span role="status">{courseCompletion}</span>}</div>}
-        <RoomDock onSelect={destination=>{if(destination==='food')setPocketCategory('food');setPanel(destination)}}/></>}
+        <RoomDock onSelect={destination=>{if(destination==='restaurant'){void enterRestaurant();return;}if(destination==='food')setPocketCategory('food');setPanel(destination)}}/></>}
       {pet&&panel==='decor'&&<aside className={`room-decor-drawer ${warehouseCollapsed?'is-collapsed':''}`} aria-label="小屋布置工具"><header><strong>布置小屋</strong><button className="warehouse-collapse" aria-label={warehouseCollapsed?'展开家具仓库':'收起家具仓库'} aria-expanded={!warehouseCollapsed} onClick={()=>setWarehouseCollapsed(value=>!value)}>{warehouseCollapsed?'仓库':'收起'}</button><button aria-label="完成布置" onClick={()=>setPanel(null)}>完成</button></header><RoomFurnishingEditor inline pet={current} media={roomMedia} onBuy={id=>apply(buyFurniture(petRef.current!,id))} onPlace={updateFurniture} onRemove={id=>updateFurniture(id)}/><RoomSettings media={roomMedia}/></aside>}
       <footer className="classic-footer">{saveError ? '存档未保存，请导出备份' : 'mole-baby · 本地自动保存'}<span>非官方同人桌宠</span></footer>
     </TimeScene>

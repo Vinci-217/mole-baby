@@ -96,7 +96,7 @@ async function musicStore<T>(mode: IDBTransactionMode, operation: (store: IDBObj
 
 /** Background playback is opt-in. Local tracks stay in IndexedDB.
  * Background music has independent volume and enable settings. */
-export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaController {
+export function useRoomMedia(inRoom: boolean, hasPet = true, sceneMusic?:string): RoomMediaController {
   const [settings, setSettings] = useState(loadPreferences);
   const localPhase = useLocalScenePhase();
   // Preview is transient. Stored preferences always follow the real local time.
@@ -147,14 +147,14 @@ export function useRoomMedia(inRoom: boolean, hasPet = true): RoomMediaControlle
     nativeVisible.current=state.windowVisible!==false;
     if(!nativeVisible.current&&!backgroundAllowed.current)audio.current?.pause();else resumeMusic();
   }),[resumeMusic]);
-  const source = settings.musicId === 'custom' && custom ? custom.url : (ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0]).src;
+  const source = sceneMusic ?? (settings.musicId === 'custom' && custom ? custom.url : (ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0]).src);
   const nextMusic=useCallback(()=>{
     setSettings(previous=>{
       const pool=[...ROOM_MUSIC.map(track=>track.id as string),...(custom?['custom']:[])].filter(id=>id!==previous.musicId);
       return {...previous,musicId:pool[Math.min(pool.length-1,Math.floor(Math.random()*pool.length))]??previous.musicId};
     });
   },[custom]);
-  const awaitingCustom=settings.musicId==='custom'&&!customLoaded;
+  const awaitingCustom=!sceneMusic&&settings.musicId==='custom'&&!customLoaded;
   useEffect(() => {
     if (awaitingCustom) return;
     const element = new Audio(source); element.loop = !settings.shuffle; element.preload = 'metadata';

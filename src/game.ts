@@ -1,3 +1,4 @@
+import {normalizeRestaurant,type RestaurantState} from './restaurant';
 import { ITEMS, getItem } from './catalog';
 import {normalizeNotes,normalizeStatHistory} from './pet-records';
 import type {PetNote,StatChange} from './pet-records';
@@ -73,6 +74,7 @@ export interface GameState {
   education?: Education;
   activity?: PetActivity;
   room?: RoomFurnishings;
+  restaurant?: RestaurantState;
 }
 
 export interface CareResult {
@@ -427,7 +429,7 @@ const isIntegerIn = (value: unknown, min: number, max: number): value is number 
 
 /** Validate untrusted local storage, normalize known fields, then apply offline time. */
 export function parseSave(raw: string | null, now = Date.now(), manualStageSelected = false): GameState | null {
-  if (!raw || raw.length > 50_000 || !Number.isFinite(now) || now < 0) return null;
+  if (!raw || raw.length > 100_000 || !Number.isFinite(now) || now < 0) return null;
   try {
     const value: unknown = JSON.parse(raw);
     if (!isRecord(value) || value.version !== 1) return null;
@@ -456,7 +458,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     for (const item of ITEMS) inventory[item.id] ??= 0;
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
     const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
-    const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity(value.activity,{createdAt:value.createdAt,education,growth:value.growth,evolution:value.evolution as Evolution|undefined},now):undefined;
+    const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity((value.activity as PetActivity)?.kind==='restaurant'?undefined:value.activity,{createdAt:value.createdAt,education,growth:value.growth,evolution:value.evolution as Evolution|undefined},now):undefined;
     return tick(reconcileCourseRewards({
       version: 1,
       name: value.name.trim(),
@@ -479,6 +481,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       lastRewardAt: value.lastRewardAt,
       ...(normalizeCheckIn(value.checkIn,now)?{checkIn:normalizeCheckIn(value.checkIn,now)}:{}),
       ...(importedOuting?{outing:importedOuting}:{}),
+      ...(normalizeRestaurant(value.restaurant)?{restaurant:normalizeRestaurant(value.restaurant)}:{}),
       ...(education?{education}:{}),...(activity?{activity}:{}),...(room?{room}:{}),
       ...(isIntegerIn(value.lastOutingAt,value.createdAt,now+300000)?{lastOutingAt:value.lastOutingAt}:{}),
     }), now);

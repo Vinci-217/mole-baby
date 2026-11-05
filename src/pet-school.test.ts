@@ -42,9 +42,9 @@ describe('persistent school and restaurant activities',()=>{
   expect(end-(now+1)).toBe(JOB_MS);expect(settleActivity(r.state,end-1).coins).toBe(p.coins)
   const done=settleActivity(r.state,end);expect(done.coins).toBe(p.coins+JOB_PAY);expect(settleActivity(done,end+5000).coins).toBe(done.coins)
  })
- it('continues and settles a saved job after reopening without repeated rewards',()=>{
+ it('cancels a legacy saved job on reopening without offline rewards',()=>{
   const started=beginActivity(pet(),'restaurant',undefined,now+1).state,done=parseSave(JSON.stringify(started),now+JOB_MS+2)!
-  expect(done.coins).toBe(pet().coins+JOB_PAY);expect(done.activity).toBeUndefined();expect(parseSave(JSON.stringify(done),now+JOB_MS+3)!.coins).toBe(done.coins)
+  expect(done.coins).toBe(pet().coins);expect(done.activity).toBeUndefined();expect(parseSave(JSON.stringify(done),now+JOB_MS+3)!.coins).toBe(done.coins)
  })
  it('requires enough energy to finish a shift without an immediate automatic nap',()=>{
   const tired={...pet(),stats:{...pet().stats,energy:30.1}};
@@ -70,10 +70,10 @@ describe('persistent school and restaurant activities',()=>{
   // differ below one thousandth, far below a displayed percentage point.
   for(const key of Object.keys(once.stats) as (keyof typeof once.stats)[])expect(Math.abs(many.stats[key]-once.stats[key])).toBeLessThan(.001)
  })
- it('settles a due saved activity even when the stored tick is already at its deadline',()=>{
+ it('does not pay a legacy saved job even when the stored tick is at its deadline',()=>{
   const started=beginActivity(pet(),'restaurant',undefined,now).state,end=started.activity!.endsAt
   const saved={...started,lastTick:end},restored=parseSave(JSON.stringify(saved),end)!
-  expect(restored.coins).toBe(saved.coins+JOB_PAY);expect(restored.activity).toBeUndefined()
+  expect(restored.coins).toBe(saved.coins);expect(restored.activity).toBeUndefined()
   expect(parseSave(JSON.stringify(restored),end)!.coins).toBe(restored.coins)
  })
  it('keeps lesson progress and certificates through save parsing',()=>{

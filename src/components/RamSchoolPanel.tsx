@@ -1,6 +1,6 @@
 import type {GameState} from '../game'
 import ActivityCountdown from './ActivityCountdown'
-import {COURSES,learned,courseIcon,activityBlockReason,type CourseId,JOB_PAY} from '../pet-school'
+import {COURSES,learned,courseIcon,activityBlockReason,type CourseId} from '../pet-school'
 import {getStage} from '../game'
 import {elementSkillsForCourse} from '../element-skills'
 import './RamSchoolPanel.css'
@@ -15,7 +15,6 @@ export default function RamSchoolPanel({pet,onLearn,onSkill,onElementSkill,onCan
   return <article key={c.id} className={mastered?'graduated':''}><img src={courseIcon(c.id)} alt=""/><h4>{c.name}</h4><p>{reason?reason:mastered?`已学会 · ${c.skill}`:`${c.minutes} 分钟 · 学一次即可掌握`}</p><div className="lesson-dots" aria-label={`已完成${count}节`}>{Array.from({length:c.lessons},(_,i)=><i key={i} className={i<count?'done':''}/>)}</div>{(!mastered||!skills.length)&&<button className="game-button small" disabled={busy||Boolean(reason)||mastered&&(pet.sleeping||Boolean(pet.activity)||Boolean(pet.outing))} onClick={()=>mastered?onSkill(c.id):onLearn(c.id)}>{mastered?'展示本领':'上这一课'}</button>}{skills.length>0&&<ol className="element-skill-list">{skills.map(skill=><li key={skill.id}><span>{skill.name}</span><button disabled={busy||!mastered||stageLocked||Boolean(pet.activity)||pet.sleeping||Boolean(pet.outing)} onClick={()=>onElementSkill(skill.id)}>{mastered?'变身':'未学会'}</button></li>)}</ol>}</article>
  })}</div><p className="school-note">课程时长为桌宠的本地安排；结业证书会放进小屋布置箱。</p></section>
 }
-export function RestaurantCard({pet,onStart,onCancel}:{pet:GameState;onStart:()=>void;onCancel:()=>void}){
- const reason=activityBlockReason(pet,'restaurant');
- return <section className="restaurant-card" aria-label="餐厅打工"><img src="./assets/generated/school/icons/restaurant.png" alt=""/><div><h3>餐厅小服务员</h3><p>送餐、收拾小桌子 · 2 分钟 / +{JOB_PAY} 摩尔豆</p>{reason&&<p role="status">{reason}</p>}</div><button className="game-button small" disabled={Boolean(reason)} title={reason??undefined} onClick={onStart}>去打工</button>{pet.activity?.kind==='restaurant'&&<ActivityCard pet={pet} onCancel={onCancel}/>}</section>
+export function RestaurantCard({pet,onStart}:{pet:GameState;onStart:()=>void;onCancel:()=>void}){
+ return <section className="restaurant-card" aria-label="拉姆餐厅"><img src="./assets/original/restaurant/dock.png" alt=""/><div><h3>拉姆餐厅</h3><p>用摩尔豆备菜，和拉姆一起招待客人、经营小店。</p><p>仅在线营业 · {pet.restaurant?.served??0} 位客人已用餐</p></div><button className="game-button small" onClick={onStart}>进入餐厅</button></section>
 }

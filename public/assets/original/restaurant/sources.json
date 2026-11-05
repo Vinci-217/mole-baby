@@ -1,0 +1,1073 @@
+{
+  "license": "Original art and sounds belong to Taomee. See README and research/restaurant-original-assets.md.",
+  "assets": [
+    {
+      "path": "resource/restaurant/swf/1340001.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340001.swf",
+      "bytes": 35007,
+      "sha256": "5a1cac658d268bb7f0c9759eae49fff01e20642f0be8a7eb953982456bd82339"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340001.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340001.swf",
+      "bytes": 8695,
+      "sha256": "093ef8ed2da10b787efdcdb6af265bf3708c412bff88ce2992286c3d25359cd9"
+    },
+    {
+      "path": "resource/restaurant/swf/1340002.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340002.swf",
+      "bytes": 27009,
+      "sha256": "54a1f9d6b4dca411bcb2f2f4d03c0b5d67893a09e782d008797c0a04599949d6"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340002.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340002.swf",
+      "bytes": 4895,
+      "sha256": "7ba1ec73a0c437e09a39aa09e05a9c9ce769c5fdb5d968ae2faa3167ac84685f"
+    },
+    {
+      "path": "resource/restaurant/swf/1340003.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340003.swf",
+      "bytes": 25472,
+      "sha256": "54d0004ada7dc773e546165e4322da4f364bd7c4d44451de6569cbe64fa175b8"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340003.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340003.swf",
+      "bytes": 12145,
+      "sha256": "116904ddeb0cd8925a96c3ed0afc8eeab0bc611e2ceecfedb2072a2dc6159812"
+    },
+    {
+      "path": "resource/restaurant/swf/1340004.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340004.swf",
+      "bytes": 25891,
+      "sha256": "a3d3699e4f59323944ae15d3eb87c843380a561dc730e0d48af1fbdcfe6e8d51"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340004.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340004.swf",
+      "bytes": 8584,
+      "sha256": "1c5d8e0f79e6747520ca5c7e94735f8e7b5d8f6abd793f6ba1a154bfa20ae243"
+    },
+    {
+      "path": "resource/restaurant/swf/1340005.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340005.swf",
+      "bytes": 23657,
+      "sha256": "62f9a2027bf3e28d735ffc5712d598977aeb63062a0ebf79b2ace0e7f895bb81"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340005.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340005.swf",
+      "bytes": 6697,
+      "sha256": "c65f4087f7076d65af2ce6df98afa3e8379fca21a8876450387f0cc2ca709559"
+    },
+    {
+      "path": "resource/restaurant/swf/1340006.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340006.swf",
+      "bytes": 15955,
+      "sha256": "64e56f9e291c0672e56761a3398ee2c24f266ec5389ab95261a917172db5b558",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340006.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340006.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340006.swf",
+      "bytes": 5304,
+      "sha256": "141cb90df71f8dfa960755e732f1869ca182b1dd57591b5bbb2457ef274a5909"
+    },
+    {
+      "path": "resource/restaurant/swf/1340007.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340007.swf",
+      "bytes": 21710,
+      "sha256": "80583b0554c1c62263d87d4a78fe87a1757f68f3619756d1798a15fd93e19beb"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340007.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340007.swf",
+      "bytes": 5556,
+      "sha256": "053f2c37578c49a4bdb8983fab4c265a16f4cd266c4f3f57b3c9af8f3e99d7a4"
+    },
+    {
+      "path": "resource/restaurant/swf/1340008.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340008.swf",
+      "bytes": 20412,
+      "sha256": "17f77ac601f8c5531ff9c53438773f147f73b27bfc30b2ca7a47f301fb51bb70",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340008.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340008.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340008.swf",
+      "bytes": 3923,
+      "sha256": "e6e4310b81819464b4317b99935b46e168b893fb7e0bc4ae8f4fd31e22835c31"
+    },
+    {
+      "path": "resource/restaurant/swf/1340009.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340009.swf",
+      "bytes": 14661,
+      "sha256": "62b37fa223699182c5d35564f6c2e799796c4196926a1dbd8ae961b360113c5b"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340009.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340009.swf",
+      "bytes": 3554,
+      "sha256": "d6ff0460f550050c54f31bea3bedef420cebd98aaca2799363bfd5b6b885046e",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340009.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340010.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340010.swf",
+      "bytes": 17205,
+      "sha256": "89417a425ba7093e8f6176fbf2e1dcdd1231273961ff1bffe00562ddd63dc600",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340010.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340010.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340010.swf",
+      "bytes": 4184,
+      "sha256": "587993d3c7554c2761dd429269c260fcc5e585f1f08c49d124e688831b852bab",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340010.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340011.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340011.swf",
+      "bytes": 17169,
+      "sha256": "8e8bb5b5fea738b04bba2c1cbafe9bb0c4a4f43dfcf9fc8d4d625477217510b8",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340011.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340011.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340011.swf",
+      "bytes": 4276,
+      "sha256": "5d91134ca58592df4f21d7a2feef8490aa45915e6438cb626e970b1944bf274f",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340011.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340012.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340012.swf",
+      "bytes": 17796,
+      "sha256": "2334915e80f23e5f375b2729041e1894f62aa516a499c84b833a0c7a3044aa38",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340012.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340012.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340012.swf",
+      "bytes": 5519,
+      "sha256": "0ace62b43aa3d6e0ef6ff474b74cb6f922c45f7013310c0c18ed8013d66d6648",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340012.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340013.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340013.swf",
+      "bytes": 19923,
+      "sha256": "e93a919350f0cc633904c422b07082c9d2e43d71f03bcc876cec4bf27cfd2df1",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340013.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340013.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340013.swf",
+      "bytes": 6668,
+      "sha256": "55590583a11c8539ef6db569c6410bdffeb2506b6f535f0bb33e37515d1ea851"
+    },
+    {
+      "path": "resource/restaurant/swf/1340014.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340014.swf",
+      "bytes": 15299,
+      "sha256": "00f9f2ad643fda5bc1b09723ebf395dd2b78ce40863955119e8a062e49d2f106",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340014.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340014.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340014.swf",
+      "bytes": 4145,
+      "sha256": "991e4cf8603e39fd07d54ac3fbbad1ed43f9d6998a9b8a88176aaad3d38c133e"
+    },
+    {
+      "path": "resource/restaurant/swf/1340015.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340015.swf",
+      "bytes": 17914,
+      "sha256": "a161900633d51da8d9ffcc7b05ab29700ffe968ff593c867e420441b56df9095"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340015.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340015.swf",
+      "bytes": 3672,
+      "sha256": "d79b5f1ac4a92f95223e3922a4ac17756f62fcdfc2b2fb56cdf479e3056aa0e0"
+    },
+    {
+      "path": "resource/restaurant/swf/1340016.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340016.swf",
+      "bytes": 22005,
+      "sha256": "300a44743188b17f5aa167d8e7819b9005f9bdac943e52882bce181a1ae2c7ea",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340016.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340016.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340016.swf",
+      "bytes": 5406,
+      "sha256": "39501b9e2ca819d08c81957e3c6e822a24acebd7f9acfeee1681877bb64f70d2"
+    },
+    {
+      "path": "resource/restaurant/swf/1340017.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340017.swf",
+      "bytes": 16252,
+      "sha256": "2fe449168bbf3bd5feafdceac2a40a625580553692d73c003b27070b8116cbf5",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340017.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340017.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340017.swf",
+      "bytes": 966,
+      "sha256": "95824d52053358f81d65684c4d07d7ef17f08a14aa174676114e9841dac4e726"
+    },
+    {
+      "path": "resource/restaurant/swf/1340018.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340018.swf",
+      "bytes": 19334,
+      "sha256": "72fc11e0272f51bf94f5c0161929a3e663cc67e5e5c91707955138b6fcd3a901"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340018.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340018.swf",
+      "bytes": 3272,
+      "sha256": "0d8ed82767db01af68c35c8dbcf8f013f712172d69ca12aa04d35b948a6c6c6c"
+    },
+    {
+      "path": "resource/restaurant/swf/1340019.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340019.swf",
+      "bytes": 28937,
+      "sha256": "5943d8870a1e4e9a0cc8d0fdcc7c3f4a75d9826d75e3dd03cee57d04c5baf603",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340019.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340019.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340019.swf",
+      "bytes": 8386,
+      "sha256": "6a9ca41ac7502bbe46960cd1da5c2c4b10004cfb52f20e9034af463a8f7d9ba4"
+    },
+    {
+      "path": "resource/restaurant/swf/1340020.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340020.swf",
+      "bytes": 14092,
+      "sha256": "45fc903e073cf58958fc089f037edad3fc7458c6feb587ab916b0ad0aa11161a",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340020.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340020.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340020.swf",
+      "bytes": 5478,
+      "sha256": "011932b50482a9e6244083c4b2472abe84aa5e283262c6ba50c5e0bc8f71f7c5"
+    },
+    {
+      "path": "resource/restaurant/swf/1340021.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340021.swf",
+      "bytes": 17146,
+      "sha256": "b6372a740279b0294e8aa8113ffb65748ec04887192bee685e789487a12806e8",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340021.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340021.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340021.swf",
+      "bytes": 4367,
+      "sha256": "a1950a67a3c59552c7882174825a8cacfd8a4dc77a1704df8e0512eefeb36352"
+    },
+    {
+      "path": "resource/restaurant/swf/1340022.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340022.swf",
+      "bytes": 20780,
+      "sha256": "5cde9da0118d8607d9122b243010c4489ad3403fbd75ddc3b3ff1f66fac248b2",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340022.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340022.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340022.swf",
+      "bytes": 5439,
+      "sha256": "d9a32b55b9cd93db5bbaa6d5822163a61bcc73f1bfe067d8799d7c15609bd398",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340022.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340023.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340023.swf",
+      "bytes": 21457,
+      "sha256": "66e7e38ad50ac6bd7add70f89b23064f1e0b4300982b10e34708a63a67d5e945",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340023.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340023.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340023.swf",
+      "bytes": 5115,
+      "sha256": "e74b90e0228471b08759ad5447b84eac58b9dece71f14608b1b4227511d9b013",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340023.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340024.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340024.swf",
+      "bytes": 25206,
+      "sha256": "9cb2466b123f5ce235c0fe035956679257184729e5d9f7e80b676ea9cc135291",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340024.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340024.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340024.swf",
+      "bytes": 2880,
+      "sha256": "c438c8983320495ed6af16409745465facb5e52e6d7afc14200a43eb2e61da70"
+    },
+    {
+      "path": "resource/restaurant/swf/1340025.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340025.swf",
+      "bytes": 24505,
+      "sha256": "b19dcb1ae587d36f8f29cefddaefdc479427db5535209a0e5553e8ef9d9296c5",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340025.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340025.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340025.swf",
+      "bytes": 2076,
+      "sha256": "453aa3d47a24d92e12114682d1115197de05ea007e61d087bfdda340f5075aec",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340025.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340026.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340026.swf",
+      "bytes": 33599,
+      "sha256": "2a817f814e72b321dd63eea972f97fb50cba5a555b5a1ff2fac18131bab06086",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340026.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340026.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340026.swf",
+      "bytes": 10655,
+      "sha256": "c210e2d0b9e0c77c847ad9361215bd192af58e9503a47e553c2b26f6480c07f4"
+    },
+    {
+      "path": "resource/restaurant/swf/1340027.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340027.swf",
+      "bytes": 32067,
+      "sha256": "da52a69f632a42fefecaea9c7bb929a11b69e3ef2d0c088ee54377566ee3a4ba",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340027.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340027.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340027.swf",
+      "bytes": 9413,
+      "sha256": "68d957968af4e520604761cd95d4b5acb9da89be7736617259adfe9e14a4c115"
+    },
+    {
+      "path": "resource/restaurant/swf/1340028.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340028.swf",
+      "bytes": 29089,
+      "sha256": "87f7681428c5272afe1009d1d091c11d06641f0de305f419c7cd739c34c92047",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340028.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340028.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340028.swf",
+      "bytes": 6871,
+      "sha256": "0dbb5cfaf097f631e393b1a4db09a20eb01fc891d16a7e95933e779eb81436a8",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340028.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340029.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340029.swf",
+      "bytes": 20619,
+      "sha256": "1244bc4361d6773c6f34e2ab5472060a9f7571f355d7059496aa3c063dc99177",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340029.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340029.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340029.swf",
+      "bytes": 3573,
+      "sha256": "9146fbfc268ab05cdcedec94fea7f55fa8ef43deb073b42fec06fc8634c2f879"
+    },
+    {
+      "path": "resource/restaurant/swf/1340030.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340030.swf",
+      "bytes": 22241,
+      "sha256": "544cefac9e72561b7c4bb22bd0c55070d20e9dae0392713cb58181347b8b0b95",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340030.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340030.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340030.swf",
+      "bytes": 2920,
+      "sha256": "fb3e7764c0069111da8985df76f12f94fcebc6e747cd852d5192eee23e288f71"
+    },
+    {
+      "path": "resource/restaurant/swf/1340031.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340031.swf",
+      "bytes": 23432,
+      "sha256": "92df558a2f56a71249965acb8fdfd2719afc9ba2450bb7d4693374d52782ed3a",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340031.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340031.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340031.swf",
+      "bytes": 7540,
+      "sha256": "9afc0ee4e05c87291d9f77599e18969dddde4ef2312ebbf6b1701b11a8a66b57",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340031.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340032.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340032.swf",
+      "bytes": 25193,
+      "sha256": "30b994d780a12dcdf6dd8626821c050d1fcf8a8591fd87303233a1c2d664e3de",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340032.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340032.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340032.swf",
+      "bytes": 8004,
+      "sha256": "42b555dec261c89752ec763421ea73bed91d6a8fee6aedabe98d6c9797dd8711",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340032.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340033.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340033.swf",
+      "bytes": 25496,
+      "sha256": "0b3b9708fe06e52951d76d1828d686b07df764cbc703226c29bc8c4cabadb307",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340033.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340033.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340033.swf",
+      "bytes": 9337,
+      "sha256": "3cd2d21f1b2a72d522144ec008beb4255345bb86479b9eae8fe7f7f9416e7879",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340033.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340034.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340034.swf",
+      "bytes": 18604,
+      "sha256": "ada4e16c1de0eab0df095b1f8414556fa46372199c0512b26e88c6d497f1d2eb",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340034.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340034.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340034.swf",
+      "bytes": 4687,
+      "sha256": "d39692bae19f50128039dec57d32908b1097337525f289a3d46a106ef327afd4",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340034.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340035.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340035.swf",
+      "bytes": 23992,
+      "sha256": "9047b298865a2f8b0bd123a6aca584801026a5766fabefb9355107e461e465d7",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340035.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340035.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340035.swf",
+      "bytes": 5688,
+      "sha256": "fb9c0ec2abe3e4b75f2b914bc4673d1a159cfecc9c25d3685f9c95619a91778a",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340035.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340036.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340036.swf",
+      "bytes": 14290,
+      "sha256": "3bbe750668ee55e34429e5f23a09004ed6e08dac125ce697a1acef112ea00d64",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340036.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340036.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340036.swf",
+      "bytes": 4804,
+      "sha256": "286006dca8767503ec6ffeecdaa893d782425a0d0ece0c8faf2650fcb3d5db01",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340036.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340037.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340037.swf",
+      "bytes": 26772,
+      "sha256": "46a53aa0af1e04e14420e9318247856982f02761211f1fe02669119e543ed619",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340037.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340037.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340037.swf",
+      "bytes": 6552,
+      "sha256": "5d1a58d3a2e99e35214f30599bddd896c5319ad0201ff1acda654e2089b68043",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340037.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340039.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340039.swf",
+      "bytes": 28683,
+      "sha256": "0a6078d5b37f9700eac0173d83aaecdac8502fef6817c816bee7d84d8df96ddb",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340039.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340039.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340039.swf",
+      "bytes": 5636,
+      "sha256": "5aac4426b7ba66592c0be2a90d82639074a98b817b3f1a18dbb1ee713fd5254a",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340039.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340040.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340040.swf",
+      "bytes": 29352,
+      "sha256": "559e83a7005348d23eda4f143e6135ccc7cc7b0c77af2169ac86b49d1c9930b8",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340040.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340040.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340040.swf",
+      "bytes": 7352,
+      "sha256": "81a7db192d00d8e7029c9fd91f688f7e359cf45b25bd545fede7772695a8e8ae",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340040.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340041.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340041.swf",
+      "bytes": 20909,
+      "sha256": "4c1c1d180b388ad819f1602c5c2496f3ac26ea681f36bbfc68767b222afee544",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340041.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340041.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340041.swf",
+      "bytes": 4216,
+      "sha256": "93efd873f85ede49354d7de950f4f72b93844d5751bddb242e0ef81e8ba77aa8",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340041.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340042.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340042.swf",
+      "bytes": 23597,
+      "sha256": "29b16c4034a88ea26562f6d0a199da1b724f26b9b743a59bfe43f0a672b24c0b",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340042.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340042.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340042.swf",
+      "bytes": 4817,
+      "sha256": "84518fa80d99f4ee6ca8a83e7922d7a76053427e14617a21f0fcce79a96f2ec3",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340042.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340043.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340043.swf",
+      "bytes": 19724,
+      "sha256": "78e20133b59c69970235456bed4b6be2ccd7e6347d79830d546c5dbd008105eb",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340043.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340043.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340043.swf",
+      "bytes": 3121,
+      "sha256": "119a6dabf2bf21d8a5850df1b337e77d94d8b338d93a063b8fe5b21694209d84",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340043.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340044.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340044.swf",
+      "bytes": 23947,
+      "sha256": "6995d1a73c922f25583f1a3c2895dcc4031f99ff3c80d527701ec8e9c9f35614",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340044.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340044.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340044.swf",
+      "bytes": 7173,
+      "sha256": "d988e840a684fdd17a6a3c5d9f8cf4b1e5aca848c6261e1bd92936f3de473be9",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340044.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340045.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340045.swf",
+      "bytes": 29241,
+      "sha256": "e677345e62a93c6399ae0affb1fa5071cf1d65e8a8b71d26b1817a7727929ac3",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340045.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340045.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340045.swf",
+      "bytes": 12081,
+      "sha256": "a867626bde895499915d984919534ba66834fd9bb97587ba04aa247b2221f71c",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340045.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340046.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340046.swf",
+      "bytes": 13196,
+      "sha256": "e097149d05a3f456aaa819e235d81a1d9924d8e66392051dc5f7d5fc17f5fc70",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340046.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340046.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340046.swf",
+      "bytes": 4290,
+      "sha256": "359f736848ec7ebf139e0618f88497c4e8e8576735707fc9faf377b3912c12d7",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340046.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340048.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340048.swf",
+      "bytes": 28831,
+      "sha256": "83b390cd0e829e5079142f5b3948615b25cee7c278f465140c01953a6070105e",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340048.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340048.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340048.swf",
+      "bytes": 7929,
+      "sha256": "c0e02b0e2c88eb2bd5bfc401dc9801a98b016bf2473d35becb268365ae03f345",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340048.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340049.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340049.swf",
+      "bytes": 28830,
+      "sha256": "30505571bb0995a237397af7629c44e4d3c832c5ea154d3510d360fd1423e769",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340049.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340049.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340049.swf",
+      "bytes": 7430,
+      "sha256": "39b2285e9b532a235af753e9e42f1d01c890128864b8cbe6c6d34266ad4b764c",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340049.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340050.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340050.swf",
+      "bytes": 22463,
+      "sha256": "e0017005f3e154f6c2cdd179e59712ce2bcf3bce6a400f2f917956b0b739ed98",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340050.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340050.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340050.swf",
+      "bytes": 4878,
+      "sha256": "f1cd4d5fb30a6564ee4b75df31bc63c0d7bf5853121f9f3fc657d0ba5df3e536",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340050.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340051.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340051.swf",
+      "bytes": 15399,
+      "sha256": "14526f81ccbe69502f3c7e83efe73beee342019a8faeaaba44dae98ea5be1f36",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340051.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340051.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340051.swf",
+      "bytes": 1848,
+      "sha256": "788470d306c0736e75b06ecde47835cf1aec07416104bc5edbb47397438f2da3",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340051.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340052.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340052.swf",
+      "bytes": 24648,
+      "sha256": "e26a0518e6a04527a731c5abb380f841270bb5f57c0a2727426da69793089fd3",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340052.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340052.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340052.swf",
+      "bytes": 6015,
+      "sha256": "514a7361a70ecc242f42df528314dfaa5fbc661c0867d43a3abe4179ca75385c",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340052.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340053.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340053.swf",
+      "bytes": 19122,
+      "sha256": "a54fdc08b66072506222c937b6452c842a83234895d58e33bf09187f7f045412",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340053.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340053.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340053.swf",
+      "bytes": 3811,
+      "sha256": "d6ac4b2facb047cf74527c5103d43d068276e886c6d9afcfac06f8e0fb04cb36",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340053.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340054.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340054.swf",
+      "bytes": 24441,
+      "sha256": "2ff9958d413c656afa0e7a2bead05660495fc9d4b8a86f1487c4978e2df231c0",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340054.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340054.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340054.swf",
+      "bytes": 7827,
+      "sha256": "0d79129814a458e0223546ea3bc9a1bf346a990e98dd235b0874a05aed2eda1b",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340054.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340055.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340055.swf",
+      "bytes": 14151,
+      "sha256": "8f85ed9237138078426dcf216bd84c617e0d975c205ae317642f81cd22dd4245",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340055.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340055.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340055.swf",
+      "bytes": 1247,
+      "sha256": "75025398ba3bb76519c50bb7cb5f648bf4a3715c385b030f30ea602a3efa6e72",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340055.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340056.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340056.swf",
+      "bytes": 31074,
+      "sha256": "58c4a924fc2e88f3bbb9891a2bdaa1a981df36904f6fff2e7e407169a5fb202c",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340056.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340056.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340056.swf",
+      "bytes": 7915,
+      "sha256": "56ddf79ce469422d291b6eb2cc94139747ace23eb0d3c5592bed3193a554dd08",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340056.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340057.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340057.swf",
+      "bytes": 34173,
+      "sha256": "9c9fab365190a7569c6b08e42c2ebf1ece62da6241ecbd6d92792beeccf41cde",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340057.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340057.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340057.swf",
+      "bytes": 10497,
+      "sha256": "cf4a70c181f566a473224c5a268716a15985e7d4087fefb09d4212dd3bf58324",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340057.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340058.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340058.swf",
+      "bytes": 31243,
+      "sha256": "280d37be2466e97bc6f1d9b13df81c132a1fd50e36d1fb5e15be97d324a77414",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340058.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340058.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340058.swf",
+      "bytes": 6227,
+      "sha256": "a1cf88c79ed47a8a4ced380ae42efa7f5a596037afdd05ffbfce3d7219318c22",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340058.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340059.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340059.swf",
+      "bytes": 17296,
+      "sha256": "e978174a5913bb8197865ab5707766b56ba0a884801ff4f68772fc01b0c6a25f",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340059.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340059.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340059.swf",
+      "bytes": 6675,
+      "sha256": "ee7b8668c941d302273f285b0a335fea07eaac1defd5e1d110eeb440c0f3175d",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340059.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340060.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340060.swf",
+      "bytes": 25869,
+      "sha256": "d83791deddaaca9dfb1460b406d0b515ae36300ff23873029496593eb437db0d",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340060.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340060.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340060.swf",
+      "bytes": 6035,
+      "sha256": "7bfe1fe50d356f3c833dc10493f603672b724dae80183b9a959ea734e3173db3",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340060.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340061.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340061.swf",
+      "bytes": 28847,
+      "sha256": "20401280f4fc40230f7f88fc50c45679de8da26cc367973574b946d5425c47dc",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340061.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340061.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340061.swf",
+      "bytes": 4986,
+      "sha256": "884584386b0f0aaa5c246d979f9db8f7c12f450f40a7bb53cfb40b185b80ddeb",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340061.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340062.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340062.swf",
+      "bytes": 17674,
+      "sha256": "1f319874d8e48af560f9fe8357e384067d7b5773681541efa60fbd1eaf047e7b",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340062.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340062.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340062.swf",
+      "bytes": 7397,
+      "sha256": "63260628f91155d11cca89ea31c6a9ce7169c3edefb2902c3efc35cda3e2d917",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340062.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340063.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340063.swf",
+      "bytes": 26126,
+      "sha256": "18bb957a050f8b41d0d5518b5ef604bd4fafd60be620c6821897cc4119cc6dcd",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340063.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340063.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340063.swf",
+      "bytes": 4566,
+      "sha256": "4320a312ead7a33680a524edba01e79bab92835d111286aed31ea0c404eb068b"
+    },
+    {
+      "path": "resource/restaurant/swf/1340064.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340064.swf",
+      "bytes": 27427,
+      "sha256": "fd61c407508ffffd614fb8ce450d6374c94b4f20fa6977602f12718a4e3671ca",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340064.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340064.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340064.swf",
+      "bytes": 6035,
+      "sha256": "e32c911a9bf27b5d5590887255a40b6181447ad5082305d5b6bb6da1c5e534fa"
+    },
+    {
+      "path": "resource/restaurant/swf/1340065.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340065.swf",
+      "bytes": 16388,
+      "sha256": "30d94844fdd4202a0046c6f2a233acfcdd30046b3fca7a831d49ec3fcb3e0985",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340065.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340065.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340065.swf",
+      "bytes": 4184,
+      "sha256": "55292cb88aba8e40c3979dea4c604e8af20b3019771f9834135a76e6d26a273e",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340065.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340066.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340066.swf",
+      "bytes": 22564,
+      "sha256": "c565cfdaf8ef90941399f6845d35b2f7de26af1edd480fdaa12105beea309bb6",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340066.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340066.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340066.swf",
+      "bytes": 3741,
+      "sha256": "4b63f014104826130de2abae0071b5329e18904b1ff85d18af74bece12d93943",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340066.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340067.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340067.swf",
+      "bytes": 18899,
+      "sha256": "7200beb8f0452ca08ab6c46606d6c61ca55550db2d4ff33b875f117e319ad050",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340067.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340067.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340067.swf",
+      "bytes": 7248,
+      "sha256": "3fdc31778e0f428537d93bf7f482caaef3d60ebefed4c38ba743ba9156586e7d"
+    },
+    {
+      "path": "resource/restaurant/swf/1340068.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340068.swf",
+      "bytes": 60861,
+      "sha256": "e43a3f8bada5793b4cbd6b54bf0612f63a610adf446c271d8be010ee1af6fd2d",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340068.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340068.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340068.swf",
+      "bytes": 3093,
+      "sha256": "55d1d7480cb419249f945b0a929284358ea270dbf28eba42c5b8902efd24e1e3"
+    },
+    {
+      "path": "resource/restaurant/swf/1340069.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340069.swf",
+      "bytes": 21156,
+      "sha256": "e8471e99dfc6ac3a9fad7d1b9073e832a4433ad73027101222c2d5e10de109c3",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340069.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340069.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340069.swf",
+      "bytes": 6159,
+      "sha256": "9a13cfcf212295a7e560ba794b72e8e2b4b82d852298cb5174a9476192984d07"
+    },
+    {
+      "path": "resource/restaurant/swf/1340070.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340070.swf",
+      "bytes": 12020,
+      "sha256": "6e6c73e5c2c3a70402d3e1ee9888302e33d39e4175041efcfd9c440f2769b3b5",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340070.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340070.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340070.swf",
+      "bytes": 2528,
+      "sha256": "5f8b0014bd288f841d904654bab4d375e405e754f4cf77e0235bf4f8c1c17cba"
+    },
+    {
+      "path": "resource/restaurant/swf/1340071.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340071.swf",
+      "bytes": 23647,
+      "sha256": "52b1e0fb110e2acb137ece7ca83a08679976b6ff165f61546a0dcd70f11a5c36",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340071.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340071.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340071.swf",
+      "bytes": 5200,
+      "sha256": "50d6429cf349b6a8b40ebbb6f1a72b0e1ff3dd305ec9b29b60d93f98ae7981d3"
+    },
+    {
+      "path": "resource/restaurant/swf/1340072.swf",
+      "local": "local-assets/raw/root/resource/restaurant/swf/1340072.swf",
+      "bytes": 51676,
+      "sha256": "bf3cb82d9a1847c7626085007703a357244e1723516820fa5250f343816cce05"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340072.swf",
+      "local": "local-assets/raw/root/resource/restaurant/meunicon/1340072.swf",
+      "bytes": 4505,
+      "sha256": "32320af6a6926f8f3921e2b24abd3a774d8374e551f2fe8adeb70fdb234e13dc"
+    },
+    {
+      "path": "resource/restaurant/swf/1340073.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340073.swf",
+      "bytes": 22135,
+      "sha256": "1904b009abea846900a777e9de63d60d13758a8baee22402701900c8f8594ab6",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340073.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340073.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340073.swf",
+      "bytes": 3746,
+      "sha256": "dfd1748d0cc4386a1c9f4f2fc94d712f71a0533408a88a8d2405981a147e3f29",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340073.swf"
+    },
+    {
+      "path": "resource/restaurant/swf/1340074.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/swf/1340074.swf",
+      "bytes": 24944,
+      "sha256": "2fee28403ff309c8fa5719464eda4784c12f6c1ccbde5be87cdf0a753ddbbfb8",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340074.swf"
+    },
+    {
+      "path": "resource/restaurant/meunicon/1340074.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/restaurant/meunicon/1340074.swf",
+      "bytes": 11491,
+      "sha256": "6bebc7defd173d933e5794f3b09535eb08a18cb3c2757690e9d5814ebf867c14",
+      "url": "https://mole.61.com/resource/restaurant/meunicon/1340074.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330004.swf",
+      "local": "local-assets/raw/root/resource/oneBigStree/swf/1330004.swf",
+      "bytes": 102123,
+      "sha256": "a43f50fcf795a268c5e67812e9aedb09462834cff191998d87885d307f0d60a0"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330006.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330006.swf",
+      "bytes": 102559,
+      "sha256": "5cfe219935e44f1c1ecc22cdc5975cc02e3d927911e04455767ed5f7648c2784"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330009.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330009.swf",
+      "bytes": 96435,
+      "sha256": "60a600b2c00494b7788323a06c93343d3fb19aed108ed0f4e7a7416d15eadfb2",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330009.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330010.swf",
+      "local": "local-assets/raw/root/resource/oneBigStree/swf/1330010.swf",
+      "bytes": 102778,
+      "sha256": "e7a435dbcbcf9eb5f1bcfea931a68889f76413972eff7360a3e7c5502527a032"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330011.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330011.swf",
+      "bytes": 96506,
+      "sha256": "3aa42e49e83546f436ca51a6200aa75fb7a1b27f96bbd0924c081d5c7bb8a6a1",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330011.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330012.swf",
+      "local": "local-assets/raw/root/resource/oneBigStree/swf/1330012.swf",
+      "bytes": 108726,
+      "sha256": "64452dd6a2a503eafd7733544f6ef523572f12ee253cc131120fd898e94d7405"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330013.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330013.swf",
+      "bytes": 99045,
+      "sha256": "111876cb02ba61524d79e848d636b2350624ad6f91e298be74918e4232a66d7f",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330013.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330014.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330014.swf",
+      "bytes": 117932,
+      "sha256": "4a40bd260ce4bc9a1ba003c956cb6513d10d444604c8ba264a9d1fcef70b83a4",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330014.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330015.swf",
+      "local": "local-assets/raw/root/resource/oneBigStree/swf/1330015.swf",
+      "bytes": 129381,
+      "sha256": "5ccd599c6890b3a78e6508ba707469787db0062396d6214e115b3c63b036d5bc"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330017.swf",
+      "local": "local-assets/raw/root/resource/oneBigStree/swf/1330017.swf",
+      "bytes": 111605,
+      "sha256": "d563ea561a6a61b452960ac4c8b608ec602c9b326c029efded232939c330781e"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330018.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330018.swf",
+      "bytes": 100577,
+      "sha256": "de7b9bc7d71e1082570f849b6193ebcae5b9119e9394c02a61a9cad275681bc7",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330018.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330019.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330019.swf",
+      "bytes": 127167,
+      "sha256": "749bac8a556d9500cb3ee8bce44e23ed50c1dcc26aca00e402f0878503867e3d",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330019.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330020.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330020.swf",
+      "bytes": 155740,
+      "sha256": "d265216a4d8974c237dd2fc2aea708643a264e9fd4f255bd3d7fadc01dc6ca94",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330020.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330023.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330023.swf",
+      "bytes": 112150,
+      "sha256": "5a773cab352ffde7b89e1b4b0ff76c2a2639d3b517046119fd96ef14c94acdf5",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330023.swf"
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330024.swf",
+      "local": "local-assets/research/restaurant-port/official/resource/oneBigStree/swf/1330024.swf",
+      "bytes": 106387,
+      "sha256": "e0cc2203b66cf280e16bd509a497900b36ceeeb09921b58dc918999973f31412",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330024.swf"
+    }
+  ],
+  "adaptation": "Lossless rendered original SWFs; worker uses original body colour transform GV.petColor_3. Online clocks, coin-only recipes and gameplay are a local desktop adaptation, not official server logic."
+}

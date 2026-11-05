@@ -1,0 +1,46 @@
+const {chromium,expect}=require('@playwright/test'),assert=require('assert/strict'),fs=require('fs'),path=require('path');
+const out=path.resolve(__dirname,'../../artifacts/playable-restaurant');fs.mkdirSync(out,{recursive:true});
+let browser;
+(async()=>{
+ browser=await chromium.launch({executablePath:'/usr/local/bin/chromium',headless:true});
+ const context=await browser.newContext({viewport:{width:1280,height:860}});
+ const page=await context.newPage(),errors=[],failed=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push([r.status(),r.url()])});
+ await page.addInitScript(()=>{if(!localStorage.getItem('ramu-house-save-v1'))localStorage.setItem('ramu-house-save-v1','primary-save-untouched');});
+ await page.goto('http://localhost:5173/?preview=restaurant');
+ await expect(page.getByRole('dialog',{name:'拉姆餐厅',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'开始营业',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'备菜 清炒毛毛豆 75 摩尔豆',exact:true}).click();
+ await page.getByRole('button',{name:'开始营业',exact:true}).click();
+ await expect(page.getByRole('button',{name:'灶台 1 清炒毛毛豆 已做好',exact:true})).toBeVisible({timeout:20000});
+ await page.getByRole('button',{name:'灶台 1 清炒毛毛豆 已做好',exact:true}).click();
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')).restaurant.served>=1,{timeout:25000});
+ await page.screenshot({path:path.join(out,'desktop.png')});
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')));
+ assert.equal(saved.coins,3000-75+saved.restaurant.revenue);assert(saved.restaurant.served>0);
+ await context.setOffline(true);await expect(page.locator('.restaurant-open-badge')).toHaveText('已打烊');await expect(page.getByRole('button',{name:'开始营业',exact:true})).toBeDisabled();await context.setOffline(false);await page.getByRole('button',{name:'开始营业',exact:true}).click();
+ // Hidden state is delivered by WebView / Electron as visibilitychange and native state.
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+ await expect(page.locator('.restaurant-open-badge')).toHaveText('已打烊');
+ const stopped=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')));
+ await page.waitForTimeout(1000);assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')))).coins,stopped.coins);
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});
+ await page.reload();await expect(page.locator('.restaurant-open-badge')).toHaveText('已打烊');
+ const reloaded=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')));assert.equal(reloaded.coins,stopped.coins);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('ramu-house-save-v1')),'primary-save-untouched');
+ await page.getByRole('button',{name:'员工',exact:true}).click();await page.getByRole('button',{name:'招募帮手 · 250 豆',exact:true}).click();
+ const hired=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-restaurant-review-v1')));assert.equal(hired.restaurant.staff,2);assert.equal(hired.coins,stopped.coins-250);
+ await page.getByRole('button',{name:'菜谱',exact:true}).click();await page.getByLabel('显示未解锁').check();assert.equal(await page.locator('.restaurant-recipe').count(),72);
+ await page.getByLabel('搜索菜谱').fill('月亮');assert.equal(await page.locator('.restaurant-recipe').count(),1);await page.getByLabel('搜索菜谱').fill('');
+ await page.getByRole('button',{name:'账本',exact:true}).click();await expect(page.locator('.restaurant-ledger')).toBeVisible();
+ const mobile=await context.newPage();mobile.on('pageerror',e=>errors.push(e.message));await mobile.setViewportSize({width:390,height:844});await mobile.goto('http://localhost:5173/?preview=restaurant');
+ await mobile.getByRole('button',{name:'开始营业',exact:true}).click();await mobile.waitForTimeout(500);
+ await mobile.screenshot({path:path.join(out,'mobile.png'),fullPage:true});
+ const widths=await mobile.evaluate(()=>({body:document.body.scrollWidth,viewport:innerWidth,app:document.querySelector('.restaurant-app').getBoundingClientRect().width}));assert(widths.body<=widths.viewport);assert(widths.app<=widths.viewport);
+ for(const name of ['餐台','员工','装修','账本','菜谱']){await mobile.getByRole('button',{name,exact:true}).click();await expect(mobile.locator('.restaurant-management-content')).toBeVisible();}
+ await mobile.getByRole('button',{name:'打烊休息',exact:true}).click();
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
+ const report={passed:true,served:saved.restaurant.served,revenue:saved.restaurant.revenue,walletReconciled:true,backgroundAutomaticallyClosed:true,networkDisconnectAutomaticallyClosed:true,reloadClosedWithoutOfflinePay:true,mainSaveUntouched:true,all72RecipesVisible:true,hiring:true,mobileWidths:widths,errors,failed};
+ fs.writeFileSync(path.join(out,'browser-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+ await context.close();await browser.close();
+})().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{await browser?.close()});
