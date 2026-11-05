@@ -1,10 +1,10 @@
 import {describe,it,expect} from 'vitest'
-import {roomWalkArea,roomWalkTarget,stepRoomWalk} from './room-walk'
+import {roomWalkArea,roomWalkClickTop,roomWalkTarget,stepRoomWalk} from './room-walk'
 describe('room floor travel',()=>{
- it('keeps targets below the wall and above the dock while leaving room for the pet',()=>{
+ it('lets the pet reach the whole room interior while staying inside the dock and edges',()=>{
   for(const [width,height,dock] of [[1180,790,650],[1000,690,540],[600,590,440]]){
    const area=roomWalkArea(width,height,dock)
-   expect(area.top).toBeGreaterThanOrEqual(height*.5);expect(area.bottom).toBeLessThan(dock)
+   expect(area.top).toBeLessThan(height*.2);expect(area.bottom).toBeLessThan(dock);expect(area.right).toBeGreaterThan(width*.8)
    expect(roomWalkTarget({x:-100,y:-100},area)).toEqual({x:area.left,y:area.top})
    expect(roomWalkTarget({x:width+500,y:height+500},area)).toEqual({x:area.right,y:area.bottom})
   }
@@ -12,10 +12,17 @@ describe('room floor travel',()=>{
  it('keeps a usable floor strip on a short landscape phone',()=>{
   const area=roomWalkArea(852,393,278)
   expect(area.bottom-area.top).toBeGreaterThanOrEqual(44)
-  expect(area.top).toBeGreaterThan(60)
+  expect(area.top).toBeLessThan(100)
   expect(area.bottom).toBeLessThan(278)
   const target=roomWalkTarget({x:760,y:200},area)
   expect(target.x).toBe(760);expect(target.y).toBe(200)
+ })
+ it('keeps wall taps outside the pointer surface while the travel area stays expanded',()=>{
+  const area=roomWalkArea(1180,790,650)
+  const clickTop=roomWalkClickTop(area)
+  expect(clickTop).toBeGreaterThan(area.top)
+  expect(area.bottom-clickTop).toBeGreaterThanOrEqual(44)
+  expect(clickTop).toBeLessThan(area.bottom)
  })
  it('travels at the same speed diagonally and never overshoots a nearby destination',()=>{
   const straight=stepRoomWalk({x:0,y:0},{x:100,y:0},40),diagonal=stepRoomWalk({x:0,y:0},{x:100,y:100},40)

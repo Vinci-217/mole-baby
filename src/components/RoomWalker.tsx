@@ -3,7 +3,7 @@ import type {KeyboardEvent,PointerEvent,ReactNode} from 'react'
 import type {Stage,Evolution} from '../game'
 import visibility from '../../electron/edge-visibility.json'
 import {ramForm} from '../original-actions'
-import {roomWalkArea,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-walk'
+import {roomWalkArea,roomWalkClickTop,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-walk'
 import './RoomWalker.css'
 
 export default function RoomWalker({stage,evolution,blocked,randomWalk=true,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;children:(action:string|null)=>ReactNode}) {
@@ -40,17 +40,22 @@ export default function RoomWalker({stage,evolution,blocked,randomWalk=true,chil
   return()=>{cancelled=true;cancelAnimationFrame(frame)}
  },[target,blocked,stage])
  useEffect(()=>{
-  if(!randomWalk||blocked||target||stage===0||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(!randomWalk||blocked||target||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const timer=window.setInterval(()=>{
    if(document.hidden)return;
    setTarget(roomWalkTarget({x:area.left+Math.random()*(area.right-area.left),y:area.top+Math.random()*(area.bottom-area.top)},area));
   },10000+Math.random()*8000);
   return()=>window.clearInterval(timer);
  },[randomWalk,blocked,target,stage,area]);
- const go=(next:RoomPoint)=>{if(!blocked){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
+ const go=(next:RoomPoint,manual=false)=>{if(!blocked&&( !manual || next.y>=roomWalkClickTop(area) )){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
+ useEffect(()=>{
+  const element=root.current;if(!element)return
+  const redirect=(event:Event)=>{const detail=(event as CustomEvent<{clientX:number;clientY:number}>).detail,box=element.getBoundingClientRect();if(detail&&box)go({x:detail.clientX-box.left,y:detail.clientY-box.top},true)}
+  element.addEventListener('room-walk-redirect',redirect);return()=>element.removeEventListener('room-walk-redirect',redirect)
+ },[area,blocked])
  const down=(e:PointerEvent<HTMLButtonElement>)=>{
   if(e.button!==0)return
-  const box=root.current?.getBoundingClientRect();if(box)go({x:e.clientX-box.left,y:e.clientY-box.top})
+  const box=root.current?.getBoundingClientRect();if(box)go({x:e.clientX-box.left,y:e.clientY-box.top},true)
  }
  const key=(e:KeyboardEvent<HTMLButtonElement>)=>{
   const delta=({ArrowLeft:[-50,0],ArrowRight:[50,0],ArrowUp:[0,-30],ArrowDown:[0,30]} as Record<string,number[]>)[e.key]
@@ -62,7 +67,7 @@ export default function RoomWalker({stage,evolution,blocked,randomWalk=true,chil
  const footOffset=183-visibility.forms[ramForm(stage,evolution)].body[3]*1.5
  return <div ref={root} className={`room-walker ${moving&&!blocked?'is-moving':''}`} data-stage={stage} data-moving={moving&&!blocked}>
   <button className="room-walk-surface" aria-label="小屋地面，点击让拉姆走过去" disabled={blocked} onPointerDown={down} onKeyDown={key}
-   style={{left:area.left,top:area.top,width:area.right-area.left,height:area.bottom-area.top}}/>
+  style={{left:area.left,top:roomWalkClickTop(area),width:area.right-area.left,height:area.bottom-roomWalkClickTop(area)}}/>
   {!blocked&&target&&<span className="room-walk-target" aria-hidden="true" style={{left:target.x,top:target.y}}/>}
   <div className="room-pet-position" style={{left:position?.x??'50%',top:position?position.y+footOffset:'72%'}} data-speech-side={(position?.x??area.width/2)>area.width/2?'left':'right'} data-x={position?.x.toFixed(2)} data-y={position?.y.toFixed(2)}>{children(motion)}</div>
  </div>

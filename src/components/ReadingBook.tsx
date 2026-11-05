@@ -37,5 +37,9 @@ export default function ReadingBook({form,sound}:{form:RamForm;sound:boolean}){
   document.addEventListener('visibilitychange',redraw);media.addEventListener('change',redraw);
   return()=>{active=false;cancelAnimationFrame(request);document.removeEventListener('visibilitychange',redraw);media.removeEventListener('change',redraw);audio.stop()};
  },[form]);
- return <canvas ref={ref} width={384} height={256} className="reading-book" aria-hidden="true" style={{left:`${form==='seed'?58:50-width/2}%`,top:`${(bottom+2-height*.85)/108*100}%`,width:`${width}%`}}/>;
+ // Lower the book into the hands/body area. The old top edge sat above the
+ // head and read visually like a phone under a tree; this keeps the same
+ // proportion while making the reading pose clear.
+ const handDrop=form==='seed'?5:8
+ return <canvas ref={ref} width={384} height={256} className="reading-book" aria-hidden="true" style={{left:`${form==='seed'?58:50-width/2}%`,top:`${(bottom+2-height*.85+handDrop)/108*100}%`,width:`${width}%`}}/>;
 }
