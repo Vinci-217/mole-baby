@@ -1,0 +1,176 @@
+{
+  "checkedAt": "2026-11-05T06:47:39.623184+00:00",
+  "sourceRepository": "Miigon/RecMoleRes",
+  "source": {
+    "complete": true,
+    "verifiedFiles": 21523,
+    "expectedFiles": 21523,
+    "bytes": 1701100697,
+    "revision": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+    "elapsedSeconds": 8.39,
+    "verification": "Every file size and Git blob SHA-1 matched the pinned GitHub tree"
+  },
+  "rawVerification": {
+    "files": 21523,
+    "errors": [],
+    "complete": true
+  },
+  "index": {
+    "md": 1,
+    "files": 21523,
+    "animatedTimelines": 37942,
+    "labelledTimelines": 1967,
+    "swf": 20997,
+    "xml": 365,
+    "recoveredContainers": 1,
+    "mp3": 159,
+    "versionContainers": 1,
+    "txt": 1,
+    "complete": true,
+    "exportJobs": 12673,
+    "elapsedSeconds": 30.41
+  },
+  "exports": {
+    "complete": true,
+    "expectedSources": 12673,
+    "exportedSources": 12673,
+    "missingSources": [],
+    "missingDeclaredMedia": [],
+    "errors": [],
+    "filesByExtension": {
+      ".txt": 12911,
+      ".as": 472336,
+      ".mp3": 599,
+      ".jpg": 2533,
+      ".png": 419257,
+      ".wav": 140,
+      ".bin": 854,
+      ".pcode": 48488
+    },
+    "bytesByExtension": {
+      ".txt": 501804,
+      ".as": 307305932,
+      ".mp3": 18865163,
+      ".jpg": 212393705,
+      ".png": 2041494089,
+      ".wav": 298134,
+      ".bin": 28484380,
+      ".pcode": 4398998434
+    },
+    "pcodeFallbackSources": 238,
+    "highLevelScriptWarnings": 23,
+    "highLevelWarningSources": [
+      "root/dll/TaomeeCoreDLL.swf",
+      "root/module/external/MagicalPassPanel.swf",
+      "root/module/game/MonoplayOnePeoplePanel.swf"
+    ],
+    "warningsWithoutPcode": [],
+    "validEmbeddedAudioFiles": 607,
+    "emptyAudioHeaders": 132,
+    "unexpandedEmbeddedSwfs": []
+  },
+  "originalMediaInventory": {
+    "counts": {
+      "expectedBinaryPayloads": 839,
+      "verifiedBinaryPayloads": 839,
+      "expectedImages": 421790,
+      "exportedImages": 421790
+    },
+    "mismatches": [],
+    "legacyBinaryCopies": [
+      "root/module/external/BagMagicSpiritPanel.swf/binaryData/464_com.mole.app.manager.NewStatisticsManager_xmlClass_com.mole.app.manager.NewStatisticsManager_xmlClass.bin",
+      "root/module/external/BagMagicSpiritPanel.swf/binaryData/465_com.mole.app.info.SystemTimeXMLInfo_xmlClass_com.mole.app.info.SystemTimeXMLInfo_xmlClass.bin",
+      "root/module/external/BagMagicSpiritPanel.swf/binaryData/463_com.mole.app.manager.StatisticsManager_xmlClass_com.mole.app.manager.StatisticsManager_xmlClass.bin",
+      "root/module/external/CatchFishNewGameInstrPanel.swf/binaryData/66_com.mole.app.info.SystemTimeXMLInfo_xmlClass_com.mole.app.info.SystemTimeXMLInfo_xmlClass.bin",
+      "root/module/external/CatchFishNewGameInstrPanel.swf/binaryData/64_com.mole.app.manager.StatisticsManager_xmlClass_com.mole.app.manager.StatisticsManager_xmlClass.bin",
+      "root/module/external/CatchFishNewGameInstrPanel.swf/binaryData/65_com.mole.app.manager.NewStatisticsManager_xmlClass_com.mole.app.manager.NewStatisticsManager_xmlClass.bin",
+      "root/module/external/MagicSpiritMainPanel.swf/binaryData/326_com.mole.app.manager.StatisticsManager_xmlClass_com.mole.app.manager.StatisticsManager_xmlClass.bin",
+      "root/module/external/MagicSpiritMainPanel.swf/binaryData/328_com.mole.app.info.SystemTimeXMLInfo_xmlClass_com.mole.app.info.SystemTimeXMLInfo_xmlClass.bin",
+      "root/module/external/MagicSpiritMainPanel.swf/binaryData/327_com.mole.app.manager.NewStatisticsManager_xmlClass_com.mole.app.manager.NewStatisticsManager_xmlClass.bin",
+      "root/module/external/MagicalPassPanel.swf/binaryData/29_com.mole.app.manager.NewStatisticsManager_xmlClass_com.mole.app.manager.NewStatisticsManager_xmlClass.bin",
+      "root/module/external/MagicalPassPanel.swf/binaryData/30_com.mole.app.info.SystemTimeXMLInfo_xmlClass_com.mole.app.info.SystemTimeXMLInfo_xmlClass.bin",
+      "root/module/external/MagicalPassPanel.swf/binaryData/28_com.mole.app.manager.StatisticsManager_xmlClass_com.mole.app.manager.StatisticsManager_xmlClass.bin",
+      "root/module/external/Task382Panel_1.swf/binaryData/32_com.mole.app.manager.StatisticsManager_xmlClass_com.mole.app.manager.StatisticsManager_xmlClass.bin",
+      "root/module/external/Task382Panel_1.swf/binaryData/33_com.mole.app.manager.NewStatisticsManager_xmlClass_com.mole.app.manager.NewStatisticsManager_xmlClass.bin",
+      "root/module/external/Task382Panel_1.swf/binaryData/34_com.mole.app.info.SystemTimeXMLInfo_xmlClass_com.mole.app.info.SystemTimeXMLInfo_xmlClass.bin"
+    ],
+    "complete": true
+  },
+  "restaurantLoop": {
+    "fps": 24,
+    "frames": 264,
+    "durationSeconds": 11,
+    "phases": [
+      "等待接单",
+      "前往备餐台",
+      "取餐",
+      "端盘送餐",
+      "放下餐盘",
+      "空手返回"
+    ],
+    "firstFrameSha256": "07d0d0c389b55fe17d043ead0d0757aac4f0bb21da22b43d819988a25248ca3e",
+    "lastFrameSha256": "07d0d0c389b55fe17d043ead0d0757aac4f0bb21da22b43d819988a25248ca3e",
+    "seamlessEndpointPixels": true,
+    "sourceColour": "ClientCommonDLL GV.petColor_3 applied only to original petBone1 instances",
+    "sourceScene": "resource/oneBigStree/swf/1330004.swf",
+    "sourceFood": "resource/restaurant/swf/1340002.swf, mc frame 6",
+    "adaptation": "Original service-worker poses and original GV.petColor_3 instance transform; original restaurant 1330004 room layers, control/collision overlays omitted. Route, phase durations and demonstrative clearing of the served dish are local preview choreography, not an original full-game recording.",
+    "automaticClearing": "The served dish is cleared before the next demo cycle. The official runtime clears it via the guest eating flow."
+  },
+  "officialWorkerComparisons": [
+    {
+      "id": "1200042",
+      "url": "https://mole.61.com/resource/petcloth/swf2/1200042.swf",
+      "checkedDate": "2026-11-05",
+      "bytes": 12781,
+      "sha256": "482a6eb19b6b21a42bfdf6898def786320b44cfc0fededc693aca565d4293520",
+      "matchesPinnedArchive": true
+    },
+    {
+      "id": "1200043",
+      "url": "https://mole.61.com/resource/petcloth/swf2/1200043.swf",
+      "checkedDate": "2026-11-05",
+      "bytes": 12157,
+      "sha256": "bd2e161a58b7e0e1e556190f1e4a1306791418982f9bbed7307cc98bc3fc826a",
+      "matchesPinnedArchive": true
+    }
+  ],
+  "browser": {
+    "video": {
+      "width": 1000,
+      "height": 600,
+      "duration": 11,
+      "time": 0.213968,
+      "paused": false,
+      "error": null
+    },
+    "fullSceneVideoLoaded": true,
+    "audio": {
+      "duration": 4.752,
+      "playing": true,
+      "error": null
+    },
+    "source": "root/resource/petcloth/swf2/1200042.swf",
+    "cachedPreview": {
+      "key": "635c6e082cb860a14d18796b",
+      "state": "ready",
+      "url": "/previews/635c6e082cb860a14d18796b/preview.gif",
+      "frames": 15,
+      "limited": false,
+      "note": "原时间轴栅格预览；原客户端交互、分层和配色需按脚本组合。"
+    },
+    "mobile": [
+      {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      {
+        "width": 360,
+        "scrollWidth": 360
+      }
+    ],
+    "unknownSourceRejected": true,
+    "pageErrors": []
+  },
+  "scope": "The pinned public archive is fully mirrored. Original vector animations remain in SWF; bounded GIF previews are generated and cached on demand. Decompiled text is not original author source. Restaurant route, durations and demo dish clearing are local choreography using original assets. No runtime application, save format, update channel or release was changed."
+}
