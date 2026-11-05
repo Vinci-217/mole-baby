@@ -1,0 +1,48 @@
+{
+  "archive": "Miigon/RecMoleRes (community archive of original client resources)",
+  "revision": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "retrieval": "GitHub git/blobs API, base64 payload decoded without modifying bytes",
+  "tool": "JPEXS 26.4.0",
+  "sources": [
+    {
+      "file": "restaurant.swf",
+      "path": "root/module/restaurant/restaurant.swf",
+      "url": "https://github.com/Miigon/RecMoleRes/blob/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/restaurant/restaurant.swf",
+      "blob": "c68f571d0a4fc1d2041f344cf85b171d19fa4547",
+      "bytes": 719447,
+      "sha256": "0bcb56419eafc5f4a0885a0ec6d2849eb11d39afd550214a3a49e64060794676"
+    },
+    {
+      "file": "restaurantEmployePanelMain.swf",
+      "path": "root/module/external/restaurantEmployePanelMain.swf",
+      "url": "https://github.com/Miigon/RecMoleRes/blob/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/external/restaurantEmployePanelMain.swf",
+      "blob": "64267e372169bca8fc7ae941306ba8c1cc43b7f1",
+      "bytes": 23290,
+      "sha256": "3ef3da782bca33380cf6b6804356dc2f54dbd938fbe8671280b1368bfd38f72d"
+    },
+    {
+      "file": "ClientAppDLL.swf",
+      "path": "root/dll/ClientAppDLL.swf",
+      "url": "https://github.com/Miigon/RecMoleRes/blob/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/dll/ClientAppDLL.swf",
+      "blob": "bd4e072e41fe619c814c4d9837cf216a6cbb23f0",
+      "bytes": 2709921,
+      "sha256": "9666b6f62ff5f9de9a3e3fb2885dbe234375eaafd03ee35d4e7d29ccc3ce87a6"
+    },
+    {
+      "file": "1200042.swf",
+      "path": "root/resource/petcloth/swf2/1200042.swf",
+      "url": "https://github.com/Miigon/RecMoleRes/blob/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200042.swf",
+      "blob": "02bc5cc55ff25930636594a1e1fc8429079f2076",
+      "bytes": 12781,
+      "sha256": "482a6eb19b6b21a42bfdf6898def786320b44cfc0fededc693aca565d4293520"
+    },
+    {
+      "file": "1200043.swf",
+      "path": "root/resource/petcloth/swf2/1200043.swf",
+      "url": "https://github.com/Miigon/RecMoleRes/blob/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/petcloth/swf2/1200043.swf",
+      "blob": "f654423f88d48f638c3d471a2e28a70fb67e89ae",
+      "bytes": 12157,
+      "sha256": "bd2e161a58b7e0e1e556190f1e4a1306791418982f9bbed7307cc98bc3fc826a"
+    }
+  ]
+}
