@@ -1,4 +1,4 @@
-import type {GameState,CareResult} from './game'
+import {getStage,type GameState,type CareResult} from './game'
 import {MAGIC_WAND_ID,hasMagicDiploma} from './course-rewards'
 
 /** Original accessory graphics. Names and prices are this desktop adaptation. */
@@ -33,6 +33,7 @@ export function buyOutfit(pet:GameState,id:string):CareResult {
   return {state:{...pet,coins:pet.coins-outfit.price,wardrobe:[...(pet.wardrobe??[]),outfit.id]},ok:true,message:`${outfit.name}收进衣橱啦，试试看吧。`}
 }
 export function wearOutfit(pet:GameState,id?:string):CareResult {
+  if(id&&getStage(pet.growth,pet.evolution)===0)return {state:pet,ok:false,message:'种子期还不能穿戴装扮，长成初级拉姆后再来试试吧。'}
   if(id===MAGIC_WAND_ID&&!hasMagicDiploma(pet))return {state:pet,ok:false,message:'完成魔法课后才能领取和佩戴魔法法杖。'}
   const outfit=getOutfit(id)
   if(id&&(!outfit||!pet.wardrobe?.includes(outfit.id)))return {state:pet,ok:false,message:'先把这件装扮收进衣橱吧。'}

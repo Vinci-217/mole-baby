@@ -2,8 +2,16 @@ import {describe,it,expect} from 'vitest'
 import {createPet,parseSave,changePetStage} from './game'
 import {OUTFITS,buyOutfit,wearOutfit,normalizeWardrobe} from './wardrobe'
 const NOW=Date.UTC(2026,9,24,8)
-const pet=()=>createPet('小叶','blue',NOW)
+const pet=()=>({...createPet('小叶','blue',NOW),growth:60})
 describe('a real owned wardrobe',()=>{
+  it('rejects every costume on seeds without touching ownership, colour or the remembered grown outfit',()=>{
+    const seed={...pet(),growth:0,highestGrowth:180,wardrobe:OUTFITS.filter(i=>i.id!=='star-wand').map(i=>i.id),wearing:'wizard-cap' as const}
+    for(const item of OUTFITS){const result=wearOutfit(seed,item.id);expect(result.ok).toBe(false);expect(result.state).toBe(seed);expect(result.message).toContain('种子期')}
+    expect(wearOutfit({...seed,growth:60},'party-cap').ok).toBe(true)
+    const removed=wearOutfit(seed);expect(removed.ok).toBe(true);expect(removed.state.wearing).toBeUndefined();expect(removed.state.wardrobe).toEqual(seed.wardrobe)
+    const restored=parseSave(JSON.stringify(seed),NOW)!;expect(restored.wardrobe).toEqual(seed.wardrobe);expect(restored.wearing).toBe(seed.wearing)
+  })
+
   it('buys one permanent accessory, charges once and leaves all needs, growth and consumables alone',()=>{
     const before=pet(),result=buyOutfit(before,'party-cap')
     expect(result.ok).toBe(true);expect(result.state.coins).toBe(70);expect(result.state.wardrobe).toEqual(['party-cap']);expect(result.state.wearing).toBeUndefined()

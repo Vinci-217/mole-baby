@@ -1,5 +1,9 @@
 /** Source coverage locates the actual body, including squash/jump poses. */
 export interface WearAnchor {x:number;y:number;bodyWidth:number;bodyHeight:number;angle:number}
+/** Translate an original hand-held drawing beside the current body pose. */
+export function bodySideAccessoryOffset(anchor:WearAnchor,box:readonly number[],origin:readonly number[]){
+  return {x:anchor.x+anchor.bodyWidth*.48-((box[0]+box[2])/2-origin[0]),y:anchor.y+anchor.bodyHeight*.68-((box[1]+box[3])/2-origin[1])}
+}
 export function bodyWearAnchor(mask:Uint8ClampedArray,_neutral:Uint8ClampedArray,atlasWidth:number,sx:number,sy:number,width:number,height:number,seed=false):WearAnchor|null {
   let left=width,right=0,top=height,bottom=0
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){

@@ -4,7 +4,7 @@ const {adopt,enterHome}=require('./smoke-helpers.cjs');
 const {reloadStoredFixture}=require('./smoke-storage.cjs');
 const dir=path.resolve(__dirname,'../artifacts/wardrobe-expansion');fs.mkdirSync(dir,{recursive:true});
 const additions=[['flower-crown','鲜花花冠',55],['knight-shield','骑士盾牌',65],['angel-wings','天使羽翼',75]];
-const forms=['seed','junior','middle','senior','super','water','wood','fire'];
+const forms=['junior','middle','senior','super','water','wood','fire'];
 const SAVE='ramu-house-save-v1';let browser;
 (async()=>{
  browser=await chromium.launch({executablePath:'/usr/local/bin/chromium',headless:true});
@@ -14,6 +14,18 @@ const SAVE='ramu-house-save-v1';let browser;
  await page.clock.install();await page.goto('http://localhost:5173/?preview=wardrobe');
  const wear=page.locator('.wardrobe-mirror .ram-wear');
  const ready=async id=>{await expect(page.locator('.wardrobe-mirror canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true');await expect(wear).toHaveAttribute('data-outfit',id);await expect(wear).toHaveAttribute('data-loaded','true');await expect(wear).toHaveAttribute('data-registration','original-source');await expect(wear).toBeVisible();};
+ await ready('flower-crown');
+ await page.getByRole('combobox',{name:'预览形态',exact:true}).selectOption('seed');
+ for(const target of [0,1]){
+  const back=page.getByRole('button',{name:'衣橱上一页',exact:true});if(target===0&&await back.isEnabled())await back.click();
+  if(target===1)await page.getByRole('button',{name:'衣橱下一页',exact:true}).click();
+  const buttons=page.locator('.wardrobe-grid button').filter({hasNot:page.locator('[src$="icon-happy.webp"]')});
+  for(const b of await buttons.all()){await b.click();await expect(page.locator('.wardrobe-mirror .ram-wear')).toHaveCount(0);await expect(page.getByRole('button',{name:'长大后才能穿戴',exact:true})).toBeDisabled()}
+ }
+ await page.screenshot({path:path.join(dir,'seed-outfits-blocked.png')});
+ assert.equal(await page.locator('.wardrobe-grid').getByText('穿戴中',{exact:true}).count(),0);
+ await page.getByRole('combobox',{name:'预览形态',exact:true}).selectOption('middle');
+ await page.getByRole('button',{name:'试戴鲜花花冠',exact:true}).click();
  await ready('flower-crown');await expect(page.getByRole('button',{name:'试戴鲜花花冠',exact:true})).toBeVisible();
  for(const [index,[id,label]] of additions.entries()){
   await page.getByRole('button',{name:`试戴${label}`,exact:true}).click();
@@ -36,7 +48,7 @@ const SAVE='ramu-house-save-v1';let browser;
   await page.screenshot({path:path.join(dir,`${id}-wardrobe.png`)});
   await page.locator('.wardrobe-mirror').screenshot({path:path.join(dir,`${id}-mirror.png`)});
  }
- await sharp({create:{width:1440,height:660,channels:4,background:'#f6eedb'}}).composite(shots).png().toFile(path.join(dir,'outfits-eight-forms.png'));
+ await sharp({create:{width:1260,height:660,channels:4,background:'#f6eedb'}}).composite(shots).png().toFile(path.join(dir,'outfits-eight-forms.png'));
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),SAVE),'wardrobe-preview-untouched');
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(dir,'wardrobe-mobile.png')});
  assert(await page.evaluate(()=>document.body.scrollWidth<=innerWidth));await page.close();
@@ -59,6 +71,17 @@ const SAVE='ramu-house-save-v1';let browser;
  for(const field of ['createdAt','color','growthLocked','inventory'])assert.deepEqual(after[field],before[field],field);
  assert.equal(after.wearing,'angel-wings');assert.equal(after.coins,805);
  assert.deepEqual(after.wardrobe,['party-cap','gold-feather','wizard-cap',...additions.map(a=>a[0])]);
+ await main.evaluate(key=>{const p=JSON.parse(localStorage.getItem(key));p.growth=0;localStorage.setItem(key,JSON.stringify(p));},SAVE);
+ await reloadStoredFixture(main);
+ await expect(main.locator('.companion-layout .ram-wear')).toHaveCount(0);
+ await enterHome(main);await expect(main.locator('.scene-character .ram-wear')).toHaveCount(0);
+ const seedSave=await main.evaluate(key=>JSON.parse(localStorage.getItem(key)),SAVE);
+ assert.equal(seedSave.wearing,'angel-wings');assert.deepEqual(seedSave.wardrobe,after.wardrobe);assert.equal(seedSave.coins,after.coins);
+ await main.evaluate(key=>{const p=JSON.parse(localStorage.getItem(key));p.growth=60;localStorage.setItem(key,JSON.stringify(p));},SAVE);
+ await reloadStoredFixture(main);
+ await expect(main.locator('.companion-layout .ram-wear')).toHaveAttribute('data-outfit','angel-wings');
+ await expect(main.locator('.companion-layout .ram-wear')).toHaveAttribute('data-loaded','true');
+
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
- const report={passed:true,threeOriginalModules:true,eightFormsPerOutfit:true,allEightPreviewActions:true,usesAuthoredFootballPoses:true,previewLeavesSaveUntouched:true,doublePurchaseOnlyChargesOnce:true,oldOwnershipColourInventoryAndNewClothesSurviveReload:true,mobileNoHorizontalOverflow:true,errors,failed};fs.writeFileSync(path.join(dir,'browser-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+ const report={passed:true,threeOriginalModules:true,grownFormsPerOutfit:7,seedCannotTryOrWearAnyOutfit:true,seedHidesImportedClothingOnDesktopAndInRoom:true,ownedClothesAndPreferenceResumeAfterGrowing:true,allEightPreviewActions:true,usesAuthoredFootballPoses:true,previewLeavesSaveUntouched:true,doublePurchaseOnlyChargesOnce:true,oldOwnershipColourInventoryAndNewClothesSurviveReload:true,mobileNoHorizontalOverflow:true,errors,failed};fs.writeFileSync(path.join(dir,'browser-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close()});

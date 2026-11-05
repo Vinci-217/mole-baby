@@ -29,7 +29,7 @@ function requestOutfitMotion(body:HTMLCanvasElement){
   outfitLoading??=import('../outfit-motion').then(module=>{outfitMotion=module;for(const canvas of outfitWaiters)if(canvas.isConnected)canvas.dispatchEvent(new Event('ram-wardrobe-change'));outfitWaiters.clear()}).catch(()=>{outfitLoading=undefined;outfitWaiters.clear()})
 }
 import {getOutfit,outfitCoversCrown} from '../wardrobe'
-import {bodyWearAnchor,type WearAnchor} from '../wear-anchor'
+import {bodyWearAnchor,bodySideAccessoryOffset,type WearAnchor} from '../wear-anchor'
 import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
@@ -206,12 +206,15 @@ function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
 }
 const costumeImages=new Map<string,HTMLImageElement>()
 const costumePending=new Map<string,Promise<HTMLImageElement>>()
-const costumeListeners=new WeakMap<HTMLCanvasElement,string>()
+const costumeListeners=new WeakMap<HTMLCanvasElement,Promise<HTMLImageElement>>()
 function costumeImage(path:string,wear:HTMLCanvasElement,body:HTMLCanvasElement) {
   const ready=costumeImages.get(path);if(ready)return ready
   let pending=costumePending.get(path)
   if(!pending){pending=new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Costume PNG unavailable'));im.src=path});costumePending.set(path,pending)}
-  if(costumeListeners.get(wear)!==path){costumeListeners.set(wear,path);pending.then(im=>{costumeImages.set(path,im);costumePending.delete(path);while(costumeImages.size>24)costumeImages.delete(costumeImages.keys().next().value!);if(body.isConnected&&wear.isConnected&&costumeListeners.get(wear)===path)body.dispatchEvent(new Event('ram-wardrobe-change'))}).catch(()=>{costumePending.delete(path)})}
+  // A cache eviction can create a fresh request for the same path. Observe the
+  // request itself so a previously loaded hat can repaint after loading again.
+  const request=pending
+  if(costumeListeners.get(wear)!==request){costumeListeners.set(wear,request);request.then(im=>{costumeImages.set(path,im);costumePending.delete(path);while(costumeImages.size>24)costumeImages.delete(costumeImages.keys().next().value!);if(body.isConnected&&wear.isConnected&&costumeListeners.get(wear)===request)body.dispatchEvent(new Event('ram-wardrobe-change'))}).catch(()=>{costumePending.delete(path)})}
   return null
 }
 function placeFootballHeadwear(wear:HTMLCanvasElement,rig:NonNullable<ReturnType<typeof footballOutfitRig>>,box:{x:number;y:number;width:number;height:number}){
@@ -251,6 +254,14 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
     const signature=`${spec.file}:${index}`
     if(wear.dataset.paint!==signature){wear.width=spec.cell[0];wear.height=spec.cell[1];context.clearRect(0,0,wear.width,wear.height);const box=spec.rects[index],w=box[2]-box[0],h=box[3]-box[1];context.drawImage(im,index%spec.columns*spec.tile[0],Math.floor(index/spec.columns)*spec.tile[1],w,h,box[0],box[1],w,h);wear.dataset.paint=signature}
     wear.style.left=`${-spec.origin[0]/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${-spec.origin[1]/height*100*scaleY-(football?61.5384615:0)}%`
+    delete wear.dataset.mount
+    if(outfit.id==='knight-shield'){
+      let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
+      const key=`${frame}:${row}:${width}:${height}`
+      if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height))
+      const anchor=cache.get(key)
+      if(anchor){const offset=bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin);wear.style.left=`${(-spec.origin[0]+offset.x)/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${(-spec.origin[1]+offset.y)/height*100*scaleY-(football?61.5384615:0)}%`;wear.dataset.mount='body-side'}
+    }
     wear.style.width=`${spec.cell[0]/width*100*scaleX}%`;wear.style.height=`${spec.cell[1]/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='original-source';wear.dataset.sourceFrame=String(sourceFrame??frame)
     if(headRig)placeFootballHeadwear(wear,headRig,{x:-spec.origin[0],y:-spec.origin[1],width:spec.cell[0],height:spec.cell[1]})
   }else{
@@ -642,7 +653,8 @@ function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:P
  return <canvas ref={ref} width={192} height={208} className="ram-classic-frame" data-form="classic" data-color={color} aria-hidden="true"/>;
 }
 
-export default function Ram({ rawDaily: _rawDaily=false, color, costume, companionId=0, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+export default function Ram({ rawDaily: _rawDaily=false, color, costume:requestedCostume, companionId=0, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+  const costume=stage>0?requestedCostume:undefined
   const clock=useRef({key:'',startedAt:0})
   const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
   const eventKey=`${action}:${actionId??0}:${itemId??''}`
