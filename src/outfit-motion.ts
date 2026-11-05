@@ -1,11 +1,25 @@
 import data from '../public/assets/original/wardrobe-motion/runtime.json';
 import heads from '../public/assets/original/football/head-poses.json';
+import flight from '../public/assets/original/flight/runtime.json';
+import classic from '../public/assets/classic/ram-level-animation-sources.json';
 export interface OutfitSheet {cell:number[];tile:number[];rects:number[][];bodyCell:number[];origin:number[];columns:number;rows:number;lookup:Record<string,number>;frameMap:number[];file:string}
 interface OutfitSource {sourceId:string;additiveRig:boolean;forms:Record<string,Record<string,OutfitSheet>>}
 const sources=data.outfits as unknown as Record<string,OutfitSource>;
-export function outfitFrame(id:string,form:string,kind:string,frame:number,row:number,columns:number,sourceFrame?:number) {
+interface OutfitPose {sheet:OutfitSheet;index:number;sampledFlight?:boolean}
+export function outfitFrame(id:string,form:string,kind:string,frame:number,row:number,columns:number,sourceFrame?:number):OutfitPose|null {
   if(kind==='gentle'||kind==='dizzy'||kind==='yawn'||kind==='affection')return outfitFrame(id,form,form==='seed'?'seed':'slumber',0,0,8)
   const sheet=sources[id]?.forms[form]?.[kind==='item'?'item-motion':kind];
+  if(!sheet&&kind==='flight'&&(form==='senior'||form==='super')){
+    // Earlier clothes predate the full-flight atlas. Their original sampled
+    // direction poses already exist; never replace a full-size hood with its
+    // tiny shop icon when the body switches to the complete flight player.
+    const cell=row*columns+frame,clips=flight.forms[form].clips;
+    const direction=clips.left.frames.some(p=>p.index===cell)?2:clips.right.frames.some(p=>p.index===cell)?1:0;
+    const starts=form==='senior'?classic.senior.rows[direction].actionFrames:[1,3,5,7,9,11,13,15];
+    const sampled=Math.max(0,starts.filter(start=>start<=(sourceFrame??1)).length-1);
+    const pose=outfitFrame(id,form,'classic',sampled,direction,8);
+    return pose?{...pose,sampledFlight:true}:null;
+  }
   if(!sheet)return null;
   const key=String((kind==='football'||kind.startsWith('emotion-'))&&sourceFrame!==undefined?sourceFrame:row*columns+frame);
   const index=sheet.lookup[key];if(index===undefined)return null;

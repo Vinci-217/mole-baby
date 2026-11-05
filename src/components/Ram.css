@@ -142,6 +142,9 @@
 @media(prefers-reduced-motion:reduce){.ram-sleep-particles>img{animation:none!important;opacity:.7;transform:translate(12px,-22px)}.ram-sleep-particles>img+img{display:none}}
 
 .ram-wear{position:absolute;object-fit:contain;visibility:hidden;translate:none;transform-origin:50% 100%;pointer-events:none;z-index:2}
+.ram-pose-layer{isolation:isolate}
+.ram-pose-layer>canvas:not(.ram-wear){position:relative;z-index:1}
+.ram-wear[data-layer="behind"]{z-index:0}
 .ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-flight-layer,.ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-pose-layer{animation:none;transform:none}
 
 /* Local little performances reuse source props and the unchanged source face. */

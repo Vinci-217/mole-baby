@@ -3,6 +3,16 @@ import {sleepPose,dozyPose} from '../original-actions'
 import { getRamActionDuration, sampleRamPose, sampleSeedPose, sampleEvolvedPose, sampleFlyingPose, SEED_IDLE_FRAME_COUNT, SEED_IDLE_FPS } from './ram-animation'
 
 describe('original Ram care animation contract', () => {
+  it('keeps ground walking on its own original timestamps, including crouch and landing holds',()=>{
+    for(const [form,starts,count] of [['junior',[1,3,4,6,8,10,11,13],15],['middle',[1,3,5,7,8,10,12,14],16]] as const){
+      for(let source=1;source<=count;source++)for(const [action,row] of [['walk-left',2],['walk-right',1]] as const){
+        const time=(source-1+.1)*1000/24
+        expect(sampleRamPose(action,time,false,form)).toEqual({row,frame:starts.filter(s=>s<=source).length-1,finished:false})
+        expect(sampleRamPose(action,time,true,form)).toEqual({row,frame:0,finished:false})
+      }
+      expect(sampleRamPose('walk-left',count*1000/24+.1,false,form).frame).toBe(0)
+    }
+  })
   it('plays every original seed idle frame, loops before the extra sleep cell and respects static/reduced motion',()=>{
     expect(SEED_IDLE_FRAME_COUNT).toBe(61);expect(SEED_IDLE_FPS).toBe(24);
     const frames=Array.from({length:61},(_,i)=>sampleSeedPose('idle',(i+.25)*1000/24).frame);

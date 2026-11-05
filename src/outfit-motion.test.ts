@@ -3,6 +3,7 @@ import {outfitFrame,hasAuthoredOutfit,footballOutfitRig} from './outfit-motion'
 import {OUTFITS,outfitCoversCrown} from './wardrobe'
 import {emotionSpec} from './mood-motion'
 import {bodyWearAnchor} from './wear-anchor'
+import flight from '../public/assets/original/flight/runtime.json'
 
 describe('original wardrobe source registration',()=>{
  it('keeps every authored outfit registered on the matching body during the new sleep-entry yawn',()=>{
@@ -32,6 +33,13 @@ describe('original wardrobe source registration',()=>{
    const pose=outfitFrame(id,form,'flight',cell%8,Math.floor(cell/8),8)
    expect(pose,`${id}:${form}:${cell}`).not.toBeNull()
    expect(pose!.sheet.rects[pose!.index][2]).toBeGreaterThan(1)
+  }
+ })
+ it('keeps older clothes on original full-size direction artwork throughout both flight loops',()=>{
+  for(const id of OUTFITS.slice(1,9).map(o=>o.id))for(const form of ['senior','super'] as const)for(const direction of ['down','left','right'] as const){
+   const poses=flight.forms[form].clips[direction].frames.map(p=>outfitFrame(id,form,'flight',p.index%8,Math.floor(p.index/8),8,p.sourceFrame));
+   for(const pose of poses){expect(pose,`${id}:${form}:${direction}`).not.toBeNull();expect(pose!.sampledFlight).toBe(true);expect(pose!.sheet.file).toBe(`${id}-${form}-classic.png`)}
+   expect(new Set(poses.map(p=>p!.index)).size).toBeGreaterThan(1)
   }
  })
  it('keeps mild frowns out of the stretched-eye section of the original performance',()=>{

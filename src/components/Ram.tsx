@@ -29,7 +29,7 @@ function requestOutfitMotion(body:HTMLCanvasElement){
   outfitLoading??=import('../outfit-motion').then(module=>{outfitMotion=module;for(const canvas of outfitWaiters)if(canvas.isConnected)canvas.dispatchEvent(new Event('ram-wardrobe-change'));outfitWaiters.clear()}).catch(()=>{outfitLoading=undefined;outfitWaiters.clear()})
 }
 import {getOutfit,outfitCoversCrown} from '../wardrobe'
-import {bodyWearAnchor,bodySideAccessoryOffset,type WearAnchor} from '../wear-anchor'
+import {bodyWearAnchor,bodySideAccessoryOffset,backAccessoryOffset,headAccessoryOffset,type WearAnchor} from '../wear-anchor'
 import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
@@ -244,7 +244,8 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
   // These three original modules include a separable football costume rig.
   // Play those source poses rather than treating wings or a shield as a hat.
   const headRig=rig&&!['magic-book','star-wand','flower-crown','knight-shield','angel-wings'].includes(outfit.id)?rig:null;
-  const authored=headRig?outfitFrame(outfit.id,form,'slumber',0,0,8):outfitFrame(outfit.id,form,kind,frame,row,source.neutral.width/width,sourceFrame)
+  const mountedHead=kind==='classic'&&(row===1||row===2)&&['wizard-cap','gold-feather','warm-scarf','flower-crown','leaf-hood','sport-goggles'].includes(outfit.id)
+  const authored=headRig?outfitFrame(outfit.id,form,'slumber',0,0,8):outfitFrame(outfit.id,form,kind,mountedHead?0:frame,row,source.neutral.width/width,sourceFrame)
   if(!headRig){wear.style.transformOrigin='50% 100%';delete wear.dataset.headRegistration}
   const scaleX=football?1.666666667:1,scaleY=football?1.846153846:1
   const context=wear.getContext('2d');if(!context)return
@@ -255,12 +256,16 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
     if(wear.dataset.paint!==signature){wear.width=spec.cell[0];wear.height=spec.cell[1];context.clearRect(0,0,wear.width,wear.height);const box=spec.rects[index],w=box[2]-box[0],h=box[3]-box[1];context.drawImage(im,index%spec.columns*spec.tile[0],Math.floor(index/spec.columns)*spec.tile[1],w,h,box[0],box[1],w,h);wear.dataset.paint=signature}
     wear.style.left=`${-spec.origin[0]/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${-spec.origin[1]/height*100*scaleY-(football?61.5384615:0)}%`
     delete wear.dataset.mount
-    if(outfit.id==='knight-shield'){
+    if(outfit.id==='knight-shield'||outfit.id==='angel-wings'||mountedHead){
       let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
       const key=`${frame}:${row}:${width}:${height}`
       if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height))
       const anchor=cache.get(key)
-      if(anchor){const offset=bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin);wear.style.left=`${(-spec.origin[0]+offset.x)/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${(-spec.origin[1]+offset.y)/height*100*scaleY-(football?61.5384615:0)}%`;wear.dataset.mount='body-side'}
+      if(anchor){
+        const action=canvas.closest<HTMLElement>('.ram-sprite')?.dataset.action??'',facing=action.includes('left')?-1:action.includes('right')?1:0
+        const offset=mountedHead?headAccessoryOffset(anchor,spec.rects[index],spec.origin,outfit.id):outfit.id==='angel-wings'?backAccessoryOffset(anchor,spec.rects[index],spec.origin,facing):bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin)
+        wear.style.left=`${(-spec.origin[0]+offset.x)/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${(-spec.origin[1]+offset.y)/height*100*scaleY-(football?61.5384615:0)}%`;wear.dataset.mount=mountedHead?'head':outfit.id==='angel-wings'?'body-back':'body-side'
+      }
     }
     wear.style.width=`${spec.cell[0]/width*100*scaleX}%`;wear.style.height=`${spec.cell[1]/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='original-source';wear.dataset.sourceFrame=String(sourceFrame??frame)
     if(headRig)placeFootballHeadwear(wear,headRig,{x:-spec.origin[0],y:-spec.origin[1],width:spec.cell[0],height:spec.cell[1]})
@@ -315,6 +320,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const flightClock = useRef(0)
+  const walkClock = useRef(0)
   const eyePosition=useRef<PetGaze>({x:0,y:0})
   const gazeRef=useRef(gaze);gazeRef.current=gaze
   const soundRef=useRef(sound);soundRef.current=sound
@@ -342,6 +348,8 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   useEffect(() => {
     const canvas = canvasRef.current, context = canvas?.getContext('2d')
     if (!canvas || !context || !sheets) return
+    const walking = action.includes('walk') || action.includes('running-')
+    if(!walking)walkClock.current=0
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
@@ -350,9 +358,10 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
       const delta=last&&now-last<250?Math.max(0,now-last):0
       elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
       flightClock.current+=delta
+      if(walking)walkClock.current+=delta
       eyePosition.current=media.matches?{x:0,y:0}:easeGaze(eyePosition.current,gazeRef.current?.current??{x:0,y:0},delta)
       last = now
-      const pose = ['senior', 'super', 'water', 'wood', 'fire'].includes(form) ? sampleFlyingPose(action, elapsed, media.matches, form, flightClock.current) : sampleRamPose(action, elapsed, media.matches)
+      const pose = ['senior', 'super', 'water', 'wood', 'fire'].includes(form) ? sampleFlyingPose(action, elapsed, media.matches, form, flightClock.current) : sampleRamPose(action, walking?walkClock.current:elapsed, media.matches, form)
       if(!media.matches||action!=='focus')soundClock.tick(elapsed)
       paintItemCue(canvas, itemMotion, elapsed, media.matches)
       paintSocialCue(canvas, form === 'junior' ? 1 : form === 'middle' ? 2 : form === 'senior' ? 3 : 4, action, elapsed, media.matches, ['super','water','wood','fire'].includes(form) ? form as Evolution : undefined)

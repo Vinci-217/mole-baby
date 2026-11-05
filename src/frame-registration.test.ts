@@ -4,11 +4,11 @@ import { bodyFrameRegistration } from './frame-registration'
 
 /** Inspect the real source masks so an exporter change can invalidate these
  * calibrations instead of leaving a passing test of constants alone. */
-async function inkBounds(form: string, directory: string, row = 0) {
+async function inkBounds(form: string, directory: string, row = 0, frame = 0) {
   const { data, info } = await sharp(`public/assets/${directory}/${form}-mask.png`).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
   let left = 192, top = 208, right = 0, bottom = 0
   for (let y = 0; y < 208; y++) for (let x = 0; x < 192; x++) {
-    const offset = ((row * 208 + y) * info.width + x) * 4
+    const offset = ((row * 208 + y) * info.width + frame * 192 + x) * 4
     if (data[offset + 3] <= 40 || data[offset] + data[offset + 1] + data[offset + 2] <= 40) continue
     left = Math.min(left, x); top = Math.min(top, y)
     right = Math.max(right, x); bottom = Math.max(bottom, y)
@@ -29,18 +29,22 @@ describe('fixed body registration across source sheets', () => {
     }
   })
 
-  it('keeps both walking directions at their form’s front-body height, center and baseline', async () => {
+  it('bounds the entire original walking cycle instead of magnifying its first crouch', async () => {
     for (const form of ['junior', 'middle']) {
       const front = await inkBounds(form, 'classic')
       for (const row of [1, 2]) {
-        const side = await inkBounds(form, 'classic', row)
         const registration = bodyFrameRegistration(form, 'classic', row)
         expect(registration.scaleX).toBe(registration.scaleY)
-        const height = (side.bottom - side.top) * registration.scaleY
-        expect(Math.abs(height - (front.bottom - front.top))).toBeLessThanOrEqual(1.1)
-        const center = (side.left + side.right) / 2 * registration.scaleX + registration.x
-        expect(Math.abs(center - (front.left + front.right) / 2)).toBeLessThanOrEqual(.6)
-        expect(Math.abs(side.bottom * registration.scaleY + registration.y - front.bottom)).toBeLessThanOrEqual(1.1)
+        const cycle = await Promise.all(Array.from({length:8},(_,frame)=>inkBounds(form,'classic',row,frame)))
+        const frontHeight = front.bottom-front.top
+        const heights = cycle.map(side=>(side.bottom-side.top)*registration.scaleY)
+        expect(Math.max(...heights)).toBeLessThan(frontHeight*(form==='middle'?1.33:1.15))
+        expect(Math.max(...heights)).toBeGreaterThan(frontHeight)
+        expect(Math.min(...heights)).toBeGreaterThan(frontHeight*.6)
+        const floor = Math.max(...cycle.map(side=>side.bottom*registration.scaleY+registration.y))
+        expect(Math.abs(floor-front.bottom)).toBeLessThanOrEqual(1.1)
+        // A leap may rise, but neither direction can sink below the floor.
+        for(const side of cycle)expect(side.bottom*registration.scaleY+registration.y).toBeLessThanOrEqual(front.bottom+1.1)
       }
     }
   })

@@ -102,8 +102,14 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
     if (n >= once.frames.length) return { row: 0, frame: 0, finished: true }
     return reduced ? { row: 0, frame: 0, finished: false } : { row: once.row, frame: once.frames[n], finished: false }
   }
+  if (action.includes('walk') || action.includes('running-')) {
+    // Match the sampled cells to their original 24fps timestamps. Evenly
+    // advancing eight cells sped up the middle hop and cut its landing hold.
+    const starts = form === 'middle' ? [1,3,5,7,8,10,12,14] : [1,3,4,6,8,10,11,13]
+    const phase = Math.floor(Math.max(0, elapsed) * 24 / 1000) % (form === 'middle' ? 16 : 15) + 1
+    return { row: action.endsWith('left') ? 2 : 1, frame: reduced ? 0 : starts.filter(start => start <= phase).length - 1, finished: false }
+  }
   if (reduced) return { row: 0, frame: 0, finished: false }
-  if (action.includes('walk') || action.includes('running-')) return { row: action.endsWith('left') ? 2 : 1, frame: Math.floor(elapsed / 62.5) % 8, finished: false }
   if (action === 'peek' || action === 'hide') {
     const phase = elapsed % 5000
     return { row: 0, frame: phase < 4200 ? 0 : Math.min(4, Math.floor((phase - 4200) / 170)), finished: false }
