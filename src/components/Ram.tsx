@@ -29,7 +29,7 @@ function requestOutfitMotion(body:HTMLCanvasElement){
   outfitLoading??=import('../outfit-motion').then(module=>{outfitMotion=module;for(const canvas of outfitWaiters)if(canvas.isConnected)canvas.dispatchEvent(new Event('ram-wardrobe-change'));outfitWaiters.clear()}).catch(()=>{outfitLoading=undefined;outfitWaiters.clear()})
 }
 import {getOutfit,outfitCoversCrown} from '../wardrobe'
-import {bodyWearAnchor,bodySideAccessoryOffset,backAccessoryOffset,headAccessoryOffset,type WearAnchor} from '../wear-anchor'
+import {bodyWearAnchor,bodySideAccessoryOffset,backAccessoryOffset,headAccessoryOffset,CONTACT_HEADWEAR,garmentBottomContour,headwearContactOffset,headwearSurfaceGap,borrowedBodyPlacement,type WearAnchor} from '../wear-anchor'
 import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
@@ -207,6 +207,7 @@ function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
 const costumeImages=new Map<string,HTMLImageElement>()
 const costumePending=new Map<string,Promise<HTMLImageElement>>()
 const costumeListeners=new WeakMap<HTMLCanvasElement,Promise<HTMLImageElement>>()
+const costumeContours=new WeakMap<HTMLCanvasElement,{signature:string;bottom:readonly (number|null)[]}>()
 function costumeImage(path:string,wear:HTMLCanvasElement,body:HTMLCanvasElement) {
   const ready=costumeImages.get(path);if(ready)return ready
   let pending=costumePending.get(path)
@@ -233,6 +234,12 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
   if(!outfitMotion){wear.style.visibility='hidden';requestOutfitMotion(canvas);return}
   const {outfitFrame,footballOutfitRig}=outfitMotion
   const kind=source.kind??'classic',form=width===96?'seed':source.form??'junior'
+  const bodyAnchor=()=>{
+    let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
+    const key=`${frame}:${row}:${width}:${height}`
+    if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,width===96))
+    return cache.get(key)
+  }
   if(football&&['magic-book','star-wand'].includes(outfit.id)){
     const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas),context=wear.getContext('2d');if(!image||!context){wear.style.visibility='hidden';return}
     if(wear.dataset.paint!==`stowed:${outfit.id}`){wear.width=image.naturalWidth;wear.height=image.naturalHeight;context.clearRect(0,0,wear.width,wear.height);context.drawImage(image,0,0);wear.dataset.paint=`stowed:${outfit.id}`}
@@ -256,31 +263,41 @@ function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:n
     if(wear.dataset.paint!==signature){wear.width=spec.cell[0];wear.height=spec.cell[1];context.clearRect(0,0,wear.width,wear.height);const box=spec.rects[index],w=box[2]-box[0],h=box[3]-box[1];context.drawImage(im,index%spec.columns*spec.tile[0],Math.floor(index/spec.columns)*spec.tile[1],w,h,box[0],box[1],w,h);wear.dataset.paint=signature}
     wear.style.left=`${-spec.origin[0]/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${-spec.origin[1]/height*100*scaleY-(football?61.5384615:0)}%`
     delete wear.dataset.mount
-    if(outfit.id==='knight-shield'||outfit.id==='angel-wings'||mountedHead){
-      let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
-      const key=`${frame}:${row}:${width}:${height}`
-      if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height))
-      const anchor=cache.get(key)
+    if(outfit.id==='knight-shield'||outfit.id==='angel-wings'||mountedHead||!football&&CONTACT_HEADWEAR.has(outfit.id)){
+      const anchor=bodyAnchor()
       if(anchor){
         const action=canvas.closest<HTMLElement>('.ram-sprite')?.dataset.action??'',facing=action.includes('left')?-1:action.includes('right')?1:0
-        const offset=mountedHead?headAccessoryOffset(anchor,spec.rects[index],spec.origin,outfit.id):outfit.id==='angel-wings'?backAccessoryOffset(anchor,spec.rects[index],spec.origin,facing):bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin)
+        const head=mountedHead||!football&&CONTACT_HEADWEAR.has(outfit.id)
+        const offset=head?headAccessoryOffset(anchor,spec.rects[index],spec.origin,outfit.id):outfit.id==='angel-wings'?backAccessoryOffset(anchor,spec.rects[index],spec.origin,facing):bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin)
         wear.style.left=`${(-spec.origin[0]+offset.x)/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${(-spec.origin[1]+offset.y)/height*100*scaleY-(football?61.5384615:0)}%`;wear.dataset.mount=mountedHead?'head':outfit.id==='angel-wings'?'body-back':'body-side'
       }
     }
     wear.style.width=`${spec.cell[0]/width*100*scaleX}%`;wear.style.height=`${spec.cell[1]/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='original-source';wear.dataset.sourceFrame=String(sourceFrame??frame)
+    if(authored.borrowedBody&&!football&&!CONTACT_HEADWEAR.has(outfit.id)&&!['knight-shield','angel-wings'].includes(outfit.id)){
+      const anchor=bodyAnchor()
+      if(anchor){const fit=borrowedBodyPlacement(anchor,authored.borrowedBody,{left:-spec.origin[0],top:-spec.origin[1],scaleX:1,scaleY:1});wear.style.left=`${fit.left/width*100}%`;wear.style.top=`${fit.top/height*100}%`;wear.style.width=`${spec.cell[0]*fit.scaleX/width*100}%`;wear.style.height=`${spec.cell[1]*fit.scaleY/height*100}%`;wear.dataset.mount='borrowed-body'}
+    }
     if(headRig)placeFootballHeadwear(wear,headRig,{x:-spec.origin[0],y:-spec.origin[1],width:spec.cell[0],height:spec.cell[1]})
   }else{
     const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas)
     if(!image){wear.style.visibility='hidden';return}
-    let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
-    const key=`${frame}:${row}:${width}:${height}`
-    if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,width===96))
-    const anchor=cache.get(key);if(!anchor){wear.style.visibility='hidden';return}
+    const anchor=bodyAnchor();if(!anchor){wear.style.visibility='hidden';return}
     if(wear.dataset.paint!==outfit.id){wear.width=image.naturalWidth;wear.height=image.naturalHeight;context.clearRect(0,0,wear.width,wear.height);context.drawImage(image,0,0);wear.dataset.paint=outfit.id}
     const w=anchor.bodyWidth*outfit.width,x=(anchor.x+anchor.bodyWidth*outfit.x-w/2)/width*100*scaleX-(football?33.3333333:0)
     const y=(anchor.y+anchor.bodyHeight*outfit.y-w*image.naturalHeight/image.naturalWidth)/height*100*scaleY-(football?61.5384615:0)
     wear.style.left=`${x}%`;wear.style.top=`${y}%`;wear.style.width=`${w/width*100*scaleX}%`;wear.style.height=`${w*image.naturalHeight/image.naturalWidth/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='head-fit'
     if(headRig){const b=headRig.body,bw=b[2]-b[0],bh=b[3]-b[1],size=bw*outfit.width;placeFootballHeadwear(wear,headRig,{x:(b[0]+b[2])/2+bw*outfit.x-size/2,y:b[1]-bh*.025+bh*outfit.y-size*image.naturalHeight/image.naturalWidth,width:size,height:size*image.naturalHeight/image.naturalWidth})}
+  }
+  delete wear.dataset.contactGap
+  if(!football&&!kind.startsWith('emotion-')&&CONTACT_HEADWEAR.has(outfit.id)){
+    const anchor=bodyAnchor()
+    if(anchor){
+      let contour=costumeContours.get(wear)
+      if(!contour||contour.signature!==wear.dataset.paint){contour={signature:wear.dataset.paint??'',bottom:garmentBottomContour(context.getImageData(0,0,wear.width,wear.height).data,wear.width,wear.height)};costumeContours.set(wear,contour)}
+      const placement={left:parseFloat(wear.style.left)*width/100,top:parseFloat(wear.style.top)*height/100,scaleX:parseFloat(wear.style.width)*width/100/wear.width,scaleY:parseFloat(wear.style.height)*height/100/wear.height}
+      placement.top+=headwearContactOffset(anchor,contour.bottom,placement)
+      wear.style.top=`${placement.top/height*100}%`;wear.dataset.contactGap=String(headwearSurfaceGap(anchor,contour.bottom,placement));wear.dataset.mount='head-contact'
+    }
   }
   wear.dataset.anchorFrame=`${frame}:${row}`;wear.dataset.loaded='true'
 }

@@ -6,6 +6,26 @@ import {bodyWearAnchor} from './wear-anchor'
 import flight from '../public/assets/original/flight/runtime.json'
 
 describe('original wardrobe source registration',()=>{
+ it('mounts original Super clothing on every classic three-leaf flight pose',()=>{
+  for(const id of OUTFITS.slice(1).map(o=>o.id))for(const clip of Object.values(flight.forms.classic.clips))for(const p of clip.frames){
+   const pose=outfitFrame(id,'classic','flight',p.index%8,Math.floor(p.index/8),8,p.sourceFrame)!
+   expect(pose).not.toBeNull()
+   expect(pose.borrowedForm).toBe('super')
+   const box=pose.sheet.rects[pose.index]
+   expect(box[2]-box[0]).toBeGreaterThan(1)
+   expect(box[3]-box[1]).toBeGreaterThan(1)
+  }
+ })
+ it('holds the previous original drawing at old Super Ram empty costume control cells',()=>{
+  for(const id of ['wizard-cap','warm-scarf','rabbit-hood']){
+   const before=outfitFrame(id,'super','classic',6,0,8)!,control=outfitFrame(id,'super','classic',7,0,8)!
+   expect(control.index).toBe(before.index)
+   expect(control.heldSourceIndex).toBe(6)
+   const box=control.sheet.rects[control.index]
+   expect(box[2]-box[0]).toBeGreaterThan(10)
+   expect(box[3]-box[1]).toBeGreaterThan(10)
+  }
+ })
  it('keeps every authored outfit registered on the matching body during the new sleep-entry yawn',()=>{
   for(const form of ['seed','junior','middle','senior','super','water','wood','fire'])for(const outfit of OUTFITS.slice(1))for(const frame of [0,3,7]){
    expect(outfitFrame(outfit.id,form,'yawn',frame,0,8)).toEqual(outfitFrame(outfit.id,form,form==='seed'?'seed':'slumber',0,0,8))

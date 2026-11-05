@@ -31,4 +31,6 @@ v0.26使用一次中性姿态校准，服饰原动作不再被逐帧外框缩放
 
 方向与移动可在 `?preview=wardrobe-motion` 查看全部12件装扮的实际播放器。GIF录制与原服饰八方向对照见 `scripts/record-wardrobe-motion.cjs`、`scripts/art/export-costume-directions.py`；原方向对照是分层服饰时间轴，不冒称完整穿衣角色或完整客户端录像。
 
+贴合预览可通过 `?preview=wardrobe-motion&form=junior&zoom=2` 放大初级，通过 `form=classic` / `form=super` / `form=water` / `form=wood` / `form=fire` 直接查看最终形态，无需解锁，也不写入玩家存档。预览中的「查看大小」仅调整审核画面。当前共8种成长形态；经典三叶超级的服饰使用原神力超级图形作挂接适配。
+
 本轮移动复核还修正盾牌的身侧挂接：只按当前身体覆盖范围平移，保留原方向图形、比例和动作帧，避免侧身时漂离身体；切换形态使缓存淘汰后，按新的图片请求重新订阅刷新，避免同路径配饰加载完成后仍隐藏。
