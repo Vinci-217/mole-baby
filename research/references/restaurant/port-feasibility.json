@@ -1,0 +1,3095 @@
+{
+  "date": "2026-11-05",
+  "revision": "7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff",
+  "scope": "Research only: original web client snapshot, not the mobile remake or all historical versions. No official game server connection was made.",
+  "sources": [
+    {
+      "path": "root/dll/ClientAppDLL.swf",
+      "sha256": "9666b6f62ff5f9de9a3e3fb2885dbe234375eaafd03ee35d4e7d29ccc3ce87a6",
+      "bytes": 2709921
+    },
+    {
+      "path": "root/dll/ClientSocketDLL.swf",
+      "sha256": "252027f058ba6f2c09de7c286418f60c0135169c78ab1193beb44ef23ccfdfa0",
+      "bytes": 465968
+    },
+    {
+      "path": "root/dll/ClientConfigDLL.swf",
+      "sha256": "52ad1c8dbee8b0b7cdcbecd05a83f4569bb4c0a17a3e2b0af98b8bd11bc2d0f5",
+      "bytes": 1026462
+    },
+    {
+      "path": "root/dll/ClientCommonDLL.swf",
+      "sha256": "1c23c4167a37cef5cb1e57c577869a316e4da85b46250aa6c845e2697a479b47",
+      "bytes": 451229
+    },
+    {
+      "path": "root/module/restaurant/restaurant.swf",
+      "sha256": "0bcb56419eafc5f4a0885a0ec6d2849eb11d39afd550214a3a49e64060794676",
+      "bytes": 719447
+    }
+  ],
+  "amf3": {
+    "binaryPath": "extracted/root/dll/ClientConfigDLL.swf/binaryData/40_com.global.staticData.XMLInfo_itemXmlData_com.global.staticData.XMLInfo_itemXmlData.bin",
+    "binarySha256": "fcf801e6451e8aba9f7cc2feec3c50c44fa2ad6b6f92c43f52d8aaed3d60493b",
+    "decodedItemCount": 14986,
+    "bytesConsumed": 1307573,
+    "bytesExpected": 1307573
+  },
+  "coreClasses": [
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantBeen.as",
+      "lines": 105,
+      "sha256": "2c4eaa512f7ea2c59b7b1767ce49a15ff24421a7c6d5fce274a8026995144252",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantEmp.as",
+      "lines": 190,
+      "sha256": "de846fc68d872a4da9427240dc46b5213f358e4d2cef31d3e9ca2ee739f4d274",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantEvent.as",
+      "lines": 216,
+      "sha256": "06d997ed21ea5e2df70f7c55006e565ba2a22d00cc9e4b79bc87da3c577d9570",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantFood.as",
+      "lines": 681,
+      "sha256": "7c2818192c292f5ffe83b3590ef181d848cfe7d5d0e0a7e86022eee41829817c",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantGuest.as",
+      "lines": 896,
+      "sha256": "ece0362d48d0534048a454889d7d100158bb0dc0fb87fcce8ba8ba364e5757cb",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantMakeFoodTips.as",
+      "lines": 393,
+      "sha256": "6f8a256acf76e47d3d027b260b43e1cf9bab47ab255f37b8d5c2bf6bb40d270f",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantRandomSay.as",
+      "lines": 58,
+      "sha256": "ddc21a4db2d53fccde28cb54c0a789996f3503866988516a16440c32694a726f",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantTheme.as",
+      "lines": 44,
+      "sha256": "616f20747c79a80f51d5eb069575ced6f37a97c47fa1b6fafcfe14d4d806f8e9",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantTool.as",
+      "lines": 60,
+      "sha256": "0bddc0abba599c4f61eed005c5d58152a320a50b035a38b8eca6dda33196a40b",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantUI.as",
+      "lines": 604,
+      "sha256": "65db2e0d2886fc6e999fa222330294c9be35079e610b3553a19cf35e3934c46c",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/RestaurantView.as",
+      "lines": 477,
+      "sha256": "f3d5f2e98785a648f7230e3ba15fdd9afc5d9a4aa6262062dd200070e39b843e",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/addLamuByRestaurant.as",
+      "lines": 188,
+      "sha256": "03d475bab2eb7b876ecf112aec7a4f1fcf2500ccd2e5cc0e364cc5c89488f9d9",
+      "decompilerWarning": false
+    },
+    {
+      "path": "extracted/root/dll/ClientAppDLL.swf/scripts/com/module/restaurant/mysticPeople.as",
+      "lines": 299,
+      "sha256": "ab5976a68853d9129cc43b5d6c610d09a5428eb21dc8de10f5db45e4e406d7e5",
+      "decompilerWarning": false
+    }
+  ],
+  "socketCommands": [
+    {
+      "method": "oneBigStreetHouse",
+      "command": 995,
+      "line": 22
+    },
+    {
+      "method": "creatHouse",
+      "command": 996,
+      "line": 53
+    },
+    {
+      "method": "houseCertificate",
+      "command": 997,
+      "line": 70
+    },
+    {
+      "method": "setHouseName",
+      "command": 998,
+      "line": 84
+    },
+    {
+      "method": "setHouseStyle",
+      "command": 1049,
+      "line": 101
+    },
+    {
+      "method": "queryGirdTotal",
+      "command": 1000,
+      "line": 119
+    },
+    {
+      "method": "setHouseInnerStyle",
+      "command": 1013,
+      "line": 135
+    },
+    {
+      "method": "restaurantInfo",
+      "command": 1014,
+      "line": 153
+    },
+    {
+      "method": "makeFood",
+      "command": 1017,
+      "line": 219
+    },
+    {
+      "method": "setMakeFoodState",
+      "command": 1020,
+      "line": 240
+    },
+    {
+      "method": "moveMakeFoodLocation",
+      "command": 1021,
+      "line": 254
+    },
+    {
+      "method": "clearFood",
+      "command": 1019,
+      "line": 284
+    },
+    {
+      "method": "getEmpList",
+      "command": 1022,
+      "line": 305
+    },
+    {
+      "method": "empUser",
+      "command": 1015,
+      "line": 340
+    },
+    {
+      "method": "removeEmpUser",
+      "command": 1016,
+      "line": 370
+    },
+    {
+      "method": "checkFoodNum",
+      "command": 1018,
+      "line": 389
+    },
+    {
+      "method": "lowerHouseFavor",
+      "command": 1025,
+      "line": 420
+    },
+    {
+      "method": "queryHouseByUid",
+      "command": 1027,
+      "line": 445
+    },
+    {
+      "method": "whereMyLamu",
+      "command": 1028,
+      "line": 472
+    },
+    {
+      "method": "unLockGoods",
+      "command": 1024,
+      "line": 495
+    },
+    {
+      "method": "getHonorList",
+      "command": 1030,
+      "line": 521
+    },
+    {
+      "method": "getUnOnlineInfo",
+      "command": 1023,
+      "line": 544
+    },
+    {
+      "method": "queryRestaurantEvent",
+      "command": 1031,
+      "line": 566
+    },
+    {
+      "method": "randomEventOver",
+      "command": 1032,
+      "line": 580
+    },
+    {
+      "method": "getFirendRestaurantRank",
+      "command": 1034,
+      "line": 606
+    },
+    {
+      "method": "queryFoodCount",
+      "command": 1040,
+      "line": 642
+    },
+    {
+      "method": "delFoodByID",
+      "command": 1035,
+      "line": 659
+    },
+    {
+      "method": "querySellFood",
+      "command": 1043,
+      "line": 677
+    },
+    {
+      "method": "getSellFood",
+      "command": 1044,
+      "line": 693
+    },
+    {
+      "method": "queryMakeFoodCount",
+      "command": 1046,
+      "line": 711
+    }
+  ],
+  "serverPushCommands": [
+    1026,
+    1029,
+    1047
+  ],
+  "recipes": [
+    {
+      "ID": 1340001,
+      "Name": "清炒毛毛豆",
+      "NeedTimer": 300,
+      "Timeout": 600,
+      "Count": 15,
+      "Price": "0",
+      "SellPrice": 10,
+      "Condition": 1,
+      "Food": "190196",
+      "Star": "25,80,190,410,960",
+      "ExtraCount": 0,
+      "ExtraExp": 1,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340001.swf",
+        "inPinnedArchive": false,
+        "officialProbe": {
+          "path": "resource/restaurant/swf/1340001.swf",
+          "url": "https://mole.61.com/resource/restaurant/swf/1340001.swf",
+          "status": 200,
+          "contentType": "application/x-shockwave-flash",
+          "bytes": 35007,
+          "validSwf": true,
+          "sha256": "5a1cac658d268bb7f0c9759eae49fff01e20642f0be8a7eb953982456bd82339",
+          "fps": 24.0,
+          "frames": 1
+        },
+        "cachedOfficialCopy": true
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340001.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340002,
+      "Name": "酱爆雪顶菇",
+      "NeedTimer": 300,
+      "Timeout": 600,
+      "Count": 10,
+      "Price": "20",
+      "SellPrice": 3,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340002.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340002.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340003,
+      "Name": "果冻花咖喱饭",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 680,
+      "Price": "1200",
+      "SellPrice": 2,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340003.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340003.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340004,
+      "Name": "咕噜果奶酥",
+      "NeedTimer": 43200,
+      "Timeout": 86400,
+      "Count": 1000,
+      "Price": "1400",
+      "SellPrice": 2,
+      "Condition": 2,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340004.swf",
+        "inPinnedArchive": false,
+        "officialProbe": {
+          "path": "resource/restaurant/swf/1340004.swf",
+          "url": "https://mole.61.com/resource/restaurant/swf/1340004.swf",
+          "status": 200,
+          "bytes": 25891,
+          "validSwf": true,
+          "sha256": "a3d3699e4f59323944ae15d3eb87c843380a561dc730e0d48af1fbdcfe6e8d51",
+          "fps": 24.0,
+          "frames": 1
+        },
+        "cachedOfficialCopy": true
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340004.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340005,
+      "Name": "咕唧蛋挞",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 80,
+      "Price": "140",
+      "SellPrice": 3,
+      "Condition": 3,
+      "Food": "0",
+      "Star": "15,45,105,215,450",
+      "ExtraCount": 20,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340005.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340005.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340006,
+      "Name": "蓝莓彩羽汤",
+      "NeedTimer": 2160,
+      "Timeout": 4320,
+      "Count": 300,
+      "Price": "260",
+      "SellPrice": 3,
+      "Condition": 4,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340006.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340006.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340007,
+      "Name": "阳光酥油肉松",
+      "NeedTimer": 7200,
+      "Timeout": 144000,
+      "Count": 1400,
+      "Price": "1800",
+      "SellPrice": 2,
+      "Condition": 5,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340007.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340007.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340008,
+      "Name": "开心果蔬饼",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 90,
+      "Price": "0",
+      "SellPrice": 2,
+      "Condition": 6,
+      "Food": "190654,190654,190653,190653",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340008.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340008.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340009,
+      "Name": "杰克南瓜酥",
+      "NeedTimer": 172800,
+      "Timeout": 345600,
+      "Count": 1440,
+      "Price": "0",
+      "SellPrice": 3,
+      "Condition": 7,
+      "Food": "190187,190187,190022",
+      "Star": "2,5,9,14,20",
+      "ExtraCount": 0,
+      "ExtraExp": 240,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340009.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340009.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340010,
+      "Name": "串烤海琴花",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 300,
+      "Price": "230",
+      "SellPrice": 1,
+      "Condition": 8,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340010.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340010.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340011,
+      "Name": "蜜汁卡兰花",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 150,
+      "Price": "260",
+      "SellPrice": 2,
+      "Condition": 10,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340011.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340011.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340012,
+      "Name": "尤尤什锦百烩",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 90,
+      "Price": "150",
+      "SellPrice": 2,
+      "Condition": 11,
+      "Food": "0",
+      "Star": "20,40,80,160,320",
+      "ExtraCount": 0,
+      "ExtraExp": 4,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340012.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340012.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340013,
+      "Name": "摩雅霜降鱼排",
+      "NeedTimer": 172800,
+      "Timeout": 345600,
+      "Count": 700,
+      "Price": "1400",
+      "SellPrice": 7,
+      "Condition": 12,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340013.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340013.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340014,
+      "Name": "四季百花羹",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 320,
+      "Price": "260",
+      "SellPrice": 1,
+      "Condition": 13,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340014.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340014.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340015,
+      "Name": "惊奇松塔饼",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 1000,
+      "Price": "0",
+      "SellPrice": 2,
+      "Condition": 14,
+      "Food": "190026,190654,190654",
+      "Star": "2,5,10,20,42",
+      "ExtraCount": 0,
+      "ExtraExp": 180,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340015.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340015.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340016,
+      "Name": "彩虹浆果烩蝶鱼",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 300,
+      "Price": "500",
+      "SellPrice": 2,
+      "Condition": 15,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340016.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340016.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340017,
+      "Name": "拉姆小馒头",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 40,
+      "Price": "0",
+      "SellPrice": 13,
+      "Condition": 16,
+      "Food": "190024,190187,190187",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340017.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340017.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340018,
+      "Name": "神秘湖蟹蓉泡芙",
+      "NeedTimer": 216000,
+      "Timeout": 432000,
+      "Count": 1000,
+      "Price": "3400",
+      "SellPrice": 5,
+      "Condition": 17,
+      "Food": "0",
+      "Star": "1,2,4,8,12",
+      "ExtraCount": 0,
+      "ExtraExp": 400,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340018.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340018.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340019,
+      "Name": "金枪鱼彩菇披萨",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 720,
+      "Price": "2800",
+      "SellPrice": 9,
+      "Condition": 18,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340019.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340019.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340020,
+      "Name": "梅森鲜果汤",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 900,
+      "Price": "0",
+      "SellPrice": 2,
+      "Condition": 20,
+      "Food": "190660,190660,190660,190141,190141",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340020.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340020.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340021,
+      "Name": "玫瑰香蒸塔塔苏",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 30,
+      "Price": "140",
+      "SellPrice": 6,
+      "Condition": 21,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340021.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340021.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340022,
+      "Name": "雪丁丁",
+      "NeedTimer": 43200,
+      "Timeout": 86400,
+      "Count": 600,
+      "Price": "3000",
+      "SellPrice": 10,
+      "Condition": 22,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340022.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340022.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340023,
+      "Name": "荷香爽饮",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 10,
+      "Price": "100",
+      "SellPrice": 17,
+      "Condition": 23,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340023.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340023.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340024,
+      "Name": "豆香南瓜饭",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 700,
+      "Price": "0",
+      "SellPrice": 10,
+      "Condition": 24,
+      "Food": "190022,190196,190196,190196,190196",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340024.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340024.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340025,
+      "Name": "葡萄沙冰",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 20,
+      "Price": "100",
+      "SellPrice": 7,
+      "Condition": 25,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340025.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340025.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340026,
+      "Name": "七彩草莓冰激凌",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 30,
+      "Price": "0",
+      "SellPrice": 10,
+      "Condition": 26,
+      "Food": "190142,190142,190025,190025",
+      "Star": "55,110,220,440,880",
+      "ExtraCount": 70,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340026.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340026.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340027,
+      "Name": "十二星座饼干",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 120,
+      "Price": "600",
+      "SellPrice": 7,
+      "Condition": 27,
+      "Food": "0",
+      "Star": "55,110,220,440,880",
+      "ExtraCount": 45,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340027.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340027.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340028,
+      "Name": "酸甜冰泥",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 200,
+      "Price": "400",
+      "SellPrice": 3,
+      "Condition": 28,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340028.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340028.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340029,
+      "Name": "云朵松糕",
+      "NeedTimer": 108000,
+      "Timeout": 216000,
+      "Count": 1000,
+      "Price": "4000",
+      "SellPrice": 10,
+      "Condition": 29,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340029.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340029.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340030,
+      "Name": "爱心蛋蛋堡",
+      "NeedTimer": 172800,
+      "Timeout": 345600,
+      "Count": 1200,
+      "Price": "0",
+      "SellPrice": 10,
+      "Condition": 30,
+      "Food": "190309,190309,190216,190216,190216",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340030.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340030.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340031,
+      "Name": "蜂蜜水果热饮",
+      "NeedTimer": 1500,
+      "Timeout": 3000,
+      "Count": 45,
+      "Price": "500",
+      "SellPrice": 20,
+      "Condition": 32,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340031.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340031.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340032,
+      "Name": "黑椒西冷牛排",
+      "NeedTimer": 172800,
+      "Timeout": 345600,
+      "Count": 800,
+      "Price": "4200",
+      "SellPrice": 22,
+      "Condition": 38,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340032.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340032.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340033,
+      "Name": "胡萝卜盖饭",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 500,
+      "Price": "0",
+      "SellPrice": 15,
+      "Condition": 34,
+      "Food": "190028,190028,190028,190216,190216",
+      "Star": "3,7,15,30,60",
+      "ExtraCount": 2500,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340033.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340033.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340034,
+      "Name": "拉姆七彩沙拉",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 500,
+      "Price": "1200",
+      "SellPrice": 4,
+      "Condition": 36,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340034.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340034.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340035,
+      "Name": "拉姆曲奇饼",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 100,
+      "Price": "1000",
+      "SellPrice": 12,
+      "Condition": 50,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340035.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340035.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340036,
+      "Name": "拉姆鸭蛋面",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 100,
+      "Price": "0",
+      "SellPrice": 15,
+      "Condition": 44,
+      "Food": "190024,190024,190187,190187",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340036.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340036.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340037,
+      "Name": "麻辣小龙虾",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 500,
+      "Price": "0",
+      "SellPrice": 5,
+      "Condition": 40,
+      "Food": "190260,190260",
+      "Star": "20,55,105,210,410",
+      "ExtraCount": 0,
+      "ExtraExp": 90,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340037.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340037.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340039,
+      "Name": "葡萄石榴派",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 60,
+      "Price": "0",
+      "SellPrice": 30,
+      "Condition": 60,
+      "Food": "190379,190379,190379,190388,190388",
+      "Star": "55,110,225,550,1100",
+      "ExtraCount": 15,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340039.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340039.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340040,
+      "Name": "七宝饭",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 400,
+      "Price": "3500",
+      "SellPrice": 35,
+      "Condition": 42,
+      "Food": "0",
+      "Star": "3,7,15,30,60",
+      "ExtraCount": 850,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340040.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340040.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340041,
+      "Name": "清爽薯片",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 60,
+      "Price": "0",
+      "SellPrice": 12,
+      "Condition": 40,
+      "Food": "190654,190654,190654,190654,190654",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340041.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340041.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340042,
+      "Name": "浓情南瓜盅",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "500",
+      "SellPrice": 4,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340042.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340042.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340043,
+      "Name": "果蔬蛋卷",
+      "NeedTimer": 172800,
+      "Timeout": 345600,
+      "Count": 1000,
+      "Price": "0",
+      "SellPrice": 12,
+      "Condition": 54,
+      "Food": "190660,190660,190660,190660,190216",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340043.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340043.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340044,
+      "Name": "双层巧克力蛋糕",
+      "NeedTimer": 129600,
+      "Timeout": 259200,
+      "Count": 600,
+      "Price": "5500",
+      "SellPrice": 48,
+      "Condition": 56,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340044.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340044.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340045,
+      "Name": "水果饭团",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 40,
+      "Price": "100",
+      "SellPrice": 15,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340045.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340045.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340046,
+      "Name": "糖葫芦",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 50,
+      "Price": "100",
+      "SellPrice": 20,
+      "Condition": 4,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340046.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340046.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340048,
+      "Name": "小恶魔披萨",
+      "NeedTimer": 86400,
+      "Timeout": 172800,
+      "Count": 600,
+      "Price": "4000",
+      "SellPrice": 30,
+      "Condition": 46,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340048.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340048.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340049,
+      "Name": "音符巧克力",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 100,
+      "Price": "1000",
+      "SellPrice": 13,
+      "Condition": 52,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340049.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340049.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340050,
+      "Name": "月亮船酸奶雪糕",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 100,
+      "Price": "1000",
+      "SellPrice": 11,
+      "Condition": 58,
+      "Food": "0",
+      "Star": "110,225,550,1100,2200",
+      "ExtraCount": 0,
+      "ExtraExp": 15,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340050.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340050.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340051,
+      "Name": "焦糖拉姆布丁",
+      "NeedTimer": 21600,
+      "Timeout": 86400,
+      "Count": 500,
+      "Price": "0",
+      "SellPrice": 50,
+      "Condition": 48,
+      "Food": "190309,190309,190655",
+      "Star": "15,30,60,120,240",
+      "ExtraCount": 0,
+      "ExtraExp": 850,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340051.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340051.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340052,
+      "Name": "多彩粽子",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 30,
+      "Price": "300",
+      "SellPrice": 25,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340052.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340052.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340053,
+      "Name": "缤纷土豆泥",
+      "NeedTimer": 28800,
+      "Timeout": 57600,
+      "Count": 1200,
+      "Price": "0",
+      "SellPrice": 5,
+      "Condition": 43,
+      "Food": "190654,190654,190654,190654,190654",
+      "Star": "6,15,30,60,120",
+      "ExtraCount": 0,
+      "ExtraExp": 900,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340053.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340053.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340054,
+      "Name": "柠檬蛋糕",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "300",
+      "SellPrice": 2,
+      "Condition": 6,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340054.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340054.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340055,
+      "Name": "草莓冰爽碎碎冰",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "0",
+      "SellPrice": 5,
+      "Condition": 21,
+      "Food": "190142,190142,190142,190142",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340055.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340055.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340056,
+      "Name": "彩虹冰爽",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "0",
+      "SellPrice": 6,
+      "Condition": 33,
+      "Food": "190419,190419,190142,190142",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340056.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340056.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340057,
+      "Name": "甜橙布丁冷饮",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "3000",
+      "SellPrice": 12,
+      "Condition": 47,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340057.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340057.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340058,
+      "Name": "鲜虾时蔬拼盘",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 300,
+      "Price": "0",
+      "SellPrice": 7,
+      "Condition": 57,
+      "Food": "190289,190289,190228,190419",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340058.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340058.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340059,
+      "Name": "黑糊糊粥",
+      "NeedTimer": 5400,
+      "Timeout": 10800,
+      "Count": 100,
+      "Price": "0",
+      "SellPrice": 15,
+      "Condition": 9,
+      "Food": "190683,190683,190683,190683,190683",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340059.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340059.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340060,
+      "Name": "多彩挞挞酥",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 25,
+      "Price": "200",
+      "SellPrice": 30,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340060.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340060.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340061,
+      "Name": "摩摩蛋黄月饼",
+      "NeedTimer": 1200,
+      "Timeout": 1200,
+      "Count": 30,
+      "Price": "200",
+      "SellPrice": 15,
+      "Condition": 1,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340061.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340061.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340062,
+      "Name": "清爽布丁",
+      "NeedTimer": 1200,
+      "Timeout": 2400,
+      "Count": 35,
+      "Price": "100",
+      "SellPrice": 5,
+      "Condition": 401,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340062.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340062.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340063,
+      "Name": "秘制小煎饼",
+      "NeedTimer": 5400,
+      "Timeout": 10800,
+      "Count": 100,
+      "Price": "0",
+      "SellPrice": 7,
+      "Condition": 28,
+      "Food": "190187,190187,190654,190654,190654",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340063.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340063.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340064,
+      "Name": "水果丰收蛋糕",
+      "NeedTimer": 43200,
+      "Timeout": 86400,
+      "Count": 300,
+      "Price": "3000",
+      "SellPrice": 25,
+      "Condition": 22,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340064.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340064.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340065,
+      "Name": "水蛋堡",
+      "NeedTimer": 1800,
+      "Timeout": 3600,
+      "Count": 30,
+      "Price": "0",
+      "SellPrice": 25,
+      "Condition": 25,
+      "Food": "190309,190309",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340065.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340065.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340066,
+      "Name": "南瓜布丁",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 200,
+      "Price": "0",
+      "SellPrice": 5,
+      "Condition": 31,
+      "Food": "190022,190022,190309",
+      "Star": "30,75,150,300,600",
+      "ExtraCount": 200,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340066.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340066.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340067,
+      "Name": "香浓姜汤",
+      "NeedTimer": 2400,
+      "Timeout": 4800,
+      "Count": 160,
+      "Price": "0",
+      "SellPrice": 10,
+      "Condition": 10,
+      "Food": "190809,190809",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340067.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340067.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340068,
+      "Name": "水果冰晶粽",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 30,
+      "Price": "0",
+      "SellPrice": 15,
+      "Condition": 1,
+      "Food": "190119,191096,191096,191097",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340068.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340068.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340069,
+      "Name": "夏日清爽凉面",
+      "NeedTimer": 600,
+      "Timeout": 1200,
+      "Count": 20,
+      "Price": "0",
+      "SellPrice": 5,
+      "Condition": 1,
+      "Food": "190653,190653,190187,190660",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340069.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340069.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340070,
+      "Name": "烧烤拉姆",
+      "NeedTimer": 1800,
+      "Timeout": 3200,
+      "Count": 20,
+      "Price": "0",
+      "SellPrice": 20,
+      "Condition": 35,
+      "Food": "191216,190216",
+      "Star": "50,100,200,400,800",
+      "ExtraCount": 80,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340070.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340070.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340071,
+      "Name": "夏威夷冰饮",
+      "NeedTimer": 900,
+      "Timeout": 1800,
+      "Count": 500,
+      "Price": "500",
+      "SellPrice": 2,
+      "Condition": 19,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340071.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340071.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340072,
+      "Name": "摩摩蛋包饭",
+      "NeedTimer": 43200,
+      "Timeout": 86400,
+      "Count": 350,
+      "Price": "1500",
+      "SellPrice": 10,
+      "Condition": 10,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340072.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340072.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340073,
+      "Name": "樱花冰激凌蛋糕",
+      "NeedTimer": 3600,
+      "Timeout": 7200,
+      "Count": 150,
+      "Price": "1000",
+      "SellPrice": 10,
+      "Condition": 45,
+      "Food": "0",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340073.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340073.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "ID": 1340074,
+      "Name": "浆果糯米糍",
+      "NeedTimer": 10800,
+      "Timeout": 21600,
+      "Count": 500,
+      "Price": "0",
+      "SellPrice": 6,
+      "Condition": 55,
+      "Food": "191217,191217,190119",
+      "Star": "0",
+      "ExtraCount": 0,
+      "ExtraExp": 0,
+      "VipOnly": 0,
+      "model": {
+        "path": "resource/restaurant/swf/1340074.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      },
+      "menuIcon": {
+        "path": "resource/restaurant/meunicon/1340074.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    }
+  ],
+  "ingredientItems": [
+    {
+      "id": 190022,
+      "name": "南瓜"
+    },
+    {
+      "id": 190024,
+      "name": "鸭蛋"
+    },
+    {
+      "id": 190025,
+      "name": "七色花"
+    },
+    {
+      "id": 190026,
+      "name": "野生蘑菇"
+    },
+    {
+      "id": 190028,
+      "name": "胡萝卜"
+    },
+    {
+      "id": 190119,
+      "name": "糯米"
+    },
+    {
+      "id": 190141,
+      "name": "苹果"
+    },
+    {
+      "id": 190142,
+      "name": "草莓"
+    },
+    {
+      "id": 190187,
+      "name": "面粉"
+    },
+    {
+      "id": 190196,
+      "name": "毛毛豆"
+    },
+    {
+      "id": 190216,
+      "name": "白菜"
+    },
+    {
+      "id": 190228,
+      "name": "荔枝"
+    },
+    {
+      "id": 190260,
+      "name": "小龙虾"
+    },
+    {
+      "id": 190289,
+      "name": "磷虾"
+    },
+    {
+      "id": 190309,
+      "name": "鲜鸡蛋"
+    },
+    {
+      "id": 190379,
+      "name": "葡萄"
+    },
+    {
+      "id": 190388,
+      "name": "石榴"
+    },
+    {
+      "id": 190419,
+      "name": "玉米"
+    },
+    {
+      "id": 190653,
+      "name": "青瓜"
+    },
+    {
+      "id": 190654,
+      "name": "马铃薯"
+    },
+    {
+      "id": 190655,
+      "name": "虫虫谷波浪菜"
+    },
+    {
+      "id": 190660,
+      "name": "圣女果"
+    },
+    {
+      "id": 190683,
+      "name": "QQ小芝麻"
+    },
+    {
+      "id": 190809,
+      "name": "摩尔拉雅姜"
+    },
+    {
+      "id": 191096,
+      "name": "桔子"
+    },
+    {
+      "id": 191097,
+      "name": "哈密瓜"
+    },
+    {
+      "id": 191216,
+      "name": "拉姆菌"
+    },
+    {
+      "id": 191217,
+      "name": "五色浆果"
+    }
+  ],
+  "menuNameDifferences": [
+    {
+      "id": 1340016,
+      "itemName": "彩虹浆果烩蝶鱼",
+      "menuName": "七彩浆果烩蝶鱼"
+    },
+    {
+      "id": 1340018,
+      "itemName": "神秘湖蟹蓉泡芙",
+      "menuName": "神秘湖蟹蓉泡"
+    }
+  ],
+  "nonCookingFoodEntries": [
+    {
+      "id": 1340038,
+      "name": "待定",
+      "NeedTimer": 0
+    },
+    {
+      "id": 1340047,
+      "name": "五彩沙拉",
+      "NeedTimer": 0
+    }
+  ],
+  "growth": {
+    "level": [
+      0,
+      30,
+      80,
+      170,
+      360,
+      650,
+      1040,
+      1530,
+      2120,
+      2830,
+      3660,
+      4610,
+      5860,
+      6870,
+      8200,
+      9670,
+      11280,
+      13030,
+      14920,
+      16970,
+      19180,
+      21550,
+      24080,
+      26770,
+      29720,
+      32930,
+      36400,
+      40130,
+      44120,
+      48470,
+      53180,
+      58250,
+      63680,
+      69470,
+      75760,
+      82550,
+      89840,
+      97630,
+      105920,
+      114710,
+      124200,
+      134190,
+      144680,
+      155670,
+      167160,
+      179150,
+      191640,
+      204630,
+      218120,
+      232610,
+      247600,
+      263090,
+      279180,
+      295870,
+      313160,
+      331050,
+      349540,
+      368630,
+      388320,
+      409510
+    ],
+    "EmpWorkTimer": [
+      86400,
+      172800,
+      259200,
+      345600,
+      432000,
+      604800
+    ],
+    "EmpCountByLevel": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "favorlimitByLevel": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+    ],
+    "honorName": [
+      "小有心得",
+      "登堂入室",
+      "大家风范",
+      "当世厨神",
+      "精打细算",
+      "财源滚滚",
+      "富甲一方",
+      "天降财神",
+      "助人为乐",
+      "乐善好施",
+      "日行一善",
+      "绝世好人",
+      "小有所成",
+      "渐入佳境",
+      "星光闪耀",
+      "五星厨神"
+    ]
+  },
+  "maxLevel": 60,
+  "systemGuestCount": 20,
+  "eventCount": 17,
+  "interiors": [
+    {
+      "id": 1330004,
+      "name": "普拉内饰1",
+      "stoves": 3,
+      "servingCounters": 2,
+      "tables": 3,
+      "price": "500",
+      "condition": 1,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330004.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330006,
+      "name": "普拉内饰2",
+      "stoves": 3,
+      "servingCounters": 2,
+      "tables": 4,
+      "price": "700",
+      "condition": 5,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330006.swf",
+        "inPinnedArchive": false,
+        "officialProbe": {
+          "path": "resource/oneBigStree/swf/1330006.swf",
+          "url": "https://mole.61.com/resource/oneBigStree/swf/1330006.swf",
+          "status": 200,
+          "contentType": "application/x-shockwave-flash",
+          "bytes": 102559,
+          "validSwf": true,
+          "sha256": "5cfe219935e44f1c1ecc22cdc5975cc02e3d927911e04455767ed5f7648c2784",
+          "fps": 24.0,
+          "frames": 1
+        },
+        "cachedOfficialCopy": true
+      }
+    },
+    {
+      "id": 1330009,
+      "name": "超拉内饰2",
+      "stoves": 3,
+      "servingCounters": 2,
+      "tables": 4,
+      "price": "700",
+      "condition": 5,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330009.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330010,
+      "name": "普拉内饰3",
+      "stoves": 3,
+      "servingCounters": 3,
+      "tables": 4,
+      "price": "1200",
+      "condition": 8,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330010.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330011,
+      "name": "超拉内饰3",
+      "stoves": 3,
+      "servingCounters": 3,
+      "tables": 4,
+      "price": "1200",
+      "condition": 8,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330011.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330012,
+      "name": "普拉内饰4",
+      "stoves": 4,
+      "servingCounters": 3,
+      "tables": 5,
+      "price": "2400",
+      "condition": 16,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330012.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330013,
+      "name": "超拉内饰4",
+      "stoves": 4,
+      "servingCounters": 3,
+      "tables": 5,
+      "price": "2400",
+      "condition": 16,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330013.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330014,
+      "name": "石质内饰1",
+      "stoves": 4,
+      "servingCounters": 3,
+      "tables": 4,
+      "price": "1000",
+      "condition": 6,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330014.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330015,
+      "name": "石质内饰2",
+      "stoves": 6,
+      "servingCounters": 4,
+      "tables": 6,
+      "price": "5000",
+      "condition": 7,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330015.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330017,
+      "name": "普拉内饰5",
+      "stoves": 4,
+      "servingCounters": 4,
+      "tables": 5,
+      "price": "3000",
+      "condition": 20,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330017.swf",
+        "inPinnedArchive": true,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330018,
+      "name": "超拉内饰5",
+      "stoves": 4,
+      "servingCounters": 4,
+      "tables": 5,
+      "price": "3000",
+      "condition": 20,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330018.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330019,
+      "name": "石质内饰3",
+      "stoves": 4,
+      "servingCounters": 4,
+      "tables": 5,
+      "price": "1500",
+      "condition": 11,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330019.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330020,
+      "name": "石质内饰4",
+      "stoves": 7,
+      "servingCounters": 4,
+      "tables": 7,
+      "price": "50000",
+      "condition": 12,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330020.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330023,
+      "name": "骑士风格内饰(豪华版)",
+      "stoves": 7,
+      "servingCounters": 6,
+      "tables": 8,
+      "price": "100000",
+      "condition": 16,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330023.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    },
+    {
+      "id": 1330024,
+      "name": "骑士风格内饰(专业版)",
+      "stoves": 5,
+      "servingCounters": 6,
+      "tables": 6,
+      "price": "20000",
+      "condition": 14,
+      "asset": {
+        "path": "resource/oneBigStree/swf/1330024.swf",
+        "inPinnedArchive": false,
+        "officialProbe": null,
+        "cachedOfficialCopy": false
+      }
+    }
+  ],
+  "literalModuleReferences": [
+    {
+      "path": "module/external/BeforeEventMain.swf",
+      "inPinnedArchive": true,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/BooksUI/petShopBook.swf",
+      "inPinnedArchive": false,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/changeRestaurantMain.swf",
+      "inPinnedArchive": true,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/restaurantEmployePanelMain.swf",
+      "inPinnedArchive": true,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/restaurantFavor.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantFavor.swf",
+        "url": "https://mole.61.com/module/external/restaurantFavor.swf",
+        "status": 200,
+        "bytes": 26446,
+        "validSwf": true,
+        "sha256": "d7a61bc733be25030771cc15c871cc56b2f041015aa7b5f4dc9718830c2d3f4d",
+        "fps": 24.0,
+        "frames": 1
+      },
+      "cachedOfficialCopy": true
+    },
+    {
+      "path": "module/external/restaurantGoOtherMain.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantGoOtherMain.swf",
+        "url": "https://mole.61.com/module/external/restaurantGoOtherMain.swf",
+        "validSwf": false,
+        "error": "Remote end closed connection without response",
+        "errorType": "RemoteDisconnected"
+      },
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/restaurantLevelMain.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantLevelMain.swf",
+        "url": "https://mole.61.com/module/external/restaurantLevelMain.swf",
+        "status": 200,
+        "bytes": 14101,
+        "validSwf": true,
+        "sha256": "9c00a3453ba287e6676bd5eac77e114655583cfc0daf00df8f0e4a02ac702b1e",
+        "fps": 24.0,
+        "frames": 1
+      },
+      "cachedOfficialCopy": true
+    },
+    {
+      "path": "module/external/restaurantMenuBtnMain.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantMenuBtnMain.swf",
+        "url": "https://mole.61.com/module/external/restaurantMenuBtnMain.swf",
+        "status": 200,
+        "contentType": "application/x-shockwave-flash",
+        "bytes": 742799,
+        "validSwf": true,
+        "sha256": "5aaf7425af6c35c59ae5fff4c365b84ec9fec870adf9f5d4b85c9a9f516a1df1",
+        "fps": 24.0,
+        "frames": 1
+      },
+      "cachedOfficialCopy": true
+    },
+    {
+      "path": "module/external/restaurantMenuMain.swf",
+      "inPinnedArchive": true,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/restaurantMoneyMain.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantMoneyMain.swf",
+        "url": "https://mole.61.com/module/external/restaurantMoneyMain.swf",
+        "status": 200,
+        "contentType": "application/x-shockwave-flash",
+        "bytes": 14219,
+        "validSwf": true,
+        "sha256": "f0b580d22118174e8e77562d78224c838dc905bafc1b282604b0a013c958dd49",
+        "fps": 24.0,
+        "frames": 1
+      },
+      "cachedOfficialCopy": true
+    },
+    {
+      "path": "module/external/restaurantStateMain.swf",
+      "inPinnedArchive": true,
+      "officialProbe": null,
+      "cachedOfficialCopy": false
+    },
+    {
+      "path": "module/external/restaurantStateOtherMain.swf",
+      "inPinnedArchive": false,
+      "officialProbe": {
+        "path": "module/external/restaurantStateOtherMain.swf",
+        "url": "https://mole.61.com/module/external/restaurantStateOtherMain.swf",
+        "validSwf": false,
+        "error": "timed out",
+        "errorType": "TimeoutError"
+      },
+      "cachedOfficialCopy": false
+    }
+  ],
+  "officialProbes": [
+    {
+      "path": "module/restaurant/restaurant.swf",
+      "url": "https://mole.61.com/module/restaurant/restaurant.swf",
+      "status": 200,
+      "contentType": "application/x-shockwave-flash",
+      "bytes": 719447,
+      "validSwf": true,
+      "sha256": "0bcb56419eafc5f4a0885a0ec6d2849eb11d39afd550214a3a49e64060794676",
+      "fps": 24.0,
+      "frames": 1,
+      "matchesArchive": true
+    },
+    {
+      "path": "module/external/restaurantMoneyMain.swf",
+      "url": "https://mole.61.com/module/external/restaurantMoneyMain.swf",
+      "status": 200,
+      "contentType": "application/x-shockwave-flash",
+      "bytes": 14219,
+      "validSwf": true,
+      "sha256": "f0b580d22118174e8e77562d78224c838dc905bafc1b282604b0a013c958dd49",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "module/external/restaurantMenuBtnMain.swf",
+      "url": "https://mole.61.com/module/external/restaurantMenuBtnMain.swf",
+      "status": 200,
+      "contentType": "application/x-shockwave-flash",
+      "bytes": 742799,
+      "validSwf": true,
+      "sha256": "5aaf7425af6c35c59ae5fff4c365b84ec9fec870adf9f5d4b85c9a9f516a1df1",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "module/external/restaurantFavor.swf",
+      "url": "https://mole.61.com/module/external/restaurantFavor.swf",
+      "status": 200,
+      "bytes": 26446,
+      "validSwf": true,
+      "sha256": "d7a61bc733be25030771cc15c871cc56b2f041015aa7b5f4dc9718830c2d3f4d",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "resource/restaurant/swf/1340001.swf",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340001.swf",
+      "status": 200,
+      "contentType": "application/x-shockwave-flash",
+      "bytes": 35007,
+      "validSwf": true,
+      "sha256": "5a1cac658d268bb7f0c9759eae49fff01e20642f0be8a7eb953982456bd82339",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "resource/restaurant/swf/1340004.swf",
+      "url": "https://mole.61.com/resource/restaurant/swf/1340004.swf",
+      "status": 200,
+      "bytes": 25891,
+      "validSwf": true,
+      "sha256": "a3d3699e4f59323944ae15d3eb87c843380a561dc730e0d48af1fbdcfe6e8d51",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "resource/oneBigStree/swf/1330006.swf",
+      "url": "https://mole.61.com/resource/oneBigStree/swf/1330006.swf",
+      "status": 200,
+      "contentType": "application/x-shockwave-flash",
+      "bytes": 102559,
+      "validSwf": true,
+      "sha256": "5cfe219935e44f1c1ecc22cdc5975cc02e3d927911e04455767ed5f7648c2784",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "module/external/restaurantLevelMain.swf",
+      "url": "https://mole.61.com/module/external/restaurantLevelMain.swf",
+      "status": 200,
+      "bytes": 14101,
+      "validSwf": true,
+      "sha256": "9c00a3453ba287e6676bd5eac77e114655583cfc0daf00df8f0e4a02ac702b1e",
+      "fps": 24.0,
+      "frames": 1
+    },
+    {
+      "path": "module/external/restaurantGoOtherMain.swf",
+      "url": "https://mole.61.com/module/external/restaurantGoOtherMain.swf",
+      "validSwf": false,
+      "error": "Remote end closed connection without response",
+      "errorType": "RemoteDisconnected"
+    },
+    {
+      "path": "module/external/restaurantStateOtherMain.swf",
+      "url": "https://mole.61.com/module/external/restaurantStateOtherMain.swf",
+      "validSwf": false,
+      "error": "timed out",
+      "errorType": "TimeoutError"
+    }
+  ],
+  "restaurantSounds": [
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/1_foodOk.mp3",
+      "bytes": 4576
+    },
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/2_downPot.mp3",
+      "bytes": 1248
+    },
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/3_downFood.mp3",
+      "bytes": 3016
+    },
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/4_foodSuccess.mp3",
+      "bytes": 2808
+    },
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/5_foodGo.mp3",
+      "bytes": 1248
+    },
+    {
+      "path": "extracted/root/module/restaurant/restaurant.swf/sounds/6_bgSound.mp3",
+      "bytes": 55120
+    }
+  ],
+  "coverage": {
+    "regularRecipes": 72,
+    "menuDescriptions": 72,
+    "localFoodModels": 8,
+    "localMenuIcons": 30,
+    "interiors": 15,
+    "localInteriors": 5,
+    "staticSwfReferences": 12,
+    "localStaticSwfReferences": 5
+  }
+}
