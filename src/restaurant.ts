@@ -8,12 +8,14 @@ export const restaurantLevel=(xp:number)=>Math.max(1,data.levels.reduce((level,n
 export const staffLimit=(xp:number)=>data.staffLimits[restaurantLevel(xp)-1];
 export const restaurantInterior=(r:RestaurantState)=>INTERIORS.find(i=>i.id===r.interior)!;
 export const dishStars=(r:RestaurantState,id:number)=>recipeById(id)!.stars.filter(n=>(r.mastery[id]??0)>=n).length;
-export interface Stove {dish:number;remaining:number;fresh:number;state:'cooking'|'ready'|'burnt'}
+export const PREP_MS=2000; // Original bar frames 3–50 at 24 fps.
+export interface Stove {dish:number;remaining:number;fresh:number;prep?:number;state:'pot'|'ingredients'|'cooking'|'ready'|'burnt'}
 export interface RestaurantState {
  version:1;xp:number;favor:number;revenue:number;spent:number;served:number;lost:number;
  interior:number;owned:number[];staff:number;stock:Record<number,number>;reserved?:Record<number,number>;mastery:Record<number,number>;stoves:(Stove|null)[];
 }
 export const createRestaurant=():RestaurantState=>({version:1,xp:0,favor:50,revenue:0,spent:0,served:0,lost:0,interior:1330004,owned:[1330004],staff:1,stock:{},mastery:{},stoves:[]});
+const duration=(x:unknown,max:number):x is number=>typeof x==='number'&&Number.isFinite(x)&&x>=0&&x<=max;
 const int=(x:unknown,max=1e9):x is number=>Number.isSafeInteger(x)&&Number(x)>=0&&Number(x)<=max;
 /** Session, guests and clocks are intentionally never restored; only earned progress survives. */
 export function normalizeRestaurant(raw:unknown):RestaurantState|undefined {
@@ -32,12 +34,12 @@ export function normalizeRestaurant(raw:unknown):RestaurantState|undefined {
  // Keep batches from a previously larger interior. Switching requires idle stoves.
  r.stoves=Array.from({length:restaurantInterior(r).stoves},(_,i)=>{
   const s=Array.isArray(v.stoves)?v.stoves[i]:null,recipe=s&&recipeById(s.dish);
-  return s&&recipe&&['cooking','ready','burnt'].includes(s.state)&&int(s.remaining,recipe.cookMs)&&int(s.fresh,recipe.freshMs)?{dish:s.dish,remaining:s.remaining,fresh:s.fresh,state:s.state}:null;
+  return s&&recipe&&['pot','ingredients','cooking','ready','burnt'].includes(s.state)&&duration(s.remaining,recipe.cookMs)&&duration(s.fresh,recipe.freshMs)?{dish:s.dish,remaining:s.remaining,fresh:s.fresh,state:s.state,...(duration(s.prep,PREP_MS)&&s.prep>0?{prep:s.prep}:{})}:null;
  });
  // Valid supplies survive even if a future version changes counter capacity.
  return r;
 }
-export type RestaurantCommand={kind:'cook';dish:number;stove:number}|{kind:'collect'|'discard';stove:number}|{kind:'hire'}|{kind:'interior';id:number};
+export type RestaurantCommand={kind:'cook';dish:number;stove:number}|{kind:'prepare'|'collect'|'discard';stove:number}|{kind:'hire'}|{kind:'interior';id:number};
 export function restaurantCommand(pet:GameState,command:RestaurantCommand):{state:GameState;ok:boolean;message:string}{
  const r=pet.restaurant??createRestaurant(),interior=restaurantInterior(r);
  const fail=(message:string)=>({state:pet,ok:false,message});
@@ -48,7 +50,12 @@ export function restaurantCommand(pet:GameState,command:RestaurantCommand):{stat
   if(next.stoves[command.stove])return fail('这个灶台还在使用中。');
   if(coins<recipe.cost)return fail('摩尔豆不够，先用现有菜品营业或回小屋签到。');
   if((r.stock[recipe.id]??0)+recipe.servings>1e6)return fail('这道菜的存量已满，先营业卖一些吧。');
-  coins-=recipe.cost;next.spent=Math.min(1e9,next.spent+recipe.cost);next.stoves[command.stove]={dish:recipe.id,state:'cooking',remaining:recipe.cookMs,fresh:recipe.freshMs};message=`${recipe.name}已备料，花费 ${recipe.cost} 摩尔豆。`;
+  coins-=recipe.cost;next.spent=Math.min(1e9,next.spent+recipe.cost);next.stoves[command.stove]={dish:recipe.id,state:'pot',prep:PREP_MS,remaining:recipe.cookMs,fresh:recipe.freshMs};message=`${recipe.name}已备料，花费 ${recipe.cost} 摩尔豆。`;
+ }else if(command.kind==='prepare'){
+  if(!int(command.stove,interior.stoves-1))return fail('请选择灶台。');
+  const stove=next.stoves[command.stove];if(stove?.prep)return fail('正在准备，请等进度条结束。');if(!stove||!['pot','ingredients'].includes(stove.state))return fail('这个灶台不需要继续备菜。');
+  next.stoves[command.stove]={...stove,prep:PREP_MS,state:stove.state==='pot'?'ingredients':'cooking'};
+  message=stove.state==='pot'?'食材已放入，再点击灶台开始制作。':'开始烹饪，做好后点击灶台端菜。';
  }else if(command.kind==='collect'||command.kind==='discard'){
   if(!int(command.stove,interior.stoves-1))return fail('请选择灶台。');
   const s=next.stoves[command.stove];if(!s)return fail('灶台已经空了。');
@@ -58,7 +65,7 @@ export function restaurantCommand(pet:GameState,command:RestaurantCommand):{stat
    if(!Object.hasOwn(next.stock,s.dish)&&Object.keys(next.stock).length>=interior.counters)return fail('餐台已满，请先卖完一种菜再上新菜。');
    if((next.stock[s.dish]??0)+recipe.servings>1e6)return fail('这道菜的存量已满，先营业卖一些吧。');
    next.stock[s.dish]=(next.stock[s.dish]??0)+recipe.servings;next.mastery[s.dish]=Math.min(1e6,(next.mastery[s.dish]??0)+1);next.xp=Math.min(1e9,next.xp+5+recipe.extraXp);message=`${recipe.name}已上餐台，共 ${recipe.servings} 份。`;
-  }else message='灶台已清理，食材费用不退还。';
+  }else{if(coins<100)return fail('清理或捐赠需要100摩尔豆。');coins-=100;next.spent=Math.min(1e9,next.spent+100);message=s.state==='burnt'?'已支付100摩尔豆清理烧糊的菜。':'已支付100摩尔豆包装费，将菜捐给流浪的拉姆。';}
   next.stoves[command.stove]=null;
  }else if(command.kind==='hire'){
   if(r.staff>=staffLimit(r.xp))return fail('已达到当前等级的员工上限。');
@@ -79,7 +86,7 @@ export function restaurantCommand(pet:GameState,command:RestaurantCommand):{stat
 export interface Guest {id:number;seat:number;dish:number;phase:'enter'|'wait'|'fetch'|'deliver'|'eat'|'leave';elapsed:number;wait:number;worker:number;paid:boolean;colour:number}
 export interface RestaurantSession {open:boolean;arrival:number;nextId:number;guests:Guest[];earned:number;served:number;notice:string;seed:number}
 export const createSession=(seed=Date.now()):RestaurantSession=>({open:false,arrival:2500,nextId:1,guests:[],earned:0,served:0,notice:'备好菜，再让拉姆开始营业吧。',seed:seed>>>0});
-export const PHASE_MS={enter:2600,wait:30000,fetch:2100,deliver:3100,eat:9000,leave:2300};
+export const PHASE_MS={enter:2600,wait:15000,fetch:2100,deliver:3100,eat:16000,leave:2300};
 export function restaurantBlockReason(pet:GameState):string|null {
  if(pet.sleeping)return '拉姆睡着了，叫醒以后再来工作。';
  if(pet.outing||pet.activity)return '先结束当前的外出、课程或工作。';
@@ -99,17 +106,19 @@ export function closeRestaurant(pet:GameState,session:RestaurantSession,notice='
 }
 /** Advances only bounded, observed online time; a suspended tab never catches up. */
 export function advanceRestaurant(pet:GameState,session:RestaurantSession,elapsed:number){
- if(!session.open)return {state:pet,session};
  if(!Number.isFinite(elapsed)||elapsed<=0)return {state:pet,session};
  if(elapsed>3000)return closeRestaurant(pet,session,'程序已暂停，自动打烊；未完成的订单不结算，菜品已退回。');
- const reason=restaurantBlockReason(pet);if(reason)return closeRestaurant(pet,session,reason+' 已自动打烊。');
+ const reason=restaurantBlockReason(pet);if(session.open&&reason)return closeRestaurant(pet,session,reason+' 已自动打烊。');
  const dt=elapsed,r=pet.restaurant??createRestaurant(),stock={...r.stock},reserved={...r.reserved};
  let revenue=r.revenue,xp=r.xp,served=r.served,lost=r.lost,favor=r.favor,coins=pet.coins,earned=session.earned,sessionServed=session.served,notice=session.notice;
  const stoves=r.stoves.map(s=>{
-  if(!s||s.state==='burnt')return s;
+  if(!s)return s;
+  if(s.prep)return {...s,prep:Math.max(0,s.prep-dt)};
+  if(s.state==='burnt'||s.state==='pot'||s.state==='ingredients')return s;
   if(s.state==='cooking')return s.remaining>dt?{...s,remaining:s.remaining-dt}:{...s,remaining:0,state:'ready' as const};
   return s.fresh>dt?{...s,fresh:s.fresh-dt}:{...s,fresh:0,state:'burnt' as const};
  });
+ if(!session.open)return {state:stoves.some((s,i)=>s!==r.stoves[i])?{...pet,restaurant:{...r,stoves}}:pet,session};
  const guests:Guest[]=[];
  for(const original of session.guests){
   let g={...original,elapsed:original.elapsed+dt};

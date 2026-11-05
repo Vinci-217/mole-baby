@@ -310,3 +310,6 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 本轮选用的 159 份原 SWF 来自固定资源存档（`Miigon/RecMoleRes`，提交 `7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff`）以及 `https://mole.61.com/` 相同公开资源路径的补取。包括 `resource/restaurant/meunicon/` 菜谱图、`resource/restaurant/swf/` 成品菜盘和 `resource/oneBigStree/swf/` 的 15 套内饰。所有补取文件经过解压长度与 SHA-256 检查，原始路径和校验值见 `public/assets/original/restaurant/sources.json`。
 
 制服动画来自 `resource/petcloth/swf2/1200042.swf`、`1200043.swf`，顾客进餐与六段音频来自 `module/restaurant/restaurant.swf`；使用原客户端身体实例的调色方式，保留帽子、眼睛及餐具的颜色。角色显示帧使用独立导出的图集，未改写本地原件。烹饪、送餐路线、豆价适配、招募与荣誉条件是本项目的本地实现，不是官方整场录像或服务器规则复刻；具体区别见 [餐厅说明](docs/RESTAURANT.md)。
+
+
+原灶台与菜谱界面进一步使用 `restaurantMenuMain.swf` 的 VIEW（sprite 67）、`restaurant.swf` 的原 HUD、制作条、时钟与气泡，以及每道菜的原六状态帧；保留原坐标与文本框。来源和移植边界见 [原界面记录](research/restaurant-original-ui-port.md)。

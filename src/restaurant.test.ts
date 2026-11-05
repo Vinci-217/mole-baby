@@ -8,8 +8,20 @@ import type {GameState} from './game';
 const now=1700000000000;
 const pet=():GameState=>({...createPet('紫紫','blue',now),color:'#9b59d0',growth:840,growthLocked:true,evolution:'classic',coins:20000,restaurant:createRestaurant()});
 function run(p:GameState,s:RestaurantSession,ms:number){for(let t=0;t<ms;t+=250){const next=advanceRestaurant(p,s,Math.min(250,ms-t));p=next.state;s=next.session;}return {p,s};}
+function prepared(p=pet(),dish=1340001){
+ let current=restaurantCommand(p,{kind:'cook',dish,stove:0}).state;
+ current=run(current,createSession(),2000).p;
+ current=restaurantCommand(current,{kind:'prepare',stove:0}).state;
+ current=run(current,createSession(),2000).p;
+ current=restaurantCommand(current,{kind:'prepare',stove:0}).state;
+ return run(current,createSession(),2000).p;
+}
+function reserve(p:GameState,s:RestaurantSession){
+ for(let t=0;t<60000;t+=250){({p,s}=run(p,s,250));if(s.guests.some(g=>['fetch','deliver','eat'].includes(g.phase)))return {p,s};}
+ throw Error('No order was reserved');
+}
 function cookAndServe(p=pet(),dish=1340001){
- const cooked=restaurantCommand(p,{kind:'cook',dish,stove:0});expect(cooked.ok).toBe(true);
+ const cooked={state:prepared(p,dish),ok:true};
  let {p:next,s}=run(cooked.state,openRestaurant(cooked.state,createSession(13)).session,RECIPES.find(r=>r.id===dish)!.cookMs);
  const collected=restaurantCommand(next,{kind:'collect',stove:0});expect(collected.ok).toBe(true);next=collected.state;
  return {p:next,s};
@@ -26,24 +38,27 @@ describe('online local restaurant',()=>{
   expect(restaurantCommand({...p,coins:0},{kind:'cook',dish:recipe.id,stove:1}).ok).toBe(false);
   expect(restaurantCommand(p,{kind:'cook',dish:1340074,stove:0}).ok).toBe(false);
  });
- it('requires online cooking, manual collection, and prevents collecting twice',()=>{
-  const p=restaurantCommand(pet(),{kind:'cook',dish:1340001,stove:0}).state;
-  expect(advanceRestaurant(p,createSession(),1000).state).toBe(p);
+ it('uses three original preparation stages, allows online kitchen work before opening and collects once',()=>{
+  const first=restaurantCommand(pet(),{kind:'cook',dish:1340001,stove:0}).state;
+  expect(first.restaurant!.stoves[0]!.state).toBe('pot');expect(restaurantCommand(first,{kind:'prepare',stove:0}).ok).toBe(false);
+  const warmed=run(first,createSession(),2000).p;
+  const second=restaurantCommand(warmed,{kind:'prepare',stove:0}).state;expect(second.restaurant!.stoves[0]!.state).toBe('ingredients');
+  const p=prepared();expect(p.restaurant!.stoves[0]!.state).toBe('cooking');
   expect(restaurantCommand(p,{kind:'collect',stove:0}).ok).toBe(false);
-  const {p:done}=run(p,openRestaurant(p,createSession(1)).session,10000);
+  const {p:done}=run(p,createSession(1),RECIPES[0].cookMs);
   const collected=restaurantCommand(done,{kind:'collect',stove:0});expect(collected.state.restaurant!.stock[1340001]).toBe(15);
   expect(restaurantCommand(collected.state,{kind:'collect',stove:0}).ok).toBe(false);
  });
  it('takes orders, fetches, delivers, returns and pays exactly once after eating',()=>{
   let {p,s}=cookAndServe();const coins=p.coins,phases=new Set<string>();
-  for(let t=0;t<30000;t+=250){({state:p,session:s}=advanceRestaurant(p,s,250));for(const g of s.guests)phases.add(g.phase);}
+  for(let t=0;t<90000;t+=250){({state:p,session:s}=advanceRestaurant(p,s,250));for(const g of s.guests)phases.add(g.phase);}
   for(const phase of ['wait','fetch','deliver','eat','leave'])expect(phases.has(phase)).toBe(true);
   expect(s.served).toBeGreaterThan(0);expect(p.coins-coins).toBe(p.restaurant!.revenue);expect(p.restaurant!.served).toBe(s.served);
   expect(s.earned).toBe(p.restaurant!.revenue);expect(restaurantLevel(p.restaurant!.xp)).toBeGreaterThanOrEqual(1);
   const closed=closeRestaurant(p,s);expect(advanceRestaurant(closed.state,closed.session,2000).state.coins).toBe(p.coins);
  });
  it('refunds an in-flight order on close, reload or backup restore with no offline earnings',()=>{
-  let {p,s}=cookAndServe();({p,s}=run(p,s,3500));expect(s.guests.some(g=>g.phase==='fetch'||g.phase==='deliver'||g.phase==='eat')).toBe(true);
+  let {p,s}=cookAndServe();({p,s}=reserve(p,s));expect(s.guests.some(g=>g.phase==='fetch'||g.phase==='deliver'||g.phase==='eat')).toBe(true);
   const total=(p.restaurant!.stock[1340001]??0)+Object.values(p.restaurant!.reserved??{}).reduce((a,b)=>a+b,0),coins=p.coins;
   const restore=parseSave(JSON.stringify(p),now+24*3600000)!;expect(restore.coins).toBe(coins);expect(restore.restaurant!.stock[1340001]).toBe(total);expect(restore.restaurant!.reserved).toBeUndefined();
   expect(restore.color).toBe(p.color);expect(restore.growthLocked).toBe(true);expect(restore.evolution).toBe('classic');expect(restore.inventory).toEqual(p.inventory);
@@ -51,13 +66,13 @@ describe('online local restaurant',()=>{
   expect(closeRestaurant(closed.state,closed.session).state.restaurant).toEqual(closed.state.restaurant);
  });
  it('automatically closes on suspension and freezes remaining cooking time across restart',()=>{
-  const p=restaurantCommand(pet(),{kind:'cook',dish:1340001,stove:0}).state,s=openRestaurant(p,createSession()).session;
-  const paused=advanceRestaurant(p,s,60000);expect(paused.session.open).toBe(false);expect(paused.state.restaurant!.stoves[0]!.remaining).toBe(10000);
-  const restored=parseSave(JSON.stringify(paused.state),now+3600000)!;expect(restored.restaurant!.stoves[0]!.remaining).toBe(10000);expect(restored.coins).toBe(p.coins);
+  const p=prepared(),s=openRestaurant(p,createSession()).session;
+  const paused=advanceRestaurant(p,s,60000);expect(paused.session.open).toBe(false);expect(paused.state.restaurant!.stoves[0]!.remaining).toBe(RECIPES[0].cookMs);
+  const restored=parseSave(JSON.stringify(paused.state),now+3600000)!;expect(restored.restaurant!.stoves[0]!.remaining).toBe(RECIPES[0].cookMs);expect(restored.coins).toBe(p.coins);
  });
  it('burns uncollected dishes, preserves stock at capacity and does not oversell',()=>{
-  const p=restaurantCommand(pet(),{kind:'cook',dish:1340001,stove:0}).state;
-  const done=run(p,openRestaurant(p,createSession()).session,75000);expect(done.p.restaurant!.stoves[0]!.state).toBe('burnt');
+  const p=prepared();
+  const done=run(p,openRestaurant(p,createSession()).session,RECIPES[0].cookMs+RECIPES[0].freshMs+1000);expect(done.p.restaurant!.stoves[0]!.state).toBe('burnt');
   expect(restaurantCommand(done.p,{kind:'collect',stove:0}).ok).toBe(false);
   const p2={...pet(),restaurant:{...createRestaurant(),stock:{1340001:1}}},s2=openRestaurant(p2,createSession(3)).session;
   const sale=run(p2,s2,90000);expect(sale.p.restaurant!.served).toBe(1);expect(sale.p.restaurant!.revenue).toBe(10);expect(Object.values(sale.p.restaurant!.stock).every(n=>n>=0)).toBe(true);expect(sale.p.restaurant!.lost).toBeGreaterThan(0);
@@ -65,7 +80,7 @@ describe('online local restaurant',()=>{
  it('gates staff/interiors and stops work for a tired pet without losing unpaid meals',()=>{
   const p=pet(),hired=restaurantCommand(p,{kind:'hire'});expect(hired.ok).toBe(true);expect(hired.state.restaurant!.staff).toBe(2);expect(restaurantCommand(hired.state,{kind:'hire'}).ok).toBe(false);
   expect(restaurantCommand(p,{kind:'interior',id:1330006}).ok).toBe(false);
-  let {p:working,s}=cookAndServe();({p:working,s}=run(working,s,3500));
+  let {p:working,s}=cookAndServe();({p:working,s}=reserve(working,s));
   const stopped=advanceRestaurant({...working,stats:{...working.stats,energy:10}},s,250);expect(stopped.session.open).toBe(false);expect(stopped.state.coins).toBe(working.coins);
  });
  it('round trips all progress without altering existing save identity and rejects invalid data',()=>{
@@ -74,7 +89,7 @@ describe('online local restaurant',()=>{
   const bad=normalizeRestaurant({version:1,stock:{evil:999,1340001:-1},stoves:[{dish:0}],xp:NaN,staff:999})!;expect(bad.xp).toBe(0);expect(bad.stock).toEqual({});expect(bad.staff).toBe(1);expect(bad.stoves.every(s=>s===null)).toBe(true);
  });
  it('exports and restores restaurant supplies together with the original pet memories',()=>{
-  let {p,s}=cookAndServe();({p,s}=run(p,s,3500));
+  let {p,s}=cookAndServe();({p,s}=reserve(p,s));
   const memory=recordEvent(createMemory(p),{kind:'test-restaurant',detail:'保留原来的陪伴记忆',at:now}),values=new Map<string,string>();
   const storage={getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value)},removeItem:(key:string)=>{values.delete(key)}};
   const result=restorePetBackup(JSON.stringify({...p,companionMemory:memory}),storage,now);
@@ -82,6 +97,19 @@ describe('online local restaurant',()=>{
   expect(result.memory.events.some(e=>e.detail==='保留原来的陪伴记忆')).toBe(true);
   expect(result.pet.restaurant!.stock[1340001]).toBe(15);expect(result.pet.restaurant!.reserved).toBeUndefined();
   expect(JSON.parse(values.get(PET_SAVE_KEY)!).restaurant.stock[1340001]).toBe(15);
+ });
+
+ it('preserves fractional browser timer values and in-progress preparation across restart',()=>{
+  const p=prepared(),s=openRestaurant(p,createSession()).session,next=advanceRestaurant(p,s,249.375);
+  const restored=parseSave(JSON.stringify(next.state),now)!;expect(restored.restaurant!.stoves[0]!.remaining).toBe(RECIPES[0].cookMs-249.375);
+  const pot=restaurantCommand(pet(),{kind:'cook',dish:1340001,stove:0}).state,mid=advanceRestaurant(pot,createSession(),100.125).state;
+  expect(parseSave(JSON.stringify(mid),now)!.restaurant!.stoves[0]!.prep).toBe(1899.875);
+ });
+ it('uses original cooking/expiry durations and charges the original 100-bean clearing fee once',()=>{
+  expect(RECIPES[0].cookMs).toBe(300000);expect(RECIPES[0].freshMs).toBe(600000);
+  const p=prepared(),cleared=restaurantCommand(p,{kind:'discard',stove:0});expect(cleared.state.coins).toBe(p.coins-100);expect(cleared.state.restaurant!.stoves[0]).toBeNull();
+  expect(restaurantCommand(cleared.state,{kind:'discard',stove:0}).ok).toBe(false);
+  expect(restaurantCommand({...p,coins:99},{kind:'discard',stove:0}).ok).toBe(false);
  });
 
 });
