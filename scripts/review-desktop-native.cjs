@@ -30,8 +30,20 @@ const snapshot=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-sav
  // Leave the board open while changing the pet. A later notes edit must merge
  // into the current save and must never restore the old blue colour.
  await p.bringToFront();await p.getByRole('button',{name:'打开拉姆背包',exact:true}).click();await p.getByRole('tab',{name:'药水',exact:true}).click();const immediate=await p.locator('[data-item-id=mix-9955cc]').evaluate(el=>{el.click();return JSON.parse(localStorage.getItem('ramu-house-save-v1'))});assert.equal(immediate.color,'#9955cc');const id=immediate.createdAt;
- await board.bringToFront();await board.getByRole('button',{name:'编辑留言：桌面窗口里的第一条留言',exact:true}).click();await board.locator('#board-note').fill('换色后继续编辑，保留紫色');await board.getByRole('button',{name:'保存',exact:true}).click();await expect.poll(async()=>(await snapshot(p)).notes[0].text).toBe('换色后继续编辑，保留紫色');assert.equal((await snapshot(p)).color,'#9955cc');await board.screenshot({path:path.join(out,'native-board-one.png')});await board.close();
+ await board.bringToFront();await board.getByRole('button',{name:'编辑留言：桌面窗口里的第一条留言',exact:true}).click();await board.locator('#board-note').fill('换色后继续编辑，保留紫色');await board.getByRole('button',{name:'保存',exact:true}).click();await expect.poll(async()=>(await snapshot(p)).notes[0].text).toBe('换色后继续编辑，保留紫色');assert.equal((await snapshot(p)).color,'#9955cc');
+ // Classic Windows scrollbars used to make the board resize every frame at
+ // this content height. Test the same renderer in a real native window too.
+ for(const height of [711,710,720,740]){
+  await app.evaluate(({BrowserWindow},height)=>{BrowserWindow.getAllWindows().find(window=>window.webContents.getURL().endsWith('#message-board')).setContentSize(980,height)},height);
+  await board.waitForTimeout(150);
+  const states=await board.evaluate(async()=>{
+   const values=[];for(let frame=0;frame<60;frame++){await new Promise(requestAnimationFrame);const r=document.querySelector('.message-board-original').getBoundingClientRect();values.push(JSON.stringify([r.x,r.y,r.width,r.height]))}
+   return [...new Set(values)];
+  });
+  assert.equal(states.length,1,`Native board keeps moving at height ${height}: ${states.join('; ')}`);
+ }
+ await board.screenshot({path:path.join(out,'native-board-one.png')});await board.close();
  await p.evaluate(()=>window.desktop.flushSave());await app.close();app=null;
  p=await launch();await p.getByTestId('desktop-character').waitFor();assert.equal((await snapshot(p)).color,'#9955cc');assert.equal((await snapshot(p)).createdAt,id);assert.equal((await snapshot(p)).notes[0].text,'换色后继续编辑，保留紫色');assert.equal((await snapshot(p)).inventory['mix-9955cc'],0);await expect(p.locator('.desktop-character .ram-sprite')).toHaveAttribute('data-color','#9955cc');await captureNative('native-purple-after-relaunch.png');
- assert.deepEqual(errors,[]);console.log('PASS real Electron: native corner drag at 1.4x with no size dialog; standalone board notes CRUD; concurrent notes edit keeps the latest potion colour; complete app relaunch preserves identity, colour, notes and inventory.');
+ assert.deepEqual(errors,[]);console.log('PASS real Electron: native corner drag at 1.4x with no size dialog; standalone board notes CRUD; board stable across four native window sizes; concurrent notes edit keeps the latest potion colour; complete app relaunch preserves identity, colour, notes and inventory.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true})});

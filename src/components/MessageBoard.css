@@ -1,6 +1,10 @@
 .message-board-overlay{position:fixed;inset:0;z-index:180;display:grid;place-items:center;padding:12px;background:#34201470}
 .message-board-window{position:relative;outline:none;width:min(940px,100%);max-height:calc(var(--app-height,100vh) - 24px);overflow:auto;color:#4c301c;font:14px/1.5 'Microsoft YaHei','PingFang SC',sans-serif;isolation:isolate}
-.message-board-scroll{overflow:auto;max-height:calc(var(--app-height,100vh) - 65px);overscroll-behavior:contain;scrollbar-color:#b88145 #f4ddb1}
+/* Reserve the vertical scrollbar before ResizeObserver measures the content.
+   Otherwise scaling can hide/show the bar every frame on Windows. Keep the
+   same reservation on older WebViews that do not support scrollbar-gutter. */
+.message-board-scroll{overflow:auto;overflow-y:scroll;scrollbar-gutter:stable;max-height:calc(var(--app-height,100vh) - 65px);overscroll-behavior:contain;scrollbar-color:#b88145 #f4ddb1}
+@supports(scrollbar-gutter:stable){.message-board-scroll{overflow-y:auto}}
 .message-board-stage{position:relative;margin:auto;flex:none}
 .message-board-original{position:absolute;left:0;top:0;width:770px;height:531px;transform-origin:0 0}
 .message-board-original-art{position:absolute;inset:0;width:770px;height:531px;pointer-events:none}
