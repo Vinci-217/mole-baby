@@ -10,7 +10,7 @@ import {useElasticDrag} from '../use-elastic-drag';
 import {isPastime} from '../pet-pastimes';
 import {isSchoolAction,learned,type CourseId} from '../pet-school';
 import ActivityCountdown from './ActivityCountdown';
-import DesktopRestaurantStatus from './DesktopRestaurantStatus';
+import DesktopRestaurantWork from './DesktopRestaurantWork';
 import {ELEMENT_TYPES,elementSkillsForCourse,learnedElementSkill} from '../element-skills';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
@@ -186,7 +186,7 @@ export default function DesktopCompanion(p: Props) {
   const working=p.pet.activity?.kind==='restaurant';
   const toolsVisible=!working&&!resizing&&!dragging&&!docked&&(tools||p.panel!==null);
   const condition=desktopCondition(p.pet,p.moodLabel);
-  return <div ref={root} className={`companion-layout ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} ${resizing?'is-pet-resizing':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
+  return <div ref={root} className={`companion-layout ${working?'is-working':''} ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} ${resizing?'is-pet-resizing':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
     <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''} ${p.pet.activity?.kind==='restaurant'?'pet-at-work':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={contextMenu}>
       {p.timerRunning&&!docked&&!resizing&&<div className="pet-focus-time" role="timer" aria-label={p.timerDirection==='countup'?'专注正向计时':'专注倒计时'}><Icon path="ui/icon-book"/><span>{reminderTime(p.reminderSeconds)}</span></div>}
       <CareFeedback feedback={docked||classicOpen||p.pet.activity?.kind==='restaurant'?null:p.careFeedback}/>{p.bubbleVisible&&!p.timerRunning&&!docked&&!p.pet.activity&&!p.courseCompletion&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
@@ -195,7 +195,7 @@ export default function DesktopCompanion(p: Props) {
       <button className="desktop-character" data-testid="desktop-character" aria-label="拉姆：悬停互动，点击摸摸，按住拖动" onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
       </button>
-      {working&&<DesktopRestaurantStatus pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
+      {working&&<DesktopRestaurantWork pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
       {toolsVisible && <><div className="compact-hover-bridge" onPointerEnter={revealTools}/><nav className="pet-actions" data-testid="pet-actions" aria-label="拉姆快捷操作" onPointerEnter={revealTools}>
                 <button aria-label="状态" onClick={() => show('status')}><Icon path={icons.status}/></button>

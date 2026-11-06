@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import RestaurantPreview from './components/RestaurantPreview';
+import ReadingPreview from './components/ReadingPreview';
 import WardrobePreview from './components/WardrobePreview';
 import WardrobeMotionPreview from './components/WardrobeMotionPreview';
 import StandaloneMessageBoard from './components/StandaloneMessageBoard';
@@ -17,4 +18,4 @@ const viewport=()=>document.documentElement.style.setProperty('--app-height',`${
 viewport();window.addEventListener('resize',viewport);
 import {installAndroidHost} from './android-host';
 installAndroidHost();
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe-motion'?<WardrobeMotionPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe'?<WardrobePreview/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='reading'?<ReadingPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe-motion'?<WardrobeMotionPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe'?<WardrobePreview/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);

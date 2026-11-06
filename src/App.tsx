@@ -1,4 +1,5 @@
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
+import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
 import MessageBoard from './components/MessageBoard';
 import GameSoundToggle from './components/GameSoundToggle';
 import {normalizeNotes,recordStatChange} from './pet-records';
@@ -439,7 +440,8 @@ export default function App() {
     const interrupted=Boolean((effectId||importedEffect)&&(changedMode||panel!==null||game!==null));
     if(interrupted){if(importedEffect)stopUploaded();else finishPerformance()}
     const rect=!interrupted&&petMode?(importedEffect?uploadedEffectRect(importedEffect,ramForm(stage,pet?.evolution)):effectId?elementEffectRect(effectId,ramForm(stage,pet?.evolution)):null):null;
-    void window.desktop?.setPetEffectBounds?.(rect?{...rect,x:rect.x+30,y:rect.y+71}:null).catch(()=>{});
+    const bounds=petMode&&workingAway?DESKTOP_WORK_BOUNDS:rect?{...rect,x:rect.x+30,y:rect.y+71}:null;
+    void window.desktop?.setPetEffectBounds?.(bounds).catch(()=>{});
   },[effectId,importedEffect,actionItemId,petMode,stage,pet?.evolution,floating,panel,game,workingAway]);
   useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(ramForm(stage,pet?.evolution));},[hasPet,stage,pet?.evolution]);
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !pet?.sleeping && !pet?.outing && !pet?.activity); }, [hasPet,pet?.sleeping,pet?.outing,pet?.activity,stage]);
