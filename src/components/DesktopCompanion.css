@@ -5,6 +5,7 @@
 .companion-layout.panel-open.panel-left .compact-pet{left:340px}
 .companion-layout .desktop-character{position:absolute;left:30px;top:71px;bottom:auto;width:100px;height:108.34px;margin:0;padding:0;border:0;background:transparent;filter:none;cursor:grab;touch-action:none;transform:none}
 .companion-layout .desktop-character:active{cursor:grabbing;translate:none}
+.companion-layout.is-reading .desktop-character,.companion-layout.is-reading .desktop-character:active{cursor:default}
 .companion-layout .desktop-character:focus-visible{outline:1px dashed #d79842;outline-offset:1px;border-radius:10px}
 .companion-layout .compact-pet-name{position:absolute;left:10px;right:10px;top:174px;padding:1px 3px;min-height:20px;text-align:center;font-size:10px;font-weight:400;color:#795b33;text-shadow:0 1px #fff;opacity:0;transition:opacity .12s}
 .companion-layout .compact-pet:hover .compact-pet-name,.companion-layout .actions-open .compact-pet-name{opacity:1}

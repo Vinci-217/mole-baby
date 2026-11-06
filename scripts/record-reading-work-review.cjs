@@ -55,6 +55,10 @@ async function loaded(page,locator,count=1){
  await reloadStoredFixture(page);await openActions(page);await page.getByRole('button',{name:'开始计时',exact:true}).click();
  await expect.poll(async()=>{await page.clock.runFor(32);return page.locator('.reading-book[data-loaded=true]').count()},{timeout:30000}).toBe(1);
  await expect(page.locator('.reading-pet-source .ram-wear')).toHaveCount(0);
+ const readingBounds=await page.getByTestId('desktop-character').boundingBox();
+ await page.mouse.move(readingBounds.x+50,readingBounds.y+60);await page.mouse.down();await page.mouse.move(readingBounds.x+135,readingBounds.y+110,{steps:5});await page.mouse.up();
+ assert.deepEqual(await page.getByTestId('desktop-character').boundingBox(),readingBounds,'reading pet cannot be dragged');
+ await expect(page.locator('.ram-reading')).toBeVisible();
  assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')))).wearing,'magic-book');
  await openActions(page);await page.getByRole('button',{name:'取消计时',exact:true}).click();
  await expect.poll(async()=>{await page.clock.runFor(32);return page.getByTestId('desktop-character').locator('.ram-wear[data-outfit=magic-book]').isVisible()},{timeout:20000}).toBe(true);
@@ -87,15 +91,25 @@ async function loaded(page,locator,count=1){
   pet.lastTick=Date.now();localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));
   localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,lively:false,presence:false,outings:false}));
   const state={petMode:false,alwaysOnTop:true,wandering:false,companionPanel:false,panelSide:'right',edgeHiding:false,edgeSide:null,edgePose:'visible',windowVisible:true,petOffset:{x:0,y:0}};
-  const listeners=new Set(),emit=()=>listeners.forEach(fn=>fn({...state}));window.__workBounds=[];
-  const stub={isElectron:true,platform:'win32',messageBoard:undefined,getState:async()=>({...state}),onStateChanged:fn=>{listeners.add(fn);return()=>listeners.delete(fn)},
+  const listeners=new Set(),emit=()=>listeners.forEach(fn=>fn({...state}));window.__workBounds=[];window.__readMobility=[];window.__readDragRequests=0;
+  const stub={isElectron:true,platform:'win32',messageBoard:undefined,
+   setPetCanMove:async enabled=>{window.__readMobility.push(enabled);return enabled},
+   preparePetDrag:async()=>{window.__readDragRequests++;return true},getState:async()=>({...state}),onStateChanged:fn=>{listeners.add(fn);return()=>listeners.delete(fn)},
    setPetMode:async enabled=>{state.petMode=enabled;emit();return enabled},
    setCompanionPanel:async open=>{state.companionPanel=open;emit();return {...state}},
    setPetEffectBounds:async bounds=>{window.__workBounds.push(bounds);state.petOffset={x:bounds?96:0,y:0};state.effectExpanded=Boolean(bounds);emit();return {...state}},
    updates:new Proxy({getState:async()=>({status:'disabled',enabled:false,currentVersion:'preview',version:null,percent:0,automaticInstall:false,checkedAt:null,message:''})},{get:(target,key)=>key in target?target[key]:String(key).startsWith('on')?()=>()=>{}:async()=>true})};
   window.desktop=new Proxy(stub,{get:(target,key)=>key in target?target[key]:String(key).startsWith('on')?()=>()=>{}:async()=>true});
  },stopped);
- await native.goto(origin+'/');await openActions(native).catch(async error=>{console.error('Native bridge diagnostic:',await native.evaluate(()=>({body:document.body.innerText,effects:window.__workBounds})));throw error});await native.getByRole('button',{name:'玩耍',exact:true}).click();
+ await native.goto(origin+'/');await openActions(native).catch(async error=>{console.error('Native bridge diagnostic:',await native.evaluate(()=>({body:document.body.innerText,effects:window.__workBounds})));throw error});
+ await native.getByRole('button',{name:'开始计时',exact:true}).click();await expect(native.locator('.ram-reading')).toBeVisible();
+ await expect.poll(()=>native.evaluate(()=>window.__readMobility.at(-1))).toBe(false);
+ const beforeNativeRead=await native.getByTestId('desktop-character').boundingBox();
+ await native.mouse.move(beforeNativeRead.x+50,beforeNativeRead.y+60);await native.mouse.down();await native.mouse.move(beforeNativeRead.x+135,beforeNativeRead.y+110,{steps:5});await native.mouse.up();
+ assert.deepEqual(await native.getByTestId('desktop-character').boundingBox(),beforeNativeRead);assert.equal(await native.evaluate(()=>window.__readDragRequests),0);
+ await openActions(native);await native.getByRole('button',{name:'取消计时',exact:true}).click();
+ await expect.poll(()=>native.evaluate(()=>window.__readMobility.at(-1))).toBe(true);
+ await openActions(native);await native.getByRole('button',{name:'玩耍',exact:true}).click();
  await native.getByRole('button',{name:'去餐厅打工',exact:true}).click();
  const nativeWork=native.getByTestId('desktop-restaurant-work');await expect(nativeWork.locator('canvas')).toHaveAttribute('data-loaded','true');
  await expect.poll(()=>native.evaluate(()=>window.__workBounds.at(-1))).toEqual({x:-96,y:5,width:352,height:200});
@@ -104,6 +118,6 @@ async function loaded(page,locator,count=1){
  await expect.poll(()=>native.evaluate(()=>window.__workBounds.at(-1))).toBe(null);
  await native.close();
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
- fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({reading,positions,desktop,startsFromRealFootballMenu:true,desktopAndRestaurantShareShift:true,stoppingRestoresPetWithoutPay:true,nativeBridgeRequestsExpandedHostAndRestores:true,previewDoesNotTouchPlayerSave:true,readingStowsBookOutfitAndRestoresWithoutSaveChange:true,narrowScreens:[320,393,1000],errors,failed},null,2)+'\n');
+ fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({reading,positions,desktop,startsFromRealFootballMenu:true,desktopAndRestaurantShareShift:true,stoppingRestoresPetWithoutPay:true,nativeBridgeRequestsExpandedHostAndRestores:true,readingDisablesNativeWanderAndDesktopDrag:true,readingRestoresNativeMobilityOnCancel:true,previewDoesNotTouchPlayerSave:true,readingStowsBookOutfitAndRestoresWithoutSaveChange:true,narrowScreens:[320,393,1000],errors,failed},null,2)+'\n');
  console.log('PASS: nine reading forms and a full desktop delivery GIF from actual app work; 320px fit, enter/stop and player identity retained.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close()});
