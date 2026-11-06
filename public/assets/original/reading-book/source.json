@@ -1,0 +1,19 @@
+{
+  "source": "root/resource/petcloth/swf2/1200026.swf",
+  "sourceSha256": "c30d025ffe0bf1c284e360343e660e1a43df79ec5324527eb5b7de0ebf9f145f",
+  "sourceSprite": 13,
+  "sourceFrames": 15,
+  "fps": 24,
+  "adaptation": "Only the grey depth-1 registration placeholder is removed. Original page vectors, purple cover, colours, placement matrices and all 15 frames retained. Opening, reading cadence and page-turn timing in the app are local adaptation, not a recovered official read action.",
+  "width": 384,
+  "height": 169,
+  "columns": 5,
+  "frames": 15,
+  "crop": [
+    0,
+    0,
+    316,
+    139
+  ],
+  "sha256": "20f19f4bc6107538a99b7ac4633f5ba13e4a228ca352356e3a4ce4398bff4022"
+}

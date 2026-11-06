@@ -1,6 +1,7 @@
 import {dailyFrameSpec} from '../daily-frames';
 import UploadedLamuFrames from './UploadedLamuFrames';
 import ReadingBook from './ReadingBook';
+import visibility from '../../electron/edge-visibility.json';
 import {uploadedMotion,UPLOADED_TOYS} from '../uploaded-actions';
 import {petColorName,petColorOffsets,isCustomPetColor} from '../pet-color';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -723,7 +724,7 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
   const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   if(reading)return <span className="ram-sprite ram-classic ram-reading" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action="focus" data-life-action={lifeAction} data-color={color} data-sleeping="false" data-art-style="classic">
-    <span className="reading-pet-source" aria-hidden="true"><Ram color={color} costume={costume==='magic-book'?undefined:costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></span><ReadingBook form={stage===0?'seed':form} sound={sound}/>
+    <span className="reading-pet-source" aria-hidden="true" style={stage===0?undefined:{transform:`translate(${(50-(visibility.forms[form].body[0]+visibility.forms[form].body[2])/2)*.64}%,${(71-visibility.forms[form].body[3]*.64)/108*100}%) scale(.64)`,transformOrigin:"50% 0"}}><Ram rawDaily color={color} costume={costume==='magic-book'?undefined:costume} companionId={companionId} stage={stage} evolution={evolution} action="focus" sound={false}/></span><ReadingBook key={eventKey} form={stage===0?'seed':form} sound={sound} duration={action==='read-alone'?18000:undefined}/>
   </span>;
   if(daily)return <span className="ram-sprite ram-classic ram-daily" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>
     <UploadedLamuFrames key={eventKey} spec={daily} form={stage===0?'seed':form} color={color} sound={sound} loop={daily.id==='focus'||daily.id==='sleep'} limit={action==='read-alone'?18000:undefined} action={daily.id} onEnd={onActionEnd} fallback={<Ram color={color} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
