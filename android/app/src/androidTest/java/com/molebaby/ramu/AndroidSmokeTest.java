@@ -46,6 +46,15 @@ public final class AndroidSmokeTest {
     static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
     static void drawn()throws Exception{CountDownLatch latch=new CountDownLatch(1);ui(()->{host().web.postVisualStateCallback(SystemClock.uptimeMillis(),new WebView.VisualStateCallback(){@Override public void onComplete(long requestId){latch.countDown();}});host().web.postInvalidateOnAnimation();});assertTrue("The real WebView compositor must present its current page",latch.await(20,TimeUnit.SECONDS));SystemClock.sleep(600);}
+    static void dismissKeyboard()throws Exception{
+        ui(()->context().getSystemService(android.view.inputmethod.InputMethodManager.class).hideSoftInputFromWindow(host().web.getWindowToken(),0));
+        if(Build.VERSION.SDK_INT>=30)waitFor(()->{
+            boolean[] hidden={false};ui(()->{android.view.WindowInsets insets=host().web.getRootWindowInsets();hidden[0]=insets!=null&&!insets.isVisible(android.view.WindowInsets.Type.ime());});return hidden[0];
+        },10000,"The native keyboard must close before locating the adoption button");
+        // Closing the IME resizes the Activity and recentres the form. Commit
+        // that layout before deriving physical finger coordinates from the DOM.
+        instrumentation.waitForIdleSync();drawn();
+    }
     static void shell(String command)throws Exception{try(ParcelFileDescriptor fd=instrumentation.getUiAutomation().executeShellCommand(command);InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){while(in.read()!=-1){}}}
     static void rotateDisplay(UiDevice device,boolean landscape)throws Exception{
         context().startActivity(new Intent().setClassName(instrumentation.getContext().getPackageName(),RotationFixtureActivity.class.getName())
@@ -59,7 +68,7 @@ public final class AndroidSmokeTest {
         try{
             waitFor(()->host().loaded&&has("[aria-label='选择蓝色拉姆']"),TIMEOUT,"First offline asset preparation and page load");assertFalse(host().controller.petMode);assertFalse(host().controller.attached);
             click("[aria-label='选择蓝色拉姆']");textButton("给它起名");waitFor(()->has("#pet-name"));
-            js("(()=>{const input=document.querySelector('#pet-name');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'安卓小蓝');input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:'安卓小蓝'}));input.dispatchEvent(new Event('change',{bubbles:true}));input.blur();})()");ui(()->context().getSystemService(android.view.inputmethod.InputMethodManager.class).hideSoftInputFromWindow(host().web.getWindowToken(),0));SystemClock.sleep(300);textButton("带拉姆回家！");waitFor(()->has(".room-dock"));
+            js("(()=>{const input=document.querySelector('#pet-name');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'安卓小蓝');input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:'安卓小蓝'}));input.dispatchEvent(new Event('change',{bubbles:true}));input.blur();})()");dismissKeyboard();textButton("带拉姆回家！");waitFor(()->has(".room-dock"));
             assertFalse("Adoption opens the house without starting an overlay",host().controller.petMode);
             waitFor(()->host().store.pet().optString("name").equals("安卓小蓝"));long petId=host().store.pet().getLong("createdAt");WebView runtime=host().web;
             waitFor(()->{try{return "true".equals(js("Array.from(document.images).filter(im=>im.getBoundingClientRect().width>0&&im.getBoundingClientRect().height>0).every(im=>im.complete&&im.naturalWidth>0)"));}catch(Exception e){return false;}},30000,"All visible original artwork must load from the active private resource pack");

@@ -108,7 +108,9 @@ async function verifySpellCare(page,desktop){
   const before=(await save()).stats.energy;await page.clock.fastForward(60000);
   assert.ok(Math.abs((await save()).stats.energy-before-10)<.01,'sleep recovers ten points per minute');
   if(desktop)await expect.poll(()=>page.evaluate(async()=>(await window.desktop.getState()).trayTooltip)).toMatch(/睡觉中[\s\S]*精力 32/);
-  await page.reload();await page.clock.fastForward(300100);assert.equal((await save()).sleeping,false);assert.ok((await save()).stats.energy>=84.9);
+  // This fixture now starts at 22 energy. After the first minute it has 32;
+  // allow another 5.5 minutes to reach the unchanged automatic wake threshold.
+  await page.reload();await page.clock.fastForward(330100);assert.equal((await save()).sleeping,false);assert.ok((await save()).stats.energy>=84.9);
   if(desktop){
    await page.evaluate(()=>window.desktop.hideToTray());await page.clock.fastForward(15000);
    await expect.poll(()=>page.evaluate(async()=>(await window.desktop.getState()).trayTooltip)).toMatch(/陪伴中[\s\S]*精力/);
