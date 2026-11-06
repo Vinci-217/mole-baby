@@ -2,26 +2,8 @@
 const{chromium,expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
 const root=path.resolve(__dirname,'../..'),origin=process.env.MOLE_REVIEW_URL||'http://127.0.0.1:5239',output=path.join(root,'artifacts/android');let browser;
 const server=process.env.MOLE_REVIEW_URL?null:spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),...(process.argv.includes('--dev')?[]:['preview']),'--host','127.0.0.1','--port','5239','--strictPort'],{cwd:root,stdio:'ignore'});
-function mockNative(){
- const storage=JSON.parse(sessionStorage.getItem('android-native-mirror')||'{}'),calls=[];
- const state={petMode:false,alwaysOnTop:true,wandering:true,companionPanel:false,panelSide:'right',edgeHiding:true,edgeSide:null,edgePose:'visible',windowVisible:true};
- const permissions={overlay:false,notifications:true,exactAlarms:true,installPackages:false,batteryOptimized:true,touchThrough:false,autoDownloadWifi:false,api:35,version:'0.32.0-preview.1',channel:'android-preview'};
- const emit=(event,value)=>window.__moleAndroidEvent?.(event,value);
- window.__androidTest={storage,calls,state,permissions,emit,failWrites:false};
- window.MoleAndroid={bootstrap:()=>JSON.stringify({storage,state,permissions}),persist:(key,value)=>{if(window.__androidTest.failWrites)return false;if(value===null)delete storage[key];else storage[key]=value;sessionStorage.setItem('android-native-mirror',JSON.stringify(storage));return true;},invoke:(id,method,raw)=>{
-  const a=JSON.parse(raw);calls.push({method,args:a});let value=true,error=null;
-  if(method==='getState')value={...state};
-  if(method==='permissions')value={...permissions};
-  if(method==='permission'){if(a.kind==='overlay')permissions.overlay=true;emit('permissions',permissions);}
-  if(method==='updatesState')value={status:'idle',currentVersion:permissions.version,version:null,percent:0,enabled:true,automaticInstall:false,checkedAt:null,message:'安卓预览渠道待发布'};
-  if(method==='updatesWifi'){permissions.autoDownloadWifi=a.enabled;value={...permissions};emit('permissions',permissions);}
-  if(method==='setPetMode'){if(a.enabled&&!permissions.overlay)error='请先允许拉姆显示在其他应用上层，再点击悬浮陪伴。';else{state.petMode=a.enabled;value=a.enabled;emit('state',state);}}
-  if(method==='setCompanionPanel'){state.companionPanel=a.open;state.panelGeometry=a.open?{petX:90,petY:0,panelX:8,panelY:230,panelWidth:324,panelHeight:362,scale:1}:null;value={...state};emit('state',state);}
-  if(method==='setPetAppearance'||method==='setPetEffectBounds'||method==='revealPet')value={...state};
-  if(method==='wasNotified')value=false;
-  setTimeout(()=>window.__moleAndroidReceive?.(id,value,error),0);
- }};
-}
+const{mockNative}=require('./mock-native.cjs');
+
 const save=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
 async function artwork(page){await expect.poll(()=>page.evaluate(()=>[...document.images].filter(im=>im.getBoundingClientRect().width>0&&im.getBoundingClientRect().height>0).filter(im=>!im.complete||im.naturalWidth===0).map(im=>im.currentSrc||im.src)),{timeout:20000,message:'Visible original artwork must load before review screenshots'}).toEqual([]);}
 async function panel(page,name){if(await page.locator('.game-panel').isVisible())await page.getByRole('button',{name:'关闭面板',exact:true}).click();await page.locator('.room-dock').getByRole('button',{name,exact:true}).click();await expect(page.locator('.game-panel')).toBeVisible();}
@@ -57,6 +39,7 @@ async function fitLandscapeSpeech(page,label){
  };
  await check();
  const floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),bounds=await floor.boundingBox();
+ if((await save(page)).growth<60){await expect(floor).toBeDisabled();await expect(page.locator('.room-walker')).toHaveAttribute('data-moving','false');await page.screenshot({path:path.join(output,`${label}-seed-speech.png`)});return;}
  // The expanded room surface also spans the speech bubble's height. Tap a
  // clear floor point, rather than waiting for that bubble to expire first.
  await floor.tap({position:{x:bounds.width*.82,y:bounds.height*.86}});
@@ -81,6 +64,7 @@ async function scenario(viewport,label){
  await page.locator('.game-panel input[type=file][accept="application/json,.json"]').setInputFiles({name:'android-unlocked-backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(unlockedBackup))});
  await expect.poll(async()=>(await save(page)).highestGrowth).toBeGreaterThanOrEqual(60);await page.reload();
  await panel(page,'成长手册');await page.getByRole('button',{name:'固定形态',exact:true}).click();await page.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await page.getByRole('button',{name:'应用成长设置',exact:true}).click();await page.getByRole('button',{name:'确认切换',exact:true}).click();await expect.poll(async()=>(await save(page)).growthLocked).toBe(true);
+ await page.getByRole('button',{name:'关闭面板',exact:true}).click();await fitLandscapeSpeech(page,label+'-grown');
  await panel(page,'进入拉姆学院');const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});await expect(language.getByRole('button',{name:'上这一课',exact:true})).toBeEnabled({timeout:25000});await language.getByRole('button',{name:'上这一课',exact:true}).click();await expect.poll(async()=>(await save(page)).activity?.course).toBe('language');let activity=(await save(page)).activity;assert.equal(activity.endsAt-activity.startedAt,180000);await expect(page.getByRole('progressbar',{name:'语言课进度',exact:true})).toHaveAttribute('max','180000');
  await page.clock.setFixedTime(new Date(activity.endsAt+1000));await page.evaluate(()=>window.__androidTest.emit('resume',{}));await expect.poll(async()=>(await save(page)).education?.graduated?.language).toBeTruthy();const learned=await save(page);await page.evaluate(()=>window.__androidTest.emit('resume',{}));await expect.poll(async()=>(await save(page)).education.graduated.language).toBe(learned.education.graduated.language);await fit(page);await artwork(page);await page.screenshot({path:path.join(output,`${label}-school.png`)});
  await panel(page,'游乐时光');await page.getByRole('button',{name:'开始寻宝',exact:true}).click();await expect(page.locator('.treasure-dialog')).toBeVisible();await fit(page);await page.evaluate(()=>window.__androidTest.emit('back',{}));await expect(page.locator('.treasure-dialog')).toHaveCount(0);

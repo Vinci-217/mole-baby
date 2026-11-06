@@ -20,7 +20,9 @@ describe('clear need requirements',()=>{
  }
  it('uses the same blocker in activities and recreation instead of silently refusing',()=>{
   const p={...fresh(),stats:{...fresh().stats,energy:29.9}};
-  expect(activityBlockReason(p,'restaurant')).toContain('31');
+  expect(activityBlockReason(p,'restaurant')).toBeNull();
+  expect(activityBlockReason(p,'course','language')).toContain('30');
+  expect(activityBlockReason({...p,stats:{...p.stats,energy:22.9}},'restaurant')).toContain('23');
   expect(playBlockReason(p)).toContain('29.9');expect(mayPlay(p)).toBe(false);
  });
 });

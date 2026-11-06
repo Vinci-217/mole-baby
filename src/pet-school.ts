@@ -1,7 +1,7 @@
 import {getStage,type GameState} from './game'
 import {elementSkillById} from './element-skills'
 import {reconcileCourseRewards} from './course-rewards'
-import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,unmetNeedReason} from './pet-status'
+import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,RESTAURANT_ENERGY_COST,unmetNeedReason} from './pet-status'
 
 const COURSE_DEFINITIONS=[
  {id:'language',name:'语言课',skill:'说中文',minutes:3,lessons:1,requires:null,icon:'language'},
@@ -71,7 +71,7 @@ export function beginActivity(pet:GameState,kind:'course'|'restaurant',id?:Cours
  const reason=activityBlockReason(pet,kind,id);if(reason)return fail(reason)
  if(!Number.isSafeInteger(now)||now<pet.lastTick)return fail('时间暂时不正确，请稍后再试。')
  const activity:PetActivity={id:`${pet.createdAt}:${now}`,kind,...(kind==='course'?{course:c!.id}:{}),startedAt:now,endsAt:now+(kind==='restaurant'?JOB_MS:c!.minutes*60_000)}
- return {state:{...pet,activity,stats:{...pet.stats,energy:pet.stats.energy-(kind==='restaurant'?10:5)}},ok:true,message:kind==='restaurant'?'围裙系好，去餐厅送餐啦！':`开始${c!.name}，这一节慢慢学。`}
+ return {state:{...pet,activity,stats:{...pet.stats,energy:pet.stats.energy-(kind==='restaurant'?RESTAURANT_ENERGY_COST:5)}},ok:true,message:kind==='restaurant'?'围裙系好，去餐厅送餐啦！':`开始${c!.name}，这一节慢慢学。`}
 }
 /** A persisted single activity settles once, even after reopening the app. */
 export function settleActivity(pet:GameState,now:number):GameState{

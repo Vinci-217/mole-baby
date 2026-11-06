@@ -1,5 +1,6 @@
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
 import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
+import {WorkPresence} from './work-presence';
 import MessageBoard from './components/MessageBoard';
 import GameSoundToggle from './components/GameSoundToggle';
 import {normalizeNotes,recordStatChange} from './pet-records';
@@ -149,6 +150,7 @@ export default function App() {
   const [saveError, setSaveError] = useState(false);
   const petRef = useRef(pet); petRef.current = pet;
   const workHeartbeat = useRef(Date.now());
+  const workPresence=useRef(new WorkPresence());
   const timers = useRef<{ animation?: ReturnType<typeof setTimeout>; toast?: ReturnType<typeof setTimeout>; bubble?: ReturnType<typeof setTimeout>; feedback?: ReturnType<typeof setTimeout>;course?:ReturnType<typeof setTimeout> }>({});
   const ambient = useRef<{line:PresenceLine;at:number}|null>(null);
   const previousRest = useRef<{petId:number;sleeping:boolean}|null>(null);
@@ -269,7 +271,7 @@ export default function App() {
   const previousActivity=useRef(pet?.activity);
   function advancePresentPet(saved:GameState){
     const now=Date.now(),gap=now-workHeartbeat.current;
-    if(saved.activity?.kind==='restaurant'&&(document.hidden||navigator.onLine===false||gap>5000||gap<0)){
+    if(saved.activity?.kind==='restaurant'&&(!workPresence.current.isPresent(document.hidden,now)||navigator.onLine===false||gap>5000||gap<0)){
       previousActivity.current=undefined;return tick(cancelActivity(saved),now);
     }
     return tick(saved,now);
@@ -280,9 +282,9 @@ export default function App() {
       previousActivity.current=undefined;const next=cancelActivity(saved);petRef.current=next;setPet(next,'餐厅工作中止');
       try{localStorage.setItem(SAVE_KEY,JSON.stringify(next));void window.desktop?.flushSave?.().catch(()=>{})}catch{setSaveError(true)}
     };
-    const visibility=()=>{if(document.hidden)cancelWork()};
-    const heartbeat=setInterval(()=>{const now=Date.now();if(document.hidden||navigator.onLine===false||now-workHeartbeat.current>5000)cancelWork();workHeartbeat.current=now;},1000);
-    const unsubscribe=window.desktop?.onStateChanged(state=>{if(state.windowVisible===false)cancelWork()});
+    const visibility=()=>{if(!workPresence.current.isPresent(document.hidden))cancelWork()};
+    const heartbeat=setInterval(()=>{const now=Date.now();if(!workPresence.current.isPresent(document.hidden,now)||navigator.onLine===false||now-workHeartbeat.current>5000)cancelWork();workHeartbeat.current=now;},1000);
+    const unsubscribe=window.desktop?.onStateChanged(state=>{workPresence.current.observeWindow(state);if(!workPresence.current.isPresent(document.hidden))cancelWork()});
     window.addEventListener('offline',cancelWork);window.addEventListener('pagehide',cancelWork);document.addEventListener('visibilitychange',visibility);
     return()=>{clearInterval(heartbeat);unsubscribe?.();window.removeEventListener('offline',cancelWork);window.removeEventListener('pagehide',cancelWork);document.removeEventListener('visibilitychange',visibility)};
   },[]);
@@ -559,7 +561,10 @@ export default function App() {
   }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
   function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
-  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetMode(true); } catch(error) { notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
+  function beginWorkViewSwitch(targetMode:boolean){
+    if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
+  }
+  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null);beginWorkViewSwitch(true); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetMode(true); } catch(error) {workPresence.current.endViewSwitch(); notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
   function updateNotes(notes:PetNote[]){
     const saved=petRef.current;if(!saved)return false;
     const next={...saved,notes:normalizeNotes(notes)};
@@ -576,7 +581,7 @@ export default function App() {
     setPanel('notes');
   }
   async function openPanel(next: Panel) { if(next==='notes'){await openBoard();return} if (floating && next && ['shop','games','growth','settings','decor','wardrobe','memories','school','notes'].includes(next)) { await enterHome(next); return; } if (next === 'food'||next === 'status') setPocketVisit(v => v + 1); setPanel(next); if (petMode) { try { await window.desktop?.setCompanionPanel(next !== null, 'compact'); } catch { notify('小窗暂时无法打开，请再试一次。'); } } }
-  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false); await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false); }
+  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false);beginWorkViewSwitch(false);try{await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false)}catch(error){workPresence.current.endViewSwitch();throw error} }
   function startTimer() {
     if (!prefs.reminders) return;
     if(petRef.current?.activity){notify('先结束当前课程或工作吧。');return;}

@@ -17,9 +17,10 @@ export const ACTIVITY_REQUIREMENTS:readonly NeedRequirement[]=[
  {key:'health',minimum:35},{key:'energy',minimum:30},
  {key:'hunger',minimum:25},{key:'thirst',minimum:25},
 ];
-// 31 covers the ten-point start cost and two minutes of natural decay
+export const RESTAURANT_ENERGY_COST=2;
+// 23 covers the two-point start cost and two minutes of natural decay
 // without crossing the automatic sleep threshold before the shift ends.
-export const RESTAURANT_REQUIREMENTS:readonly NeedRequirement[]=ACTIVITY_REQUIREMENTS.map(rule=>rule.key==='energy'?{...rule,minimum:31}:rule);
+export const RESTAURANT_REQUIREMENTS:readonly NeedRequirement[]=ACTIVITY_REQUIREMENTS.map(rule=>rule.key==='energy'?{...rule,minimum:23}:rule);
 export const PLAY_REQUIREMENTS:readonly NeedRequirement[]=[
  {key:'health',minimum:35,exclusive:true},{key:'energy',minimum:30},
  {key:'hunger',minimum:30},{key:'thirst',minimum:30},{key:'cleanliness',minimum:30},

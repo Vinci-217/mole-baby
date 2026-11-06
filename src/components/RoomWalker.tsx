@@ -6,7 +6,8 @@ import {ramForm} from '../original-actions'
 import {roomWalkArea,roomWalkClickTop,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-walk'
 import './RoomWalker.css'
 
-export default function RoomWalker({stage,evolution,blocked,randomWalk=true,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;children:(action:string|null)=>ReactNode}) {
+export default function RoomWalker({stage,evolution,blocked:interactionBlocked,randomWalk=true,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;children:(action:string|null)=>ReactNode}) {
+ const blocked=interactionBlocked||stage===0
  const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),placedByUser=useRef(false)
  const [area,setArea]=useState(()=>roomWalkArea(1000,750)),[position,setPosition]=useState<RoomPoint|null>(null)
  const [target,setTarget]=useState<RoomPoint|null>(null),[moving,setMoving]=useState(false),[direction,setDirection]=useState('walk-right')
@@ -50,7 +51,14 @@ export default function RoomWalker({stage,evolution,blocked,randomWalk=true,chil
  const go=(next:RoomPoint,manual=false)=>{if(!blocked&&( !manual || next.y>=roomWalkClickTop(area) )){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
  useEffect(()=>{
   const element=root.current;if(!element)return
-  const redirect=(event:Event)=>{const detail=(event as CustomEvent<{clientX:number;clientY:number}>).detail,box=element.getBoundingClientRect();if(detail&&box)go({x:detail.clientX-box.left,y:detail.clientY-box.top},true)}
+  const redirect=(event:Event)=>{
+   const detail=(event as CustomEvent<{clientX:number;clientY:number}>).detail,box=element.getBoundingClientRect();if(!detail)return
+   // The pet's transparent padding must yield to a visible furniture control
+   // underneath it before treating the point as a floor destination.
+   const furniture=document.elementsFromPoint(detail.clientX,detail.clientY).map(node=>node.closest<HTMLButtonElement>('[data-room-interactive="true"]')).find(Boolean)
+   if(furniture){furniture.click();return}
+   go({x:detail.clientX-box.left,y:detail.clientY-box.top},true)
+  }
   element.addEventListener('room-walk-redirect',redirect);return()=>element.removeEventListener('room-walk-redirect',redirect)
  },[area,blocked])
  const down=(e:PointerEvent<HTMLButtonElement>)=>{
@@ -61,7 +69,7 @@ export default function RoomWalker({stage,evolution,blocked,randomWalk=true,chil
   const delta=({ArrowLeft:[-50,0],ArrowRight:[50,0],ArrowUp:[0,-30],ArrowDown:[0,30]} as Record<string,number[]>)[e.key]
   if(delta){e.preventDefault();go({x:point.current.x+delta[0],y:point.current.y+delta[1]})}
  }
- const motion=(!blocked&&moving)?stage===0?'waiting':direction:null
+ const motion=(!blocked&&moving)?direction:null
  // Match the measured original body baseline, rather than the name label.
  // Room CSS fixes the character at 150x163, 20px above its name anchor.
  const footOffset=183-visibility.forms[ramForm(stage,evolution)].body[3]*1.5

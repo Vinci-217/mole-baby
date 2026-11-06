@@ -47,12 +47,12 @@ describe('persistent school and restaurant activities',()=>{
   expect(done.coins).toBe(pet().coins);expect(done.activity).toBeUndefined();expect(parseSave(JSON.stringify(done),now+JOB_MS+3)!.coins).toBe(done.coins)
  })
  it('requires enough energy to finish a shift without an immediate automatic nap',()=>{
-  const tired={...pet(),stats:{...pet().stats,energy:30.1}};
+  const tired={...pet(),stats:{...pet().stats,energy:22.1}};
   const refused=beginActivity(tired,'restaurant',undefined,now);
-  expect(refused.ok).toBe(false);expect(refused.state).toBe(tired);expect(refused.message).toContain('31');
-  const ready={...tired,stats:{...tired.stats,energy:31}};
+  expect(refused.ok).toBe(false);expect(refused.state).toBe(tired);expect(refused.message).toContain('23');
+  const ready={...tired,stats:{...tired.stats,energy:23}};
   const started=beginActivity(ready,'restaurant',undefined,now);
-  expect(started.ok).toBe(true);
+  expect(started.ok).toBe(true);expect(started.state.stats.energy).toBe(ready.stats.energy-2);
   const done=tick(started.state,now+JOB_MS);
   expect(done.coins).toBe(tired.coins+JOB_PAY);expect(done.sleeping).toBe(false);
   expect(done.activity).toBeUndefined();expect(done.stats.energy).toBeGreaterThan(20);
