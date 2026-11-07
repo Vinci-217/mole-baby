@@ -14,7 +14,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const loadKey=`${clip.id}:${form}:${bodyForm}:${finite}:${registerBody}`
  const [loadState,setLoadState]=useState({key:'',state:'loading'}),[token]=useState(()=>Math.random().toString(36).slice(2))
  const state=loadState.key===loadKey?loadState.state:'loading'
- const sequence=useRef(0)
+ const sequence=useRef(0),requestLoad=useRef<()=>void>(()=>{})
  const direction=action.includes('left')?'left':action.includes('right')?'right':'down'
  const pose=useRef({form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused})
  pose.current={form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused}
@@ -26,6 +26,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
   let done=false,finish:ReturnType<typeof setTimeout>|undefined
   setLoadState({key:loadKey,state:'loading'})
   const load=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-load',token,sequence:current,value:{id:clip.id,form:officialTimelineForm(clip,form),loop:!finite,registerBody,referenceForm:OFFICIAL_FORM[bodyForm],pose:pose.current}},'*')
+  requestLoad.current=load
   const fail=()=>{if(done)return;done=true;setLoadState({key:loadKey,state:'failed'});errorCallback.current?.();if(finite)end.current?.(false)}
   const watchdog=setTimeout(fail,OFFICIAL_LOAD_TIMEOUT)
   const receive=(event:MessageEvent)=>{
@@ -44,11 +45,11 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
    }
   }
   addEventListener('message',receive);load()
-  return()=>{done=true;clearTimeout(watchdog);clearTimeout(finish);removeEventListener('message',receive)}
+  return()=>{done=true;requestLoad.current=()=>{};clearTimeout(watchdog);clearTimeout(finish);removeEventListener('message',receive)}
  },[clip.id,form,finite,registerBody,token,loadKey])
  return <span className={`official-ram-clip is-${state}`} data-official-id={clip.id} data-source={clip.path} data-color={color} data-loaded={state==='ready'}>
   {state!=='ready'&&<span className="official-clip-fallback">{fallback}</span>}
-  <iframe ref={frame} src={src} title={clip.name} className="official-clip-player" aria-hidden="true" tabIndex={-1} allow="autoplay"/>
+  <iframe ref={frame} src={src} onLoad={()=>requestLoad.current()} title={clip.name} className="official-clip-player" aria-hidden="true" tabIndex={-1} allow="autoplay"/>
   {state==='ready'&&<canvas ref={mask} width={100} height={108} className="ram-classic-frame official-hit-mask" aria-hidden="true"/>}
  </span>
 }

@@ -49,6 +49,17 @@ async function openBoard(p){
  await panel(p,'成长手册');await p.getByRole('button',{name:'固定形态',exact:true}).click();await p.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await p.getByRole('button',{name:'应用成长设置',exact:true}).click();await p.getByRole('button',{name:'确认切换',exact:true}).click();assert.ok((await save(p)).highestGrowth>=original.highestGrowth);await expect(p.getByRole('button',{name:'切换到神力拉姆',exact:true})).toBeEnabled();
  for(const viewport of [{width:360,height:320},{width:480,height:360},{width:1000,height:720}]){await p.setViewportSize(viewport);if(await p.locator('.game-panel').isVisible())await p.getByRole('button',{name:'关闭面板',exact:true}).click();assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);const dock=await p.locator('.room-dock').boundingBox();assert.ok(dock.x>=0&&dock.x+dock.width<=viewport.width+.5&&dock.y+dock.height<=viewport.height);const board=await openBoard(p),box=await board.boundingBox();assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=viewport.width+.5&&box.y+box.height<=viewport.height+.5);await expect(board.locator('.paper-tabs')).toHaveCount(0);await expect(board.locator('.message-card')).toHaveCount(1);await p.screenshot({path:path.join(out,`room-${viewport.width}x${viewport.height}.png`)});await p.keyboard.press('Escape');}
 
+ // Deterministic lost-boot regression: hold the deferred runtime until the
+ // parent's initial request has been sent, then discard the child's boot ping.
+ // Only iframe.onload can establish the second, reliable handshake.
+ let heldRuntime;
+ await p.route('**/assets/original/official/runtime.js',route=>{heldRuntime=route});
+ await p.evaluate(()=>{window.__lostBoot=e=>{if(e.data?.type==='ram-original-boot')e.stopImmediatePropagation()};addEventListener('message',window.__lostBoot,true)});
+ await panel(p,'拉姆小衣橱');await p.getByRole('button',{name:'试戴粉兔帽',exact:true}).click();
+ await expect.poll(()=>Boolean(heldRuntime),{timeout:15000}).toBe(true);await p.waitForTimeout(500);await heldRuntime.continue();
+ await expect(p.locator('.wardrobe-mirror .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:60000});
+ await p.evaluate(()=>{removeEventListener('message',window.__lostBoot,true);delete window.__lostBoot});await p.unroute('**/assets/original/official/runtime.js');
+ console.log('PASS deterministic original-player handshake with delayed runtime and dropped boot message');
  assert.deepEqual(errors,[]);await p.close();
  const seed=await browser.newPage();await seed.addInitScript(fixture,{seed:true});await seed.goto(origin);await home(seed);await panel(seed,'成长手册');for(const name of ['初级拉姆','中级拉姆','高级拉姆','神力拉姆'])await expect(seed.getByRole('button',{name:'切换到'+name,exact:true})).toBeEnabled();await seed.close();
  const recovery=await browser.newPage();await recovery.addInitScript(fixture,{corrupt:true});await recovery.goto(origin);await expect(recovery.getByRole('heading',{name:'先把原来的拉姆存档保管好',exact:true})).toBeVisible();assert.equal(await recovery.evaluate(()=>localStorage.getItem('ramu-house-save-v1')),'broken original save');await expect(recovery.getByRole('button',{name:'带拉姆回家！',exact:true})).toHaveCount(0);await recovery.close();
