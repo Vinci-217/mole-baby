@@ -31,7 +31,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
   const watchdog=setTimeout(fail,OFFICIAL_LOAD_TIMEOUT)
   const receive=(event:MessageEvent)=>{
    if(event.data?.token!==token)return
-   if(frame.current){frame.current.dataset.lastMessage=JSON.stringify({type:event.data.type,sequence:event.data.sequence,id:event.data.id,expectedSequence:current,expectedId:clip.id,sourceMatches:event.source===frame.current.contentWindow,sourceNull:event.source===null})}
+   if(frame.current){frame.current.dataset.lastMessage=JSON.stringify({type:event.data.type,sequence:event.data.sequence,id:event.data.id,expectedSequence:current,expectedId:clip.id,sourceMatches:event.source===frame.current.contentWindow,sourceNull:event.source===null,value:event.data.type==='ram-original-error'||event.data.type==='ram-original-diagnostic'?event.data.value:undefined})}
    if(event.source!==frame.current?.contentWindow)return
    if(event.data.type==='ram-original-boot'){load();return}
    if(event.data.sequence!==current||event.data.id!==clip.id)return

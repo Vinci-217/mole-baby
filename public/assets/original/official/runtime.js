@@ -1,6 +1,6 @@
 /* Offline original vectors. No application bridge or access to parent storage. */
 (async function(){
- const token=new URLSearchParams(location.search).get('token');
+ const token=new URLSearchParams(location.search).get('token'),pollLimit=300; // 45s at 150ms, matching the host's cold-start budget
  let player,ready=false,timer,lastPose,id,sequence=0,loading=false,pending,clip,looping,pose,requestAcknowledged=false;
  const manifest=fetch('manifest.json').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
@@ -13,6 +13,7 @@
   const rgba=ctx.getImageData(0,0,100,108).data,alpha=[];
   for(let i=3;i<rgba.length;i+=4)alpha.push(rgba[i]);return alpha;
  }
+ function sendMask(){try{const alpha=pixels();if(alpha)send('mask',alpha);}catch(error){window.originalMaskError=String(error);send('diagnostic',{phase:'mask',error:String(error)});}}
  function apply(){if(!ready)return;call('setBodyColor',...pose.color);if(!lastPose||lastPose.form!==pose.form||lastPose.direction!==pose.direction||lastPose.moving!==pose.moving)call('previewPose',pose.form,pose.direction,pose.moving);player.ruffle().volume=pose.sound?Math.max(0,Math.min(1,pose.volume??.45)):0;lastPose={...pose};player.ruffle()[pose.paused||document.hidden?'suspend':'resume']();}
  async function load(request){
   if(request.sequence<=sequence)return;
@@ -33,23 +34,23 @@
      // without asking the paused engine to run code.
      if(ready&&(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)){
       if(!requestAcknowledged)send('ready',{path:clip.path,sha256:clip.sha256});
-      if(performance.now()-lastMask>600){lastMask=performance.now();send('mask',pixels());}
+      if(performance.now()-lastMask>600){lastMask=performance.now();sendMask();}
       return;
      }
      const state=call('previewStatus');
      if(state&&state.error){send('error',state.error);clearInterval(timer);return;}
      if(state&&state.ended){if(looping){call('previewSymbol',clip.symbol);lastPose=null;}else{send('finished');clearInterval(timer);}return;}
      if(state&&state.ready&&state.settled&&state.width>0){
+      if(!ready){ready=true;try{apply();}catch(error){ready=false;throw error;}}
       tries=0;
-      if(!ready){ready=true;apply();}
       // Ready is an idempotent handshake. Repeat until the host acknowledges;
       // custom-protocol frames may become ready before their host listener.
       if(!requestAcknowledged)send('ready',{path:clip.path,sha256:clip.sha256});
-      if(performance.now()-lastMask>600){lastMask=performance.now();send('mask',pixels());}
-      send('state',state);
+      if(performance.now()-lastMask>600){lastMask=performance.now();sendMask();}
+      try{send('state',JSON.parse(JSON.stringify(state)));}catch(error){window.originalStateError=String(error);send('diagnostic',{phase:'state',error:String(error)});}
       if(matchMedia('(prefers-reduced-motion: reduce)').matches)player.ruffle().suspend();
-     }else if(++tries>100){send('error','Source requires the full client');clearInterval(timer);}
-    }catch(error){send('error',String(error));clearInterval(timer);}
+     }else if(++tries>pollLimit){send('error','Source requires the full client');clearInterval(timer);}
+    }catch(error){window.originalRuntimeError=String(error);send('diagnostic',{phase:'status',error:String(error)});if(++tries>pollLimit){send('error',String(error));clearInterval(timer);}}
    },150);
   }catch(error){send('error',String(error));}
   finally{loading=false;if(pending){const next=pending;pending=null;load(next);}}

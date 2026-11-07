@@ -54,12 +54,13 @@ async function openBoard(p){
  // Only iframe.onload can establish the second, reliable handshake.
  let heldRuntime;
  await p.route('**/assets/original/official/runtime.js',route=>{heldRuntime=route});
+ await p.addInitScript(()=>{if(!location.pathname.endsWith('/runtime.html'))return;const original=CanvasRenderingContext2D.prototype.getImageData;let first=true;CanvasRenderingContext2D.prototype.getImageData=function(...args){if(first&&this.canvas.width===100&&this.canvas.height===108){first=false;throw new DOMException('A source frame is not painted yet','InvalidStateError')}return original.apply(this,args)}});
  await p.evaluate(()=>{window.__lostReadyCount=0;window.__lostBoot=e=>{if(e.data?.type==='ram-original-boot'||e.data?.type==='ram-original-ready'&&window.__lostReadyCount++<3)e.stopImmediatePropagation()};addEventListener('message',window.__lostBoot,true)});
  await panel(p,'拉姆小衣橱');await p.getByRole('button',{name:'试戴粉兔帽',exact:true}).click();
  await expect.poll(()=>Boolean(heldRuntime),{timeout:15000}).toBe(true);await p.waitForTimeout(500);await heldRuntime.continue();
  await expect(p.locator('.wardrobe-mirror .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:60000});
  await p.evaluate(()=>{removeEventListener('message',window.__lostBoot,true);delete window.__lostBoot});await p.unroute('**/assets/original/official/runtime.js');
- assert.ok(await p.evaluate(()=>window.__lostReadyCount)>=4,'Host recovers after three lost ready messages');console.log('PASS deterministic original-player handshake with delayed runtime, dropped boot and three dropped ready messages');
+ await expect(p.locator('.wardrobe-mirror .official-hit-mask')).toHaveAttribute('data-loaded','true',{timeout:15000});assert.ok(await p.evaluate(()=>window.__lostReadyCount)>=4,'Host recovers after three lost ready messages');console.log('PASS deterministic original-player handshake with delayed runtime, dropped boot and three dropped ready messages');
  assert.deepEqual(errors,[]);await p.close();
  const seed=await browser.newPage();await seed.addInitScript(fixture,{seed:true});await seed.goto(origin);await home(seed);await panel(seed,'成长手册');for(const name of ['初级拉姆','中级拉姆','高级拉姆','神力拉姆'])await expect(seed.getByRole('button',{name:'切换到'+name,exact:true})).toBeEnabled();await seed.close();
  const recovery=await browser.newPage();await recovery.addInitScript(fixture,{corrupt:true});await recovery.goto(origin);await expect(recovery.getByRole('heading',{name:'先把原来的拉姆存档保管好',exact:true})).toBeVisible();assert.equal(await recovery.evaluate(()=>localStorage.getItem('ramu-house-save-v1')),'broken original save');await expect(recovery.getByRole('button',{name:'带拉姆回家！',exact:true})).toHaveCount(0);await recovery.close();
