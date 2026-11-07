@@ -1,7 +1,7 @@
 /* Offline original vectors. No application bridge or access to parent storage. */
 (async function(){
  const token=new URLSearchParams(location.search).get('token');
- let player,ready=false,timer,lastPose,id,sequence=0,loading=false,pending,clip,looping,pose;
+ let player,ready=false,timer,lastPose,id,sequence=0,loading=false,pending,clip,looping,pose,requestAcknowledged=false;
  const manifest=fetch('manifest.json').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
  const call=(name,...args)=>player&&player.ruffle().callExternalInterface(name,...args);
@@ -17,7 +17,7 @@
  async function load(request){
   if(request.sequence<=sequence)return;
   if(loading){pending=request;return;}
-  loading=true;ready=false;clearInterval(timer);lastPose=null;
+  loading=true;ready=false;requestAcknowledged=false;clearInterval(timer);lastPose=null;
   sequence=request.sequence;id=request.value.id;pose=request.value.pose;looping=request.value.loop;
   try{
    clip=(await manifest).clips.find(row=>row.id===id);if(!clip)throw Error('Unknown source');
@@ -28,12 +28,23 @@
    let tries=0,lastMask=0;
    timer=setInterval(()=>{
     try{
+     // A suspended Ruffle timeline does not reliably service ExternalInterface.
+     // Its loaded state remains valid; repeat the handshake and pixel mask
+     // without asking the paused engine to run code.
+     if(ready&&(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)){
+      if(!requestAcknowledged)send('ready',{path:clip.path,sha256:clip.sha256});
+      if(performance.now()-lastMask>600){lastMask=performance.now();send('mask',pixels());}
+      return;
+     }
      const state=call('previewStatus');
      if(state&&state.error){send('error',state.error);clearInterval(timer);return;}
      if(state&&state.ended){if(looping){call('previewSymbol',clip.symbol);lastPose=null;}else{send('finished');clearInterval(timer);}return;}
      if(state&&state.ready&&state.settled&&state.width>0){
       tries=0;
-      if(!ready){ready=true;apply();send('ready',{path:clip.path,sha256:clip.sha256});}
+      if(!ready){ready=true;apply();}
+      // Ready is an idempotent handshake. Repeat until the host acknowledges;
+      // custom-protocol frames may become ready before their host listener.
+      if(!requestAcknowledged)send('ready',{path:clip.path,sha256:clip.sha256});
       if(performance.now()-lastMask>600){lastMask=performance.now();send('mask',pixels());}
       send('state',state);
       if(matchMedia('(prefers-reduced-motion: reduce)').matches)player.ruffle().suspend();
@@ -46,6 +57,7 @@
  addEventListener('message',event=>{
   if(event.source!==parent||!event.data||event.data.token!==token)return;
   if(event.data.type==='ram-original-load')load(event.data);
+  if(event.data.type==='ram-original-ack'&&event.data.sequence===sequence){requestAcknowledged=true;}
   if(event.data.type==='ram-original-pose'&&event.data.sequence===sequence){pose=event.data.value;apply();}
  });
  send('boot');

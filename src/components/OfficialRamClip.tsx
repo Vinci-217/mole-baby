@@ -23,17 +23,21 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  useEffect(()=>{sendPose()},[color,direction,action,form,sound,volume,paused])
  useEffect(()=>{
   const current=++sequence.current
-  let done=false,finish:ReturnType<typeof setTimeout>|undefined
+  let done=false,announced=false,finish:ReturnType<typeof setTimeout>|undefined
   setLoadState({key:loadKey,state:'loading'})
   const load=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-load',token,sequence:current,value:{id:clip.id,form:officialTimelineForm(clip,form),loop:!finite,registerBody,referenceForm:OFFICIAL_FORM[bodyForm],pose:pose.current}},'*')
   requestLoad.current=load
   const fail=()=>{if(done)return;done=true;setLoadState({key:loadKey,state:'failed'});errorCallback.current?.();if(finite)end.current?.(false)}
   const watchdog=setTimeout(fail,OFFICIAL_LOAD_TIMEOUT)
   const receive=(event:MessageEvent)=>{
-   if(event.source!==frame.current?.contentWindow||event.data?.token!==token)return
+   if(event.data?.token!==token)return
+   if(frame.current){frame.current.dataset.lastMessage=JSON.stringify({type:event.data.type,sequence:event.data.sequence,id:event.data.id,expectedSequence:current,expectedId:clip.id,sourceMatches:event.source===frame.current.contentWindow,sourceNull:event.source===null})}
+   if(event.source!==frame.current?.contentWindow)return
    if(event.data.type==='ram-original-boot'){load();return}
    if(event.data.sequence!==current||event.data.id!==clip.id)return
    if(event.data.type==='ram-original-ready'){
+    frame.current?.contentWindow?.postMessage({type:'ram-original-ack',token,sequence:current},'*')
+    if(announced||done)return;announced=true
     clearTimeout(watchdog);setLoadState({key:loadKey,state:'ready'});sendPose();readyCallback.current?.()
     if(finite)finish=setTimeout(()=>{if(!done){done=true;end.current?.(true)}},OFFICIAL_DURATION)
    }
