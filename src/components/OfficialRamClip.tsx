@@ -3,7 +3,7 @@ import type {ReactNode} from 'react'
 import type {PetColor} from '../pet-color'
 import {petColorOffsets} from '../pet-color'
 import type {RamForm} from '../original-actions'
-import {officialTimelineForm,OFFICIAL_FORM,OFFICIAL_DURATION} from '../official-clips'
+import {officialTimelineForm,OFFICIAL_FORM,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from '../official-clips'
 import type {OfficialClip} from '../official-clips'
 import './OfficialRamClip.css'
 
@@ -27,7 +27,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
   setLoadState({key:loadKey,state:'loading'})
   const load=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-load',token,sequence:current,value:{id:clip.id,form:officialTimelineForm(clip,form),loop:!finite,registerBody,referenceForm:OFFICIAL_FORM[bodyForm],pose:pose.current}},'*')
   const fail=()=>{if(done)return;done=true;setLoadState({key:loadKey,state:'failed'});errorCallback.current?.();if(finite)end.current?.(false)}
-  const watchdog=setTimeout(fail,18000)
+  const watchdog=setTimeout(fail,OFFICIAL_LOAD_TIMEOUT)
   const receive=(event:MessageEvent)=>{
    if(event.source!==frame.current?.contentWindow||event.data?.token!==token)return
    if(event.data.type==='ram-original-boot'){load();return}

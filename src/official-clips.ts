@@ -4,6 +4,8 @@ export interface OfficialClip {id:string;name:string;kind:string;path:string;sha
 export const OFFICIAL_CLIPS:readonly OfficialClip[]=manifest.clips
 export const ORIGINAL_OUTFITS=manifest.outfits
 export const OFFICIAL_DURATION=16_000
+/** Older 32-bit Chromium may compile the bundled engine slowly on first use. */
+export const OFFICIAL_LOAD_TIMEOUT=45_000
 export const OFFICIAL_FORM:Record<RamForm,string>={seed:'level1',junior:'level2',middle:'level3',senior:'level4',classic:'level101',super:'level101_7',water:'level5_2',wood:'level5_4',fire:'level5_1'}
 const levels:Record<RamForm,number>={seed:1,junior:2,middle:3,senior:4,classic:101,super:101,water:5,wood:5,fire:5}
 export const isOfficialAction=(action:string)=>action.startsWith('official-')||/^ambient-[a-f0-9]{16}$/.test(action)

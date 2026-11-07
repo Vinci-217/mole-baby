@@ -1,5 +1,5 @@
 import OfficialClipMenu from './components/OfficialClipMenu';
-import {officialClip,isOfficialAction,OFFICIAL_DURATION} from './official-clips';
+import {officialClip,isOfficialAction,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from './official-clips';
 import {chooseAutonomousOriginal,isAmbientAction,originalItemClip,playbackForm,usesTransformationSmoke} from './pet-original-actions';
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
 import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
@@ -497,7 +497,9 @@ export default function App() {
     if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
     else if(!itemId)finishCareFeedback();
     const transformed=isOfficialAction(next)?officialClip(next.replace(/^(official-|ambient-)/,'')):undefined;
-    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); }, transformed&&usesTransformationSmoke(transformed)?60000:duration + (next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||isAmbientAction(next)||isOfficialAction(next)||embeddedItem||original||recorded||isEmotionClip(next)?15000:50)));
+    const sourcePlayback=isOfficialAction(next)||Boolean(embeddedItem||original);
+    const fallbackDelay=sourcePlayback?OFFICIAL_LOAD_TIMEOUT+Math.max(duration,OFFICIAL_DURATION)+(transformed&&usesTransformationSmoke(transformed)?8000:3000):duration+(next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||isAmbientAction(next)||recorded||isEmotionClip(next)?15000:50));
+    clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); },fallbackDelay);
   }
   function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(appearance.form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
