@@ -1,5 +1,7 @@
+import GameRewardItem from './GameRewardItem';
+import {useGameRound} from '../use-game-round';
 import { useEffect, useRef, useState } from 'react';
-import type { GameReceipt } from './game-receipt';
+import type { GameReceipt,GameComplete } from './game-receipt';
 import GameArt from './GameArt';
 import {
   activeFrameDelta, createOrchard, createPuzzle, ORCHARD_DURATION, orchardClaim,
@@ -10,7 +12,7 @@ import './MoreGames.css';
 import { playGameSound,stopGameSounds } from '../pet-audio';
 
 export type ExtraGame = 'rhythm' | 'orchard' | 'puzzle';
-type Props = { kind: ExtraGame; onComplete: (score: number) => GameReceipt | void; onClose: () => void; sound?: boolean };
+type Props = { kind: ExtraGame; onComplete: GameComplete; onClose: () => void; sound?: boolean };
 type Phase = 'ready' | 'playing' | 'finished' | 'closed';
 const titles: Record<ExtraGame, string> = { rhythm: '节奏拍拍乐', orchard: '草地采果', puzzle: '小屋拼拼乐' };
 const instructions: Record<ExtraGame, string> = {
@@ -29,6 +31,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(document.hidden);
+  const roundClock=useGameRound(phase==='playing',paused||hidden);
   const [judgments, setJudgments] = useState<BeatJudgment[]>(() => RHYTHM_BEATS.map(() => null));
   const [fruits, setFruits] = useState<OrchardFruit[]>([]);
   const [claimed, setClaimed] = useState(new Set<number>());
@@ -61,9 +64,10 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
   function finish(finalScore: number) {
     if (completed.current || phaseRef.current !== 'playing') return;
     completed.current = true; phaseRef.current = 'finished'; setScore(finalScore); setPhase('finished');
-    setReceipt(callbacks.current.onComplete(finalScore) ?? null);
+    setReceipt(callbacks.current.onComplete(finalScore,roundClock.finish(elapsedRef.current)) ?? null);
   }
   function start() {
+    roundClock.start();
     lastWarning.current=4;playGameSound('start',sound);
     elapsedRef.current = 0; lastFrame.current = null; setElapsed(0); manualPause.current = false; setPaused(false);
     completed.current = false; setReceipt(null); setFeedback({ message: '', at: 0 });
@@ -218,7 +222,7 @@ function GameSession({ kind, onComplete, onClose, sound=false }: Props) {
     {phase === 'finished' && <div className="extra-game-result" data-testid="extra-game-result">
       <GameArt kind="trophy"/><h3>{kind === 'puzzle' ? '小屋拼好啦！' : '玩得真开心！'}</h3><strong className="extra-game-final-score">{score} 分</strong>
       {kind === 'puzzle' && <p>{moves} 步 · {Math.floor(elapsed / 1000)} 秒</p>}
-      {receipt && <><div className="extra-game-rewards"><span><strong>+{receipt.coins}</strong> 摩尔豆</span><span><strong>+{receipt.food}</strong> 用品</span></div><p className="extra-game-receipt" role="status">{receipt.message}</p></>}
+      {receipt && <><div className="extra-game-rewards"><span><strong>+{receipt.coins}</strong> 摩尔豆</span><span><GameRewardItem receipt={receipt}/></span></div><p className="extra-game-receipt" role="status">{receipt.message}</p></>}
       <div className="extra-game-result-actions"><button className="extra-game-secondary" onClick={start}>再玩一次</button><button className="extra-game-primary" onClick={close}>{receipt?.ok === false ? '返回小屋' : '完成'}</button></div>
     </div>}
   </div></div>;

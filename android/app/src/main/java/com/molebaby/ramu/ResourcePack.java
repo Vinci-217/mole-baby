@@ -42,7 +42,7 @@ final class ResourcePack {
         for(int i=0;i<entries.length();i++){
             JSONObject item=entries.getJSONObject(i);String name=item.getString("path");long size=item.getLong("size");
             SafeFiles.child(destination,name);
-            if(!name.startsWith("assets/")||!name.matches("(?i).+\\.(webp|png|jpg|jpeg|gif|mp3|ogg|wav|json|svg|woff2?|ttf|xml|md)")||size<0||size>200*1024*1024||!SafeFiles.digest(item.getString("sha256"))||expected.put(name,item)!=null)throw new IOException("素材索引不合法");
+            if(!name.startsWith("assets/")||!name.matches("(?i).+\\.(webp|png|jpg|jpeg|gif|mp3|ogg|wav|swf|json|svg|woff2?|ttf|xml|md)")||size<0||size>200*1024*1024||!SafeFiles.digest(item.getString("sha256"))||expected.put(name,item)!=null)throw new IOException("素材索引不合法");
             total+=size;if(total>2L*1024*1024*1024)throw new IOException("素材超过存储限制");
         }
         File staging=new File(destination.getPath()+".staging");SafeFiles.delete(staging);staging.mkdirs();

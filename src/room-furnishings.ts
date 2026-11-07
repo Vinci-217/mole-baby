@@ -1,6 +1,7 @@
 import type {GameState} from './game'
 import {COURSES,learned,type CourseId} from './pet-school'
 import originalFurniture from '../public/assets/original/furniture/catalog.json'
+import {FURNITURE_PRICE} from './economy'
 export type Surface='wall'|'floor'
 export interface Placement {id:string;x:number;y:number;instanceId?:string;scale?:number;order?:number}
 export interface RoomFurnishings {owned:string[];placed:Placement[]}
@@ -17,7 +18,7 @@ export const FURNITURE:readonly FurnitureDefinition[]=[
  {id:'leaf-clock',name:'双叶挂钟',surface:'wall',price:200,width:9},
  {id:'picture',name:'庄园风景画',surface:'wall',price:240,width:14},
  {id:'message-board',name:'小屋留言板',surface:'wall',price:0,width:9,image:'./assets/original/message-board/board.png',sourceId:'160131',dragOnly:true},
-] as const
+].map(furniture=>({...furniture,surface:furniture.surface as Surface,price:FURNITURE_PRICE}))
 export function furnitureById(id:string){
  const f=FURNITURE.find(f=>f.id===id);if(f)return f
  if(id.startsWith('certificate-')){const c=COURSES.find(c=>id===`certificate-${c.id}`);if(c)return {id,name:`${c.name}结业证书`,surface:'wall' as const,price:0,width:12}}

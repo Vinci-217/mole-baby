@@ -2,6 +2,7 @@ import {getStage,type GameState} from './game'
 import {elementSkillById} from './element-skills'
 import {reconcileCourseRewards} from './course-rewards'
 import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,RESTAURANT_ENERGY_COST,unmetNeedReason} from './pet-status'
+import {JOB_BEANS_PER_SECOND} from './economy'
 
 const COURSE_DEFINITIONS=[
  {id:'language',name:'语言课',skill:'说中文',minutes:3,lessons:1,requires:null,icon:'language'},
@@ -19,8 +20,8 @@ export type CourseId=typeof COURSE_DEFINITIONS[number]['id']
 export const COURSES=COURSE_DEFINITIONS.map(course=>({...course,minStage:course.id.startsWith('element-')?4:1,legacy:['wind','fire','ice','meteor'].includes(course.id)}))
 export const courseIcon=(id:unknown)=>{const c=courseById(id);return c?.id.startsWith('element-')?`./assets/original/element-skills/icons/${c.icon}.png`:`./assets/generated/school/icons/${c?.icon??'language'}.png`}
 export interface Education {lessons:Partial<Record<CourseId,number>>;graduated:Partial<Record<CourseId,number>>}
-export interface PetActivity {id:string;kind:'course'|'restaurant';course?:CourseId;startedAt:number;endsAt:number}
-export const JOB_MS=120_000,JOB_PAY=180
+export interface PetActivity {id:string;kind:'course'|'restaurant';course?:CourseId;startedAt:number;endsAt:number;continuous?:boolean;paidCoins?:number}
+export const JOB_MS=120_000,JOB_PAY=JOB_MS/1000*JOB_BEANS_PER_SECOND
 export const COURSE_MS=180_000
 export const courseById=(id:unknown)=>COURSES.find(c=>c.id===id)
 export const learned=(pet:Pick<GameState,'education'>,id:CourseId)=>Boolean(pet.education?.graduated[id])
@@ -70,12 +71,19 @@ export function beginActivity(pet:GameState,kind:'course'|'restaurant',id?:Cours
  const fail=(message:string)=>({state:pet,ok:false,message})
  const reason=activityBlockReason(pet,kind,id);if(reason)return fail(reason)
  if(!Number.isSafeInteger(now)||now<pet.lastTick)return fail('时间暂时不正确，请稍后再试。')
- const activity:PetActivity={id:`${pet.createdAt}:${now}`,kind,...(kind==='course'?{course:c!.id}:{}),startedAt:now,endsAt:now+(kind==='restaurant'?JOB_MS:c!.minutes*60_000)}
+ const activity:PetActivity={id:`${pet.createdAt}:${now}`,kind,...(kind==='course'?{course:c!.id}:{continuous:true,paidCoins:0}),startedAt:now,endsAt:now+(kind==='restaurant'?JOB_MS:c!.minutes*60_000)}
  return {state:{...pet,activity,stats:{...pet.stats,energy:pet.stats.energy-(kind==='restaurant'?RESTAURANT_ENERGY_COST:5)}},ok:true,message:kind==='restaurant'?'围裙系好，去餐厅送餐啦！':`开始${c!.name}，这一节慢慢学。`}
 }
 /** A persisted single activity settles once, even after reopening the app. */
 export function settleActivity(pet:GameState,now:number):GameState{
- const a=pet.activity;if(!a||now<a.endsAt)return pet
+ const a=pet.activity;if(!a)return pet
+ if(a.kind==='restaurant'&&a.continuous){
+  if(!Number.isFinite(now)||now<a.startedAt)return pet;
+  const earned=Math.min(1e9,Math.floor((now-a.startedAt)*JOB_PAY/JOB_MS)),paid=a.paidCoins??0;
+  if(earned<=paid)return pet;
+  return {...pet,coins:Math.min(1e9,pet.coins+earned-paid),activity:{...a,paidCoins:earned}};
+ }
+ if(now<a.endsAt)return pet
  const next={...pet};delete next.activity
  if(a.kind==='restaurant')return {...next,coins:Math.min(1e9,next.coins+JOB_PAY),stats:{...next.stats,happiness:Math.min(100,next.stats.happiness+5)}}
  const c=courseById(a.course);if(!c)return next
@@ -93,3 +101,7 @@ export function schoolBody(action:string,elapsed:number){
  return elapsed<600?{action:'look-around',elapsed}:elapsed<1700?{action:'waving',elapsed:elapsed-600}:{action:'idle',elapsed:elapsed-1700}
 }
 export function cancelActivity(pet:GameState){const next={...pet};delete next.activity;return next}
+/** Only call for a currently present session; reopening still drops work. */
+export function finishRestaurantWork(pet:GameState,now=Date.now()){
+ return cancelActivity(pet.activity?.kind==='restaurant'?settleActivity(pet,now):pet);
+}

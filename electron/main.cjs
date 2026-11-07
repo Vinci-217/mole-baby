@@ -1,4 +1,6 @@
-const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, nativeImage, shell, net, autoUpdater:nativeAutoUpdater } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, nativeImage, shell, net, protocol, autoUpdater:nativeAutoUpdater } = require('electron');
+const {registerOriginalAssets}=require('./original-assets.cjs');
+protocol.registerSchemesAsPrivileged([{scheme:'ram-original',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true}}]);
 const fs = require('node:fs');
 const {nativePosition,movementProgress}=require('./native-position.cjs');
 const path = require('node:path');
@@ -1027,6 +1029,7 @@ if (!app.requestSingleInstanceLock()) {
     showFromTray();
   });
   app.whenReady().then(() => {
+    registerOriginalAssets(protocol,path.join(__dirname,'..','dist','assets','original','official'));
     if (process.platform === 'win32') app.setAppUserModelId(windowsEdition.appId);
     if (process.platform === 'darwin') {
       app.dock.hide();

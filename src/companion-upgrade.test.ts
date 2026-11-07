@@ -4,9 +4,9 @@ import {beginActivity} from './pet-school';
 import {normalizeNotes,recordStatChange} from './pet-records';
 const NOW=1_800_000_000_000;
 describe('earned forms and existing companion saves',()=>{
- it('rejects every unearned stage, including through direct care configuration',()=>{
+ it('freely selects every stage while keeping natural progress independent',()=>{
   const pet=createPet('一直是我','blue',NOW),before=JSON.stringify(pet);
-  for(const stage of [1,2,3,4] as const)for(const mode of ['fixed','auto'] as const){const result=configureGrowth(pet,{mode,stage},NOW);expect(result.ok).toBe(false);expect(result.state).toBe(pet);}
+  for(const stage of [1,2,3,4] as const)for(const mode of ['fixed','auto'] as const){const result=configureGrowth(pet,{mode,stage},NOW);expect(result.ok).toBe(true);expect(result.state.naturalGrowth).toBe(0);expect(result.state.growth).toBe(mode==='fixed'?STAGES[stage].threshold:0);}
   expect(JSON.stringify(pet)).toBe(before);
  });
  it('keeps earned progress and unlocks through lower fixed forms, reload and automatic growth',()=>{
@@ -48,7 +48,7 @@ describe('recovery items and status receipts',()=>{
  it('separates earned work rewards from natural decay in status reasons',()=>{
   const pet={...createPet('小叶','blue',NOW),growth:60},working=beginActivity(pet,'restaurant',undefined,NOW).state;
   const done=tick(working,working.activity!.endsAt),recorded=recordStatChange(working,done,'自然消耗与休息',done.lastTick);
-  expect(recorded.statHistory?.at(-1)?.reason).toContain('餐厅工作完成');expect(recorded.statHistory?.at(-1)?.delta.happiness).toBeGreaterThan(0);
+  expect(recorded.statHistory?.at(-1)?.reason).toContain('餐厅打工收入');expect(recorded.statHistory?.at(-1)?.delta.happiness).toBeLessThan(0);
  });
  it('bounds memo text and ignores malformed optional records without rejecting the pet',()=>{
   expect(normalizeNotes([{id:'ok',text:'x'.repeat(500),createdAt:NOW},{id:'ok',text:'duplicate',createdAt:NOW},null])).toHaveLength(1);

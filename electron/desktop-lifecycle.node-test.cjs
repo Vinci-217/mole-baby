@@ -72,6 +72,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   screen.getCursorScreenPoint=()=>({...cursor});screen.getDisplayNearestPoint=()=>display;
   screen.getPrimaryDisplay = screen.getDisplayMatching = () => display;
   const electron = { app, shell:{openExternal:async url=>{(stats.openedExternal??=[]).push(url)}}, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
+    protocol:{registerSchemesAsPrivileged:schemes=>{stats.protocolSchemes=schemes},registerBufferProtocol:scheme=>{stats.assetProtocol=scheme}},
     Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => ({path:value,template:false,setTemplateImage(flag){this.template=flag;}}) },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
     Notification: { isSupported: () => false }, dialog:{showMessageBox:async(...args)=>{stats.dialogs.push({parent:args.length===2?args[0]:null,options:args.at(-1)});return{response:options.dialogAnswers?.shift()??1}}} };

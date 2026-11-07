@@ -1,52 +1,40 @@
 import {useEffect,useRef} from 'react';
 import type {RamForm} from '../original-actions';
-import {readingMotion} from '../reading-motion';
-import {createPetSoundClock} from '../pet-audio';
-import {socialSoundScore} from '../pet-sound-score';
+import type {PetColor} from '../pet-color';
+import {petColorOffsets} from '../pet-color';
 import source from '../../public/assets/original/reading-book/source.json';
 
-/** Original purple-book artwork. The open/hold/turn/close sequence is a local
- * reading adaptation; the original costume SWF is not a full read action. */
-export default function ReadingBook({form,sound,duration}:{form:RamForm;sound:boolean;duration?:number}){
- const ref=useRef<HTMLCanvasElement>(null),voice=useRef(sound);voice.current=sound;
- const width=form==='seed'?50:100;
+type BookForm=keyof typeof source.forms;
+const cache=new Map<string,Promise<HTMLCanvasElement[]>>();
+function sheets(form:BookForm,color:PetColor){
+ const key=`${form}:${color}`,found=cache.get(key);if(found)return found;
+ const pending=Promise.all(['neutral','mask'].map(layer=>new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=`./assets/original/reading-book/${form}-${layer}.png`;}))).then(([neutral,mask])=>{
+  const canvas=document.createElement('canvas');canvas.width=neutral.naturalWidth;canvas.height=neutral.naturalHeight;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('无法显示原版看书动画');ctx.drawImage(neutral,0,0);
+  const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(mask,0,0);const coverage=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  const offsets=petColorOffsets(color),deltas=[255,204,153].map(base=>offsets.map(v=>Math.max(0,Math.min(255,base+v))-base));
+  for(let i=0;i<pixels.data.length;i+=4){if(!pixels.data[i+3])continue;for(let c=0;c<3;c++)pixels.data[i+c]=Math.max(0,Math.min(255,pixels.data[i+c]+deltas[0][c]*coverage[i]/255+deltas[1][c]*coverage[i+1]/255+deltas[2][c]*coverage[i+2]/255));}
+  ctx.putImageData(pixels,0,0);return [canvas];
+ }).catch(error=>{cache.delete(key);throw error});
+ if(cache.size>=8)cache.delete(cache.keys().next().value!);cache.set(key,pending);return pending;
+}
+/** Original Ebook costume, captured from its running nested SWF timelines.
+ * The body, book and crown share the source frame clock; no local page turns. */
+export default function ReadingBook({form,color}:{form:Exclude<RamForm,'seed'>;color:PetColor}){
+ const ref=useRef<HTMLCanvasElement>(null),spec=source.forms[form];
+ const width=Math.min(100,108*.92*spec.width/spec.height);
  useEffect(()=>{
-  const canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
-  let active=true,request=0,last=-1;const began=performance.now(),media=matchMedia('(prefers-reduced-motion: reduce)'),book=new Image(),audio=createPetSoundClock(socialSoundScore('focus'),()=>voice.current);
-  function draw(now:number){
+  let active=true,request=0,last=-1;const media=matchMedia('(prefers-reduced-motion: reduce)'),canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
+  let draw:((now:number)=>void)|undefined;
+  const redraw=()=>{cancelAnimationFrame(request);if(active&&!document.hidden&&draw)request=requestAnimationFrame(draw);};
+  void sheets(form,color).then(layers=>{if(!active)return;const began=performance.now();draw=now=>{
    if(!active||document.hidden)return;
-   const elapsed=now-began,frame=Math.floor(elapsed*24/1000),motion=readingMotion(elapsed,media.matches);
-   if(frame!==last||media.matches){
-    const w=source.width,h=source.height,cx=w/2;
-    const opening=media.matches?1:Math.min(1,elapsed/650),closing=media.matches||!duration?1:Math.min(1,Math.max(0,(duration-elapsed)/650));
-    const spread=Math.sin(Math.min(opening,closing)*Math.PI/2);
-    ctx!.clearRect(0,0,w,h+32);ctx!.save();ctx!.translate(cx,32);ctx!.scale(Math.max(.035,spread),1);ctx!.translate(-cx,0);
-    // Use a stable original spread for reading. The source's 15-frame flex
-    // belongs to its walking costume; running it continuously looks like a
-    // bouncing book. Page turns sample its real page shapes instead.
-    const originalFrame=motion.turning?Math.min(14,Math.floor(motion.progress*14)):0;
-    const sx=originalFrame%source.columns*w,sy=Math.floor(originalFrame/source.columns)*h;
-    ctx!.drawImage(book,sx,sy,w,h,0,0,w,h);
-    if(motion.turning){
-     // Turn a texture from the original paper about its spine. Small strips
-     // describe the curve without stretching/rotating the character itself.
-     ctx!.globalAlpha=motion.opacity;
-     for(let i=0;i<48;i++){
-      const u=i/48,next=(i+1)/48,fold=motion.fold,x=cx+u*cx*fold,nx=cx+next*cx*fold;
-      const lift=Math.sin(u*Math.PI)*motion.lift*24;
-      const paperX=motion.progress<.5?cx+u*cx:cx-next*cx;
-      ctx!.drawImage(book,paperX,0,cx/48+1,h*.83,Math.min(x,nx),-lift,Math.max(1,Math.abs(nx-x)+.5),h*.83);
-     }
-    }
-    ctx!.restore();canvas!.dataset.loaded='true';canvas!.dataset.source='1200026:13';canvas!.dataset.pagePhase=opening<1?'opening':closing<1?'closing':motion.turning?'turning':'reading';canvas!.dataset.pageProgress=String(motion.progress);last=frame;
-   }
-   if(!media.matches)audio.tick(elapsed);
-   if(!media.matches)request=requestAnimationFrame(draw);
-  }
-  const redraw=()=>{cancelAnimationFrame(request);if(!document.hidden)request=requestAnimationFrame(draw)};
-  book.src='./assets/original/reading-book/pages.png';void book.decode().then(()=>{if(active)redraw()}).catch(()=>{});
+   const frame=media.matches?0:Math.floor(Math.max(0,now-began)*source.fps/1000)%spec.frames;
+   if(frame!==last){ctx.clearRect(0,0,spec.width,spec.height);for(const layer of layers)ctx.drawImage(layer,frame%spec.columns*spec.width,Math.floor(frame/spec.columns)*spec.height,spec.width,spec.height,0,0,spec.width,spec.height);last=frame;canvas.dataset.loaded='true';canvas.dataset.source='1200026';canvas.dataset.sourceFrame=String(frame+1);canvas.dataset.loadedColor=color;}
+   if(!media.matches)request=requestAnimationFrame(draw!);
+  };redraw();}).catch(()=>{if(active)canvas.dataset.failed='true';});
   document.addEventListener('visibilitychange',redraw);media.addEventListener('change',redraw);
-  return()=>{active=false;cancelAnimationFrame(request);document.removeEventListener('visibilitychange',redraw);media.removeEventListener('change',redraw);audio.stop()};
- },[form,duration]);
- return <canvas ref={ref} width={source.width} height={source.height+32} className="reading-book" aria-hidden="true" style={{left:`${form==='seed'?46:50-width/2}%`,top:`${((form==='seed'?82:63)-32*width/source.width)/108*100}%`,width:`${width}%`}}/>;
+  return()=>{active=false;cancelAnimationFrame(request);document.removeEventListener('visibilitychange',redraw);media.removeEventListener('change',redraw);};
+ },[form,color,spec]);
+ return <canvas ref={ref} width={spec.width} height={spec.height} className="reading-book" aria-hidden="true" data-form={form} data-source-frames={spec.frames} style={{left:`${(100-width)/2}%`,bottom:'8%',width:`${width}%`}}/>;
 }

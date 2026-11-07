@@ -1,6 +1,7 @@
-import UploadedActionMenu from './UploadedActionMenu';
+import OfficialClipMenu from './OfficialClipMenu';
+import {isOfficialAction} from '../official-clips';
 import {isUploadedAction} from '../uploaded-actions';
-import {ramForm} from '../original-actions';
+import {petAppearance} from '../wardrobe';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
@@ -8,10 +9,9 @@ import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
 import {isPastime} from '../pet-pastimes';
-import {isSchoolAction,learned,type CourseId} from '../pet-school';
+import {isSchoolAction} from '../pet-school';
 import ActivityCountdown from './ActivityCountdown';
 import DesktopRestaurantWork from './DesktopRestaurantWork';
-import {ELEMENT_TYPES,elementSkillsForCourse,learnedElementSkill} from '../element-skills';
 import {pointerGaze,type PetGaze} from '../pet-attention';
 import { reminderTime } from '../use-rest-reminder';
 import CareFeedback from './CareFeedback';
@@ -23,16 +23,16 @@ import {desktopCondition} from '../desktop-condition';
 export type CompanionPanel = 'status' | 'food' | 'play';
 interface Props {
   moodLabel:string;moodBusy:boolean;interactionReason:string|null;onMood:()=>void; pocketContent:ReactNode;statusContent:ReactNode;
-  onUploadedPlay:(id:string)=>void;onStopUploaded:()=>void;uploadedPlaying:boolean;courseCompletion:string;onElementSkill:(id:string)=>void;
+  onOriginalPlay:(id:string)=>void;onUploadedPlay:(id:string)=>void;onStopUploaded:()=>void;uploadedPlaying:boolean;courseCompletion:string;onElementSkill:(id:string)=>void;
   pet: GameState; stage: Stage; action: string; actionId: number; itemId?: string; fromColor?: PetColor;
   bubble: string; bubbleVisible: boolean; careFeedback:CareFeedbackData|null; panel: CompanionPanel | null;
-  native: boolean; desktopState: DesktopState; sound: boolean;
+  native: boolean; desktopState: DesktopState; sound: boolean; gameSound:boolean; soundVolume:number;
   onBoard:()=>void;onOuting:()=>void;
   saveError: boolean;
   timerDirection:'countdown'|'countup'; reminderSeconds: number; reminders: boolean; timerRunning: boolean;
   onPanel: (panel: CompanionPanel | null) => void;
   onCare: (action: Action, item?: string) => void;
-  onWork:()=>void;onViewRestaurant:()=>void;onStopWork:()=>void;onSchool:()=>void;onMagic:()=>void;magicLearned:boolean;onHome: () => void; onShop: () => void; onFocus: () => void;
+  onWork:()=>void;onViewRestaurant:()=>void;onStopWork:()=>void;onSchool:()=>void;onMagic:()=>void;magicLearned:boolean;onHome: () => void; onShop: () => void;onWardrobe:()=>void; onFocus: () => void;
   onSay: (text: string) => void; onShake: () => void; onBubble: () => void; onPresence: () => void; onCurious: () => void; onPet: () => void;
   onActionEnd?:(completed?:boolean)=>void; onTug?:()=>void;
   onRecall:()=>void;
@@ -42,6 +42,7 @@ const icons = { food: 'items/180001', wash: 'items/180003', timer: 'ui/icon-book
 function Icon({ path }: { path: string }) { return <img alt="" draggable={false} src={`./assets/original/${path}.png`}/>; }
 const labels: Record<CompanionPanel, string> = {status:'状态',food:'背包',play:'一起玩耍'};
 export default function DesktopCompanion(p: Props) {
+  const appearance=petAppearance(p.pet);
   const reading=p.timerRunning||p.action==='focus'||p.action==='read-alone';
   const [tools, setTools] = useState(false), [dragging, setDragging] = useState(false);
   const [shaking, setShaking] = useState(false);
@@ -89,7 +90,7 @@ export default function DesktopCompanion(p: Props) {
     if(hideTimer.current!==undefined)return;
     hideTimer.current=setTimeout(()=>{hideTimer.current=undefined;if(!root.current?.querySelector('.compact-pet :focus-visible'))setTools(false);},220);
   };
-  const elastic=useElasticDrag(root,p.stage,p.native,reaction=>{
+  const elastic=useElasticDrag(root,appearance.stage,p.native,reaction=>{
     if(p.pet.sleeping)return;
     if(reaction==='dizzy'&&!p.itemId){setShaking(true);clearTimeout(shakeTimer.current);shakeTimer.current=setTimeout(()=>setShaking(false),3200);p.onShake();}
     else if(reaction==='turn')p.onTug?.();
@@ -113,7 +114,7 @@ export default function DesktopCompanion(p: Props) {
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  const selfBusy=reading||isUploadedAction(p.action)||Boolean(p.itemId)||isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
+  const selfBusy=isOfficialAction(p.action)||reading||isUploadedAction(p.action)||Boolean(p.itemId)||isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
   useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null || selfBusy); }, [tools, dragging, p.panel,docked,selfBusy]);
   useEffect(()=>{if(p.desktopState.mouseThrough){setTools(false);if(p.panel)p.onPanel(null)}},[p.desktopState.mouseThrough,p.panel]);
   useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
@@ -180,9 +181,9 @@ export default function DesktopCompanion(p: Props) {
   const edge = p.native ? p.desktopState.edgePose : 'visible';
   const edgeSide = p.native ? p.desktopState.edgeSide : null;
   const entering = docked && edge === 'tucking' && !dragging;
-  const targetOffset = edgeTargetOffset(edgeSide, edge, p.desktopState.edgeOffset,ramForm(p.stage,p.pet.evolution));
+  const targetOffset = edgeTargetOffset(edgeSide, edge, p.desktopState.edgeOffset,appearance.form);
   const paintedOffset = docked && dragging ? heldEdgeOffset : targetOffset;
-  const edgeAction = entering ? edgeEntryAction(p.stage, edgeSide) : edge === 'hidden' ? 'still' : edge === 'peek' ? 'idle' : p.action;
+  const edgeAction = entering ? edgeEntryAction(appearance.stage, edgeSide) : edge === 'hidden' ? 'still' : edge === 'peek' ? 'idle' : p.action;
   const displayAction = docked && !p.itemId && !p.pet.sleeping ? edgeAction : p.action;
   const layoutStyle = { '--classic-pet-x': `${bookGeometry?.petX??p.desktopState.petOffset?.x??0}px`, '--classic-pet-y': `${bookGeometry?.petY??p.desktopState.petOffset?.y??0}px`, '--edge-x': `${paintedOffset.x}px`, '--edge-y': `${paintedOffset.y}px`, '--pocket-x':`${bookGeometry?.panelX??160}px`,'--pocket-y':`${bookGeometry?.panelY??20}px`,'--pocket-width':`${bookGeometry?.panelWidth??324}px`,'--pocket-height':`${bookGeometry?.panelHeight??272}px`,...(!p.native ? { transform: `translate(${offset.x}px,${offset.y}px) scale(${previewScale})`,transformOrigin:'80px 240px' } : {}) } as CSSProperties;
   const working=p.pet.activity?.kind==='restaurant';
@@ -195,7 +196,7 @@ export default function DesktopCompanion(p: Props) {
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.name}</button>
       <button className="compact-pet-condition" data-testid="desktop-condition" data-condition={condition.id} data-attention={condition.attention} aria-label={p.pet.sleeping?'叫醒拉姆：睡梦中':`查看拉姆状态：${condition.label}`} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={()=>p.pet.sleeping?p.onCare('sleep'):show('status')}>{condition.label}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label={reading?'拉姆正在看书':'拉姆：悬停互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
+        {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} gameSound={p.gameSound&&!docked} soundVolume={p.soundVolume} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
       </button>
       {working&&<DesktopRestaurantWork pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}
@@ -215,20 +216,19 @@ export default function DesktopCompanion(p: Props) {
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel&&<section className={`companion-panel panel-${p.panel}`} role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
-      {p.panel==='status'?p.statusContent:p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><div className="desktop-play">
+      {p.panel==='status'?p.statusContent:p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><OfficialClipMenu pet={p.pet} busy={p.moodBusy} onPlay={p.onOriginalPlay} onStop={p.onStopUploaded} playing={isOfficialAction(p.action)} activities={<div className="desktop-play">
+        {(!p.native||Boolean(window.desktop?.openSizeEditor))&&<button aria-label="放大缩小" disabled={reading} onClick={beginResize}><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 3H3v6m12 12h6v-6M3 3l7 7m11 11-7-7"/></svg>调整大小</button>}
+        <button aria-label={working?'结束餐厅打工':'去餐厅打工'} disabled={!working&&(p.moodBusy||p.stage===0)} onClick={working?p.onStopWork:p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>{working?'结束打工':'餐厅打工'}</button>
+        <button onClick={p.onViewRestaurant}><img alt="" src="./assets/original/restaurant/dock.png"/>进入餐厅</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={()=>p.onCare('play')}><Icon path="items/180004"/>一起玩球</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onPet}><Icon path="ui/icon-happy"/>摸摸拉姆</button>
         <button disabled={p.moodBusy||p.stage===0||p.pet.sleeping||Boolean(p.pet.outing)} onClick={p.onOuting}><svg className="outing-icon" aria-hidden="true" viewBox="0 0 32 32" fill="none"><path d="M6 26c1-5 5-7 9-9s8-4 10-10" stroke="#a77d45" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 3"/><path d="M18 7c0-4 7-4 7 0 0 3-3.5 7-3.5 7S18 10 18 7Z" fill="#df7648" stroke="#9d5431" strokeWidth="1.3"/><circle cx="21.5" cy="6.5" r="1.4" fill="#fff5d9"/><path d="M3 26c0-4 3-7 5-7s3 4 1 6-6 3-6 1Z" fill="#b6c973" stroke="#7c9347" strokeWidth="1.3"/></svg>出门逛逛</button>
         <button disabled={p.pet.sleeping||p.moodBusy} onClick={p.onCurious}><img alt="" src="./assets/generated/v15-butterfly.png"/>和蝴蝶玩</button>
         <button disabled={p.moodBusy&&!p.pet.sleeping} onClick={()=>p.onCare('sleep')}><Icon path="ui/status-sleep"/>{p.pet.sleeping?'轻轻叫醒':'睡一会儿'}</button>
-        {(!p.native||Boolean(window.desktop?.openSizeEditor))&&<button aria-label="放大缩小" disabled={reading} onClick={beginResize}><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 3H3v6m12 12h6v-6M3 3l7 7m11 11-7-7"/></svg>调整大小</button>}
         <button onClick={p.onBoard}><img alt="" src="./assets/original/message-board/board.png"/>留言板</button>
-        <button disabled={p.moodBusy||p.stage===0} onClick={p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>去餐厅打工</button>
-        <button onClick={p.onViewRestaurant}><img alt="" src="./assets/original/restaurant/dock.png"/>进入餐厅</button>
         <button onClick={p.onSchool}><Icon path="ui/icon-book-large"/>学院</button>
-        <button disabled={p.moodBusy||!p.magicLearned} onClick={p.onMagic}><img alt="" src="./assets/generated/school/icons/magic.png"/>{p.magicLearned?'变魔术':'上魔法课解锁'}</button>
         <button onClick={p.onHome}><Icon path={icons.home}/>回小屋</button>
-      </div><UploadedActionMenu pet={p.pet} busy={p.moodBusy} busyReason={p.interactionReason} onPlay={p.onUploadedPlay} onStop={p.onStopUploaded} playing={p.uploadedPlaying} onStatus={()=>show('status')}/>{ELEMENT_TYPES.filter(type=>learned(p.pet,`element-${type.id}` as CourseId)).map(type=><section key={type.id} className="desktop-element-group" aria-label={`${type.name}法术`}><h3>{type.name}法术</h3><div className="desktop-element-grid">{elementSkillsForCourse(`element-${type.id}`).map(skill=><button key={skill.id} disabled={p.moodBusy||!learnedElementSkill(p.pet,skill.id)||p.pet.sleeping||Boolean(p.pet.activity)||Boolean(p.pet.outing)} onClick={()=>p.onElementSkill(skill.id)}><img alt="" src={`./assets/original/element-skills/icons/${type.id}.png`}/>{skill.name}</button>)}</div></section>)}</>}
+      </div>}/></>}
     </section>}
 
   </div>;

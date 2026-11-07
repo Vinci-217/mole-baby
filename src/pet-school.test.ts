@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {createPet,care,parseSave,tick} from './game'
-import {COURSES,activityBlockReason,beginActivity,cancelActivity,learned,settleActivity,petSpeech,JOB_MS,JOB_PAY,type CourseId} from './pet-school'
+import {COURSES,activityBlockReason,beginActivity,cancelActivity,finishRestaurantWork,learned,settleActivity,petSpeech,JOB_MS,JOB_PAY,type CourseId} from './pet-school'
 const now=1_700_000_000_000
 const pet=()=>({...createPet('豆豆','red',now),growth:60})
 function graduate(id:CourseId,state=pet()){
@@ -37,10 +37,24 @@ describe('persistent school and restaurant activities',()=>{
   const p=graduate('language');expect(beginActivity(p,'course','english',now+20).ok).toBe(true);expect(beginActivity(p,'course','wind',now+20).ok).toBe(false)
   expect(beginActivity(graduate('magic',p),'course','wind',now+30).ok).toBe(true)
  })
- it('does not settle or pay before the deadline, and pays exactly once',()=>{
+ it('pays proportional elapsed wages once and keeps working beyond two minutes',()=>{
   const p=pet(),r=beginActivity(p,'restaurant',undefined,now+1),end=r.state.activity!.endsAt
-  expect(end-(now+1)).toBe(JOB_MS);expect(settleActivity(r.state,end-1).coins).toBe(p.coins)
-  const done=settleActivity(r.state,end);expect(done.coins).toBe(p.coins+JOB_PAY);expect(settleActivity(done,end+5000).coins).toBe(done.coins)
+  expect(end-(now+1)).toBe(JOB_MS)
+  const partial=settleActivity(r.state,now+1+30_000)
+  expect(partial.coins).toBe(p.coins+30);expect(partial.activity).toMatchObject({continuous:true,paidCoins:30})
+  expect(settleActivity(partial,now+1+30_000)).toBe(partial)
+  const longer=settleActivity(partial,end+JOB_MS)
+  expect(longer.coins).toBe(p.coins+2*JOB_PAY);expect(longer.activity?.kind).toBe('restaurant')
+  const stopped=finishRestaurantWork(longer,end+JOB_MS+20_000)
+  expect(stopped.coins).toBe(p.coins+2*JOB_PAY+20);expect(stopped.activity).toBeUndefined()
+  expect(finishRestaurantWork(stopped,end+JOB_MS+60_000)).toEqual(stopped)
+ })
+ it('retains compatibility with a finite legacy shift',()=>{
+  const started=beginActivity(pet(),'restaurant',undefined,now).state
+  const legacy={...started,activity:{...started.activity!,continuous:undefined,paidCoins:undefined}}
+  expect(settleActivity(legacy,now+JOB_MS-1).coins).toBe(pet().coins)
+  const done=settleActivity(legacy,now+JOB_MS)
+  expect(done.coins).toBe(pet().coins+JOB_PAY);expect(done.activity).toBeUndefined()
  })
  it('cancels a legacy saved job on reopening without offline rewards',()=>{
   const started=beginActivity(pet(),'restaurant',undefined,now+1).state,done=parseSave(JSON.stringify(started),now+JOB_MS+2)!
@@ -55,7 +69,7 @@ describe('persistent school and restaurant activities',()=>{
   expect(started.ok).toBe(true);expect(started.state.stats.energy).toBe(ready.stats.energy-2);
   const done=tick(started.state,now+JOB_MS);
   expect(done.coins).toBe(tired.coins+JOB_PAY);expect(done.sleeping).toBe(false);
-  expect(done.activity).toBeUndefined();expect(done.stats.energy).toBeGreaterThan(20);
+  expect(done.activity).toMatchObject({continuous:true,paidCoins:JOB_PAY});expect(done.stats.energy).toBeGreaterThan(20);
  })
  it('settles before a later nap and integrates rewards identically across long and short ticks',()=>{
   const initial={...pet(),stats:{...pet().stats,energy:50,happiness:34.95}}
@@ -63,8 +77,8 @@ describe('persistent school and restaurant activities',()=>{
   const once=tick(started,now+6*3_600_000)
   let many=started
   for(let minute=1;minute<=360;minute++)many=tick(many,now+minute*60_000)
-  expect(once.coins).toBe(initial.coins+JOB_PAY);expect(many.coins).toBe(once.coins)
-  expect(once.activity).toBeUndefined();expect(many.activity).toBeUndefined()
+  expect(once.coins).toBe(initial.coins+JOB_PAY*180);expect(many.coins).toBe(once.coins)
+  expect(once.activity).toMatchObject({continuous:true,paidCoins:JOB_PAY*180});expect(many.activity).toEqual(once.activity)
   expect(many.sleeping).toBe(once.sleeping);expect(many.growth).toBeCloseTo(once.growth,3)
   // Each tick rounds needs to six decimals; accumulated minute ticks may
   // differ below one thousandth, far below a displayed percentage point.

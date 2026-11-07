@@ -14,7 +14,7 @@ async function record(page,locator,name,duration,fps){
  for(let i=0;i<count;i++){
   if(i)await page.clock.runFor(1000/fps);
   if(!checksOnly)await locator.screenshot({path:path.join(dir,String(i).padStart(4,'0')+'.png')});
-  const values=await locator.locator('canvas').evaluateAll(nodes=>nodes.map(c=>c.dataset.pagePhase||c.dataset.phase).filter(Boolean));
+  const values=await locator.locator('canvas').evaluateAll(nodes=>nodes.map(c=>c.dataset.sourceFrame||c.dataset.phase).filter(Boolean));
   values.forEach(v=>phases.add(v));
  }
  if(!checksOnly)execFileSync('ffmpeg',['-y','-loglevel','error','-framerate',String(fps),'-i',path.join(dir,'%04d.png'),'-filter_complex_threads','1','-filter_complex','split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a','-threads','2','-loop','0',path.join(out,name+'.gif')],{timeout:60000});
@@ -33,12 +33,12 @@ async function loaded(page,locator,count=1){
  await gallery.clock.install();await gallery.clock.pauseAt(new Date(Date.now()+1000));
  await gallery.goto(origin+'/?preview=reading');
  const grid=gallery.locator('.reading-preview-grid');
- await expect.poll(async()=>{await gallery.clock.runFor(32);return grid.locator('.reading-book[data-loaded=true]').count()},{timeout:30000}).toBe(9);
- await expect.poll(async()=>{await gallery.clock.runFor(32);return grid.locator('.reading-pet-source canvas[data-loaded=true]').count()},{timeout:30000}).toBe(9);
- const positions=await grid.locator('.reading-book').evaluateAll(nodes=>nodes.map(n=>({top:parseFloat(n.style.top),left:parseFloat(n.style.left),width:parseFloat(n.style.width)})));
+ await expect.poll(async()=>{await gallery.clock.runFor(32);return grid.locator('.reading-book[data-loaded=true]').count()},{timeout:30000}).toBe(8);
+ await expect.poll(async()=>{await gallery.clock.runFor(32);return grid.locator('.reading-pet-source canvas[data-loaded=true]').count()},{timeout:30000}).toBe(1);
+ const positions=await grid.locator('.reading-book').evaluateAll(nodes=>nodes.map(n=>({bottom:parseFloat(n.style.bottom),left:parseFloat(n.style.left),width:parseFloat(n.style.width)})));
  await grid.screenshot({path:path.join(out,'reading.png')});
  const reading=await record(gallery,grid,'reading',8000,16);
- assert(reading.phases.includes('turning'));assert(reading.phases.includes('reading'));
+ assert(reading.phases.length>=8,'original source frames advance');
  await gallery.getByRole('button',{name:'桌面大小',exact:true}).click();
  await gallery.clock.runFor(32);await grid.screenshot({path:path.join(out,'reading-desktop.png')});
  assert.equal(await gallery.evaluate(()=>localStorage.getItem('ramu-house-save-v1')),'review-does-not-touch-save');
@@ -119,5 +119,5 @@ async function loaded(page,locator,count=1){
  await native.close();
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
  fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({reading,positions,desktop,startsFromRealFootballMenu:true,desktopAndRestaurantShareShift:true,stoppingRestoresPetWithoutPay:true,nativeBridgeRequestsExpandedHostAndRestores:true,readingDisablesNativeWanderAndDesktopDrag:true,readingRestoresNativeMobilityOnCancel:true,previewDoesNotTouchPlayerSave:true,readingStowsBookOutfitAndRestoresWithoutSaveChange:true,narrowScreens:[320,393,1000],errors,failed},null,2)+'\n');
- console.log('PASS: nine reading forms and a full desktop delivery GIF from actual app work; 320px fit, enter/stop and player identity retained.');
+ console.log('PASS: eight original reading forms plus seed and a full desktop delivery GIF from actual app work; 320px fit, enter/stop and player identity retained.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close()});

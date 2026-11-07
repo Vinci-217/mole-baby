@@ -17,7 +17,7 @@ export interface ShopBookProps { pet: GameState; onBuy: (id: string) => void; in
 
 /** This shop is mounted by the room only. The bag never performs a purchase. */
 export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopBookProps) {
-  const [category, setCategory] = useState<ItemCategory>(initialCategory);
+  const [category, setCategory] = useState<ItemCategory>(initialCategory==='toy'?'food':initialCategory);
   const [page, setPage] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const book = books.find(value => value.id === category)!;
@@ -26,7 +26,7 @@ export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopB
   const visible = items.slice(page * BOOK_PAGE_SIZE, (page + 1) * BOOK_PAGE_SIZE);
   const selected = visible.find(item => item.id === selectedId) ?? visible[0];
   const count = selected ? pet.inventory[selected.id] ?? 0 : 0;
-  const full = count >= 9_999;
+  const full = count >= (selected?.reusable?1:9_999);
   const enough = selected && pet.coins >= selected.price;
   const locked = selected && getStage(pet.growth) < selected.minStage;
 
@@ -52,9 +52,9 @@ export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopB
           <div className="book-item-portrait"><img src={selected.image} alt={selected.name} draggable={false}/></div>
           <h4>{selected.name}</h4>
           <p className="book-item-effects">{itemEffectLine(selected)}</p>
-          <p className="book-item-owned">背包里有 <b>{count}</b> 份</p>
+          <p className="book-item-owned">背包里有 <b>{count}</b> 份{selected.reusable?' · 可以反复玩':''}</p>
           {locked && <p className="book-item-stage">{['种子期', '初级', '中级', '高级'][selected.minStage]}时使用，可以先收好。</p>}
-          <button type="button" className="book-buy" aria-label={`购买${selected.name}`} disabled={!enough || full} onClick={() => onBuy(selected.id)}><b>{selected.price} 摩尔豆</b><span>{full ? '背包已满' : enough ? '买一份' : '摩尔豆不足'}</span></button>
+          <button type="button" className="book-buy" aria-label={`购买${selected.name}`} disabled={!enough || full} onClick={() => onBuy(selected.id)}><b>{selected.price} 摩尔豆</b><span>{full ? selected.reusable?'已拥有':'背包已满' : enough ? '买一份' : '摩尔豆不足'}</span></button>
         </article>}
         <div className="book-page-number" aria-hidden="true">— {page * 2 + 2} —</div>
       </div>

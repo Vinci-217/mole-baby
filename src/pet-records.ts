@@ -23,12 +23,13 @@ export function normalizeStatHistory(value:unknown):StatChange[]{
  * records remain readable and the v1 save stays below its validation limit. */
 export function recordStatChange(before:GameState,after:GameState,reason:string,at=Date.now()):GameState{
  if(before.createdAt!==after.createdAt)return after;
+ if(reason==='自然消耗与休息'&&before.activity?.kind==='restaurant'&&before.activity.continuous&&after.coins>before.coins)reason='餐厅打工收入与日常消耗';
  if(reason==='自然消耗与休息'&&before.activity&&!after.activity&&after.lastTick>=before.activity.endsAt)reason=before.activity.kind==='restaurant'?'餐厅工作完成与日常消耗':'课程完成与日常消耗';
  const delta:Partial<PetStats>={};
  for(const key of fields){const d=Math.round((after.stats[key]-before.stats[key])*1000)/1000;if(d)delta[key]=d;}
  if(!Object.keys(delta).length)return after;
  const history=[...(after.statHistory??before.statHistory??[])],last=history.at(-1);
- if(reason==='自然消耗与休息'&&last?.reason===reason&&at-last.at<15*60000){
+ if(['自然消耗与休息','餐厅打工收入与日常消耗'].includes(reason)&&last?.reason===reason&&at-last.at<15*60000){
   const combined:Partial<PetStats>={};for(const key of fields){const d=Math.round(((last.delta[key]??0)+(delta[key]??0))*1000)/1000;if(d)combined[key]=d;}
   history[history.length-1]={at,reason,delta:combined};
  }else history.push({at,reason:reason.slice(0,100),delta});

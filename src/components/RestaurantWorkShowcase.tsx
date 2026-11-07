@@ -4,6 +4,7 @@ import type { GameState } from '../game';
 import { restaurantWorkFrame, RESTAURANT_BACKGROUNDS, WORK_PHASE_LABELS, type WorkPhase } from '../restaurant-work';
 import {loadRestaurantImage as loadImage, loadRestaurantWorkers, paintRestaurantWorker, RESTAURANT_ASSET as ASSET, GUEST_COLORS} from '../restaurant-painter';
 import './RestaurantWorkShowcase.css';
+import ActivityCountdown from './ActivityCountdown';
 
 const BACKGROUND_KEY = 'ramu-restaurant-background-v1';
 
@@ -13,7 +14,7 @@ function initialBackground(pet: GameState) {
   return RESTAURANT_BACKGROUNDS.includes(id) ? id : RESTAURANT_BACKGROUNDS[0];
 }
 
-export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameState; onClose: () => void }) {
+export default function RestaurantWorkShowcase({ pet, onClose,onStart,onStop }: { pet: GameState; onClose: () => void;onStart?:()=>void;onStop?:()=>void }) {
   const working=pet.activity?.kind==='restaurant';
   const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const [roomId, setRoomId] = useState(() => initialBackground(pet));
@@ -136,6 +137,7 @@ export default function RestaurantWorkShowcase({ pet, onClose }: { pet: GameStat
         </aside>
       </div>
       <p className="restaurant-work-status" role="status"><span aria-hidden="true" />{!working?'拉姆正在休息':online ? WORK_PHASE_LABELS[phase] : '网络已断开，打工暂停'}</p>
+      <footer className="restaurant-work-session">{working&&pet.activity&&<ActivityCountdown activity={pet.activity}/>}<small>在线计薪 · 每2分钟180摩尔豆 · 可随时结束，按实际时长结算</small>{(working?onStop:onStart)&&<button className="game-button small" onClick={working?onStop:onStart}>{working?'结束打工':'开始打工'}</button>}</footer>
     </section>
   </div>;
 }

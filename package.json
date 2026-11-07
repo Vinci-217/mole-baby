@@ -1,6 +1,6 @@
 {
   "name": "mole-baby",
-  "version": "0.32.3",
+  "version": "0.33.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
@@ -27,7 +27,8 @@
     "dist:win:legacy:ia32": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch ia32",
     "android:build": "node scripts/android/build.cjs",
     "android:assets": "node scripts/android/prepare-assets.cjs",
-    "android:manifest": "node scripts/android/prepare-update.cjs"
+    "android:manifest": "node scripts/android/prepare-update.cjs",
+    "build:preview": "cross-env VITE_LOCAL_DEBUG=1 npm run build"
   },
   "dependencies": {
     "core-js": "^3.51.0",

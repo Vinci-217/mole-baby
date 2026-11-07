@@ -1,7 +1,9 @@
 import {dailyFrameSpec} from '../daily-frames';
 import UploadedLamuFrames from './UploadedLamuFrames';
-import ReadingBook from './ReadingBook';
-import visibility from '../../electron/edge-visibility.json';
+import OfficialRamClip from './OfficialRamClip';
+import OfficialTransformation from './OfficialTransformation';
+import {originalActionClip,originalItemClip,playbackForm,usesTransformationSmoke} from '../pet-original-actions';
+import {OFFICIAL_CLIPS,isOfficialAction,supportsOfficial} from '../official-clips';
 import {uploadedMotion,UPLOADED_TOYS} from '../uploaded-actions';
 import {petColorName,petColorOffsets,isCustomPetColor} from '../pet-color';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -18,19 +20,9 @@ import { CARE_COLUMNS, CARE_ROWS, getRamActionDuration, sampleRamPose, sampleSee
 import { edgePeekTilt, type PetEdge } from '../edge-motion'
 import {isDragForm,dragSpec,dragRegistration,sampleDragPose} from '../drag-poses'
 import {bodyFrameRegistration} from '../frame-registration'
-import {sleepPose,affectionFrame,footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
+import {ramForm,sleepPose,affectionFrame,footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
-import RamWear from './RamWear'
-import type {footballOutfitRig} from '../outfit-motion'
-let outfitMotion:typeof import('../outfit-motion')|undefined
-let outfitLoading:Promise<void>|undefined
-const outfitWaiters=new Set<HTMLCanvasElement>()
-function requestOutfitMotion(body:HTMLCanvasElement){
-  outfitWaiters.add(body)
-  outfitLoading??=import('../outfit-motion').then(module=>{outfitMotion=module;for(const canvas of outfitWaiters)if(canvas.isConnected)canvas.dispatchEvent(new Event('ram-wardrobe-change'));outfitWaiters.clear()}).catch(()=>{outfitLoading=undefined;outfitWaiters.clear()})
-}
-import {getOutfit,outfitCoversCrown} from '../wardrobe'
-import {bodyWearAnchor,bodySideAccessoryOffset,backAccessoryOffset,headAccessoryOffset,CONTACT_HEADWEAR,garmentBottomContour,headwearContactOffset,headwearSurfaceGap,borrowedBodyPlacement,type WearAnchor} from '../wear-anchor'
+import {costumeAppearance,outfitAnimation} from '../wardrobe'
 import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
@@ -55,6 +47,8 @@ interface RamProps {
   edgeEntry?: PetEdge
   fromColor?: PetColor
   sound?: boolean
+  gameSound?: boolean
+  soundVolume?: number
   className?: string
   /** Compatibility only: every rendering path uses original game artwork. */
   artStyle?: 'classic' | 'hd'
@@ -75,8 +69,6 @@ const CELL_WIDTH = 192
 const CELL_HEIGHT = 208
 const sourceCache = new Map<string, Promise<SheetSource>>()
 const tintedCache = new Map<string, Promise<HTMLCanvasElement>>()
-const wearSources=new WeakMap<HTMLCanvasElement,SheetSource>()
-const wearAnchors=new WeakMap<SheetSource,Map<string,WearAnchor|null>>()
 const ACTION_NAMES: Record<string, string> = {
   'mood-joy':'开心地舒展开身体','mood-grumpy':'有点闷闷的，轻轻皱起眉头','mood-content':'安心地眯眯眼','mood-dozy':'困倦地打个小哈欠',
   'watch-butterfly':'好奇地看着小蝴蝶', 'look-around':'轻轻转身张望',
@@ -137,6 +129,8 @@ function getSource(form: Form, kind: SheetKind): Promise<SheetSource> {
     context.clearRect(0, 0, spec.width, spec.height); context.drawImage(maskImage, 0, 0)
     return { neutral, mask: context.getImageData(0, 0, spec.width, spec.height).data }
   }).catch((error: unknown) => { sourceCache.delete(key); throw error })
+  // Mounted renderers retain their own sheets; old forms need no permanent copy.
+  while(sourceCache.size>=8)sourceCache.delete(sourceCache.keys().next().value!)
   sourceCache.set(key, pending)
   return pending
 }
@@ -167,140 +161,13 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
       for (let channel = 0; channel < 3; channel++) pixels.data[i + channel] = clamp(pixels.data[i + channel] + deltas[0][channel] * white + deltas[1][channel] * gray + deltas[2][channel] * dark)
     }
     context.putImageData(pixels, 0, 0)
-    wearSources.set(canvas,{neutral,mask,form,kind})
     return canvas
   }).catch((error: unknown) => { tintedCache.delete(key); throw error })
   // Keep old colour previews from retaining an unlimited number of large
   // canvases after repeated pet imports. Mounted components hold their own copy.
-  if (tintedCache.size >= 18) tintedCache.delete(tintedCache.keys().next().value!)
+  if (tintedCache.size >= 6) tintedCache.delete(tintedCache.keys().next().value!)
   tintedCache.set(key, pending)
   return pending
-}
-/** Clothing belongs inside the body's transform layer and uses the same source
- * frame coverage. The anchor is cached per source cell, independent of colour. */
-const crownlessSheets=new WeakMap<HTMLCanvasElement,HTMLCanvasElement>()
-/** Original dress layers can hide foliage. Keep the source face and body; do
- * not paint a second face over it or tint the accessory with body colours. */
-function wardrobeBody(body:HTMLCanvasElement,sheet:HTMLCanvasElement) {
-  if(body.closest<HTMLElement>('.ram-sprite')?.dataset.crownHidden!=='true')return sheet
-  const cached=crownlessSheets.get(sheet);if(cached)return cached
-  const source=wearSources.get(sheet);if(!source)return sheet
-  // Football foliage participates in the source performance and can cross the
-  // face. Cropping a flattened crown there would leave holes in the body.
-  if(source.kind==='football')return sheet
-  const width=source.kind==='seed'||source.form==='seed'?96:source.kind==='drag'&&isDragForm(source.form??'')?dragSpec(source.form as 'junior'|'middle').cell[0]:192,height=source.kind==='seed'||source.form==='seed'?99:source.kind==='drag'&&isDragForm(source.form??'')?dragSpec(source.form as 'junior'|'middle').cell[1]:208
-  const view=document.createElement('canvas');view.width=sheet.width;view.height=sheet.height;const ctx=view.getContext('2d');if(!ctx)return sheet
-  ctx.drawImage(sheet,0,0);const pixels=ctx.getImageData(0,0,view.width,view.height),n=source.neutral.data,m=source.mask
-  for(let sy=0;sy<view.height;sy+=height)for(let sx=0;sx<view.width;sx+=width){
-    const anchor=bodyWearAnchor(m,n,view.width,sx,sy,width,height)
-    if(!anchor){if(source.kind==='grounded'&&sx/width===4)for(let y=0;y<height;y++)for(let x=0;x<width;x++)pixels.data[((sy+y)*view.width+sx+x)*4+3]=0;continue}
-    const left=anchor.x-anchor.bodyWidth/2,right=anchor.x+anchor.bodyWidth/2,top=anchor.y+anchor.bodyHeight*.025
-    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-      const i=((sy+y)*view.width+sx+x)*4
-      if(m[i]+m[i+1]+m[i+2]>50)continue
-      const coloured=Math.max(n[i],n[i+1],n[i+2])-Math.min(n[i],n[i+1],n[i+2])>25
-      const outsideFace=y<top-anchor.bodyHeight*.35||x<left-anchor.bodyWidth*.1||x>right+anchor.bodyWidth*.1
-      if((coloured&&(y<top+anchor.bodyHeight*.18||x<left-anchor.bodyWidth*.04||x>right+anchor.bodyWidth*.04))||(outsideFace&&y<top+anchor.bodyHeight*.9))pixels.data[i+3]=0
-    }
-  }
-  ctx.putImageData(pixels,0,0);crownlessSheets.set(sheet,view);return view
-}
-const costumeImages=new Map<string,HTMLImageElement>()
-const costumePending=new Map<string,Promise<HTMLImageElement>>()
-const costumeListeners=new WeakMap<HTMLCanvasElement,Promise<HTMLImageElement>>()
-const costumeContours=new WeakMap<HTMLCanvasElement,{signature:string;bottom:readonly (number|null)[]}>()
-function costumeImage(path:string,wear:HTMLCanvasElement,body:HTMLCanvasElement) {
-  const ready=costumeImages.get(path);if(ready)return ready
-  let pending=costumePending.get(path)
-  if(!pending){pending=new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Costume PNG unavailable'));im.src=path});costumePending.set(path,pending)}
-  // A cache eviction can create a fresh request for the same path. Observe the
-  // request itself so a previously loaded hat can repaint after loading again.
-  const request=pending
-  if(costumeListeners.get(wear)!==request){costumeListeners.set(wear,request);request.then(im=>{costumeImages.set(path,im);costumePending.delete(path);while(costumeImages.size>24)costumeImages.delete(costumeImages.keys().next().value!);if(body.isConnected&&wear.isConnected&&costumeListeners.get(wear)===request)body.dispatchEvent(new Event('ram-wardrobe-change'))}).catch(()=>{costumePending.delete(path)})}
-  return null
-}
-function placeFootballHeadwear(wear:HTMLCanvasElement,rig:NonNullable<ReturnType<typeof footballOutfitRig>>,box:{x:number;y:number;width:number;height:number}){
-  const sx=100/160*1.666666667,sy=100/192*1.846153846;
-  wear.style.left=`${(rig.x-(rig.neutralX-box.x)*rig.scale)*sx-33.3333333}%`;
-  wear.style.top=`${(rig.y-(rig.neutralY-box.y)*rig.scale)*sy-61.5384615}%`;
-  wear.style.width=`${box.width*rig.scale*sx}%`;wear.style.height=`${box.height*rig.scale*sy}%`;
-  wear.style.transformOrigin=`${(rig.neutralX-box.x)/box.width*100}% ${(rig.neutralY-box.y)/box.height*100}%`;
-  wear.style.rotate=`${rig.angle}deg`;wear.dataset.headRegistration='original-symbols';
-}
-function paintWear(canvas:HTMLCanvasElement|null,sheet:HTMLCanvasElement,frame:number,row:number,width=192,height=208,football=false,sourceFrame?:number) {
-  if(!canvas?.isConnected)return
-  const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear'),source=wearSources.get(sheet)
-  const outfit=getOutfit(wear?.dataset.outfit)
-  if(!wear||!outfit||!source)return
-  if(!outfitMotion){wear.style.visibility='hidden';requestOutfitMotion(canvas);return}
-  const {outfitFrame,footballOutfitRig}=outfitMotion
-  const kind=source.kind??'classic',form=width===96?'seed':source.form??'junior'
-  const bodyAnchor=()=>{
-    let cache=wearAnchors.get(source);if(!cache){cache=new Map();wearAnchors.set(source,cache)}
-    const key=`${frame}:${row}:${width}:${height}`
-    if(!cache.has(key))cache.set(key,bodyWearAnchor(source.mask,source.neutral.data,source.neutral.width,frame*width,row*height,width,height,width===96))
-    return cache.get(key)
-  }
-  if(football&&['magic-book','star-wand'].includes(outfit.id)){
-    const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas),context=wear.getContext('2d');if(!image||!context){wear.style.visibility='hidden';return}
-    if(wear.dataset.paint!==`stowed:${outfit.id}`){wear.width=image.naturalWidth;wear.height=image.naturalHeight;context.clearRect(0,0,wear.width,wear.height);context.drawImage(image,0,0);wear.dataset.paint=`stowed:${outfit.id}`}
-    const settle=Math.min(1,Math.max(0,((sourceFrame??1)-1)/12)),size=outfit.id==='magic-book'?21:13;
-    wear.style.left=outfit.id==='magic-book'?'7%':'82%';wear.style.top=`${72+(1-settle)*-8}%`;wear.style.width=`${size}%`;wear.style.height=`${size*192/208*image.naturalHeight/image.naturalWidth}%`;wear.style.transformOrigin='50% 100%';wear.style.rotate=outfit.id==='magic-book'?'-9deg':'24deg';wear.style.visibility='visible';wear.dataset.loaded='true';wear.dataset.registration='original-source';wear.dataset.stowed='true';wear.dataset.sourceFrame=String(sourceFrame);delete wear.dataset.headRegistration;return
-  }
-  delete wear.dataset.stowed;
-  const rig=football&&sourceFrame?footballOutfitRig(form,sourceFrame):null;
-  // These three original modules include a separable football costume rig.
-  // Play those source poses rather than treating wings or a shield as a hat.
-  const headRig=rig&&!['magic-book','star-wand','flower-crown','knight-shield','angel-wings'].includes(outfit.id)?rig:null;
-  const mountedHead=kind==='classic'&&(row===1||row===2)&&['wizard-cap','gold-feather','warm-scarf','flower-crown','leaf-hood','sport-goggles'].includes(outfit.id)
-  const authored=headRig?outfitFrame(outfit.id,form,'slumber',0,0,8):outfitFrame(outfit.id,form,kind,mountedHead?0:frame,row,source.neutral.width/width,sourceFrame)
-  if(!headRig){wear.style.transformOrigin='50% 100%';delete wear.dataset.headRegistration}
-  const scaleX=football?1.666666667:1,scaleY=football?1.846153846:1
-  const context=wear.getContext('2d');if(!context)return
-  if(authored){
-    const {sheet:spec,index}=authored,im=costumeImage(`./assets/original/wardrobe-motion/${spec.file}`,wear,canvas)
-    if(!im){wear.style.visibility='hidden';return}
-    const signature=`${spec.file}:${index}`
-    if(wear.dataset.paint!==signature){wear.width=spec.cell[0];wear.height=spec.cell[1];context.clearRect(0,0,wear.width,wear.height);const box=spec.rects[index],w=box[2]-box[0],h=box[3]-box[1];context.drawImage(im,index%spec.columns*spec.tile[0],Math.floor(index/spec.columns)*spec.tile[1],w,h,box[0],box[1],w,h);wear.dataset.paint=signature}
-    wear.style.left=`${-spec.origin[0]/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${-spec.origin[1]/height*100*scaleY-(football?61.5384615:0)}%`
-    delete wear.dataset.mount
-    if(outfit.id==='knight-shield'||outfit.id==='angel-wings'||mountedHead||!football&&CONTACT_HEADWEAR.has(outfit.id)){
-      const anchor=bodyAnchor()
-      if(anchor){
-        const action=canvas.closest<HTMLElement>('.ram-sprite')?.dataset.action??'',facing=action.includes('left')?-1:action.includes('right')?1:0
-        const head=mountedHead||!football&&CONTACT_HEADWEAR.has(outfit.id)
-        const offset=head?headAccessoryOffset(anchor,spec.rects[index],spec.origin,outfit.id):outfit.id==='angel-wings'?backAccessoryOffset(anchor,spec.rects[index],spec.origin,facing):bodySideAccessoryOffset(anchor,spec.rects[index],spec.origin)
-        wear.style.left=`${(-spec.origin[0]+offset.x)/width*100*scaleX-(football?33.3333333:0)}%`;wear.style.top=`${(-spec.origin[1]+offset.y)/height*100*scaleY-(football?61.5384615:0)}%`;wear.dataset.mount=mountedHead?'head':outfit.id==='angel-wings'?'body-back':'body-side'
-      }
-    }
-    wear.style.width=`${spec.cell[0]/width*100*scaleX}%`;wear.style.height=`${spec.cell[1]/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='original-source';wear.dataset.sourceFrame=String(sourceFrame??frame)
-    if(authored.borrowedBody&&!football&&!CONTACT_HEADWEAR.has(outfit.id)&&!['knight-shield','angel-wings'].includes(outfit.id)){
-      const anchor=bodyAnchor()
-      if(anchor){const fit=borrowedBodyPlacement(anchor,authored.borrowedBody,{left:-spec.origin[0],top:-spec.origin[1],scaleX:1,scaleY:1});wear.style.left=`${fit.left/width*100}%`;wear.style.top=`${fit.top/height*100}%`;wear.style.width=`${spec.cell[0]*fit.scaleX/width*100}%`;wear.style.height=`${spec.cell[1]*fit.scaleY/height*100}%`;wear.dataset.mount='borrowed-body'}
-    }
-    if(headRig)placeFootballHeadwear(wear,headRig,{x:-spec.origin[0],y:-spec.origin[1],width:spec.cell[0],height:spec.cell[1]})
-  }else{
-    const image=costumeImage(`./assets/original/wardrobe/${outfit.id}.png`,wear,canvas)
-    if(!image){wear.style.visibility='hidden';return}
-    const anchor=bodyAnchor();if(!anchor){wear.style.visibility='hidden';return}
-    if(wear.dataset.paint!==outfit.id){wear.width=image.naturalWidth;wear.height=image.naturalHeight;context.clearRect(0,0,wear.width,wear.height);context.drawImage(image,0,0);wear.dataset.paint=outfit.id}
-    const w=anchor.bodyWidth*outfit.width,x=(anchor.x+anchor.bodyWidth*outfit.x-w/2)/width*100*scaleX-(football?33.3333333:0)
-    const y=(anchor.y+anchor.bodyHeight*outfit.y-w*image.naturalHeight/image.naturalWidth)/height*100*scaleY-(football?61.5384615:0)
-    wear.style.left=`${x}%`;wear.style.top=`${y}%`;wear.style.width=`${w/width*100*scaleX}%`;wear.style.height=`${w*image.naturalHeight/image.naturalWidth/height*100*scaleY}%`;wear.style.rotate='none';wear.style.visibility='visible';wear.dataset.registration='head-fit'
-    if(headRig){const b=headRig.body,bw=b[2]-b[0],bh=b[3]-b[1],size=bw*outfit.width;placeFootballHeadwear(wear,headRig,{x:(b[0]+b[2])/2+bw*outfit.x-size/2,y:b[1]-bh*.025+bh*outfit.y-size*image.naturalHeight/image.naturalWidth,width:size,height:size*image.naturalHeight/image.naturalWidth})}
-  }
-  delete wear.dataset.contactGap
-  if(!football&&!kind.startsWith('emotion-')&&CONTACT_HEADWEAR.has(outfit.id)){
-    const anchor=bodyAnchor()
-    if(anchor){
-      let contour=costumeContours.get(wear)
-      if(!contour||contour.signature!==wear.dataset.paint){contour={signature:wear.dataset.paint??'',bottom:garmentBottomContour(context.getImageData(0,0,wear.width,wear.height).data,wear.width,wear.height)};costumeContours.set(wear,contour)}
-      const placement={left:parseFloat(wear.style.left)*width/100,top:parseFloat(wear.style.top)*height/100,scaleX:parseFloat(wear.style.width)*width/100/wear.width,scaleY:parseFloat(wear.style.height)*height/100/wear.height}
-      placement.top+=headwearContactOffset(anchor,contour.bottom,placement)
-      wear.style.top=`${placement.top/height*100}%`;wear.dataset.contactGap=String(headwearSurfaceGap(anchor,contour.bottom,placement));wear.dataset.mount='head-contact'
-    }
-  }
-  wear.dataset.anchorFrame=`${frame}:${row}`;wear.dataset.loaded='true'
 }
 /** Body and accessory consume the exact same elapsed event clock. The
  * accessory is moved, not used to resize/re-register the original body. */
@@ -345,12 +212,18 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
   const errorRef = useRef(onError); errorRef.current = onError
   const endRef = useRef(onActionEnd); endRef.current = onActionEnd
   const [ready, setReady] = useState<{ key: string; classic: HTMLCanvasElement; care: HTMLCanvasElement; item: HTMLCanvasElement; grounded?: HTMLCanvasElement; slumber: HTMLCanvasElement; yawn: HTMLCanvasElement; affection:HTMLCanvasElement; drag?:HTMLCanvasElement; gentle:HTMLCanvasElement; previous: (HTMLCanvasElement | undefined)[] | null } | null>(null)
-  const key = `${form}:${color}:${fromColor??''}`
+  const key = `${form}:${color}:${fromColor??''}:${action==='still'?'portrait':'active'}`
   const sheets = ready?.key === key ? ready : null
   usePaintReadiness(canvasRef,`${key}:${action}:${actionId??0}`)
   useEffect(() => {
     let cancelled = false
     const load=async(c:PetColor)=>{
+      // Growth/wardrobe portraits need one body, not every care/drag sheet.
+      if(action==='still'){
+        const grounded=['junior','middle'].includes(form)?await getTintedSheet(form,c,'grounded'):undefined;
+        const classic=grounded??await getTintedSheet(form,c,'classic');
+        return {classic,care:classic,item:classic,grounded,slumber:classic,gentle:classic,yawn:classic,affection:classic,drag:undefined};
+      }
       const [classic,care,item]=await Promise.all([getTintedSheet(form,c,'classic'),getTintedSheet(form,c,'care'),getTintedSheet(form,c,'item')]);
       const grounded=['junior','middle'].includes(form)?await getTintedSheet(form,c,'grounded'):undefined;
       const slumber=await getTintedSheet(form,c,'slumber');
@@ -407,11 +280,11 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         const target=sheet==='drag'?sheets.drag!:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic
         const old=sheets.previous?.[sheet==='drag'?6:sheet==='gentle'?5:sheet==='slumber'?4:sheet==='grounded'?3:sheet==='care'?1:sheet==='item'?2:0]
         const draw=(source:HTMLCanvasElement)=>{
-          context.drawImage(wardrobeBody(canvas,source),frame*drawWidth,row*drawHeight,drawWidth,drawHeight,0,0,drawWidth,drawHeight)
+          context.drawImage(source,frame*drawWidth,row*drawHeight,drawWidth,drawHeight,0,0,drawWidth,drawHeight)
           if(grounded&&!affection&&!drag){
-            if(frame===0)context.drawImage(wardrobeBody(canvas,source),3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
+            if(frame===0)context.drawImage(source,3*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,grounded.eyeX,grounded.eyeY,CELL_WIDTH,CELL_HEIGHT)
             context.save();context.translate(96,110);context.rotate(grounded.leafAngle*Math.PI/180);context.translate(-96,-110)
-            context.drawImage(wardrobeBody(canvas,source),4*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.restore()
+            context.drawImage(source,4*CELL_WIDTH,0,CELL_WIDTH,CELL_HEIGHT,0,0,CELL_WIDTH,CELL_HEIGHT);context.restore()
           }
         }
         if(old&&mix<1){draw(old);context.globalAlpha=mix}
@@ -419,7 +292,7 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
         if(grounded){canvas.dataset.gazeX=grounded.eyeX.toFixed(2);canvas.dataset.gazeY=grounded.eyeY.toFixed(2)}
         canvas.dataset.row=String(row);canvas.dataset.frame=String(frame);canvas.dataset.sheet=sheet;canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;previous=signature
       }
-      paintWear(canvas,drag?sheets.classic:sheet==='affection'?sheets.affection:sheet==='gentle'?sheets.gentle:sheet==='grounded'?sheets.grounded!:sheet==='yawn'?sheets.yawn:sheet==='slumber'?sheets.slumber:sheet==='care'?sheets.care:sheet==='item'?sheets.item:sheets.classic,drag?drag.wearFrame:frame,drag?drag.wearRow:row)
+
       if(drag){
         canvas.dataset.dragView=drag.direction;canvas.dataset.dragPhase=String(drag.phase);
         const wear=canvas.parentElement?.querySelector<HTMLCanvasElement>('.ram-wear');
@@ -468,8 +341,8 @@ function FootballFrames({form,color,actionId,sound,startedAt,performanceClock,on
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=footballPose(form,elapsed,media.matches)
       if(!media.matches)audio.tick(elapsed)
       performanceClock.current.lastAudioElapsed=elapsed
-      if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(wardrobeBody(canvas,source),pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
-      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),160,192,true,pose.sourceFrame)
+      if(previous!==pose.frame){context.clearRect(0,0,160,192);context.drawImage(source,pose.frame%8*160,Math.floor(pose.frame/8)*192,160,192,0,0,160,192);previous=pose.frame}
+
       canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.nearBall=String(pose.nearBall)
       if(pose.finished&&!ended){ended=true;endRef.current?.()}
       if(!ended)request=requestAnimationFrame(paint)
@@ -492,8 +365,8 @@ function EmotionFrames({form,color,action,actionId,performanceClock,onError,onAc
       if(cancelled||!source||!canvas.isConnected||document.hidden)return
       if(performanceClock.current.began===undefined)performanceClock.current.began=now
       const elapsed=Math.max(0,now-performanceClock.current.began),pose=emotionPose(form,action,elapsed,media.matches)
-      if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(wardrobeBody(canvas,source),pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
-      paintWear(canvas,source,pose.frame%8,Math.floor(pose.frame/8),192,208,false,pose.sourceFrame)
+      if(previous!==pose.frame){context.clearRect(0,0,192,208);context.drawImage(source,pose.frame%8*192,Math.floor(pose.frame/8)*208,192,208,0,0,192,208);previous=pose.frame}
+
       canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(pose.frame);canvas.dataset.sourceFrame=String(pose.sourceFrame)
       if(pose.finished&&!ended){ended=true;endRef.current?.()}
       if(!ended)request=requestAnimationFrame(paint)
@@ -535,7 +408,7 @@ function SeedBody({ color, fromColor, action, actionId, itemMotion, sound, start
         if (ref.current) { ref.current.dataset.loaded = 'true'; ref.current.dataset.loadedColor=color; ref.current.dataset.frame = String(pose.frame);ref.current.dataset.sheet=sleepy?(yawning?'yawn':'slumber'):isGentle?'gentle':'seed' }
         previous = signature
       }
-      paintWear(canvas,activeSource,pose.frame%8,Math.floor(pose.frame/8),96,99)
+
       if (pose.finished && !ended) { ended = true; endRef.current?.() }
       if (!ended && action !== 'still' && (!media.matches || getRamActionDuration(action) !== null)) request = requestAnimationFrame(paint)
     }
@@ -556,8 +429,8 @@ function DizzyFrames({form,color,startedAt,onError}:{form:Form;color:PetColor;st
   const paint=(now:number)=>{
    if(cancelled||!canvas.isConnected||!sheet||document.hidden)return
    const elapsed=Math.max(0,now-startedAt),pose=dizzyEyes(elapsed,media.matches,dizzySource.forms[form==='classic'?'super':form].orbit)
-   const body=wardrobeBody(canvas,sheet);ctx.clearRect(0,0,w,h);ctx.drawImage(body,0,0,w,h,0,0,w,h);ctx.drawImage(body,w,0,w,h,pose.x,pose.y,w,h)
-   paintWear(canvas,sheet,0,0,w,h);paintSocialCue(canvas,form==='seed'?0:form==='junior'?1:form==='middle'?2:form==='senior'?3:4,'dizzy',elapsed,media.matches)
+   const body=sheet;ctx.clearRect(0,0,w,h);ctx.drawImage(body,0,0,w,h,0,0,w,h);ctx.drawImage(body,w,0,w,h,pose.x,pose.y,w,h)
+
    canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.sheet='dizzy';canvas.dataset.pupilX=pose.x.toFixed(3);canvas.dataset.pupilY=pose.y.toFixed(3)
    if(!pose.finished&&!media.matches)request=requestAnimationFrame(paint)
   }
@@ -602,7 +475,7 @@ function OriginalFlightFrames({form,color,action,actionId,startedAt,onError,onAc
    if(split)stepFanMotion(fan.current,delta,speed,action==='pet'?elapsed:null,reduced);
    const index=split?senior.bodyIndex:pose.index,signature=`${index}:${split?fan.current.angle.toFixed(3):''}:${root?.dataset.crownHidden}`;
    if(signature!==previous){
-    context.clearRect(0,0,192,208);drawCell(wardrobeBody(canvas,source),index);
+    context.clearRect(0,0,192,208);drawCell(source,index);
     if(split&&root?.dataset.crownHidden!=='true'){
      const [x,y]=senior.rotor.pivot,projection=senior.rotor.projectionY;
      if(rawDaily){context.save();context.translate(x,y);context.scale(1,projection);context.rotate(fan.current.angle);context.scale(1,1/projection);context.translate(-x,-y);drawCell(source,senior.crownIndex);context.restore()}
@@ -610,7 +483,7 @@ function OriginalFlightFrames({form,color,action,actionId,startedAt,onError,onAc
     }
     previous=signature;
    }
-   paintWear(canvas,source,index%8,Math.floor(index/8),192,208,false,pose.sourceFrame);
+
    paintSocialCue(canvas,form==='senior'?3:4,action,elapsed,reduced,form==='senior'?undefined:form);
    canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(index);canvas.dataset.sourceFrame=String(pose.sourceFrame);canvas.dataset.frameCount=String(clip.frames.length);canvas.dataset.row=String(Math.floor(index/8));canvas.dataset.direction=direction;
    if(split){canvas.dataset.fanSpeed=fan.current.speed.toFixed(3);canvas.dataset.fanAngle=fan.current.angle.toFixed(3);canvas.dataset.fanBlades=String(senior.bladeCount)}
@@ -643,9 +516,9 @@ function ClassicGentleFrames({color,fromColor,action,actionId,startedAt,itemMoti
     const index=closed?1:0,frame=closed?sleepPose(elapsed,media.matches).frame:itemMotion?sampleGentleMouth(itemMotion,elapsed,media.matches):0;
     const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;
     ctx.clearRect(0,0,192,208);
-    if(old&&mix<1)ctx.drawImage(wardrobeBody(canvas,old[index]),frame*192,0,192,208,0,0,192,208);
-    ctx.globalAlpha=mix;ctx.drawImage(wardrobeBody(canvas,sheets[index]),frame*192,0,192,208,0,0,192,208);ctx.globalAlpha=1;
-    paintWear(canvas,sheets[index],frame,0);paintItemCue(canvas,itemMotion,elapsed,media.matches);paintSocialCue(canvas,4,action,elapsed,media.matches,'classic');
+    if(old&&mix<1)ctx.drawImage(old[index],frame*192,0,192,208,0,0,192,208);
+    ctx.globalAlpha=mix;ctx.drawImage(sheets[index],frame*192,0,192,208,0,0,192,208);ctx.globalAlpha=1;
+
     audio.tick(elapsed);canvas.dataset.loaded='true';canvas.dataset.loadedColor=color;canvas.dataset.frame=String(frame);canvas.dataset.sheet=closed?'slumber':'gentle';
     const duration=getRamActionDuration(action,'classic');if(duration!==null&&elapsed>=duration&&!finished){finished=true;end.current?.()}
     if(!media.matches||duration!==null)request=requestAnimationFrame(paint);
@@ -671,7 +544,7 @@ function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:P
     const elapsed=performance.now()-start,duration=getRamActionDuration(action,'classic');
     const row=action.includes('left')?2:action.includes('right')?1:action==='pet'||action==='waving'?3:action==='play'?4:['sleep','waiting'].includes(action)?6:action==='happy'||action==='reward'?8:0;
     const frame=still||media.matches?0:Math.floor(elapsed/140)%6;
-    const body=wardrobeBody(ref.current,sheet);ctx.clearRect(0,0,192,208);ctx.drawImage(body,frame*192,row*208,192,208,0,0,192,208);paintWear(ref.current,sheet,frame,row);ref.current.dataset.loaded='true';
+    const body=sheet;ctx.clearRect(0,0,192,208);ctx.drawImage(body,frame*192,row*208,192,208,0,0,192,208);ref.current.dataset.loaded='true';
     if(duration&&elapsed>=duration&&!done){done=true;end.current?.()}if(!still)raf=requestAnimationFrame(draw);
    };redraw=draw;draw();
   }).catch(()=>{if(live)onError()});
@@ -680,7 +553,12 @@ function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:P
  return <canvas ref={ref} width={192} height={208} className="ram-classic-frame" data-form="classic" data-color={color} aria-hidden="true"/>;
 }
 
-export default function Ram({ rawDaily: _rawDaily=false, color, costume:requestedCostume, companionId=0, stage, evolution, action = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+export default function Ram({ rawDaily: _rawDaily=false, color, costume:requestedCostume, companionId=0, stage:actualStage, evolution:actualEvolution, action:requestedAction = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, gameSound=sound, soundVolume=.45, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
+  const action=requestedAction.startsWith('ambient-element-')?requestedAction.slice(8):requestedAction;
+  const reading=!_rawDaily&&!sleeping&&!dragging&&!shaking&&(action==='focus'||action==='read-alone');
+  // Reading is an action, not the Ebook outfit. Stow clothing visually without
+  // changing the saved outfit or allowing its junior fallback to change form.
+  const {stage,evolution}=costumeAppearance(actualStage,actualEvolution,reading?undefined:requestedCostume);
   const costume=stage>0?requestedCostume:undefined
   const clock=useRef({key:'',startedAt:0})
   const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
@@ -688,8 +566,7 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   if(clock.current.key!==eventKey)clock.current={key:eventKey,startedAt:performance.now()}
   if(playClock.current.key!==eventKey)playClock.current={key:eventKey,began:undefined}
   const form: Form = stage === 4 ? evolution ?? 'super' : stage <= 1 ? 'junior' : stage === 2 ? 'middle' : 'senior'
-  const reading=!_rawDaily&&!sleeping&&!dragging&&!shaking&&(action==='focus'||action==='read-alone');
-  const daily=!reading&&!_rawDaily&&!costume&&!dragging&&!shaking?dailyFrameSpec(stage===0?'seed':form,sleeping||action==='sleep'?'sleep':action):undefined
+  const daily=!_rawDaily&&(!costume||reading)&&!dragging&&!shaking?dailyFrameSpec(stage===0?'seed':form,sleeping||action==='sleep'?'sleep':action):undefined
   const uploaded=!sleeping&&!dragging&&!shaking?uploadedMotion(stage===0?'seed':form,action,itemId):undefined
   const lifeAction=!sleeping&&!dragging&&!shaking&&isPastime(action)?action:undefined
   const schoolAction=!sleeping&&!dragging&&!shaking&&isSchoolAction(action)?action:undefined
@@ -706,7 +583,6 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
     if(lifeAction!=='play-alone')timers.push(setTimeout(()=>finishRef.current?.(),getRamActionDuration(lifeAction,stage===0?'seed':form)!))
     return()=>timers.forEach(clearTimeout)
   },[eventKey,lifeAction,schoolAction,form,stage,magicAction,uploaded,daily])
-  const wearing=costume
   const sourceEnd=schoolAction||lifeAction&&lifeAction!=='play-alone'?undefined:onActionEnd
   const itemRecipe = itemId ? getItemMotion(itemId) : getItemMotionByAction(action)
   const itemMotion = itemRecipe?.itemId && (getItemMotionByAction(action) || ['feed', 'eat', 'drink', 'wash', 'medical', 'use'].includes(action)) && !sleeping && action !== 'sleep' && !dragging ? itemRecipe : undefined
@@ -722,11 +598,21 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   // Lift the artwork within its fixed hit box so a peek actually reveals eyes;
   // the native window offset and drag-out placement stay unchanged.
   const bottomPeek = peeking && peekSide === 'bottom' && !dragging ? stage === 1 ? -25 : -45 : 0
-  const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
-  if(reading)return <span className="ram-sprite ram-classic ram-reading" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action="focus" data-life-action={lifeAction} data-color={color} data-sleeping="false" data-art-style="classic">
-    <span className="reading-pet-source" aria-hidden="true" style={stage===0?undefined:{transform:`translate(${(50-(visibility.forms[form].body[0]+visibility.forms[form].body[2])/2)*.64}%,${(71-visibility.forms[form].body[3]*.64)/108*100}%) scale(.64)`,transformOrigin:"50% 0"}}><Ram rawDaily color={color} costume={costume==='magic-book'?undefined:costume} companionId={companionId} stage={stage} evolution={evolution} action="focus" sound={false}/></span><ReadingBook key={eventKey} form={stage===0?'seed':form} sound={sound} duration={action==='read-alone'?18000:undefined}/>
+  const explicitOfficial=isOfficialAction(action)?originalActionClip(action):undefined
+  const itemOfficial=itemId?originalItemClip(itemId,stage===0?'seed':form,typeof actionId==='number'?actionId:0):undefined
+  const costumeOfficial=outfitAnimation(costume)
+  const uploadedOfficial=uploaded?OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.path.endsWith('/'+uploaded.id+'.swf')&&supportsOfficial(clip,stage===0?'seed':form)):undefined
+  const sourceClip=explicitOfficial??itemOfficial??uploadedOfficial??costumeOfficial
+  const officialForm=sourceClip?playbackForm(sourceClip,stage===0?'seed':form):undefined
+  const finiteOriginal=Boolean(explicitOfficial||itemOfficial||uploadedOfficial)
+  if(!reading&&!magicAction&&explicitOfficial&&officialForm&&usesTransformationSmoke(explicitOfficial))return <span className="ram-sprite ram-classic ram-transform" role="img" aria-label={`拉姆变身：${explicitOfficial.name}`} data-action={action}>
+    <OfficialTransformation key={eventKey} clip={explicitOfficial} form={officialForm} color={color} startedAt={clock.current.startedAt} sound={gameSound} volume={soundVolume} onEnd={onActionEnd}><Ram color={color} costume={costume} stage={actualStage} evolution={actualEvolution} action="still" sound={false}/></OfficialTransformation>
   </span>;
-  if(daily)return <span className="ram-sprite ram-classic ram-daily" role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>
+  if(!reading&&!magicAction&&sourceClip&&officialForm)return <span className="ram-sprite ram-classic ram-official" role="img" aria-label={`${petColorName(color)}拉姆 · ${sourceClip.name}`} data-stage={stage} data-growth-stage={actualStage} data-form={officialForm} data-color={color} data-action={action}>
+    <OfficialRamClip key={finiteOriginal?eventKey:'costume'} clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={action} finite={finiteOriginal} registerBody={!finiteOriginal} sound={gameSound} volume={soundVolume} onEnd={onActionEnd} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
+  </span>
+  const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
+  if(daily)return <span className={`ram-sprite ram-classic ram-daily${reading?' ram-reading':''}`} role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>
     <UploadedLamuFrames key={eventKey} spec={daily} form={stage===0?'seed':form} color={color} sound={sound} loop={daily.id==='focus'||daily.id==='sleep'} limit={action==='read-alone'?18000:undefined} action={daily.id} onEnd={onActionEnd} fallback={<Ram color={color} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
   </span>
   if(uploaded)return <span className="ram-sprite ram-classic ram-uploaded" role="img" aria-label={`${petColorName(color)}拉姆 · ${UPLOADED_TOYS.find(t=>t.id===uploaded.id)?.name??itemMotion?.label??'原版动作'}`} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping="false" data-art-style="classic" data-uploaded-action={uploaded.id}>
@@ -734,11 +620,11 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   </span>
   if(magicAction)return <SharedMagicBox key={eventKey} startedAt={clock.current.startedAt} onEnd={onActionEnd} prepare={elementId?prepareElementSkill(elementId):undefined} targetDuration={elementClip?.durationMs} label={elementClip?`烟雾变身 · ${elementClip.name} · 恢复原形`:undefined} target={elementId?(began=><OriginalElementSkill id={elementId} startedAt={began} form={stage===0?'seed':form}/>):undefined}><Ram color={color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></SharedMagicBox>
   return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
-    role="img" aria-label={label} data-crown-hidden={outfitCoversCrown(wearing)||undefined} data-life-action={lifeAction} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
+    role="img" aria-label={label}  data-life-action={lifeAction} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-proportion-layer"><span className="ram-flight-layer">
-    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}<RamWear costume={wearing}/></span></span></span></>
-      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className={`ram-pose-layer ${activeAction==='focus'&&wearing==='magic-book'?'using-reading-book':''}`}>
-        {!fallback&&form==='classic'&&(Boolean(itemMotion)||['sleep','wake','mood-dozy'].includes(activeAction))?<ClassicGentleFrames color={color} fromColor={fromColor} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} itemMotion={itemMotion} sound={sound} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&hasFlightRig(form,activeAction)?<OriginalFlightFrames rawDaily={_rawDaily} form={form} color={color} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&form==='classic'&&activeAction!=='play'?<ClassicSuperFrames color={color} action={activeAction} actionId={actionId} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${isCustomPetColor(color)?'red':color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}<RamWear costume={wearing}/>
+    {stage === 0 ? <><img className="seed-pot-original" src="./assets/original/seed/pot.png" alt="" draggable={false}/><span className="seed-body-original" style={{ transform: `${seedPeek}rotate(${resting ? 0 : tilt}deg)` }}><span className="ram-elastic-layer"><span className="ram-pose-layer">{activeAction==='dizzy'?<DizzyFrames form="seed" color={color} startedAt={clock.current.startedAt}/>:<SeedBody startedAt={clock.current.startedAt} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd}/>}</span></span></span></>
+      : <span className="ram-artwork" style={{ transform: `translateY(${bottomPeek}%) rotate(${dragging&&stage<=2?Math.max(-3,Math.min(3,tilt)):tilt}deg) translateY(${dragging&&stage>=3 ? '-2px' : '0'})` }}><span className="ram-elastic-layer"><span className="ram-pose-layer">
+        {!fallback&&form==='classic'&&(Boolean(itemMotion)||['sleep','wake','mood-dozy'].includes(activeAction))?<ClassicGentleFrames color={color} fromColor={fromColor} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} itemMotion={itemMotion} sound={sound} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&hasFlightRig(form,activeAction)?<OriginalFlightFrames rawDaily={_rawDaily} form={form} color={color} action={activeAction} actionId={actionId} startedAt={clock.current.startedAt} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:!fallback&&form==='classic'&&activeAction!=='play'?<ClassicSuperFrames color={color} action={activeAction} actionId={actionId} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:fallback ? <img className="ram-original-static" src={`./assets/original/pets/${form}-${isCustomPetColor(color)?'red':color}-idle.png`} alt="" draggable={false}/> : activeAction==='dizzy'?<DizzyFrames form={form} color={color} startedAt={clock.current.startedAt}/>:isEmotionClip(activeAction)?<EmotionFrames form={form} color={color} action={activeAction} actionId={actionId} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:activeAction==='play'?<FootballFrames form={form} color={color} actionId={actionId} sound={sound} startedAt={clock.current.startedAt} performanceClock={playClock} onActionEnd={sourceEnd} onError={()=>setFailedKey(key)}/>:<ClassicFrames gaze={gaze} startedAt={clock.current.startedAt} form={form} color={color} fromColor={fromColor} sound={sound} action={activeAction} actionId={actionId} itemMotion={itemMotion} onActionEnd={sourceEnd} onError={() => setFailedKey(key)}/>}
       </span></span></span>}
     <LifeCue key={`life:${action}:${actionId??0}`} action={lifeAction} stage={stage} sound={sound}/><SocialCue key={`${activeAction}:${actionId ?? 0}`} action={schoolAction?'idle':activeAction} originalFootball={stage>0&&activeAction==='play'}/>
     {schoolAction&&<RamSchool key={`school:${action}:${actionId??0}`} action={schoolAction} sound={sound} startedAt={clock.current.startedAt} stage={stage}/>}

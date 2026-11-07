@@ -44,20 +44,36 @@ public final class DeltaDownloadTest {
         byte[] old=payload(3),next=changed(old),apk=new byte[old.length+173];System.arraycopy(old,0,apk,173,old.length);Server server=new Server(next);
         File output=UpdateTransport.download(server,new UpdateTransport.Base(base(apk),173,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),p->{});assertEquals(sha(next),SafeFiles.sha256(output));assertEquals(1,server.rangeRequests);
     }
-    @Test public void unsupportedRangeFallsBackToVerifiedFullDownload()throws Exception{
+    @Test public void unsupportedRangeRetriesOnlyDeltaAndNeverDownloadsFull()throws Exception{
         byte[] old=payload(4),next=changed(old);Server server=new Server(next);server.noRange=true;
-        File output=UpdateTransport.download(server,new UpdateTransport.Base(base(old),0,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),p->{});assertEquals(sha(next),SafeFiles.sha256(output));assertEquals(1,server.fullRequests);
+        File baseline=base(old);assertThrows(IOException.class,()->UpdateTransport.download(server,new UpdateTransport.Base(baseline,0,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),p->{}));assertEquals(3,server.rangeRequests);assertEquals(0,server.fullRequests);assertFalse(target().exists());
     }
     @Test public void damagedBaseCannotProduceBadUpdate()throws Exception{
         byte[] old=payload(5),next=changed(old),bad=new byte[old.length];Server server=new Server(next);List<UpdateTransport.Progress> events=new ArrayList<>();
-        File output=UpdateTransport.download(server,new UpdateTransport.Base(base(bad),0,bad.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),events::add);assertEquals(sha(next),SafeFiles.sha256(output));assertEquals(1,server.fullRequests);assertNotNull(events.get(events.size()-1).fallback());
+        File baseline=base(bad);assertThrows(IOException.class,()->UpdateTransport.download(server,new UpdateTransport.Base(baseline,0,bad.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),events::add));assertEquals(0,server.fullRequests);assertTrue(events.stream().allMatch(p->p.mode().equals("differential")));assertFalse(target().exists());
     }
-    @Test public void missingBaseFallsBackWithoutDeletingOldSave()throws Exception{
+    @Test public void missingBaseStopsWithoutDownloadingFullOrDeletingOldSave()throws Exception{
         byte[] old=payload(6),next=changed(old);File save=base("pet-save".getBytes());Server server=new Server(next);
-        UpdateTransport.download(server,new UpdateTransport.Base(new File(temporary.getRoot(),"missing"),0,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),p->{});assertEquals("pet-save",SafeFiles.readText(save));assertEquals(1,server.fullRequests);
+        assertThrows(IOException.class,()->UpdateTransport.download(server,new UpdateTransport.Base(new File(temporary.getRoot(),"missing"),0,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),p->{}));assertEquals("pet-save",SafeFiles.readText(save));assertEquals(0,server.fullRequests);assertFalse(target().exists());
     }
     @Test public void largeChangeAndExplicitPolicySelectFull()throws Exception{
         byte[] old=payload(7),next=payload(8);assertFalse(plan(old,next).differential());assertFalse(DeltaPlan.build(DeltaPlan.parse(map(old),old.length),DeltaPlan.parse(map(changed(old)),old.length),true).differential());
+    }
+    @Test public void largeReusableDeltaRemainsDifferential()throws Exception{
+        byte[] old=payload(70),next=payload(71);System.arraycopy(old,0,next,0,CHUNK);
+        DeltaPlan.Plan plan=plan(old,next);assertTrue(plan.differential());assertEquals(15L*CHUNK,plan.download());assertEquals(CHUNK,plan.reuse());
+    }
+    @Test public void onlyReusableTinyGapIsNotCoalescedIntoFullDownload(){
+        DeltaPlan.Block copy=new DeltaPlan.Block(4,4,"same");
+        DeltaPlan.MapFile old=new DeltaPlan.MapFile(12,List.of(copy));
+        DeltaPlan.MapFile next=new DeltaPlan.MapFile(12,List.of(new DeltaPlan.Block(0,4,"new1"),copy,new DeltaPlan.Block(8,4,"new2")));
+        DeltaPlan.Plan plan=DeltaPlan.build(old,next,false);assertTrue(plan.differential());assertEquals(4,plan.reuse());assertEquals(8,plan.download());
+    }
+    @Test public void interruptedRangeResumesFromReceivedOffsetWithoutFullRequest()throws Exception{
+        byte[] old=payload(72),next=changed(old);List<Long> starts=new ArrayList<>();List<UpdateTransport.Progress> progress=new ArrayList<>();
+        UpdateTransport.Source source=(from,length,range)->{assertTrue(range);starts.add(from);int count=starts.size()==1?(int)length/2:(int)length;return new ByteArrayInputStream(Arrays.copyOfRange(next,(int)from,(int)from+count));};
+        File output=UpdateTransport.download(source,new UpdateTransport.Base(base(old),0,old.length),plan(old,next),next.length,sha(next),target(),new AtomicBoolean(),progress::add);
+        assertEquals(List.of(5L*CHUNK,5L*CHUNK+CHUNK/2),starts);assertEquals(sha(next),SafeFiles.sha256(output));assertTrue(progress.stream().allMatch(p->p.mode().equals("differential")));assertEquals(CHUNK,progress.get(progress.size()-1).bytes());
     }
     @Test public void identicalFilesNeedNoNetwork()throws Exception{
         byte[] old=payload(9);Server server=new Server(old);DeltaPlan.Plan plan=plan(old,old);assertEquals(0,plan.download());UpdateTransport.download(server,new UpdateTransport.Base(base(old),0,old.length),plan,old.length,sha(old),target(),new AtomicBoolean(),p->{});assertEquals(0,server.transferred);

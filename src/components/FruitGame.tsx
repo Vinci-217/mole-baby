@@ -1,3 +1,4 @@
+import {useGameRound} from '../use-game-round';
 import GameRewardItem from './GameRewardItem';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
@@ -5,13 +6,13 @@ import type { PetColor, Stage, Evolution } from '../game';
 import './FruitGame.css';
 import GameArt from './GameArt';
 import Ram from './Ram';
-import type { GameReceipt } from './game-receipt';
+import type { GameReceipt,GameComplete } from './game-receipt';
 import { advanceFruitGame, initialFruitModel, getCatchBand, FRUIT_ARENA, FRUIT_SIZE, PET_WIDTH, PET_HEIGHT, GAME_SECONDS } from './fruit-physics';
 import type { FruitModel } from './fruit-physics';
 import { playGameSound,stopGameSounds } from '../pet-audio';
 
 interface FruitGameProps {
-  onComplete: (score: number) => GameReceipt | void;
+  onComplete: GameComplete;
   onClose: () => void;
   color?: PetColor;
   stage?: Stage;
@@ -27,6 +28,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
   useEffect(()=>()=>stopGameSounds(),[]);
   const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [phase, setPhase] = useState<Phase>('ready');
+  const roundClock=useGameRound(phase==='playing');
   const [frame, setFrame] = useState<FruitModel>(initialFruitModel);
   const model = useRef<FruitModel>(initialFruitModel());
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -91,7 +93,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
       model.current = next; setFrame(next);
       if (next.elapsed >= GAME_SECONDS) {
         heldKeys.current.clear(); setPhase('finished');
-        if (!awarded.current) { awarded.current = true; setReceipt(completeRef.current(next.score) ?? null); }
+        if (!awarded.current) { awarded.current = true; setReceipt(completeRef.current(next.score,roundClock.finish(next.elapsed*1000)) ?? null); }
         return;
       }
       animationId = requestAnimationFrame(animate);
@@ -101,6 +103,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
   }, [phase, stage, evolution, sound]);
 
   const startGame = () => {
+    roundClock.start();
     if (stage === 0) return;
     lastWarning.current=4;playGameSound('start',sound);
     model.current = initialFruitModel(); awarded.current = false; heldKeys.current.clear();
@@ -160,7 +163,7 @@ export default function FruitGame({ onComplete, onClose, color = 'red', stage = 
           <div className="fruit-trophy"><GameArt kind="trophy"/></div>
           <h3>{frame.score >= 7 ? '拉姆接到了好多果子！' : frame.score > 0 ? '可可果收好啦！' : '练习完成，下次会更棒！'}</h3>
           <p>本局接取计分：<strong>{frame.score}</strong> / 10 颗</p>
-          <div className="fruit-rewards"><div><strong>+{receipt?.coins ?? (4 + frame.score * 2)}</strong><span>摩尔豆</span></div><div><GameRewardItem receipt={receipt}/></div></div>
+          <div className="fruit-rewards"><div><strong>+{receipt?.coins ?? 0}</strong><span>摩尔豆</span></div><div><GameRewardItem receipt={receipt}/></div></div>
           <p className="fruit-reward-saved">{receipt?.ok === false ? receipt.message : `${receipt?.message ?? '以上奖励已入背包'} 接到的果子用于本局计分。`}</p>
           <div className="fruit-result-actions"><button ref={replayRef} type="button" className="fruit-secondary" onClick={startGame}>再来一局</button><button type="button" className="fruit-primary" onClick={onClose}>{receipt?.ok === false ? '返回' : '收好奖励'}</button></div>
         </div>}

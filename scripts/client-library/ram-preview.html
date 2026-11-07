@@ -1,0 +1,36 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; object-src 'none'">
+<title>拉姆动画预览</title><style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.6 system-ui,sans-serif;color:#3f493e;background:#fbfaf6}header{padding:16px 20px 8px}h1{font-size:18px;margin:0}#path{font:11px/1.6 monospace;overflow-wrap:anywhere;color:#7b8574}.controls{padding:10px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.controls label{display:flex;align-items:center;gap:6px;font-size:12px}select,button{border:1px solid #cfd9c9;border-radius:7px;background:white;color:#355b43;padding:6px 8px;font:inherit;max-width:240px}button{cursor:pointer}#stage{aspect-ratio:12/7;width:100%;max-height:60vh;background-color:#f4f1e8;background-image:linear-gradient(45deg,#e9e7df 25%,transparent 25%),linear-gradient(-45deg,#e9e7df 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e9e7df 75%),linear-gradient(-45deg,transparent 75%,#e9e7df 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}ruffle-player{display:block;width:100%;height:100%}#status{padding:10px 20px;margin:0;font-size:12px;color:#6f7c65;min-height:42px}.note{padding:0 20px 16px;margin:0;font-size:12px;color:#89917f}#zoom{width:100px}@media(max-width:480px){header,.controls{padding-left:12px;padding-right:12px}.controls{gap:8px}select{max-width:170px}#stage{max-height:none}h1{font-size:16px}}
+</style><script src="ruffle/ruffle.js"></script></head><body>
+<header><h1 id="name">动画预览</h1><div id="path"></div></header>
+<div class="controls"><label>画面<select id="symbol" aria-label="预览画面"></select></label><label>形态<select id="form" aria-label="成长形态"></select></label><label>方向<select id="direction" aria-label="方向"></select></label><label><input type="checkbox" id="moving" checked>走动</label><button id="pause" disabled>暂停</button><button id="restart" disabled>重新播放</button><label>缩放<input id="zoom" type="range" min="50" max="180" value="100"></label></div>
+<div id="stage"></div><p id="status" role="status">正在加载播放器…</p><p class="note">播放原件中的图形和动作。装扮可切换其实际支持的形态、方向；分层素材可能只显示帽子或衣服，依赖完整游戏的模块可能无法独立播放。</p>
+<script>
+const el=id=>document.getElementById(id),formNames={level1:'种子',level2:'初级',level3:'中级',level4:'高级',level101:'经典超拉',level101_7:'神力超拉',level5_1:'水系',level5_2:'木系',level5_4:'火系'},directions={down:'正面',leftdown:'左前',left:'左侧',leftup:'左后',up:'背面',rightup:'右后',right:'右侧',rightdown:'右前'};
+let player,metadata,asset,paused=false,poll;
+function option(value,text){const o=document.createElement('option');o.value=value;o.textContent=text;return o}
+function call(name,...args){return player?.ruffle().callExternalInterface(name,...args)}
+function availableForms(){const selected=el('symbol').value;const timeline=metadata.timelines.find(t=>t.symbol===selected||!selected&&t.sprite===0);const labels=(timeline?.labels||[]).map(l=>l.name);const forms=labels.filter(s=>s.startsWith('level')&&!(asset.path.includes('/petcloth/')&&s==='level1'));el('form').replaceChildren(...forms.map(s=>option(s,formNames[s]||s)));if(!el('form').options.length)el('form').append(option('','原始画面'));el('form').disabled=!forms.length;if(forms.includes('level101_7'))el('form').value='level101_7';else if(forms.includes('level2'))el('form').value='level2';el('direction').disabled=el('form').disabled;el('moving').disabled=el('form').disabled}
+function pose(){if(paused){player.ruffle().resume();paused=false;el('pause').textContent='暂停'}call('previewPose',el('form').value,el('direction').value,el('moving').checked)}
+function status(){const s=call('previewStatus');if(s?.error){el('status').textContent='这个片段需要完整客户端环境，暂时无法独立播放。';return}if(s?.ready&&s.settled){el('pause').disabled=el('restart').disabled=false;el('status').textContent=s.width>0?'正在播放原始时间轴，可切换画面、形态与方向。':'素材已加载。若画面为空，请切换“画面”或形态；该文件可能只提供内部组件。';window.previewReady=s.width>0;}}
+(async()=>{try{
+ const path=new URLSearchParams(location.search).get('path');
+ const catalog=await fetch('catalog.json').then(r=>r.json());asset=catalog.items.find(r=>r.path===path&&r.status==='official-ok');if(!asset)throw Error('未找到已保存的素材');
+ metadata=await fetch(asset.timelineUrl).then(r=>r.json());el('name').textContent=(asset.aliases?.[0]||asset.names?.[0]||'动画预览')+' · 原版素材';el('path').textContent=asset.path;
+ const symbols=metadata.timelines.filter(t=>t.symbol&&t.sprite!==0).sort((a,b)=>(b.symbol.includes('lamu_mc')-a.symbol.includes('lamu_mc'))||b.labels.length-a.labels.length||b.frames-a.frames);
+ el('symbol').append(option('','原始画面'),...symbols.map(t=>option(t.symbol,t.symbol.split('.').pop()+(t.labels.length?' · '+t.labels.length+'种状态':''))));
+ const main=symbols.find(t=>t.symbol.includes('lamu_mc'));if(main)el('symbol').value=main.symbol;
+ availableForms();for(const[k,v]of Object.entries(directions))el('direction').append(option(k,v));
+ player=window.RufflePlayer.newest().createPlayer();window.player=player;el('stage').append(player);
+ await player.ruffle().load({url:'preview-harness.swf',parameters:{source:asset.fileUrl,symbol:el('symbol').value,form:el('form').value},autoplay:'on',unmuteOverlay:'hidden',splashScreen:false,allowScriptAccess:true,openUrlMode:'deny',wmode:'transparent',logLevel:'error',preferredRenderer:'canvas'});
+ player.ruffle().volume=0;
+ poll=setInterval(status,350);
+ el('symbol').onchange=()=>{availableForms();call('previewSymbol',el('symbol').value);pose()};
+ el('form').onchange=el('direction').onchange=el('moving').onchange=pose;
+ el('zoom').oninput=()=>call('previewZoom',Number(el('zoom').value)/100);
+ el('pause').onclick=()=>{paused=!paused;player.ruffle()[paused?'suspend':'resume']();el('pause').textContent=paused?'继续':'暂停'};
+ el('restart').onclick=()=>{call('previewSymbol',el('symbol').value);pose()};
+}catch(e){el('status').textContent='预览未能加载：'+e.message}})();
+addEventListener('pagehide',()=>{clearInterval(poll);player?.remove()});
+</script></body></html>

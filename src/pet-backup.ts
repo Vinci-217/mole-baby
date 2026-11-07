@@ -1,4 +1,4 @@
-import {parseSave,legacyUnlockedGrowth} from './game'
+import {parseSave,legacyUnlockedGrowth,earnedGrowth} from './game'
 import type {GameState} from './game'
 import {memoryKey,parseMemory} from './companion-memory'
 import type {CompanionMemory} from './companion-memory'
@@ -19,7 +19,7 @@ export function restorePetBackup(text:string,storage:BackupStorage,now=Date.now(
  if(!pet)throw new Error('Invalid pet save')
  const key=memoryKey(pet),previousMemory=storage.getItem(key)
  const memory=parseMemory(companionMemory??previousMemory,pet)
- pet={...pet,highestGrowth:Math.max(pet.growth,pet.highestGrowth??0,legacyUnlockedGrowth(memory.events))}
+ pet={...pet,highestGrowth:Math.max(earnedGrowth(pet),pet.naturalGrowth===undefined?legacyUnlockedGrowth(memory.events):0)}
  const encodedMemory=JSON.stringify(memory),encodedPet=JSON.stringify(pet)
  storage.setItem(key,encodedMemory)
  try{storage.setItem(PET_SAVE_KEY,encodedPet)}catch(error){

@@ -15,7 +15,7 @@ export function useIdleLife({petId,pet,memory,enabled,blocked,onAction}:{petId?:
   useEffect(()=>{sequence.current=0;deadline.current=0;previous.current=undefined},[identity])
   useEffect(()=>{
     if(!enabled||blocked||identity===undefined)return
-    const delay=()=>idleDelay(identity,sequence.current)
+    const delay=()=>Math.round(idleDelay(identity,sequence.current)*(.75+Math.random()*.5))
     deadline.current=Math.max(Date.now()+15000,deadline.current||Date.now()+delay())
     const timer=setInterval(()=>{
       if(document.hidden||Date.now()<deadline.current)return

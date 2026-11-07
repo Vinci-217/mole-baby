@@ -61,7 +61,7 @@ final class AndroidUpdates {
         if(wifiOnly&&network==null)return;
         UpdateTransport.Connector connector=network==null?UpdateTransport::connect:(url,range)->UpdateTransport.connect(url,range,address->(java.net.HttpURLConnection)network.openConnection(address));
         working=true;canceled.set(false);JSONObject selected=Json.parse(artifact.toString());JSONObject release=Json.parse(manifest.toString());String selectedKind=kind;
-        patch("status","downloading","percent",0,"message","正在准备差量下载…","fallbackReason",null);
+        patch("status","downloading","percent",0,"downloadMode",null,"transferredBytes",0,"totalBytes",0,"reusedBytes",0,"message","正在准备更新下载…","fallbackReason",null);
         try{androidx.core.content.ContextCompat.startForegroundService(host.context,new Intent(host.context,UpdateService.class));}catch(RuntimeException e){working=false;fail(new IOException("请先回到小屋，再开始下载。"));return;}
         worker.execute(()->{try{
             long size=selected.getLong("size");String sha=selected.getString("sha256");File output=new File(directory,"verified/"+(selectedKind.equals("apk")?"ramu-"+release.getInt("versionCode")+".apk":"resources-"+selected.getString("revision")+".zip"));
@@ -76,8 +76,9 @@ final class AndroidUpdates {
                         else{JSONArray bases=release.optJSONArray("bases");if(bases!=null)for(int i=0;i<bases.length();i++){JSONObject candidate=bases.getJSONObject(i);if(candidate.optInt("versionCode")==BuildConfig.VERSION_CODE&&candidate.optLong("size")==base.length()){old=DeltaPlan.parse(blockmap(candidate.getJSONObject("blockmap"),connector),base.length());break;}}}
                     }
                 }
-            }catch(Exception ignored){/* Missing/bad indexes select a complete download, never block updating. */}
+            }catch(Exception error){throw new IOException("差量索引暂时无法读取，请重试；未开始全量下载。",error);}
             DeltaPlan.Plan plan=next==null?DeltaPlan.full(size):DeltaPlan.build(old,next,policy().equals("full"));
+            patch("downloadMode",plan.differential()?"differential":"full","transferredBytes",0,"totalBytes",plan.download(),"reusedBytes",plan.reuse());
             boolean cached=output.isFile()&&output.length()==size&&sha.equals(SafeFiles.sha256(output));
             if(!cached)UpdateTransport.download(UpdateTransport.source(connector,selected.getString("url"),size),base,plan,size,sha,output,canceled,p->patch("downloadMode",p.mode(),"transferredBytes",p.bytes(),"totalBytes",p.total(),"reusedBytes",p.reused(),"percent",p.total()==0?100:Math.min(100,p.bytes()*100d/p.total()),"fallbackReason",p.fallback(),"message",p.mode().equals("differential")?"正在下载发生变化的部分…":"正在下载完整包…"));
             if(canceled.get())throw new IOException("下载已取消");

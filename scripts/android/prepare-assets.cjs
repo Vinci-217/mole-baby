@@ -11,8 +11,8 @@ async function prepare(){
  const media=[],entries=[],renderer=[];
  for(const file of files(source)){
   const name=path.relative(source,file).split(path.sep).join('/');
-  if(/\.(?:js|css)$/.test(name)||!name.startsWith('assets/')){const out=path.join(target,name);fs.mkdirSync(path.dirname(out),{recursive:true});fs.copyFileSync(file,out);if(/\.(?:js|css|html)$/.test(name))renderer.push({path:name,sha256:digest(file)});continue;}
-  if(!/\.(?:webp|png|jpg|jpeg|gif|mp3|ogg|wav|json|svg|woff2?|ttf|xml|md)$/i.test(name))throw Error('未归类的安卓素材: '+name);
+  if(/\.(?:js|css|html|wasm)$/.test(name)||/^assets\/original\/official\/ruffle\/LICENSE(?:_APACHE|_MIT)?$/.test(name)||!name.startsWith('assets/')){const out=path.join(target,name);fs.mkdirSync(path.dirname(out),{recursive:true});fs.copyFileSync(file,out);if(/\.(?:js|css|html|wasm)$/.test(name))renderer.push({path:name,sha256:digest(file)});continue;}
+  if(!/\.(?:webp|png|jpg|jpeg|gif|mp3|ogg|wav|swf|json|svg|woff2?|ttf|xml|md)$/i.test(name))throw Error('未归类的安卓素材: '+name);
   media.push(name);entries.push({path:name,size:fs.statSync(file).size,sha256:digest(file)});
  }
  const index={schema:1,revision:crypto.createHash('sha256').update(JSON.stringify(entries)).digest('hex').slice(0,24),rendererHash:crypto.createHash('sha256').update(JSON.stringify(renderer)).digest('hex'),files:entries};

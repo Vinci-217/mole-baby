@@ -54,10 +54,15 @@ final class UpdateTransport {
     }
     static File download(Source source, Base base, DeltaPlan.Plan plan, long size, String sha, File target, AtomicBoolean cancel, Consumer<Progress> progress) throws IOException {
         if(size<1 || size>SafeFiles.MAX_PACKAGE || !SafeFiles.digest(sha)) throw new IOException("更新校验信息无效");
-        target.getParentFile().mkdirs(); File part=new File(target.getPath()+".part"); String fallback=null;
+        target.getParentFile().mkdirs(); File part=new File(target.getPath()+".part");
         try {
-            try { transfer(source,base,plan,size,part,cancel,progress,null); if(!sha.equals(SafeFiles.sha256(part)))throw new IOException("差量重建校验未通过"); }
-            catch(IOException e) { if(cancel.get() || !plan.differential()) throw e; fallback=e.getMessage(); transfer(source,null,DeltaPlan.full(size),size,part,cancel,progress,fallback); }
+            // Once a differential plan starts, never silently spend the bytes of
+            // a complete package. Network failures retry the remaining range.
+            try { transfer(source,base,plan,size,part,cancel,progress,null); }
+            catch(IOException e) {
+                if(cancel.get() || !plan.differential())throw e;
+                throw new IOException("差量下载未完成，请重试；未转为全量下载。"+e.getMessage(),e);
+            }
             if(cancel.get())throw new IOException("下载已取消");
             if(part.length()!=size || !sha.equals(SafeFiles.sha256(part)))throw new IOException("更新校验失败，已保留原版本");
             java.nio.file.Files.move(part.toPath(),target.toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING,java.nio.file.StandardCopyOption.ATOMIC_MOVE);
@@ -74,10 +79,27 @@ final class UpdateTransport {
                     if(old==null || p.source()+p.size()>base.length || base.offset+base.length>old.length())throw new IOException("旧文件不完整");
                     old.seek(base.offset+p.source());long left=p.size();
                     while(left>0){if(cancel.get())throw new IOException("下载已取消");int n=old.read(buffer,0,(int)Math.min(buffer.length,left));if(n<0)throw new EOFException("旧文件已截断");dest.write(buffer,0,n);left-=n;}
-                }else try(InputStream in=source.open(p.source(),p.size(),plan.differential())){
-                    long left=p.size();while(left>0){if(cancel.get())throw new IOException("下载已取消");int n=in.read(buffer,0,(int)Math.min(buffer.length,left));if(n<0)throw new EOFException("下载提前结束");dest.write(buffer,0,n);left-=n;downloaded+=n;
-                        long now=System.currentTimeMillis();if(now-last>200){report.accept(new Progress(plan.differential()?"differential":"full",downloaded,plan.download(),plan.reuse(),fallback));last=now;}
-                    }if(in.read()!=-1)throw new IOException("下载内容超出声明范围");
+                }else {
+                    long received=0;int failures=0;
+                    while(received<p.size()){
+                        if(cancel.get())throw new IOException("下载已取消");
+                        // Full transfers must restart from byte zero; only a
+                        // verified Range response can resume within a segment.
+                        try(InputStream in=source.open(p.source()+received,p.size()-received,plan.differential())){
+                            while(received<p.size()){
+                                if(cancel.get())throw new IOException("下载已取消");
+                                int n=in.read(buffer,0,(int)Math.min(buffer.length,p.size()-received));
+                                if(n<0)throw new EOFException("下载提前结束");
+                                if(n==0)continue;
+                                dest.write(buffer,0,n);received+=n;downloaded+=n;
+                                long now=System.currentTimeMillis();if(now-last>200){report.accept(new Progress(plan.differential()?"differential":"full",downloaded,plan.download(),plan.reuse(),fallback));last=now;}
+                            }
+                            if(in.read()!=-1)throw new IOException("下载内容超出声明范围");
+                        }catch(IOException e){
+                            if(cancel.get()||!plan.differential()||received==p.size()||++failures>=3)throw e;
+                            report.accept(new Progress("differential",downloaded,plan.download(),plan.reuse(),"正在重试差量分段"));
+                        }
+                    }
                 }
             }dest.getFD().sync();
         }

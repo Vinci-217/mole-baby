@@ -78,7 +78,7 @@ final class RamuHost {
                 if(!path.startsWith("assets/")||path.matches("(?i).*\\.(js|css|html|dex|so)$")||resources.active==null)return blocked();
                 File local=SafeFiles.child(resources.active,path);if(!local.isFile())return blocked();input=new FileInputStream(local);
             }
-            String ext=path.substring(path.lastIndexOf('.')+1).toLowerCase(Locale.ROOT);String mime=switch(ext){case"js"->"application/javascript";case"json"->"application/json";case"css"->"text/css";case"html"->"text/html";case"webp"->"image/webp";case"png"->"image/png";case"svg"->"image/svg+xml";case"mp3"->"audio/mpeg";case"ogg"->"audio/ogg";case"gif"->"image/gif";default->"application/octet-stream";};
+            String ext=path.substring(path.lastIndexOf('.')+1).toLowerCase(Locale.ROOT);String mime=switch(ext){case"js"->"application/javascript";case"wasm"->"application/wasm";case"swf"->"application/x-shockwave-flash";case"json"->"application/json";case"css"->"text/css";case"html"->"text/html";case"webp"->"image/webp";case"png"->"image/png";case"svg"->"image/svg+xml";case"mp3"->"audio/mpeg";case"ogg"->"audio/ogg";case"gif"->"image/gif";default->"application/octet-stream";};
             return new WebResourceResponse(mime,mime.startsWith("text/")||mime.contains("json")||mime.contains("javascript")?"UTF-8":null,200,"OK",Map.of("X-Content-Type-Options","nosniff","Cache-Control","no-cache"),input);
         }catch(Exception e){return blocked();}
     }

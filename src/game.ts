@@ -6,7 +6,9 @@ import {normalizeWardrobe} from './wardrobe';
 import {reconcileCourseRewards} from './course-rewards';
 import type {OutfitId} from './wardrobe';
 import type { PetItem } from './catalog';
-import {normalizeCheckIn} from './daily-check-in';
+import {normalizeCheckIn,localDay} from './daily-check-in';
+import {INITIAL_BEANS,FIRST_GAME_BEANS,gameBeans,normalizeGameRewards,type GameRewards,type GamePrize,type RewardRound} from './economy';
+import {gamePrizeChoices,grantGamePrize} from './game-prizes';
 import type {DailyCheckIn} from './daily-check-in';
 import {normalizeOuting} from './pet-pastimes';
 import type {PetOuting} from './pet-pastimes';
@@ -32,6 +34,8 @@ export const EVOLUTIONS: { id: Evolution; name: string; description: string }[] 
   { id: 'wood', name: '弹力木系拉姆', description: '戴着翠绿的木系头冠。' },
   { id: 'fire', name: '霹雳火系拉姆', description: '顶着明亮的火焰头冠。' },
 ];
+/** Old super saves remain readable; the empty-looking variant is no longer offered. */
+export const SELECTABLE_EVOLUTIONS=EVOLUTIONS.filter(form=>form.id!=='super');
 export type Action = 'pet' | 'feed' | 'drink' | 'wash' | 'use' | 'play' | 'sleep';
 
 export interface PetStats {
@@ -52,6 +56,8 @@ export interface GameState {
   growth: number;
   /** Highest earned progress; changing appearance never removes unlocks. */
   highestGrowth?: number;
+  /** Earned progress retained separately while a freely chosen appearance is fixed. */
+  naturalGrowth?: number;
   notes?: PetNote[];
   statHistory?: StatChange[];
   /** Set only by an explicit stage choice in settings. */
@@ -69,6 +75,7 @@ export interface GameState {
   completedGames: number;
   lastRewardAt: number;
   checkIn?: DailyCheckIn;
+  gameRewards?:GameRewards;
   outing?: PetOuting;
   lastOutingAt?: number;
   education?: Education;
@@ -104,7 +111,7 @@ export const STAGES = [
   { name: '初级拉姆', description: '离开花盆，无叶的初级拉姆。', threshold: 60 },
   { name: '中级拉姆', description: '长出两片嫩叶的中级拉姆。', threshold: 180 },
   { name: '高级拉姆', description: '扇形叶片展开的高级拉姆。', threshold: 420 },
-  { name: '神力拉姆', description: '五种原版神力形态，选择自己的成长方向。', threshold: 840 },
+  { name: '神力拉姆', description: '经典超拉与水、木、火三系形态。', threshold: 840 },
 ] as const;
 
 export const GROWTH_MAX = STAGES[4].threshold;
@@ -146,7 +153,7 @@ export function createPet(name: string, color: PetColor, now = Date.now()): Game
     lastTick: now,
     growth: 0,
     highestGrowth:0,notes:[],statHistory:[],
-    coins: 100,
+    coins: INITIAL_BEANS,
     stats: { hunger: 82, thirst: 82, happiness: 78, cleanliness: 88, health: 100, energy: 85 },
     inventory: Object.fromEntries(ITEMS.map(item => [item.id, 0])),
     sleeping: false,
@@ -184,22 +191,22 @@ export function legacyUnlockedGrowth(events:unknown):number{
  }
  return highest;
 }
-export function earnedGrowth(state:GameState):number{return Math.max(state.growth,state.highestGrowth??0)}
+export function earnedGrowth(state:GameState):number{return Math.max(state.naturalGrowth??state.growth,state.highestGrowth??0)}
 export function unlockedStage(state:GameState):Stage{
  const progress=earnedGrowth(state);return (STAGES.reduce<number>((highest,stage,index)=>progress>=stage.threshold?index:highest,0)) as Stage;
 }
-/** Deliberate selection of an earned appearance, separate from progress. */
+/** Deliberate appearance choice; natural progress and possessions stay intact. */
 export function changePetStage(state: GameState, stage: Stage, evolution?: Evolution, now = Date.now()): CareResult {
   if (!validStageChoice(stage,evolution)) {
     return { state, ok: false, message: '请选择一个拉姆阶段。' };
   }
-  if(stage>unlockedStage(state))return {state,ok:false,message:'这个形态还没有解锁，健康成长到达后就能固定，也能回到之前的形态。'};
-  const form = stage === 4 ? evolution ?? state.evolution ?? 'super' : undefined;
+  const form = stage === 4 ? evolution ?? state.evolution ?? 'classic' : undefined;
   if (state.growthLocked && getStage(state.growth, state.evolution) === stage && state.evolution === form) {
     return { state, ok: true, message: `现在就是${STAGES[stage].name}啦。` };
   }
-  const next = { ...state, highestGrowth:earnedGrowth(state), growth: getStage(state.growth,state.evolution)===stage && state.evolution===form ? state.growth : STAGES[stage].threshold, growthLocked: true, lastTick: Math.max(now,state.lastTick) };
+  const next = { ...state, naturalGrowth:earnedGrowth(state), highestGrowth:earnedGrowth(state), growth: getStage(state.growth,state.evolution)===stage && state.evolution===form ? state.growth : STAGES[stage].threshold, growthLocked: true, lastTick: Math.max(now,state.lastTick) };
   if (form) next.evolution = form; else delete next.evolution;
+  if(stage===0)delete next.wearing;
   return { state: next, ok: true, message: `已经切换为${form ? EVOLUTIONS.find(v => v.id === form)!.name : STAGES[stage].name}。` };
 }
 
@@ -224,7 +231,8 @@ export function configureGrowth(state:GameState,selection:GrowthSelection,now=Da
   const changed=changePetStage(current,targetStage,sameAppearance?current.evolution:selection.evolution,current.lastTick);
   if(!changed.ok)return changed;
   const next={...changed.state,growthLocked:selection.mode==='fixed'};
-  if(selection.mode==='auto'){next.growth=earnedGrowth(current);if(next.growth<GROWTH_MAX)delete next.evolution;else next.evolution??=current.evolution;}
+  if(selection.mode==='auto'){next.growth=earnedGrowth(current);next.naturalGrowth=next.growth;if(next.growth<GROWTH_MAX)delete next.evolution;else next.evolution??=current.evolution;}
+  if(getStage(next.growth,next.evolution)===0)delete next.wearing;
   next.highestGrowth=earnedGrowth(next);
   const label=next.evolution?EVOLUTIONS.find(form=>form.id===next.evolution)!.name:STAGES[getStage(next.growth,next.evolution)].name;
   return {state:next,ok:true,message:selection.mode==='auto'?`已从${label}继续自动成长，进度会保存。`:`已固定为${label}，成长进度已保留。`};
@@ -260,7 +268,8 @@ function advanceStats(state: GameState, now: number): GameState {
     ...state,
     lastTick: now,
     growth: state.growthLocked ? state.growth : growForHours(state.growth, healthyHours),
-    highestGrowth: Math.max(earnedGrowth(state),state.growthLocked?state.growth:growForHours(state.growth,healthyHours)),
+    ...(state.naturalGrowth!==undefined?{naturalGrowth:state.growthLocked?earnedGrowth(state):growForHours(state.growth,healthyHours)}:{}),
+    highestGrowth: Math.max(earnedGrowth(state),state.growthLocked?earnedGrowth(state):growForHours(state.growth,healthyHours)),
     stats: {
       hunger: rounded(clamp(state.stats.hunger - hours * rates.hunger)),
       thirst: rounded(clamp(state.stats.thirst - hours * rates.thirst)),
@@ -291,7 +300,7 @@ export function tick(state: GameState, now = Date.now()): GameState {
       : Math.max((current.stats.energy-REST_ENERGY)/NEED_RATES.awake.energy*3_600_000,(current.awakeUntil??0)-cursor);
     // Reward at the actual deadline, before a later nap or stat decay. This
     // keeps a bulk offline tick equivalent to many ordinary timer ticks.
-    const end=Math.min(now,cursor+Math.max(1,untilTransition),current.activity?.endsAt??Infinity);
+    const end=Math.min(now,cursor+Math.max(1,untilTransition),current.activity&&(current.activity.kind==='course'||!current.activity.continuous)?current.activity.endsAt:Infinity);
     current=settleRest(settleActivity(advanceStats(current,end),end),end);cursor=end;
   }
   return current;
@@ -319,6 +328,10 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
       || (action === 'drink' && item.category === 'drink') || (action === 'wash' && item.category === 'clean');
     if (!rightCategory) return { state: current, message: '这种用品需要在对应的照料分类里使用。', ok: false };
     if (getStage(current.growth) < item.minStage) return { state: current, message: `${item.name}要等到${STAGES[item.minStage].name}才能使用，先留在背包里吧。`, ok: false };
+    if(item.category==='toy'){
+      if(current.activity||current.outing)return {state:current,ok:false,message:'先结束当前活动，再一起玩吧。'};
+      return {state:current,ok:true,message:`来玩${item.name}吧！`};
+    }
     if (!(current.inventory[item.id] > 0)) return { state: current, message: `${item.name}用完啦，去商店用摩尔豆补充一些吧。`, ok: false };
     if (item.changesColor) {
       if (current.color === item.changesColor) return {state:current,ok:false,message:'已经是这个颜色啦，药水先收好。'};
@@ -358,6 +371,8 @@ export function buyItem(state: GameState, itemId: string): CareResult {
   if (customPotionColor(item.id)) return { state, message: '这种药水只能在拉姆换色游戏里自己调制。', ok: false };
   if (state.coins < item.price) return { state, message: '摩尔豆不够啦，玩一局小游戏赚一些吧。', ok: false };
   const count = state.inventory[item.id] ?? 0;
+  if(item.category==='toy')return {state,ok:false,message:'玩具可以在一起玩耍里免费使用。'};
+  if(item.reusable&&count>0)return {state,ok:false,message:'这件玩具已经在背包里，可以反复使用。'};
   if (count >= MAX_INVENTORY) return { state, message: '这种用品已经装满背包啦。', ok: false };
   return {
     state: { ...state, coins: state.coins - item.price, inventory: { ...state.inventory, [item.id]: count + 1 } },
@@ -389,34 +404,28 @@ export function gameRewardItems(state:GameState):PetItem[]{
   return ITEMS.filter(item=>['food','drink','clean'].includes(item.category)&&item.minStage<=stage);
 }
 
-export function rewardGame(state: GameState, score: number, now = Date.now(), random:()=>number=Math.random): CareResult & {rewardItem?:PetItem} {
-  const current = tick(state, now);
-  if (current.sleeping) return { state: current, message: '小拉姆正在睡觉，醒来再一起玩吧。', ok: false };
-  if (current.completedGames > 0 && now - current.lastRewardAt < GAME_REWARD_COOLDOWN_MS) {
-    return { state: current, message: '这份奖励已经领过啦，休息一下再开始新的一局。', ok: false };
-  }
-  const safeScore = Number.isFinite(score) ? Math.floor(clamp(score, 10)) : 0;
-  const coins = Math.min(4 + safeScore * 2, MAX_COINS - current.coins);
-  const pool=gameRewardItems(current).filter(item=>(current.inventory[item.id]??0)<MAX_INVENTORY);
-  const roll=pool.length?random():0;
-  const food=pool[Math.min(pool.length-1,Math.max(0,Math.floor((Number.isFinite(roll)?roll:0)*pool.length)))];
+export function rewardGame(state: GameState, score: number, now = Date.now(), random:()=>number=Math.random,round?:RewardRound): CareResult & {rewardItem?:PetItem;prize?:GamePrize;baseCoins?:number;bonusCoins?:number} {
+  const current = tick(state, now),safeScore=Number.isFinite(score)?Math.floor(clamp(score,10)):0;
+  const fail=(message:string)=>({state:current,message,ok:false});
+  if(!Number.isSafeInteger(now)||now<current.lastTick)return fail('时间暂时不正确，请稍后再试。');
+  if(current.sleeping)return fail('小拉姆正在睡觉，醒来再一起玩吧。');
+  if(round&&(!round.id||round.id.length>120||!Number.isFinite(round.activeMs)||round.activeMs<0))return fail('本局记录无效，请重新开始一局。');
+  if(round&&current.gameRewards?.rounds.includes(round.id))return fail('这局奖励已经收好啦。');
+  if(current.completedGames>0&&now-current.lastRewardAt<GAME_REWARD_COOLDOWN_MS)return fail('这份奖励已经领过啦，休息一下再开始新的一局。');
+  if(safeScore===0)return fail('本局还没有完成有效目标，再试一次吧。');
+  const today=localDay(now),baseCoins=Math.min(gameBeans(safeScore,round?.activeMs),MAX_COINS-current.coins);
+  const bonusCoins=safeScore>=5&&current.gameRewards?.firstDay!==today?Math.min(FIRST_GAME_BEANS,MAX_COINS-current.coins-baseCoins):0;
+  const pool=gamePrizeChoices(current),roll=pool.length?random():0;
+  const prize=pool[Math.min(pool.length-1,Math.max(0,Math.floor((Number.isFinite(roll)?roll:0)*pool.length)))];
+  const next=prize?grantGamePrize(current,prize):current;
+  const rounds=round?[...(current.gameRewards?.rounds??[]),round.id].slice(-80):current.gameRewards?.rounds??[];
   return {
-    state: {
-      ...current,
-      coins: clamp(current.coins + coins, MAX_COINS),
-      stats: {
-        ...current.stats,
-        happiness: clamp(current.stats.happiness + 8 + safeScore),
-        hunger: clamp(current.stats.hunger - 4),
-        energy: clamp(current.stats.energy - 8),
-      },
-      inventory: food ? { ...current.inventory, [food.id]: (current.inventory[food.id]??0) + 1 } : { ...current.inventory },
-      completedGames: Math.min(current.completedGames + 1, MAX_COINS),
-      lastRewardAt: now,
-    },
-    rewardItem:food,
-    message: `本局获得 ${safeScore} 分！收获 ${coins} 摩尔豆${food ? `和${food.name} × 1` : '，可用用品背包已满'}。`,
-    ok: true,
+    state:{...next,coins:current.coins+baseCoins+bonusCoins,
+      stats:{...current.stats,happiness:clamp(current.stats.happiness+8+safeScore),hunger:clamp(current.stats.hunger-4),energy:clamp(current.stats.energy-8)},
+      completedGames:Math.min(current.completedGames+1,MAX_COINS),lastRewardAt:now,
+      gameRewards:{rounds,...(bonusCoins>0?{firstDay:today}:current.gameRewards?.firstDay?{firstDay:current.gameRewards.firstDay}:{})}},
+    rewardItem:prize?.kind==='item'?getItem(prize.id):undefined,prize,baseCoins,bonusCoins,
+    message:`本局获得 ${safeScore} 分！游戏 ${baseCoins} 摩尔豆${bonusCoins?`，每日首局 +${bonusCoins}`:''}${prize?`，${prize.kind==='item'?'获得':'解锁'}${prize.name}${prize.kind==='item'?' × 1':''}`:'，奖池物品已全部收好'}。`,ok:true,
   };
 }
 
@@ -466,12 +475,13 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       createdAt: value.createdAt,
       lastTick: value.lastTick,
       growth: value.growth,
-      highestGrowth:Math.max(value.growth,isNumberIn(value.highestGrowth,0,GROWTH_MAX)?value.highestGrowth:0),
+      ...(isNumberIn(value.naturalGrowth,0,GROWTH_MAX)?{naturalGrowth:value.naturalGrowth}:{}),
+      highestGrowth:Math.max(isNumberIn(value.naturalGrowth,0,GROWTH_MAX)?value.naturalGrowth:value.growth,isNumberIn(value.highestGrowth,0,GROWTH_MAX)?value.highestGrowth:0),
       notes:normalizeNotes(value.notes),statHistory:normalizeStatHistory(value.statHistory),
       ...(typeof value.growthLocked==='boolean'?{growthLocked:value.growthLocked}:manualStageSelected?{growthLocked:true}:{}),
       ...(value.evolution ? { evolution: value.evolution as Evolution } : {}),
       coins: value.coins,
-      ...normalizeWardrobe(value.wardrobe,value.wearing),
+      ...normalizeWardrobe(value.wardrobe,value.growth<STAGES[1].threshold?undefined:value.wearing),
       stats: { hunger, thirst, happiness, cleanliness, health, energy },
       inventory,
       sleeping: value.sleeping,
@@ -480,6 +490,7 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       completedGames: value.completedGames,
       lastRewardAt: value.lastRewardAt,
       ...(normalizeCheckIn(value.checkIn,now)?{checkIn:normalizeCheckIn(value.checkIn,now)}:{}),
+      ...(normalizeGameRewards(value.gameRewards,localDay(now))?{gameRewards:normalizeGameRewards(value.gameRewards,localDay(now))}:{}),
       ...(importedOuting?{outing:importedOuting}:{}),
       ...(normalizeRestaurant(value.restaurant)?{restaurant:normalizeRestaurant(value.restaurant)}:{}),
       ...(education?{education}:{}),...(activity?{activity}:{}),...(room?{room}:{}),

@@ -26,7 +26,7 @@ export function uploadedMotion(form:string,action:string,itemId?:string):Uploade
  if(action.startsWith('uploaded-'))return uploadedSpec(form,action.slice(9))
  if(action==='play-alone')return uploadedSpec(form,'180004')
  if(!itemId||!(['feed','eat','drink','wash','use','medical'].includes(action)||getItemMotion(itemId).action===action))return
- const item=getItem(itemId);return item?uploadedSpec(form,item.changesColor?'180005':item.id==='energy-drink'?'180014':item.sourceId):undefined
+ const item=getItem(itemId);return item?uploadedSpec(form,item.changesColor?'180005':item.id==='energy-drink'?'180014':item.animationIds?.includes(itemId)?itemId:item.sourceId):undefined
 }
 export function uploadedEffectRect(spec:UploadedSpec,form:RamForm){
  const r=spec.registration,k=r.cssPixelsPerAtlasPixel*(r.displayScale??1)

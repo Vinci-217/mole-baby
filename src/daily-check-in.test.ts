@@ -7,7 +7,7 @@ const NOW=new Date(2026,9,24,12).getTime()
 const pet=()=>({...createPet('小叶','blue',NOW-86400000),lastTick:NOW,growth:180})
 describe('daily local-calendar beans',()=>{
   it('awards exactly 1000 once, including rapid repeated clicks and reloads',()=>{
-    const first=claimDailyCheckIn(pet(),NOW);expect(first.ok).toBe(true);expect(first.state.coins).toBe(1100)
+    const first=claimDailyCheckIn(pet(),NOW);expect(first.ok).toBe(true);expect(first.state.coins).toBe(2000)
     expect(first.state.stats).toEqual(pet().stats);expect(first.state.growth).toBe(180)
     expect(claimDailyCheckIn(first.state,NOW).state).toBe(first.state)
     const restored=parseSave(JSON.stringify(first.state),NOW)!;expect(checkedInToday(restored,NOW)).toBe(true)
@@ -17,9 +17,9 @@ describe('daily local-calendar beans',()=>{
     const first=claimDailyCheckIn(pet(),NOW).state
     const tomorrow=new Date(2026,9,25,0,0,0).getTime()
     expect(claimDailyCheckIn(first,tomorrow-1).ok).toBe(false)
-    const second=claimDailyCheckIn(first,tomorrow).state;expect(second.checkIn).toMatchObject({day:localDay(tomorrow),streak:2,total:2});expect(second.coins).toBe(2100)
+    const second=claimDailyCheckIn(first,tomorrow).state;expect(second.checkIn).toMatchObject({day:localDay(tomorrow),streak:2,total:2});expect(second.coins).toBe(3000)
     const skipped=claimDailyCheckIn(second,new Date(2026,9,27,0).getTime()).state
-    expect(skipped.checkIn).toMatchObject({streak:1,total:3});expect(skipped.coins).toBe(3100)
+    expect(skipped.checkIn).toMatchObject({streak:1,total:3});expect(skipped.coins).toBe(4000)
   })
   it('does not reopen a claim when the clock goes backwards and preserves a sleeping pet',()=>{
     const first=claimDailyCheckIn({...pet(),sleeping:true},NOW).state;expect(first.sleeping).toBe(true)
@@ -34,20 +34,20 @@ describe('daily local-calendar beans',()=>{
     const started=beginActivity(pet(),'restaurant',undefined,NOW).state
     const result=claimDailyCheckIn(started,NOW+JOB_MS+1)
     expect(result.ok).toBe(true);expect(result.state.coins).toBe(pet().coins+JOB_PAY+1000)
-    expect(result.state.activity).toBeUndefined()
+    expect(result.state.activity).toMatchObject({continuous:true,paidCoins:JOB_PAY})
     expect(claimDailyCheckIn(result.state,NOW+JOB_MS+2).state.coins).toBe(result.state.coins)
   })
   it('checks capacity after settling a due wage without consuming the daily claim',()=>{
     const started=beginActivity({...pet(),coins:999998900},'restaurant',undefined,NOW).state
     const result=claimDailyCheckIn(started,NOW+JOB_MS+1)
     expect(result.ok).toBe(false);expect(result.state.coins).toBe(999998900+JOB_PAY)
-    expect(result.state.activity).toBeUndefined();expect(result.state.checkIn).toBeUndefined()
+    expect(result.state.activity).toMatchObject({continuous:true,paidCoins:JOB_PAY});expect(result.state.checkIn).toBeUndefined()
     const spent={...result.state,coins:999998990}
     expect(claimDailyCheckIn(spent,NOW+JOB_MS+2).state.coins).toBe(999999990)
   })
   it('migrates old saves and discards corrupt optional claim data without losing the pet',()=>{
     for(const checkIn of [undefined,{day:'2026-99-99',claimedAt:NOW,streak:1,total:1},{day:localDay(NOW),claimedAt:NOW,streak:-1,total:1}]){
-      const restored=parseSave(JSON.stringify({...pet(),checkIn}),NOW)!;expect(restored.name).toBe('小叶');expect(restored.checkIn).toBeUndefined();expect(restored.coins).toBe(100)
+      const restored=parseSave(JSON.stringify({...pet(),checkIn}),NOW)!;expect(restored.name).toBe('小叶');expect(restored.checkIn).toBeUndefined();expect(restored.coins).toBe(1000)
     }
   })
 })

@@ -13,7 +13,7 @@ describe('pet creation and growth', () => {
     a.inventory.berry = 5;
     expect(b.inventory.berry).toBe(0);
     expect(Object.values(b.inventory).every(count => count === 0)).toBe(true);
-    expect(b.coins).toBe(100);
+    expect(b.coins).toBe(1000);
     expect(b.growth).toBe(0);
     expect(createPet(' \n ', 'red', NOW).name).toBe('小拉姆');
   });
@@ -130,9 +130,9 @@ describe('care and shopping', () => {
     const original = fresh();
     const bought = buyFood(original, 'berry');
     expect(bought.ok).toBe(true);
-    expect(bought.state.coins).toBe(75);
+    expect(bought.state.coins).toBe(975);
     expect(bought.state.inventory.berry).toBe(1);
-    expect(original.coins).toBe(100);
+    expect(original.coins).toBe(1000);
     const poor = { ...fresh(), coins: 7 };
     expect(buyFood(poor, 'berry')).toMatchObject({ state: poor, ok: false });
     expect(buyFood(original, 'unknown').ok).toBe(false);
@@ -144,13 +144,13 @@ describe('minigame rewards', () => {
     const original = fresh();
     const reward = rewardGame(original, 999, NOW,()=>0);
     expect(reward.ok).toBe(true);
-    expect(reward.state.coins).toBe(124);
+    expect(reward.state.coins).toBe(2100);
     expect(reward.state.inventory.berry).toBe(1);
     expect(reward.state.growth).toBe(0);
     expect(reward.state.completedGames).toBe(1);
     expect(original.completedGames).toBe(0);
-    expect(rewardGame(original, -1, NOW).state.coins).toBe(104);
-    expect(rewardGame(original, Number.NaN, NOW).state.coins).toBe(104);
+    expect(rewardGame(original, -1, NOW).state.coins).toBe(1000);
+    expect(rewardGame(original, Number.NaN, NOW).state.coins).toBe(1000);
   });
 
   it('rejects duplicate rewards, then permits another completed round', () => {
@@ -201,7 +201,7 @@ describe('save validation', () => {
   });
 
   it('rejects non-finite values and hostile inventory keys', () => {
-    const raw = JSON.stringify(fresh()).replace('"coins":100', '"coins":1e999');
+    const raw = JSON.stringify(fresh()).replace('"coins":1000', '"coins":1e999');
     expect(parseSave(raw, NOW)).toBeNull();
     const hostile = JSON.stringify(fresh()).replace('"berry":0', '"__proto__":5');
     expect(parseSave(hostile, NOW)).toBeNull();
@@ -210,7 +210,7 @@ describe('save validation', () => {
 
 
 describe('original item catalogue', () => {
-  it('uses documented names, effects, nonzero shop prices and existing original art', () => {
+  it('uses documented names, effects, free toys and shop prices and existing original art', () => {
     const xml = readFileSync(new URL('../public/assets/original/items/petfood.xml', import.meta.url), 'utf8');
     const source = new Map([...xml.matchAll(/<Item\s+([^>]+)\/?\s*>/g)].map(match => {
       const attributes = Object.fromEntries([...match[1].matchAll(/(\w+)="([^"]*)"/g)].map(attr => [attr[1], attr[2]]));
@@ -218,9 +218,11 @@ describe('original item catalogue', () => {
     }));
     expect(ITEMS.length).toBeGreaterThanOrEqual(18);
     expect(new Set(ITEMS.map(item => item.id)).size).toBe(ITEMS.length);
-    expect(new Set(ITEMS.map(item => item.category))).toEqual(new Set(['food', 'drink', 'clean', 'medicine']));
+    expect(new Set(ITEMS.map(item => item.category))).toEqual(new Set(['food', 'drink', 'clean', 'medicine', 'toy']));
     for (const item of ITEMS) {
       if(item.changesColor){expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);expect(item.localPrice).toBe(true);expect(item.originalPrice).toBe(0);expect(COLORS.some(c=>c.id===item.changesColor)).toBe(true);continue;}
+      if(item.category==='toy'){expect(item.price).toBe(0);expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);continue;}
+      if(item.reusable||item.id==='180026'){expect(item.localPrice||item.originalPrice>0).toBe(true);expect(item.price).toBeGreaterThan(0);expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);continue;}
       if(item.id==='energy-drink'){expect(item.energy).toBe(100);expect(item.localPrice).toBe(true);expect(existsSync(new URL(`../public/${item.image.slice(2)}`,import.meta.url))).toBe(true);continue;}
       const original = source.get(item.sourceId)!;
       expect(original.Name).toBe(item.name);
@@ -230,20 +232,20 @@ describe('original item catalogue', () => {
       expect(item.happiness).toBe(item.id==='180006'?100:Number(original.Spirit));
       expect(item.price).toBeGreaterThan(0);
       expect(item.originalPrice).toBe(Number(original.Price));
-      if (item.originalPrice > 0) expect(item.price).toBe(item.originalPrice);
-      else expect(item.localPrice).toBe(true);
+      if(item.id==='180006')expect(item.price).toBe(400);else expect(item.price).toBeLessThanOrEqual(80);
+      expect(item.localPrice).toBe(item.originalPrice===0||item.price!==item.originalPrice);
       expect(existsSync(new URL(`../public/${item.image.slice(2)}`, import.meta.url))).toBe(true);
     }
     expect(getItem('180027')).toMatchObject({ id: 'berry', name: '可可果', hunger: 50, thirst: 0 });
-    expect(getItem('juice')).toMatchObject({ hunger: 0, thirst: 50, price: 20 });
+    expect(getItem('juice')).toMatchObject({ hunger: 0, thirst: 50, price: 25 });
   });
 
   it('charges each item price, adds exactly one and preserves unrelated inventory', () => {
-    for (const item of ITEMS) {
-      const state = { ...fresh(), coins: 500 };
+    for (const item of ITEMS.filter(item=>item.category!=='toy')) {
+      const state = { ...fresh(), coins: 6000 };
       const result = buyItem(state, item.id);
       expect(result.ok).toBe(true);
-      expect(result.state.coins).toBe(500 - item.price);
+      expect(result.state.coins).toBe(6000 - item.price);
       expect(result.state.inventory[item.id]).toBe(1);
       expect(state.inventory[item.id]).toBe(0);
       expect(buyItem({ ...state, coins: item.price - 1 }, item.id).ok).toBe(false);
@@ -259,7 +261,7 @@ describe('original item catalogue', () => {
       state.inventory[item.id] = 2;
       const result = care(state, 'use', item.id, NOW);
       expect(result.ok).toBe(true);
-      expect(result.state.inventory[item.id]).toBe(1);
+      expect(result.state.inventory[item.id]).toBe(item.reusable?2:1);
       for (const key of ['hunger', 'thirst', 'cleanliness', 'happiness', 'health'] as const) {
         expect(result.state.stats[key]).toBe(Math.min(100, 10 + item[key]));
       }
@@ -445,8 +447,8 @@ describe('deliberate settings stage selection', () => {
     const locked=changePetStage(current,2).state;expect(locked.growth).toBe(current.growth);expect(locked.growthLocked).toBe(true);expect(changePetStage(locked,2).state).toBe(locked);
     for(const stage of [-1,5,1.5,NaN])expect(changePetStage(current,stage as 0).ok).toBe(false);
     expect(changePetStage(current,4,'invalid' as 'super').ok).toBe(false);
-    expect(changePetStage(current,4).ok).toBe(false);
-    expect(changePetStage({...current,growth:GROWTH_MAX},4).state.evolution).toBe('super');
+    expect(changePetStage(current,4).state).toMatchObject({growth:GROWTH_MAX,naturalGrowth:213,highestGrowth:213,growthLocked:true});
+    expect(changePetStage({...current,growth:GROWTH_MAX},4).state.evolution).toBe('classic');
   });
 });
 

@@ -4,19 +4,19 @@ import {OUTFITS,buyOutfit,wearOutfit,normalizeWardrobe} from './wardrobe'
 const NOW=Date.UTC(2026,9,24,8)
 const pet=()=>({...createPet('小叶','blue',NOW),growth:60})
 describe('a real owned wardrobe',()=>{
-  it('rejects every costume on seeds without touching ownership, colour or the remembered grown outfit',()=>{
+  it('rejects every costume on seeds without removing ownership or changing colour',()=>{
     const seed={...pet(),growth:0,highestGrowth:180,wardrobe:OUTFITS.filter(i=>i.id!=='star-wand').map(i=>i.id),wearing:'wizard-cap' as const}
     for(const item of OUTFITS){const result=wearOutfit(seed,item.id);expect(result.ok).toBe(false);expect(result.state).toBe(seed);expect(result.message).toContain('种子期')}
     expect(wearOutfit({...seed,growth:60},'party-cap').ok).toBe(true)
     const removed=wearOutfit(seed);expect(removed.ok).toBe(true);expect(removed.state.wearing).toBeUndefined();expect(removed.state.wardrobe).toEqual(seed.wardrobe)
-    const restored=parseSave(JSON.stringify(seed),NOW)!;expect(restored.wardrobe).toEqual(seed.wardrobe);expect(restored.wearing).toBe(seed.wearing)
+    const restored=parseSave(JSON.stringify(seed),NOW)!;expect(restored.wardrobe).toEqual(seed.wardrobe);expect(restored.wearing).toBeUndefined()
   })
 
   it('buys one permanent accessory, charges once and leaves all needs, growth and consumables alone',()=>{
     const before=pet(),result=buyOutfit(before,'party-cap')
-    expect(result.ok).toBe(true);expect(result.state.coins).toBe(70);expect(result.state.wardrobe).toEqual(['party-cap']);expect(result.state.wearing).toBeUndefined()
+    expect(result.ok).toBe(true);expect(result.state.coins).toBe(920);expect(result.state.wardrobe).toEqual(['party-cap']);expect(result.state.wearing).toBeUndefined()
     expect(result.state.stats).toEqual(before.stats);expect(result.state.growth).toBe(before.growth);expect(result.state.inventory).toEqual(before.inventory)
-    const again=buyOutfit(result.state,'party-cap');expect(again.ok).toBe(false);expect(again.state).toBe(result.state);expect(before.coins).toBe(100)
+    const again=buyOutfit(result.state,'party-cap');expect(again.ok).toBe(false);expect(again.state).toBe(result.state);expect(before.coins).toBe(1000)
   })
   it('rejects unknown, unaffordable and unowned equipment without partial writes',()=>{
     for(const result of [buyOutfit(pet(),'unknown'),buyOutfit({...pet(),coins:29},'party-cap'),wearOutfit(pet(),'party-cap')]){expect(result.ok).toBe(false);expect(result.state.wardrobe).toBeUndefined();expect(result.state.wearing).toBeUndefined()}
@@ -26,17 +26,17 @@ describe('a real owned wardrobe',()=>{
     for(const item of OUTFITS.slice(0,2))saved=buyOutfit(saved,item.id).state
     saved=wearOutfit(saved,'party-cap').state;expect(saved.wearing).toBe('party-cap');expect(wearOutfit(saved,'party-cap').ok).toBe(false)
     saved=wearOutfit(saved,'gold-feather').state;saved=wearOutfit(saved).state
-    expect(saved.wearing).toBeUndefined();expect(saved.wardrobe).toEqual(['party-cap','gold-feather']);expect(saved.color).toBe('blue');expect(saved.coins).toBe(25)
+    expect(saved.wearing).toBeUndefined();expect(saved.wardrobe).toEqual(['party-cap','gold-feather']);expect(saved.color).toBe('blue');expect(saved.coins).toBe(840)
   })
   it('keeps wardrobe and wearing through parsing, backup-style serialization and stage changes',()=>{
     const dressed=wearOutfit(buyOutfit(pet(),'wizard-cap').state,'wizard-cap').state
-    for(const stage of [0,1,2,3,4] as const){const changed=changePetStage(dressed,stage,stage===4?'water':undefined,NOW).state;const loaded=parseSave(JSON.stringify(changed),NOW)!;expect(loaded.wearing).toBe('wizard-cap');expect(loaded.wardrobe).toEqual(['wizard-cap']);expect(loaded.name).toBe('小叶');expect(loaded.color).toBe('blue')}
+    for(const stage of [0,1,2,3,4] as const){const changed=changePetStage(dressed,stage,stage===4?'water':undefined,NOW).state;const loaded=parseSave(JSON.stringify(changed),NOW)!;expect(loaded.wearing).toBe(stage===0?undefined:'wizard-cap');expect(loaded.wardrobe).toEqual(['wizard-cap']);expect(loaded.name).toBe('小叶');expect(loaded.color).toBe('blue')}
   })
   it('migrates old saves and safely drops unknown/duplicate/unowned imported outfits',()=>{
     expect(parseSave(JSON.stringify(pet()),NOW)?.wardrobe).toBeUndefined()
     expect(normalizeWardrobe(['party-cap','party-cap','unknown'],'wizard-cap')).toEqual({wardrobe:['party-cap']})
     const loaded=parseSave(JSON.stringify({...pet(),wardrobe:['party-cap','unknown'],wearing:'unknown'}),NOW)!
-    expect(loaded.wardrobe).toEqual(['party-cap']);expect(loaded.wearing).toBeUndefined();expect(loaded.coins).toBe(100)
+    expect(loaded.wardrobe).toEqual(['party-cap']);expect(loaded.wearing).toBeUndefined();expect(loaded.coins).toBe(1000)
     expect(pet().wearing).toBeUndefined()
   })
 

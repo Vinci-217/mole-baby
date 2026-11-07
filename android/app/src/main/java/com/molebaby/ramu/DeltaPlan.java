@@ -45,15 +45,18 @@ final class DeltaPlan {
             parts.add(p);
         }
         // Coalesce tiny copied gaps between ranges to avoid hundreds of HTTP requests.
+        int copyParts=(int)parts.stream().filter(part -> part.copy).count();
         for (int i = 1; i + 1 < parts.size();) {
             Part a = parts.get(i-1), b = parts.get(i), c = parts.get(i+1);
-            if (!a.copy && b.copy && b.size <= 65536 && !c.copy) {
-                parts.set(i-1, new Part(false,a.target,a.target,a.size+b.size+c.size)); parts.remove(i+1); parts.remove(i);
+            if (!a.copy && b.copy && b.size <= 65536 && !c.copy && copyParts>1) {
+                parts.set(i-1, new Part(false,a.target,a.target,a.size+b.size+c.size)); parts.remove(i+1); parts.remove(i); copyParts--;
             } else i++;
         }
         long download = 0; int requests = 0;
         for (Part p : parts) if (!p.copy) { download += p.size; requests++; }
-        if (download >= next.size * .9 || requests > 512 || download + requests * 65536L >= next.size * .9) return full(next.size);
+        // A large but valid delta stays a delta. Full download is selected only
+        // before transfer when there is no reusable data or the user asks for it.
+        if (download == next.size) return full(next.size);
         return new Plan(List.copyOf(parts), download, next.size-download, requests, true);
     }
     static Plan full(long size) { return new Plan(List.of(new Part(false,0,0,size)),size,0,1,false); }

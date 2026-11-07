@@ -1,12 +1,14 @@
 import {UPLOADED_ITEMS} from './uploaded-item-data';
 import {customPotionColor,petColorName} from './pet-color';
+import toyFrames from '../public/assets/original/uploaded-actions/index.json';
 /** Original item names/effects/prices: assets/original/items/petfood.xml.
  * Activity gifts have explicit local shop prices; see research/items-states.md.
  * Stable berry/biscuit/juice IDs keep existing v1 saves and rewards intact.
  */
 import type { PetColor } from './game';
-export type ItemCategory = 'food' | 'drink' | 'clean' | 'medicine';
-export const CATEGORY_LABELS: Record<ItemCategory, string> = { food: '食物', drink: '饮品', clean: '清洁', medicine: '药水' };
+import {carePrice} from './economy';
+export type ItemCategory = 'food' | 'drink' | 'clean' | 'medicine' | 'toy';
+export const CATEGORY_LABELS: Record<ItemCategory, string> = { food: '食物', drink: '饮品', clean: '清洁', medicine: '药水',toy:'玩具' };
 export interface PetItem {
   id: string;
   sourceId: string;
@@ -26,6 +28,8 @@ export interface PetItem {
   minStage: 0 | 1 | 2 | 3;
   description: string;
   changesColor?: PetColor;
+  reusable?:boolean;
+  animationIds?:string[];
 }
 
 export const ITEMS: PetItem[] = [
@@ -60,6 +64,14 @@ export const ITEMS: PetItem[] = [
 ];
 
 ITEMS.push(...UPLOADED_ITEMS);
+const toyDefinitions=[['180004','运动足球',0],['180011','逗逗拉姆·一',0],['180012','逗逗拉姆·二',0],['180013','逗逗拉姆·三',0],['180023','魔法弹簧',0],['drawing-kit','彩色涂鸦套装',0]] as const;
+for(const [id,name,price] of toyDefinitions){
+ const sourceId=id==='drawing-kit'?'tuya1':id,frame=toyFrames[`junior-${sourceId}` as keyof typeof toyFrames];
+ const image=['180004','180023'].includes(id)?`./assets/original/items/${id}.png`:frame?`./assets/original/uploaded-actions/${frame.assetKey}/poster.png`:'./assets/original/ui/icon-happy.png';
+ ITEMS.push({id,sourceId,name,category:'toy',image,emoji:'⚽',price,originalPrice:id==='180004'?800:id==='180023'?1200:0,localPrice:true,hunger:0,thirst:0,cleanliness:0,happiness:0,health:0,minStage:1,reusable:true,animationIds:id==='drawing-kit'?['tuya1','tuya2','tuya3','tuya4']:[sourceId],description:'免费玩耍，在一起玩耍里直接使用。'});
+}
+ITEMS.push({id:'180026',sourceId:'180026',name:'乐刷刷',category:'clean',image:'./assets/original/items/180026.png',emoji:'🛁',price:30,originalPrice:0,localPrice:true,hunger:0,thirst:0,cleanliness:40,happiness:0,health:0,minStage:1,description:'清洁+40，播放对应原版刷洗动作；价格与清洁效果为桌宠适配。'},
+ {id:'180097',sourceId:'180097',name:'比巴卜泡泡糖',category:'food',image:'./assets/original/items/180097.png',emoji:'🍬',price:50,originalPrice:50,localPrice:false,hunger:0,thirst:0,cleanliness:0,happiness:80,health:0,minStage:1,description:'心情+80，播放原版泡泡糖动作。'});
 // Keep the original ID/icon/animation and stock in existing players' backpacks.
 Object.assign(ITEMS.find(item=>item.id==='180006')!,{hunger:100,thirst:100,cleanliness:100,happiness:100,health:100,energy:100,description:'一键将饱食、水分、清洁、心情、健康、精力全部恢复到100（桌宠适配）。'});
 ITEMS.push({id:'energy-drink',sourceId:'energy-drink',name:'满满精力饮料',category:'drink',image:'./assets/original/items/180014.png',emoji:'🥛',price:70,originalPrice:0,localPrice:true,hunger:0,thirst:20,cleanliness:0,happiness:0,health:0,energy:100,minStage:0,description:'精力立即恢复到100，水分+20；沿用运动可乐原图与喝饮料动作，效果为桌宠设定。'});
@@ -73,10 +85,11 @@ export const COLOR_POTIONS = ([['red','红色'],['yellow','黄色'],['blue','蓝
   description:`变为${name}，保留阶段、物品和回忆。`,
 }));
 ITEMS.push(...COLOR_POTIONS);
+for(const item of ITEMS){item.price=carePrice(item);item.localPrice=item.originalPrice===0||item.price!==item.originalPrice;}
 
 /** Accept a source numeric ID at API boundaries, return the stable save ID. */
 export function getItem(id: string | undefined): PetItem | undefined {
-  const known=ITEMS.find(item => item.id === id || item.sourceId === id);if(known)return known;
+  const known=ITEMS.find(item => item.id === id || item.sourceId === id || Boolean(id&&item.animationIds?.includes(id)));if(known)return known;
   const color=customPotionColor(id);if(!color)return;
   return {id:id!,sourceId:id!,name:`自调色药水 ${color.toUpperCase()}`,category:'medicine',image:'./assets/original/items/180005.png',emoji:'🧪',price:0,originalPrice:0,localPrice:true,hunger:0,thirst:0,cleanliness:0,happiness:0,health:0,minStage:0,changesColor:color,description:`变为${petColorName(color)}，阶段、课程和回忆不变。`};
 }

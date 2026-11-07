@@ -19,7 +19,7 @@ export default function AndroidSettings(){
     <div className="settings-row"><span>软件更新</span><button className="game-button small" onClick={()=>{void window.desktop?.updates.check().catch(error=>setMessage(error.message));}}>{update?.status==='checking'?'检查中…':'检查更新'}</button></div>
     {update&&update.status!=='idle'&&update.status!=='current'&&<p className="settings-hint">{update.message}{update.percent>0?`（${Math.round(update.percent)}%）`:''}</p>}
     <div className="settings-row"><span>Wi-Fi 下自动下载更新</span><button role="switch" aria-label="Wi-Fi 下自动下载更新" aria-checked={state?.autoDownloadWifi===true} onClick={()=>{void window.mobile?.setAutoDownloadWifi(!state?.autoDownloadWifi).then(setState).catch(error=>setMessage(error.message));}}>{state?.autoDownloadWifi?'开启':'关闭'}</button></div>
-    <p>更新会在启动后检查；差量不适用时自动改用完整包。自动下载默认关闭，开启后仅使用非计费的 Wi-Fi；APK 安装始终由系统征求确认。</p>
+    <p>更新会在启动后检查；支持差量时持续使用差量，失败可重试，不会中途转为完整包。自动下载默认关闭，开启后仅使用非计费的 Wi-Fi；APK 安装始终由系统征求确认。</p>
     <button className="game-button small" onClick={()=>{void window.mobile?.cancelUpdate();}}>取消正在下载的更新</button>
     {message&&<p role="alert">{message}</p>}
   </section>;

@@ -69,9 +69,9 @@ const byAction = new Map([...motions.values()].map(motion => [motion.action, mot
 
 /** Stable save IDs and original numeric IDs resolve to the same recipe. */
 export function getItemMotion(id: string | undefined): ItemMotion {
-  const found = id ? motions.get(id) : undefined
-  if (found) return found
   const item=id?getItem(id):undefined
+  const found = id ? motions.get(item?.id??id)??motions.get(id) : undefined
+  if (found) return found
   if(item){
     const body=item.category==='food'?'eat':item.category==='drink'?'drink':item.category==='clean'?'wash':'medical'
     const duration=body==='eat'?4600:body==='drink'?4000:body==='wash'?3600:2800

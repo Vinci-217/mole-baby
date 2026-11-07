@@ -1,0 +1,15 @@
+{
+  "files": 567,
+  "newOutfits": 110,
+  "bytes": 18843929,
+  "categories": {
+    "body": 1,
+    "care": 251,
+    "magic": 27,
+    "outfit": 122,
+    "school": 109,
+    "skill": 27,
+    "transform": 30
+  },
+  "adaptation": "Original SWF vectors and timelines; a separate offline controller selects the source forms, directions and bone events. No artwork interpolation. Source archive and player saves unchanged."
+}

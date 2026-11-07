@@ -1,7 +1,7 @@
 import { ITEMS, getStage, type Action, type GameState, type ItemCategory, type PetItem } from './game';
 
 export const CLASSIC_PAGE_SIZE = 12;
-export const categoryAction = (category: ItemCategory): Action => ({food:'feed',drink:'drink',clean:'wash',medicine:'use'} as const)[category];
+export const categoryAction = (category: ItemCategory): Action => ({food:'feed',drink:'drink',clean:'wash',medicine:'use',toy:'use'} as const)[category];
 /** Keep the last consumed slot in place until selection changes. Never show
  * unowned shop stock as if it were in the player's backpack. */
 export function pocketItems(pet: GameState, retained?: string) {

@@ -1,3 +1,5 @@
+import GameRewardItem from './GameRewardItem';
+import {useGameRound} from '../use-game-round';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { Evolution, PetColor, Stage } from '../game';
@@ -13,7 +15,7 @@ import './TreasureGame.css';
 interface Props {
   background: RoomBackground; phase: ScenePhase; color: PetColor; stage: Stage; evolution?: Evolution;
   costume?:string;
-  sound?: boolean; onClose: () => void; onComplete: (score: number) => GameReceipt;
+  sound?: boolean; onClose: () => void; onComplete: (score: number,round?:import('../economy').RewardRound) => GameReceipt;
 }
 type RoundPhase = 'ready' | 'playing' | 'collected' | 'finished' | 'closed';
 
@@ -26,6 +28,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
   const [hintedId, setHintedId] = useState<string | null>(null);
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(document.hidden);
+  const roundClock=useGameRound(mode==='playing',paused||hidden);
   const [feedback, setFeedback] = useState('');
   const [receipt, setReceipt] = useState<GameReceipt | null>(null);
   const [reaction, setReaction] = useState({ action: 'idle', id: 0 });
@@ -48,6 +51,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
   }
   closeRef.current = close;
   function start() {
+    roundClock.start();
     playGameSound('start',sound);
     setRound(createTreasureRound()); foundRef.current = []; setFound([]); hinted.current = []; setHintedId(null);
     setReceipt(null); setFeedback('慢慢找，我陪着你。'); claimed.current = false;
@@ -74,7 +78,7 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
   function collect() {
     if (modeRef.current !== 'collected' || claimed.current || document.hidden || pausedRef.current) return;
     claimed.current = true; modeRef.current = 'finished'; setMode('finished');
-    setReceipt(callbacks.current.onComplete(treasureScore(round, foundRef.current, hinted.current)));
+    setReceipt(callbacks.current.onComplete(treasureScore(round, foundRef.current, hinted.current),roundClock.finish()));
     setReaction(previous => ({ action: 'happy', id: previous.id + 1 }));
   }
   function togglePause() { const next = !paused;playGameSound(next?'pause':'resume',sound); manualPause.current = next; pausedRef.current = next || document.hidden; setPaused(next); }
@@ -117,6 +121,6 @@ export default function TreasureGame({ background, phase, color, stage, evolutio
     {mode === 'ready' && <button ref={primary} className="treasure-button treasure-start" type="button" data-testid="treasure-start" onClick={start}>开始寻宝</button>}
     {looking && <><div className="treasure-toolbar"><strong aria-label={`已经找到${found.length}件，共${round.targets.length}件`}>{found.length} / {round.targets.length}</strong><button type="button" className="treasure-button secondary" disabled={stopped || Boolean(hintedId)} onClick={hint}>拉姆提示</button><button type="button" className="treasure-button secondary" disabled={stopped} onClick={togglePause}>暂停寻宝</button></div><p className="treasure-feedback" role="status">{feedback}</p></>}
     {mode === 'collected' && <div className="treasure-claim"><p role="status">一起找到的小宝物，收进今天的回忆。</p><button ref={primary} type="button" className="treasure-button" disabled={stopped} onClick={collect}>收好宝物</button></div>}
-    {mode === 'finished' && <div className="treasure-result"><h3>又多了一段小小的冒险</h3>{receipt && <><div className="treasure-receipt"><span>摩尔豆 <b>+{receipt.coins}</b></span><span>用品 <b>+{receipt.food}</b></span></div><p role="status">{receipt.message}</p></>}<div className="treasure-result-actions"><button type="button" className="treasure-button secondary" onClick={start}>再找一局</button><button ref={primary} type="button" className="treasure-button" onClick={close}>完成</button></div></div>}
+    {mode === 'finished' && <div className="treasure-result"><h3>又多了一段小小的冒险</h3>{receipt && <><div className="treasure-receipt"><span>摩尔豆 <b>+{receipt.coins}</b></span><span><GameRewardItem receipt={receipt}/></span></div><p role="status">{receipt.message}</p></>}<div className="treasure-result-actions"><button type="button" className="treasure-button secondary" onClick={start}>再找一局</button><button ref={primary} type="button" className="treasure-button" onClick={close}>完成</button></div></div>}
   </div></div>;
 }

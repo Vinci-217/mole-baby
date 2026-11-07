@@ -1,0 +1,25 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/all-original-animations');
+const manifest=require('../public/assets/original/official/manifest.json');
+const captures=new Map(fs.readFileSync(path.join(out,'captures.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(line=>{const row=JSON.parse(line);return [row.id,row]}));
+const kinds={outfit:'装扮',care:'道具互动',school:'课堂',magic:'魔法',transform:'变身',skill:'技能',body:'基础动作'};
+const forms={level1:'种子',level2:'初级',level3:'中级',level4:'高级',level101:'经典超拉',level101_7:'神力超拉',level5_2:'水系',level5_4:'木系',level5_1:'火系'};
+const magicNames={baibiansuixin:'百变随心',bibobibo:'bibo 变变变',mofaxianzhiqiu:'魔法先知球',mofaxingxing:'魔法星星',shikongganying:'时空感应',xingchenshouhu:'星辰守护',yishouzhetian:'一手遮天'};
+const rows=manifest.clips.map(clip=>{
+ const capture=captures.get(clip.id);assert(capture?.ok,`Missing GIF: ${clip.path}`);assert(fs.existsSync(path.join(out,capture.gif)));
+ const outfit=manifest.outfits.find(row=>row.clipId===clip.id),stem=clip.path.split('/').pop().replace('.swf','');
+ const name=magicNames[stem]||(/^\d+$/.test(clip.name)?`${kinds[clip.kind]}片段 ${clip.name}`:clip.name);
+ return {id:clip.id,name,kind:clip.kind,kindName:kinds[clip.kind],newOutfit:Boolean(outfit),outfitId:outfit?.id,source:clip.path,sha256:clip.sha256,gif:capture.gif,form:capture.form,formName:forms[capture.form]||`阶段 ${clip.level||'通用'}`,supported:(clip.forms.length?clip.forms.map(form=>forms[form]||form):[clip.level?forms['level'+clip.level]||'对应阶段':'通用片段']),animatedSource:clip.animated,motion:capture.uniqueFrames>1,frames:capture.frames,seconds:Math.round(capture.capturedFrames/12*100)/100};
+});
+assert.equal(rows.length,567);assert.equal(rows.filter(row=>row.newOutfit).length,110);
+const order=Object.keys(kinds),featured=['1200001','1200007','1200011','1200016','1200022','1200030','1200058','1200078','1200042','1200065','1200069','1200094'];
+const rank=row=>{const index=featured.indexOf(row.source.split('/').pop().replace('.swf',''));return index<0?1000:index};
+rows.sort((a,b)=>order.indexOf(a.kind)-order.indexOf(b.kind)||Number(b.newOutfit)-Number(a.newOutfit)||rank(a)-rank(b)||a.source.localeCompare(b.source,undefined,{numeric:true}));
+fs.writeFileSync(path.join(out,'catalog.json'),JSON.stringify({total:rows.length,newOutfits:110,kinds,rows},null,2)+'\n');
+const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';
+const csv=[['分类','名称','新增衣橱','预览形态','适用形态','预览画面有变化','源文件含多帧','预览秒数','GIF文件','官方来源','SHA256'],...rows.map(row=>[row.kindName,row.name,row.newOutfit?'是':'',row.formName,row.supported.join(' / '),row.motion?'是':'原片停驻或静态',row.animatedSource?'是':'否',row.seconds,row.gif,'https://mole.61.com/'+row.source,row.sha256])].map(row=>row.map(quote).join(',')).join('\r\n');
+fs.writeFileSync(path.join(out,'全部预览清单.csv'),'\ufeff'+csv+'\r\n');
+const html=fs.readFileSync(path.join(root,'scripts/art/all-original-gallery.html'),'utf8');
+fs.writeFileSync(path.join(out,'index.html'),html.replace('__CATALOG__',JSON.stringify({rows,kinds}).replaceAll('<','\\u003c')));
+fs.writeFileSync(path.join(out,'使用说明.txt'),'拉姆桌宠 · 完整原版素材预览\n\n打开 index.html 即可离线观看，保留 gifs 文件夹即可，无需安装 Flash 或播放器。\n共有 567 项原版素材，包括 110 件新增衣橱装扮；分类、搜索、翻页或点击图片放大查看。\n每项一般截取约 4 秒；短动作按原结束信号停止，装扮依次展示正面站立、左移和右移。\n35 份原素材为静态，另有部分多帧原片在选定形态下会停驻，目录如实标注。\n这是全部接入素材的逐项预览，不表示每项都是新增完整动作或完整玩法。旧 12 件装扮保留原编号，未新增为重复衣橱项。\n不读取或修改玩家存档。本轮尚未发版。\n\n原版美术、动画素材的权利归淘米等原权利方；本项目使用公开可取得的素材进行非官方学习与适配。如构成侵权，请联系作者删除。\n');
+console.log(JSON.stringify({items:rows.length,newOutfits:110,visiblyMoving:rows.filter(row=>row.motion).length,stillInCapture:rows.filter(row=>!row.motion).length}));

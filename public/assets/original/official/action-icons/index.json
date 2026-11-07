@@ -1,0 +1,90 @@
+{
+  "adaptation": "First original icon frame, transparent trim and proportional fit; no artwork redrawing.",
+  "icons": {
+    "190415": {
+      "image": "./assets/original/official/action-icons/190415.png",
+      "source": "root/resource/allJob/icon/190415.swf",
+      "sha256": "c3f802222d66056998af7a1f9274e867256069e4d6b9e452cb8b2a92206faf99"
+    },
+    "190416": {
+      "image": "./assets/original/official/action-icons/190416.png",
+      "source": "root/resource/allJob/icon/190416.swf",
+      "sha256": "ba1541ea28abe295e2f9033ba803e67d3d05df344790de5ca1a32ec15d9fa997"
+    },
+    "190583": {
+      "image": "./assets/original/official/action-icons/190583.png",
+      "source": "root/resource/allJob/icon/190583.swf",
+      "sha256": "951e07984405c89ebf75b2fb51f7fa4fad3474bde5425dcf2e88db8ac6fdba3c"
+    },
+    "190584": {
+      "image": "./assets/original/official/action-icons/190584.png",
+      "source": "root/resource/allJob/icon/190584.swf",
+      "sha256": "6726d5595aeba4f0f79689937c15fe53ed0386f567fbe11d882d3df782e1cb5d"
+    },
+    "190585": {
+      "image": "./assets/original/official/action-icons/190585.png",
+      "source": "root/resource/allJob/icon/190585.swf",
+      "sha256": "da92f7fad764c446d80f8427e815af5d7f1c6058d8606cfe2eb05e3abb4eb3d8"
+    },
+    "190586": {
+      "image": "./assets/original/official/action-icons/190586.png",
+      "source": "root/resource/allJob/icon/190586.swf",
+      "sha256": "cf4121076e9d86bad84ae9e925ff6eb9c1b147412e5499dfd55903b907a8781e"
+    },
+    "190587": {
+      "image": "./assets/original/official/action-icons/190587.png",
+      "source": "root/resource/allJob/icon/190587.swf",
+      "sha256": "890adfef6b3ea8313c942bd6ba43d9c97b4adfab35bd32377bf62b6ff4d6b7e8"
+    },
+    "190588": {
+      "image": "./assets/original/official/action-icons/190588.png",
+      "source": "root/resource/allJob/icon/190588.swf",
+      "sha256": "2cb31f94d46aebf510647c5d670490f8898df38c639354916b41bd853e13fb21"
+    },
+    "190589": {
+      "image": "./assets/original/official/action-icons/190589.png",
+      "source": "root/resource/allJob/icon/190589.swf",
+      "sha256": "73cc77400b258397c3a225d9f8b671eb9abf243e16612ed81b5b0901f169adf1"
+    },
+    "190606": {
+      "image": "./assets/original/official/action-icons/190606.png",
+      "source": "root/resource/allJob/icon/190606.swf",
+      "sha256": "6e89959178027aba839154c41b3ef2cc84f0e03840b6d61d6af36534ed71c250"
+    },
+    "190607": {
+      "image": "./assets/original/official/action-icons/190607.png",
+      "source": "root/resource/allJob/icon/190607.swf",
+      "sha256": "9d860c382bef25b2d1b2b0225fce966c6486d2df46db18f60a26e65e571437f9"
+    },
+    "190608": {
+      "image": "./assets/original/official/action-icons/190608.png",
+      "source": "root/resource/allJob/icon/190608.swf",
+      "sha256": "3f41d9d2bf2be84a62157c498b6d643b126d751da95ff0ff40988066657afb31"
+    },
+    "190609": {
+      "image": "./assets/original/official/action-icons/190609.png",
+      "source": "root/resource/allJob/icon/190609.swf",
+      "sha256": "7259932ba4506e1b818e5fbf44b0f83f40c78ce272eb04898d3a7adee896eb6c"
+    },
+    "190619": {
+      "image": "./assets/original/official/action-icons/190619.png",
+      "source": "root/resource/allJob/icon/190619.swf",
+      "sha256": "5abb884ab4045c4e0103679efe3c2a89fb432f78758e6d2db2cd3b3a650aa7c1"
+    },
+    "190620": {
+      "image": "./assets/original/official/action-icons/190620.png",
+      "source": "root/resource/allJob/icon/190620.swf",
+      "sha256": "5ba1fc6fbe8803171e78e0f4612e2cb357410330cbd3307a51091308e09012d2"
+    },
+    "190621": {
+      "image": "./assets/original/official/action-icons/190621.png",
+      "source": "root/resource/allJob/icon/190621.swf",
+      "sha256": "879760646018738f613baa3eea58673bb421521cc6cd51d4e1a5bbb7e60de2d7"
+    },
+    "190622": {
+      "image": "./assets/original/official/action-icons/190622.png",
+      "source": "root/resource/allJob/icon/190622.swf",
+      "sha256": "abb9fd8b06c633493e4f834f86672b29f02dff178987e3ae2cd05915023482ac"
+    }
+  }
+}

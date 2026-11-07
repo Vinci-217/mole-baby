@@ -1,5 +1,10 @@
+import {gamePrizeChoices} from './game-prizes';
+import {ALL_OUTFITS} from './wardrobe';
+import {FURNITURE} from './room-furnishings';
+import {ITEMS} from './catalog';
+import {gameBeans} from './economy';
 import {describe,it,expect} from 'vitest';
-import {createPet,care,tick,parseSave,gameRewardItems,rewardGame,STAGES,WAKE_ENERGY} from './game';
+import {createPet,care,tick,parseSave,rewardGame,STAGES,WAKE_ENERGY} from './game';
 import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,PLAY_REQUIREMENTS,unmetNeedReason} from './pet-status';
 import {activityBlockReason} from './pet-school';
 import {mayPlay,playBlockReason} from './pet-pastimes';
@@ -44,27 +49,27 @@ describe('quick, continuous sleep',()=>{
  });
 });
 describe('random game receipts',()=>{
- it('can award every eligible item at every score without changing coins or source saves',()=>{
+ it('awards each eligible prize and preserves inventory, identity and ownership through reload',()=>{
   for(const growth of STAGES.map(s=>s.threshold)){
-   const p={...fresh(),growth};const pool=gameRewardItems(p);
-   expect(pool.length).toBeGreaterThan(3);
-   for(const [index,item] of pool.entries())for(const score of [0,5,10]){
-    const result=rewardGame(p,score,NOW,()=>(index+.5)/pool.length);
-    expect(result.rewardItem?.id).toBe(item.id);expect(result.state.inventory[item.id]).toBe(1);
-    expect(result.message).toContain(item.name);expect(result.state.coins-p.coins).toBe(4+score*2);
-    expect(item.minStage).toBeLessThanOrEqual(growth===0?0:growth===60?1:growth===180?2:3);
-    expect(p.inventory[item.id]).toBe(0);expect(parseSave(JSON.stringify(result.state),NOW)).not.toBeNull();
+   const p={...fresh(),growth},pool=gamePrizeChoices(p);
+   for(const [index,prize] of pool.entries()){
+    const result=rewardGame(p,5,NOW,()=>(index+.5)/pool.length);
+    expect(result.prize).toEqual(prize);expect(result.state.coins-p.coins).toBe(gameBeans(5)+500);
+    expect(result.message).toContain(prize.name);const loaded=parseSave(JSON.stringify(result.state),NOW)!;expect(loaded.createdAt).toBe(p.createdAt);expect(loaded.color).toBe(p.color);
+    if(prize.kind==='item'){expect(loaded.inventory[prize.id]).toBe(1);expect(p.inventory[prize.id]).toBe(0);}
+    else if(prize.kind==='outfit'){expect(loaded.wardrobe).toContain(prize.id);expect(loaded.wearing).toBeUndefined();}
+    else {expect(loaded.room?.owned).toContain(prize.id);expect(loaded.room?.placed??[]).toEqual([]);}
    }
   }
  });
- it('skips full stacks and gives coins alone when every eligible stack is full',()=>{
-  const p=fresh(),pool=gameRewardItems(p);p.inventory[pool[0].id]=9999;
-  expect(rewardGame(p,0,NOW,()=>0).rewardItem?.id).toBe(pool[1].id);
-  for(const item of pool)p.inventory[item.id]=9999;
-  const result=rewardGame(p,0,NOW,()=>{throw Error('Do not draw from an empty pool')});
-  expect(result.rewardItem).toBeUndefined();expect(result.state.coins).toBe(104);expect(result.state.inventory).toEqual(p.inventory);
+ it('skips full stacks and can pay coins with no remaining collection slots',()=>{
+  const p=fresh(),pool=gamePrizeChoices(p);p.inventory[pool[0].id]=9999;
+  expect(rewardGame(p,1,NOW,()=>0).prize?.id).toBe(pool[1].id);
+  p.inventory=Object.fromEntries(ITEMS.map(item=>[item.id,9999]));p.wardrobe=ALL_OUTFITS.filter(o=>o.id!=='star-wand').map(o=>o.id);p.room={owned:FURNITURE.map(f=>f.id),placed:[]};
+  const result=rewardGame(p,1,NOW,()=>{throw Error('No draw from empty pool')});
+  expect(result.prize).toBeUndefined();expect(result.state.coins).toBe(p.coins+gameBeans(1));expect(result.state.inventory).toEqual(p.inventory);
  });
- it('does not draw or grant a second item on duplicate completion',()=>{
+ it('does not draw or grant a second prize on duplicate completion',()=>{
   const result=rewardGame(fresh(),5,NOW,()=>.5);
   expect(rewardGame(result.state,5,NOW,()=>{throw Error('Duplicate draw')}).ok).toBe(false);
  });

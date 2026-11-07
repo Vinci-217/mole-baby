@@ -5,9 +5,9 @@ import {furnitureArt,furnitureHit} from './furniture-art';
 const now=1_700_000_000_000,p=()=>({...createPet('叶叶','blue',now),coins:1000});
 describe('independent furniture copies and free layout',()=>{
  it('unlocks a design once and places multiple copies without charging or replacing earlier copies',()=>{
-  const bought=buyFurniture(p(),'plant');expect(bought.state.coins).toBe(840);expect(buyFurniture(bought.state,'plant').ok).toBe(false);
+  const bought=buyFurniture(p(),'plant');expect(bought.state.coins).toBe(920);expect(buyFurniture(bought.state,'plant').ok).toBe(false);
   const one=placeFurniture(bought.state,'plant',20,12),two=placeFurniture(one,'plant',70,87);
-  expect(two.coins).toBe(840);expect(two.room!.placed).toHaveLength(2);expect(two.room!.placed[0]).toEqual(one.room!.placed[0]);expect(new Set(two.room!.placed.map(placementKey)).size).toBe(2);
+  expect(two.coins).toBe(920);expect(two.room!.placed).toHaveLength(2);expect(two.room!.placed[0]).toEqual(one.room!.placed[0]);expect(new Set(two.room!.placed.map(placementKey)).size).toBe(2);
  });
  it('allows every owned type anywhere, including wall decorations on open scenes, while respecting unlocks',()=>{
   expect(placeFurniture(p(),'plant',40,32)).toEqual(p());

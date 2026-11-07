@@ -1,19 +1,156 @@
 {
   "source": "root/resource/petcloth/swf2/1200026.swf",
+  "url": "https://mole.61.com/resource/petcloth/swf2/1200026.swf",
   "sourceSha256": "c30d025ffe0bf1c284e360343e660e1a43df79ec5324527eb5b7de0ebf9f145f",
-  "sourceSprite": 13,
-  "sourceFrames": 15,
+  "name": "Ebook",
   "fps": 24,
-  "adaptation": "Only the grey depth-1 registration placeholder is removed. Original page vectors, purple cover, colours, placement matrices and all 15 frames retained. Opening, reading cadence and page-turn timing in the app are local adaptation, not a recovered official read action.",
-  "width": 384,
-  "height": 169,
-  "columns": 5,
-  "frames": 15,
-  "crop": [
-    0,
-    0,
-    316,
-    139
-  ],
-  "sha256": "20f19f4bc6107538a99b7ac4633f5ba13e4a228ca352356e3a4ce4398bff4022"
+  "captureEngine": "Ruffle 0.7.1",
+  "view": "down",
+  "adaptation": "Original costume timelines played with LamuUIManage bone synchronization and the source stand/flight rule. Browser final-render screenshots preserve Flash filters/masks. Neutralized body and colour coverage recovered from original yellow/blue/red/pink rendered probes; verified against a separate original custom-purple render. Identity-transform screenshots are retained only as research evidence; normalized runtime artwork follows the actual coloured final renders and their filter/alpha results. One shared crop/scale per form; no page drawing, artificial page turns, opening, closing, body deformation or motion interpolation. Seed has no source costume. This is an isolated source-asset playback, not a recording of a logged-in game session.",
+  "forms": {
+    "junior": {
+      "width": 320,
+      "height": 217,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 0,
+      "sourceLoopFrames": 24,
+      "crop": [
+        177,
+        276,
+        392,
+        422
+      ],
+      "sha256": {
+        "junior-neutral.png": "244008cd7421acc24c02595420b3f84118fc6fcbf39f35dc9ec507ae28429fe3",
+        "junior-mask.png": "9a224eeb5534e51d911ee8a2dd74991720aa58dd8579f4c2954c0afde4384aaf"
+      }
+    },
+    "middle": {
+      "width": 320,
+      "height": 283,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 0,
+      "sourceLoopFrames": 24,
+      "crop": [
+        177,
+        231,
+        393,
+        422
+      ],
+      "sha256": {
+        "middle-neutral.png": "26052bd817570730b298217328e61af9c6405d863bbc9f28b6e9420c629e7fa5",
+        "middle-mask.png": "2be8eb12aaa85c95b4c369e3981773591e6612834998a7206ce6175e9581fe5f"
+      }
+    },
+    "senior": {
+      "width": 320,
+      "height": 329,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 2,
+      "sourceLoopFrames": 24,
+      "crop": [
+        177,
+        193,
+        400,
+        422
+      ],
+      "sha256": {
+        "senior-neutral.png": "12e89830e00d7db8b3636e1978ff44a0e0a93a76a5d552996b67b962df40b571",
+        "senior-mask.png": "917dde09ad59127400af58d18e5074517b7a516c1558eef6226ed0490e7b8c60"
+      }
+    },
+    "classic": {
+      "width": 320,
+      "height": 363,
+      "columns": 6,
+      "frames": 16,
+      "sourceLoopStart": 8,
+      "sourceLoopFrames": 16,
+      "crop": [
+        177,
+        169,
+        401,
+        423
+      ],
+      "sha256": {
+        "classic-neutral.png": "66fed049b4e7b6e22595b390c5fd35ad4d8aaaed24d87f4f2acda4def5291715",
+        "classic-mask.png": "1178a07b863a1b759b95f46c372b729bdd041b63494edb8bc69a8fcaf38c8550"
+      }
+    },
+    "super": {
+      "width": 320,
+      "height": 348,
+      "columns": 6,
+      "frames": 18,
+      "sourceLoopStart": 6,
+      "sourceLoopFrames": 18,
+      "crop": [
+        138,
+        118,
+        447,
+        454
+      ],
+      "sha256": {
+        "super-neutral.png": "05ee5a5db7d6b9e486edabdc93c92aaaaeb08a8f72dfba2f74ce6800613a59ec",
+        "super-mask.png": "fe693796bc6e28a60cbbaeaee0fd5d50f266c9564bc4c514588ce48d2514f50a"
+      }
+    },
+    "water": {
+      "width": 320,
+      "height": 303,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 1,
+      "sourceLoopFrames": 24,
+      "crop": [
+        176,
+        211,
+        401,
+        424
+      ],
+      "sha256": {
+        "water-neutral.png": "34447f7beb1f8151dcefcbf9308f1baecdc5bd5d24fc36762452ddf8f6561f97",
+        "water-mask.png": "7d037a3877fea1896663ef4cf2c4d2de896654cd6b4b98684e81171222f7baa7"
+      }
+    },
+    "wood": {
+      "width": 320,
+      "height": 341,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 2,
+      "sourceLoopFrames": 24,
+      "crop": [
+        175,
+        182,
+        403,
+        425
+      ],
+      "sha256": {
+        "wood-neutral.png": "c980dbb1e5673b19e0e8c313fab14e6762db2ea38f0521282cb4891f71a1aac9",
+        "wood-mask.png": "0484152afdfff799e1493f98a2ffa3d7e50250409ba2a66d85595ecdb166fe73"
+      }
+    },
+    "fire": {
+      "width": 320,
+      "height": 304,
+      "columns": 6,
+      "frames": 24,
+      "sourceLoopStart": 0,
+      "sourceLoopFrames": 24,
+      "crop": [
+        176,
+        209,
+        401,
+        423
+      ],
+      "sha256": {
+        "fire-neutral.png": "2fb66d30aa67327c1f987a3edc7b0358db78c4841fec3ff0c531fcf5883a5ce7",
+        "fire-mask.png": "7970b1558b3e164aa75ec4cad9c8920df9aa91809d2794527858739512c7fa89"
+      }
+    }
+  }
 }
