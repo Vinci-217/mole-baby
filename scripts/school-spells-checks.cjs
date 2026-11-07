@@ -27,19 +27,17 @@ async function verifySchoolSpells(page){
   for(const name of ['火系变身课','水系变身课','木系变身课']){
    await roomTab(page,'学院');await course(name).getByRole('button',{name:'上这一课',exact:true}).click();await expect(room.getByRole('timer')).toHaveText('3:00');await page.clock.fastForward(180150);
   }
-  await toDesktop(page);let actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();
-  let panel=page.getByTestId('companion-panel');await expect(panel.locator('.desktop-element-group')).toHaveCount(3);await expect(panel.locator('.desktop-element-grid button')).toHaveCount(18);
-  assert.ok(await panel.evaluate(p=>p.scrollHeight>p.clientHeight),'Spells must be reachable in the compact scrolling pocket');
-  await panel.evaluate(p=>p.scrollTop=p.scrollHeight);await page.clock.runFor(50);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v305-spells-pocket.png'),omitBackground:true});
-  for(const [id,name]of[['fire-6','星火涅槃'],['water-6','水上狂舞'],['wood-6','上天入地']]){
-   if(!await panel.count()){actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click()}
-   await panel.getByRole('button',{name,exact:true}).click();const magic=page.getByTestId('desktop-character').locator('.magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
+  await toDesktop(page);const actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();const panel=page.getByTestId('companion-panel');await expect(panel.getByRole('tab')).toHaveText(['活动','道具','魔法']);await panel.getByRole('tab',{name:'魔法',exact:true}).click();await expect(panel.getByRole('button',{name:'播放星火涅槃',exact:true})).toBeVisible();await expect(panel.getByRole('button',{name:'播放水上狂舞',exact:true})).toHaveCount(1);await expect(panel.getByRole('button',{name:'播放上天入地',exact:true})).toHaveCount(1);await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
+  // The original raster school spells remain available in the academy;
+  // desktop magic uses the separately verified native source timelines.
+  for(const id of ['fire-6','water-6','wood-6']){
+   await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clips[id].name}).getByRole('button',{name:'变身',exact:true}).click();
+   const magic=page.locator('.scene-character .magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
    await page.clock.runFor(950);const smoke=magic.locator('.magic-box-smoke');await expect(smoke).toHaveCount(1);
    const white=await smoke.evaluate(im=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const ctx=c.getContext('2d');ctx.filter=getComputedStyle(im).filter;ctx.drawImage(im,0,0);const d=ctx.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+3]>200){if(d[i]!==255||d[i+1]!==255||d[i+2]!==255)return false;n++}return n>100});assert.equal(white,true,'Transformation smoke must be pure white');
-   await page.clock.runFor(1700);await expect(magic.locator(`canvas[data-element-skill="${id}"]`)).toBeVisible();await expect(panel).toHaveCount(0);
-   await page.clock.fastForward(clips[id].durationMs+5000);await expect(magic).toHaveCount(0);assert.deepEqual((await save()).wardrobe,['star-wand']);
+   await page.clock.runFor(1700);await expect(magic.locator(`canvas[data-element-skill="${id}"]`)).toBeVisible();await page.clock.fastForward(clips[id].durationMs+5000);await expect(magic).toHaveCount(0);assert.deepEqual((await save()).wardrobe,['star-wand']);
   }
-  console.log('PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, all 18 scrolling desktop entries, three apex casts with pure-white smoke and restored outfit');
+  console.log('PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, three desktop magic tabs and apex entries, three apex casts with pure-white smoke and restored outfit');
  }catch(error){failed=true;console.error('School/spells error:',error);throw error;}finally{
   if(clock)await page.clock.resume();await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(e=>{if(!failed)throw e});
  }

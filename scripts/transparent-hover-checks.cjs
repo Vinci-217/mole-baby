@@ -33,12 +33,12 @@ async function verifyTransparentHover(page,desktop,options={}){
  try{
   await page.evaluate(()=>{
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));
-   Object.assign(p,{sleeping:false,wearing:undefined,lastTick:Date.now(),stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:90}});
+   Object.assign(p,{growth:840,evolution:'super',sleeping:false,wearing:undefined,lastTick:Date.now(),stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:90}});
    delete p.outing;p.inventory.biscuit=3;p.inventory.juice=2;
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
    localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,quiet:true,lively:false,presence:false}));
   });
-  await page.reload();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setPetMode(true);await window.desktop.setEdgeHiding(false)});
   await expect(page.getByTestId('desktop-character').locator('canvas:not(.ram-wear)')).toHaveAttribute('data-loaded','true',{timeout:20000});
   await noTitles();await captureClearTop('idle');
@@ -71,7 +71,7 @@ async function verifyTransparentHover(page,desktop,options={}){
  }finally{
   if(!page.isClosed()){
    await page.evaluate(s=>{localStorage.setItem('ramu-house-save-v1',s.save);if(s.prefs===null)localStorage.removeItem('ramu-house-preferences-v2');else localStorage.setItem('ramu-house-preferences-v2',s.prefs)},snapshot);
-   await page.reload();await page.getByTestId('desktop-character').waitFor();
+   await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
   }
  }
 }

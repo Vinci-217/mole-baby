@@ -57,7 +57,7 @@ async function verifyGrowthSettings(page,desktop){
   const baseline=(await save()).growth;
   await stagePanel().getByRole('button',{name:'固定形态',exact:true}).click();assert.equal((await save()).growthLocked,false);
   await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();const confirm=page.getByRole('alertdialog',{name:'确认切换成长设置？',exact:true});
-  await expect(confirm).toContainText('已有成长进度和已解锁形态都会保留');assert.equal((await save()).growthLocked,false);
+  await expect(confirm).toContainText('已有成长进度、颜色、物品和回忆都会保留');assert.equal((await save()).growthLocked,false);
   await page.keyboard.press('Escape');await expect(confirm).toHaveCount(0);await expect(stagePanel()).toBeVisible();assert.equal((await save()).growthLocked,false);
   await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growthLocked,false);
   await applyGrowthSettings(page);assert.equal((await save()).growthLocked,true);assert.equal((await save()).growth,baseline);
@@ -68,7 +68,7 @@ async function verifyGrowthSettings(page,desktop){
   for(let n=0;n<2;n++){await page.reload();await enterHome(page);await roomTab(page,'成长');assert.equal((await save()).growthLocked,false);assert.ok((await save()).growth>=grown)}
 
   const identity=await save();await stagePanel().getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();
-  await expect(confirm).toContainText('已有成长进度和已解锁形态都会保留');await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growth,grown);
+  await expect(confirm).toContainText('已有成长进度、颜色、物品和回忆都会保留');await confirm.getByRole('button',{name:'取消',exact:true}).click();assert.equal((await save()).growth,grown);
   await applyGrowthSettings(page,{mode:'fixed'});assert.equal((await save()).growth,60);assert.equal((await save()).growthLocked,true);assert.ok((await save()).highestGrowth>=grown);
   for(const key of ['createdAt','name','color','inventory','coins'])assert.deepEqual((await save())[key],identity[key]);
   await page.clock.fastForward(3600000);assert.equal((await save()).growth,60);await applyGrowthSettings(page,{mode:'auto'});assert.ok(Math.abs((await save()).growth-grown)<.001);await page.clock.fastForward(3600000);assert.ok(Math.abs((await save()).growth-(grown+240/168))<.001);

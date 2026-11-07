@@ -28,19 +28,8 @@ async function verifySpellCare(page,desktop){
   if(desktop)await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false)});
   await fixture(95);
   for(const id of ['fire-6','water-6','wood-6']){
-   const clip=clips[id],character=page.getByTestId('desktop-character');
-   const actions=await openActions(page);
-   // Capture before resizing, from the authoritative native window plus pet
-   // offset. Chromium's screenX/screenY can lag a Windows move notification.
-   let baseline;
-   if(desktop){
-    const state=await page.evaluate(()=>window.desktop.getState());assert.equal(state.companionPanel,false);
-    const bounds=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-    baseline={x:bounds.x+(state.petOffset?.x??0)+30,y:bounds.y+(state.petOffset?.y??0)+71};
-    await expect.poll(async()=>{const p=await character.evaluate(el=>{const r=el.getBoundingClientRect();return{x:screenX+r.x,y:screenY+r.y}});return Math.max(Math.abs(p.x-baseline.x),Math.abs(p.y-baseline.y))}).toBeLessThan(1);
-   }
-   await actions.getByRole('button',{name:'玩耍',exact:true}).click();
-   await page.getByTestId('companion-panel').getByRole('button',{name:clip.name,exact:true}).click();
+   const clip=clips[id],character=page.locator('.scene-character');
+   await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clip.name}).getByRole('button',{name:'变身',exact:true}).click();
    const magic=character.locator('.magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
    const started=Number(await magic.getAttribute('data-magic-start'));
    const peak=clip.frameMap.map((index,frame)=>({frame:frame+1,area:clip.rectangles[index][3]*clip.rectangles[index][4]})).sort((a,b)=>b.area-a.area)[0].frame;
@@ -60,40 +49,16 @@ async function verifySpellCare(page,desktop){
     samples.push({frame,...result});
     if(frame===peak)await page.screenshot({path:path.join(out,`${id}-${desktop?'native':'browser'}.png`),omitBackground:true});
    }
-   if(desktop){
-    const native=await page.evaluate(()=>window.desktop.getState());assert.equal(native.effectExpanded,true);
-    const bounds=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());assert.ok(bounds.width>160||bounds.height>240);
-    const anchor=await character.evaluate(el=>{const r=el.getBoundingClientRect();return{x:screenX+r.x,y:screenY+r.y}});
-    assert.ok(Math.abs(anchor.x-baseline.x)<1&&Math.abs(anchor.y-baseline.y)<1,`native resize must preserve character position: ${JSON.stringify({id,baseline,anchor,bounds,offset:native.petOffset})}`);
-    receipt.spells.push({id,peak,samples,baseline,anchor});
-   }
-   await page.clock.runFor(4000);await expect(magic).toHaveCount(0);
-   if(desktop)await expect.poll(async()=>{
-    const b=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());return[b.width,b.height];
-   }).toEqual([160,240]);
-   if(!desktop)receipt.spells.push({id,peak,samples});
+   receipt.spells.push({id,peak,samples});await page.clock.runFor(4000);await expect(magic).toHaveCount(0);await toDesktop(page);
   }
+
   // Interrupt through real controls: no target may keep painting after its
   // expanded host is restored or a different interaction surface is opened.
   receipt.interruptions=[];
-  for(const route of ['panel','room','desktop']){
-   if(route==='desktop'){
-    await enterHome(page);await roomTab(page,'学院');
-    await page.locator('.element-skill-list li').filter({hasText:clips['fire-1'].name}).getByRole('button',{name:'变身',exact:true}).click();
-   }else{
-    const tools=await openActions(page);await tools.getByRole('button',{name:'玩耍',exact:true}).click();
-    await page.getByTestId('companion-panel').getByRole('button',{name:clips['fire-1'].name,exact:true}).click();
-   }
+  for(const route of ['room','desktop']){
+   await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clips['fire-1'].name}).getByRole('button',{name:'变身',exact:true}).click();
    await expect.poll(async()=>{await page.clock.runFor(16);return page.locator('.magic-box-performance').getAttribute('data-ready')},{timeout:15000}).toBe('true');await page.clock.runFor(2100);
-   if(route==='panel'){
-    const tools=await openActions(page);await tools.getByRole('button',{name:'状态',exact:true}).click();
-    await expect(page.locator('.magic-box-performance')).toHaveCount(0);
-    await page.getByTestId('companion-panel').getByRole('button',{name:'关闭小窗',exact:true}).click();
-   }else if(route==='room'){
-    await enterHome(page);await expect(page.locator('.magic-box-performance')).toHaveCount(0);await toDesktop(page);
-   }else{await toDesktop(page);await expect(page.locator('.magic-box-performance')).toHaveCount(0)}
-   if(desktop)await expect.poll(async()=>{const b=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());return[b.width,b.height]}).toEqual([160,240]);
-   receipt.interruptions.push(route);
+   if(route==='room')await roomTab(page,'设置');else await toDesktop(page);await expect(page.locator('.magic-box-performance')).toHaveCount(0);if(route==='room')await toDesktop(page);receipt.interruptions.push(route);
   }
   await fixture(22);await enterHome(page);await roomTab(page,'学院');
   const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
@@ -119,19 +84,16 @@ async function verifySpellCare(page,desktop){
   for(const roll of [.05,.5,.95]){
    await fixture(95);await enterHome(page);await roomTab(page,'游戏');
    await page.evaluate(roll=>{Math.random=()=>roll},roll);
-   await page.getByRole('button',{name:'开始接果子',exact:true}).click();const before=await save();
-   await page.getByTestId('fruit-game-start').click();await page.clock.runFor(22000);await expect(page.getByTestId('fruit-game-result')).toBeVisible();
-   const after=await save(),awarded=Object.keys(after.inventory).filter(id=>after.inventory[id]>(before.inventory[id]??0));
-   assert.equal(awarded.length,1);assert.equal(after.inventory[awarded[0]]-(before.inventory[awarded[0]]??0),1);
-   const item=page.locator('.fruit-rewards>div').nth(1),name=await item.locator('span').textContent();
-   await expect(item.locator('strong')).toHaveText('+1');await expect(item.locator('img')).toBeVisible();
-   await expect(page.locator('.fruit-reward-saved')).toContainText(name);
-   receipt.rewards.push({roll,id:awarded[0],name});
+   await page.getByRole('button',{name:'开始翻牌',exact:true}).click();const before=await save();await page.getByTestId('memory-start').click();const kinds=await page.getByTestId('memory-card').evaluateAll(nodes=>nodes.map(n=>n.dataset.kind));await page.clock.runFor(3100);for(const kind of new Set(kinds)){for(let index=0;index<kinds.length;index++)if(kinds[index]===kind)await page.getByTestId('memory-card').nth(index).click();}await page.clock.runFor(7100);await expect(page.getByTestId('memory-result')).toBeVisible();
+   const after=await save(),items=Object.keys(after.inventory).filter(id=>after.inventory[id]>(before.inventory[id]??0)),outfits=(after.wardrobe??[]).filter(id=>!before.wardrobe?.includes(id)),furniture=(after.room?.owned??[]).filter(id=>!before.room?.owned?.includes(id));
+   assert.equal(items.length+outfits.length+furniture.length,1);assert.ok(after.coins>before.coins,'effective game time earns beans');
+   const item=page.locator('.memory-rewards>div').nth(1),name=await item.locator('span').textContent();await expect(item.locator('strong')).toHaveText(items.length?'+1':'已解锁');await expect(item.locator('img')).toBeVisible();await expect(page.locator('.memory-saved')).toContainText(name);
+   receipt.rewards.push({roll,id:[...items,...outfits,...furniture][0],name});
    if(roll===.95)await page.screenshot({path:path.join(out,`random-reward-${desktop?'native':'browser'}.png`)});
   }
   assert.equal(new Set(receipt.rewards.map(r=>r.id)).size,3);
   fs.writeFileSync(path.join(out,`${desktop?'native':'browser'}-checks.json`),JSON.stringify(receipt,null,2)+'\n');
-  console.log('PASS fixed-size apex spells/native expansion+anchor+restore, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory');
+  console.log('PASS fixed-size academy apex spells, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory');
  }finally{
   if(originalDesktop)await page.evaluate(async s=>{await window.desktop.setEdgeHiding(s.edgeHiding);await window.desktop.wander(s.wandering)},originalDesktop);
   if(clock)await page.clock.resume();

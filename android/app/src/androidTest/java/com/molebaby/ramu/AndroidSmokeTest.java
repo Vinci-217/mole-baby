@@ -29,19 +29,22 @@ public final class AndroidSmokeTest {
     static void tap(String expression)throws Exception{gesture(expression,false);}
     static void hold(String expression)throws Exception{gesture(expression,true);}
     static void gesture(String expression,boolean longPress)throws Exception{
-        String script="(()=>{const e="+expression+";if(!e||e.disabled)return null;e.scrollIntoView({block:'nearest',inline:'nearest'});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!hit||!(e===hit||e.contains(hit)))return null;return {x,y,viewport:innerWidth};})()";
+        String script="(()=>{const e="+expression+";if(!e||e.disabled)return null;e.scrollIntoView({block:'nearest',inline:'nearest'});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!hit||!(e===hit||e.contains(hit)))return null;return {x,y,viewport:innerWidth,height:innerHeight};})()";
         String[] result={null};waitFor(()->{try{result[0]=js(script);return result[0]!=null&&!result[0].equals("null");}catch(Exception e){return false;}},30000,"Button must be usable by a real finger: "+expression);
         // DOM readiness does not guarantee that WebView has committed its
         // scroll/layout to the input compositor. Send one tap only, after the
         // real visual-state callback, then require a trusted click event.
-        drawn();result[0]=js(script);assertNotEquals("The painted button must remain usable", "null",result[0]);
+        drawn();
+        String[] previous={null};int[] stable={0};
+        waitFor(()->{try{String next=js(script);if(next==null||next.equals("null"))return false;JSONObject geometry=new JSONObject(next);int[] size=new int[2];ui(()->{size[0]=host().web.getWidth();size[1]=host().web.getHeight();});double scale=size[0]/geometry.getDouble("viewport");boolean synchronizedSize=Math.abs(size[1]/scale-geometry.getDouble("height"))<2;stable[0]=synchronizedSize&&next.equals(previous[0])?stable[0]+1:0;previous[0]=next;return stable[0]>=3;}catch(Exception error){return false;}},10000,"Native and DOM geometry must settle before the physical gesture: "+expression);
+        result[0]=js(script);assertNotEquals("The painted button must remain usable", "null",result[0]);
         JSONObject point=new JSONObject(result[0]);int[] location=new int[2],width=new int[1];ui(()->{host().web.getLocationOnScreen(location);width[0]=host().web.getWidth();});double scale=width[0]/point.getDouble("viewport");
-        js("window.__moleTestInput?.abort();window.__moleTestInput=new AbortController();window.__moleTestPointer={};for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>window.__moleTestPointer[type]={x:e.clientX,y:e.clientY,trusted:e.isTrusted,target:e.target.closest('button,input')?.outerHTML?.slice(0,300)},{once:true,capture:true,signal:window.__moleTestInput.signal})");
+        js("window.__moleTestTarget="+expression+";window.__moleTestInput?.abort();window.__moleTestInput=new AbortController();window.__moleTestPointer={};for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>window.__moleTestPointer[type]={x:e.clientX,y:e.clientY,trusted:e.isTrusted,matched:window.__moleTestTarget===e.target||window.__moleTestTarget?.contains(e.target),target:e.target.closest('button,input')?.outerHTML?.slice(0,300)},{once:true,capture:true,signal:window.__moleTestInput.signal})");
         int x=location[0]+(int)Math.round(point.getDouble("x")*scale),y=location[1]+(int)Math.round(point.getDouble("y")*scale);
         UiDevice device=UiDevice.getInstance(instrumentation);
         assertTrue(longPress?device.swipe(x,y,x,y,180):device.click(x,y));SystemClock.sleep(180);
         String event=longPress?"pointerdown":"click";
-        waitFor(()->{try{return "true".equals(js("window.__moleTestPointer?."+event+"?.trusted===true"));}catch(Exception e){return false;}},5000,"Physical gesture must dispatch a trusted "+event+": "+expression);
+        waitFor(()->{try{return "true".equals(js("window.__moleTestPointer?."+event+"?.trusted===true&&window.__moleTestPointer?."+event+"?.matched===true"));}catch(Exception e){return false;}},5000,"Physical gesture must dispatch a trusted "+event+": "+expression);
     }
     static void click(String selector)throws Exception{tap("document.querySelector("+JSONObject.quote(selector)+")");}
     static void textButton(String text)throws Exception{tap("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()==="+JSONObject.quote(text)+")");}
@@ -128,6 +131,12 @@ public final class AndroidSmokeTest {
             device.openNotification();home=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue(home.waitForExists(10000));home.click();waitFor(()->host().activityVisible&&!host().controller.petMode&&has(".room-dock"));
             assertFalse(host().controller.panel);assertEquals(160,host().controller.width);assertEquals(240,host().controller.height);
             assertEquals(panelAnchorX,host().controller.x,.01f);assertEquals(panelAnchorY,host().controller.y,.01f);assertSame(runtime,host().web);
+            // Exercise the actual bundled SWF engine inside the native WebView,
+            // without changing the adopted pet or its upgrade fixture.
+            js("(()=>{window.__originalSmoke={};window.__originalSmokeListener=e=>{if(e.data?.token!=='android-swf')return;const type=e.data.type;if(type==='ram-original-ready')window.__originalSmoke.ready=true;if(type==='ram-original-error')window.__originalSmoke.error=e.data.value;if(type==='ram-original-mask')window.__originalSmoke.pixels=e.data.value.filter(a=>a>32).length;};addEventListener('message',window.__originalSmokeListener);const frame=document.createElement('iframe');frame.id='android-original-smoke';frame.style.cssText='position:fixed;left:0;top:0;width:180px;height:194px;z-index:9999';frame.src='./assets/original/official/runtime.html?id=7d44ff45c11e567f&form=level2&loop=1&registerBody=1&token=android-swf';document.body.append(frame);})()");
+            waitFor(()->{try{return "true".equals(js("Boolean(window.__originalSmoke?.error||(window.__originalSmoke?.ready&&window.__originalSmoke?.pixels>0))"));}catch(Exception error){return false;}},60000,"Bundled original outfit must load and paint in the native Android WebView");
+            assertEquals("Native source player error: "+js("window.__originalSmoke"),"true",js("!window.__originalSmoke.error&&window.__originalSmoke.ready&&window.__originalSmoke.pixels>0"));
+            js("document.getElementById('android-original-smoke').remove();removeEventListener('message',window.__originalSmokeListener);delete window.__originalSmokeListener");
             context().getSharedPreferences("upgrade-fixture",0).edit().putLong("petId",petId).putInt("code",context().getPackageManager().getPackageInfo(context().getPackageName(),0).versionCode).commit();host().store.flush();
             drawn();File picture=new File(context().getExternalFilesDir(null),"android-house.png");device.takeScreenshot(picture);
             RamuActivity previous=host().activity;ui(previous::recreate);waitFor(()->host().activity!=null&&host().activity!=previous&&host().activityVisible&&has(".room-dock"));assertEquals(petId,host().store.pet().getLong("createdAt"));assertSame(runtime,host().web);

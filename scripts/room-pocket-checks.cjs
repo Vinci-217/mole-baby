@@ -33,7 +33,7 @@ async function verifyRoomPocket(page,desktop){
   await page.evaluate(()=>window.desktop.adjustRoomSize(-200,-200));
   await page.screenshot({path:path.join(out,label+'-small-room.png')});
   for(const name of ['回到桌面','全屏查看小屋','进入摩尔庄园'])await expect(page.getByRole('button',{name,exact:true})).toBeInViewport();
-  await roomTab(page,'背包');await verifyTabs(page.getByRole('region',{name:'拉姆用品背包',exact:true}));
+  await roomTab(page,'背包');await verifyTabs(page.getByRole('region',{name:'拉姆用品背包',exact:true}),false);
   await toDesktop(page);await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();
   const pocket=await enterBackpack(page);await verifyTabs(pocket);
   const tab=pocket.getByRole('tab',{name:'食物',exact:true});await tab.focus();await tab.press('End');await expect(pocket.getByRole('tab',{name:'药水',exact:true})).toHaveAttribute('aria-selected','true');await pocket.getByRole('tab',{name:'药水',exact:true}).press('Home');await expect(tab).toHaveAttribute('aria-selected','true');
@@ -45,13 +45,14 @@ async function verifyRoomPocket(page,desktop){
   await page.evaluate(snapshot=>{localStorage.clear();for(const [key,value]of Object.entries(snapshot))localStorage.setItem(key,value)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  }
 }
-async function verifyTabs(pocket){
- const tabs=pocket.getByRole('tablist',{name:'物品分类',exact:true}).getByRole('tab');assert.deepEqual(await tabs.allTextContents(),['食物','饮品','清洁','药水']);await expect(pocket.locator('select')).toHaveCount(0);
+async function verifyTabs(pocket,compact=true){
+ const names=compact?['食物','饮品','清洁','药水']:['食物','饮品','清洁','药水','玩具'];
+ const tabs=pocket.getByRole('tablist',{name:'物品分类',exact:true}).getByRole('tab');assert.deepEqual(await tabs.allTextContents(),names);await expect(pocket.locator('select')).toHaveCount(0);
  const boxes=await tabs.evaluateAll(ns=>ns.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height}}));
  assert.ok(Math.max(...boxes.map(b=>b.x))-Math.min(...boxes.map(b=>b.x))<1,'Categories form one column on the right');
  assert.ok(boxes.every((b,i)=>i===0||b.y>=boxes[i-1].y+boxes[i-1].height),'Category icons do not overlap vertically');
  const slot=await pocket.locator('.pocket-slot').last().boundingBox();assert.ok(boxes[0].x>=slot.x+slot.width,'Categories stay to the right of inventory slots');
- await expect(tabs.locator('img')).toHaveCount(4);
+ await expect(tabs.locator('img')).toHaveCount(names.length);
  for(const name of ['食物','饮品','清洁','药水']){
   const tab=pocket.getByRole('tab',{name,exact:true});await tab.click();await expect(tab).toHaveAttribute('aria-selected','true');await expect(pocket.locator('.pocket-slot')).toHaveCount(16);
   const squares=await pocket.locator('.pocket-slot').evaluateAll(ns=>ns.every(n=>{const b=n.getBoundingClientRect();return Math.abs(b.width-b.height)<1}));assert.equal(squares,true);

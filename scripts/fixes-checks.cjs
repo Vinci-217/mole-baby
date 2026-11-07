@@ -4,7 +4,7 @@ async function verifyFixes(page,desktop){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));let failed=false;
  await page.addInitScript(()=>{const Base=window.Audio;window.__fixAudio=[];window.Audio=class extends Base{constructor(...args){super(...args);window.__fixAudio.push(this)}}});
  try{
-  await page.evaluate(()=>{const k='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(k));Object.assign(p,{growth:60,highestGrowth:840,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,education:undefined,lastTick:Date.now()});p.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};localStorage.setItem(k,JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false}));localStorage.removeItem('ramu-room-media-v1')});
+  await page.evaluate(()=>{const k='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(k));Object.assign(p,{wearing:undefined,growth:60,highestGrowth:840,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,education:undefined,lastTick:Date.now()});p.stats={hunger:90,thirst:90,happiness:90,cleanliness:90,health:100,energy:90};localStorage.setItem(k,JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false}));localStorage.removeItem('ramu-room-media-v1')});
   await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'学院');
   const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
   await expect(language.getByRole('button',{name:'上这一课',exact:true})).toBeEnabled();await language.getByRole('button',{name:'上这一课',exact:true}).click();
@@ -13,7 +13,7 @@ async function verifyFixes(page,desktop){
   await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await expect(page.locator('.school-scene-status')).toContainText('语言课');
   await page.locator('.school-scene-status').getByRole('button').click();await roomTab(page,'成长');
   await page.getByRole('button',{name:'切换到神力拉姆',exact:true}).click();
-  const forms=page.getByRole('group',{name:'选择神力形态',exact:true});await expect(forms.getByRole('button')).toHaveCount(5);
+  const forms=page.getByRole('group',{name:'选择神力形态',exact:true});await expect(forms.getByRole('button')).toHaveCount(4);
   await forms.getByRole('button',{name:'切换为经典超级拉姆',exact:true}).click();await require('./smoke-helpers.cjs').applyGrowthSettings(page,{mode:'fixed'});
   await expect(page.locator('.scene-character canvas[data-form=classic]')).toBeVisible();
   await expect.poll(()=>page.locator('.scene-character canvas[data-form=classic]').evaluate(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data.filter((_,i)=>i%4===3).some(v=>v>0))).toBe(true);
@@ -49,7 +49,7 @@ async function verifyFixes(page,desktop){
   await require('./original-room-checks.cjs').verifyOriginalRoom(page,desktop);
   await require('./color-mixer-checks.cjs').verifyColorMixer(page,{label:desktop?'native':'browser'});
   await require('./uploaded-motion-checks.cjs').verifyUploadedMotion(page,desktop);
-  console.log('PASS fixes: language enrolment/reopen, five divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
+  console.log('PASS fixes: language enrolment/reopen, four selectable divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});
  }
