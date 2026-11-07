@@ -14,7 +14,7 @@ async function verifyGrowthSettings(page,desktop){
   await page.clock.install({time:new Date(originalTime)});clock=true;await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+10000));
   await page.evaluate(()=>{
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
-   Object.assign(p,{growth:230,highestGrowth:230,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,lastTick:now,coins:3000});
+   Object.assign(p,{growth:230,naturalGrowth:230,highestGrowth:230,growthLocked:false,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,lastTick:now,coins:3000});
    p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};p.inventory.biscuit=3;
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
    localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false}));
@@ -82,7 +82,7 @@ async function verifyGrowthSettings(page,desktop){
   // unloaded canvas looking blank even when the surrounding controls work.
   await page.clock.resume();await page.clock.setSystemTime(new Date(originalTime+Date.now()-wallStart));clock=false;
   await page.evaluate(()=>{
-   const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:230,highestGrowth:230,growthLocked:false,sleeping:false,activity:undefined,outing:undefined,lastTick:Date.now()});
+   const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));Object.assign(p,{growth:230,naturalGrowth:230,highestGrowth:230,growthLocked:false,sleeping:false,activity:undefined,outing:undefined,lastTick:Date.now()});
    p.stats={hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95};localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));
   });
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
