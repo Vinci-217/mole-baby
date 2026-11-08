@@ -5,12 +5,14 @@ import {petColorOffsets} from '../pet-color'
 import type {RamForm} from '../original-actions'
 import {officialTimelineForm,OFFICIAL_FORM,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from '../official-clips'
 import type {OfficialClip} from '../official-clips'
+import {validOutfitBody,type OutfitBodyBounds} from '../outfit-petting'
 import './OfficialRamClip.css'
 
 /** A mounted outfit reuses one isolated engine; the player has no save bridge. */
-export default function OfficialRamClip({clip,form,bodyForm=form,color,action='idle',finite=false,registerBody=true,sound=false,volume=.45,paused=false,fallback,onEnd,onReady,onError}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;action?:string;finite?:boolean;registerBody?:boolean;sound?:boolean;volume?:number;paused?:boolean;fallback:ReactNode;onEnd?:(completed?:boolean)=>void;onReady?:()=>void;onError?:()=>void}){
+export default function OfficialRamClip({clip,form,bodyForm=form,color,action='idle',finite=false,registerBody=true,sound=false,volume=.45,paused=false,fallback,onEnd,onReady,onError,onBodyBounds}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;action?:string;finite?:boolean;registerBody?:boolean;sound?:boolean;volume?:number;paused?:boolean;fallback:ReactNode;onEnd?:(completed?:boolean)=>void;onReady?:()=>void;onError?:()=>void;onBodyBounds?:(body:OutfitBodyBounds)=>void}){
  const frame=useRef<HTMLIFrameElement>(null),mask=useRef<HTMLCanvasElement>(null),end=useRef(onEnd);end.current=onEnd
  const readyCallback=useRef(onReady),errorCallback=useRef(onError);readyCallback.current=onReady;errorCallback.current=onError;
+ const bodyCallback=useRef(onBodyBounds);bodyCallback.current=onBodyBounds;
  const loadKey=`${clip.id}:${form}:${bodyForm}:${finite}:${registerBody}`
  const [loadState,setLoadState]=useState({key:'',state:'loading'}),[token]=useState(()=>Math.random().toString(36).slice(2))
  const state=loadState.key===loadKey?loadState.state:'loading'
@@ -18,7 +20,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const direction=action.includes('left')?'left':action.includes('right')?'right':'down'
  const pose=useRef({form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused})
  pose.current={form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused}
- const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=4&token=${token}`)
+ const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=5&token=${token}`)
  const sendPose=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-pose',token,sequence:sequence.current,value:pose.current},'*')
  useEffect(()=>{sendPose()},[color,direction,action,form,sound,volume,paused])
  useEffect(()=>{
@@ -43,7 +45,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
    }
    if(event.data.type==='ram-original-error')fail()
    if(event.data.type==='ram-original-finished'&&finite&&!done){done=true;clearTimeout(finish);end.current?.(true)}
-   if(event.data.type==='ram-original-state'&&frame.current){frame.current.dataset.frame=String(event.data.value.frame);frame.current.dataset.bones=JSON.stringify(event.data.value.bones);frame.current.dataset.registration=JSON.stringify(event.data.value.registration)}
+   if(event.data.type==='ram-original-state'&&frame.current){frame.current.dataset.frame=String(event.data.value.frame);frame.current.dataset.bones=JSON.stringify(event.data.value.bones);frame.current.dataset.registration=JSON.stringify(event.data.value.registration);if(validOutfitBody(event.data.value.body))bodyCallback.current?.(event.data.value.body)}
    if(event.data.type==='ram-original-mask'&&Array.isArray(event.data.value)&&event.data.value.length===10800){
     const ctx=mask.current?.getContext('2d');if(ctx){const image=ctx.createImageData(100,108);for(let i=0;i<10800;i++)image.data[i*4+3]=event.data.value[i];ctx.putImageData(image,0,0);mask.current!.dataset.loaded='true'}
    }

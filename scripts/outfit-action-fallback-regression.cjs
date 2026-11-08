@@ -21,9 +21,10 @@ async function pixels(canvas){return canvas.evaluate(node=>{const rgba=node.getC
    const first=Number(await ball.getAttribute('data-source-frame'));await expect.poll(async()=>Number(await ball.getAttribute('data-source-frame'))).toBeGreaterThan(first);
    await worn(page);await expect(page.locator('.wardrobe-mirror>.ram-sprite')).toHaveAttribute('data-form','junior');
    await page.getByRole('button',{name:'预览摸摸动作',exact:true}).click();
-   const pet=page.locator('.wardrobe-mirror .ram-daily-frame');await expect(pet).toHaveAttribute('data-form',form);await expect(pet).toHaveAttribute('data-loaded','true');assert(await pixels(pet)>100);
-   await worn(page);
-   checks.push({form,footballPainted:true,originalFramesAdvance:true,originalPetting:true,costumeRestored:true});console.log('PASS',form);
+   await expect(page.locator('.wardrobe-mirror [data-petting-adaptation]')).toHaveAttribute('data-petting-adaptation','project');
+   await expect(page.locator('.wardrobe-mirror>.ram-sprite')).toHaveAttribute('data-form','junior');await worn(page);
+   await expect(page.locator('.wardrobe-mirror>.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:8000});
+   checks.push({form,footballPainted:true,originalFramesAdvance:true,adaptedClothedPetting:true,costumeRetained:true});console.log('PASS',form);
   }
   await page.getByRole('combobox',{name:'预览形态'}).selectOption('middle');await worn(page);
   await page.getByRole('button',{name:'预览开心动作',exact:true}).click();await expect(page.locator('.wardrobe-mirror .ram-emotion-frame')).toHaveAttribute('data-form','middle');await expect(page.locator('.wardrobe-mirror .ram-emotion-frame')).toHaveAttribute('data-loaded','true');await worn(page);

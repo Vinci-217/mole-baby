@@ -76,6 +76,7 @@
 .ram-item-cue{position:absolute;inset:0;display:block;pointer-events:none;line-height:0;z-index:3;opacity:var(--care-opacity)}
 @media(prefers-reduced-motion:reduce){.ram-item-cue *{transition:none!important;animation:none!important}}
 .ram-social{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:var(--social-opacity,1)}
+.ram-official .ram-social{opacity:var(--social-opacity,0)}
 .social-ball,.social-hand,.social-book{position:absolute;display:block;object-fit:contain;translate:-50% -50%}
 .social-ball{left:var(--social-bx,85%);top:var(--social-by,80%);width:24%;aspect-ratio:1;transform:rotate(var(--social-spin,0deg))}
 .social-hand{left:var(--social-hx,70%);top:var(--social-hy,20%);width:var(--social-handwidth,53%);height:auto}
@@ -86,7 +87,7 @@
 @keyframes ram-seed-sleep{0%,100%{transform:scale(1)}50%{transform:scale(1.004,.993)}}
 .social-ball-contact{position:absolute;left:calc(var(--social-bx,100%) - 10%);top:var(--social-by,75%);width:12%;height:12%;translate:-50% -50%;opacity:var(--social-contact,0);transform:scale(calc(.6 + var(--social-contact,0)*.4))}
 .social-ball-contact>img{display:block;width:100%;height:100%;object-fit:contain}
-.social-affection{position:absolute;left:77%;top:18%;width:20%;height:20%;object-fit:contain;opacity:var(--social-affection,0);translate:0 var(--social-heartY,0%)}
+.social-affection{position:absolute;left:var(--social-affection-x,77%);top:var(--social-affection-y,18%);width:var(--social-affection-size,20%);height:var(--social-affection-size,20%);object-fit:contain;opacity:var(--social-affection,0);translate:0 var(--social-heartY,0%)}
 .ram-seed .social-affection{top:30%}
 .social-dizzy-stars{position:absolute;inset:0;pointer-events:none}.social-dizzy-stars>i{position:absolute;width:12%;height:12%;transform:translate(-50%,-50%);line-height:0}.social-dizzy-stars>i>img{position:absolute;width:200%;height:200%;left:-50%;top:-50%;object-fit:contain}
 @media(prefers-reduced-motion:reduce){.ram-sprite:is(.action-pet,.action-play,.action-wake,.action-focus,.action-dizzy) .ram-pose-layer{transform:none}.social-dizzy-stars{transform:none}}

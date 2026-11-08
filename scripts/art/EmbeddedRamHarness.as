@@ -240,7 +240,10 @@ package §1200026_fla§ {
    for each(var mc:MovieClip in bones)frames.push(mc?mc.currentFrame:0);
    for each(mc in bones){if(mc){var b:Rectangle=mc.getBounds(holder);rig.push({x:mc.x,y:mc.y,scaleX:mc.scaleX,scaleY:mc.scaleY,parent:mc.parent?mc.parent.name:"",bounds:{x:b.x,y:b.y,width:b.width,height:b.height}});}else rig.push(null);}
    var painted:Rectangle=holder.getBounds(this);
+   var bodyNode:DisplayObject=bones[1]||namedBody(holder)||bones[0]||selected;
+   var bodyPaint:Rectangle=bodyNode?bodyNode.getBounds(this):new Rectangle();
    return {ready:ready,settled:settle==0,ended:ended,error:failure,symbol:requestedSymbol,form:form,direction:direction,moving:moving,
+    body:{x:(bodyPaint.x-440)/4,y:(bodyPaint.y-475.2)/4,width:bodyPaint.width/4,height:bodyPaint.height/4},
     viewport:{width:stage.stageWidth,height:stage.stageHeight},painted:{x:painted.x,y:painted.y,width:painted.width,height:painted.height},
     width:holder.getBounds(holder).width,height:holder.getBounds(holder).height,
     registration:registration,bones:frames,rig:rig,frame:selected is MovieClip?MovieClip(selected).currentFrame:0};

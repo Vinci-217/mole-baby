@@ -32,9 +32,17 @@ const executablePath=process.env.CHROMIUM_PATH||'/usr/local/bin/chromium',saveKe
   await page.screenshot({path:path.join(out,'game-feedback.png')});console.log('PASS real matching game, actual coin/happiness receipts, both decoded feedback icons');
   await toDesktop(page);await expect(page.getByTestId('desktop-character')).toBeVisible();
   const reduced=await browser.newPage({viewport:{width:1100,height:850},reducedMotion:'reduce'});await reduced.goto(base+'/?preview=wardrobe');await reduced.getByRole('button',{name:'衣橱上一页',exact:true}).click();await reduced.getByRole('button',{name:'试戴紫色魔法帽',exact:true}).click();
-  await expect(reduced.locator('.wardrobe-mirror .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});await reduced.getByRole('button',{name:'预览右走动作',exact:true}).click();
-  const frame=await(await reduced.locator('.wardrobe-mirror iframe').elementHandle()).contentFrame();await expect.poll(()=>frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus').direction)).toBe('right');
-  await expect.poll(()=>frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus').settled)).toBe(true);await expect(reduced.locator('.official-hit-mask')).toHaveAttribute('data-loaded','true');
+  await expect(reduced.locator('.wardrobe-mirror .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});
+  // A suspended Ruffle engine need not service ad-hoc ExternalInterface calls.
+  // Check its actual pose reports delivered before suspension instead.
+  await reduced.evaluate(()=>{window.reducedPose={};addEventListener('message',event=>{if(event.data?.type==='ram-original-state'&&event.source===document.querySelector('.wardrobe-mirror iframe')?.contentWindow)window.reducedPose=event.data.value})});
+  await reduced.getByRole('button',{name:'预览右走动作',exact:true}).click();
+  await expect.poll(()=>reduced.evaluate(()=>window.reducedPose.direction)).toBe('right');
+  await expect.poll(()=>reduced.evaluate(()=>window.reducedPose.settled)).toBe(true);await expect(reduced.locator('.official-hit-mask')).toHaveAttribute('data-loaded','true');
+  const sourceBefore=await reduced.locator('.wardrobe-mirror iframe').getAttribute('src');await reduced.getByRole('button',{name:'预览摸摸动作',exact:true}).click();
+  await expect(reduced.locator('[data-petting-adaptation]')).toHaveAttribute('data-petting-adaptation','project');
+  await expect.poll(()=>reduced.locator('.wardrobe-mirror>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--social-opacity'))||0)).toBe(1);
+  await expect(reduced.locator('.wardrobe-mirror>.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:8000});assert.equal(await reduced.locator('.wardrobe-mirror iframe').getAttribute('src'),sourceBefore);
   assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);console.log('PASS reduced-motion outfit selection and direction change remain painted; no page errors or missing assets');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

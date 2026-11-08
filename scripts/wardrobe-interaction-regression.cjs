@@ -20,11 +20,11 @@ async function ready(page){await expect(page.locator('.wardrobe-mirror .official
     assert.equal(await frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus').form),'level2','original layer 45 must choose the junior body, not a middle body with ears');
    }
    await page.getByRole('button',{name:'预览摸摸动作',exact:true}).click();
-   await expect(page.locator('.wardrobe-mirror .ram-daily-frame')).toHaveAttribute('data-form',form);
-   await expect(page.locator('.wardrobe-mirror .ram-daily-frame')).toHaveAttribute('data-loaded','true');
-   assert.equal(await page.locator('.wardrobe-mirror .official-ram-clip').count(),0,'native petting must not be replaced by a costume idle pose');
+   await expect(page.locator('.wardrobe-mirror [data-petting-adaptation]')).toHaveAttribute('data-petting-adaptation','project');
+   await expect.poll(()=>page.locator('.wardrobe-mirror>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--social-opacity'))||0)).toBeGreaterThan(.5);
+   assert.equal(await iframe.getAttribute('src'),token,'adapted petting keeps the complete worn source');
    if(form==='junior')await page.screenshot({path:path.join(out,'petting.png')});
-   await ready(page);assert.notEqual(await iframe.getAttribute('src'),token,'restore the saved outfit after the original petting action');
+   await expect(page.locator('.wardrobe-mirror>.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:8000});await ready(page);assert.equal(await iframe.getAttribute('src'),token,'petting must not recreate the player');
    const mirror=page.locator('.wardrobe-mirror'),box=await mirror.boundingBox(),point={x:box.x+box.width*.5,y:box.y+box.height*.6};
    await page.mouse.move(point.x,point.y);await page.mouse.down();
    for(let i=1;i<=16;i++){await page.mouse.move(point.x+i*5,point.y);await page.waitForTimeout(18);}
@@ -37,7 +37,7 @@ async function ready(page){await expect(page.locator('.wardrobe-mirror .official
    await expect.poll(()=>page.locator('.wardrobe-mirror>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--drag-view'))||0)).toBeLessThan(-.18);await page.mouse.up();
    const restored=await ready(page);assert.equal(await restored.evaluate(()=>player.ruffle().callExternalInterface('previewStatus').direction),'down');
    assert.deepEqual(JSON.parse(await iframe.getAttribute('data-registration')),registration,'restoring the outfit must preserve its body registration');
-   checks.gestures.push({form,name,originalPetting:true,originalDrag:true,left:true,right:true,costumeRestored:true,stableRegistration:true});
+   checks.gestures.push({form,name,adaptedClothedPetting:true,originalDrag:true,left:true,right:true,costumeRetainedWhilePetting:true,stableRegistration:true});
   }
   for(const width of [1100,393,320]){
    await page.setViewportSize({width,height:900});const prev=page.getByRole('button',{name:'衣橱上一页',exact:true}),next=page.getByRole('button',{name:'衣橱下一页',exact:true});while(await prev.isEnabled())await prev.click();
