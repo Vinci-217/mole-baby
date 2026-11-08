@@ -8133,7 +8133,21 @@
       "level": 0,
       "fps": 24.0,
       "animated": true,
-      "clothingLayer": 65
+      "clothingLayer": 65,
+      "namedBodyPaths": {
+        "down": [
+          0,
+          0
+        ],
+        "left": [
+          0,
+          0
+        ],
+        "right": [
+          0,
+          0
+        ]
+      }
     },
     {
       "id": "4ac5e0884ada15f6",

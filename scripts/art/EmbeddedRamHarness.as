@@ -35,6 +35,7 @@ package §1200026_fla§ {
   public var registration:Object=null;
   public var fitX:Number=0;
   public var fitY:Number=0;
+  public var namedBodyPaths:Object={};
   public function lamu_mc_1(){super();addFrameScript(0,boot);}
   internal function boot():void {
    stop();while(numChildren)removeChildAt(0);addChild(holder);
@@ -66,6 +67,10 @@ package §1200026_fla§ {
    referenceBounds=String(params.referenceBounds||"17.11472,35.95208,82.03084,81.50964").split(",");
    for(var coordinate:int=0;coordinate<referenceBounds.length;coordinate++)referenceBounds[coordinate]=Number(referenceBounds[coordinate]);
    costume=params.kind=="outfit";
+   for each(var poseDirection:String in ["down","left","right"]){
+    var bodyPath:String=String(params["bodyPath_"+poseDirection]||"");
+    if(bodyPath)namedBodyPaths[poseDirection]=bodyPath.split(",");
+   }
    // Register clothes against the resting down pose, before any walk starts.
    // The moving body's squash must not decide a newly worn outfit's size.
    if(registerBody)moving=false;
@@ -196,6 +201,24 @@ package §1200026_fla§ {
    }
    return null;
   }
+  public function anatomyBody():DisplayObject {
+   if(bones[1])return bones[1];
+   var node:DisplayObject=namedBody(holder);
+   // Some original full costumes call the entire decorated character petBody.
+   // Follow only paths verified against that source's actual body artwork.
+   // The node remains live: source motion and its original matrices are kept.
+   var path:Array=namedBodyPaths[direction] as Array;
+   if(node&&path){
+    var core:DisplayObject=node;
+    for each(var index:int in path){
+     var container:DisplayObjectContainer=core as DisplayObjectContainer;
+     if(!container||index<0||index>=container.numChildren)return node;
+     core=container.getChildAt(index);
+    }
+    return core;
+   }
+   return node||bones[0]||selected;
+  }
   public function fit():void {
    if(!selected)return;
    var text:Object=("lamu_txt" in Object(selected))?Object(selected)["lamu_txt"]:null;
@@ -207,7 +230,7 @@ package §1200026_fla§ {
    if(("lamu_txt" in Object(selected))&&Object(selected)["lamu_txt"])
     Object(selected)["lamu_txt"].visible=false;
    if(bounds.width<=0||bounds.height<=0){settle=1;return;}
-   var nativeBody:DisplayObject=bones[1]||namedBody(holder)||bones[0]||selected;
+   var nativeBody:DisplayObject=anatomyBody();
    if(registerBody&&nativeBody){
     // Register the original BODY, never the hat/wings/book envelope. Cache the
     // down pose for every direction so changing pose cannot resize the pet.
@@ -218,7 +241,7 @@ package §1200026_fla§ {
      fittedScale=400*(target[2]-target[0])/100/body.width;
      fitX=400*(target[0]+target[2])/200-(body.x+body.width/2)*fittedScale;
      fitY=432*target[3]/108-body.bottom*fittedScale;
-     registration={basis:bones[1]?"body-bone":nativeBody!=selected?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
+     registration={basis:bones[1]?"body-bone":namedBodyPaths[direction]?"verified-body-node":nativeBody!=selected?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
      registered=true;
     }
    }else if(!registered){
@@ -240,7 +263,7 @@ package §1200026_fla§ {
    for each(var mc:MovieClip in bones)frames.push(mc?mc.currentFrame:0);
    for each(mc in bones){if(mc){var b:Rectangle=mc.getBounds(holder);rig.push({x:mc.x,y:mc.y,scaleX:mc.scaleX,scaleY:mc.scaleY,parent:mc.parent?mc.parent.name:"",bounds:{x:b.x,y:b.y,width:b.width,height:b.height}});}else rig.push(null);}
    var painted:Rectangle=holder.getBounds(this);
-   var bodyNode:DisplayObject=bones[1]||namedBody(holder)||bones[0]||selected;
+   var bodyNode:DisplayObject=anatomyBody();
    var bodyPaint:Rectangle=bodyNode?bodyNode.getBounds(this):new Rectangle();
    return {ready:ready,settled:settle==0,ended:ended,error:failure,symbol:requestedSymbol,form:form,direction:direction,moving:moving,
     body:{x:(bodyPaint.x-440)/4,y:(bodyPaint.y-475.2)/4,width:bodyPaint.width/4,height:bodyPaint.height/4},

@@ -1,0 +1,7 @@
+{
+  "resource/petcloth/swf2/1200113.swf": {
+    "sha256": "05c32a65e4785b61449b0db0b82d529cf45a55c1a692653feadf91f53f6fb9f9",
+    "namedBodyPaths": {"down": [0, 0], "left": [0, 0], "right": [0, 0]},
+    "evidence": "Original SWF petBody includes the bow, leaves and ribbons. In down/left/right, child 0 / child 0 is sprite 5, whose shape 4 is the actual oval body (twips -3,-112 to 446,383). Use that live node for sizing and petting; preserve every source matrix and decorative layer."
+  }
+}

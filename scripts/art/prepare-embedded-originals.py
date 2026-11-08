@@ -14,6 +14,7 @@ CONTROLLERS={'module/lamuPKSys/AnimalSkillControler.swf','resource/lamuPKSys/ani
 def main():
  OUT.mkdir(parents=True,exist_ok=True)
  items=json.loads((VAULT/'items.json').read_text());clips=[];outfits=[]
+ bodyRegistrations=json.loads((ROOT/'scripts/art/embedded-original/body-registration.json').read_text())
  old={'1200008','1200018','1200020','1200021','1200026','1200033','1200036','1200047','1200052','1200006','1200024','1200040'}
  for row in json.loads((VAULT/'catalog.json').read_text())['items']:
   if row.get('status')!='official-ok' or row['category'] not in KINDS:continue
@@ -46,6 +47,10 @@ def main():
    bytes=len(data),symbol=main['symbol'] if main else '',forms=forms,
    level=int(level[1]) if level else 0,fps=row.get('fps',24),animated=bool(row.get('multiFrameTimelines')),
    **({'clothingLayer':int(items[stem].get('Layer',0))} if kind=='outfit' else {})))
+  if row['path'] in bodyRegistrations:
+   anatomy=bodyRegistrations[row['path']]
+   assert anatomy['sha256']==row['sha256'], 'Recheck body paths against changed source artwork'
+   clips[-1]['namedBodyPaths']=anatomy['namedBodyPaths']
   if kind=='outfit' and stem not in old:
    icon=VAULT/'files/resource/petcloth/icon'/(stem+'.swf')
    outfits.append(dict(id='original-'+stem,name=name,sourceId=stem,clipId=ident,price=80,width=.6,x=0,y=0,iconPath='./assets/original/official/icons/'+stem+'.png' if icon.exists() else './assets/original/ui/icon-happy.png'))

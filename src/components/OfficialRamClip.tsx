@@ -20,7 +20,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const direction=action.includes('left')?'left':action.includes('right')?'right':'down'
  const pose=useRef({form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused})
  pose.current={form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused}
- const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=5&token=${token}`)
+ const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=6&token=${token}`)
  const sendPose=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-pose',token,sequence:sequence.current,value:pose.current},'*')
  useEffect(()=>{sendPose()},[color,direction,action,form,sound,volume,paused])
  useEffect(()=>{
