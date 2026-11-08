@@ -2,12 +2,12 @@ import {useId,useState} from 'react';
 import type {ReactNode} from 'react';
 import type {GameState} from '../game';
 import {getStage} from '../game';
-import {petAppearance} from '../wardrobe';
+import {petActionAppearance} from '../wardrobe';
 import {originalPlayTools,originalMagicActions,originalSpecialActions} from '../pet-original-actions';
 import './OfficialClipMenu.css';
 const tabs=[['activities','活动'],['toys','道具'],['magic','魔法']] as const;
 export default function OfficialClipMenu({pet,busy,onPlay,onStop,playing,activities}:{pet:GameState;busy:boolean;onPlay:(id:string)=>void;onStop:()=>void;playing:boolean;activities:ReactNode}){
- const [tab,setTab]=useState<typeof tabs[number][0]>('activities'),id=useId(),form=petAppearance(pet).form;
+ const [tab,setTab]=useState<typeof tabs[number][0]>('activities'),id=useId(),form=petActionAppearance(pet,'play').form;
  const rows=tab==='toys'?originalPlayTools(form):tab==='magic'?[...originalMagicActions(form),...originalSpecialActions(form)]:[];
  const blocked=busy||pet.sleeping||Boolean(pet.activity)||Boolean(pet.outing)||getStage(pet.growth,pet.evolution)===0;
  return <section className="official-clip-menu" aria-label="原版互动与自然动作">

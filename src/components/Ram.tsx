@@ -23,7 +23,7 @@ import {isDragForm,dragSpec,dragRegistration,sampleDragPose} from '../drag-poses
 import {bodyFrameRegistration} from '../frame-registration'
 import {ramForm,sleepPose,affectionFrame,footballSpec,footballPose,footballDuration,slumberEmitter,type RamForm} from '../original-actions'
 import {emotionSpec,emotionPose,emotionDuration,isEmotionClip} from '../mood-motion'
-import {costumeAppearance,outfitAnimation} from '../wardrobe'
+import {costumeAppearance,outfitAnimation,outfitSupportsAction} from '../wardrobe'
 import {isPastime,pastimeBody,PASTIME_LABELS} from '../pet-pastimes'
 import LifeCue from './LifeCue'
 import dizzySource from '../../public/assets/original/dizzy/source.json'
@@ -557,10 +557,12 @@ function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:P
 export default function Ram({ rawDaily: _rawDaily=false, color, costume:requestedCostume, companionId=0, stage:actualStage, evolution:actualEvolution, action:requestedAction = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, gameSound=sound, soundVolume=.45, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
   const action=requestedAction.startsWith('ambient-element-')?requestedAction.slice(8):requestedAction;
   const reading=!_rawDaily&&!sleeping&&!dragging&&!shaking&&(action==='focus'||action==='read-alone');
-  // Reading is an action, not the Ebook outfit. Stow clothing visually without
-  // changing the saved outfit or allowing its junior fallback to change form.
-  const {stage,evolution}=costumeAppearance(actualStage,actualEvolution,reading?undefined:requestedCostume);
-  const costume=stage>0?requestedCostume:undefined
+  // Stow unsupported clothing only in the renderer. Keep the exact same
+  // original action and real growth form as an unclothed pet, then restore
+  // the saved costume when its resting/walking action returns.
+  const appearanceAction=sleeping?'sleep':shaking?'dizzy':dragging?'drag':action;
+  const costume=actualStage>0&&outfitSupportsAction(appearanceAction)?requestedCostume:undefined;
+  const {stage,evolution}=costumeAppearance(actualStage,actualEvolution,costume);
   const clock=useRef({key:'',startedAt:0})
   const playClock=useRef<{key:string;began:number|undefined;lastAudioElapsed?:number}>({key:'',began:undefined})
   const eventKey=`${action}:${actionId??0}:${itemId??''}`
@@ -610,7 +612,7 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
     <OfficialTransformation key={eventKey} clip={explicitOfficial} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} startedAt={clock.current.startedAt} sound={gameSound} volume={soundVolume} onEnd={onActionEnd}><Ram color={color} costume={costume} stage={actualStage} evolution={actualEvolution} action="still" sound={false}/></OfficialTransformation>
   </span>;
   if(!reading&&!magicAction&&sourceClip&&officialForm)return <span className={`ram-sprite ram-classic ram-official action-${activeAction} ${resting?'is-sleeping':''} ${dragging?'is-dragging':''} ${shaking?'is-shaking':''} ${className}`} role="img" aria-label={`${petColorName(color)}拉姆 · ${sourceClip.name}`} data-stage={stage} data-growth-stage={actualStage} data-form={officialForm} data-color={color} data-action={activeAction}>
-    {finiteOriginal?<OfficialRamClip key={eventKey} clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={action} finite sound={gameSound} volume={soundVolume} onEnd={onActionEnd} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>:<OfficialOutfitMotion startedAt={clock.current.startedAt} stage={stage} evolution={evolution} form={officialForm} action={activeAction} actionId={actionId} dragging={dragging} tilt={tilt} onEnd={onActionEnd}>{pose=><OfficialRamClip clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={pose} registerBody sound={gameSound} volume={soundVolume} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>}</OfficialOutfitMotion>}
+    {finiteOriginal?<OfficialRamClip key={eventKey} clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={action} finite sound={gameSound} volume={soundVolume} onEnd={onActionEnd} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>:<OfficialOutfitMotion action={activeAction} tilt={tilt}>{pose=><OfficialRamClip clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={pose} registerBody sound={gameSound} volume={soundVolume} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>}</OfficialOutfitMotion>}
   </span>
   const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   if(daily)return <span className={`ram-sprite ram-classic ram-daily${reading?' ram-reading':''}`} role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>

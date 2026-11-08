@@ -20,8 +20,7 @@ export default function Wardrobe({pet,onBuy,onWear}:{pet:GameState;onBuy:(id:str
   const suitable=!clip||Boolean(officialOutfitForm(clip,actualForm))
   const onlyClassic=clip?.forms.length===1&&clip.forms[0]==='level101'
   const juniorAppearance=!seed&&costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,outfit?.id).form!==actualForm
-  const previewStage=costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,outfit?.id).stage
-  const drag=useElasticDrag(mirror,previewStage,false,()=>{})
+  const drag=useElasticDrag(mirror,getStage(pet.growth,pet.evolution),false,()=>{})
   const release=()=>{drag.release();setDragging(false)}
   const pages=Math.ceil((OUTFITS.length+1)/9),cards=[null,...OUTFITS].slice(page*9,(page+1)*9)
   return <section className="wardrobe" aria-label="拉姆小衣橱">

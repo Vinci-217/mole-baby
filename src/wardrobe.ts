@@ -33,6 +33,11 @@ export function costumeAppearance(stage:Stage,evolution?:Evolution,id?:string):{
  return {form,stage:form==='seed'?0:form==='junior'?1:form==='middle'?2:form==='senior'?3:4,...(['classic','super','water','wood','fire'].includes(form)?{evolution:form as Evolution}:{})};
 }
 export const petAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>)=>costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,pet.wearing);
+/** The native costume adapter has authored resting/directional walk poses.
+ * Every other action must use the normal original action renderer; a costume
+ * idle pose plus a gesture is not a substitute for that source timeline. */
+export const outfitSupportsAction=(action:string)=>['idle','waiting','still','peek','hide','walk-left','walk-right','running','running-left','running-right'].includes(action);
+export const petActionAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>,action:string)=>costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,outfitSupportsAction(action)?pet.wearing:undefined);
 export function normalizeWardrobe(owned:unknown,wearing:unknown):{wardrobe?:OutfitId[];wearing?:OutfitId} {
   const wardrobe=Array.isArray(owned)?ALL_OUTFITS.filter(outfit=>owned.includes(outfit.id)).map(outfit=>outfit.id):[]
   const current=getOutfit(typeof wearing==='string'?wearing:undefined)

@@ -4,7 +4,7 @@ import {getStage,type GameState} from './game';
 import type {RamForm} from './original-actions';
 import {OFFICIAL_CLIPS,supportsOfficial,officialOutfitForm,type OfficialClip} from './official-clips';
 import {learned} from './pet-school';
-import {petAppearance} from './wardrobe';
+import {petActionAppearance} from './wardrobe';
 import {ELEMENT_SKILLS,learnedElementSkill} from './element-skills';
 
 export const FORM_NAMES:Record<RamForm,string>={seed:'种子',junior:'初级拉姆',middle:'中级拉姆',senior:'高级拉姆',classic:'经典超级拉姆',super:'神力超级拉姆',water:'水系拉姆',wood:'木系拉姆',fire:'火系拉姆'};
@@ -65,7 +65,7 @@ export function originalSpecialActions(form:RamForm):OriginalChoice[]{
 }
 export function autonomousOriginalActions(pet:GameState):string[]{
  if(pet.sleeping||pet.activity||pet.outing||getStage(pet.growth,pet.evolution)===0||pet.stats.energy<30||pet.stats.health<=35||pet.stats.hunger<30||pet.stats.thirst<30||pet.stats.cleanliness<30)return [];
- const form=petAppearance(pet).form;
+ const form=petActionAppearance(pet,'play').form;
  const originals=[...naturalOriginalActions(form),...originalPlayTools(form),...(learned(pet,'magic')?originalMagicActions(form):[])].map(row=>'ambient-'+row.id);
 
  for(const skill of ELEMENT_SKILLS)if(learnedElementSkill(pet,skill.id))originals.push('ambient-element-'+skill.id);

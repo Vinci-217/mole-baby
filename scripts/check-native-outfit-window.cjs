@@ -24,9 +24,11 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-i
   const before=await anchor(),expanded=await bounds();assert(expanded.width>=360&&expanded.height>=420,'large outfit has its complete native drawing surface');
   await page.evaluate(()=>window.desktop.setPetArtworkBounds(null));assert.deepEqual(await anchor(),before);assert.equal((await bounds()).width,160);
   await page.evaluate(()=>window.desktop.setPetArtworkBounds({x:-100,y:-80,width:360,height:420}));assert.deepEqual(await anchor(),before);
-  await page.getByTestId('desktop-character').press('Enter');await expect(page.locator('.social-hand')).toBeVisible();await expect.poll(()=>page.locator('.desktop-character>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))||0)).toBeGreaterThan(.2);
+  await page.getByTestId('desktop-character').press('Enter');await expect(page.locator('.desktop-character .ram-daily-frame')).toHaveAttribute('data-form','middle');await expect(page.locator('.desktop-character .ram-daily-frame')).toHaveAttribute('data-loaded','true');
   await page.screenshot({path:path.join(out,'electron-outfit.png')});
-  const source=await frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus'));assert.equal(source.form,'level2');assert(source.registration);assert.deepEqual(errors,[]);
+  await expect(page.locator('.desktop-character .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});
+  const restored=await(await page.locator('.desktop-character iframe').elementHandle()).contentFrame();
+  const source=await restored.evaluate(()=>player.ruffle().callExternalInterface('previewStatus'));assert.equal(source.form,'level2');assert(source.registration);assert.deepEqual(errors,[]);
   fs.writeFileSync(path.join(out,'electron-checks.json'),JSON.stringify({passed:true,protocol:frame.url().split('?')[0],expanded,anchor:before,form:source.form,petting:true,errors},null,2));
   console.log('PASS actual Electron custom-protocol outfit, enlarged transparent window, unchanged screen anchor, real petting and saved prior identity');
  }finally{await desktop.close()}

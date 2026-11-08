@@ -5,6 +5,7 @@ import {petAppearance} from '../wardrobe';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
+import {getStage} from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
@@ -90,7 +91,7 @@ export default function DesktopCompanion(p: Props) {
     if(hideTimer.current!==undefined)return;
     hideTimer.current=setTimeout(()=>{hideTimer.current=undefined;if(!root.current?.querySelector('.compact-pet :focus-visible'))setTools(false);},220);
   };
-  const elastic=useElasticDrag(root,appearance.stage,p.native,reaction=>{
+  const elastic=useElasticDrag(root,getStage(p.pet.growth,p.pet.evolution),p.native,reaction=>{
     if(p.pet.sleeping)return;
     if(reaction==='dizzy'&&!p.itemId){setShaking(true);clearTimeout(shakeTimer.current);shakeTimer.current=setTimeout(()=>setShaking(false),3200);p.onShake();}
     else if(reaction==='turn')p.onTug?.();

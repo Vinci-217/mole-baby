@@ -28,7 +28,7 @@ import DesktopCompanion from './components/DesktopCompanion';
 import type { CompanionPanel } from './components/DesktopCompanion';
 import ShopBook from './components/ShopBook';
 import Wardrobe from './components/Wardrobe';
-import {buyOutfit,wearOutfit,getOutfit,petAppearance} from './wardrobe';
+import {buyOutfit,wearOutfit,getOutfit,petAppearance,petActionAppearance} from './wardrobe';
 import {isMoodAction,isEmotionClip} from './mood-motion';
 import {moodResponse} from './mood-companion';
 import TimeScene from './components/TimeScene';
@@ -176,6 +176,7 @@ export default function App() {
   const spokenBubble=petSpeech(current,bubble);
   const workingAway = current.activity?.kind==='restaurant';
   const renderedAction = (workingAway?'still':activityAction(current.activity)) ?? (action !== 'idle' ? action : desktopState.motion === 'left' ? 'walk-left' : desktopState.motion === 'right' ? 'walk-right' : condition.action);
+  const actionAppearance=petActionAppearance(current,current.sleeping?'sleep':renderedAction);
   const roomMedia = useRoomMedia(hasPet && !floating, hasPet, game==='restaurant'&&workingAway?'./assets/original/restaurant/audio/bgSound.mp3':undefined);
   useEffect(()=>window.desktop?.onMusicToggle?.(enabled=>roomMedia.update({backgroundPlayback:enabled})),[roomMedia.update]);
   useEffect(()=>{void window.desktop?.setMusicState?.({playing:roomMedia.playing,enabled:roomMedia.settings.musicEnabled||roomMedia.settings.backgroundPlayback,background:roomMedia.settings.backgroundPlayback})?.catch(()=>{})},[roomMedia.playing,roomMedia.settings.musicEnabled,roomMedia.settings.backgroundPlayback]);
@@ -354,14 +355,14 @@ export default function App() {
     if(prefs.presence&&!prefs.quiet)speak(PASTIME_LINES[kind],9500);
   }
   function startUploaded(id:string){
-    const saved=petRef.current;if(!saved)return;const clip=uploadedSpec(petAppearance(saved).form,id),toy=UPLOADED_TOYS.find(t=>t.id===id)
+    const saved=petRef.current;if(!saved)return;const clip=uploadedSpec(petActionAppearance(saved,`uploaded-${id}`).form,id),toy=UPLOADED_TOYS.find(t=>t.id===id)
     if(!clip||!toy)return
     const reason=playBlockReason(saved);if(reason){notify(reason);return}
     const blocked=animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});if(blocked){notify(blocked);return}
     clearInvitation();setPanel(null);setBubbleVisible(false);animate(`uploaded-${id}`);uploadedRun.current={petId:saved.createdAt,id,endsAt:performance.now()+clip.durationMs};
   }
   function startOfficial(id:string){
-    const saved=petRef.current,clip=officialClip(id);if(!saved||!clip||clip.path.includes('/tatter/')||!playbackForm(clip,petAppearance(saved).form))return;
+    const saved=petRef.current,clip=officialClip(id);if(!saved||!clip||clip.path.includes('/tatter/')||!playbackForm(clip,petActionAppearance(saved,`official-${id}`).form))return;
     const reason=playBlockReason(saved)??animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});if(reason){notify(reason);return}
     clearInvitation();setPanel(null);setBubbleVisible(false);animate(`official-${id}`);setMemory(m=>m?recordEvent(m,{kind:'play-original',detail:`你让我展示了${clip.name}。`}):m);
   }
@@ -454,17 +455,17 @@ export default function App() {
     void window.desktop?.setPetArtworkBounds?.(petMode&&current.wearing&&!reading&&!workingAway?{x:-100,y:-80,width:360,height:420}:null).catch(()=>{});
   },[petMode,current.wearing,reading,workingAway]);
   const effectId=action.startsWith('element-')?action.slice(8):null;
-  const importedEffect=uploadedMotion(appearance.form,action,actionItemId);
+  const importedEffect=uploadedMotion(actionAppearance.form,action,actionItemId);
   const previousEffectMode=useRef(floating);
   useEffect(()=>{
     const changedMode=previousEffectMode.current!==floating;previousEffectMode.current=floating;
     const interrupted=Boolean((effectId||importedEffect)&&(changedMode||panel!==null||game!==null));
     if(interrupted){if(importedEffect)stopUploaded();else finishPerformance()}
-    const rect=!interrupted&&petMode?(importedEffect?uploadedEffectRect(importedEffect,appearance.form):effectId?elementEffectRect(effectId,appearance.form):null):null;
+    const rect=!interrupted&&petMode?(importedEffect?uploadedEffectRect(importedEffect,actionAppearance.form):effectId?elementEffectRect(effectId,actionAppearance.form):null):null;
     const bounds=petMode&&workingAway?DESKTOP_WORK_BOUNDS:rect?{...rect,x:rect.x+30,y:rect.y+71}:null;
     void window.desktop?.setPetEffectBounds?.(bounds).catch(()=>{});
-  },[effectId,importedEffect,actionItemId,petMode,appearance.form,floating,panel,game,workingAway]);
-  useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(appearance.form);},[hasPet,appearance.form]);
+  },[effectId,importedEffect,actionItemId,petMode,actionAppearance.form,floating,panel,game,workingAway]);
+  useEffect(()=>{if(hasPet)void window.desktop?.setPetAppearance(actionAppearance.form);},[hasPet,actionAppearance.form]);
   useEffect(() => { void window.desktop?.setPetCanMove(hasPet && stage > 0 && !reading && !pet?.sleeping && !pet?.outing && !pet?.activity); }, [hasPet,pet?.sleeping,pet?.outing,pet?.activity,stage,reading]);
   useEffect(()=>{
     const before=previousRest.current;previousRest.current=pet?{petId:pet.createdAt,sleeping:pet.sleeping}:null;
@@ -492,10 +493,11 @@ export default function App() {
     if(!isUploadedAction(next))uploadedRun.current=null;
     const motion = itemId ? getItemMotion(itemId) : null;
     const p=petRef.current;
-    const original=uploadedMotion(p?petAppearance(p).form:'seed',next,itemId);
-    const recorded=!p?.wearing?dailyFrameSpec(p?petAppearance(p).form:'seed',next):undefined;
-    const embeddedItem=p&&itemId?originalItemClip(itemId,petAppearance(p).form):undefined;
-    const duration = (isOfficialAction(next)||embeddedItem?OFFICIAL_DURATION:undefined) ?? original?.durationMs ?? (recorded&&!['focus','sleep','read-alone'].includes(next)?recorded.durationMs:undefined) ?? motion?.duration ?? getRamActionDuration(next.startsWith('ambient-element-')?next.slice(8):next,p?petAppearance(p).form:'seed') ?? 900;
+    const form=p?petActionAppearance(p,next).form:'seed';
+    const original=uploadedMotion(form,next,itemId);
+    const recorded=dailyFrameSpec(form,next);
+    const embeddedItem=p&&itemId?originalItemClip(itemId,form):undefined;
+    const duration = (isOfficialAction(next)||embeddedItem?OFFICIAL_DURATION:undefined) ?? original?.durationMs ?? (recorded&&!['focus','sleep','read-alone'].includes(next)?recorded.durationMs:undefined) ?? motion?.duration ?? getRamActionDuration(next.startsWith('ambient-element-')?next.slice(8):next,form) ?? 900;
     setActionId(n => n + 1); setActionFromColor(fromColor); setActionItemId(itemId); setAction(motion?.action ?? next);
     careUntil.current = itemId ? Date.now() + duration + 50 : 0;
     if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
@@ -505,7 +507,7 @@ export default function App() {
     const fallbackDelay=sourcePlayback?OFFICIAL_LOAD_TIMEOUT+Math.max(duration,OFFICIAL_DURATION)+(transformed&&usesTransformationSmoke(transformed)?8000:3000):duration+(next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||isAmbientAction(next)||recorded||isEmotionClip(next)?15000:50));
     clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); },fallbackDelay);
   }
-  function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(appearance.form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
+  function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(petActionAppearance(current,action).form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
     const before = petRef.current;
     if(result.ok&&before&&before.color!==result.state.color){
@@ -542,12 +544,13 @@ export default function App() {
     if(type==='sleep')previousActivity.current=undefined;
     if (!itemId && type !== 'sleep' && Date.now() < careUntil.current) return;
     const item = getItem(itemId), next = type === 'sleep' && saved.sleeping ? 'wake' : type;
-    if(item?.category==='toy'&&!originalItemClip(item.id,petAppearance(saved).form)){notify('这件玩具暂无当前形态的原版动作，先留在背包里；可以试试看书、玩球或已学会的本领。');return false;}
+    const form=petActionAppearance(saved,next).form;
+    if(item?.category==='toy'&&!originalItemClip(item.id,form)){notify('这件玩具暂无当前形态的原版动作，先留在背包里；可以试试看书、玩球或已学会的本领。');return false;}
     const detail = invitationDetail ?? (item ? `你用${item.name}照料了我。` : type === 'sleep' ? saved.sleeping ? '你轻轻叫醒了我。' : '你让我安心睡了一觉。' : undefined);
     const result=care(saved, type, itemId, Date.now());
     if(result.ok){clearInvitation();if(type==='sleep')previousRest.current={petId:result.state.createdAt,sleeping:result.state.sleeping};}
     const applied=apply(result, next, detail, itemId);
-    if(applied&&(uploadedMotion(petAppearance(saved).form,next,itemId)||originalItemClip(itemId,petAppearance(saved).form))){setPanel(null);setBubbleVisible(false)}
+    if(applied&&(uploadedMotion(form,next,itemId)||originalItemClip(itemId,form))){setPanel(null);setBubbleVisible(false)}
     return applied;
   }
   function chooseGrowth(selection:GrowthSelection) {
