@@ -2,7 +2,7 @@ import {getItem} from './catalog';
 import actionIcons from '../public/assets/original/official/action-icons/index.json';
 import {getStage,type GameState} from './game';
 import type {RamForm} from './original-actions';
-import {OFFICIAL_CLIPS,supportsOfficial,type OfficialClip} from './official-clips';
+import {OFFICIAL_CLIPS,supportsOfficial,officialOutfitForm,type OfficialClip} from './official-clips';
 import {learned} from './pet-school';
 import {petAppearance} from './wardrobe';
 import {ELEMENT_SKILLS,learnedElementSkill} from './element-skills';
@@ -11,6 +11,7 @@ export const FORM_NAMES:Record<RamForm,string>={seed:'种子',junior:'初级拉�
 export const playableOriginal=(clip:OfficialClip)=>!clip.path.includes('/tatter/');
 export const usesTransformationSmoke=(clip:OfficialClip)=>['magic','transform','skill'].includes(clip.kind)&&playableOriginal(clip);
 export function playbackForm(clip:OfficialClip,form:RamForm):RamForm|undefined{
+ if(clip.kind==='outfit')return officialOutfitForm(clip,form);
  if(form==='seed')return supportsOfficial(clip,form)?form:undefined;
  if(supportsOfficial(clip,form))return form;
  return (['junior','middle','senior','classic','super','water','wood','fire'] as RamForm[]).find(candidate=>supportsOfficial(clip,candidate));

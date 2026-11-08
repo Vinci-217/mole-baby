@@ -13,6 +13,12 @@ async function ready(page){await expect(page.locator('.wardrobe-mirror .official
   for(const [form,name] of [['junior','紫色魔法帽'],['super','魔法书'],['senior','天使羽翼'],['middle','皇冠猫耳']]){
    await page.getByRole('combobox',{name:'预览形态',exact:true}).selectOption(form);await choose(page,name);const frame=await ready(page),iframe=page.locator('.wardrobe-mirror iframe'),token=await iframe.getAttribute('src');
    const registration=JSON.parse(await iframe.getAttribute('data-registration'));
+   for(const key of ['x','y','scale','bodyWidth','bodyHeight'])assert(Number.isFinite(registration[key]),`${name}: ${key} must be finite`);
+   if(name==='皇冠猫耳'){
+    assert.equal(await page.locator('.wardrobe-mirror>.ram-sprite').getAttribute('data-stage'),'1');
+    assert.equal(await page.locator('.wardrobe-mirror>.ram-sprite').getAttribute('data-growth-stage'),'2');
+    assert.equal(await frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus').form),'level2','original layer 45 must choose the junior body, not a middle body with ears');
+   }
    await page.getByRole('button',{name:'预览摸摸动作',exact:true}).click();await expect(page.locator('.social-hand')).toBeVisible();
    await expect.poll(()=>page.locator('.wardrobe-mirror>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))||0)).toBeGreaterThan(.2);
    const pose=await page.locator('.wardrobe-mirror .ram-pose-layer').first().evaluate(n=>getComputedStyle(n).transform);assert.notEqual(pose,'none');

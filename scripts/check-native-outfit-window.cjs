@@ -26,7 +26,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-i
   await page.evaluate(()=>window.desktop.setPetArtworkBounds({x:-100,y:-80,width:360,height:420}));assert.deepEqual(await anchor(),before);
   await page.getByTestId('desktop-character').press('Enter');await expect(page.locator('.social-hand')).toBeVisible();await expect.poll(()=>page.locator('.desktop-character>.ram-sprite').evaluate(n=>parseFloat(n.style.getPropertyValue('--social-angle'))||0)).toBeGreaterThan(.2);
   await page.screenshot({path:path.join(out,'electron-outfit.png')});
-  const source=await frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus'));assert.equal(source.form,'level3');assert(source.registration);assert.deepEqual(errors,[]);
+  const source=await frame.evaluate(()=>player.ruffle().callExternalInterface('previewStatus'));assert.equal(source.form,'level2');assert(source.registration);assert.deepEqual(errors,[]);
   fs.writeFileSync(path.join(out,'electron-checks.json'),JSON.stringify({passed:true,protocol:frame.url().split('?')[0],expanded,anchor:before,form:source.form,petting:true,errors},null,2));
   console.log('PASS actual Electron custom-protocol outfit, enlarged transparent window, unchanged screen anchor, real petting and saved prior identity');
  }finally{await desktop.close()}

@@ -8,7 +8,7 @@ import type {OfficialClip} from '../official-clips'
 import './OfficialRamClip.css'
 
 /** A mounted outfit reuses one isolated engine; the player has no save bridge. */
-export default function OfficialRamClip({clip,form,bodyForm=form,color,action='idle',finite=false,registerBody=false,sound=false,volume=.45,paused=false,fallback,onEnd,onReady,onError}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;action?:string;finite?:boolean;registerBody?:boolean;sound?:boolean;volume?:number;paused?:boolean;fallback:ReactNode;onEnd?:(completed?:boolean)=>void;onReady?:()=>void;onError?:()=>void}){
+export default function OfficialRamClip({clip,form,bodyForm=form,color,action='idle',finite=false,registerBody=true,sound=false,volume=.45,paused=false,fallback,onEnd,onReady,onError}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;action?:string;finite?:boolean;registerBody?:boolean;sound?:boolean;volume?:number;paused?:boolean;fallback:ReactNode;onEnd?:(completed?:boolean)=>void;onReady?:()=>void;onError?:()=>void}){
  const frame=useRef<HTMLIFrameElement>(null),mask=useRef<HTMLCanvasElement>(null),end=useRef(onEnd);end.current=onEnd
  const readyCallback=useRef(onReady),errorCallback=useRef(onError);readyCallback.current=onReady;errorCallback.current=onError;
  const loadKey=`${clip.id}:${form}:${bodyForm}:${finite}:${registerBody}`
@@ -18,7 +18,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const direction=action.includes('left')?'left':action.includes('right')?'right':'down'
  const pose=useRef({form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused})
  pose.current={form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused}
- const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?token=${token}`)
+ const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=4&token=${token}`)
  const sendPose=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-pose',token,sequence:sequence.current,value:pose.current},'*')
  useEffect(()=>{sendPose()},[color,direction,action,form,sound,volume,paused])
  useEffect(()=>{

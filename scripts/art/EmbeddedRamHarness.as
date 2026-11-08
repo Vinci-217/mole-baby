@@ -29,6 +29,8 @@ package §1200026_fla§ {
   public var zoom:Number=1;
   public var registerBody:Boolean=false;
   public var referenceForm:String="";
+  public var referenceBounds:Array;
+  public var costume:Boolean=false;
   public var registered:Boolean=false;
   public var registration:Object=null;
   public var fitX:Number=0;
@@ -61,6 +63,9 @@ package §1200026_fla§ {
    requestedSymbol=String(params.symbol||"");
    form=String(params.form||"");
    registerBody=params.registerBody=="1";referenceForm=String(params.referenceForm||form);
+   referenceBounds=String(params.referenceBounds||"17.11472,35.95208,82.03084,81.50964").split(",");
+   for(var coordinate:int=0;coordinate<referenceBounds.length;coordinate++)referenceBounds[coordinate]=Number(referenceBounds[coordinate]);
+   costume=params.kind=="outfit";
    // Register clothes against the resting down pose, before any walk starts.
    // The moving body's squash must not decide a newly worn outfit's size.
    if(registerBody)moving=false;
@@ -116,7 +121,9 @@ package §1200026_fla§ {
      var mc:MovieClip=selected as MovieClip;
      if(form&&hasLabel(mc,form))mc.gotoAndStop(form);else mc.play();
     }
-    settle=12;
+    // Item timelines already start with their complete original body. Register
+    // that first pose, before an intro can stretch/shrink it or move a prop.
+    settle=costume?12:1;
    }catch(error:Error){failure=error.message;}
   }
   public function hasLabel(mc:MovieClip,label:String):Boolean {
@@ -184,7 +191,7 @@ package §1200026_fla§ {
   public function namedBody(node:DisplayObjectContainer):DisplayObject {
    for(var i:int=0;i<node.numChildren;i++){
     var child:DisplayObject=node.getChildAt(i);
-    if(child.name=="petBody")return child;
+    if(child.name=="petBody"||child.name=="lahm"||child.name=="pet")return child;
     if(child is DisplayObjectContainer){var nested:DisplayObject=namedBody(child as DisplayObjectContainer);if(nested)return nested;}
    }
    return null;
@@ -199,19 +206,19 @@ package §1200026_fla§ {
    var bounds:Rectangle=holder.getBounds(holder);
    if(("lamu_txt" in Object(selected))&&Object(selected)["lamu_txt"])
     Object(selected)["lamu_txt"].visible=false;
-   if(bounds.width<=0||bounds.height<=0)return;
+   if(bounds.width<=0||bounds.height<=0){settle=1;return;}
    var nativeBody:DisplayObject=bones[1]||namedBody(holder)||bones[0]||selected;
    if(registerBody&&nativeBody){
     // Register the original BODY, never the hat/wings/book envelope. Cache the
     // down pose for every direction so changing pose cannot resize the pet.
     if(!registered){
      var body:Rectangle=nativeBody.getBounds(holder);
-     var target:Array=referenceForm=="level3"?[22.093,46.312,81.823,88.774]:referenceForm=="level4"?[18.75,53.481,76.042,101.25]:referenceForm=="level101"?[26.562,48.808,72.396,87.75]:referenceForm=="level101_7"?[26.042,60.231,70.312,97.096]:referenceForm=="level5_2"?[16.667,48.808,80.208,96.577]:referenceForm=="level5_4"?[20.312,56.596,75,97.615]:referenceForm=="level5_1"?[19.792,48.288,81.25,97.096]:[21.597,42.63,80.655,91.6];
-     if(body.width<=0)return;
+     var target:Array=referenceBounds;
+     if(body.width<=0){settle=1;return;}
      fittedScale=400*(target[2]-target[0])/100/body.width;
      fitX=400*(target[0]+target[2])/200-(body.x+body.width/2)*fittedScale;
      fitY=432*target[3]/108-body.bottom*fittedScale;
-     registration={basis:bones[1]?"body-bone":nativeBody.name=="petBody"?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
+     registration={basis:bones[1]?"body-bone":nativeBody!=selected?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
      registered=true;
     }
    }else if(!registered){

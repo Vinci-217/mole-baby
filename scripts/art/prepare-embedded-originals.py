@@ -44,11 +44,13 @@ def main():
    forms=[form for form in forms if form in available]
   clips.append(dict(id=ident,name=name,kind=kind,path=row['path'],sha256=row['sha256'],base=needsBase,
    bytes=len(data),symbol=main['symbol'] if main else '',forms=forms,
-   level=int(level[1]) if level else 0,fps=row.get('fps',24),animated=bool(row.get('multiFrameTimelines'))))
+   level=int(level[1]) if level else 0,fps=row.get('fps',24),animated=bool(row.get('multiFrameTimelines')),
+   **({'clothingLayer':int(items[stem].get('Layer',0))} if kind=='outfit' else {})))
   if kind=='outfit' and stem not in old:
    icon=VAULT/'files/resource/petcloth/icon'/(stem+'.swf')
    outfits.append(dict(id='original-'+stem,name=name,sourceId=stem,clipId=ident,price=80,width=.6,x=0,y=0,iconPath='./assets/original/official/icons/'+stem+'.png' if icon.exists() else './assets/original/ui/icon-happy.png'))
- (OUT/'manifest.json').write_text(json.dumps(dict(version=1,clips=clips,outfits=outfits),ensure_ascii=False,indent=2)+'\n')
+ bodyBounds={form:row['body'] for form,row in json.loads((ROOT/'electron/edge-visibility.json').read_text())['forms'].items()}
+ (OUT/'manifest.json').write_text(json.dumps(dict(version=1,clips=clips,outfits=outfits,bodyBounds=bodyBounds),ensure_ascii=False,indent=2)+'\n')
  keep={clip['path'] for clip in clips}
  for copied in (OUT/'files').rglob('*.swf'):
   if str(copied.relative_to(OUT/'files')) not in keep:copied.unlink()

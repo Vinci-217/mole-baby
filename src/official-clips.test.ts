@@ -41,6 +41,21 @@ describe('bundled original animation integration',()=>{
   const care=OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.level===2)!
   expect(officialOutfitForm(care,'super')).toBeUndefined();expect(supportsOfficial(care,'super')).toBe(false)
  })
+ it('honours the original clothing layer even when other level labels contain artwork',()=>{
+  const cat=outfitAnimation('warm-scarf')!;
+  expect(cat.clothingLayer).toBe(45);expect(cat.forms).toContain('level3');
+  const forced=OFFICIAL_CLIPS.filter(clip=>clip.kind==='outfit'&&[45,65].includes(clip.clothingLayer??0));
+  expect(forced).toHaveLength(99);
+  for(const clip of forced)for(const form of ['junior','middle','senior','classic','super','water','wood','fire'] as const){
+   expect(officialOutfitForm(clip,form),`${clip.path}:${form}`).toBe('junior');
+  }
+  for(const growth of [60,180,420,840]){
+   const pet={...createPet('旧记忆','blue',now),growth,evolution:growth===840?'super' as const:undefined,wardrobe:['warm-scarf' as const]};
+   const dressed=wearOutfit(pet,'warm-scarf').state;
+   expect(petAppearance(dressed)).toEqual({stage:1,form:'junior'});
+   expect(wearOutfit(dressed).state).toEqual(pet);
+  }
+ })
  it('restores the actual form on removing clothing and keeps growth, identity and colour through reload',()=>{
   const cap=ORIGINAL_OUTFITS.find(row=>row.sourceId==='1200001')!
   const actual={...createPet('小紫','blue',now),color:'#9c5fd4' as const,growth:840,naturalGrowth:213,highestGrowth:213,growthLocked:true,evolution:'super' as const,wardrobe:[cap.id as `original-${string}`]}

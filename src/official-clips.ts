@@ -1,6 +1,6 @@
 import manifest from '../public/assets/original/official/manifest.json'
 import type {RamForm} from './original-actions'
-export interface OfficialClip {id:string;name:string;kind:string;path:string;sha256:string;bytes:number;symbol:string;forms:string[];level:number;fps:number;animated:boolean;base:boolean}
+export interface OfficialClip {id:string;name:string;kind:string;path:string;sha256:string;bytes:number;symbol:string;forms:string[];level:number;fps:number;animated:boolean;base:boolean;clothingLayer?:number}
 export const OFFICIAL_CLIPS:readonly OfficialClip[]=manifest.clips
 export const ORIGINAL_OUTFITS=manifest.outfits
 export const OFFICIAL_DURATION=16_000
@@ -24,6 +24,9 @@ export function supportsOfficial(clip:OfficialClip,form:RamForm){
  * Keep this separate from spells and care, which require their exact form. */
 export function officialOutfitForm(clip:OfficialClip,form:RamForm):RamForm|undefined{
  if(form==='seed'||clip.kind!=='outfit')return;
+ // LamuUIManage.checkClothType chooses the complete junior rig for these
+ // layers, even when the garment SWF contains other (reused) level labels.
+ if(clip.clothingLayer===45||clip.clothingLayer===65)return supportsOfficial(clip,'junior')?'junior':undefined;
  if(supportsOfficial(clip,form))return form;
  if(supportsOfficial(clip,'junior'))return 'junior';
  // A few full costumes contain only a classic Super Ram. Use that complete

@@ -1,8 +1,8 @@
 /* Offline original vectors. No application bridge or access to parent storage. */
 (async function(){
  const token=new URLSearchParams(location.search).get('token'),pollLimit=300; // 45s at 150ms, matching the host's cold-start budget
- let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,loading=false,pending,clip,looping,pose,requestAcknowledged=false;
- const manifest=fetch('manifest.json?v=3').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
+ let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,clip,looping,pose,requestAcknowledged=false;
+ const manifest=fetch('manifest.json?v=4').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
  const call=(name,...args)=>player&&player.ruffle().callExternalInterface(name,...args);
  const maskCanvas=document.createElement('canvas');maskCanvas.width=100;maskCanvas.height=108;
@@ -25,18 +25,25 @@
  }
  async function load(request){
   if(request.sequence<=sequence)return;
-  if(loading){pending=request;return;}
-  loading=true;ready=false;visible=false;poseSettling=false;requestAcknowledged=false;clearInterval(timer);lastPose=null;
+  ready=false;visible=false;poseSettling=false;requestAcknowledged=false;clearInterval(timer);lastPose=null;
   sequence=request.sequence;id=request.value.id;pose=request.value.pose;looping=request.value.loop;
+  const current=sequence;
+  // Retire a superseded load immediately. A slow/failed old engine must not
+  // hold every later wardrobe selection in a serial loading queue.
+  if(player){player.remove();player=null;}
   try{
-   clip=(await manifest).clips.find(row=>row.id===id);if(!clip)throw Error('Unknown source');
+   const library=await manifest;
+   if(current!==sequence)return;
+   clip=library.clips.find(row=>row.id===id);if(!clip)throw Error('Unknown source');
    if(clip.forms.length&&!clip.forms.includes(pose.form))throw Error('Unsupported form');
    // Each source gets a fresh AVM2 application. Reloading different client
    // libraries in one player can retain conflicting exported class definitions.
    // The iframe and already loaded Ruffle module remain in place.
-   if(player)player.remove();
    player=window.RufflePlayer.newest().createPlayer();window.player=player;document.body.append(player);
-   await player.ruffle().load({url:'controller.swf?v=3',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,registerBody:request.value.registerBody?'1':'',referenceForm:request.value.referenceForm||pose.form,base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
+   const referenceForm=request.value.referenceForm||pose.form;
+   const formName={level1:'seed',level2:'junior',level3:'middle',level4:'senior',level101:'classic',level101_7:'super',level5_1:'fire',level5_2:'water',level5_4:'wood'}[referenceForm]||'junior';
+   await player.ruffle().load({url:'controller.swf?v=4',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,kind:clip.kind,registerBody:request.value.registerBody!==false?'1':'',referenceForm,referenceBounds:library.bodyBounds[formName].join(','),base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
+   if(current!==sequence)return;
    player.ruffle().volume=0;
    let tries=0,lastMask=0;
    timer=setInterval(()=>{
@@ -69,8 +76,7 @@
      }else if(++tries>pollLimit){send('error','Source requires the full client');clearInterval(timer);}
     }catch(error){window.originalRuntimeError=String(error);send('diagnostic',{phase:'status',error:String(error)});if(++tries>pollLimit){send('error',String(error));clearInterval(timer);}}
    },150);
-  }catch(error){send('error',String(error));}
-  finally{loading=false;if(pending){const next=pending;pending=null;load(next);}}
+  }catch(error){if(current===sequence)send('error',String(error));}
  }
  addEventListener('message',event=>{
   if(event.source!==parent||!event.data||event.data.token!==token)return;
