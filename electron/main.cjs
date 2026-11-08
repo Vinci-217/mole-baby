@@ -111,6 +111,8 @@ let draggingFromEdge = false;
 let petOffset={x:0,y:0};
 let petEffectBounds=null;
 let petEffectAnchor=null;
+let petArtworkBounds=null,petArtworkAnchor=null;
+let nativePetLimits=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
 let petAlwaysOnTop=true,mouseThrough=false,trayMenuKey='';
@@ -335,12 +337,17 @@ function walkAlongDesktop() {
 /** Keep a virtual pet anchor even if Windows clamps the transparent frame.
  * The renderer offsets the body by the actual OS displacement, so every edge
  * remains reachable without asking the OS to put a window above its bounds. */
-function placePetAt(target){
+function artworkWindowBounds(base){
+ if(!petArtworkBounds||petResizing)return base;
+ const physical=Object.fromEntries(Object.entries(petArtworkBounds).map(([key,value])=>[key,value*petScale]));
+ return effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physical);
+}
+function placePetAt(target,force=false){
   if(!mainWindow||mainWindow.isDestroyed()||quitting)return;
   const point=nativePosition(target);
   if(!point){stopMovement();scheduleWander();return;}
   target={...target,...point};
-  const previous=currentPetBounds();if(!companionPanel&&previous.x===Math.round(target.x)&&previous.y===Math.round(target.y))return;
+  const previous=currentPetBounds();if(!force&&!companionPanel&&previous.x===Math.round(target.x)&&previous.y===Math.round(target.y))return;
   changingMode=true;
   const x=Math.round(target.x),y=Math.round(target.y);
   // setPosition reads the current native rectangle back before moving. On
@@ -351,13 +358,16 @@ function placePetAt(target){
     // Use one rectangle conversion on every platform. macOS setPosition can
     // reject a numeric argument after wake/display changes; setBounds also
     // preserves the fixed logical pet size and canonical integer coordinates.
-    mainWindow.setBounds({...PET_SIZE,x,y},false);
+    const frameBounds=artworkWindowBounds({...PET_SIZE,x,y});
+    if(process.platform==='win32'&&(nativePetLimits?.width!==frameBounds.width||nativePetLimits?.height!==frameBounds.height))applyMinimum(frameBounds,true);
+    mainWindow.setBounds(frameBounds,false);
   }catch(error){
     // A monitor/window may change while a movement timer is queued. Preserve
     // the last valid anchor and stop this walk instead of throwing in a timer.
     stopMovement();console.error('Unable to move pet window:',error);return;
   }finally{changingMode=false;}
   const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
+  if(petArtworkBounds)petArtworkAnchor={x:target.x,y:target.y};
   petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
 }
 function preparePetDrag(){
@@ -470,13 +480,15 @@ function changeMouseThrough(enabled){
 }
 function currentPetBounds(){
  if(petMode&&petEffectBounds&&petEffectAnchor)return {...PET_SIZE,...petEffectAnchor};
+ if(petMode&&petArtworkBounds&&petArtworkAnchor&&!companionPanel)return {...PET_SIZE,...petArtworkAnchor};
  const b=mainWindow.getBounds();return {...PET_SIZE,x:b.x+(companionPanel&&panelGeometry?panelGeometry.petX:petOffset.x),y:b.y+(companionPanel&&panelGeometry?panelGeometry.petY:petOffset.y)};
 }
 /** Old Windows can deliver its final placement after setBounds returns. Keep
  * the effect's screen anchor independent of those asynchronous WM messages. */
 function syncEffectAnchor(){
- if(changingMode||!petMode||!petEffectBounds||!petEffectAnchor||!mainWindow||mainWindow.isDestroyed())return;
- const actual=mainWindow.getBounds(),next={x:petEffectAnchor.x-actual.x,y:petEffectAnchor.y-actual.y};
+ const anchor=petEffectBounds?petEffectAnchor:petArtworkBounds&&!companionPanel?petArtworkAnchor:null;
+ if(changingMode||!petMode||!anchor||!mainWindow||mainWindow.isDestroyed())return;
+ const actual=mainWindow.getBounds(),next={x:anchor.x-actual.x,y:anchor.y-actual.y};
  if(next.x===petOffset.x&&next.y===petOffset.y)return;
  petOffset=next;publishState();
 }
@@ -488,9 +500,10 @@ function changePetEffectBounds(effect){
  if(effect)revealPet();
  const base=currentPetBounds();
  const physicalEffect=effect?Object.fromEntries(Object.entries(effect).map(([key,value])=>[key,value*petScale])):null;
- const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physicalEffect):clampBounds(base,PET_SIZE);
+ const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physicalEffect):artworkWindowBounds(clampBounds(base,PET_SIZE));
  petEffectBounds=effect?{x:effect.x,y:effect.y,width:effect.width,height:effect.height}:null;
  petEffectAnchor=effect?{x:base.x,y:base.y}:null;
+ if(petArtworkBounds)petArtworkAnchor={x:base.x,y:base.y};
  changingMode=true;
  if(process.platform==='win32')applyMinimum(target,true);
  mainWindow.setBounds(target);
@@ -500,8 +513,24 @@ function changePetEffectBounds(effect){
  publishState();scheduleSave();scheduleWander();
  return getDesktopState();
 }
+/** Clothes expand only the drawing surface. Dragging, wandering, hit testing
+ * and the saved logical pet anchor keep their normal behaviour. */
+function changePetArtworkBounds(bounds){
+ if(bounds!==null&&(!bounds||Array.isArray(bounds)||['x','y','width','height'].some(key=>typeof bounds[key]!=='number'||!Number.isFinite(bounds[key]))||Math.abs(bounds.x)>4096||Math.abs(bounds.y)>4096||bounds.width<=0||bounds.height<=0||bounds.width>4096||bounds.height>4096))throw new TypeError('Invalid pet artwork bounds');
+ if(JSON.stringify(bounds)===JSON.stringify(petArtworkBounds))return getDesktopState();
+ const base=petMode?currentPetBounds():null;
+ petArtworkBounds=bounds?{x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height}:null;
+ petArtworkAnchor=bounds&&base?{x:base.x,y:base.y}:null;
+ if(base&&!petEffectBounds&&!companionPanel)placePetAt(base,true);
+ publishState();return getDesktopState();
+}
 function companionBounds(base){
- const result=compactPanelBounds(base,screen.getDisplayMatching(base).workArea);panelSide=result.panelSide;panelGeometry=result.geometry;return result.bounds;
+ const result=compactPanelBounds(base,screen.getDisplayMatching(base).workArea),art=artworkWindowBounds(base),old=result.bounds;
+ const x=Math.min(old.x,art.x),y=Math.min(old.y,art.y);
+ result.bounds={x,y,width:Math.max(old.x+old.width,art.x+art.width)-x,height:Math.max(old.y+old.height,art.y+art.height)-y};
+ for(const key of ['petX','panelX'])result.geometry[key]+=old.x-x;
+ for(const key of ['petY','panelY'])result.geometry[key]+=old.y-y;
+ panelSide=result.panelSide;panelGeometry=result.geometry;return result.bounds;
 }
 function changeCompanionPanel(open, layout = 'compact') {
   if (typeof open !== 'boolean') throw new TypeError('Companion panel visibility must be a boolean');
@@ -511,10 +540,11 @@ function changeCompanionPanel(open, layout = 'compact') {
   stopMovement();
   const base = currentPetBounds();
   panelLayout = 'compact';
-  const target = open ? companionBounds(base) : clampBounds(base, PET_SIZE);
+  const target = open ? companionBounds(base) : artworkWindowBounds(clampBounds(base, PET_SIZE));
   if (!open) panelGeometry = null;
   changingMode = true;
   companionPanel = open;
+  if(!open&&petArtworkBounds)petArtworkAnchor={x:base.x,y:base.y};
   if(process.platform==='win32')applyMinimum(target,petMode);
   mainWindow.setBounds(target);
   const actual=mainWindow.getBounds();
@@ -536,8 +566,8 @@ function changePetScale(scale,anchor=null){
  stopMovement();revealPet();applyPetMetrics(Math.round(scale*100)/100);
  if(base)petBounds=fitPetBounds(anchor?anchoredPetBounds(anchor,petScale,PET_SIZE):{x:base.x+(oldSize.width-PET_SIZE.width)/2,y:base.y+oldSize.height-PET_SIZE.height},screen.getDisplayMatching(base).workArea);
  if(petMode){
-  const target=clampBounds(petBounds,PET_SIZE);changingMode=true;
-  try{applyMinimum(target,true);mainWindow.setBounds({...target,...nativePosition(target)});mainWindow.webContents.setZoomFactor?.(petScale);const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};}finally{changingMode=false;}
+  const baseTarget=clampBounds(petBounds,PET_SIZE),target=artworkWindowBounds(baseTarget);changingMode=true;
+  try{applyMinimum(target,true);mainWindow.setBounds({...target,...nativePosition(target)});mainWindow.webContents.setZoomFactor?.(petScale);const actual=mainWindow.getBounds();petOffset={x:baseTarget.x-actual.x,y:baseTarget.y-actual.y};if(petArtworkBounds)petArtworkAnchor={x:baseTarget.x,y:baseTarget.y};}finally{changingMode=false;}
   if(open)changeCompanionPanel(true);
  }
  wanderAnchor=null;if(!petResizing)saveWindowState();publishState();if(!petResizing)scheduleWander();return petScale;
@@ -549,7 +579,7 @@ async function openSizeEditor(){
  if(!petMode)await changePetMode(true);
  changeCompanionPanel(false);revealPet();stopMovement();
  if(!petResizing)petResizeOriginal={scale:petScale,bounds:{...currentPetBounds()},mouseThrough};
- petResizing=true;mouseThrough=false;changeMousePassthrough(false);mainWindow.setIgnoreMouseEvents(false);publishState();return true;
+ petResizing=true;placePetAt(currentPetBounds(),true);mouseThrough=false;changeMousePassthrough(false);mainWindow.setIgnoreMouseEvents(false);publishState();return true;
 }
 function stopPetResizeDrag(){clearInterval(petResizeTimer);petResizeTimer=null;}
 function startPetResize(corner){
@@ -566,7 +596,7 @@ function finishPetResize(commit=true){
  stopPetResizeDrag();if(!petResizing)return false;
  const original=petResizeOriginal;
  if(!commit&&original){const anchor={x:original.bounds.x,y:original.bounds.y,local:{x:0,y:0}};changePetScale(original.scale,anchor)}
- petResizing=false;petResizeOriginal=null;changeMouseThrough(original?.mouseThrough??false);saveWindowState();publishState();scheduleWander();return true;
+ petResizing=false;petResizeOriginal=null;placePetAt(currentPetBounds(),true);changeMouseThrough(original?.mouseThrough??false);saveWindowState();publishState();scheduleWander();return true;
 }
 
 function settingsPath() {
@@ -654,6 +684,7 @@ function applyMinimum(bounds, isPet) {
     const fixed=isPet?bounds:size;
     mainWindow.setMinimumSize(Math.min(fixed.width,area.width),Math.min(fixed.height,area.height));
     if(isPet)mainWindow.setMaximumSize(bounds.width,bounds.height);
+    nativePetLimits=isPet?{width:bounds.width,height:bounds.height}:null;
   }else mainWindow.setMinimumSize(Math.min(size.width,area.width),Math.min(size.height,area.height));
 }
 
@@ -707,15 +738,15 @@ function changePetMode(enabled) {
   panelGeometry = null;
   if (enabled) {
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
-    const target = clampBounds(petBounds, PET_SIZE);
+    const baseTarget = clampBounds(petBounds, PET_SIZE),target=artworkWindowBounds(baseTarget);
     mainWindow.webContents.setZoomFactor?.(petScale);
     petMode = true;
     applyMinimum(target, true);
     if(process.platform!=='win32')mainWindow.setResizable(false);
     mainWindow.setBounds(target);
-    const actual=mainWindow.getBounds();petOffset={x:target.x-actual.x,y:target.y-actual.y};
+    const actual=mainWindow.getBounds();petOffset={x:baseTarget.x-actual.x,y:baseTarget.y-actual.y};if(petArtworkBounds)petArtworkAnchor={x:baseTarget.x,y:baseTarget.y};
     mainWindow.setAlwaysOnTop(petAlwaysOnTop, 'floating');
-    petBounds = target;
+    petBounds = baseTarget;
   } else {
     mainWindow.webContents.setZoomFactor?.(1);
     petMode = false;petOffset={x:0,y:0};
@@ -868,6 +899,7 @@ function registerIPC() {
   handle('desktop:finish-pet-resize',finishPetResize);
   handle('desktop:open-size-editor',openSizeEditor);
   handle('desktop:set-pet-effect-bounds',changePetEffectBounds);
+  handle('desktop:set-pet-artwork-bounds',changePetArtworkBounds);
   handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
   handle('updates:open-release',()=>shell.openExternal('https://github.com/Vinci-217/mole-baby/releases/latest'));
   listen('desktop:minimize', hideToTray);
@@ -1060,11 +1092,14 @@ if (!app.requestSingleInstanceLock()) {
       revealPet();
       const base = petMode ? clampBounds(currentPetBounds(), PET_SIZE) : null;
       const bounds = petMode
-        ? companionPanel ? companionBounds(base) : base
+        ? companionPanel ? companionBounds(base) : artworkWindowBounds(base)
         : clampBounds(mainWindow.getBounds(), NORMAL_SIZE);
       changingMode = true;
       applyMinimum(bounds, petMode);
       mainWindow.setBounds(bounds);
+      if(petMode&&petArtworkBounds&&!companionPanel&&!petEffectBounds){
+        petArtworkAnchor={x:base.x,y:base.y};const actual=mainWindow.getBounds();petOffset={x:base.x-actual.x,y:base.y-actual.y};
+      }
       changingMode = false;
       scheduleSave();
       publishState();

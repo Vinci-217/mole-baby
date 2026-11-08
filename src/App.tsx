@@ -62,7 +62,7 @@ import { usePresence } from './use-presence';
 import { presenceKey, welcomeLine, wantsQuiet } from './companion-presence';
 import { useIdleLife } from './use-idle-life';
 import CareFeedback from './components/CareFeedback';
-import {careGains,mergeCareFeedback,type CareFeedbackData} from './care-feedback';
+import {careGains,gameGains,mergeCareFeedback,type CareFeedbackData} from './care-feedback';
 import type { PresenceLine } from './companion-presence';
 import { useRestReminder, validReminderMinutes, reminderTime, timerRecordDetail, type TimerDirection } from './use-rest-reminder';
 import PetInvitation from './components/PetInvitation';
@@ -127,6 +127,7 @@ export default function App() {
   const [actionItemId, setActionItemId] = useState<string | undefined>();
   const [actionFromColor,setActionFromColor]=useState<PetColor|undefined>();
   const [careFeedback,setCareFeedback]=useState<CareFeedbackData|null>(null);
+  const gameFeedback=useRef<CareFeedbackData|null>(null);
   const pendingCareFeedback=useRef<CareFeedbackData|null>(null);
   const lastTug=useRef(0);
   const [action, setAction] = useState('idle');
@@ -369,7 +370,7 @@ export default function App() {
     if(!completed||!run||!saved||saved.createdAt!==run.petId||performance.now()<run.endsAt)return
     const current=tick(saved),amount=Math.min(6,100-current.stats.happiness),next={...current,stats:{...current.stats,happiness:current.stats.happiness+amount,energy:Math.max(0,current.stats.energy-3)}}
     petRef.current=next;setPet(next,'完成一起玩耍：心情奖励与精力消耗')
-    if(amount>0){setCareFeedback({id:Date.now(),petId:next.createdAt,gains:[{key:'happiness',label:'心情',amount:Math.round(amount*10)/10,image:'./assets/original/ui/status-happy.png'}]});clearTimeout(timers.current.feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2300)}
+    if(amount>0){setCareFeedback({id:Date.now(),petId:next.createdAt,gains:[{key:'happiness',label:'心情',amount:Math.round(amount*10)/10,image:'./assets/original/ui/icon-happy.png'}]});clearTimeout(timers.current.feedback);timers.current.feedback=setTimeout(()=>setCareFeedback(null),2300)}
     const title=UPLOADED_TOYS.find(t=>t.id===run.id)!.name;setMemory(m=>m?recordEvent(m,{kind:'play-original',detail:`你陪我玩了${title}。`}):m)
   }
   function stopUploaded(){uploadedRun.current=null;clearTimeout(timers.current.animation);finishCareFeedback();setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}
@@ -449,6 +450,9 @@ export default function App() {
     setBubbleVisible(false);
   }
   useDesktopPetStatus(pet);
+  useEffect(()=>{
+    void window.desktop?.setPetArtworkBounds?.(petMode&&current.wearing&&!reading&&!workingAway?{x:-100,y:-80,width:360,height:420}:null).catch(()=>{});
+  },[petMode,current.wearing,reading,workingAway]);
   const effectId=action.startsWith('element-')?action.slice(8):null;
   const importedEffect=uploadedMotion(appearance.form,action,actionItemId);
   const previousEffectMode=useRef(floating);
@@ -659,9 +663,18 @@ export default function App() {
     const before = tick(saved, now), result = rewardGame(before, safeScore, now,Math.random,round);
     const food = result.rewardItem;
     apply(result, 'reward', `我们一起在${roomMedia.background.label}完成了《${game ? GAME_LABELS[game] : '小屋游戏'}》，得到${safeScore}分，收获${result.state.coins-before.coins}摩尔豆。`);
+    if(result.ok)gameFeedback.current=mergeCareFeedback(gameFeedback.current,{id:now,petId:before.createdAt,gains:gameGains(before,result.state)});
     return { ok: result.ok, coins: result.state.coins - before.coins, growth: Math.round((result.state.growth - before.growth) * 100) / 100,
       food: food ? (result.state.inventory[food.id] ?? 0) - (before.inventory[food.id] ?? 0) : 0, itemId:food?.id,prize:result.prize,baseCoins:result.baseCoins,bonusCoins:result.bonusCoins,message: result.message };
   }
+
+  useEffect(()=>{
+    if(game!==null||!gameFeedback.current)return;
+    const receipt=gameFeedback.current;gameFeedback.current=null;
+    if(receipt.petId!==petRef.current?.createdAt||!receipt.gains.length)return;
+    clearTimeout(timers.current.feedback);setBubbleVisible(false);setCareFeedback(receipt);
+    timers.current.feedback=setTimeout(()=>setCareFeedback(null),2300);
+  },[game]);
 
   const mood = getCompanionMood(currentMemory, current);
   const habits=getPetHabits(currentMemory);

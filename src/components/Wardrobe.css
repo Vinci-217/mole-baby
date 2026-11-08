@@ -15,3 +15,15 @@
 .wardrobe-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:380px}.wardrobe-grid>button{gap:5px;min-width:0;padding:7px 3px}.wardrobe-grid img{width:48px;height:48px}.wardrobe-grid b{font-size:14px;line-height:1.3;text-align:center;overflow-wrap:anywhere}.wardrobe-grid span{font-size:13px}.wardrobe-choice{margin-top:9px;gap:8px}.wardrobe-choice p{font-size:14px;margin:0}.wardrobe-pages{display:flex;align-items:center;justify-content:center;gap:22px;margin:10px 0;color:#976029}.wardrobe-pages>button{font:inherit;border:0;background:#fff2c5;border-radius:8px;padding:3px 12px;color:#a55f14;cursor:pointer}.wardrobe-pages>button:disabled{opacity:.35;cursor:default}.wardrobe-actions{display:flex;gap:7px}.wardrobe-actions>button{display:grid;place-items:center;width:34px;height:34px;padding:5px;border:1px solid #e9c479;border-radius:9px;background:#fffdf0;cursor:pointer}.wardrobe-actions img{width:25px;height:25px;object-fit:contain}.wardrobe-actions>button[aria-pressed=true]{background:#ffe88e;border-color:#e29825}
 
 .wardrobe-actions{display:grid;grid-template-columns:repeat(4,34px);gap:7px}
+
+/* Every page occupies the same 3x3 frame, including the final empty slots. */
+.wardrobe-grid{aspect-ratio:1;grid-template-rows:repeat(3,minmax(0,1fr))}
+.wardrobe-grid>button,.wardrobe-empty{min-height:0;aspect-ratio:auto;box-sizing:border-box;border:2px solid #edcf91;border-radius:14px}
+.wardrobe-empty{background:#f6eddf;border-style:dashed;opacity:.65}
+.wardrobe-grid>button{gap:3px;padding:5px 3px}
+.wardrobe-grid img{width:40px;height:40px;flex-shrink:0}
+.wardrobe-grid b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wardrobe-grid span{line-height:1.3}
+.wardrobe-pages{min-height:30px;flex-shrink:0}
+.wardrobe-mirror{touch-action:none;cursor:grab}.wardrobe-mirror[data-dragging=true]{cursor:grabbing}
+@media(max-width:380px){.wardrobe-mirror>.ram-sprite{width:90px}.wardrobe-grid img{width:32px;height:32px}.wardrobe-grid b{font-size:12px}.wardrobe-grid span{font-size:11px}}

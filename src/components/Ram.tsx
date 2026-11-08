@@ -1,6 +1,7 @@
 import {dailyFrameSpec} from '../daily-frames';
 import UploadedLamuFrames from './UploadedLamuFrames';
 import OfficialRamClip from './OfficialRamClip';
+import OfficialOutfitMotion from './OfficialOutfitMotion';
 import OfficialTransformation from './OfficialTransformation';
 import {originalActionClip,originalItemClip,playbackForm,usesTransformationSmoke} from '../pet-original-actions';
 import {OFFICIAL_CLIPS,isOfficialAction,supportsOfficial} from '../official-clips';
@@ -608,8 +609,8 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   if(!reading&&!magicAction&&explicitOfficial&&officialForm&&usesTransformationSmoke(explicitOfficial))return <span className="ram-sprite ram-classic ram-transform" role="img" aria-label={`拉姆变身：${explicitOfficial.name}`} data-action={action}>
     <OfficialTransformation key={eventKey} clip={explicitOfficial} form={officialForm} color={color} startedAt={clock.current.startedAt} sound={gameSound} volume={soundVolume} onEnd={onActionEnd}><Ram color={color} costume={costume} stage={actualStage} evolution={actualEvolution} action="still" sound={false}/></OfficialTransformation>
   </span>;
-  if(!reading&&!magicAction&&sourceClip&&officialForm)return <span className="ram-sprite ram-classic ram-official" role="img" aria-label={`${petColorName(color)}拉姆 · ${sourceClip.name}`} data-stage={stage} data-growth-stage={actualStage} data-form={officialForm} data-color={color} data-action={action}>
-    <OfficialRamClip key={finiteOriginal?eventKey:'costume'} clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={action} finite={finiteOriginal} registerBody={!finiteOriginal} sound={gameSound} volume={soundVolume} onEnd={onActionEnd} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
+  if(!reading&&!magicAction&&sourceClip&&officialForm)return <span className={`ram-sprite ram-classic ram-official action-${activeAction} ${resting?'is-sleeping':''} ${dragging?'is-dragging':''} ${shaking?'is-shaking':''} ${className}`} role="img" aria-label={`${petColorName(color)}拉姆 · ${sourceClip.name}`} data-stage={stage} data-growth-stage={actualStage} data-form={officialForm} data-color={color} data-action={activeAction}>
+    {finiteOriginal?<OfficialRamClip key={eventKey} clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={action} finite sound={gameSound} volume={soundVolume} onEnd={onActionEnd} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>:<OfficialOutfitMotion startedAt={clock.current.startedAt} stage={stage} evolution={evolution} form={officialForm} action={activeAction} actionId={actionId} dragging={dragging} tilt={tilt} onEnd={onActionEnd}>{pose=><OfficialRamClip clip={sourceClip} form={officialForm} bodyForm={ramForm(actualStage,actualEvolution)} color={color} action={pose} registerBody sound={gameSound} volume={soundVolume} fallback={<Ram color={color} stage={stage} evolution={evolution} action="still" sound={false}/>}/>}</OfficialOutfitMotion>}
   </span>
   const label = `${petColorName(color)}${['种子期', '初级', '中级', '高级', '神力'][stage]}拉姆，${stage === 0 ? '花盆可以拖动，' : ''}${lifeAction?PASTIME_LABELS[lifeAction]:itemMotion?.label ?? ACTION_NAMES[activeAction] ?? ACTION_NAMES.idle}`
   if(daily)return <span className={`ram-sprite ram-classic ram-daily${reading?' ram-reading':''}`} role="img" aria-label={label} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-life-action={lifeAction} data-color={color} data-sleeping={resting?'true':'false'} data-art-style="classic" data-daily-action={daily.id}>

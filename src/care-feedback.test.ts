@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {care,createPet} from './game'
-import {careGains} from './care-feedback'
+import {careGains,gameGains} from './care-feedback'
 const now=1_800_000_000_000
 function use(id:string,stats={}){const pet=createPet('小芽','red',now);Object.assign(pet.stats,stats);pet.inventory[id]=1;return {before:pet,result:care(pet,'use',id,now)}}
 describe('actual care gains',()=>{
@@ -8,6 +8,14 @@ describe('actual care gains',()=>{
  it('lists every restored need of a multi-effect item in status order',()=>{const {before,result}=use('180005',{hunger:90,thirst:85,cleanliness:97,happiness:50,health:10});expect(careGains(before,result.state,'180005').map(g=>[g.key,g.amount])).toEqual([['hunger',10],['thirst',15],['cleanliness',3],['happiness',20],['health',90]])})
  it('omits full or unchanged stats and never attaches gains to another pet',()=>{const {before,result}=use('biscuit',{hunger:100});expect(careGains(before,result.state,'biscuit')).toEqual([]);expect(careGains(before,{...result.state,createdAt:now+1},'biscuit')).toEqual([]);expect(careGains(before,result.state,'missing')).toEqual([])})
  it('announces the consumed potion colour without a fake numeric reward',()=>{const {before,result}=use('recolor-blue');expect(result.ok).toBe(true);expect(careGains(before,result.state,'recolor-blue')).toEqual([expect.objectContaining({key:'color',label:'变为蓝色'})]);expect(careGains(result.state,result.state,'recolor-blue')).toEqual([])})
+})
+
+it('shows actual game beans and capped happiness with existing icons',()=>{
+ const before=createPet('小芽','red',now);before.stats.happiness=98
+ const after={...before,coins:before.coins+120,stats:{...before.stats,happiness:100}}
+ expect(gameGains(before,after)).toEqual([{key:'coins',label:'摩尔豆',amount:120,image:'./assets/original/ui/icon-medal.png'},{key:'happiness',label:'心情',amount:2,image:'./assets/original/ui/icon-happy.png'}])
+ expect(gameGains(after,after)).toEqual([])
+ expect(gameGains(before,{...after,createdAt:now+1})).toEqual([])
 })
 
 it('merges interrupted care receipts once, totals actual gains and never crosses pet identity',async()=>{

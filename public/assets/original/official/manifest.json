@@ -5925,9 +5925,7 @@
       "bytes": 26789,
       "symbol": "1200001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -5943,9 +5941,7 @@
       "bytes": 26870,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -5961,9 +5957,7 @@
       "bytes": 27022,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -5979,9 +5973,7 @@
       "bytes": 26717,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -5997,10 +5989,7 @@
       "bytes": 28887,
       "symbol": "1200005_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4",
-        "level5"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6016,9 +6005,7 @@
       "bytes": 131600,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6034,9 +6021,7 @@
       "bytes": 50308,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6052,9 +6037,7 @@
       "bytes": 23961,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6089,9 +6072,7 @@
       "bytes": 40866,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6107,7 +6088,6 @@
       "bytes": 187143,
       "symbol": "1200011_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6127,7 +6107,6 @@
       "bytes": 89939,
       "symbol": "1200012_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6147,9 +6126,7 @@
       "bytes": 47223,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6165,9 +6142,7 @@
       "bytes": 69458,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6183,9 +6158,7 @@
       "bytes": 107296,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6201,7 +6174,6 @@
       "bytes": 326592,
       "symbol": "1200016_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6221,9 +6193,7 @@
       "bytes": 66768,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6239,7 +6209,6 @@
       "bytes": 51168,
       "symbol": "1200018_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6263,7 +6232,6 @@
       "bytes": 309542,
       "symbol": "1200019_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6283,9 +6251,7 @@
       "bytes": 33827,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6301,7 +6267,6 @@
       "bytes": 182259,
       "symbol": "1200021_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6321,7 +6286,6 @@
       "bytes": 83150,
       "symbol": "1200022_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6341,7 +6305,6 @@
       "bytes": 131227,
       "symbol": "1200023_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6361,7 +6324,6 @@
       "bytes": 99087,
       "symbol": "1200024_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6381,10 +6343,6 @@
       "bytes": 30786,
       "symbol": "1200025_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
         "level101"
       ],
       "level": 0,
@@ -6401,7 +6359,6 @@
       "bytes": 47915,
       "symbol": "1200026_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6467,9 +6424,7 @@
       "bytes": 80093,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6504,9 +6459,7 @@
       "bytes": 96299,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6540,7 +6493,6 @@
       "bytes": 76749,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6560,10 +6512,7 @@
       "bytes": 149357,
       "symbol": "1200035_fla.lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -6579,7 +6528,6 @@
       "bytes": 197891,
       "symbol": "1200036_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6805,7 +6753,6 @@
       "bytes": 210271,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6825,7 +6772,6 @@
       "bytes": 228577,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6845,7 +6791,6 @@
       "bytes": 225744,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6968,7 +6913,6 @@
       "bytes": 5320,
       "symbol": "1200055_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -6992,7 +6936,6 @@
       "bytes": 5386,
       "symbol": "1200056_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7016,11 +6959,7 @@
       "bytes": 37246,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7036,11 +6975,7 @@
       "bytes": 28486,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7056,11 +6991,7 @@
       "bytes": 57077,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7076,11 +7007,7 @@
       "bytes": 101323,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7096,7 +7023,6 @@
       "bytes": 254118,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7116,11 +7042,7 @@
       "bytes": 44297,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7136,11 +7058,7 @@
       "bytes": 58679,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7356,7 +7274,6 @@
       "bytes": 51469,
       "symbol": "1200075_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7380,7 +7297,6 @@
       "bytes": 51137,
       "symbol": "1200076_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7424,9 +7340,7 @@
       "bytes": 62820,
       "symbol": "1200055_fla.111lamu_mc_1",
       "forms": [
-        "level2",
-        "level3",
-        "level4"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7502,11 +7416,7 @@
       "bytes": 60434,
       "symbol": "1200082_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -7542,7 +7452,6 @@
       "bytes": 48516,
       "symbol": "1200084_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7562,7 +7471,6 @@
       "bytes": 56771,
       "symbol": "1200085_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7582,7 +7490,6 @@
       "bytes": 57922,
       "symbol": "1200086_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7602,7 +7509,6 @@
       "bytes": 48082,
       "symbol": "1200087_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -7782,7 +7688,6 @@
       "bytes": 36867,
       "symbol": "_1200096_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -8062,11 +7967,7 @@
       "bytes": 38123,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8082,11 +7983,7 @@
       "bytes": 45840,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8102,11 +7999,7 @@
       "bytes": 43857,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8141,11 +8034,7 @@
       "bytes": 94099,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8161,11 +8050,7 @@
       "bytes": 79103,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8181,11 +8066,7 @@
       "bytes": 24640,
       "symbol": "_1200116_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8201,11 +8082,7 @@
       "bytes": 24646,
       "symbol": "_1200117_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8221,11 +8098,7 @@
       "bytes": 24669,
       "symbol": "_00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8241,7 +8114,6 @@
       "bytes": 23700,
       "symbol": "_00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
         "level2",
         "level3",
         "level4",
@@ -8261,11 +8133,7 @@
       "bytes": 29387,
       "symbol": "_00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8281,11 +8149,7 @@
       "bytes": 23252,
       "symbol": "_00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8301,11 +8165,7 @@
       "bytes": 24660,
       "symbol": "_00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8321,11 +8181,7 @@
       "bytes": 212588,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,
@@ -8341,11 +8197,7 @@
       "bytes": 74119,
       "symbol": "00001_fla.lamu_mc_1",
       "forms": [
-        "level1",
-        "level2",
-        "level3",
-        "level4",
-        "level101"
+        "level2"
       ],
       "level": 0,
       "fps": 24.0,

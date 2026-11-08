@@ -27,7 +27,14 @@ describe('bundled original animation integration',()=>{
   const cap=officialClip(ORIGINAL_OUTFITS.find(row=>row.sourceId==='1200001')!.clipId)!
   const juniorOnly={...cap,forms:['level2']}
   for(const form of ['junior','middle','senior','classic','super','water','wood','fire'] as const)expect(officialOutfitForm(juniorOnly,form)).toBe('junior')
-  for(const form of ['junior','middle','senior'] as const)expect(officialOutfitForm(cap,form)).toBe(form)
+  for(const form of ['junior','middle','senior'] as const)expect(officialOutfitForm(cap,form)).toBe('junior')
+  const book=outfitAnimation('magic-book')!
+  for(const form of ['junior','middle','senior','super'] as const)expect(officialOutfitForm(book,form)).toBe(form)
+  const ball=OFFICIAL_CLIPS.find(clip=>clip.path.endsWith('/1200005.swf'))!
+  expect(ball.forms).toEqual(['level2']);expect(officialOutfitForm(ball,'middle')).toBe('junior')
+  const classicOnly=OFFICIAL_CLIPS.find(clip=>clip.path.endsWith('/1200025.swf'))!
+  for(const form of ['junior','middle','senior','classic','super','water','wood','fire'] as const)expect(officialOutfitForm(classicOnly,form)).toBe('classic')
+  expect(officialOutfitForm(classicOnly,'seed')).toBeUndefined()
   expect(officialOutfitForm(juniorOnly,'seed')).toBeUndefined()
   const singleBody={...cap,base:false,forms:[],level:0}
   expect(officialOutfitForm(singleBody,'senior')).toBe('junior');expect(supportsOfficial(singleBody,'senior')).toBe(false)
@@ -44,7 +51,8 @@ describe('bundled original animation integration',()=>{
   const removed=wearOutfit(restored).state;expect(petAppearance(removed)).toEqual({stage:4,form:'super',evolution:'super'})
   expect(petAppearance({...actual,wearing:'party-cap'}).form).toBe('junior')
   expect(petAppearance({...actual,wearing:'magic-book'}).form).toBe('super')
-  for(const [growth,form] of [[180,'middle'],[420,'senior']] as const)expect(petAppearance({...dressed,growth,evolution:undefined}).form).toBe(form)
+  for(const growth of [180,420])expect(petAppearance({...dressed,growth,evolution:undefined}).form).toBe('junior')
+  for(const [growth,form] of [[180,'middle'],[420,'senior']] as const)expect(petAppearance({...dressed,wearing:'magic-book',growth,evolution:undefined}).form).toBe(form)
  })
  it('uses native SWF for all legacy and new clothes; switching to seed unequips but retains collection',()=>{
   expect(ALL_OUTFITS).toHaveLength(122);

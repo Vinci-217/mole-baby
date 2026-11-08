@@ -16,6 +16,13 @@ export function careGains(before:GameState,after:GameState,itemId:string):CareGa
   })
 }
 
+/** A completed game's receipt follows the real capped save changes. */
+export function gameGains(before:GameState,after:GameState):CareGain[] {
+ if(before.createdAt!==after.createdAt)return []
+ const coins=after.coins-before.coins,happiness=Math.round((after.stats.happiness-before.stats.happiness)*10)/10
+ return [...(coins>0?[{key:'coins',label:'摩尔豆',amount:coins,image:'./assets/original/ui/icon-medal.png'}]:[]),...(happiness>0?[{key:'happiness',label:'心情',amount:happiness,image:'./assets/original/ui/icon-happy.png'}]:[])]
+}
+
 /** Rapid single clicks commit inventory immediately. If the current care clip
  * is replaced, collect its receipt into the next completion, once per pet. */
 export function mergeCareFeedback(previous:CareFeedbackData|null,next:CareFeedbackData):CareFeedbackData {

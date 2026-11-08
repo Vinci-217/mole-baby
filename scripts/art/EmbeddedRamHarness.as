@@ -61,6 +61,9 @@ package §1200026_fla§ {
    requestedSymbol=String(params.symbol||"");
    form=String(params.form||"");
    registerBody=params.registerBody=="1";referenceForm=String(params.referenceForm||form);
+   // Register clothes against the resting down pose, before any walk starts.
+   // The moving body's squash must not decide a newly worn outfit's size.
+   if(registerBody)moving=false;
    if(params.base){
     baseLoader=new Loader();
     baseLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onError);
@@ -120,8 +123,8 @@ package §1200026_fla§ {
    for each(var f:FrameLabel in mc.currentLabels)if(f.name==label)return true;
    return false;
   }
-  public function previewPose(nextForm:String,nextDirection:String,isMoving:Boolean):void {
-   if(nextForm!=form)registered=false;
+  public function previewPose(nextForm:String,nextDirection:String,isMoving:Boolean,refreshRegistration:Boolean=false):void {
+   if(nextForm!=form||refreshRegistration)registered=false;
    form=nextForm;direction=nextDirection;moving=isMoving;
    bones=[null,null,null,null];directionMC=null;
    if(baseRoot){baseRoot.gotoAndStop(1);baseRoot.gotoAndStop(form);}
@@ -152,10 +155,21 @@ package §1200026_fla§ {
    if(mc.totalFrames>4)mc.addFrameScript(mc.totalFrames-3,restartBody);
    if(index==1||index==0&&!bones[1]){
     if(index==1&&mc.totalFrames>3)mc.addFrameScript(2,syncBones);
-    if(moving||form!="level2"&&form!="level3")mc.gotoAndPlay(Math.min(2,mc.totalFrames));
+    if(moving||form!="level2"&&form!="level3"||index==0&&!baseRoot&&!bones[1])mc.gotoAndPlay(Math.min(2,mc.totalFrames));
     else mc.gotoAndStop(Math.min(2,mc.totalFrames));
    }
-   if(bones[1]&&bones[3]&&bones[1].parent)bones[1].parent.addChild(bones[3]);
+   if(bones[1]&&bones[3]&&bones[1].parent&&bones[3].parent!=bones[1].parent){
+    // Exported costume direction containers have their own authoring offset.
+    // Preserve the original artwork's coordinates when attaching it to the
+    // body's rig; addChild alone discards that parent's transformation.
+    var cloth:MovieClip=bones[3];
+    var parentNode:DisplayObjectContainer=bones[1].parent;
+    var origin:Point=parentNode.globalToLocal(cloth.localToGlobal(new Point()));
+    var axisX:Point=parentNode.globalToLocal(cloth.localToGlobal(new Point(1,0)));
+    var axisY:Point=parentNode.globalToLocal(cloth.localToGlobal(new Point(0,1)));
+    parentNode.addChild(cloth);
+    cloth.transform.matrix=new Matrix(axisX.x-origin.x,axisX.y-origin.y,axisY.x-origin.x,axisY.y-origin.y,origin.x,origin.y);
+   }
    syncBones();
   }
   public function syncBones():void {
@@ -194,29 +208,35 @@ package §1200026_fla§ {
      var body:Rectangle=nativeBody.getBounds(holder);
      var target:Array=referenceForm=="level3"?[22.093,46.312,81.823,88.774]:referenceForm=="level4"?[18.75,53.481,76.042,101.25]:referenceForm=="level101"?[26.562,48.808,72.396,87.75]:referenceForm=="level101_7"?[26.042,60.231,70.312,97.096]:referenceForm=="level5_2"?[16.667,48.808,80.208,96.577]:referenceForm=="level5_4"?[20.312,56.596,75,97.615]:referenceForm=="level5_1"?[19.792,48.288,81.25,97.096]:[21.597,42.63,80.655,91.6];
      if(body.width<=0)return;
-     fittedScale=stage.stageWidth*(target[2]-target[0])/100/body.width;
-     fitX=stage.stageWidth*(target[0]+target[2])/200-(body.x+body.width/2)*fittedScale;
-     fitY=stage.stageHeight*target[3]/108-body.bottom*fittedScale;
+     fittedScale=400*(target[2]-target[0])/100/body.width;
+     fitX=400*(target[0]+target[2])/200-(body.x+body.width/2)*fittedScale;
+     fitY=432*target[3]/108-body.bottom*fittedScale;
      registration={basis:bones[1]?"body-bone":nativeBody.name=="petBody"?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
      registered=true;
     }
    }else if(!registered){
-    fittedScale=Math.min(6,stage.stageWidth*.92/bounds.width,stage.stageHeight*.88/bounds.height);
-    fitX=stage.stageWidth/2-(bounds.x+bounds.width/2)*fittedScale;
-    fitY=stage.stageHeight*.53-(bounds.y+bounds.height/2)*fittedScale;
+    fittedScale=Math.min(6,400*.92/bounds.width,432*.88/bounds.height);
+    fitX=200-(bounds.x+bounds.width/2)*fittedScale;
+    fitY=432*.53-(bounds.y+bounds.height/2)*fittedScale;
     registered=true;
    }
    holder.scaleX=holder.scaleY=fittedScale*zoom;
-   holder.x=fitX;holder.y=fitY;
+   // Transparent padding surrounds the fixed logical body viewport. Body
+   // registration still uses 400x432; oversized hats must never shrink it.
+   holder.x=440+fitX;holder.y=475.2+fitY;
   }
   public function previewZoom(value:Number):void {zoom=value;fit();}
   public function setBodyColor(r:int,g:int,b:int):void {tint=new ColorTransform(1,1,1,1,r,g,b,0);if(bones[1])bones[1].transform.colorTransform=tint;}
   public function previewStatus():Object {
    var frames:Array=[];
+   var rig:Array=[];
    for each(var mc:MovieClip in bones)frames.push(mc?mc.currentFrame:0);
-   return {ready:ready,settled:settle==0,ended:ended,error:failure,symbol:requestedSymbol,form:form,direction:direction,
+   for each(mc in bones){if(mc){var b:Rectangle=mc.getBounds(holder);rig.push({x:mc.x,y:mc.y,scaleX:mc.scaleX,scaleY:mc.scaleY,parent:mc.parent?mc.parent.name:"",bounds:{x:b.x,y:b.y,width:b.width,height:b.height}});}else rig.push(null);}
+   var painted:Rectangle=holder.getBounds(this);
+   return {ready:ready,settled:settle==0,ended:ended,error:failure,symbol:requestedSymbol,form:form,direction:direction,moving:moving,
+    viewport:{width:stage.stageWidth,height:stage.stageHeight},painted:{x:painted.x,y:painted.y,width:painted.width,height:painted.height},
     width:holder.getBounds(holder).width,height:holder.getBounds(holder).height,
-    registration:registration,bones:frames,frame:selected is MovieClip?MovieClip(selected).currentFrame:0};
+    registration:registration,bones:frames,rig:rig,frame:selected is MovieClip?MovieClip(selected).currentFrame:0};
   }
  }
 }

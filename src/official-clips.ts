@@ -25,7 +25,10 @@ export function supportsOfficial(clip:OfficialClip,form:RamForm){
 export function officialOutfitForm(clip:OfficialClip,form:RamForm):RamForm|undefined{
  if(form==='seed'||clip.kind!=='outfit')return;
  if(supportsOfficial(clip,form))return form;
- return supportsOfficial(clip,'junior')?'junior':undefined;
+ if(supportsOfficial(clip,'junior'))return 'junior';
+ // A few full costumes contain only a classic Super Ram. Use that complete
+ // original appearance as a cosmetic, keeping the pet's actual growth intact.
+ return (['classic','super','middle','senior','water','wood','fire'] as const).find(candidate=>supportsOfficial(clip,candidate));
 }
 export const OFFICIAL_GROUPS=[['outfit','原版装扮'],['care','道具互动'],['school','课堂动作'],['magic','魔法动作'],['transform','变身'],['skill','技能'],['body','基础动作']] as const
 

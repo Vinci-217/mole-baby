@@ -68,6 +68,7 @@ declare global {
       setCompanionPanel: (open: boolean, layout?: 'compact' | 'classic' | 'profile') => Promise<DesktopState>;
       setPetStatus:(status:{name:string;stage:number;sleeping:boolean;stats:Record<string,number>;activity?:'course'|'restaurant'|'outing'}|null)=>Promise<void>;
       setPetEffectBounds:(bounds:{x:number;y:number;width:number;height:number}|null)=>Promise<DesktopState>;
+      setPetArtworkBounds?:(bounds:{x:number;y:number;width:number;height:number}|null)=>Promise<DesktopState>;
       setPetAppearance:(form:string)=>Promise<DesktopState>;
       setPetCanMove: (enabled: boolean) => Promise<boolean>;
       setEdgeHiding: (enabled: boolean) => Promise<boolean>;

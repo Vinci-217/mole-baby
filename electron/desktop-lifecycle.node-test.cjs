@@ -156,6 +156,33 @@ test('delayed Windows placement preserves the spell anchor and the position rest
  run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),base);
 });
 
+for(const platform of ['win32','darwin','linux'])test(`${platform}: wide native outfits retain their anchor and remain draggable through panels, spells and resizing`,async t=>{
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.invoke('desktop:move-pet',-700,-400);const base=run.window.getBounds(),art={x:-100,y:-80,width:360,height:420};
+ const anchor=()=>{const state=run.invoke('desktop:get-state'),bounds=run.window.getBounds();return{x:bounds.x+(state.panelGeometry?.petX??state.petOffset.x)*state.petScale,y:bounds.y+(state.panelGeometry?.petY??state.petOffset.y)*state.petScale}};
+ run.invoke('desktop:set-pet-artwork-bounds',art);assert.deepEqual(anchor(),{x:base.x,y:base.y});assert.ok(run.window.bounds.width>=360);assert.equal(run.invoke('desktop:get-state').effectExpanded,false);
+ if(platform==='win32')assert.deepEqual(run.window.maximum,[run.window.bounds.width,run.window.bounds.height],'Windows fixed-frame limits must expand with the artwork');
+ assert.equal(run.invoke('desktop:prepare-pet-drag'),true);assert.equal(run.invoke('desktop:start-pet-drag'),true);run.cursor.x+=30;run.cursor.y+=20;run.invoke('desktop:end-pet-drag');const moved={x:base.x+30,y:base.y+20};assert.deepEqual(anchor(),moved);assert.ok(run.window.bounds.width>=360);
+ for(let i=0;i<3;i++){run.invoke('desktop:set-companion-panel',true);assert.deepEqual(anchor(),moved);assert.ok(run.window.bounds.x<=moved.x-100);run.invoke('desktop:set-companion-panel',false);assert.deepEqual(anchor(),moved);}
+ run.invoke('desktop:set-pet-effect-bounds',{x:-200,y:-300,width:600,height:700});run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(anchor(),moved);assert.ok(run.window.bounds.width>=360);
+ run.invoke('desktop:set-pet-scale',1.5);assert.equal(run.invoke('desktop:get-state').petScale,1.5);assert.ok(run.window.bounds.width>=540);const scaled=anchor();
+ await run.invoke('desktop:open-size-editor');assert.equal(run.invoke('desktop:get-state').petResizing,true);assert.equal(run.window.bounds.width,240);run.invoke('desktop:finish-pet-resize',true);assert.deepEqual(anchor(),scaled);assert.ok(run.window.bounds.width>=540);
+ run.invoke('desktop:set-pet-mode',false);run.invoke('desktop:set-pet-mode',true);assert.deepEqual(anchor(),scaled);assert.ok(run.window.bounds.width>=540);
+ run.display.workArea={x:0,y:0,width:800,height:600};run.screen.emit('display-metrics-changed');const fit=require('./desktop-geometry.cjs').fitPetBounds(scaled,run.display.workArea,1.5);assert.deepEqual(anchor(),{x:fit.x,y:fit.y});
+ const afterMonitor=anchor();run.invoke('desktop:set-pet-artwork-bounds',null);assert.deepEqual(anchor(),afterMonitor);assert.equal(run.window.bounds.width,240);assert.equal(run.window.bounds.height,360);
+ if(platform==='win32')assert.deepEqual(run.window.maximum,[240,360]);
+ for(const bad of [{...art,x:NaN},{...art,width:0},{...art,height:Infinity},true,[]])assert.throws(()=>run.invoke('desktop:set-pet-artwork-bounds',bad));
+});
+
+test('delayed Windows movement does not drift the enlarged outfit body or saved anchor',async t=>{
+ const run=await launch(undefined,false,'win32',{delayedMove:true});t.after(()=>run.cleanup());run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);run.invoke('desktop:move-pet',-700,-400);const base=run.window.getBounds();
+ run.invoke('desktop:set-pet-artwork-bounds',{x:-100,y:-80,width:360,height:420});await new Promise(resolve=>setImmediate(resolve));
+ let state=run.invoke('desktop:get-state'),actual=run.window.getBounds();assert.equal(actual.x+state.petOffset.x,base.x);assert.equal(actual.y+state.petOffset.y,base.y);
+ run.invoke('desktop:move-pet',20,15);await new Promise(resolve=>setImmediate(resolve));state=run.invoke('desktop:get-state');actual=run.window.getBounds();assert.equal(actual.x+state.petOffset.x,base.x+20);assert.equal(actual.y+state.petOffset.y,base.y+15);
+ run.invoke('desktop:set-pet-artwork-bounds',null);assert.equal(run.window.bounds.x,base.x+20);assert.equal(run.window.bounds.y,base.y+15);
+});
+
 test('room fullscreen restores its normal bounds and exits before returning to the compact pet',async t=>{
  const run=await launch();t.after(()=>run.cleanup());run.send('desktop:ready-to-show',true);
  const normal=run.window.getBounds();await run.invoke('desktop:set-room-fullscreen',true);

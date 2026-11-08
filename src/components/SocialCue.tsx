@@ -1,7 +1,7 @@
 import type { Evolution, Stage } from '../game';
 import { isSocialAction, sampleSocialMotion } from '../social-motion';
 
-export function paintSocialCue(canvas: HTMLCanvasElement, stage: Stage, action: string, elapsed: number, reduced: boolean, evolution?: Evolution) {
+export function paintSocialCue(canvas: HTMLElement, stage: Stage, action: string, elapsed: number, reduced: boolean, evolution?: Evolution) {
   const root=canvas.closest<HTMLElement>('.ram-sprite'); if(!root||!isSocialAction(action)) return;
   const pose=sampleSocialMotion(stage,action,elapsed,reduced,evolution);
   const values={opacity:String(pose.opacity),angle:`${pose.bodyAngle}deg`,lift:`${pose.bodyY}%`,x:`${pose.bodyX}%`,scaleX:String(pose.bodyScaleX),scaleY:String(pose.bodyScaleY),contact:String(pose.contact),affection:String(pose.affection),heartY:`${pose.heartY}%`,bx:`${pose.ballX}%`,by:`${pose.ballY}%`,spin:`${pose.ballAngle}deg`,hx:`${pose.handX}%`,hy:`${pose.handY}%`,handwidth:`${pose.handWidth}%`,bookx:`${pose.bookX}%`,booky:`${pose.bookY}%`,page:`${pose.page}deg`,pageOpacity:String(pose.pageOpacity),readTilt:`${pose.readTilt}deg`};

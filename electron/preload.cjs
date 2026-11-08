@@ -75,6 +75,7 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   },
   setPetStatus:status=>ipcRenderer.invoke('desktop:set-pet-status',status),
   setPetEffectBounds:bounds=>ipcRenderer.invoke('desktop:set-pet-effect-bounds',bounds),
+  setPetArtworkBounds:bounds=>ipcRenderer.invoke('desktop:set-pet-artwork-bounds',bounds),
   setPetAppearance:form=>ipcRenderer.invoke('desktop:set-pet-appearance',form),
   setRoomFullscreen:enabled=>ipcRenderer.invoke('desktop:set-room-fullscreen',enabled),
   startRoomResize:edge=>ipcRenderer.invoke('desktop:start-room-resize',edge),

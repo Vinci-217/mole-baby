@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'scripts/client-library'))
 from collect_ram_official import abc_strings
+from outfit_forms import playable_outfit_forms
 VAULT=ROOT/'local-assets/ram-official-sweep/2026-11-06'
 OUT=ROOT/'public/assets/original/official'
 KINDS={'装扮／变身动作':'outfit','道具互动动作':'care','课堂／学习动作':'school',
@@ -38,6 +39,9 @@ def main():
   strings=abc_strings(data);needsBase='petBone3' in strings and 'petBone1' not in strings
   forms=[l['name'] for l in main['labels'] if l['name'].startswith('level')] if main else []
   if needsBase:forms=[form for form in forms if form in ['level1','level2','level3','level4','level101']]
+  if kind=='outfit':
+   available=playable_outfit_forms(source,main['symbol'] if main else '')
+   forms=[form for form in forms if form in available]
   clips.append(dict(id=ident,name=name,kind=kind,path=row['path'],sha256=row['sha256'],base=needsBase,
    bytes=len(data),symbol=main['symbol'] if main else '',forms=forms,
    level=int(level[1]) if level else 0,fps=row.get('fps',24),animated=bool(row.get('multiFrameTimelines'))))
@@ -57,7 +61,7 @@ def main():
  subprocess.run(['java','-Xmx450m','-jar','/opt/jpexs/26.4.0/ffdec-cli.jar','-replace',str(source),str(destination),'§1200026_fla§.lamu_mc_1',str(ROOT/'scripts/art/EmbeddedRamHarness.as')],check=True)
  data=destination.read_bytes();body=zlib.decompress(data[8:]) if data[:3]==b'CWS' else data[8:]
  body=body.replace(b'1200026_fla',b'preview_fla');oldRect=(5+4*(body[0]>>3)+7)//8
- bits=15;encoded=f'{bits:05b}'+''.join(f'{v:0{bits}b}' for v in [0,8000,0,8640]);encoded+='0'*((-len(encoded))%8)
+ bits=16;encoded=f'{bits:05b}'+''.join(f'{v:0{bits}b}' for v in [0,25600,0,27648]);encoded+='0'*((-len(encoded))%8)
  body=int(encoded,2).to_bytes(len(encoded)//8,'big')+body[oldRect:]
  destination.write_bytes(b'CWS'+data[3:4]+struct.pack('<I',len(body)+8)+zlib.compress(body))
  receipt=dict(files=len(clips),newOutfits=len(outfits),bytes=sum(c['bytes'] for c in clips),categories={k:sum(c['kind']==k for c in clips) for k in sorted(set(c['kind'] for c in clips))},

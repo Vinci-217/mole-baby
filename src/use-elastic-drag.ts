@@ -30,7 +30,7 @@ export function useElasticDrag(root:RefObject<HTMLElement|null>,stage:Stage,nati
     sprite.dataset.pullPhase=s.held?s.turnPulse?'turn':'pull':moving?'release':'idle'
     // Publish the pose after its inputs. Independent body RAF registration
     // must not leave one form sampling the previous drag frame.
-    if(young&&(s.held||moving))sprite.dispatchEvent(new Event('ram-drag-motion'))
+    if(s.held||moving)sprite.dispatchEvent(new Event('ram-drag-motion'))
    }
    // A moving native window changes local pointer coordinates. Read the real
    // desktop cursor instead, without touching the window's drag geometry.
