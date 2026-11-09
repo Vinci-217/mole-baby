@@ -42,7 +42,7 @@ export function compactAssets():Plugin {
   try{previous=JSON.parse(await readFile(path.join(output,'asset-size-report.json'),'utf8'));}catch{}
   const verified=new Map((previous.files??[]).map(row=>[row.file,row]));
   const digest=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
-  const report:{file:string;before:number;after:number;sourceSha256:string;sha256:string}[]=[],omitted:{file:string;bytes:number}[]=[];
+  const report:{file:string;before:number;after:number;sourceSha256:string;sha256:string}[]=[];
   async function worker(){while(cursor<candidates.length){
    const file=candidates[cursor++],relative=path.relative(sourceRoot,file).replaceAll('\\','/');
    const compress=relative.startsWith('assets/')&&file.endsWith('.png');
