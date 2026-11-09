@@ -12,6 +12,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const handles = new Map(); const listeners = new Map(); const windows = [];
   const stats = { quit: 0, dialogs: [] };
   const cursor={x:900,y:400};
+  if(options.windowState){const dir=path.join(profile,customProfile?'isolated-cli':'mole-baby');fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,'window-state.json'),JSON.stringify(options.windowState));}
   if(options.key){fs.mkdirSync(path.join(profile,'mole-baby'),{recursive:true});fs.writeFileSync(path.join(profile,'mole-baby','companion-ai-key.json'),'retired-test-key');}
   const app = new EventEmitter();
   app.isPackaged = true;
@@ -97,6 +98,23 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     cleanup() { app.emit('before-quit'); app.emit('will-quit'); fs.rmSync(profile, { recursive: true, force: true }); },
   };
 }
+
+for(const platform of ['win32','darwin'])test(`${platform} tray hover-only details toggle publishes, persists and restores without touching pet data`,async t=>{
+ const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
+ const label='仅悬停时显示名字和状态',item=()=>run.tray.menu.find(item=>item.label===label);
+ assert.equal(item().checked,false);assert.equal(run.invoke('desktop:get-state').petDetailsOnHover,false);
+ const save=path.join(run.app.userData,'Local Storage','existing-pet');fs.mkdirSync(path.dirname(save),{recursive:true});fs.writeFileSync(save,'existing identity, colour and memories');
+ const sent=[];run.window.webContents.send=(channel,state)=>{if(channel==='desktop:state-changed')sent.push(state)};
+ item().click({checked:true});
+ assert.equal(item().checked,true);assert.equal(sent.at(-1).petDetailsOnHover,true);
+ const readPrefs=()=>JSON.parse(fs.readFileSync(path.join(run.app.userData,'window-state.json'),'utf8'));
+ const prefs=readPrefs();assert.equal(prefs.petDetailsOnHover,true);
+ const restored=await launch(undefined,false,platform,{windowState:prefs});t.after(()=>restored.cleanup());
+ assert.equal(restored.invoke('desktop:get-state').petDetailsOnHover,true);assert.equal(restored.tray.menu.find(item=>item.label===label).checked,true);
+ item().click({checked:false});assert.equal(item().checked,false);assert.equal(readPrefs().petDetailsOnHover,false);assert.equal(sent.at(-1).petDetailsOnHover,false);
+ assert.equal(fs.readFileSync(save,'utf8'),'existing identity, colour and memories');
+ const old=await launch(undefined,false,platform,{windowState:{wandering:false,edgeHiding:false}});t.after(()=>old.cleanup());assert.equal(old.invoke('desktop:get-state').petDetailsOnHover,false);
+});
 
 test('Mac movement avoids positional argument conversion and keeps its anchor after a native failure',async t=>{
  const run=await launch(undefined,false,'darwin');t.after(()=>run.cleanup());

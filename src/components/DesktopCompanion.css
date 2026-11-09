@@ -231,6 +231,8 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .compact-pet-condition[data-attention=true]{color:#985d36}
 .companion-layout .compact-pet-condition:hover{text-decoration:underline;text-underline-offset:2px}
 .companion-layout .compact-pet-condition:focus-visible{outline:1px dashed #c29352;outline-offset:1px;border-radius:4px}
+.companion-layout.pet-details-hidden .compact-pet-name,
+.companion-layout.pet-details-hidden .compact-pet-condition{opacity:0;visibility:hidden;pointer-events:none}
 .companion-layout .compact-hover-bridge{left:17px;top:211px;width:126px;height:5px}
 .companion-layout .pet-actions{bottom:1px;height:25px}
 .companion-layout .pet-actions button{height:23px;min-height:0;padding:1px}

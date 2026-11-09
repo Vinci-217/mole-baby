@@ -44,4 +44,16 @@ describe('public original art/audio provenance and full poses',()=>{
   }
   expect(flight.forms.senior.bladeCount).toBe(8);expect(flight.forms.senior.crownParts).toBe(8);
  });
+ it('retains the central golden leaf through every Super front and side frame',async()=>{
+  const {data,info}=await sharp('public/assets/original/flight/super-neutral.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});
+  for(const clip of Object.values(flight.forms.super.clips))for(const pose of clip.frames){
+   let golden=0;
+   for(let y=0;y<116;y++)for(let x=0;x<192;x++){
+    const i=((Math.floor(pose.index/8)*208+y)*info.width+(pose.index%8)*192+x)*4;
+    if(data[i]>230&&data[i+1]>230&&data[i+2]<30&&data[i+3]>200)golden++;
+   }
+   // Bright yellow is the central leaf; orange side leaves cannot pass.
+   expect(golden,`missing central leaf at source frame ${pose.sourceFrame}, cell ${pose.index}`).toBeGreaterThan(2000);
+  }
+ });
 });

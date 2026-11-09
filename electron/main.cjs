@@ -98,6 +98,7 @@ let rendererReady = false;
 let hasPet = false;
 let wanderPreference = true;
 let edgeHiding = true;
+let petDetailsOnHover = false;
 let edgeSide = null;
 let petAppearance='seed';
 let musicState={playing:false,enabled:true,background:false};
@@ -140,6 +141,7 @@ function getDesktopState() {
     edgePose,
     edgeOffset: geometry.edgeOffset(edgeSide, edgePose,petAppearance),
     edgeHiding,
+    petDetailsOnHover,
     edgeNextPeekAt,
   };
 }
@@ -478,6 +480,10 @@ function changeMouseThrough(enabled){
  if(enabled){clearInterval(dragPoll);dragPoll=null;cursorDrag=null;pointerPress=null;dragging=false;interacting=false;stopMovement();}
  changeMousePassthrough(false);refreshTrayMenu();scheduleSave();publishState();return enabled;
 }
+function changePetDetailsOnHover(enabled){
+ if(typeof enabled!=='boolean')throw new TypeError('Pet details on hover must be a boolean');
+ petDetailsOnHover=enabled;saveWindowState();publishState();
+}
 function currentPetBounds(){
  if(petMode&&petEffectBounds&&petEffectAnchor)return {...PET_SIZE,...petEffectAnchor};
  if(petMode&&petArtworkBounds&&petArtworkAnchor&&!companionPanel)return {...PET_SIZE,...petArtworkAnchor};
@@ -624,6 +630,7 @@ function loadWindowState() {
     normalAlwaysOnTop = state.normalAlwaysOnTop === true;petAlwaysOnTop=state.petAlwaysOnTop!==false;mouseThrough=state.mouseThrough===true;
     wanderPreference = state.wandering !== false;
     edgeHiding = state.edgeHiding !== false;
+    petDetailsOnHover = state.petDetailsOnHover === true;
   } catch {
     // A missing or interrupted preferences file should never prevent startup.
   }
@@ -642,7 +649,7 @@ function saveWindowState() {
   try {
     const filename = settingsPath();
     fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ petScale, normalBounds, petBounds, normalAlwaysOnTop,petAlwaysOnTop,mouseThrough, wandering: wanderPreference, edgeHiding }));
+    fs.writeFileSync(`${filename}.tmp`, JSON.stringify({ petScale, normalBounds, petBounds, normalAlwaysOnTop,petAlwaysOnTop,mouseThrough, wandering: wanderPreference, edgeHiding, petDetailsOnHover }));
     fs.renameSync(`${filename}.tmp`, filename);
   } catch (error) {
     console.warn('Unable to save window position:', error.code || error.name);
@@ -815,7 +822,7 @@ function markRendererReady(adopted) {
 function refreshTrayMenu() {
   if (!tray || tray.isDestroyed() || !mainWindow || mainWindow.isDestroyed() || quitting) return;
   const movable = hasPet && petCanMove;
-  const key=JSON.stringify([hasPet,petScale,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
+  const key=JSON.stringify([hasPet,petScale,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petDetailsOnHover,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
@@ -824,6 +831,7 @@ function refreshTrayMenu() {
     { type: 'separator' },
     { label: '拉姆置顶',type:'checkbox',checked:petMode?mainWindow.isAlwaysOnTop():petAlwaysOnTop,click:item=>changeAlwaysOnTop(item.checked,true)},
     { label: '鼠标穿透',type:'checkbox',checked:mouseThrough,click:item=>changeMouseThrough(item.checked)},
+    { label: '仅悬停时显示名字和状态',type:'checkbox',checked:petDetailsOnHover,click:item=>changePetDetailsOnHover(item.checked)},
     { label: '散步', type: 'checkbox', checked: wandering, enabled: movable, click: item => {
       if (!mainWindow.isVisible()) showFromTray();
       changeWandering(item.checked);

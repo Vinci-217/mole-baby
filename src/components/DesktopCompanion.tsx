@@ -47,6 +47,8 @@ export default function DesktopCompanion(p: Props) {
   const reading=p.timerRunning||p.action==='focus'||p.action==='read-alone';
   const [tools, setTools] = useState(false), [dragging, setDragging] = useState(false);
   const [shaking, setShaking] = useState(false);
+  const [detailsHovered,setDetailsHovered]=useState(false),[detailsFocused,setDetailsFocused]=useState(false);
+  const detailsTarget='.desktop-character,.compact-pet-name,.compact-pet-condition';
   const [previewResizing,setPreviewResizing]=useState(false),[previewScale,setPreviewScale]=useState(1);
   const resizeOrigin=useRef(1),resizeDrag=useRef<{x:number;y:number;scale:number;corner:string}|null>(null);
   const resizing=p.native?Boolean(p.desktopState.petResizing):previewResizing;
@@ -100,16 +102,17 @@ export default function DesktopCompanion(p: Props) {
   useEffect(() => {
     if (!p.native) return;
     const hit = (e: MouseEvent) => {
-      if(through.current){setTools(false);return;}
+      if(through.current){setTools(false);setDetailsHovered(false);return;}
       if (drag.current?.moved) return;
       look(e.clientX,e.clientY);
       // A forwarded move can be rounded to exactly the transparent window's
       // boundary. Test its last real pixel instead of treating it as a leave.
       const nearWindow = e.clientX >= -1 && e.clientX <= innerWidth + 1 && e.clientY >= -1 && e.clientY <= innerHeight + 1;
       const target = document.elementFromPoint(nearWindow ? Math.max(0, Math.min(innerWidth - 1, e.clientX)) : e.clientX, nearWindow ? Math.max(0, Math.min(innerHeight - 1, e.clientY)) : e.clientY);
+      setDetailsHovered(Boolean(target?.closest(detailsTarget)));
       // Forwarded moves still reveal tools while the transparent window passes clicks through.
       if(dockedRef.current){peek(Boolean(target?.closest('.desktop-character')));setTools(false);}
-      else if(target?.closest('.desktop-character,.pet-actions,.compact-hover-bridge,.compact-pet-name'))revealTools();else hideTools();
+      else if(target?.closest('.desktop-character,.pet-actions,.compact-hover-bridge,.compact-pet-name,.compact-pet-condition'))revealTools();else hideTools();
       window.desktop?.setMousePassthrough(!target?.closest('button,input,textarea,select,summary,[role="dialog"],a,.compact-hover-bridge'));
     };
     document.addEventListener('mousemove', hit);
@@ -190,13 +193,14 @@ export default function DesktopCompanion(p: Props) {
   const working=p.pet.activity?.kind==='restaurant';
   const toolsVisible=!working&&!resizing&&!dragging&&!docked&&(tools||p.panel!==null);
   const condition=desktopCondition(p.pet,p.moodLabel);
-  return <div ref={root} className={`companion-layout ${reading?'is-reading':''} ${working?'is-working':''} ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} ${resizing?'is-pet-resizing':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
-    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''} ${p.pet.activity?.kind==='restaurant'?'pet-at-work':''}`} onPointerMove={e=>look(e.clientX,e.clientY)} onPointerLeave={()=>{gaze.current={x:0,y:0};hideTools();}} onFocusCapture={revealTools} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={contextMenu}>
+  const detailsHidden=docked||Boolean(p.desktopState.petDetailsOnHover&&!detailsHovered&&!detailsFocused);
+  return <div ref={root} className={`companion-layout ${detailsHidden?'pet-details-hidden':''} ${reading?'is-reading':''} ${working?'is-working':''} ${p.panel ? 'panel-open' : ''} ${classicOpen?'classic-open':''} ${docked?'is-edge-docked':''} ${dragging?'is-pet-dragging':''} ${resizing?'is-pet-resizing':''} panel-${side} ${p.desktopState.mouseThrough?'is-mouse-through':''} ${p.native ? 'is-native' : 'is-preview'} edge-${edge} edge-${edgeSide ?? 'none'}`} data-edge-pose={edge} data-edge-side={edgeSide ?? 'none'} style={layoutStyle}>
+    <div className={`desktop-pet compact-pet ${toolsVisible ? 'actions-open' : ''} ${p.pet.outing?'pet-is-away':''} ${p.pet.activity?.kind==='restaurant'?'pet-at-work':''}`} onPointerMove={e=>{look(e.clientX,e.clientY);setDetailsHovered(Boolean((e.target as Element).closest(detailsTarget)));}} onPointerLeave={()=>{setDetailsHovered(false);gaze.current={x:0,y:0};hideTools();}} onFocusCapture={e=>{setDetailsFocused(e.target.matches(':focus-visible')&&Boolean(e.target.closest(detailsTarget)));revealTools();}} onBlurCapture={e=>{setDetailsFocused(e.relatedTarget instanceof Element&&e.relatedTarget.matches(':focus-visible')&&Boolean(e.relatedTarget.closest(detailsTarget)));if(!e.currentTarget.contains(e.relatedTarget))hideTools();}} onContextMenu={contextMenu}>
       {p.timerRunning&&!docked&&!resizing&&<div className="pet-focus-time" role="timer" aria-label={p.timerDirection==='countup'?'专注正向计时':'专注倒计时'}><Icon path="ui/icon-book"/><span>{reminderTime(p.reminderSeconds)}</span></div>}
       <CareFeedback feedback={docked||classicOpen||p.pet.activity?.kind==='restaurant'?null:p.careFeedback}/>{p.bubbleVisible&&!p.timerRunning&&!docked&&!p.pet.activity&&!p.courseCompletion&&<button type="button" className={`compact-bubble ${p.bubbleVisible&&!docked ? 'visible' : ''}`} aria-label="收起拉姆提示" aria-hidden={!p.bubbleVisible||docked} tabIndex={p.bubbleVisible&&!docked?0:-1} disabled={!p.bubbleVisible||docked} onClick={()=>{setTools(true);p.onBubble();}}><span role="status">{p.bubble}</span></button>}
-      <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.name}</button>
-      <button className="compact-pet-condition" data-testid="desktop-condition" data-condition={condition.id} data-attention={condition.attention} aria-label={p.pet.sleeping?'叫醒拉姆：睡梦中':`查看拉姆状态：${condition.label}`} aria-hidden={docked} tabIndex={docked?-1:0} disabled={docked} onClick={()=>p.pet.sleeping?p.onCare('sleep'):show('status')}>{condition.label}</button>
-      <button className="desktop-character" data-testid="desktop-character" aria-label={reading?'拉姆正在看书':'拉姆：悬停互动，点击摸摸，按住拖动'} onPointerEnter={revealTools} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
+      <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={detailsHidden} tabIndex={detailsHidden?-1:0} disabled={detailsHidden} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.name}</button>
+      <button className="compact-pet-condition" data-testid="desktop-condition" data-condition={condition.id} data-attention={condition.attention} aria-label={p.pet.sleeping?'叫醒拉姆：睡梦中':`查看拉姆状态：${condition.label}`} aria-hidden={detailsHidden} tabIndex={detailsHidden?-1:0} disabled={detailsHidden} onClick={()=>p.pet.sleeping?p.onCare('sleep'):show('status')}>{condition.label}</button>
+      <button className="desktop-character" data-testid="desktop-character" aria-label={reading?'拉姆正在看书':'拉姆：悬停互动，点击摸摸，按住拖动'} onPointerEnter={()=>{setDetailsHovered(true);revealTools();}} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
         {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} gameSound={p.gameSound&&!docked} soundVolume={p.soundVolume} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
       </button>
       {working&&<DesktopRestaurantWork pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}

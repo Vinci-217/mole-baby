@@ -3,27 +3,31 @@
 Only original SWF shapes/placements are used. The desktop-controlled rotor is
 an interaction adaptation, not a claim that a source drag performance exists.
 """
-import argparse,ast,copy,hashlib,json,math,re,subprocess
+import argparse,copy,hashlib,json,math,re,subprocess
 from pathlib import Path
 import xml.etree.ElementTree as E
 import numpy as np
 from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[2]
-p=argparse.ArgumentParser();p.add_argument('--ordinary',type=Path,required=True);p.add_argument('--super',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--exporter',required=True);a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--ordinary',type=Path,required=True);p.add_argument('--super',type=Path,required=True);p.add_argument('--super-swf',type=Path);p.add_argument('--work',type=Path,required=True);p.add_argument('--exporter',required=True);p.add_argument('--forms',default='senior,classic,super');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
 # Reuse the project's reviewed Move/HasCharacter timeline handling.
-source=ast.parse((ROOT/'scripts/art/export-registered-outfits.py').read_text())
-exec(compile(ast.Module(body=[n for n in source.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))and n.name in ['Timeline','matrix','bounds','union']],type_ignores=[]),'<source-timeline>','exec'))
+from original_costume_timeline import Timeline,matrix,bounds,union
 out=ROOT/'public/assets/original/flight';out.mkdir(exist_ok=True)
-result={'fps':24,'cell':[192,208],'columns':8,'forms':{}}
+result=json.loads((out/'runtime.json').read_text())if(out/'runtime.json').exists()else{'fps':24,'cell':[192,208],'columns':8,'forms':{}}
 for form,path,master in [('senior',a.ordinary,'1777'),('classic',a.ordinary,'2525'),('super',a.super,'940')]:
+ if form not in a.forms.split(','):continue
+ source_swf=(a.super_swf if form=='super' else None)or path.with_suffix('.swf');source_hash=hashlib.sha256(source_swf.read_bytes()).hexdigest()
  tl=Timeline(path);tree=E.parse(path);tags=tree.getroot().find('tags');ns={n.get('spriteId')or n.get('shapeId'):n for n in tags if n.get('spriteId')or n.get('shapeId')}
  first,_=tl.action(master,'down',1,'body');b=union(bounds(tl.ns[s],m)for s,m in first)
  mask=np.array(Image.open(ROOT/f'public/assets/classic/{form}-mask.png').convert('RGBA'))[:208,:192];ys,xs=np.where((mask[:,:,:3].sum(2)>40)&(mask[:,:,3]>40))
  target=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)];scale=(target[2]-target[0])*20/(b[2]-b[0]);transform=np.array([[scale,0,(target[0]+target[2])*10-scale*(b[0]+b[2])/2],[0,scale,target[3]*20-scale*b[3]],[0,0,1.]])
  entries=[];clips={}
+ # Symbol IDs are local to each SWF. Ordinary 41 is a shadow; super 41 is
+ # the central golden leaf at source frames 5/6 and 15/16, and must survive.
+ def visible(parts):return [(sid,m)for sid,m in parts if form=='super'or sid!='41']
  def put(parts):
-  index=len(entries);entries.append([(sid,transform@m)for sid,m in parts if sid!='41']);return index
+  index=len(entries);entries.append([(sid,transform@m)for sid,m in visible(parts)]);return index
  def duration(sid,seen=0):
   n=tl.ns.get(sid)
   if n is None or seen>10 or n.find('subTags')is None:return 1
@@ -31,7 +35,7 @@ for form,path,master in [('senior',a.ordinary,'1777'),('classic',a.ordinary,'252
  for action in ['down','right','left']:
   active=tl.active(master,tl.labels(master)[action]);count=max(duration(v.get('characterId'))for v,_ in active if v.get('characterId'));frames=[];skipped=[]
   for frame in range(1,count+1):
-   parts,_=tl.action(master,action,frame,'all');parts=[(sid,m)for sid,m in parts if sid!='41']
+   parts,_=tl.action(master,action,frame,'all');parts=visible(parts)
    if not parts:skipped.append(frame);continue
    frames.append({'index':put(parts),'sourceFrame':frame})
   clips[action]={'sourceFrameCount':count,'frames':frames,'emptyControlFrames':skipped}
@@ -77,6 +81,8 @@ for form,path,master in [('senior',a.ordinary,'1777'),('classic',a.ordinary,'252
   for part,sourceim in enumerate([im,mask]):
    frame=Image.new('RGBA',(384,416));frame.alpha_composite(sourceim,(math.floor(box[0]/20*2),math.floor(box[1]/20*2)));frame=frame.resize((192,208),Image.Resampling.LANCZOS);atlases[part].paste(frame,(index%8*192,index//8*208))
  for name,im in zip(['neutral','mask'],atlases):im.save(out/f'{form}-{name}.png',optimize=True)
- data['sourceSwfSha256']=hashlib.sha256(path.with_suffix('.swf').read_bytes()).hexdigest();data['exportBounds']=box;result['forms'][form]=data
+ data['sourceSwfSha256']=source_hash;data['exportBounds']=box
+ if form=='super':data['symbolPolicy']='Preserve central golden leaf shape41; symbol IDs are scoped to their source SWF.'
+ result['forms'][form]=data
  print(form,'complete',len(entries),'poses',data['clips']['down']['sourceFrameCount'],'source timeline frames',flush=True)
-(out/'runtime.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+(out/'runtime.json').write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')

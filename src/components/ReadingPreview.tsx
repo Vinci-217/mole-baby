@@ -3,7 +3,7 @@ import Ram from './Ram';
 import type {Evolution,Stage} from '../game';
 import './ReadingPreview.css';
 
-const forms:[string,Stage,Evolution?][]=[['种子',0],['初级',1],['中级',2],['高级',3],['超级拉姆',4,'classic'],['水系',4,'water'],['木系',4,'wood'],['火系',4,'fire']];
+const forms:[string,Stage,Evolution?][]=[['种子',0],['初级',1],['中级',2],['高级',3],['超级拉姆',4,'classic'],['神力超级拉姆',4,'super'],['水系',4,'water'],['木系',4,'wood'],['火系',4,'fire']];
 /** Isolated visual review: uses the real Ram renderer without player storage. */
 export default function ReadingPreview(){
  const [size,setSize]=useState(150),[action,setAction]=useState('focus'),[run,setRun]=useState(0),[color,setColor]=useState<'blue'|'yellow'>('yellow');

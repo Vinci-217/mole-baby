@@ -71,7 +71,7 @@ export function sampleSocialMotion(stage: Stage, action: SocialAction, elapsed: 
     butterflyX,butterflyY,
     butterflyAngle:reduced?-12:Math.cos(progress*Math.PI*2)*18,
     butterflyWing:reduced?1:.42+Math.abs(Math.sin(time/85))*.58,
-    bookX:p.bookX, bookY:p.bookY,
+    bookX:p.bookX, bookY:p.bookY+(stage===4&&evolution==='super'?8:0),
     page:reduced?0:-180*(turn*turn*(3-2*turn)),
     pageOpacity:reduced?0:readingPhase<.74||readingPhase>.98?0:Math.min(1,(readingPhase-.74)*25,(.98-readingPhase)*30),
     readTilt:reduced||action!=='focus'?0:7+Math.sin(time/1800)*2,

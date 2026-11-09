@@ -12,6 +12,7 @@ declare global {
     dragPoint?:{x:number;y:number;at:number};
     petOffset?:{x:number;y:number};
     mouseThrough?:boolean;
+    petDetailsOnHover?:boolean;
     mousePassthrough?:boolean;
     alwaysOnTop: boolean;
     wandering: boolean;
