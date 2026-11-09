@@ -380,7 +380,7 @@ jobs:
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RELEASE_TAG" -f sha="$GITHUB_SHA"
           fi
           if gh release view android-preview >/dev/null 2>&1; then
-            gh release upload android-preview release/*.apk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
+            gh release upload android-preview release/*.apk release/*.xapk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
           else
             gh release create android-preview release/*.apk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/SHA256SUMS-android.txt --target "$GITHUB_SHA" --prerelease --latest=false --title "安卓固定签名预览版" --notes "Android 8+、兼容 APK 的 HarmonyOS 4.x；内置 WebView 兼容支持。固定签名，支持后续覆盖升级；APK 安装仍需用户确认。"
           fi
@@ -392,7 +392,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" release/*.dmg release/mole-baby-*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
-          gh release upload "$RELEASE_TAG" release/*.apk release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
+          gh release upload "$RELEASE_TAG" release/*.apk release/*.xapk release/*.apk.blockmap release/SHA256SUMS-android.txt --clobber
           gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file release/RELEASE_NOTES.md
 
   report:

@@ -19,7 +19,7 @@
 | Windows 10 / 11 · 64 位 | 下载 `Setup.exe` 安装；ZIP 需完整解压，再运行包内的「拉姆.exe」或「启动拉姆.cmd」。 |
 | Windows 7 SP1 / 8 / 8.1 | 按系统位数选 `legacy-x64` 或 `legacy-ia32`。[兼容说明](docs/WINDOWS.md) |
 | macOS 12+ | M 系列选 `arm64.dmg`，Intel 选 `x64.dmg`；打开后拖入「应用程序」。[Mac 指引](docs/MACOS.md) |
-| Android 8+ / HarmonyOS 4.x | 安装固定签名 APK，支持覆盖升级。[手机安装与权限说明](docs/ANDROID.md) |
+| Android 8+ / HarmonyOS 4.x | 优先安装固定签名 APK，支持覆盖升级；另提供 XAPK 分包版，需 XAPK 安装器。[手机安装与权限说明](docs/ANDROID.md) |
 
 预览分支中的改动不代表已经发版。HarmonyOS NEXT 不运行 Android APK；桌面版关闭窗口后会留在托盘或 Mac 菜单栏，选择「退出拉姆」才会完全退出。
 

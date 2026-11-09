@@ -1,6 +1,6 @@
 /** Build-only lossless raster compression. Authoring PNGs stay untouched. */
-import {readdirSync,readFileSync} from 'node:fs'
-import {readdir,stat,writeFile,unlink,mkdir,copyFile,readFile} from 'node:fs/promises'
+import {readdirSync} from 'node:fs'
+import {readdir,stat,writeFile,mkdir,copyFile,readFile} from 'node:fs/promises'
 import path from 'node:path'
 import {createHash} from 'node:crypto'
 import {transformAsync,type PluginObj} from '@babel/core'
@@ -8,9 +8,6 @@ import sharp from 'sharp'
 import type {Plugin} from 'vite'
 
 const root=process.cwd(),publicRoot=path.join(root,'public','assets')
-const uploaded=JSON.parse(readFileSync(path.join(publicRoot,'original/uploaded-actions/index.json'),'utf8')) as Record<string,{id:string;form:string;assetKey:string}>
-const manifest=JSON.parse(readFileSync(path.join(publicRoot,'original/official/manifest.json'),'utf8')) as {clips:{kind:string;path:string;level:number}[]}
-const superseded=new Set(Object.values(uploaded).filter(spec=>spec.id!=='180005'&&manifest.clips.some(clip=>clip.kind==='care'&&clip.path.endsWith('/'+spec.id+'.swf')&&clip.level===({seed:1,junior:2,middle:3,senior:4,classic:101} as Record<string,number>)[spec.form])).map(spec=>spec.assetKey))
 const names=new Set<string>()
 function inventory(dir:string){for(const entry of readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())inventory(file);else if(entry.name.endsWith('.png')){names.add(entry.name);names.add(path.relative(publicRoot,file).replaceAll('\\','/'))}}}
 inventory(publicRoot)
@@ -48,10 +45,6 @@ export function compactAssets():Plugin {
   const report:{file:string;before:number;after:number;sourceSha256:string;sha256:string}[]=[],omitted:{file:string;bytes:number}[]=[];
   async function worker(){while(cursor<candidates.length){
    const file=candidates[cursor++],relative=path.relative(sourceRoot,file).replaceAll('\\','/');
-   const match=relative.match(/^assets\/original\/uploaded-actions\/([^/]+)\/(.+)$/);
-   if(relative.startsWith('assets/original/wardrobe-motion/')||match&&superseded.has(match[1])&&/^(neutral|mask)[^/]*\.(png|webp)$/.test(match[2])){
-    omitted.push({file:relative,bytes:(await stat(file)).size});continue;
-   }
    const compress=relative.startsWith('assets/')&&file.endsWith('.png');
    const target=path.join(output,compress?relative.slice(0,-4)+'.webp':relative);
    await mkdir(path.dirname(target),{recursive:true});
@@ -69,12 +62,10 @@ export function compactAssets():Plugin {
   // Clean retired files from incremental build outputs as well.
   const directory=path.join(output,'assets');
   for(const file of await files(directory)){
-   const relative=path.relative(directory,file).replaceAll('\\','/'),match=relative.match(/^original\/uploaded-actions\/([^/]+)\/(.+)$/);
-   if(relative.startsWith('original/wardrobe-motion/')||match&&superseded.has(match[1])&&/^(neutral|mask)[^/]*\.(png|webp)$/.test(match[2]))await unlink(file);
-   else if(file.endsWith('.css')){const {readFile}=await import('node:fs/promises');const text=await readFile(file,'utf8');await writeFile(file,text.replace(/url\((['"]?)([^)'"\s]+\.png)\1\)/g,(_all,quote,url)=>`url(${quote}${url.slice(0,-4)}.webp${quote})`));}
+   if(file.endsWith('.css')){const {readFile}=await import('node:fs/promises');const text=await readFile(file,'utf8');await writeFile(file,text.replace(/url\((['"]?)([^)'"\s]+\.png)\1\)/g,(_all,quote,url)=>`url(${quote}${url.slice(0,-4)}.webp${quote})`));}
   }
-  await writeFile(path.join(output,'asset-size-report.json'),JSON.stringify({format:'lossless WebP + original SWF',pixelVerification:'identical visible RGBA and all alpha values',omitted,supersededAtlasBytes:omitted.reduce((sum,row)=>sum+row.bytes,0),count:report.length,before,after,saved:before-after,files:report.sort((a,b)=>a.file.localeCompare(b.file))},null,2));
-  console.log(`Lossless assets: ${report.length} images; ${(before/1e6).toFixed(2)} → ${(after/1e6).toFixed(2)} MB; ${omitted.length} superseded atlas files omitted. Authoring library unchanged.`);
+  await writeFile(path.join(output,'asset-size-report.json'),JSON.stringify({format:'lossless WebP + original SWF',pixelVerification:'identical visible RGBA and all alpha values',omitted:[],supersededAtlasBytes:0,count:report.length,before,after,saved:before-after,files:report.sort((a,b)=>a.file.localeCompare(b.file))},null,2));
+  console.log(`Lossless assets: ${report.length} images; ${(before/1e6).toFixed(2)} → ${(after/1e6).toFixed(2)} MB; all application raster fallbacks retained. Authoring library unchanged.`);
  }
  }
 }

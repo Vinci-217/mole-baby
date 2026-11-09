@@ -6,6 +6,8 @@
 
 直接[下载 v0.31.10 固定签名 APK](https://github.com/Vinci-217/mole-baby/releases/download/v0.31.10/mole-baby-android-1311000.apk)，传到手机后按系统提示允许此来源并安装。包名 `com.molebaby.ramu.preview`，固定签名支持后续覆盖升级并保留存档。
 
+正式 Release 另提供同一 APK 的 **XAPK 分包版**。XAPK 是包含 `base.apk` 和 `manifest.json` 的 ZIP 容器，需要 SAI、APKMirror Installer 或其他支持 XAPK 的安装器打开；普通文件管理器不识别时，直接使用上面的 APK。XAPK 内的 APK 与单独下载的 APK 字节一致，仍由 Android 系统弹出确认安装。
+
 此前 Actions 中的 `mole-baby-android-preview-dev.apk` 是开发包，包名带 `.dev`，与固定签名版独立。请先在旧包导出存档，再到预览版导入；不同 CI 构建的开发签名可能不同，开发包不作为公开更新渠道。
 
 - Android 8.0 及以上；手机、安卓平板均可。v0.32 不再按厂商 WebView 的应用版本号设门槛；采用 Chromium 80 语法兼容构建、API 补齐和视口单位回退。华为 HarmonyOS 4.x 可使用 APK；启动无需用户切换 WebView 提供程序。尚未覆盖所有品牌真机。

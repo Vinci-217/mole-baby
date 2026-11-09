@@ -14,6 +14,26 @@ function previousBases(previous,packageName,code,signerSha256){
  if(signerSha256&&previous.apk.signerSha256!==signerSha256)throw Error('APK 签名与上一版本不同，不能覆盖升级已安装的拉姆。');
  return [{versionCode:previous.versionCode,size:previous.apk.size,blockmap:previous.apk.blockmap},...(previous.bases??[])].filter(v=>v?.blockmap&&v.versionCode<code).slice(0,12);
 }
+function createXapk(apk,out,metadata,element){
+ const apkName=`mole-baby-android-${element.versionCode}.apk`,xapkName=`mole-baby-android-${element.versionCode}.xapk`,target=path.join(out,xapkName),apkSize=fs.statSync(apk).size;
+ const manifest={xapk_version:2,package_name:metadata.applicationId,name:'拉姆',version_code:element.versionCode,version_name:element.versionName,min_sdk_version:String(metadata.minSdk??26),target_sdk_version:String(metadata.targetSdk??36),total_size:apkSize,expansions:[],split_apks:[],installments:[{file:'base.apk',id:'base',type:'base'}]};
+ const script=String.raw`import json,pathlib,sys,zipfile
+apk,out,raw=sys.argv[1:]
+manifest=json.loads(raw)
+with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_STORED,allowZip64=True) as archive:
+    info=zipfile.ZipInfo('base.apk',date_time=(2020,1,1,0,0,0));info.compress_type=zipfile.ZIP_STORED;info.external_attr=0o100644<<16
+    with open(apk,'rb') as source,archive.open(info,'w') as destination:
+        while True:
+            chunk=source.read(1024*1024)
+            if not chunk: break
+            destination.write(chunk)
+    manifest_info=zipfile.ZipInfo('manifest.json',date_time=(2020,1,1,0,0,0));manifest_info.compress_type=zipfile.ZIP_DEFLATED;manifest_info.external_attr=0o100644<<16
+    archive.writestr(manifest_info,json.dumps(manifest,ensure_ascii=False,separators=(',',':')).encode('utf-8'))
+`;
+ cp.execFileSync('python3',['-c',script,apk,target,JSON.stringify(manifest)],{stdio:'inherit'});
+ if(!fs.statSync(target).size||fs.statSync(target).size<apkSize)throw Error('XAPK 生成结果异常。');
+ return {name:xapkName,path:target,apkName,manifest};
+}
 async function publishedManifest(){
  const response=await fetch(base+'latest-android.json',{signal:AbortSignal.timeout(30000)});if(response.status===404)return null;if(!response.ok)throw Error('无法读取上一版安卓更新清单：HTTP '+response.status);
  const chunks=[];let bytes=0;for await(const chunk of response.body){bytes+=chunk.length;if(bytes>256*1024)throw Error('上一版更新清单超出大小限制');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString('utf8'));
@@ -30,8 +50,8 @@ async function prepare(){
  const priorFile=arg('--previous'),previous=priorFile?JSON.parse(fs.readFileSync(priorFile,'utf8')):process.argv.includes('--fetch-previous')?await publishedManifest():null;
  const manifest={schema:1,channel:'android-preview',packageName:metadata.applicationId,versionCode:code,versionName:element.versionName,minSdk:26,apk:apkDescriptor,bases:previousBases(previous,metadata.applicationId,code,signature.fingerprint),resources:{...describe(resources),revision:index.revision,minAppCode:code,maxAppCode:code,index:describe(indexFile),blockmap:describe(resources+'.blockmap')}};
  const manifestName=development?'latest-android-development.json':'latest-android.json';fs.writeFileSync(path.join(out,manifestName),JSON.stringify(manifest,null,2)+'\n');
- const deliver=[name,name+'.blockmap',resourcesName,resourcesName+'.blockmap',path.basename(indexFile),manifestName];fs.writeFileSync(path.join(out,'SHA256SUMS.txt'),deliver.map(f=>hash(path.join(out,f))+'  '+f).join('\n')+'\n');
- console.log(`${development?'开发演练':'固定签名预览'}更新产物已生成：${out}；未发布。APK ${Math.round(apkDescriptor.size/1024/1024)} MiB，保留 ${manifest.bases.length} 个历史差量基线。`);
+ const xapk=createXapk(target,out,metadata,element),deliver=[name,name+'.blockmap',xapk.name,resourcesName,resourcesName+'.blockmap',path.basename(indexFile),manifestName];fs.writeFileSync(path.join(out,'SHA256SUMS.txt'),deliver.map(f=>hash(path.join(out,f))+'  '+f).join('\n')+'\n');
+ console.log(`${development?'开发演练':'固定签名预览'}更新产物已生成：${out}；未发布。APK ${Math.round(apkDescriptor.size/1024/1024)} MiB，XAPK ${Math.round(fs.statSync(xapk.path).size/1024/1024)} MiB，保留 ${manifest.bases.length} 个历史差量基线。`);
 }
 if(require.main===module)prepare().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={previousBases};
+module.exports={previousBases,createXapk};

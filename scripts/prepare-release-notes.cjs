@@ -20,7 +20,9 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
   if(fs.existsSync(androidManifest)){
     const m=JSON.parse(fs.readFileSync(androidManifest,'utf8'));
     if(m.packageName!=='com.molebaby.ramu.preview'||!Number.isInteger(m.versionCode))throw Error('Invalid fixed-signed Android release');
-    androidRow=`\n| **安卓手机／平板 · Android 8+** | **[⬇ 下载安卓固定签名预览版 .apk](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.apk)** | 兼容华为 HarmonyOS 4.x 等安卓系统；按提示安装，可覆盖升级 |`;
+    const xapk=path.join(directory,`mole-baby-android-${m.versionCode}.xapk`);
+    if(!fs.existsSync(xapk)||fs.statSync(xapk).size<fs.statSync(path.join(directory,`mole-baby-android-${m.versionCode}.apk`)).size)throw Error('Missing or invalid Android XAPK release artifact');
+    androidRow=`\n| **安卓手机／平板 · Android 8+** | **[⬇ 下载安卓固定签名版 .apk](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.apk)** · [XAPK 分包版](https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-android-${m.versionCode}.xapk) | APK 可直接安装；XAPK 需使用支持 XAPK 的安装器，兼容华为 HarmonyOS 4.x 等安卓系统，可覆盖升级 |`;
   }
   const guide = `# 下载与安装 · 拉姆 v${version}
 
