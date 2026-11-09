@@ -34,8 +34,8 @@ export const EVOLUTIONS: { id: Evolution; name: string; description: string }[] 
   { id: 'wood', name: '弹力木系拉姆', description: '戴着翠绿的木系头冠。' },
   { id: 'fire', name: '霹雳火系拉姆', description: '顶着明亮的火焰头冠。' },
 ];
-/** Old super saves remain readable; the empty-looking variant is no longer offered. */
-export const SELECTABLE_EVOLUTIONS=EVOLUTIONS.filter(form=>form.id!=='super');
+/** Every original final form remains selectable without rewriting old saves. */
+export const SELECTABLE_EVOLUTIONS=EVOLUTIONS;
 export type Action = 'pet' | 'feed' | 'drink' | 'wash' | 'use' | 'play' | 'sleep';
 
 export interface PetStats {

@@ -20,7 +20,7 @@ export default function StageSettings({pet,onChange}:{pet:GameState;onChange:(se
   </div>
   <p className="settings-hint">所有成长阶段与超拉形态均可直接选择。选择外观会固定形态；恢复自动成长时继续原有进度，保留颜色、物品和回忆。</p>
   <div className="stage-choices" role="group" aria-label="选择当前阶段">
-   {STAGES.map((s,i)=><button key={s.name} type="button" aria-label={`切换到${s.name}`} aria-pressed={draft.stage===i} onClick={()=>setDraft(d=>({...d,mode:'fixed',stage:i as Stage,evolution:i===4?(d.evolution&&d.evolution!=='super'?d.evolution:'classic'):undefined}))}>
+   {STAGES.map((s,i)=><button key={s.name} type="button" aria-label={`切换到${s.name}`} aria-pressed={draft.stage===i} onClick={()=>setDraft(d=>({...d,mode:'fixed',stage:i as Stage,evolution:i===4?(d.evolution??'classic'):undefined}))}>
     <span className="stage-portrait"><Ram color={pet.color} stage={i as Stage} evolution={i===4?draft.evolution??'classic':undefined} action="still"/></span><b>{s.name}</b>
    </button>)}
   </div>

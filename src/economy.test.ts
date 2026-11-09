@@ -31,9 +31,9 @@ describe('confirmed economy and save continuity',()=>{
    if(kind==='outfit')expect(wearOutfit(loaded,prize.id).ok).toBe(false);
   }
  });
- it('keeps old super records while removing its selector and fragment transformations',()=>{
+ it('keeps old super records and restores its selector without reintroducing fragments',()=>{
   const p={...createPet('旧超拉','blue',now),growth:840,evolution:'super' as const,coins:237};
-  expect(parseSave(JSON.stringify(p),now)).toMatchObject({coins:237,evolution:'super',createdAt:now});expect(SELECTABLE_EVOLUTIONS.some(f=>f.id==='super')).toBe(false);
+  expect(parseSave(JSON.stringify(p),now)).toMatchObject({coins:237,evolution:'super',createdAt:now});expect(SELECTABLE_EVOLUTIONS.some(f=>f.id==='super')).toBe(true);
   for(const form of ['junior','middle','senior','classic','super','water','wood','fire'] as const)expect(originalSpecialActions(form).some(row=>row.clip.path.includes('/tatter/'))).toBe(false);
  });
 });
