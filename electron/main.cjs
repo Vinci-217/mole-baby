@@ -726,11 +726,17 @@ function listen(channel, callback) {
   });
 }
 
+function settleNativeMode(value){
+  // AppKit may deliver the final setBounds result after the IPC handler has
+  // returned. Keep renderer transitions and native bounds observations in
+  // step without adding delay to Windows/Linux or the local test harness.
+  return process.platform==='darwin'?new Promise(resolve=>setTimeout(()=>resolve(value),120)):value;
+}
 function changePetMode(enabled) {
   if (typeof enabled !== 'boolean') throw new TypeError('Pet mode must be a boolean');
   roomResizer.end();if(petResizing)finishPetResize(true);
   if(enabled&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging()))return roomFullscreen.set(false).then(()=>changePetMode(enabled));
-  if (enabled === petMode) return petMode;
+  if (enabled === petMode) return settleNativeMode(petMode);
   changePetEffectBounds(null);
 
   stopMovement();
@@ -772,7 +778,7 @@ function changePetMode(enabled) {
   publishState(true);
   saveWindowState();
   scheduleWander();
-  return petMode;
+  return settleNativeMode(petMode);
 }
 
 function iconPath(filename) {
