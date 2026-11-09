@@ -454,7 +454,12 @@ export default function App() {
   }
   useDesktopPetStatus(pet);
   useEffect(()=>{
-    const bounds=petMode&&!workingAway?drawingUnion([...(nativeDrawingBounds?[nativeDrawingBounds]:[]),...(current.wearing&&!reading?[{x:-100,y:-80,width:360,height:420}]:[])]):null;
+    // The uncostumed body already fits the fixed 160×240 desktop frame. The
+    // native player reports a temporary iframe surface while it handshakes;
+    // using that surface for the plain body expands the window to the room
+    // width on some Windows/macOS runners. Only widen the native frame when a
+    // costume actually needs the extra drawing area.
+    const bounds=petMode&&!workingAway&&current.wearing?drawingUnion([...(nativeDrawingBounds?[nativeDrawingBounds]:[]),...(reading?[]:[{x:-100,y:-80,width:360,height:420}])]):null;
     void window.desktop?.setPetArtworkBounds?.(bounds).catch(()=>{});
   },[petMode,current.wearing,reading,workingAway,nativeDrawingBounds]);
   const effectId=action.startsWith('element-')?action.slice(8):null;
