@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {_electron,expect}=require('@playwright/test');
-const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-interactions'),profile=path.join(out,'electron-profile');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-interactions'),profile=path.resolve(process.env.SIZE_QA_PROFILE||path.join(out,'electron-profile'));
 (async()=>{
  const desktop=await _electron.launch({args:[root,'--no-sandbox','--disable-gpu',`--user-data-dir=${profile}`],env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'}});
  try{
@@ -13,7 +13,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-i
    pet.wardrobe=[...new Set([...pet.wardrobe,'original-1200041'])];pet.stats={hunger:85,thirst:85,cleanliness:85,happiness:85,health:100,energy:85};
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(pet));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({sound:false,gameSound:false,lively:false,presence:false,outings:false,roomWander:false}));
   },snapshot);
-  await page.reload();await page.evaluate(()=>window.desktop.setPetMode(true));await expect(page.getByTestId('desktop-character')).toBeVisible();
+  await page.reload();await page.evaluate(async()=>{await window.desktop.setPetMode(true);await window.desktop.setPetCanMove(false)});await expect(page.getByTestId('desktop-character')).toBeVisible();
   const initialBounds=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds()),initialState=await page.evaluate(()=>window.desktop.getState());
   await page.evaluate(({dx,dy})=>window.desktop.movePet(dx,dy),{dx:480-initialBounds.x-initialState.petOffset.x*initialState.petScale,dy:300-initialBounds.y-initialState.petOffset.y*initialState.petScale});
   await expect(page.locator('.desktop-character .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});
@@ -33,7 +33,22 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/wardrobe-i
   await expect(page.locator('.desktop-character .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});
   const restored=await(await page.locator('.desktop-character iframe').elementHandle()).contentFrame();
   const source=await restored.evaluate(()=>player.ruffle().callExternalInterface('previewStatus'));assert.equal(source.form,'level2');assert(source.registration);assert.deepEqual(errors,[]);
-  fs.writeFileSync(path.join(out,'electron-checks.json'),JSON.stringify({passed:true,protocol:frame.url().split('?')[0],expanded,anchor:before,form:source.form,petting:true,errors},null,2));
+  // Exercise a large original prop through the actual desktop menu, then
+  // verify its wider native drawing surface restores the same screen anchor.
+  await page.getByTestId('desktop-character').hover();await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
+  await page.getByRole('tab',{name:'道具',exact:true}).click();const propAnchor=await anchor();
+  await page.getByRole('button',{name:'播放涂鸦一',exact:true}).click();
+  const prop=page.locator('.desktop-character .official-ram-clip');
+  await expect(prop).toHaveAttribute('data-loaded','true',{timeout:45000});
+  const propWindow=await bounds(),propSize=await page.locator('.desktop-character iframe').evaluate(n=>({width:parseFloat(n.style.width),height:parseFloat(n.style.height)}));
+  assert(propSize.width>=1000&&propSize.height>=1000,'native care has a fixed wider drawing surface');
+  assert.deepEqual(await anchor(),propAnchor,'native expansion preserves the logical screen anchor');
+  assert(propWindow.width>expanded.width&&propWindow.height>expanded.height,'actual Electron window expands for original source travel');
+  await page.keyboard.press('Escape');
+  await expect(prop).toHaveAttribute('data-source','resource/petcloth/swf2/1200041.swf',{timeout:5000});
+  await expect(prop).toHaveAttribute('data-loaded','true',{timeout:45000});assert.deepEqual(await anchor(),propAnchor,'restoring the outfit preserves the anchor');
+  const restoredBounds=await bounds();assert(restoredBounds.width<=expanded.width+1&&restoredBounds.height<=expanded.height+1,'restore the original costume drawing surface');
+  fs.writeFileSync(path.join(out,'electron-checks.json'),JSON.stringify({passed:true,protocol:frame.url().split('?')[0],expanded,anchor:before,form:source.form,petting:true,nativeCare:{propWindow,propSize,restoredBounds,stableAnchor:true},errors},null,2));
   console.log('PASS actual Electron custom-protocol outfit, enlarged transparent window, unchanged screen anchor, real petting and saved prior identity');
  }finally{await desktop.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

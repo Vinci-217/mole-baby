@@ -6,7 +6,7 @@ const executablePath=process.env.CHROMIUM_PATH||'/usr/local/bin/chromium',saveKe
 (async()=>{
  // Reuse the existing review record. Never initialize, import over, or clear it.
  const profile=path.join(root,'artifacts/native-outfits-review/browser-profile');assert(fs.existsSync(profile));
- const context=await chromium.launchPersistentContext(profile,{headless:true,executablePath,viewport:{width:1100,height:850},args:['--disable-dev-shm-usage','--disk-cache-size=10485760']});
+ const context=await chromium.launchPersistentContext(profile,{headless:true,executablePath,viewport:{width:1100,height:850},ignoreDefaultArgs:['--disable-dev-shm-usage'],args:['--disk-cache-size=10485760']});
  let snapshot;
  try{const page=context.pages()[0]||await context.newPage();await page.addInitScript(()=>{window.beforeWardrobeCheck=Object.fromEntries(Object.entries(localStorage))});await page.goto(base);
   await expect(page.getByTestId('desktop-character')).toBeVisible();snapshot=await page.evaluate(()=>window.beforeWardrobeCheck);assert(snapshot[saveKey],'the previous save must exist');
@@ -17,7 +17,7 @@ const executablePath=process.env.CHROMIUM_PATH||'/usr/local/bin/chromium',saveKe
   if(snapshot[memoryKey]){const old=JSON.parse(snapshot[memoryKey]),next=JSON.parse(after[memoryKey]);for(const event of old.events)assert(next.events.some(e=>e.id===event.id),'previous memories survive');}
   fs.writeFileSync(path.join(out,'previous-record-after.json'),JSON.stringify(after,null,2));console.log('PASS previous persistent QA identity, colour, wardrobe, inventory, coins and memories survive reload');
  }finally{await context.close()}
- const browser=await chromium.launch({headless:true,executablePath,args:['--disable-dev-shm-usage']});
+ const browser=await chromium.launch({headless:true,executablePath,ignoreDefaultArgs:['--disable-dev-shm-usage'],args:['--disk-cache-size=10485760']});
  try{
   // An isolated copy of that same record exercises rewards without spending
   // or changing the persistent review pet's inventory and money.

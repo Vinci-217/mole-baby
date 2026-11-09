@@ -1,0 +1,138 @@
+[
+  {
+    "path": "resource/pet/swf/pet101/180025.swf",
+    "required": 9.797453703703704,
+    "viewportScale": 12
+  },
+  {
+    "path": "resource/pet/swf/pet2/180011.swf",
+    "required": 17.056875,
+    "viewportScale": 20
+  },
+  {
+    "path": "resource/pet/swf/pet2/180025.swf",
+    "required": 9.66087962962963,
+    "viewportScale": 12
+  },
+  {
+    "path": "resource/pet/swf/pet2/tuya1.swf",
+    "required": 13.767361111111109,
+    "viewportScale": 18,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet2/tuya2.swf",
+    "required": 13.76830150462963,
+    "viewportScale": 18,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet3/180018.swf",
+    "required": 8.405624999999999,
+    "viewportScale": 11
+  },
+  {
+    "path": "resource/pet/swf/pet3/tuya1.swf",
+    "required": 10.964988425925924,
+    "viewportScale": 15,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet3/tuya2.swf",
+    "required": 10.964988425925924,
+    "viewportScale": 15,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet4/180043.swf",
+    "required": 8.519675925925926,
+    "viewportScale": 11
+  },
+  {
+    "path": "resource/pet/swf/pet4/180046.swf",
+    "required": 9.946249999999997,
+    "viewportScale": 12
+  },
+  {
+    "path": "resource/pet/swf/pet4/180053.swf",
+    "required": 10.074375,
+    "viewportScale": 13
+  },
+  {
+    "path": "resource/pet/swf/pet4/180054.swf",
+    "required": 8.495,
+    "viewportScale": 11
+  },
+  {
+    "path": "resource/pet/swf/pet4/tuya1.swf",
+    "required": 10.419270833333334,
+    "viewportScale": 14,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet4/tuya2.swf",
+    "required": 10.419270833333334,
+    "viewportScale": 14,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet4/tuya3.swf",
+    "required": 12.689999999999998,
+    "viewportScale": 17,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet4/tuya4.swf",
+    "required": 12.5934375,
+    "viewportScale": 17,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet101/tuya1.swf",
+    "required": 4.607638888888889,
+    "viewportScale": 8,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet101/tuya2.swf",
+    "required": 4.6030092592592595,
+    "viewportScale": 8,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet101/tuya3.swf",
+    "required": 7.518518518518518,
+    "viewportScale": 11,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet101/tuya4.swf",
+    "required": 7.518518518518518,
+    "viewportScale": 11,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet2/tuya3.swf",
+    "required": 3.20625,
+    "viewportScale": 8,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet2/tuya4.swf",
+    "required": 3.206875,
+    "viewportScale": 8,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet3/tuya3.swf",
+    "required": 10.598958333333334,
+    "viewportScale": 14,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  },
+  {
+    "path": "resource/pet/swf/pet3/tuya4.swf",
+    "required": 10.598958333333334,
+    "viewportScale": 14,
+    "evidence": "Full-playback native body bounds sampled every 150 ms; fixed 20% travel margin and one extra logical viewport. Original prop motion may extend farther."
+  }
+]

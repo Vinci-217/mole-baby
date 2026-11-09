@@ -50,7 +50,8 @@ def main():
   if row['path'] in bodyRegistrations:
    anatomy=bodyRegistrations[row['path']]
    assert anatomy['sha256']==row['sha256'], 'Recheck body paths against changed source artwork'
-   clips[-1]['namedBodyPaths']=anatomy['namedBodyPaths']
+   for field in ['namedBodyPaths','effectBounds','effectFrames','referenceBodyBounds','viewportScale']:
+    if field in anatomy:clips[-1][field]=anatomy[field]
   if kind=='outfit' and stem not in old:
    icon=VAULT/'files/resource/petcloth/icon'/(stem+'.swf')
    outfits.append(dict(id='original-'+stem,name=name,sourceId=stem,clipId=ident,price=80,width=.6,x=0,y=0,iconPath='./assets/original/official/icons/'+stem+'.png' if icon.exists() else './assets/original/ui/icon-happy.png'))

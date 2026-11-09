@@ -1,4 +1,5 @@
 import OfficialAnimationPreview from './components/OfficialAnimationPreview';
+import AnimationSizePreview from './components/AnimationSizePreview';
 // OEM WebView app versions do not identify Chromium; ship required APIs.
 import 'core-js/stable';
 import React from 'react';
@@ -22,4 +23,4 @@ viewport();window.addEventListener('resize',viewport);
 import {installAndroidHost} from './android-host';
 installAndroidHost();
 installLocalDebug();
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><LocalDebugSwitch/>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='official'?<OfficialAnimationPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='reading'?<ReadingPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe-motion'?<WardrobeMotionPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe'?<WardrobePreview/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><LocalDebugSwitch/>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='size-review'?<AnimationSizePreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='official'?<OfficialAnimationPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='reading'?<ReadingPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe-motion'?<WardrobeMotionPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe'?<WardrobePreview/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);

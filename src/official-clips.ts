@@ -1,6 +1,6 @@
 import manifest from '../public/assets/original/official/manifest.json'
 import type {RamForm} from './original-actions'
-export interface OfficialClip {id:string;name:string;kind:string;path:string;sha256:string;bytes:number;symbol:string;forms:string[];level:number;fps:number;animated:boolean;base:boolean;clothingLayer?:number;namedBodyPaths?:Record<string,number[]>}
+export interface OfficialClip {id:string;name:string;kind:string;path:string;sha256:string;bytes:number;symbol:string;forms:string[];level:number;fps:number;animated:boolean;base:boolean;clothingLayer?:number;namedBodyPaths?:Record<string,number[]>;effectBounds?:number[];effectFrames?:number;referenceBodyBounds?:number[];viewportScale?:number}
 export const OFFICIAL_CLIPS:readonly OfficialClip[]=manifest.clips
 export const ORIGINAL_OUTFITS=manifest.outfits
 export const OFFICIAL_DURATION=16_000

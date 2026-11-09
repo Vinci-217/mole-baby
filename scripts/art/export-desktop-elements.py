@@ -141,3 +141,6 @@ if __name__ == '__main__':
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
         results = list(pool.map(lambda m: export(m, args.exporter, work), metas.values()))
     (OUT / 'clips.json').write_text(json.dumps({m['id']: m for m in results}, ensure_ascii=False, indent=2) + '\n')
+
+    # Reapply SHA-bound anatomical registration after packing unchanged frames.
+    subprocess.run(['python3', str(ROOT / 'scripts/art/apply-element-body-registration.py'), '--record'], check=True)

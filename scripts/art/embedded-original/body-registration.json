@@ -1,7 +1,376 @@
 {
+  "resource/lamuPKSys/animalSkill/skillsource/1.swf": {
+    "sha256": "6f59922ab7475eee216aa97f78fb5f95fd37bfb5f919d44cf4ac09330e0b8098",
+    "effectBounds": [
+      -250.95,
+      -506.87,
+      299.6,
+      51.35
+    ],
+    "effectFrames": 54,
+    "evidence": "Bodyless fireworks. Original root mc sprite 11 union across all frames, including its root matrix; ctp11 variants signal SkillOver on frame 54. A launch streak is not a Ram body."
+  },
+  "resource/lamuPKSys/animalSkill/skillsource/2.swf": {
+    "sha256": "178411cc3e5b2b208c697f6488a6bc2d34d27616355b2e22dd3242bc02a1d7c0",
+    "effectBounds": [
+      -150.95,
+      -306.45,
+      116.45,
+      -77.25
+    ],
+    "effectFrames": 140,
+    "evidence": "Bodyless confetti. Selected original symbol 2_fla.ctp11_1 is sprite 7; its full source union and final frame 140 replace the transient first-particle registration."
+  },
+  "resource/lamuPKSys/animalSkill/skillsource/3.swf": {
+    "sha256": "9ac72462ca782f05d7ce43435328ea19428069f11ba042e296b9d5567f0de21c",
+    "effectBounds": [
+      -409.2,
+      -507.1,
+      552.45,
+      58.85
+    ],
+    "effectFrames": 141,
+    "evidence": "Bodyless angel eggs. Original root mc sprite 42 union across all source frames plus x=30,y=60. Egg faces must not be mistaken for a pet body."
+  },
+  "resource/lamuPKSys/animalSkill/skillsource/4.swf": {
+    "sha256": "178411cc3e5b2b208c697f6488a6bc2d34d27616355b2e22dd3242bc02a1d7c0",
+    "effectBounds": [
+      -150.95,
+      -306.45,
+      116.45,
+      -77.25
+    ],
+    "effectFrames": 140,
+    "evidence": "Byte-identical official confetti source to skillsource/2.swf; same complete original timeline and envelope."
+  },
   "resource/petcloth/swf2/1200113.swf": {
     "sha256": "05c32a65e4785b61449b0db0b82d529cf45a55c1a692653feadf91f53f6fb9f9",
-    "namedBodyPaths": {"down": [0, 0], "left": [0, 0], "right": [0, 0]},
+    "namedBodyPaths": {
+      "down": [
+        0,
+        0
+      ],
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        0,
+        0
+      ]
+    },
     "evidence": "Original SWF petBody includes the bow, leaves and ribbons. In down/left/right, child 0 / child 0 is sprite 5, whose shape 4 is the actual oval body (twips -3,-112 to 446,383). Use that live node for sizing and petting; preserve every source matrix and decorative layer."
+  },
+  "resource/petcloth/body/pet101/shikongganying.swf": {
+    "sha256": "145dc2e0828386571d702f3d02388cd4d6d517e9dfe987894f7524f4ba2879b9",
+    "effectFrames": 31,
+    "evidence": "Original shikongganying_fla.Timeline_1 stops on frame 31. Return to the pet after the complete short source instead of holding its empty final frame for 16 seconds."
+  },
+  "resource/petcloth/body/pet2/shikongganying.swf": {
+    "sha256": "145dc2e0828386571d702f3d02388cd4d6d517e9dfe987894f7524f4ba2879b9",
+    "effectFrames": 31,
+    "evidence": "Original shikongganying_fla.Timeline_1 stops on frame 31. Return to the pet after the complete short source instead of holding its empty final frame for 16 seconds."
+  },
+  "resource/petcloth/body/pet3/shikongganying.swf": {
+    "sha256": "145dc2e0828386571d702f3d02388cd4d6d517e9dfe987894f7524f4ba2879b9",
+    "effectFrames": 31,
+    "evidence": "Original shikongganying_fla.Timeline_1 stops on frame 31. Return to the pet after the complete short source instead of holding its empty final frame for 16 seconds."
+  },
+  "resource/petcloth/body/pet4/shikongganying.swf": {
+    "sha256": "145dc2e0828386571d702f3d02388cd4d6d517e9dfe987894f7524f4ba2879b9",
+    "effectFrames": 31,
+    "evidence": "Original shikongganying_fla.Timeline_1 stops on frame 31. Return to the pet after the complete short source instead of holding its empty final frame for 16 seconds."
+  },
+  "resource/pet/swf/pet101/180025.swf": {
+    "sha256": "d7f8b3f44e9913e26bb8e1680c0cad8b9ff8ce419885b616ff8e9e35ca77e959",
+    "viewportScale": 12,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet2/180011.swf": {
+    "sha256": "d66eaa43ac95a0f928bae7eb8725f50a3fc2cfd21c0e19d6b11257d9326923d4",
+    "viewportScale": 20,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet2/180025.swf": {
+    "sha256": "86d89592c7c3046430bcab2cb7c03a5b8f69ba2b41e2e1d746a903015e501cee",
+    "viewportScale": 12,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet2/tuya1.swf": {
+    "sha256": "16c5e88b0d434bdbbcd7362b001c7bc82c10e811f15e1e351e0e92529816575b",
+    "viewportScale": 18,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet2/tuya2.swf": {
+    "sha256": "ff13d9dbe604164c71ecdc58be2ec73d997c67c481112901ca892ef0a54c5ed9",
+    "viewportScale": 18,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet3/180018.swf": {
+    "sha256": "637d5bcf6f78b75f5f15435f24e881cf5be6daf82a4f03f319c5a4cb982b4dfd",
+    "viewportScale": 11,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet3/tuya1.swf": {
+    "sha256": "7cccdfc61db2d7cda0e33c3cb00daceeff0ffa2b9dadb6e0c64b36b88752e8b6",
+    "viewportScale": 15,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet3/tuya2.swf": {
+    "sha256": "65dcde1c436f624e593eac3b3511aa2b4c5ceee2026dfce80477881c75a35e10",
+    "viewportScale": 15,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/180043.swf": {
+    "sha256": "375f523f8920da729913170beb3a5108b95e1abf0e6e1442cbd0394b61fbab83",
+    "viewportScale": 11,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/180046.swf": {
+    "sha256": "0a95d8149282c6b3b0165d6271973f41faf7c333559c2e9c7bf208b9d969d1c8",
+    "viewportScale": 12,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/180053.swf": {
+    "sha256": "a06f3b25adeb74907964390a0f7e847f7e25c28cd68ac634e70e3c1d1c04bb0e",
+    "viewportScale": 13,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/180054.swf": {
+    "sha256": "8a152eb50c9e269e6c4e59095eb384e075dcafd5ab9e3670a15228bddd19ba26",
+    "viewportScale": 11,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/tuya1.swf": {
+    "sha256": "d30242118153b89d6d1a23d091a23ae8fab0b1afd821cbfcd55a19831b95d4d9",
+    "viewportScale": 14,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/tuya2.swf": {
+    "sha256": "27878279a3615a8965707ee07a64d85ee33ef239f77ed1e21b3a7ad91cc87dc5",
+    "viewportScale": 14,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/tuya3.swf": {
+    "sha256": "797d0fe8e92c747a1bcb97973231195096fc3e75ec36202afd64ba561ab697a6",
+    "viewportScale": 17,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/pet/swf/pet4/tuya4.swf": {
+    "sha256": "a53908bfb22455e4da96f68277fc5dd0aee4d15ae8ab6f531495d45be2a764b5",
+    "viewportScale": 17,
+    "evidence": "Full original action crosses the ordinary drawing margin; fixed larger surface from observed body trajectory, without resizing the body or its saved anchor."
+  },
+  "resource/petcloth/swf2/1208000.swf": {
+    "sha256": "26163b1199a6789ed7d3c30a079ed69b92cfad1f44b69405370d26e06f7721bd",
+    "referenceBodyBounds": [
+      -7.46403211,
+      -25.31544312,
+      5.96183103,
+      -5.10311304
+    ],
+    "evidence": "Original face contour, shape 5, fill 1, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208001.swf": {
+    "sha256": "01b4036f1bdc1db31f7c85d5d7993276e8d358f3a850bfcd6310261e77e2f2db",
+    "referenceBodyBounds": [
+      -8.57629841,
+      -26.09871818,
+      7.06434153,
+      -9.37429615
+    ],
+    "evidence": "Original face contour, shape 5, fill 1, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208002.swf": {
+    "sha256": "619945c9dde494b9d279e65dab70a00a3ecd781ba414ca049267cc6275681ef9",
+    "referenceBodyBounds": [
+      -8.0137221,
+      -18.27524905,
+      6.66089412,
+      -4.31480713
+    ],
+    "evidence": "Original face contour, shape 8, fill None, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208003.swf": {
+    "sha256": "fd95c936ee2eef3f2d21822b0f2431f337cc89fc0ebb963f3ccb709afb628aa8",
+    "referenceBodyBounds": [
+      -7.74295715,
+      -17.4349801,
+      7.63106996,
+      -4.12267477
+    ],
+    "evidence": "Original face contour, shape 5, fill 2, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208004.swf": {
+    "sha256": "3b5b712041f22c61fa948cf850c84d2a5d3d90d9b7ac7ad18092739a52fd016f",
+    "referenceBodyBounds": [
+      -9.68006346,
+      -29.47302007,
+      8.14081842,
+      -13.888581
+    ],
+    "evidence": "Original face contour, shape 5, fill None, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208005.swf": {
+    "sha256": "46c4fa979dbd3cf578902caba2ccdcb19c6f9e78381c1eda5f490c792ab72c0f",
+    "referenceBodyBounds": [
+      -7.90546887,
+      -20.75814644,
+      6.38063594,
+      -6.37608044
+    ],
+    "evidence": "Original face contour, shape 8, fill None, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208006.swf": {
+    "sha256": "83abbb9aa90406a05313ee0b9b68349a326bdc72a00caaf6c487b0a3231e6d54",
+    "referenceBodyBounds": [
+      -8.92952945,
+      -33.36047534,
+      8.46997255,
+      -11.33141204
+    ],
+    "evidence": "Original face contour, shape 5, fill 3, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208007.swf": {
+    "sha256": "49ef2ae6a57cff4ece6f4361126f42dd0c798ed79a5d22ec7e8bb7902161d758",
+    "referenceBodyBounds": [
+      -9.55546,
+      -25.20360455,
+      7.81107549,
+      -14.94312908
+    ],
+    "evidence": "Original face contour, shape 5, fill 6, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208008.swf": {
+    "sha256": "cad96b78c9fdf40003832852114174e05df3f0081a6d0e41d6964c56e59a9a2b",
+    "referenceBodyBounds": [
+      -8.6337293,
+      -17.0390274,
+      8.60130971,
+      -3.33678937
+    ],
+    "evidence": "Original face contour, shape 5, fill 4, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208009.swf": {
+    "sha256": "900659d10d764135604a59413744b4d8f551c4aae485e059668c5bc94cc09ac5",
+    "referenceBodyBounds": [
+      -13.45086668,
+      -28.86801333,
+      7.64074851,
+      -11.59880098
+    ],
+    "evidence": "Original face contour, shape 4, fill 2, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208010.swf": {
+    "sha256": "2b0d95415f21992ac3a6a5ca6e735c2ac8550270e7de03b54d0d3505504cc8d0",
+    "referenceBodyBounds": [
+      -9.67983426,
+      -31.62030967,
+      8.11696123,
+      -20.86272684
+    ],
+    "evidence": "Original face contour, shape 5, fill 3, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208011.swf": {
+    "sha256": "6f54f0bf8f0c8508552bf07c23050ce4d5788a014aba106909e7ce56f8f50113",
+    "referenceBodyBounds": [
+      -7.73905038,
+      -32.56760209,
+      5.10606147,
+      -6.32937864
+    ],
+    "evidence": "Original face contour, shape 4, fill 1, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208012.swf": {
+    "sha256": "439b7d3bb65883ed183dfb845247be0e12e5bd34ad75bac23488059bf0929d0a",
+    "referenceBodyBounds": [
+      -11.48778012,
+      -54.18690123,
+      9.50153199,
+      -14.89213925
+    ],
+    "evidence": "Original face contour, shape 11, fill 1, pose level4#7; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208013.swf": {
+    "sha256": "797d0882c99b8dc9983d1d34455270338bd52f2835ffa67a587f8fec582573d9",
+    "referenceBodyBounds": [
+      -10.70024634,
+      -49.11014358,
+      2.50063925,
+      -3.99060535
+    ],
+    "evidence": "Original face contour, shape 4, fill 1, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208014.swf": {
+    "sha256": "60daeb0c55b884cb169eeb8a8ce39481448c6204b42d640081ed6a7c79dc71cd",
+    "referenceBodyBounds": [
+      -7.57460208,
+      -41.00903893,
+      9.47888672,
+      -5.47899728
+    ],
+    "evidence": "Original face contour, shape 4, fill 2, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208015.swf": {
+    "sha256": "88fc0392b33c35350bcbc3840e15d5ea3986e7e820b4494c904045b5c208979e",
+    "referenceBodyBounds": [
+      -10.52867199,
+      -41.28545457,
+      10.46064013,
+      -23.9775827
+    ],
+    "evidence": "Original face contour, shape 14, fill None, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208016.swf": {
+    "sha256": "a2834ac1c0480879743e2b900576653154fd3d94ecdf0c8ffb39acd4b2e80b48",
+    "referenceBodyBounds": [
+      -9.13168987,
+      -60.9756214,
+      6.07815082,
+      -51.83177454
+    ],
+    "evidence": "Original face contour, shape 9, fill 3, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/petcloth/swf2/1208017.swf": {
+    "sha256": "4b9fcddbadf15f5909bf8ba5866f20ff703b93f594891e09822d573c263fc639",
+    "referenceBodyBounds": [
+      -7.74482123,
+      -17.19433167,
+      9.3618649,
+      -5.23811697
+    ],
+    "evidence": "Original face contour, shape 7, fill 1, pose level4; horizontal contour through the original eyes excludes flames, branches, water columns and shadows. One fixed uniform registration for the entire timeline."
+  },
+  "resource/pet/swf/pet101/tuya1.swf": {
+    "sha256": "757e4ce0d4a2e775d181897b2900b10088c9975561f30f5ca95efc85767dd02e",
+    "viewportScale": 8
+  },
+  "resource/pet/swf/pet101/tuya2.swf": {
+    "sha256": "928d0097a8ced90ad8aed3e2c24cd04fffc12fd14c69e19f91759519a478c441",
+    "viewportScale": 8
+  },
+  "resource/pet/swf/pet101/tuya3.swf": {
+    "sha256": "5dcdc5c9ed7fb813941c3996d7932356a220f0ba5fa79602691dacb7ad3c4a46",
+    "viewportScale": 11
+  },
+  "resource/pet/swf/pet101/tuya4.swf": {
+    "sha256": "327abcd6b1816f701c4dfed369e1186aaf19a922a09c1c639117ba8e1058c47f",
+    "viewportScale": 11
+  },
+  "resource/pet/swf/pet2/tuya3.swf": {
+    "sha256": "8a7fbdcb28119e8ed44a63cf7b77525d74242a771d53e6ed6414d8e16e23f9b0",
+    "viewportScale": 8
+  },
+  "resource/pet/swf/pet2/tuya4.swf": {
+    "sha256": "827179d3fc8374d8693e9ed35b0a987fe52d742f3756331720bd29d08472425a",
+    "viewportScale": 8
+  },
+  "resource/pet/swf/pet3/tuya3.swf": {
+    "sha256": "451f314928c17fb34c8809dc194d6291524603786ead794c703c5a00477a602c",
+    "viewportScale": 14
+  },
+  "resource/pet/swf/pet3/tuya4.swf": {
+    "sha256": "f84d1600e6d36776085024a1883f60529d70c2689d11e39ba8271557e74d3769",
+    "viewportScale": 14
   }
 }

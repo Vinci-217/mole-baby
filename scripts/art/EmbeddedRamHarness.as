@@ -36,6 +36,14 @@ package §1200026_fla§ {
   public var fitX:Number=0;
   public var fitY:Number=0;
   public var namedBodyPaths:Object={};
+  public var viewportRatio:Number=1;
+  public var viewportScale:Number=3.2;
+  public var effectBounds:Rectangle;
+  public var effectFrames:int=0;
+  public var playedFrames:int=0;
+  public var holding:Boolean=false;
+  public var heldTimelines:Array=[];
+  public var bodyReference:Rectangle;
   public function lamu_mc_1(){super();addFrameScript(0,boot);}
   internal function boot():void {
    stop();while(numChildren)removeChildAt(0);addChild(holder);
@@ -45,6 +53,8 @@ package §1200026_fla§ {
     ExternalInterface.addCallback("previewSymbol",previewSymbol);
     ExternalInterface.addCallback("previewPose",previewPose);
     ExternalInterface.addCallback("previewZoom",previewZoom);
+    ExternalInterface.addCallback("previewPrepare",previewPrepare);
+    ExternalInterface.addCallback("previewPlay",previewPlay);
     ExternalInterface.addCallback("setBodyColor",setBodyColor);
    }
    sourceLoader=new Loader();
@@ -67,6 +77,11 @@ package §1200026_fla§ {
    referenceBounds=String(params.referenceBounds||"17.11472,35.95208,82.03084,81.50964").split(",");
    for(var coordinate:int=0;coordinate<referenceBounds.length;coordinate++)referenceBounds[coordinate]=Number(referenceBounds[coordinate]);
    costume=params.kind=="outfit";
+   viewportScale=Math.max(3.2,Math.min(32,Number(params.viewportScale)||3.2));
+   viewportRatio=3.2/viewportScale;
+   if(params.effectBounds){var envelope:Array=String(params.effectBounds).split(",");effectBounds=new Rectangle(Number(envelope[0]),Number(envelope[1]),Number(envelope[2])-Number(envelope[0]),Number(envelope[3])-Number(envelope[1]));effectFrames=int(params.effectFrames);}
+   effectFrames=int(params.effectFrames);
+   if(params.bodyReference){var reference:Array=String(params.bodyReference).split(",");bodyReference=new Rectangle(Number(reference[0]),Number(reference[1]),Number(reference[2])-Number(reference[0]),Number(reference[3])-Number(reference[1]));}
    for each(var poseDirection:String in ["down","left","right"]){
     var bodyPath:String=String(params["bodyPath_"+poseDirection]||"");
     if(bodyPath)namedBodyPaths[poseDirection]=bodyPath.split(",");
@@ -87,6 +102,8 @@ package §1200026_fla§ {
   public function onEnded(e:Event):void {ended=true;}
   public function onLoaded(e:Event):void {ready=true;previewSymbol(requestedSymbol);}
   public function onFrame(e:Event):void {
+   if(holding)holdTimelines(holder);
+   if(ready&&!holding&&effectFrames>0&&++playedFrames>=effectFrames)ended=true;
    stripNameFields(holder);
    if(settle>0&&--settle==0)fit();
    // petView.setPetColor colours the named petBody in item animations.
@@ -110,7 +127,7 @@ package §1200026_fla§ {
   public function previewSymbol(name:String):void {
    if(!ready)return;
    while(holder.numChildren)holder.removeChildAt(0);
-   bones=[null,null,null,null];directionMC=null;failure="";ended=false;
+   bones=[null,null,null,null];directionMC=null;failure="";ended=false;playedFrames=0;
    try{
     if(baseLoader){
      var baseClass:Class=baseLoader.contentLoaderInfo.applicationDomain.getDefinition("lamubone_fla.lamu_mc_1") as Class;
@@ -135,6 +152,19 @@ package §1200026_fla§ {
    for each(var f:FrameLabel in mc.currentLabels)if(f.name==label)return true;
    return false;
   }
+  public function holdTimelines(node:DisplayObjectContainer):void {
+   if(node is MovieClip){var mc:MovieClip=node as MovieClip;if(mc.totalFrames>1&&("isPlaying" in Object(mc))&&Object(mc)["isPlaying"]){if(heldTimelines.indexOf(mc)<0)heldTimelines.push(mc);mc.stop();}}
+   for(var i:int=0;i<node.numChildren;i++){var child:DisplayObject=node.getChildAt(i);if(child is DisplayObjectContainer)holdTimelines(child as DisplayObjectContainer);}
+  }
+  public function previewPrepare(name:String):void {
+   holding=false;heldTimelines=[];previewSymbol(name);holding=true;
+   holdTimelines(holder);
+  }
+  public function previewPlay():void {
+   if(!holding)return;holding=false;
+   for each(var mc:MovieClip in heldTimelines)if(mc.parent)mc.play();
+   heldTimelines=[];
+  }
   public function previewPose(nextForm:String,nextDirection:String,isMoving:Boolean,refreshRegistration:Boolean=false):void {
    if(nextForm!=form||refreshRegistration)registered=false;
    form=nextForm;direction=nextDirection;moving=isMoving;
@@ -146,6 +176,7 @@ package §1200026_fla§ {
     else if(direction&&hasLabel(mc,direction))mc.gotoAndStop(direction);
    }
    settle=12;
+   if(holding)holdTimelines(holder);
   }
   public function onLevel(e:Event):void {
    // Root instances in the base bone library are announced through this event.
@@ -229,19 +260,27 @@ package §1200026_fla§ {
    var bounds:Rectangle=holder.getBounds(holder);
    if(("lamu_txt" in Object(selected))&&Object(selected)["lamu_txt"])
     Object(selected)["lamu_txt"].visible=false;
-   if(bounds.width<=0||bounds.height<=0){settle=1;return;}
+   if((bounds.width<=0||bounds.height<=0)&&!effectBounds&&!bodyReference&&!registered){settle=1;return;}
    var nativeBody:DisplayObject=anatomyBody();
-   if(registerBody&&nativeBody){
+   if(effectBounds){
+    if(!registered){
+     var effectTarget:Array=referenceBounds;
+     fittedScale=Math.min(4*(effectTarget[2]-effectTarget[0])*2/effectBounds.width,4*140/effectBounds.height);
+     fitX=400*(effectTarget[0]+effectTarget[2])/200-(effectBounds.x+effectBounds.width/2)*fittedScale;
+     fitY=4*effectTarget[3]-effectBounds.bottom*fittedScale;
+     registration={basis:"effect-envelope",bodyWidth:effectBounds.width,bodyHeight:effectBounds.height,projectedWidth:effectBounds.width*fittedScale/4,scale:fittedScale,x:fitX,y:fitY};registered=true;
+    }
+   }else if(registerBody&&nativeBody){
     // Register the original BODY, never the hat/wings/book envelope. Cache the
     // down pose for every direction so changing pose cannot resize the pet.
     if(!registered){
-     var body:Rectangle=nativeBody.getBounds(holder);
+     var body:Rectangle=bodyReference||nativeBody.getBounds(holder);
      var target:Array=referenceBounds;
      if(body.width<=0){settle=1;return;}
      fittedScale=400*(target[2]-target[0])/100/body.width;
      fitX=400*(target[0]+target[2])/200-(body.x+body.width/2)*fittedScale;
      fitY=432*target[3]/108-body.bottom*fittedScale;
-     registration={basis:bones[1]?"body-bone":namedBodyPaths[direction]?"verified-body-node":nativeBody!=selected?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
+     registration={basis:bodyReference?"verified-body-reference":bones[1]?"body-bone":namedBodyPaths[direction]?"verified-body-node":nativeBody!=selected?"named-body":"complete-character",bodyWidth:body.width,bodyHeight:body.height,projectedWidth:(target[2]-target[0]),scale:fittedScale,x:fitX,y:fitY};
      registered=true;
     }
    }else if(!registered){
@@ -250,10 +289,11 @@ package §1200026_fla§ {
     fitY=432*.53-(bounds.y+bounds.height/2)*fittedScale;
     registered=true;
    }
-   holder.scaleX=holder.scaleY=fittedScale*zoom;
+   holder.scaleX=holder.scaleY=fittedScale*zoom*viewportRatio;
    // Transparent padding surrounds the fixed logical body viewport. Body
    // registration still uses 400x432; oversized hats must never shrink it.
-   holder.x=440+fitX;holder.y=475.2+fitY;
+   holder.x=(1280-400*viewportRatio)/2+fitX*viewportRatio;
+   holder.y=(1382.4-432*viewportRatio)/2+fitY*viewportRatio;
   }
   public function previewZoom(value:Number):void {zoom=value;fit();}
   public function setBodyColor(r:int,g:int,b:int):void {tint=new ColorTransform(1,1,1,1,r,g,b,0);if(bones[1])bones[1].transform.colorTransform=tint;}
@@ -265,8 +305,8 @@ package §1200026_fla§ {
    var painted:Rectangle=holder.getBounds(this);
    var bodyNode:DisplayObject=anatomyBody();
    var bodyPaint:Rectangle=bodyNode?bodyNode.getBounds(this):new Rectangle();
-   return {ready:ready,settled:settle==0,ended:ended,error:failure,symbol:requestedSymbol,form:form,direction:direction,moving:moving,
-    body:{x:(bodyPaint.x-440)/4,y:(bodyPaint.y-475.2)/4,width:bodyPaint.width/4,height:bodyPaint.height/4},
+   return {ready:ready,settled:settle==0,ended:ended,holding:holding,heldTimelines:heldTimelines.length,error:failure,symbol:requestedSymbol,form:form,direction:direction,moving:moving,
+    body:{x:(bodyPaint.x-(1280-400*viewportRatio)/2)/viewportRatio/4,y:(bodyPaint.y-(1382.4-432*viewportRatio)/2)/viewportRatio/4,width:bodyPaint.width/viewportRatio/4,height:bodyPaint.height/viewportRatio/4},viewportScale:viewportScale,
     viewport:{width:stage.stageWidth,height:stage.stageHeight},painted:{x:painted.x,y:painted.y,width:painted.width,height:painted.height},
     width:holder.getBounds(holder).width,height:holder.getBounds(holder).height,
     registration:registration,bones:frames,rig:rig,frame:selected is MovieClip?MovieClip(selected).currentFrame:0};

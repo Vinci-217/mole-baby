@@ -114,9 +114,17 @@
       251,
       273
     ],
-    "centerX": 305.6057692307692,
-    "baseY": 395.75,
-    "cssPixelsPerAtlasPixel": 0.5555555555555556
+    "centerX": 308.09037078691114,
+    "baseY": 394.04861408942304,
+    "cssPixelsPerAtlasPixel": 0.5555555555555556,
+    "referenceBodyWidth": 103.80628181704245,
+    "bodyReferenceSource": {
+      "shape": "5",
+      "fill": null,
+      "pose": "getItem",
+      "width": 17.993088848287357,
+      "sha256": "3b5b712041f22c61fa948cf850c84d2a5d3d90d9b7ac7ad18092739a52fd016f"
+    }
   },
   "durationMs": 3375,
   "rectangles": [

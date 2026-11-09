@@ -158,9 +158,17 @@
         112,
         164
       ],
-      "centerX": 78.19047619047619,
-      "baseY": 197.23809523809524,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 77.24248827136432,
+      "baseY": 196.76190476190473,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 86.41106548388454,
+      "bodyReferenceSource": {
+        "shape": "64",
+        "fill": null,
+        "pose": "getItem",
+        "width": 18.146323751615753,
+        "sha256": "26163b1199a6789ed7d3c30a079ed69b92cfad1f44b69405370d26e06f7721bd"
+      }
     },
     "durationMs": 5167,
     "rectangles": [
@@ -654,9 +662,17 @@
         101,
         194
       ],
-      "centerX": 64.65243902439025,
-      "baseY": 155.65853658536585,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 63.779149363254376,
+      "baseY": 95.24070966768295,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 57.28653853418542,
+      "bodyReferenceSource": {
+        "shape": "5",
+        "fill": 1,
+        "pose": "getItem",
+        "width": 15.658320532677347,
+        "sha256": "01b4036f1bdc1db31f7c85d5d7993276e8d358f3a850bfcd6310261e77e2f2db"
+      }
     },
     "durationMs": 4167,
     "rectangles": [
@@ -1168,9 +1184,17 @@
         140,
         281
       ],
-      "centerX": 80.30708661417323,
-      "baseY": 289.6377952755905,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 79.35648270709943,
+      "baseY": 243.1259948488189,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 60.15296453773293,
+      "bodyReferenceSource": {
+        "shape": "8",
+        "fill": null,
+        "pose": "getItem",
+        "width": 14.691204800561696,
+        "sha256": "619945c9dde494b9d279e65dab70a00a3ecd781ba414ca049267cc6275681ef9"
+      }
     },
     "durationMs": 4167,
     "rectangles": [
@@ -1547,9 +1571,17 @@
         339,
         209
       ],
-      "centerX": 212.4375,
-      "baseY": 171.8125,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 214.08556013435395,
+      "baseY": 149.320939243125,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 50.02207053960287,
+      "bodyReferenceSource": {
+        "shape": "5",
+        "fill": 2,
+        "pose": "getItem",
+        "width": 15.391406319877806,
+        "sha256": "fd95c936ee2eef3f2d21822b0f2431f337cc89fc0ebb963f3ccb709afb628aa8"
+      }
     },
     "durationMs": 3792,
     "rectangles": [
@@ -2060,9 +2092,17 @@
         251,
         273
       ],
-      "centerX": 305.6057692307692,
-      "baseY": 395.75,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 308.09037078691114,
+      "baseY": 394.04861408942304,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 103.80628181704245,
+      "bodyReferenceSource": {
+        "shape": "5",
+        "fill": null,
+        "pose": "getItem",
+        "width": 17.993088848287357,
+        "sha256": "3b5b712041f22c61fa948cf850c84d2a5d3d90d9b7ac7ad18092739a52fd016f"
+      }
     },
     "durationMs": 3375,
     "rectangles": [
@@ -2615,9 +2655,17 @@
         184,
         290
       ],
-      "centerX": 104.27272727272727,
-      "baseY": 239.27272727272725,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 102.09970660579238,
+      "baseY": 192.63708499999998,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 52.00819708653286,
+      "bodyReferenceSource": {
+        "shape": "8",
+        "fill": null,
+        "pose": "getItem",
+        "width": 14.302254198796536,
+        "sha256": "46c4fa979dbd3cf578902caba2ccdcb19c6f9e78381c1eda5f490c792ab72c0f"
+      }
     },
     "durationMs": 2875,
     "rectangles": [
@@ -2936,9 +2984,17 @@
         263,
         321
       ],
-      "centerX": 199.59615384615384,
-      "baseY": 310.6538461538462,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 196.8585043883691,
+      "baseY": 294.1986585384616,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 66.91497107591383,
+      "bodyReferenceSource": {
+        "shape": "35",
+        "fill": 3,
+        "pose": "getItem",
+        "width": 17.397892479737592,
+        "sha256": "83abbb9aa90406a05313ee0b9b68349a326bdc72a00caaf6c487b0a3231e6d54"
+      }
     },
     "durationMs": 2125,
     "rectangles": [
@@ -3222,9 +3278,17 @@
         197,
         153
       ],
-      "centerX": 157.7758620689655,
-      "baseY": 162.25862068965515,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 156.05384986219138,
+      "baseY": 118.27509641379311,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 77.6334077558599,
+      "bodyReferenceSource": {
+        "shape": "42",
+        "fill": 5,
+        "pose": "getItem",
+        "width": 17.318221730153365,
+        "sha256": "49ef2ae6a57cff4ece6f4361126f42dd0c798ed79a5d22ec7e8bb7902161d758"
+      }
     },
     "durationMs": 2542,
     "rectangles": [
@@ -3575,9 +3639,17 @@
         264,
         337
       ],
-      "centerX": 161.6368715083799,
-      "baseY": 284.4022346368715,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 161.86090281284444,
+      "baseY": 253.66009247349618,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 51.660536990858255,
+      "bodyReferenceSource": {
+        "shape": "125",
+        "fill": 4,
+        "pose": "getItem",
+        "width": 15.412060202272713,
+        "sha256": "cad96b78c9fdf40003832852114174e05df3f0081a6d0e41d6964c56e59a9a2b"
+      }
     },
     "durationMs": 1209,
     "rectangles": [
@@ -3829,9 +3901,17 @@
         257,
         581
       ],
-      "centerX": 94.95081967213115,
-      "baseY": 287.73770491803276,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 97.62126360597995,
+      "baseY": 250.28999705061102,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 41.312673539922564,
+      "bodyReferenceSource": {
+        "shape": "47",
+        "fill": 5,
+        "pose": "getItem",
+        "width": 21.000609049460635,
+        "sha256": "900659d10d764135604a59413744b4d8f551c4aae485e059668c5bc94cc09ac5"
+      }
     },
     "durationMs": 3459,
     "rectangles": [
@@ -4343,9 +4423,17 @@
         317,
         514
       ],
-      "centerX": 113.85121107266436,
-      "baseY": 268.7820069204152,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 126.64224248131097,
+      "baseY": 212.94463667820068,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 36.99013174330099,
+      "bodyReferenceSource": {
+        "shape": "53",
+        "fill": 3,
+        "pose": "getItem",
+        "width": 17.816913456356644,
+        "sha256": "2b0d95415f21992ac3a6a5ca6e735c2ac8550270e7de03b54d0d3505504cc8d0"
+      }
     },
     "durationMs": 3792,
     "rectangles": [
@@ -4854,9 +4942,17 @@
         714,
         992
       ],
-      "centerX": 287.9183673469388,
-      "baseY": 512.0,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 287.24567600139267,
+      "baseY": 480.13138000816326,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 31.492977079549146,
+      "bodyReferenceSource": {
+        "shape": "61",
+        "fill": 1,
+        "pose": "getItem",
+        "width": 12.859632307482567,
+        "sha256": "6f54f0bf8f0c8508552bf07c23050ce4d5788a014aba106909e7ce56f8f50113"
+      }
     },
     "durationMs": 4375,
     "rectangles": [
@@ -5635,9 +5731,17 @@
         700,
         830
       ],
-      "centerX": 308.88524590163934,
-      "baseY": 410.1967213114754,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 309.64980433452115,
+      "baseY": 398.70178395672133,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 41.11228995185176,
+      "bodyReferenceSource": {
+        "shape": "42",
+        "fill": 3,
+        "pose": "getItem",
+        "width": 20.89874739219131,
+        "sha256": "439b7d3bb65883ed183dfb845247be0e12e5bd34ad75bac23488059bf0929d0a"
+      }
     },
     "durationMs": 1792,
     "rectangles": [
@@ -5968,9 +6072,17 @@
         472,
         1203
       ],
-      "centerX": 274.14285714285717,
-      "baseY": 861.2857142857143,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 269.72783077714286,
+      "baseY": 853.9415538057143,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 99.08464649142857,
+      "bodyReferenceSource": {
+        "shape": "36",
+        "fill": 4,
+        "pose": "getItem#3",
+        "width": 34.679626272,
+        "sha256": "797d0882c99b8dc9983d1d34455270338bd52f2835ffa67a587f8fec582573d9"
+      }
     },
     "durationMs": 3709,
     "rectangles": [
@@ -6534,9 +6646,17 @@
         731,
         989
       ],
-      "centerX": 389.5238095238095,
-      "baseY": 614.2380952380953,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 395.13305697206204,
+      "baseY": 544.6768230422857,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 42.04548243575177,
+      "bodyReferenceSource": {
+        "shape": "44",
+        "fill": 2,
+        "pose": "getItem",
+        "width": 16.979906368284368,
+        "sha256": "60daeb0c55b884cb169eeb8a8ce39481448c6204b42d640081ed6a7c79dc71cd"
+      }
     },
     "durationMs": 4709,
     "rectangles": [
@@ -7609,7 +7729,15 @@
       ],
       "centerX": 471.1348973607038,
       "baseY": 1437.3372434017595,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 36.77198954637768,
+      "bodyReferenceSource": {
+        "shape": "14",
+        "fill": null,
+        "pose": "getItem",
+        "width": 20.898747392191318,
+        "sha256": "88fc0392b33c35350bcbc3840e15d5ea3986e7e820b4494c904045b5c208979e"
+      }
     },
     "durationMs": 6250,
     "rectangles": [
@@ -9043,9 +9171,17 @@
         1209,
         1840
       ],
-      "centerX": 629.1946564885495,
-      "baseY": 1038.8320610687022,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "centerX": 620.5797352596422,
+      "baseY": 909.9273332845614,
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 34.68140435490662,
+      "bodyReferenceSource": {
+        "shape": "9",
+        "fill": 3,
+        "pose": "getItem",
+        "width": 15.14421323497589,
+        "sha256": "a2834ac1c0480879743e2b900576653154fd3d94ecdf0c8ffb39acd4b2e80b48"
+      }
     },
     "durationMs": 5875,
     "rectangles": [
@@ -10017,7 +10153,15 @@
       ],
       "centerX": 690.9830508474575,
       "baseY": 1208.3559322033898,
-      "cssPixelsPerAtlasPixel": 0.5555555555555556
+      "cssPixelsPerAtlasPixel": 0.5555555555555556,
+      "referenceBodyWidth": 43.30391738035599,
+      "bodyReferenceSource": {
+        "shape": "7",
+        "fill": 1,
+        "pose": "getItem",
+        "width": 17.03287416960669,
+        "sha256": "4b9fcddbadf15f5909bf8ba5866f20ff703b93f594891e09822d573c263fc639"
+      }
     },
     "durationMs": 7917,
     "rectangles": [

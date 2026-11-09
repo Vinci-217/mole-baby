@@ -1,8 +1,8 @@
 /* Offline original vectors. No application bridge or access to parent storage. */
 (async function(){
  const token=new URLSearchParams(location.search).get('token'),pollLimit=300; // 45s at 150ms, matching the host's cold-start budget
- let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,clip,looping,pose,requestAcknowledged=false;
- const manifest=fetch('manifest.json?v=6').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
+ let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,clip,looping,pose,requestAcknowledged=false,viewportScale=3.2,prepared=false;
+ const manifest=fetch('manifest.json?v=8').then(response=>{if(!response.ok)throw Error('Manifest unavailable');return response.json()});
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
  const call=(name,...args)=>player&&player.ruffle().callExternalInterface(name,...args);
  const maskCanvas=document.createElement('canvas');maskCanvas.width=100;maskCanvas.height=108;
@@ -10,7 +10,7 @@
   const canvas=player.shadowRoot.querySelector('canvas'),ctx=maskCanvas.getContext('2d',{willReadFrequently:true});
   if(!canvas||!ctx)return null;
   // Match the host's original body hit area, excluding transparent padding.
-  ctx.clearRect(0,0,100,108);ctx.drawImage(canvas,canvas.width*11/32,canvas.height*11/32,canvas.width*10/32,canvas.height*10/32,0,0,100,108);
+  ctx.clearRect(0,0,100,108);ctx.drawImage(canvas,canvas.width*(viewportScale-1)/2/viewportScale,canvas.height*(viewportScale-1)/2/viewportScale,canvas.width/viewportScale,canvas.height/viewportScale,0,0,100,108);
   const rgba=ctx.getImageData(0,0,100,108).data,alpha=[];
   for(let i=3;i<rgba.length;i+=4)alpha.push(rgba[i]);return alpha;
  }
@@ -21,12 +21,13 @@
   call('setBodyColor',...pose.color);
   if(!lastPose||lastPose.form!==pose.form||lastPose.direction!==pose.direction||lastPose.moving!==pose.moving){call('previewPose',pose.form,pose.direction,pose.moving,clip.kind==='outfit'&&!visible);poseSettling=clip.kind==='outfit';}
   player.ruffle().volume=pose.sound?Math.max(0,Math.min(1,pose.volume??.45)):0;lastPose={...pose};
+  if(!pose.paused&&!document.hidden)call('previewPlay');
   if(!poseSettling&&(pose.paused||document.hidden))player.ruffle().suspend();
  }
  async function load(request){
   if(request.sequence<=sequence)return;
-  ready=false;visible=false;poseSettling=false;requestAcknowledged=false;clearInterval(timer);lastPose=null;
-  sequence=request.sequence;id=request.value.id;pose=request.value.pose;looping=request.value.loop;
+  ready=false;visible=false;poseSettling=false;requestAcknowledged=false;prepared=false;clearInterval(timer);lastPose=null;
+  sequence=request.sequence;id=request.value.id;pose=request.value.pose;looping=request.value.loop;viewportScale=Math.max(3.2,Math.min(32,request.value.viewportScale||3.2));
   const current=sequence;
   // Retire a superseded load immediately. A slow/failed old engine must not
   // hold every later wardrobe selection in a serial loading queue.
@@ -42,7 +43,7 @@
    player=window.RufflePlayer.newest().createPlayer();window.player=player;document.body.append(player);
    const referenceForm=request.value.referenceForm||pose.form;
    const formName={level1:'seed',level2:'junior',level3:'middle',level4:'senior',level101:'classic',level101_7:'super',level5_1:'fire',level5_2:'water',level5_4:'wood'}[referenceForm]||'junior';
-   await player.ruffle().load({url:'controller.swf?v=6',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,kind:clip.kind,registerBody:request.value.registerBody!==false?'1':'',referenceForm,referenceBounds:library.bodyBounds[formName].join(','),bodyPath_down:(clip.namedBodyPaths?.down||[]).join(','),bodyPath_left:(clip.namedBodyPaths?.left||[]).join(','),bodyPath_right:(clip.namedBodyPaths?.right||[]).join(','),base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
+   await player.ruffle().load({url:'controller.swf?v=8',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,kind:clip.kind,viewportScale:String(viewportScale),effectBounds:(clip.effectBounds||[]).join(','),bodyReference:(clip.referenceBodyBounds||[]).join(','),effectFrames:String(clip.effectFrames||0),registerBody:request.value.registerBody!==false?'1':'',referenceForm,referenceBounds:library.bodyBounds[formName].join(','),bodyPath_down:(clip.namedBodyPaths?.down||[]).join(','),bodyPath_left:(clip.namedBodyPaths?.left||[]).join(','),bodyPath_right:(clip.namedBodyPaths?.right||[]).join(','),base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
    if(current!==sequence)return;
    player.ruffle().volume=0;
    let tries=0,lastMask=0;
@@ -58,8 +59,9 @@
      }
      const state=call('previewStatus');
      if(state&&state.error){send('error',state.error);clearInterval(timer);return;}
+     if(state&&state.ready&&state.settled&&state.registration&&!prepared&&clip.kind!=='outfit'){call('previewPrepare',clip.symbol);prepared=true;return;}
      if(state&&state.ended){if(looping){call('previewSymbol',clip.symbol);lastPose=null;}else{send('finished');clearInterval(timer);}return;}
-     if(state&&state.ready&&state.settled&&state.width>0){
+     if(state&&state.ready&&state.settled&&state.registration){
       if(!ready){ready=true;try{apply();}catch(error){ready=false;throw error;}if(poseSettling)return;}
       poseSettling=false;
       // Pose selection recreates nested source timelines. Wait for the new

@@ -1,5 +1,6 @@
 import OfficialClipMenu from './components/OfficialClipMenu';
 import {officialClip,isOfficialAction,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from './official-clips';
+import {drawingUnion,useNativeDrawingBounds} from './original-viewport';
 import {chooseAutonomousOriginal,isAmbientAction,originalItemClip,playbackForm,usesTransformationSmoke} from './pet-original-actions';
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
 import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
@@ -108,6 +109,7 @@ function GameDialog({ title, children, onClose, wide = false }: { title: string;
 }
 
 export default function App() {
+  const nativeDrawingBounds=useNativeDrawingBounds();
   const [pet, setPetRaw] = useState<GameState | null>(readSave);
   const setPet=useCallback((change:SetStateAction<GameState|null>,reason='自然消耗与休息')=>{
     setPetRaw(previous=>{const next=typeof change==='function'?change(previous):change;return previous&&next?recordStatChange(previous,next,reason):next;});
@@ -364,7 +366,7 @@ export default function App() {
   function startOfficial(id:string){
     const saved=petRef.current,clip=officialClip(id);if(!saved||!clip||clip.path.includes('/tatter/')||!playbackForm(clip,petActionAppearance(saved,`official-${id}`).form))return;
     const reason=playBlockReason(saved)??animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});if(reason){notify(reason);return}
-    clearInvitation();setPanel(null);setBubbleVisible(false);animate(`official-${id}`);setMemory(m=>m?recordEvent(m,{kind:'play-original',detail:`你让我展示了${clip.name}。`}):m);
+    clearInvitation();void openPanel(null);setBubbleVisible(false);animate(`official-${id}`);setMemory(m=>m?recordEvent(m,{kind:'play-original',detail:`你让我展示了${clip.name}。`}):m);
   }
   function finishUploaded(completed=true){
     const run=uploadedRun.current;uploadedRun.current=null;const saved=petRef.current
@@ -452,8 +454,9 @@ export default function App() {
   }
   useDesktopPetStatus(pet);
   useEffect(()=>{
-    void window.desktop?.setPetArtworkBounds?.(petMode&&current.wearing&&!reading&&!workingAway?{x:-100,y:-80,width:360,height:420}:null).catch(()=>{});
-  },[petMode,current.wearing,reading,workingAway]);
+    const bounds=petMode&&!workingAway?drawingUnion([...(nativeDrawingBounds?[nativeDrawingBounds]:[]),...(current.wearing&&!reading?[{x:-100,y:-80,width:360,height:420}]:[])]):null;
+    void window.desktop?.setPetArtworkBounds?.(bounds).catch(()=>{});
+  },[petMode,current.wearing,reading,workingAway,nativeDrawingBounds]);
   const effectId=action.startsWith('element-')?action.slice(8):null;
   const importedEffect=uploadedMotion(actionAppearance.form,action,actionItemId);
   const previousEffectMode=useRef(floating);

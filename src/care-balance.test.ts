@@ -10,6 +10,7 @@ import {activityBlockReason} from './pet-school';
 import {mayPlay,playBlockReason} from './pet-pastimes';
 import {elementEffectRect,originalElementClip,elementDecodedBytes} from './element-playback';
 import {ELEMENT_SKILLS} from './element-skills';
+import visibility from '../electron/edge-visibility.json';
 
 const NOW=1_800_000_000_000;
 const fresh=()=>({...createPet('小叶','blue',NOW),growth:180});
@@ -74,14 +75,18 @@ describe('random game receipts',()=>{
   expect(rewardGame(result.state,5,NOW,()=>{throw Error('Duplicate draw')}).ok).toBe(false);
  });
 });
+const formWidth=(form:'classic'|'super')=>visibility.forms[form].body[2]-visibility.forms[form].body[0];
 describe('fixed original spell coordinates',()=>{
  for(const {id} of ELEMENT_SKILLS)it(`${id} keeps source scale as its effects expand`,()=>{
   const clip=originalElementClip(id),rect=elementEffectRect(id,'super')!;
-  expect(rect.width/clip.width).toBeCloseTo(160/288);
-  expect(rect.height/clip.height).toBeCloseTo(160/288);
+  const scale=rect.width/clip.width;
+  expect(rect.height/clip.height).toBeCloseTo(scale);
+  expect(clip.registration.referenceBodyWidth*scale).toBeCloseTo(visibility.forms.super.body[2]-visibility.forms.super.body[0]);
+  expect(elementEffectRect(id,'super')).toEqual(rect);
   expect(elementDecodedBytes(id)).toBeLessThan(160*1024*1024);
-  expect(elementEffectRect(id,'classic')!.width).toBe(rect.width);
-  expect(elementEffectRect(id,'classic')!.x).toBe(rect.x);
+  const classic=elementEffectRect(id,'classic')!,width=formWidth('classic');
+  expect(classic.width/rect.width).toBeCloseTo(width/formWidth('super'));
+  expect(clip.registration.referenceBodyWidth*classic.width/clip.width).toBeCloseTo(width);
  });
  it('allows large effects to exceed the former 160-pixel host',()=>{
   for(const id of ['fire-6','water-6','wood-6']){

@@ -1559,7 +1559,14 @@
       "forms": [],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "effectBounds": [
+        -250.95,
+        -506.87,
+        299.6,
+        51.35
+      ],
+      "effectFrames": 54
     },
     {
       "id": "b2c9c63884c34e98",
@@ -1573,7 +1580,14 @@
       "forms": [],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "effectBounds": [
+        -150.95,
+        -306.45,
+        116.45,
+        -77.25
+      ],
+      "effectFrames": 140
     },
     {
       "id": "a486047605dcea8d",
@@ -1587,7 +1601,14 @@
       "forms": [],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "effectBounds": [
+        -409.2,
+        -507.1,
+        552.45,
+        58.85
+      ],
+      "effectFrames": 141
     },
     {
       "id": "d2cd4bce176502a4",
@@ -1601,7 +1622,14 @@
       "forms": [],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "effectBounds": [
+        -150.95,
+        -306.45,
+        116.45,
+        -77.25
+      ],
+      "effectFrames": 140
     },
     {
       "id": "1eefd1c58ac3a016",
@@ -2357,7 +2385,8 @@
       "forms": [],
       "level": 101,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 12
     },
     {
       "id": "c770133f45af477c",
@@ -2833,7 +2862,8 @@
       "forms": [],
       "level": 101,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 8
     },
     {
       "id": "c6f55b2acc95f8de",
@@ -2847,7 +2877,8 @@
       "forms": [],
       "level": 101,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 8
     },
     {
       "id": "f96028b36141c514",
@@ -2861,7 +2892,8 @@
       "forms": [],
       "level": 101,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 11
     },
     {
       "id": "17d38d0609715304",
@@ -2875,7 +2907,8 @@
       "forms": [],
       "level": 101,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 11
     },
     {
       "id": "185894fcb037825b",
@@ -3029,7 +3062,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 20
     },
     {
       "id": "738616c2300a93c2",
@@ -3197,7 +3231,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 12
     },
     {
       "id": "57579b0f72a90e52",
@@ -3715,7 +3750,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 18
     },
     {
       "id": "fb541baeaa517546",
@@ -3729,7 +3765,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 18
     },
     {
       "id": "09591f1b8257838d",
@@ -3743,7 +3780,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 8
     },
     {
       "id": "5886132408e1721a",
@@ -3757,7 +3795,8 @@
       "forms": [],
       "level": 2,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 8
     },
     {
       "id": "0803eb1a0f3a5f39",
@@ -4009,7 +4048,8 @@
       "forms": [],
       "level": 3,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 11
     },
     {
       "id": "9c61f5407f2250fe",
@@ -4583,7 +4623,8 @@
       "forms": [],
       "level": 3,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 15
     },
     {
       "id": "e68cabae6ad929d0",
@@ -4597,7 +4638,8 @@
       "forms": [],
       "level": 3,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 15
     },
     {
       "id": "2fd2aec3e9c98765",
@@ -4611,7 +4653,8 @@
       "forms": [],
       "level": 3,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 14
     },
     {
       "id": "aa302145c0682137",
@@ -4625,7 +4668,8 @@
       "forms": [],
       "level": 3,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 14
     },
     {
       "id": "0d11219219136b41",
@@ -5087,7 +5131,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 11
     },
     {
       "id": "a5e774823a7721f7",
@@ -5129,7 +5174,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 12
     },
     {
       "id": "7f412355360cea34",
@@ -5227,7 +5273,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 13
     },
     {
       "id": "23450c1987682d39",
@@ -5241,7 +5288,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 11
     },
     {
       "id": "a8cd810dc0cb06f4",
@@ -5493,7 +5541,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 14
     },
     {
       "id": "2197dcd00bd6c5a7",
@@ -5507,7 +5556,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 14
     },
     {
       "id": "c7d7624758248c5a",
@@ -5521,7 +5571,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 17
     },
     {
       "id": "92f5127ca84d7bfc",
@@ -5535,7 +5586,8 @@
       "forms": [],
       "level": 4,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "viewportScale": 17
     },
     {
       "id": "5c0941276a5a95ca",
@@ -5605,7 +5657,8 @@
       "forms": [],
       "level": 101,
       "fps": 12.0,
-      "animated": true
+      "animated": true,
+      "effectFrames": 31
     },
     {
       "id": "90f76706243a4f04",
@@ -5703,7 +5756,8 @@
       "forms": [],
       "level": 2,
       "fps": 12.0,
-      "animated": true
+      "animated": true,
+      "effectFrames": 31
     },
     {
       "id": "54b0fc9130e65781",
@@ -5787,7 +5841,8 @@
       "forms": [],
       "level": 3,
       "fps": 12.0,
-      "animated": true
+      "animated": true,
+      "effectFrames": 31
     },
     {
       "id": "4fedf1919f3d5c3f",
@@ -5885,7 +5940,8 @@
       "forms": [],
       "level": 4,
       "fps": 12.0,
-      "animated": true
+      "animated": true,
+      "effectFrames": 31
     },
     {
       "id": "029dcc800a0418ea",
@@ -8356,7 +8412,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.46403211,
+        -25.31544312,
+        5.96183103,
+        -5.10311304
+      ]
     },
     {
       "id": "609b40d5dbea69ad",
@@ -8375,7 +8437,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -8.57629841,
+        -26.09871818,
+        7.06434153,
+        -9.37429615
+      ]
     },
     {
       "id": "297d8d8f515e04de",
@@ -8394,7 +8462,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -8.0137221,
+        -18.27524905,
+        6.66089412,
+        -4.31480713
+      ]
     },
     {
       "id": "1601b8365c0944e5",
@@ -8413,7 +8487,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.74295715,
+        -17.4349801,
+        7.63106996,
+        -4.12267477
+      ]
     },
     {
       "id": "dee9f15d976e27a2",
@@ -8432,7 +8512,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -9.68006346,
+        -29.47302007,
+        8.14081842,
+        -13.888581
+      ]
     },
     {
       "id": "6a647bf7de1e6f13",
@@ -8451,7 +8537,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.90546887,
+        -20.75814644,
+        6.38063594,
+        -6.37608044
+      ]
     },
     {
       "id": "4b6d344698e302d9",
@@ -8470,7 +8562,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -8.92952945,
+        -33.36047534,
+        8.46997255,
+        -11.33141204
+      ]
     },
     {
       "id": "e6bed5087d954bf5",
@@ -8489,7 +8587,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -9.55546,
+        -25.20360455,
+        7.81107549,
+        -14.94312908
+      ]
     },
     {
       "id": "332fb71c7e5364d2",
@@ -8508,7 +8612,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -8.6337293,
+        -17.0390274,
+        8.60130971,
+        -3.33678937
+      ]
     },
     {
       "id": "b1e99839abfe7fee",
@@ -8527,7 +8637,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -13.45086668,
+        -28.86801333,
+        7.64074851,
+        -11.59880098
+      ]
     },
     {
       "id": "6aff13f0cd602947",
@@ -8546,7 +8662,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -9.67983426,
+        -31.62030967,
+        8.11696123,
+        -20.86272684
+      ]
     },
     {
       "id": "ab1f591dc7c24aac",
@@ -8565,7 +8687,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.73905038,
+        -32.56760209,
+        5.10606147,
+        -6.32937864
+      ]
     },
     {
       "id": "4c5d65d105aa0968",
@@ -8584,7 +8712,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -11.48778012,
+        -54.18690123,
+        9.50153199,
+        -14.89213925
+      ]
     },
     {
       "id": "4588685ad73ee480",
@@ -8603,7 +8737,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -10.70024634,
+        -49.11014358,
+        2.50063925,
+        -3.99060535
+      ]
     },
     {
       "id": "121dc3613989f40b",
@@ -8622,7 +8762,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.57460208,
+        -41.00903893,
+        9.47888672,
+        -5.47899728
+      ]
     },
     {
       "id": "658b49fd71af684e",
@@ -8641,7 +8787,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -10.52867199,
+        -41.28545457,
+        10.46064013,
+        -23.9775827
+      ]
     },
     {
       "id": "7ed08393d670a47f",
@@ -8660,7 +8812,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -9.13168987,
+        -60.9756214,
+        6.07815082,
+        -51.83177454
+      ]
     },
     {
       "id": "838712f652f74cf1",
@@ -8679,7 +8837,13 @@
       ],
       "level": 0,
       "fps": 24.0,
-      "animated": true
+      "animated": true,
+      "referenceBodyBounds": [
+        -7.74482123,
+        -17.19433167,
+        9.3618649,
+        -5.23811697
+      ]
     },
     {
       "id": "f3fe158871700317",

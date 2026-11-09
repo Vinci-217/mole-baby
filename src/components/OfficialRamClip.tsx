@@ -6,6 +6,7 @@ import type {RamForm} from '../original-actions'
 import {officialTimelineForm,OFFICIAL_FORM,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from '../official-clips'
 import type {OfficialClip} from '../official-clips'
 import {validOutfitBody,type OutfitBodyBounds} from '../outfit-petting'
+import {officialViewportScale} from '../original-viewport'
 import './OfficialRamClip.css'
 
 /** A mounted outfit reuses one isolated engine; the player has no save bridge. */
@@ -13,6 +14,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const frame=useRef<HTMLIFrameElement>(null),mask=useRef<HTMLCanvasElement>(null),end=useRef(onEnd);end.current=onEnd
  const readyCallback=useRef(onReady),errorCallback=useRef(onError);readyCallback.current=onReady;errorCallback.current=onError;
  const bodyCallback=useRef(onBodyBounds);bodyCallback.current=onBodyBounds;
+ const viewportScale=officialViewportScale(clip)
  const loadKey=`${clip.id}:${form}:${bodyForm}:${finite}:${registerBody}`
  const [loadState,setLoadState]=useState({key:'',state:'loading'}),[token]=useState(()=>Math.random().toString(36).slice(2))
  const state=loadState.key===loadKey?loadState.state:'loading'
@@ -20,14 +22,22 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  const direction=action.includes('left')?'left':action.includes('right')?'right':'down'
  const pose=useRef({form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused})
  pose.current={form:officialTimelineForm(clip,form),direction,moving:action.includes('walk')||action.includes('running'),color:[...petColorOffsets(color)],sound,volume,paused}
- const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=6&token=${token}`)
+ const [src]=useState(()=>(window.desktop?.isElectron?'ram-original://assets/':'./assets/original/official/')+`runtime.html?v=8&token=${token}`)
  const sendPose=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-pose',token,sequence:sequence.current,value:pose.current},'*')
  useEffect(()=>{sendPose()},[color,direction,action,form,sound,volume,paused])
+ useEffect(()=>{
+  let announced=false;
+  const request=requestAnimationFrame(()=>{const node=frame.current,pet=node?.closest('.desktop-character'),parent=pet?.closest('.compact-pet');if(!node||!parent)return;
+   const art=node.getBoundingClientRect(),base=parent.getBoundingClientRect();announced=true;
+   window.dispatchEvent(new CustomEvent('ram-native-drawing-bounds',{detail:{token,bounds:{x:art.x-base.x,y:art.y-base.y,width:art.width,height:art.height}}}));
+  });
+  return()=>{cancelAnimationFrame(request);if(announced)window.dispatchEvent(new CustomEvent('ram-native-drawing-bounds',{detail:{token,bounds:null}}))}
+ },[token,viewportScale])
  useEffect(()=>{
   const current=++sequence.current
   let done=false,announced=false,finish:ReturnType<typeof setTimeout>|undefined
   setLoadState({key:loadKey,state:'loading'})
-  const load=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-load',token,sequence:current,value:{id:clip.id,form:officialTimelineForm(clip,form),loop:!finite,registerBody,referenceForm:OFFICIAL_FORM[bodyForm],pose:pose.current}},'*')
+  const load=()=>frame.current?.contentWindow?.postMessage({type:'ram-original-load',token,sequence:current,value:{id:clip.id,form:officialTimelineForm(clip,form),loop:!finite,registerBody,referenceForm:OFFICIAL_FORM[bodyForm],viewportScale,pose:pose.current}},'*')
   requestLoad.current=load
   const fail=()=>{if(done)return;done=true;setLoadState({key:loadKey,state:'failed'});errorCallback.current?.();if(finite)end.current?.(false)}
   const watchdog=setTimeout(fail,OFFICIAL_LOAD_TIMEOUT)
@@ -55,7 +65,7 @@ export default function OfficialRamClip({clip,form,bodyForm=form,color,action='i
  },[clip.id,form,finite,registerBody,token,loadKey])
  return <span className={`official-ram-clip is-${state}`} data-official-id={clip.id} data-source={clip.path} data-color={color} data-loaded={state==='ready'}>
   {state!=='ready'&&<span className="official-clip-fallback">{fallback}</span>}
-  <iframe ref={frame} src={src} onLoad={()=>requestLoad.current()} title={clip.name} className="official-clip-player" aria-hidden="true" tabIndex={-1} allow="autoplay"/>
+  <iframe ref={frame} src={src} onLoad={()=>requestLoad.current()} title={clip.name} className="official-clip-player" style={{left:`${-(viewportScale-1)*50}%`,top:`${-(viewportScale-1)*50}%`,width:`${viewportScale*100}%`,height:`${viewportScale*100}%`}} aria-hidden="true" tabIndex={-1} allow="autoplay"/>
   {state==='ready'&&<canvas ref={mask} width={100} height={108} className="ram-classic-frame official-hit-mask" aria-hidden="true"/>}
  </span>
 }
