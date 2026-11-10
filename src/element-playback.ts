@@ -7,9 +7,14 @@ export const originalElementClip=(id:string)=>clips[id as keyof typeof clips];
 export function elementEffectRect(id:string,form:RamForm){
  const clip=originalElementClip(id);if(!clip)return null;
  const r=clip.registration;
+ // The source timeline already records one calibrated atlas-to-CSS scale for
+ // the complete effect. Re-scaling it from the current body's width magnifies
+ // large fire/water/wood canvases a second time and breaks their fixed body
+ // registration. The form is retained in the signature for callers and the
+ // visibility profile continues to provide the body origin.
  const body=visibility.forms[form].body;
- const k=r.referenceBodyWidth?(body[2]-body[0])/r.referenceBodyWidth:r.cssPixelsPerAtlasPixel;
- return {x:50-r.centerX*k,y:visibility.forms[form].body[3]-r.baseY*k,width:clip.width*k,height:clip.height*k};
+ const k=r.cssPixelsPerAtlasPixel;
+ return {x:50-r.centerX*k,y:body[3]-r.baseY*k,width:clip.width*k,height:clip.height*k};
 }
 export function elementDecodedBytes(id:string){
  const clip=originalElementClip(id);if(!clip)return 0;
