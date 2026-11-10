@@ -112,7 +112,7 @@ let draggingFromEdge = false;
 let petOffset={x:0,y:0};
 let petEffectBounds=null;
 let petEffectAnchor=null;
-let petArtworkBounds=null,petArtworkAnchor=null;
+let petArtworkBounds=null,petArtworkAnchor=null,petArtworkResetRequested=false;
 let nativePetLimits=null;
 let trayTooltip=trayStatusText(null);
 let pointerPress=null,cursorDrag=null,dragPoll=null;
@@ -523,6 +523,7 @@ function changePetEffectBounds(effect){
  * and the saved logical pet anchor keep their normal behaviour. */
 function changePetArtworkBounds(bounds){
  if(bounds!==null&&(!bounds||Array.isArray(bounds)||['x','y','width','height'].some(key=>typeof bounds[key]!=='number'||!Number.isFinite(bounds[key]))||Math.abs(bounds.x)>4096||Math.abs(bounds.y)>4096||bounds.width<=0||bounds.height<=0||bounds.width>4096||bounds.height>4096))throw new TypeError('Invalid pet artwork bounds');
+ if(bounds===null)petArtworkResetRequested=true;else petArtworkResetRequested=false;
  if(JSON.stringify(bounds)===JSON.stringify(petArtworkBounds))return getDesktopState();
  const base=petMode?currentPetBounds():null;
  petArtworkBounds=bounds?{x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height}:null;
@@ -750,12 +751,14 @@ function changePetMode(enabled) {
   panelLayout = 'compact';
   panelGeometry = null;
   if (enabled) {
-    // A room return can race a renderer repaint after a previous costume or
-    // effect. Start the compact pet mode from the canonical 160px frame; the
-    // renderer will immediately request a larger frame again when the current
-    // outfit actually needs it.
-    petArtworkBounds = null;
-    petArtworkAnchor = null;
+    // A renderer may have explicitly cleared a previous costume/effect while
+    // the native window was still in room mode. Keep that reset authoritative
+    // through the mode transition without discarding a genuine outfit request.
+    if (petArtworkResetRequested) {
+      petArtworkBounds = null;
+      petArtworkAnchor = null;
+      petArtworkResetRequested = false;
+    }
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
     const baseTarget = clampBounds(petBounds, PET_SIZE),target=artworkWindowBounds(baseTarget);
     mainWindow.webContents.setZoomFactor?.(petScale);
@@ -767,6 +770,11 @@ function changePetMode(enabled) {
     mainWindow.setAlwaysOnTop(petAlwaysOnTop, 'floating');
     petBounds = baseTarget;
   } else {
+    if (petArtworkResetRequested) {
+      petArtworkBounds = null;
+      petArtworkAnchor = null;
+      petArtworkResetRequested = false;
+    }
     mainWindow.webContents.setZoomFactor?.(1);
     petMode = false;petOffset={x:0,y:0};
     const target = clampBounds(normalBounds, NORMAL_SIZE);
