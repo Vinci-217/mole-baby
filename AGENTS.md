@@ -30,4 +30,6 @@
 4. 推送后使用 `gh run list --repo Vinci-217/mole-baby` 和 `gh run watch <run-id> --repo Vinci-217/mole-baby --exit-status` 等待全部平台完成。任何平台失败都必须读取对应 Job 日志并修复后重跑，不能跳过失败发布。
 5. 成功后核对 GitHub Release、Windows 安装包和 ZIP、macOS DMG 和 ZIP、Android APK 和 XAPK、SHA256、更新清单与覆盖升级存档兼容性。
 
+构建时，Vite 的 `✓ built` 提示早于 `closeBundle` 中的无损素材处理结束；必须等 `Lossless assets` 汇总打印且整个进程以 0 退出，再启动依赖 `dist/` 的录制或界面检查。不要在构建仍写入素材时判定动画加载失败，也不要为缩短等待而删帧或降低素材质量。
+
 保留现有用户数据目录、固定签名、包名和更新渠道；不要通过升级脚本清理存档。`--allow-dirty` 仅用于本地演练，不能和 `--push` 一起使用。
