@@ -603,7 +603,7 @@ export default function App() {
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }
-  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null);beginWorkViewSwitch(true); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetArtworkBounds?.(null); await window.desktop.setPetMode(true); } catch(error) {workPresence.current.endViewSwitch(); notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
+  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null);beginWorkViewSwitch(true); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetEffectBounds?.(null); await window.desktop.setPetArtworkBounds?.(null); await window.desktop.setPetMode(true); } catch(error) {workPresence.current.endViewSwitch(); notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
   function updateNotes(notes:PetNote[]){
     const saved=petRef.current;if(!saved)return false;
     const next={...saved,notes:normalizeNotes(notes)};
@@ -620,7 +620,7 @@ export default function App() {
     setPanel('notes');
   }
   async function openPanel(next: Panel) { if(next==='notes'){await openBoard();return} if (floating && next && ['shop','games','growth','settings','decor','wardrobe','memories','school','notes'].includes(next)) { await enterHome(next); return; } if (next === 'food'||next === 'status') setPocketVisit(v => v + 1); setPanel(next); if (petMode) { try { await window.desktop?.setCompanionPanel(next !== null, 'compact'); } catch { notify('小窗暂时无法打开，请再试一次。'); } } }
-  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false);beginWorkViewSwitch(false);try{await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetArtworkBounds?.(null); await window.desktop?.setPetMode(false)}catch(error){workPresence.current.endViewSwitch();throw error} }
+  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false);beginWorkViewSwitch(false);try{await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetEffectBounds?.(null); await window.desktop?.setPetArtworkBounds?.(null); await window.desktop?.setPetMode(false)}catch(error){workPresence.current.endViewSwitch();throw error} }
   function startTimer() {
     if (!prefs.reminders) return;
     if(petRef.current?.activity){notify('先结束当前课程或工作吧。');return;}
