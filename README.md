@@ -55,6 +55,8 @@ npm test                 # 养成、存档、窗口与更新测试
 
 使用操作见[小屋布置与桌面计时](docs/ROOM-LAYOUT.md)。打包命令见 [package.json](package.json)。[Android 构建](docs/ANDROID.md) · [Mac 签名](docs/MACOS-SIGNING.md) · [课程说明](docs/COURSES.md)
 
+发版统一使用 `npm run release -- --check` 检查；维护者确认本轮发布后，运行 `npm run release -- --push`。各平台打包、成品校验和发布由 GitHub Actions 完成，完整操作与存档保护要求见 [AGENTS.md](AGENTS.md#通用发版流程)。
+
 提交问题时，请附上系统、软件版本、复现步骤，以及完整报错文字。涉及存档的问题请先导出备份。
 
 ## Token 赞助鸣谢
@@ -73,7 +75,7 @@ npm test                 # 养成、存档、窗口与更新测试
 
 | | |
 | :---: | :---: |
-| ![叔叔](docs/sponsors/shushu.png) **叔叔** | |
+| ![叔权](docs/sponsors/shuquan.png) **叔权** | |
 
 ## 素材声明与免责声明
 

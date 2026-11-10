@@ -2,9 +2,13 @@
 
 ## 审核状态
 
-用户已经完成本轮审计并授权发版；本地检查通过后将推送 `release/v0.33.1`，由既有多平台流水线创建标签和 GitHub Release。发布前不会直接改动用户存档或自动更新渠道。
+[v0.33.1 已正式发布](https://github.com/Vinci-217/mole-baby/releases/tag/v0.33.1)，发布时间为 **2026-11-10 11:43:25 UTC**。用户已完成本轮审计并授权发版。
+
+- 发布源码与标签：`4ccb8d13f9038d4df859ea671c743a6122deffc6`。
+- [构建与发布流水线](https://github.com/Vinci-217/mole-baby/actions/runs/42805645559)：Windows 现代版、兼容版 x64/ia32、Mac arm64/x64、Android 六个平台及正式发布检查均通过。
+- [公开下载与更新渠道核验](release-0.33.1-public-checks.json)：30 个附件、四个桌面更新渠道、Android 更新清单和 12 个安装包／便携包的公开下载入口已核对。
+
 本轮实现包含神力超拉图集、导出脚本、显示设置、完整栅格回退资源保留及 Android XAPK 分包产物。
-相对于线上 v0.33.0（`aa00515`），候选版累计包含此前已预览但未发布的 8 个本地提交、155 个文件变动。
 除下述本次修复外，还包括原版服装加载、摸头和动作回退、点点拉姆装尺寸、透明绘制窗口及神力形态选择修复。
 
 ## 本轮修复
@@ -26,7 +30,7 @@
 ## 本地验证
 
 - `npm test`：64 个 Vitest 文件、503 项测试和 169 项 Node 测试通过，共 672 项。
-- `npm run build`：生产构建完成；918 张 PNG 转为无损 WebP，逐像素验证可见 RGB 和所有 alpha；不再排除可作为动作回退的逐帧图集。
+- `npm run build`：生产构建完成；1419 张图片无损处理，166.55 MB → 106.29 MB，保留动作所需的全部栅格回退资源；原客户端素材库不改动。
 - 新增真实像素回归检查：神力超拉三个方向的每张原姿态都必须包含中间亮黄色叶片，橙色侧叶无法代替其通过检查。
 - `scripts/audit-raster-sizes.cjs`：扫描 310 段位图、54,116 个时间帧。两个既有初级涂鸦备用图集的中位身体宽度被标记；应用相应道具使用完整官方 SWF 路径，未按该旧图集重新缩放角色。
 - `scripts/record-super-reading-review.cjs`：实际生产组件录制完整看书循环、待机及左右移动；没有页面错误或缺失请求，逐帧检查飞行动作中间叶片的存在。
@@ -43,9 +47,27 @@
 648 个动作组合按播放窗口抽样检查，不等同于人工逐帧审美验收；三系特效检查首、中、末帧，完整位图另有帧表扫描。
 预览 GIF 为 14 秒、12fps 的实际录屏，游戏中保留原 24fps 动作数据。
 
-本轮 Windows 现代/兼容版、Mac arm64/x64、Android 成品由发版流水线构建和验证；Android 同时生成标准 APK 与 XAPK（内含字节一致的 APK 和安装清单）。
-Windows/Mac 托盘设置另有模拟原生接口测试；实际桌面操作验证运行在云电脑的 Linux Electron 环境，不能代替各平台成品验收。
-用户已确认发版；推送后必须通过既有各平台构建、安装包、XAPK 内容和升级存档检查，全部通过后才公开发布。
+本轮 Windows 现代/兼容版、Mac arm64/x64、Android 成品均已在发版流水线构建和验证；Android 同时生成标准 APK 与 XAPK（内含字节一致的 APK 和安装清单）。
+Windows/Mac 原生检查在各自 GitHub 运行器执行，Windows 现代版另有真实覆盖升级和存档保留检查；Android 使用 Android 15 模拟器进行 WebView、悬浮窗和同签名覆盖升级验证，不能等同于华为 Pura 70 Ultra 真机验收。
+
+打包检查同步修正了跨用例继承穿戴状态、服装不支持睡觉时的动作回退、五种神力形态、隐藏快捷栏和特效身体配准等旧测试预期；没有通过清理玩家存档解决夹具问题。
+
+## 公开成品与发布工具
+
+12 个安装包／便携包均请求了前 1024 字节，返回 HTTP 206、正确总大小和相应文件头。完整文件校验在 CI 完成；公开 SHA256 清单另外与 GitHub 上传附件的 SHA256 摘要逐项核对，局部请求不等同于本地完整重下载。
+
+| 平台 | 推荐安装包大小（十进制 MB） | 其他包 |
+| --- | ---: | --- |
+| Windows 10/11 x64 | 702.34 | ZIP 741.65 MB |
+| Windows 兼容 x64 | 681.27 | ZIP 709.75 MB |
+| Windows 兼容 ia32 | 677.64 | ZIP 704.23 MB |
+| Mac Apple 芯片 | DMG 726.51 | ZIP 720.93 MB |
+| Mac Intel | DMG 732.90 | ZIP 727.32 MB |
+| Android | APK 625.87 | XAPK 625.87 MB，需支持 XAPK 的安装器 |
+
+GitHub latest 与四个桌面更新文件均指向 0.33.1。Android 为 `0.33.1 / 1330100`，保持包名及原固定签名，保留 0.33.0 等历史版本的差量基线。Mac 两种架构均为本地签名，尚未经过 Apple 公证，首次打开按发布页指引操作。
+
+统一发版入口为 `npm run release -- --check` 和 `npm run release -- --push`，完整流程写在 `AGENTS.md`。README 新增 Token 赞助者「小红薯66D7CB02」，素材赞助单独列出「叔权」及头像，并保留淘米素材权属、免责声明和鸣谢。文档修正同步到主分支，不重新打包已校验的安装包。
 
 ## 优先审计的代码
 
@@ -57,7 +79,7 @@ Windows/Mac 托盘设置另有模拟原生接口测试；实际桌面操作验�
 | 日常图集 | `public/assets/original/daily-frames/super-*`、`flight/super-*.png`：完整帧表，缩放及落点不变 |
 | 托盘开关 | `electron/main.cjs`、`src/components/DesktopCompanion.tsx`：默认常显；开启时悬停显示并记住偏好 |
 | 角色绘制与原版服饰 | `src/components/Ram.tsx`、`OfficialRamClip.tsx`、`src/original-viewport.ts`：原版服装、临时动作回退、扩展绘制面 |
-| 版本与发布说明 | `package.json`、`package-lock.json`、`RELEASE_NOTES.md`：候选号 0.33.1，尚未公开 |
+| 版本与发布说明 | `package.json`、`package-lock.json`、`RELEASE_NOTES.md`：正式版本 0.33.1 |
 
 ## 复现素材导出
 
