@@ -750,6 +750,12 @@ function changePetMode(enabled) {
   panelLayout = 'compact';
   panelGeometry = null;
   if (enabled) {
+    // A room return can race a renderer repaint after a previous costume or
+    // effect. Start the compact pet mode from the canonical 160px frame; the
+    // renderer will immediately request a larger frame again when the current
+    // outfit actually needs it.
+    petArtworkBounds = null;
+    petArtworkAnchor = null;
     normalAlwaysOnTop = mainWindow.isAlwaysOnTop();
     const baseTarget = clampBounds(petBounds, PET_SIZE),target=artworkWindowBounds(baseTarget);
     mainWindow.webContents.setZoomFactor?.(petScale);
