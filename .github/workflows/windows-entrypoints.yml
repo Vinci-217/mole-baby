@@ -59,8 +59,7 @@ jobs:
       - name: Build only a small diagnostic app with the real installer hooks
         shell: pwsh
         run: |
-          node -e 'const fs=require("node:fs");fs.mkdirSync("artifacts",{recursive:true});fs.writeFileSync("artifacts/entrypoint-builder.cjs",`const{build}=require("../package.json");module.exports={...build,extends:null,appId:"com.molebaby.entrypointfixture",productName:"拉姆入口测试",directories:{output:"artifacts/entrypoint-package"},files:["artifacts/windows-entrypoint-fixture.cjs"],extraMetadata:{name:"mole-entrypoint-fixture",main:"artifacts/windows-entrypoint-fixture.cjs"},win:{...build.win,extraFiles:[]},nsis:{...build.nsis,artifactName:"entrypoint-Setup.exe"}};`);fs.copyFileSync("scripts/windows-entrypoint-fixture.cjs","artifacts/windows-entrypoint-fixture.cjs"));'
-          npx --no-install electron-builder --config artifacts/entrypoint-builder.cjs --win nsis --x64 --publish never
+          npx --no-install electron-builder --config scripts/entrypoint-builder.cjs --win nsis --x64 --publish never
           if($LASTEXITCODE -ne 0){throw 'Diagnostic package build failed'}
       - name: Launch every shortcut and repair intentionally stale targets
         shell: pwsh
