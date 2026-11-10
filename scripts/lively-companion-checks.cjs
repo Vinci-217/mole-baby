@@ -10,6 +10,10 @@ async function verifyLivelyCompanion(page){
   await expect.poll(async()=>{const p=await save();return{coins:p.coins,checkIn:p.checkIn}}).toEqual({coins:50,checkIn:undefined});
   const daily=page.getByRole('button',{name:'每日签到领取1000摩尔豆',exact:true});await daily.evaluate(b=>{b.click();b.click()});await expect.poll(async()=>(await save()).coins).toBe(1050);await expect(page.getByRole('button',{name:'今日已签到',exact:true})).toBeDisabled();await page.reload();await expect(page.getByTestId('desktop-character')).toBeVisible();await enterHome(page);await expect(page.getByRole('button',{name:'今日已签到',exact:true})).toBeDisabled();assert.equal((await save()).coins,1050);
   await roomTab(page,'衣橱');const mirror=page.locator('.wardrobe-mirror');await page.getByRole('button',{name:'试戴粉兔帽',exact:true}).click();
+  // Sleeping and care actions intentionally fall back to the uncostumed
+  // source when the original outfit has no matching timeline. Select a
+  // supported movement pose before asserting the native outfit player.
+  await page.getByRole('button',{name:'预览左走动作',exact:true}).click();
   const player=mirror.locator('.official-ram-clip');await expect(player).toHaveAttribute('data-loaded','true',{timeout:60000});await expect(player).toHaveAttribute('data-source',/1200033\.swf$/);
   const size=await mirror.locator('.ram-sprite').first().boundingBox();
   for(const name of ['左走','右走','睡觉','摸摸']){await page.getByRole('button',{name:`预览${name}动作`,exact:true}).click();await expect(player).toHaveAttribute('data-loaded','true');await expect(player.locator('iframe')).toHaveCount(1);const bounds=await mirror.locator('.ram-sprite').first().boundingBox();assert.ok(Math.abs(bounds.width-size.width)<.5&&Math.abs(bounds.height-size.height)<.5,'native costume poses preserve body scale');}
