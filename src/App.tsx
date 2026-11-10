@@ -603,7 +603,7 @@ export default function App() {
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }
-  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null);beginWorkViewSwitch(true); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { await window.desktop.setPetMode(true); } catch(error) {workPresence.current.endViewSwitch(); notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
+  async function toDesktop() { try{await roomScreen.exit()}catch{notify('退出全屏失败，请重试。');return;} setPanel(null); setGame(null);beginWorkViewSwitch(true); await window.desktop?.setCompanionPanel(false); if (window.desktop) { try { if(!current.wearing) await window.desktop.setPetArtworkBounds?.(null); await window.desktop.setPetMode(true); } catch(error) {workPresence.current.endViewSwitch(); notify(window.mobile&&error instanceof Error?error.message:'窗口切换失败，请稍后再试。'); } } else setPreview(true); }
   function updateNotes(notes:PetNote[]){
     const saved=petRef.current;if(!saved)return false;
     const next={...saved,notes:normalizeNotes(notes)};
