@@ -36,6 +36,7 @@ function Test-Entry([string]$entry,[string]$phase) {
  $raw=Join-Path (Split-Path -Parent $Report) ('shortcut-files/'+$phase+'/'+[IO.Path]::GetFileName((Split-Path -Parent $entry)))
  New-Item -ItemType Directory -Path $raw -Force | Out-Null
  Copy-Item -LiteralPath $entry -Destination $raw
+ Write-Output ('SHORTCUT_BYTES '+[Convert]::ToBase64String([IO.File]::ReadAllBytes($entry)))
  $record=[ordered]@{phase=$phase;shortcut=$entry;target=$link.TargetPath;workingDirectory=$link.WorkingDirectory;arguments=$link.Arguments;targetExists=(Test-Path -LiteralPath $link.TargetPath);bytes=(Get-Item -LiteralPath $entry).Length}
  $links.Add($record)
  Write-Output ('SHORTCUT '+($record|ConvertTo-Json -Compress))

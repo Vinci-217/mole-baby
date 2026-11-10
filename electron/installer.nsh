@@ -46,7 +46,6 @@
     MessageBox MB_OK|MB_ICONSTOP "无法创建安装目录中的启动入口，请检查安装目录的写入权限后重试。$\r$\n$INSTDIR"
     Abort
   ${EndIf}
-  WinShell::SetLnkAUMI "$INSTDIR\${PRODUCT_FILENAME}.lnk" "${APP_ID}"
   !ifndef DO_NOT_CREATE_START_MENU_SHORTCUT
     !insertmacro createMenuDirectory
     ClearErrors
@@ -55,7 +54,6 @@
       MessageBox MB_OK|MB_ICONSTOP "无法创建开始菜单入口，请检查安装权限后重试。$\r$\n$newStartMenuLink"
       Abort
     ${EndIf}
-    WinShell::SetLnkAUMI "$newStartMenuLink" "${APP_ID}"
   !endif
   !ifndef DO_NOT_CREATE_DESKTOP_SHORTCUT
     ${IfNot} ${isNoDesktopShortcut}
@@ -68,7 +66,6 @@
           MessageBox MB_OK|MB_ICONSTOP "无法修复桌面快捷方式，请检查桌面目录的写入权限后重试。$\r$\n$newDesktopLink"
           Abort
         ${EndIf}
-        WinShell::SetLnkAUMI "$newDesktopLink" "${APP_ID}"
       ${EndIf}
     ${EndIf}
   !endif

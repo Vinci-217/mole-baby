@@ -42,7 +42,9 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
 
 1. 先按 **Win + R**，输入 **winver** 查看系统版本；再到「计算机／此电脑 → 属性」查看 **32 位／64 位操作系统**。选择上表对应的安装包。
 2. Windows 10／11 的64位现代版文件是 **mole-baby-${version}-Setup.exe**；老系统64位文件是 **mole-baby-${version}-legacy-x64-Setup.exe**；32位文件是 **mole-baby-${version}-legacy-ia32-Setup.exe**。
-3. 双击安装包，按提示选择安装位置并安装；完成后勾选运行。第一次使用会进入领养，同一版本渠道的更新保留已有拉姆。
+3. 双击安装包，按提示选择安装位置并安装；完成后勾选运行。以后可从桌面、开始菜单或安装目录中的「拉姆.lnk」启动，兼容版为「拉姆兼容版」。第一次使用会进入领养，同一版本渠道的更新保留已有拉姆。
+
+**旧快捷方式提示找不到程序？** 直接运行本页对应的新版安装包覆盖安装，会按实际安装目录重建入口；无需先卸载，也不要删除存档。安装目录中的「拉姆.exe」（兼容版为「拉姆兼容版.exe」）是主程序，不要只移动这一个文件。
 
 如果提示「此应用无法在你的电脑上运行」，请先检查是否把64位程序放到了32位系统，或在Windows7／8上选择了现代版；下载不完整也可能造成此提示。重新下载对应安装包，可用 PowerShell 的 **Get-FileHash -Algorithm SHA256 文件名** 与附件 **SHA256SUMS.txt** 核对。安装器会在不支持的系统上给出明确提示。Windows XP、Vista及未安装SP1的Windows7不在兼容范围内。
 
