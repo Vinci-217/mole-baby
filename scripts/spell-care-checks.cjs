@@ -47,8 +47,9 @@ async function verifySpellCare(page,desktop){
     // Old Chromium rounds percentage canvas sizes to a fractional CSS pixel;
     // keep the original fixed scale contract while allowing that bounded DIP
     // rounding on legacy x86/x64 runners.
-    const expectedRatio=(160/288)*result.parentWidth/100;
-    assert.ok(Math.abs(result.ratio-expectedRatio)<.01,`original fixed scale must survive large effect bounds: ${JSON.stringify({result,expectedRatio})}`);
+    const formBody=require('../electron/edge-visibility.json').forms.super.body;
+    const expectedRatio=((formBody[2]-formBody[0])/clip.registration.referenceBodyWidth)*result.parentWidth/100;
+    assert.ok(Math.abs(result.ratio-expectedRatio)<.01,`original calibrated scale must survive large effect bounds: ${JSON.stringify({result,expectedRatio})}`);
     if(frame===1)assert.ok(Math.max(result.inkWidth,result.inkHeight)>70,'preparation pose remains readable at actual desktop size');
     samples.push({frame,...result});
     if(frame===peak)await page.screenshot({path:path.join(out,`${id}-${desktop?'native':'browser'}.png`),omitBackground:true});
