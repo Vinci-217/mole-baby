@@ -7,7 +7,11 @@ async function verifyRoomPocket(page,desktop){
  const label=process.platform+'-'+process.arch;
  const bounds=()=>desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
- await page.evaluate(()=>{const key='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(key));p.inventory={biscuit:5,berry:2,'180001':4,'180007':2,'180010':1,juice:3,'180002':2,'180003':2,'180009':1,'180005':1};p.lastTick=Date.now();localStorage.setItem(key,JSON.stringify(p))});await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
+  // This check exercises the compact, uncostumed desktop frame. The preceding
+  // packaged smoke flow intentionally tries on a native outfit; make the
+  // fixture explicit so its 160px assertion cannot depend on that earlier
+  // wardrobe scenario or on a stale renderer repaint.
+  await page.evaluate(()=>{const key='ramu-house-save-v1',p=JSON.parse(localStorage.getItem(key));delete p.wearing;p.inventory={biscuit:5,berry:2,'180001':4,'180007':2,'180010':1,juice:3,'180002':2,'180003':2,'180009':1,'180005':1};p.lastTick=Date.now();localStorage.setItem(key,JSON.stringify(p))});await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
  await enterHome(page);const original=await bounds();
  try{
   await expect(page.locator('.room-resize-edge')).toHaveCount(8);
