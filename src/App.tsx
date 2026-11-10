@@ -225,7 +225,12 @@ export default function App() {
     const desktop = window.desktop; if (!desktop) return;
     if (awaitingAdoption.current) { desktop.readyToShow(false); return; }
     let cancelled = false;
-    const ready = () => requestAnimationFrame(() => requestAnimationFrame(() => { if (!cancelled) desktop.readyToShow(hasPet); }));
+    // A hidden BrowserWindow can throttle requestAnimationFrame on Windows,
+    // leaving the adoption page hidden forever. Signal readiness immediately
+    // and keep the two-frame follow-up for platforms that need a paint settle.
+    let signaled = false;
+    const signal = () => { if (cancelled || signaled) return; signaled = true; desktop.readyToShow(hasPet); };
+    const ready = () => { signal(); requestAnimationFrame(() => requestAnimationFrame(signal)); setTimeout(signal, 250); };
     void desktop.setPetMode(desktop.platform==='android'?false:hasPet).then(ready).catch(() => {
       // A native window can reject a mode change while it is still restoring
       // its first bounds. The renderer is already usable; reveal it so the
@@ -615,7 +620,7 @@ export default function App() {
     setPanel('notes');
   }
   async function openPanel(next: Panel) { if(next==='notes'){await openBoard();return} if (floating && next && ['shop','games','growth','settings','decor','wardrobe','memories','school','notes'].includes(next)) { await enterHome(next); return; } if (next === 'food'||next === 'status') setPocketVisit(v => v + 1); setPanel(next); if (petMode) { try { await window.desktop?.setCompanionPanel(next !== null, 'compact'); } catch { notify('小窗暂时无法打开，请再试一次。'); } } }
-  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false);beginWorkViewSwitch(false);try{await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetMode(false)}catch(error){workPresence.current.endViewSwitch();throw error} }
+  async function enterHome(next: Panel = null) { setPanel(next); setGame(null); setPreview(false);beginWorkViewSwitch(false);try{await window.desktop?.setCompanionPanel(false); await window.desktop?.setPetArtworkBounds?.(null); await window.desktop?.setPetMode(false)}catch(error){workPresence.current.endViewSwitch();throw error} }
   function startTimer() {
     if (!prefs.reminders) return;
     if(petRef.current?.activity){notify('先结束当前课程或工作吧。');return;}

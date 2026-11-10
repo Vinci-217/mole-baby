@@ -65,6 +65,15 @@ npm test                 # 养成、存档、窗口与更新测试
 | :---: | :---: | :---: |
 | ![慕容狗尾巴草](docs/sponsors/murong.png) **慕容狗尾巴草** | ![太白猕猴桃🥝](docs/sponsors/taibai.png) **太白猕猴桃🥝** | ![参苓](docs/sponsors/shencha.png) **参苓** |
 | ![cong12110](docs/sponsors/cong12110.png) **cong12110** | ![波子汽水](docs/sponsors/bozi.png) **波子汽水** | ![从而言之y](docs/sponsors/congeryanzhi.png) **从而言之y** |
+| ![小红薯66D7CB02](docs/sponsors/xiaohongshu-66d7cb02.png) **小红薯66D7CB02** | | |
+
+## 素材赞助鸣谢
+
+感谢以下朋友对官方素材整理、素材处理和测试工作的支持。
+
+| | |
+| :---: | :---: |
+| ![叔叔](docs/sponsors/shushu.png) **叔叔** | |
 
 ## 素材声明与免责声明
 

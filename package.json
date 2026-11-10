@@ -28,7 +28,8 @@
     "android:build": "node scripts/android/build.cjs",
     "android:assets": "node scripts/android/prepare-assets.cjs",
     "android:manifest": "node scripts/android/prepare-update.cjs",
-    "build:preview": "cross-env VITE_LOCAL_DEBUG=1 npm run build"
+    "build:preview": "cross-env VITE_LOCAL_DEBUG=1 npm run build",
+    "release": "node scripts/release.cjs"
   },
   "dependencies": {
     "core-js": "^3.51.0",
