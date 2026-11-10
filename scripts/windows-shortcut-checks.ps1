@@ -23,6 +23,7 @@ $entries=@(
  (Join-Path ([Environment]::GetFolderPath('Programs')) "$ProductName.lnk")
 )
 if($RequireInstalledShortcut){$entries+=Join-Path $install "$ProductName.lnk"}
+$entries=@($entries|ForEach-Object {[IO.Path]::GetFullPath($_)})
 $checks=[Collections.Generic.List[string]]::new()
 $links=[Collections.Generic.List[object]]::new()
 $failure=$null
@@ -40,9 +41,6 @@ function Test-Entry([string]$entry,[string]$phase) {
  $record=[ordered]@{phase=$phase;shortcut=$entry;target=$link.TargetPath;workingDirectory=$link.WorkingDirectory;arguments=$link.Arguments;targetExists=(Test-Path -LiteralPath $link.TargetPath);bytes=(Get-Item -LiteralPath $entry).Length}
  $links.Add($record)
  Write-Output ('SHORTCUT '+($record|ConvertTo-Json -Compress))
- if(!$link.TargetPath.Equals($exe,[StringComparison]::OrdinalIgnoreCase) -or !$record.targetExists){throw "Broken $phase shortcut: $entry -> $($link.TargetPath); expected $exe"}
- if(!$link.WorkingDirectory.Equals($install,[StringComparison]::OrdinalIgnoreCase)){throw "Wrong $phase shortcut working directory: $($link.WorkingDirectory)"}
- if($link.Arguments -ne ''){throw "Unexpected $phase shortcut arguments: $($link.Arguments)"}
  Stop-TestPet
  # ShellExecute the .lnk itself, from a directory unrelated to the app. The
  # old finish-page test bypassed every shortcut by executing the EXE directly.
@@ -55,6 +53,9 @@ function Test-Entry([string]$entry,[string]$phase) {
   Start-Sleep -Milliseconds 100
  }
  if(!$visible){throw "The $phase shortcut did not launch a visible installed application: $entry"}
+ if(!$link.TargetPath -or !([IO.Path]::GetFullPath($link.TargetPath)).Equals($exe,[StringComparison]::OrdinalIgnoreCase) -or !$record.targetExists){throw "Broken $phase shortcut: $entry -> $($link.TargetPath); expected $exe"}
+ if(!$link.WorkingDirectory -or !([IO.Path]::GetFullPath($link.WorkingDirectory)).Equals($install,[StringComparison]::OrdinalIgnoreCase)){throw "Wrong $phase shortcut working directory: $($link.WorkingDirectory)"}
+ if($link.Arguments -ne ''){throw "Unexpected $phase shortcut arguments: $($link.Arguments)"}
  $checks.Add("$phase launched $entry")
  Stop-TestPet
 }
