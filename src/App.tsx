@@ -382,7 +382,7 @@ export default function App() {
     const title=UPLOADED_TOYS.find(t=>t.id===run.id)!.name;setMemory(m=>m?recordEvent(m,{kind:'play-original',detail:`你陪我玩了${title}。`}):m)
   }
   function stopUploaded(){uploadedRun.current=null;clearTimeout(timers.current.animation);finishCareFeedback();setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}
-  useEffect(()=>{if(!isUploadedAction(action)&&!isOfficialAction(action)&&!actionItemId)return;const stop=(e:KeyboardEvent)=>{if(e.key==='Escape'&&panel===null)stopUploaded()};document.addEventListener('keydown',stop);return()=>document.removeEventListener('keydown',stop)},[action,actionItemId,panel])
+  useEffect(()=>{if(!isUploadedAction(action)&&!isOfficialAction(action)&&!isSchoolAction(action)&&action!=='spell'&&!actionItemId)return;const stop=(e:KeyboardEvent)=>{if(e.key==='Escape'&&panel===null)stopUploaded()};document.addEventListener('keydown',stop);return()=>document.removeEventListener('keydown',stop)},[action,actionItemId,panel])
   function finishPastime(){
     const run=pastimeRun.current;pastimeRun.current=null;if(!run||petRef.current?.createdAt!==run.petId)return;
     setMemory(m=>m?.petId===String(run.petId)?recordEvent(m,{kind:`self-${run.kind}`,detail:PASTIME_MEMORIES[run.kind]}):m);
@@ -516,11 +516,11 @@ export default function App() {
     if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
     else if(!itemId)finishCareFeedback();
     const transformed=isOfficialAction(next)?officialClip(next.replace(/^(official-|ambient-)/,'')):undefined;
-    const sourcePlayback=isOfficialAction(next)||Boolean(embeddedItem||original)||Boolean(p?.wearing&&next==='pet');
+    const sourcePlayback=isOfficialAction(next)||Boolean(motion||embeddedItem||original)||Boolean(p?.wearing&&next==='pet');
     const fallbackDelay=sourcePlayback?OFFICIAL_LOAD_TIMEOUT+Math.max(duration,OFFICIAL_DURATION)+(transformed&&usesTransformationSmoke(transformed)?8000:3000):duration+(next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||isAmbientAction(next)||recorded||isEmotionClip(next)?15000:50));
     clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); },fallbackDelay);
   }
-  function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(petActionAppearance(current,action).form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
+  function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||action==='pet'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(petActionAppearance(current,action).form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
     const before = petRef.current;
     if(result.ok&&before&&before.color!==result.state.color){
@@ -772,7 +772,7 @@ export default function App() {
       {panel === 'shop' && <ShopBook key={shopCategory} pet={current} onBuy={buy} initialCategory={shopCategory}/>}
       {panel === 'wardrobe' && <Wardrobe pet={current} onBuy={id=>changeOutfit('buy',id)} onWear={id=>changeOutfit('wear',id)}/>}
       {panel==='school'&&<RamSchoolPanel busy={schoolBusy} pet={current} onLearn={id=>startActivity('course',id)} onSkill={showSkill} onElementSkill={showElementSkill} onCancel={stopActivity}/>}
-      {panel === 'games' && <><OfficialClipMenu pet={current} busy={interactionBusy} onPlay={startOfficial} onStop={stopUploaded} playing={isOfficialAction(action)} activities={<PetPastimes pet={current} busy={interactionBusy} onPlay={startPastime} onSleep={()=>doCare('sleep')} onOuting={()=>startOuting(true)} onRecall={()=>recallPet()}/>}/><div className="room-game-grid">{([
+      {panel === 'games' && <><OfficialClipMenu pet={current} busy={interactionBusy} onPlay={startOfficial} onElementSkill={showElementSkill} onMagic={()=>showSkill('magic')} onStop={stopUploaded} playing={isOfficialAction(action)||isSchoolAction(action)} activities={<PetPastimes pet={current} busy={interactionBusy} onPlay={startPastime} onSleep={()=>doCare('sleep')} onOuting={()=>startOuting(true)} onRecall={()=>recallPet()}/>}/><div className="room-game-grid">{([
         { id:'color-mixer',name:'拉姆换色游戏',icon:'180005',detail:'调配颜色 · 装瓶收藏',button:'拉姆换色游戏',grown:false },
         { id:'fruit',name:'拉姆接果子',icon:'180027',detail:'20 秒 · 接住果子',button:'开始接果子',grown:true },
         { id:'memory',name:'口袋翻翻乐',icon:'180017',detail:'45 秒 · 找到相同图案',button:'开始翻牌',grown:false },
@@ -788,7 +788,7 @@ export default function App() {
       {panel === 'status' && <RoomPetPanel pet={current} memory={currentMemory} onRename={renamePet} onWake={()=>doCare('sleep')}/>}
       {panel === 'food' && pocket}
       {panel === 'memories' && <PetDiary memory={currentMemory}/>}
-      {panel === 'play' && <>{playInvitation}<OfficialClipMenu pet={current} busy={interactionBusy} onPlay={startOfficial} onStop={stopUploaded} playing={isOfficialAction(action)} activities={<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping?'轻轻叫醒':'睡一会儿'}</button><button className="game-button" onClick={() => setPanel('school')}>去学院</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div>}/></>}
+      {panel === 'play' && <>{playInvitation}<OfficialClipMenu pet={current} busy={interactionBusy} onPlay={startOfficial} onElementSkill={showElementSkill} onMagic={()=>showSkill('magic')} onStop={stopUploaded} playing={isOfficialAction(action)||isSchoolAction(action)} activities={<div className="panel-shortcuts"><button className="game-button" onClick={() => doCare('play')}>一起玩球</button><button className="game-button" onClick={() => doCare('sleep')}>{current.sleeping?'轻轻叫醒':'睡一会儿'}</button><button className="game-button" onClick={() => setPanel('school')}>去学院</button><button className="game-button" onClick={() => setPanel('games')}>去游戏屋</button></div>}/></>}
       {panel === 'settings' && settingsContent}
     </GameDialog>}
     {panel==='notes'&&pet&&<MessageBoard pet={current} onChange={updateNotes} onClose={()=>setPanel(null)}/>}

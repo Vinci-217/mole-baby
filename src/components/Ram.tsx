@@ -7,7 +7,7 @@ import {originalActionClip,originalItemClip,playbackForm,usesTransformationSmoke
 import {OFFICIAL_CLIPS,isOfficialAction,supportsOfficial} from '../official-clips';
 import {uploadedMotion,UPLOADED_TOYS} from '../uploaded-actions';
 import {petColorName,petColorOffsets,isCustomPetColor} from '../pet-color';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { easeGaze, type PetGaze } from '../pet-attention'
 import type { PetColor, Stage, Evolution } from '../game'
@@ -34,6 +34,7 @@ import OriginalElementSkill,{originalElementClip,prepareElementSkill} from './Or
 import SharedMagicBox,{preloadMagicBox} from './SharedMagicBox'
 import flight from '../../public/assets/original/flight/runtime.json'
 import {createFanMotion,stepFanMotion} from '../fan-motion'
+import {tintAtlas} from '../atlas-tint'
 
 interface RamProps {
   color: PetColor
@@ -148,19 +149,13 @@ function getTintedSheet(form: Form, color: PetColor, kind: SheetKind): Promise<H
     const old=[...tintedCache.keys()].filter(k=>k.startsWith('football:')||k.startsWith('emotion-'))
     if(old.length>=3)tintedCache.delete(old[0])
   }
-  const pending = getSource(form, kind).then(({ neutral, mask }) => {
+  const pending = getSource(form, kind).then(async ({ neutral, mask }) => {
     const canvas = document.createElement('canvas')
     canvas.width = neutral.width; canvas.height = neutral.height
     const context = canvas.getContext('2d')
     if (!context) throw new Error('无法初始化拉姆配色')
     const pixels = new ImageData(new Uint8ClampedArray(neutral.data), neutral.width, neutral.height)
-    const clamp = (value: number) => Math.max(0, Math.min(255, value))
-    const deltas = [255, 204, 153].map(base => petColorOffsets(color).map(offset => clamp(base + offset) - base))
-    for (let i = 0; i < pixels.data.length; i += 4) {
-      const white = mask[i] / 255, gray = mask[i + 1] / 255, dark = mask[i + 2] / 255
-      if (!(white || gray || dark)) continue
-      for (let channel = 0; channel < 3; channel++) pixels.data[i + channel] = clamp(pixels.data[i + channel] + deltas[0][channel] * white + deltas[1][channel] * gray + deltas[2][channel] * dark)
-    }
+    await tintAtlas(pixels.data,mask,petColorOffsets(color))
     context.putImageData(pixels, 0, 0)
     return canvas
   }).catch((error: unknown) => { tintedCache.delete(key); throw error })
@@ -244,11 +239,12 @@ function ClassicFrames({ form, color, fromColor, action, actionId, itemMotion, s
     if(!walking)walkClock.current=0
     const soundClock=createPetSoundClock(itemMotion?itemSoundScore(itemMotion):socialSoundScore(action),()=>soundRef.current===true)
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = ''
+    let request = 0, elapsed = 0, last = 0, inView = true, ended = false, stopped = false, previous = '',began:number|undefined
     const paint = (now: number) => {
       if (stopped || !canvas.isConnected || document.hidden || !inView) { last = 0; return }
       const delta=last&&now-last<250?Math.max(0,now-last):0
-      elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-startedAt)
+      if(began===undefined)began=Math.max(startedAt,now)
+      elapsed=['idle','waiting','still','drag'].includes(action)?elapsed+delta:Math.max(0,now-began)
       flightClock.current+=delta
       if(walking)walkClock.current+=delta
       eyePosition.current=media.matches?{x:0,y:0}:easeGaze(eyePosition.current,gazeRef.current?.current??{x:0,y:0},delta)
@@ -511,9 +507,10 @@ function ClassicGentleFrames({color,fromColor,action,actionId,startedAt,itemMoti
   const load=(c:PetColor)=>Promise.all([getTintedSheet('classic',c,'gentle'),getTintedSheet('classic',c,'slumber')]);
   void Promise.all([load(color),fromColor&&fromColor!==color?load(fromColor):null]).then(([sheets,old])=>{
    if(!live)return;
+   const began=Math.max(startedAt,performance.now());
    const paint=(now:number)=>{
     if(!live||!canvas.isConnected||document.hidden)return;
-    const elapsed=Math.max(0,now-startedAt),closed=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&elapsed>=450&&elapsed<3300;
+    const elapsed=Math.max(0,now-began),closed=action==='sleep'||action==='wake'&&elapsed<240||action==='mood-dozy'&&elapsed>=450&&elapsed<3300;
     const index=closed?1:0,frame=closed?sleepPose(elapsed,media.matches).frame:itemMotion?sampleGentleMouth(itemMotion,elapsed,media.matches):0;
     const mix=itemMotion?.gesture==='recolor'?colorBlend(elapsed,itemMotion.duration,media.matches):1;
     ctx.clearRect(0,0,192,208);
@@ -555,7 +552,10 @@ function ClassicSuperFrames({color,action,actionId,onActionEnd,onError}:{color:P
 }
 
 export default function Ram({ rawDaily: _rawDaily=false, color, costume:requestedCostume, companionId=0, stage:actualStage, evolution:actualEvolution, action:requestedAction = 'idle', sleeping = false, peeking = false, peekSide = 'right', edgeEntry, fromColor, sound = false, gameSound=sound, soundVolume=.45, className = '', actionId, itemId, gaze, dragTilt = 0, dragging = false, shaking = false, onActionEnd }: RamProps) {
-  const action=requestedAction.startsWith('ambient-element-')?requestedAction.slice(8):requestedAction;
+  const originalAction=isOfficialAction(requestedAction)?originalActionClip(requestedAction):undefined;
+  // The free-toy menu and the quick football button share the complete,
+  // form-specific source timeline (including the divine/elemental forms).
+  const action=originalAction?.kind==='care'&&originalAction.path.endsWith('/180004.swf')&&actualStage>0?'play':requestedAction.startsWith('ambient-element-')?requestedAction.slice(8):requestedAction;
   const reading=!_rawDaily&&!sleeping&&!dragging&&!shaking&&(action==='focus'||action==='read-alone');
   // Stow unsupported clothing only in the renderer. Keep the exact same
   // original action and real growth form as an unclothed pet, then restore
@@ -575,6 +575,7 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   const schoolAction=!sleeping&&!dragging&&!shaking&&isSchoolAction(action)?action:undefined
   const elementId=schoolAction?.startsWith('element-')?schoolAction.slice(8):undefined
   const elementClip=elementId?originalElementClip(elementId):undefined
+  const elementPreparation=useMemo(()=>elementId?prepareElementSkill(elementId):undefined,[elementId,eventKey]);
   const magicAction=schoolAction==='skill-magic'||lifeAction==='spell'||Boolean(elementClip)
   useEffect(()=>{void preloadMagicBox().catch(()=>{})},[])
   const finishRef=useRef(onActionEnd);finishRef.current=onActionEnd
@@ -621,7 +622,7 @@ export default function Ram({ rawDaily: _rawDaily=false, color, costume:requeste
   if(uploaded)return <span className="ram-sprite ram-classic ram-uploaded" role="img" aria-label={`${petColorName(color)}拉姆 · ${UPLOADED_TOYS.find(t=>t.id===uploaded.id)?.name??itemMotion?.label??'原版动作'}`} data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping="false" data-art-style="classic" data-uploaded-action={uploaded.id}>
     <UploadedLamuFrames key={eventKey} spec={uploaded} form={form} color={color} fromColor={fromColor} itemMotion={itemMotion} sound={sound} onEnd={onActionEnd} fallback={<Ram color={fromColor??color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/>}/>
   </span>
-  if(magicAction)return <SharedMagicBox key={eventKey} startedAt={clock.current.startedAt} onEnd={onActionEnd} prepare={elementId?prepareElementSkill(elementId):undefined} targetDuration={elementClip?.durationMs} label={elementClip?`烟雾变身 · ${elementClip.name} · 恢复原形`:undefined} target={elementId?(began=><OriginalElementSkill id={elementId} startedAt={began} form={stage===0?'seed':form}/>):undefined}><Ram color={color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></SharedMagicBox>
+  if(magicAction)return <SharedMagicBox key={eventKey} startedAt={clock.current.startedAt} onEnd={onActionEnd} prepare={elementPreparation} targetDuration={elementClip?.durationMs} label={elementClip?`烟雾变身 · ${elementClip.name} · 恢复原形`:undefined} target={elementId?(began=><OriginalElementSkill id={elementId} startedAt={began} form={stage===0?'seed':form}/>):undefined}><Ram color={color} costume={costume} companionId={companionId} stage={stage} evolution={evolution} action="still" sound={false}/></SharedMagicBox>
   return <span className={`ram-sprite ram-classic action-${activeAction} ${lifeAction?`life-${lifeAction}`:''} ${itemMotion?'is-gentle-eating':''} ${stage === 0 ? 'ram-seed' : stage <= 2 ? 'ram-grounded' : ''} ${resting ? 'is-sleeping' : ''} ${stage >= 3 && activeAction !== 'still' && !dragging ? 'is-flying' : ''} ${peeking ? 'is-peeking' : ''} ${edgeEntry ? 'is-edge-entering' : ''} ${dragging ? 'is-dragging' : ''} ${shaking ? 'is-shaking' : ''} ${className}`}
     role="img" aria-label={label}  data-life-action={lifeAction} data-art-style="classic" data-stage={stage} data-evolution={evolution} data-action={activeAction} data-color={color} data-sleeping={resting ? 'true' : 'false'} data-peek-side={peeking ? peekSide : undefined} data-edge-entry={edgeEntry} data-fallback={fallback || undefined}>
     <span className="ram-proportion-layer"><span className="ram-flight-layer">

@@ -24,7 +24,7 @@ export default function SharedMagicBox({children,startedAt,onEnd,target,targetDu
  useEffect(()=>{onSubject?.(subject)},[subject,onSubject]);
  return <span className="magic-box-performance" role="img" aria-label={label} data-ready={ready} data-magic-start={playbackStart} data-magic-frame={frame} data-magic-subject={ready?entry.subject:'original'}>
   <span className="magic-box-original" aria-hidden={ready&&entry.subject==='box'} style={{opacity:ready&&entry.subject==='box'?0:1}}>{children}</span>
-  {target?<span className="magic-box-target" aria-hidden={subject!=='box'} style={{opacity:subject==='box'?1:0}}>{typeof target==='function'?target(playbackStart):target}</span>:ready&&entry.subject==='box'&&<img className="magic-box-layer" alt="" draggable={false} src={magicBoxImage('box',entry.box)}/>}
+  {target?ready&&<span className="magic-box-target" aria-hidden={subject!=='box'} style={{opacity:subject==='box'?1:0}}>{typeof target==='function'?target(playbackStart):target}</span>:ready&&entry.subject==='box'&&<img className="magic-box-layer" alt="" draggable={false} src={magicBoxImage('box',entry.box)}/>}
   {ready&&entry.smoke!==null&&<img className="magic-box-layer magic-box-smoke" alt="" draggable={false} src={magicBoxImage('smoke',entry.smoke)}/>}
  </span>;
 }

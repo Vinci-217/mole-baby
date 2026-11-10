@@ -14,7 +14,8 @@ export function playbackForm(clip:OfficialClip,form:RamForm):RamForm|undefined{
  if(clip.kind==='outfit')return officialOutfitForm(clip,form);
  if(form==='seed')return supportsOfficial(clip,form)?form:undefined;
  if(supportsOfficial(clip,form))return form;
- return (['junior','middle','senior','classic','super','water','wood','fire'] as RamForm[]).find(candidate=>supportsOfficial(clip,candidate));
+ const nearest:RamForm[]=form==='junior'?['middle','senior','classic']:form==='middle'?['senior','junior','classic']:['classic','super','senior','middle','junior'];
+ return ([...nearest,'water','wood','fire'] as RamForm[]).find(candidate=>supportsOfficial(clip,candidate));
 }
 export const isAmbientAction=(action:string)=>action.startsWith('ambient-');
 export const originalActionClip=(action:string)=>OFFICIAL_CLIPS.find(clip=>clip.id===(action.startsWith('official-')?action.slice(9):action.slice(8)));
@@ -66,7 +67,8 @@ export function originalSpecialActions(form:RamForm):OriginalChoice[]{
 export function autonomousOriginalActions(pet:GameState):string[]{
  if(pet.sleeping||pet.activity||pet.outing||getStage(pet.growth,pet.evolution)===0||pet.stats.energy<30||pet.stats.health<=35||pet.stats.hunger<30||pet.stats.thirst<30||pet.stats.cleanliness<30)return [];
  const form=petActionAppearance(pet,'play').form;
- const originals=[...naturalOriginalActions(form),...originalPlayTools(form),...(learned(pet,'magic')?originalMagicActions(form):[])].map(row=>'ambient-'+row.id);
+ const originals=[...naturalOriginalActions(form),...originalPlayTools(form)].map(row=>'ambient-'+row.id);
+ if(learned(pet,'magic'))originals.push('spell');
 
  for(const skill of ELEMENT_SKILLS)if(learnedElementSkill(pet,skill.id))originals.push('ambient-element-'+skill.id);
  return [...new Set(originals)];

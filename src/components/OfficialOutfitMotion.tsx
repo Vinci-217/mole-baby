@@ -8,7 +8,8 @@ import {socialSoundScore} from '../pet-sound-score'
 
 type PlayerBinding={pose:string;onReady:()=>void;onError:()=>void;onBodyBounds:(body:OutfitBodyBounds)=>void};
 /** Native costume art plus project-authored petting of that intact appearance.
- * Football and other unsupported full actions never enter this adaptation. */
+  * Dragging carries the intact source using the shared elastic layer.
+  * Football and other unsupported full actions never enter this adaptation. */
 export default function OfficialOutfitMotion({sourceKey,action,actionId,startedAt,stage,evolution,tilt,sound=false,children,onEnd}:{sourceKey:string;action:string;actionId?:number|string;startedAt:number;stage:Stage;evolution?:Evolution;tilt:number;sound?:boolean;children:(binding:PlayerBinding)=>ReactNode;onEnd?:(completed?:boolean)=>void}){
  const root=useRef<HTMLSpanElement>(null),poseLayer=useRef<HTMLSpanElement>(null),end=useRef(onEnd);end.current=onEnd;
  const voice=useRef(sound);voice.current=sound;
@@ -44,5 +45,5 @@ export default function OfficialOutfitMotion({sourceKey,action,actionId,startedA
   request=requestAnimationFrame(paint);
   return()=>{done=true;cancelAnimationFrame(request);clearTimeout(watchdog);audio.stop();failed.current=()=>{}};
  },[sourceKey,action,actionId,startedAt,stage,evolution]);
- return <><span ref={root} className="ram-artwork" data-petting-adaptation={action==='pet'?'project':undefined} style={{transform:`rotate(${tilt}deg)`}}><span className="ram-elastic-layer"><span ref={poseLayer} className="ram-pose-layer">{children({pose:action==='pet'?'idle':action,onReady:()=>{source.current.readyAt=performance.now()},onError:()=>failed.current(),onBodyBounds:body=>{source.current.body=body}})}</span></span></span>{action==='pet'&&<SocialCue action="pet"/>}</>
+ return <><span ref={root} className="ram-artwork" data-petting-adaptation={action==='pet'?'project':undefined} data-drag-adaptation={action==='drag'?'project':undefined} style={{transform:`rotate(${tilt}deg)`}}><span className="ram-elastic-layer"><span ref={poseLayer} className="ram-pose-layer">{children({pose:action==='pet'||action==='drag'?'idle':action,onReady:()=>{source.current.readyAt=performance.now()},onError:()=>failed.current(),onBodyBounds:body=>{source.current.body=body}})}</span></span></span>{action==='pet'&&<SocialCue action="pet"/>}</>
 }

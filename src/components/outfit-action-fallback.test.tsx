@@ -23,9 +23,28 @@ describe('missing clothed actions retain the original unclothed animation',()=>{
  });
  it('preserves daily, emotion, care, classroom and drag animations instead of a costume idle pose',()=>{
   vi.stubGlobal('window',{});
-  for(const [stage,evolution] of forms)for(const action of ['sleep','wake','dizzy','watch-butterfly','look-around','mood-joy','mood-grumpy','eat-bear-biscuit','school-language','drag']){
+  for(const [stage,evolution] of forms)for(const action of ['sleep','wake','dizzy','watch-butterfly','look-around','mood-joy','mood-grumpy','eat-bear-biscuit','school-language']){
    const props={stage,evolution,color:'blue' as const,action,dragging:action==='drag'};
    expect(renderToStaticMarkup(<Ram {...props} costume="warm-scarf"/>),`${stage}:${evolution}:${action}`).toBe(renderToStaticMarkup(<Ram {...props}/>));
+  }
+ });
+ for(const [stage,evolution,form] of forms)it(`carries every intact costume during dragging on ${form}`,()=>{
+  vi.stubGlobal('window',{});
+  for(const outfit of ALL_OUTFITS){
+   const clip=outfitAnimation(outfit.id)!;
+   const html=renderToStaticMarkup(<Ram stage={stage} evolution={evolution} color="blue" costume={outfit.id} dragging/>);
+   expect(html,outfit.id).toContain(`data-source="${clip.path}"`);
+   expect(html,outfit.id).toContain(`data-form="${officialOutfitForm(clip,form)}"`);
+   expect(html,outfit.id).toContain('data-drag-adaptation="project"');
+   expect(html,outfit.id).toContain(`data-growth-stage="${stage}"`);
+  }
+ });
+ it('uses the same form-specific football from both toy and quick-action entry points',()=>{
+  vi.stubGlobal('window',{});
+  for(const [stage,evolution,form] of forms){
+   const fromMenu=renderToStaticMarkup(<Ram stage={stage} evolution={evolution} color="blue" costume="warm-scarf" action="official-9e6191f95c9ab5ea"/>);
+   const quick=renderToStaticMarkup(<Ram stage={stage} evolution={evolution} color="blue" costume="warm-scarf" action="play"/>);
+   expect(fromMenu).toBe(quick);expect(fromMenu).toContain(`data-form="${form}"`);
   }
  });
  it('keeps action selection, timing and temporary appearances consistent without changing the save',()=>{

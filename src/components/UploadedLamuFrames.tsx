@@ -6,6 +6,7 @@ import {loadUploadedClip,uploadedEffectRect,type UploadedSpec,type UploadedClip}
 import {createPetSoundClock} from '../pet-audio'
 import {itemSoundScore,socialSoundScore} from '../pet-sound-score'
 import type {ItemMotion} from '../item-motion'
+import {tintAtlas} from '../atlas-tint'
 
 type Painted={clip:UploadedClip;pages:HTMLCanvasElement[];bytes:number;rasterScale:number}
 const cache=new Map<string,{ready:Promise<Painted>;bytes:number}>()
@@ -18,7 +19,7 @@ function raster(spec:UploadedSpec,color:PetColor){
   // renderer keeps every original frame, but paints a smaller backing atlas.
   const rasterScale=window.mobile ? .5 : 1;
   if(window.mobile)for(const cached of cache.keys())if(cached!==key)cache.delete(cached);
-  const offsets=petColorOffsets(color),deltas=[255,204,153].map(base=>offsets.map(v=>Math.max(0,Math.min(255,base+v))-base))
+  const offsets=petColorOffsets(color)
   const pages:HTMLCanvasElement[]=[]
   for(const page of clip.pages){
    const read=(name:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>{im.onload=im.onerror=null;resolve(im)};im.onerror=()=>{im.onload=im.onerror=null;reject(new Error(`无法读取原版动画图集：${spec.assetKey}/${name}`))};im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;})
@@ -26,7 +27,7 @@ function raster(spec:UploadedSpec,color:PetColor){
    const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('无法打开原版动作图集。')
    ctx.drawImage(neutral,0,0,page.width*rasterScale,page.height*rasterScale);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(mask,0,0,page.width*rasterScale,page.height*rasterScale);const m=ctx.getImageData(0,0,canvas.width,canvas.height).data
-   for(let i=0;i<pixels.data.length;i+=4){pixels.data[i+3]=m[i+3];if(!(m[i]||m[i+1]||m[i+2]))continue;for(let c=0;c<3;c++)pixels.data[i+c]=Math.max(0,Math.min(255,pixels.data[i+c]+deltas[0][c]*m[i]/255+deltas[1][c]*m[i+1]/255+deltas[2][c]*m[i+2]/255))}
+   await tintAtlas(pixels.data,m,offsets,true)
    ctx.putImageData(pixels,0,0);neutral.src='';mask.src='';pages.push(canvas)
   }
   entry.bytes=pages.reduce((n,p)=>n+p.width*p.height*4,0)

@@ -49,7 +49,9 @@ describe('curated original interactions',()=>{
   expect(choices.length).toBeGreaterThan(before.length);
   const first=chooseAutonomousOriginal(owned,undefined,()=>0);expect(chooseAutonomousOriginal(owned,first,()=>0)).not.toBe(first);
   for(const row of [{...owned,sleeping:true},{...owned,growth:0},{...owned,stats:{...owned.stats,energy:5}}])expect(autonomousOriginalActions(row)).toEqual([]);
-  for(const id of choices.filter(id=>!id.startsWith('ambient-element-')))expect(OFFICIAL_CLIPS.some(clip=>id==='ambient-'+clip.id)).toBe(true);
+  expect(choices).toContain('spell');
+  for(const id of choices.filter(id=>id!=='spell'&&!id.startsWith('ambient-element-')))expect(OFFICIAL_CLIPS.some(clip=>id==='ambient-'+clip.id)).toBe(true);
+  for(const clip of OFFICIAL_CLIPS.filter(clip=>['magic','transform','skill'].includes(clip.kind)))expect(choices).not.toContain('ambient-'+clip.id);
  });
 });
 describe('free stage selection without losing natural progress',()=>{

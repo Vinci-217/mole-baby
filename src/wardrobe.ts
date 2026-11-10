@@ -35,7 +35,7 @@ export function costumeAppearance(stage:Stage,evolution?:Evolution,id?:string):{
 export const petAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>)=>costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,pet.wearing);
 /** Native resting/walking plus the shared, project-authored clothed petting
  * adaptation. Other actions retain their normal unclothed source timelines. */
-export const outfitSupportsAction=(action:string)=>['idle','waiting','still','peek','hide','walk-left','walk-right','running','running-left','running-right','pet'].includes(action);
+export const outfitSupportsAction=(action:string)=>['idle','waiting','still','peek','hide','walk-left','walk-right','running','running-left','running-right','pet','drag'].includes(action);
 export const petActionAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>,action:string)=>costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,outfitSupportsAction(action)?pet.wearing:undefined);
 export function normalizeWardrobe(owned:unknown,wearing:unknown):{wardrobe?:OutfitId[];wearing?:OutfitId} {
   const wardrobe=Array.isArray(owned)?ALL_OUTFITS.filter(outfit=>owned.includes(outfit.id)).map(outfit=>outfit.id):[]

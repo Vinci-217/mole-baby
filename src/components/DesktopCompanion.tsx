@@ -5,7 +5,6 @@ import {petAppearance} from '../wardrobe';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent, ReactNode } from 'react';
 import type { Action, GameState, Stage, PetColor } from '../game';
-import {getStage} from '../game';
 import { playPetVoice } from '../pet-audio';
 import Ram from './Ram';
 import {useElasticDrag} from '../use-elastic-drag';
@@ -93,7 +92,7 @@ export default function DesktopCompanion(p: Props) {
     if(hideTimer.current!==undefined)return;
     hideTimer.current=setTimeout(()=>{hideTimer.current=undefined;if(!root.current?.querySelector('.compact-pet :focus-visible'))setTools(false);},220);
   };
-  const elastic=useElasticDrag(root,getStage(p.pet.growth,p.pet.evolution),p.native,reaction=>{
+  const elastic=useElasticDrag(root,appearance.stage,p.native,reaction=>{
     if(p.pet.sleeping)return;
     if(reaction==='dizzy'&&!p.itemId){setShaking(true);clearTimeout(shakeTimer.current);shakeTimer.current=setTimeout(()=>setShaking(false),3200);p.onShake();}
     else if(reaction==='turn')p.onTug?.();
@@ -129,9 +128,9 @@ export default function DesktopCompanion(p: Props) {
     const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') { p.onPanel(null); setTools(false); } };
     document.addEventListener('keydown', escape); return () => document.removeEventListener('keydown', escape);
   }, [p.onPanel]);
-  const touchPet = () => {if(dockedRef.current){peek(true);return;} void window.desktop?.revealPet(); revealTools(); p.onPet(); };
+  const touchPet = () => {if(reading||p.moodBusy&&p.action!=='pet')return;if(dockedRef.current){peek(true);return;} void window.desktop?.revealPet(); revealTools(); p.onPet(); };
   function down(e: PointerEvent<HTMLButtonElement>) {
-    if (reading || resizing || e.button !== 0 || p.action.startsWith('element-')) return;
+    if (reading || resizing || p.moodBusy&&p.action!=='pet' || e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     if (p.panel) p.onPanel(null);
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
@@ -140,6 +139,9 @@ export default function DesktopCompanion(p: Props) {
   }
   function move(e: PointerEvent<HTMLButtonElement>) {
     const d = drag.current; if (!d) {revealTools();return;}
+    // Repeated taps retain App's rapid-touch reaction; a busy petting action
+    // accepts taps without starting a second drag/animation at the same time.
+    if(p.moodBusy&&!d.moved)return;
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     if (!d.moved && Math.hypot(x - d.x, y - d.y) < 5) return;
     if (!d.moved) {
@@ -163,7 +165,7 @@ export default function DesktopCompanion(p: Props) {
     d.lastX = x; d.lastY = y;
   }
   function up(e: PointerEvent<HTMLButtonElement>, cancelled = false) {
-    if(reading&&!drag.current)return;
+    if(!drag.current)return;
     const d = drag.current; drag.current = null;
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     setDragging(false); elastic.release(); if(p.native)void window.desktop?.endPetDrag();
@@ -221,7 +223,7 @@ export default function DesktopCompanion(p: Props) {
       {p.saveError && <span className="compact-save-error">存档未保存，请到小屋备份</span>}
     </div>
     {p.panel&&<section className={`companion-panel panel-${p.panel}`} role="dialog" aria-label={`拉姆${labels[p.panel]}`} data-testid="companion-panel">
-      {p.panel==='status'?p.statusContent:p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><OfficialClipMenu pet={p.pet} busy={p.moodBusy} onPlay={p.onOriginalPlay} onStop={p.onStopUploaded} playing={isOfficialAction(p.action)} activities={<div className="desktop-play">
+      {p.panel==='status'?p.statusContent:p.panel==='food'?p.pocketContent:<><header><strong>一起玩耍</strong><button aria-label="关闭小窗" onClick={()=>p.onPanel(null)}>×</button></header><OfficialClipMenu pet={p.pet} busy={p.moodBusy} onPlay={p.onOriginalPlay} onElementSkill={p.onElementSkill} onMagic={p.onMagic} onStop={p.onStopUploaded} playing={isOfficialAction(p.action)||p.action.startsWith('element-')||p.action==='skill-magic'} activities={<div className="desktop-play">
         {(!p.native||Boolean(window.desktop?.openSizeEditor))&&<button aria-label="放大缩小" disabled={reading} onClick={beginResize}><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 3H3v6m12 12h6v-6M3 3l7 7m11 11-7-7"/></svg>调整大小</button>}
         <button aria-label={working?'结束餐厅打工':'去餐厅打工'} disabled={!working&&(p.moodBusy||p.stage===0)} onClick={working?p.onStopWork:p.onWork}><img alt="" src="./assets/generated/school/icons/restaurant.png"/>{working?'结束打工':'餐厅打工'}</button>
         <button onClick={p.onViewRestaurant}><img alt="" src="./assets/original/restaurant/dock.png"/>进入餐厅</button>
