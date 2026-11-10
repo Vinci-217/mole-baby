@@ -25,7 +25,7 @@ async function main() {
   const yaml=require('yaml'),feed=yaml.parse(fs.readFileSync(path.join(unpacked,'resources/app-update.yml'),'utf8'));
   if(legacy){assert.equal(feed.provider,'generic');assert.equal(feed.channel,runtime.channel)}
   await verifyApplication({executable,archive:path.join(unpacked,'resources/app.asar'),screenshot:legacy?`windows-legacy-${arch}-smoke.png`:'windows-smoke.png'});
-  require('node:child_process').execFileSync('pwsh',['-NoProfile','-NonInteractive','-File',path.join(__dirname,'windows-installer-smoke.ps1'),'-Installer',path.join(release,files[1]),'-ProductName',runtime.productName,'-InstallDirName',legacy?'mole-baby-legacy':'mole-baby'],{stdio:'inherit',timeout:360000});
+  require('node:child_process').execFileSync('pwsh',['-NoProfile','-NonInteractive','-File',path.join(__dirname,'windows-installer-smoke.ps1'),'-Installer',path.join(release,files[1]),'-ProductName',runtime.productName,'-InstallDirName',legacy?'mole-baby-legacy':'mole-baby'],{stdio:'inherit',timeout:600000});
   await writeChecksums(release,files,legacy?`SHA256SUMS-legacy-${arch}.txt`:'SHA256SUMS.txt');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

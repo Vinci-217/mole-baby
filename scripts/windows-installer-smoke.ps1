@@ -25,7 +25,7 @@ public static class InstallerUI {
  public static IntPtr Find(int pid){IntPtr found=IntPtr.Zero;EnumWindows((h,p)=>{uint owner;GetWindowThreadProcessId(h,out owner);if(owner==pid&&IsWindowVisible(h)&&GetDlgItem(h,1)!=IntPtr.Zero){found=h;return false;}return true;},IntPtr.Zero);return found;}
 }
 '@
-$folder = Join-Path $env:RUNNER_TEMP ('mole-finish-'+[guid]::NewGuid().ToString('N'))
+$folder = Join-Path $env:RUNNER_TEMP ('拉姆 安装测试-'+[guid]::NewGuid().ToString('N'))
 # electron-builder uses the ASCII package name as APP_FILENAME when the
 # product name is Chinese. Its directory pre-hook appends that name if absent.
 $install = Join-Path $folder $InstallDirName
@@ -95,6 +95,7 @@ try {
  }
  if(!$launched){throw 'Finish did not launch a visible, installed pet application'}
  Write-Output "PASS: Windows installer real Finish click hides wizard in ${hiddenMs}ms and launches installed application in $($watch.ElapsedMilliseconds)ms"
+ & (Join-Path $PSScriptRoot 'windows-shortcut-checks.ps1') -Installer $Installer -InstallDirectory $install -ProductName $ProductName -RequireInstalledShortcut -Report (Join-Path $PSScriptRoot "../artifacts/windows-entrypoints-$InstallDirName.json")
 } finally {
  # Only processes from our unique installation directory are eligible.
  Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -and $_.Path.StartsWith($install,[StringComparison]::OrdinalIgnoreCase)} | Stop-Process -Force -ErrorAction SilentlyContinue

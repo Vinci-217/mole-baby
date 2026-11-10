@@ -102,6 +102,7 @@ jobs:
             artifacts/windows-smoke.png
             artifacts/windows-smoke.log
             artifacts/windows-update-fixture.log
+            artifacts/windows-entrypoints-*.json
           if-no-files-found: ignore
           retention-days: 14
 
@@ -187,6 +188,7 @@ jobs:
             artifacts/legacy-${{ matrix.arch }}-smoke.log
             artifacts/windows-legacy-${{ matrix.arch }}-smoke.png
             artifacts/windows-installer-*.png
+            artifacts/windows-entrypoints-*.json
           if-no-files-found: ignore
           retention-days: 14
 

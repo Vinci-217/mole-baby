@@ -41,5 +41,46 @@ jobs:
         if: always()
         with:
           name: windows-published-entrypoints
-          path: artifacts/windows-entrypoints.json
+          path: |
+            artifacts/windows-entrypoints.json
+            artifacts/shortcut-files/
+          retention-days: 14
+  candidate:
+    name: Check repaired installer with visible fixture
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build only a small diagnostic app with the real installer hooks
+        shell: pwsh
+        run: |
+          node -e 'const fs=require("node:fs");fs.mkdirSync("artifacts",{recursive:true});fs.writeFileSync("artifacts/entrypoint-builder.cjs",`const{build}=require("../package.json");module.exports={...build,extends:null,appId:"com.molebaby.entrypointfixture",productName:"拉姆入口测试",directories:{output:"artifacts/entrypoint-package"},files:["artifacts/windows-entrypoint-fixture.cjs"],extraMetadata:{name:"mole-entrypoint-fixture",main:"artifacts/windows-entrypoint-fixture.cjs"},win:{...build.win,extraFiles:[]},nsis:{...build.nsis,artifactName:"entrypoint-Setup.exe"}};`);fs.copyFileSync("scripts/windows-entrypoint-fixture.cjs","artifacts/windows-entrypoint-fixture.cjs"));'
+          npx --no-install electron-builder --config artifacts/entrypoint-builder.cjs --win nsis --x64 --publish never
+          if($LASTEXITCODE -ne 0){throw 'Diagnostic package build failed'}
+      - name: Launch every shortcut and repair intentionally stale targets
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $installer=(Resolve-Path artifacts/entrypoint-package/entrypoint-Setup.exe).Path
+          $install=Join-Path $env:RUNNER_TEMP '拉姆 入口修复检查/mole-entrypoint-fixture'
+          try {
+            $p=Start-Process -FilePath $installer -ArgumentList "/S /currentuser /D=$install" -PassThru
+            if(!$p.WaitForExit(150000) -or $p.ExitCode -ne 0){throw 'Candidate installation failed'}
+            & ./scripts/windows-shortcut-checks.ps1 -Installer $installer -InstallDirectory $install -ProductName '拉姆入口测试' -RequireInstalledShortcut
+          } finally {
+            $uninstaller=Join-Path $install 'Uninstall 拉姆入口测试.exe'
+            if(Test-Path -LiteralPath $uninstaller){Start-Process -FilePath $uninstaller -ArgumentList "/S _?=$install" -Wait}
+          }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-candidate-entrypoints
+          path: |
+            artifacts/windows-entrypoints.json
+            artifacts/shortcut-files/
           retention-days: 14

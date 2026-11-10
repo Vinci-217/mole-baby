@@ -92,7 +92,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
       "artifactName": "mole-baby-${version}-Setup.${ext}",
       "installerIcon": "public/icons/ramu.ico",
       "uninstallerIcon": "public/icons/ramu.ico",

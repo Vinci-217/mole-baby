@@ -33,7 +33,10 @@ function Stop-TestPet {
 function Test-Entry([string]$entry,[string]$phase) {
  if(!(Test-Path -LiteralPath $entry)){throw "Missing $phase entry: $entry"}
  $link=$shell.CreateShortcut($entry)
- $record=[ordered]@{phase=$phase;shortcut=$entry;target=$link.TargetPath;workingDirectory=$link.WorkingDirectory;arguments=$link.Arguments;targetExists=(Test-Path -LiteralPath $link.TargetPath)}
+ $raw=Join-Path (Split-Path -Parent $Report) ('shortcut-files/'+$phase+'/'+[IO.Path]::GetFileName((Split-Path -Parent $entry)))
+ New-Item -ItemType Directory -Path $raw -Force | Out-Null
+ Copy-Item -LiteralPath $entry -Destination $raw
+ $record=[ordered]@{phase=$phase;shortcut=$entry;target=$link.TargetPath;workingDirectory=$link.WorkingDirectory;arguments=$link.Arguments;targetExists=(Test-Path -LiteralPath $link.TargetPath);bytes=(Get-Item -LiteralPath $entry).Length}
  $links.Add($record)
  Write-Output ('SHORTCUT '+($record|ConvertTo-Json -Compress))
  if(!$link.TargetPath.Equals($exe,[StringComparison]::OrdinalIgnoreCase) -or !$record.targetExists){throw "Broken $phase shortcut: $entry -> $($link.TargetPath); expected $exe"}
@@ -77,5 +80,5 @@ try {
  Stop-TestPet
  $parent=Split-Path -Parent $Report
  New-Item -ItemType Directory -Path $parent -Force | Out-Null
- [ordered]@{installDirectory=$install;executable=$exe;passed=($null -eq $failure);checks=@($checks);links=@($links);error=$failure}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $Report -Encoding utf8
+ [ordered]@{installDirectory=$install;executable=$exe;passed=($null -eq $failure);checks=$checks.ToArray();links=$links.ToArray();error=$failure}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $Report -Encoding utf8
 }
