@@ -1,0 +1,45 @@
+name: Windows installed entrypoints
+on:
+  push:
+    branches: ['preview/windows-entrypoints']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  baseline:
+    name: Check published v0.33.2 shortcuts
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Download the unchanged published installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          gh release download v0.33.2 --repo Vinci-217/mole-baby --pattern mole-baby-0.33.2-Setup.exe --pattern SHA256SUMS.txt --dir artifacts
+          if($LASTEXITCODE -ne 0){throw 'Published installer download failed'}
+          $line=Get-Content artifacts/SHA256SUMS.txt|Where-Object {$_ -match '  mole-baby-0.33.2-Setup.exe$'}
+          $expected=($line -split '  ')[0]
+          if((Get-FileHash artifacts/mole-baby-0.33.2-Setup.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected){throw 'Installer SHA256 mismatch'}
+      - name: Install with spaces and Chinese path; inspect and launch the real shortcuts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $installer=(Resolve-Path artifacts/mole-baby-0.33.2-Setup.exe).Path
+          $install=Join-Path $env:RUNNER_TEMP '拉姆 安装入口检查/mole-baby'
+          try {
+            $p=Start-Process -FilePath $installer -ArgumentList "/S /currentuser /D=$install" -PassThru
+            if(!$p.WaitForExit(150000) -or $p.ExitCode -ne 0){throw 'Baseline installation failed'}
+            & ./scripts/windows-shortcut-checks.ps1 -Installer $installer -InstallDirectory $install
+          } finally {
+            $uninstaller=Join-Path $install 'Uninstall 拉姆.exe'
+            if(Test-Path -LiteralPath $uninstaller){Start-Process -FilePath $uninstaller -ArgumentList "/S _?=$install" -Wait}
+          }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-published-entrypoints
+          path: artifacts/windows-entrypoints.json
+          retention-days: 14
