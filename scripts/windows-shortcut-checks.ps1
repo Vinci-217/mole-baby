@@ -9,15 +9,46 @@ $ErrorActionPreference='Stop'
 $env:MOLE_BABY_DISABLE_UPDATES='1'
 if(-not ('ShortcutWindow' -as [type])) {
  Add-Type @'
-using System;using System.Runtime.InteropServices;
+using System;using System.Text;using System.Runtime.InteropServices;using System.Runtime.InteropServices.ComTypes;
 public static class ShortcutWindow {
  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+}
+[ComImport, Guid("00021401-0000-0000-C000-000000000046")] internal class ShellLinkObject {}
+[ComImport, Guid("000214F9-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)] internal interface IShellLinkW {
+ void GetPath([Out,MarshalAs(UnmanagedType.LPWStr)] StringBuilder path,int count,IntPtr findData,uint flags);
+ void GetIDList(out IntPtr id);void SetIDList(IntPtr id);
+ void GetDescription([Out,MarshalAs(UnmanagedType.LPWStr)] StringBuilder text,int count);
+ void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string text);
+ void GetWorkingDirectory([Out,MarshalAs(UnmanagedType.LPWStr)] StringBuilder path,int count);
+ void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string path);
+ void GetArguments([Out,MarshalAs(UnmanagedType.LPWStr)] StringBuilder args,int count);
+ void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string args);
+ void GetHotkey(out short hotkey);void SetHotkey(short hotkey);void GetShowCmd(out int command);void SetShowCmd(int command);
+ void GetIconLocation([Out,MarshalAs(UnmanagedType.LPWStr)] StringBuilder path,int count,out int index);
+ void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string path,int index);
+ void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string path,uint reserved);void Resolve(IntPtr window,uint flags);
+ void SetPath([MarshalAs(UnmanagedType.LPWStr)] string path);
+}
+public sealed class ShortcutDetails {public string TargetPath;public string WorkingDirectory;public string Arguments;}
+public static class NativeShortcut {
+ public static ShortcutDetails Read(string path) {
+  var link=(IShellLinkW)new ShellLinkObject();
+  try {
+   ((IPersistFile)link).Load(path,0);var target=new StringBuilder(32768);var directory=new StringBuilder(32768);var args=new StringBuilder(32768);
+   link.GetPath(target,target.Capacity,IntPtr.Zero,4);link.GetWorkingDirectory(directory,directory.Capacity);link.GetArguments(args,args.Capacity);
+   return new ShortcutDetails {TargetPath=target.ToString(),WorkingDirectory=directory.ToString(),Arguments=args.ToString()};
+  } finally {Marshal.FinalReleaseComObject(link);}
+ }
+ public static void BreakTarget(string path,string target,string directory) {
+  var link=(IShellLinkW)new ShellLinkObject();
+  try {((IPersistFile)link).Load(path,0);link.SetPath(target);link.SetWorkingDirectory(directory);((IPersistFile)link).Save(path,true);}
+  finally {Marshal.FinalReleaseComObject(link);}
+ }
 }
 '@
 }
 $install=[IO.Path]::GetFullPath($InstallDirectory)
 $exe=Join-Path $install "$ProductName.exe"
-$shell=New-Object -ComObject WScript.Shell
 $entries=@(
  (Join-Path ([Environment]::GetFolderPath('DesktopDirectory')) "$ProductName.lnk"),
  (Join-Path ([Environment]::GetFolderPath('Programs')) "$ProductName.lnk")
@@ -33,7 +64,7 @@ function Stop-TestPet {
 }
 function Test-Entry([string]$entry,[string]$phase) {
  if(!(Test-Path -LiteralPath $entry)){throw "Missing $phase entry: $entry"}
- $link=$shell.CreateShortcut($entry)
+ $link=[NativeShortcut]::Read($entry)
  $raw=Join-Path (Split-Path -Parent $Report) ('shortcut-files/'+$phase+'/'+[IO.Path]::GetFileName((Split-Path -Parent $entry)))
  New-Item -ItemType Directory -Path $raw -Force | Out-Null
  Copy-Item -LiteralPath $entry -Destination $raw
@@ -65,10 +96,7 @@ try {
  # Reproduce an old/moved target retained by electron-builder's KeepShortcuts
  # upgrade path. Reinstalling must repair links, while keeping app data intact.
  foreach($entry in $entries){
-  $link=$shell.CreateShortcut($entry)
-  $link.TargetPath=Join-Path $install 'missing-old-program.exe'
-  $link.WorkingDirectory=Join-Path $install 'missing-old-directory'
-  $link.Save()
+  [NativeShortcut]::BreakTarget($entry,(Join-Path $install 'missing-old-program.exe'),(Join-Path $install 'missing-old-directory'))
  }
  $repair=Start-Process -FilePath $Installer -ArgumentList "/S /currentuser /D=$install" -PassThru
  if(!$repair.WaitForExit(150000)){throw 'Repair installation timed out'}
