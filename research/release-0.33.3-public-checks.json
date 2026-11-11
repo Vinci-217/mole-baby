@@ -1,0 +1,129 @@
+{
+  "version": "0.33.3",
+  "sourceSha": "7fe0ae44c0b56e4e1ff29cd19851111a49ff0455",
+  "checkedAt": "2026-11-11T03:55:32.673Z",
+  "publishedAt": "2026-11-11T03:54:19Z",
+  "releaseUrl": "https://github.com/Vinci-217/mole-baby/releases/tag/v0.33.3",
+  "workflowUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/42952732836",
+  "publishedAssets": 30,
+  "checksumsMatch": true,
+  "latestChannels": [
+    "latest.yml",
+    "legacy-x64.yml",
+    "legacy-ia32.yml",
+    "latest-mac.yml"
+  ],
+  "downloads": [
+    {
+      "name": "mole-baby-0.33.3-legacy-ia32-Setup.exe",
+      "size": 677637434,
+      "status": 206,
+      "range": "bytes 0-1023/677637434",
+      "sha256": "d47b56d427d03399d7400d8b55b295bd5cf09d28b0db92201ee8d30961a71056"
+    },
+    {
+      "name": "mole-baby-0.33.3-legacy-ia32.zip",
+      "size": 704232843,
+      "status": 206,
+      "range": "bytes 0-1023/704232843",
+      "sha256": "9c4473f3ced70e5b404442ff8f1811898680a9922368b3e639a9a0188153f2eb"
+    },
+    {
+      "name": "mole-baby-0.33.3-legacy-x64-Setup.exe",
+      "size": 681269589,
+      "status": 206,
+      "range": "bytes 0-1023/681269589",
+      "sha256": "8e7feb42522cde60a2f68752f36a409ae668fc3ab5e1982cb9b1cefa0f1e1611"
+    },
+    {
+      "name": "mole-baby-0.33.3-legacy-x64.zip",
+      "size": 709749626,
+      "status": 206,
+      "range": "bytes 0-1023/709749626",
+      "sha256": "68679cd8aadb5bb14369de17dc3a860f4209347353b474270509576ef5d702d4"
+    },
+    {
+      "name": "mole-baby-0.33.3-mac-arm64.dmg",
+      "size": 726509053,
+      "status": 206,
+      "range": "bytes 726508541-726509052/726509053",
+      "sha256": "21bdd6cd6b56bf0c04f86faaa2dd0a1be481590ed92eba59ab9498d935324e94"
+    },
+    {
+      "name": "mole-baby-0.33.3-mac-arm64.zip",
+      "size": 720931708,
+      "status": 206,
+      "range": "bytes 0-1023/720931708",
+      "sha256": "cd49fc647ce99395440d9ec8d70fbc740581a04ecf9a6ea73c41bd05cb0edbf1"
+    },
+    {
+      "name": "mole-baby-0.33.3-mac-x64.dmg",
+      "size": 732903712,
+      "status": 206,
+      "range": "bytes 732903200-732903711/732903712",
+      "sha256": "6f6d82c21b671b37e8a261bfa25c94b527eb557108e66b8b511a06e1ebb90074"
+    },
+    {
+      "name": "mole-baby-0.33.3-mac-x64.zip",
+      "size": 727318890,
+      "status": 206,
+      "range": "bytes 0-1023/727318890",
+      "sha256": "2f75992421e08a3e51f3c0af0566d084e3fd7d6fc112ae69f9da8e81851bc9c8"
+    },
+    {
+      "name": "mole-baby-0.33.3-Setup.exe",
+      "size": 702341124,
+      "status": 206,
+      "range": "bytes 0-1023/702341124",
+      "sha256": "b8483624c712c03a0cc77f7436ca64ecfab47d5c77ec78498b7b87be487645fd"
+    },
+    {
+      "name": "mole-baby-0.33.3-x64.zip",
+      "size": 741657706,
+      "status": 206,
+      "range": "bytes 0-1023/741657706",
+      "sha256": "a81f76f9104ec5892b34673da3f0dc53072a725a521c9d6772bf795bd31cd24f"
+    },
+    {
+      "name": "mole-baby-android-1330300.apk",
+      "size": 625872894,
+      "status": 206,
+      "range": "bytes 0-1023/625872894",
+      "sha256": "db8fe40900da834feb87da9a1d73868e4362eb3d1640ef917458e69a9dc8a5e2"
+    },
+    {
+      "name": "mole-baby-android-1330300.xapk",
+      "size": 625873305,
+      "status": 206,
+      "range": "bytes 0-1023/625873305",
+      "sha256": "44132a1982210ff2946683331b3a0e61bf5f17b36d00f87e44f71706e30ace0d"
+    }
+  ],
+  "android": {
+    "packageName": "com.molebaby.ramu.preview",
+    "versionCode": 1330300,
+    "versionName": "0.33.3",
+    "fixedSignerRetained": true,
+    "bases": [
+      1330200,
+      1330100,
+      1330000,
+      1320300,
+      1320200,
+      1320100,
+      1320000,
+      1311000
+    ]
+  },
+  "macTrust": [
+    {
+      "arch": "arm64",
+      "mode": "local"
+    },
+    {
+      "arch": "x64",
+      "mode": "local"
+    }
+  ],
+  "verificationScope": "CI verifies complete artifacts; public checks match uploaded SHA256 digests and bounded range reads."
+}
