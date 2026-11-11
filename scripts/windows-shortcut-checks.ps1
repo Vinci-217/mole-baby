@@ -93,10 +93,14 @@ function Test-Entry([string]$entry,[string]$phase) {
 try {
  if(!(Test-Path -LiteralPath $exe)){throw "Installed application executable is missing: $exe"}
  foreach($entry in $entries){Test-Entry $entry 'fresh install'}
- # Reproduce an old/moved target retained by electron-builder's KeepShortcuts
- # upgrade path. Reinstalling must repair links, while keeping app data intact.
+ # Deliberately damage the links, verify the damage independently, then require
+ # a real reinstall to repair them. This is separate from a fresh-install check.
  foreach($entry in $entries){
-  [NativeShortcut]::BreakTarget($entry,(Join-Path $install 'missing-old-program.exe'),(Join-Path $install 'missing-old-directory'))
+  $missing=Join-Path $install 'missing-old-program.exe'
+  [NativeShortcut]::BreakTarget($entry,$missing,(Join-Path $install 'missing-old-directory'))
+  $broken=[NativeShortcut]::Read($entry)
+  if(!$broken.TargetPath -or !([IO.Path]::GetFullPath($broken.TargetPath)).Equals($missing,[StringComparison]::OrdinalIgnoreCase) -or (Test-Path -LiteralPath $broken.TargetPath)){throw "Broken-link positive control failed: $entry"}
+  $checks.Add("confirmed missing target for $entry")
  }
  $repair=Start-Process -FilePath $Installer -ArgumentList "/S /currentuser /D=$install" -PassThru
  if(!$repair.WaitForExit(150000)){throw 'Repair installation timed out'}
