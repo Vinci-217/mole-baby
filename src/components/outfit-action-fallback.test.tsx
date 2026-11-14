@@ -45,11 +45,12 @@ describe('every costume retains its rig throughout ordinary interactions',()=>{
   const actions=[...RAM_ACTIONS,'sad',...OFFICIAL_CLIPS.filter(c=>!['outfit','body'].includes(c.kind)).map(c=>'official-'+c.id)];
   for(const [stage,evolution,form] of forms)for(const outfit of ALL_OUTFITS){
    const clip=outfitAnimation(outfit.id)!;
-   for(const action of actions){const plan=costumePlayback(stage,evolution,outfit.id,action);expect(plan.clip?.id,`${outfit.id}:${form}:${action}`).toBe(clip.id);expect(plan.appearance.form).toBe(officialOutfitForm(clip,form));}
+   const expectedForm=officialOutfitForm(clip,form);
+   for(const action of actions){const plan=costumePlayback(stage,evolution,outfit.id,action);assert.equal(plan.clip?.id,clip.id,`${outfit.id}:${form}:${action}`);assert.equal(plan.appearance.form,expectedForm);}
   }
   for(const [, ,form] of forms){
-   for(const action of actions){const plan=costumeAction(action,form);expect(plan.kind).toBeTruthy();expect(plan.duration===null||Number.isFinite(plan.duration)&&plan.duration>0).toBe(true);}
-   for(const item of ITEMS){const plan=costumeAction('use',form,item.id);expect(plan.kind,item.id).toBe(item.category==='toy'?item.sourceId==='180004'?'social':'toy':'care');}
+   for(const action of actions){const plan=costumeAction(action,form);assert(plan.kind);assert(plan.duration===null||Number.isFinite(plan.duration)&&plan.duration>0);}
+   for(const item of ITEMS){const plan=costumeAction('use',form,item.id);assert.equal(plan.kind,item.category==='toy'?item.sourceId==='180004'?'social':'toy':'care',item.id);}
   }
  },30000);
  it('keeps growth, colour, possessions and earned memories independent of adapted gestures',()=>{
