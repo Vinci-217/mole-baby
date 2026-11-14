@@ -18,7 +18,7 @@ test('cleanup protects tracked frames, mixed folders, assets, saved profiles and
     'tsconfig.app.tsbuildinfo', 'node_modules/.vite/cache.json', 'node_modules/keep/index.js']) write(file);
   execFileSync('git', ['add', '-f', 'artifacts/tracked-frames/01.png', 'scripts/tracked/__pycache__/keep.pyc'], { cwd: root });
   fs.symlinkSync(path.join(root, 'artifacts/player-profile'), path.join(root, 'artifacts/linked-frames'));
-  const candidates = planCleanup(root).map(entry => path.relative(root, entry.path)).sort();
+  const candidates = planCleanup(root).map(entry => path.relative(root, entry.path).split(path.sep).join('/')).sort();
   assert.deepEqual(candidates, ['artifacts/old-frames', 'node_modules/.vite', 'scripts/__pycache__', 'tsconfig.app.tsbuildinfo']);
   assert(fs.existsSync(path.join(root, 'artifacts/player-profile/save.json')));
 });
