@@ -31,7 +31,9 @@
 - **餐厅打工**：进入餐厅观看拉姆取餐、端盘送餐，客人进店、用餐、离开的完整动画循环，可自由切换 15 套原版背景。[餐厅动画与适配说明](docs/RESTAURANT.md)
 - **一起玩耍**：原版道具动作、小游戏、课程和餐厅打工；游戏音效可独立关闭，经历保存在本机回忆里。
 
-![拉姆小屋](docs/previews/room-overview.png)
+![穿着粉兔帽的拉姆与小屋示例](docs/previews/room-dressed-example.png)
+
+*小屋与装扮示例：穿上粉兔帽的拉姆。*
 
 玩法数值见[摩尔豆数值](docs/摩尔豆数值.md)与[状态数值](docs/状态数值.md)。更多动作演示收在[动画画廊](docs/README-ARCHIVE.md)，素材出处与适配范围见 [ASSETS.md](ASSETS.md)。
 
@@ -61,13 +63,15 @@ npm test                 # 养成、存档、窗口与更新测试
 
 ## Token 赞助鸣谢
 
-感谢以下朋友对开发所需 Token 的支持。头像与昵称按提供的名单整理，同一位赞助者合并展示。
+感谢以下朋友对开发所需 Token 的支持。名单按**首次支持时间从早到晚**排列（从左到右、从上到下），同一位赞助者合并展示。
 
 | | | |
 | :---: | :---: | :---: |
-| ![慕容狗尾巴草](docs/sponsors/murong.png) **慕容狗尾巴草** | ![太白猕猴桃🥝](docs/sponsors/taibai.png) **太白猕猴桃🥝** | ![参苓](docs/sponsors/shencha.png) **参苓** |
-| ![cong12110](docs/sponsors/cong12110.png) **cong12110** | ![波子汽水](docs/sponsors/bozi.png) **波子汽水** | ![从而言之y](docs/sponsors/congeryanzhi.png) **从而言之y** |
-| ![小红薯66D7CB02](docs/sponsors/xiaohongshu-66d7cb02.png) **小红薯66D7CB02** | | |
+| <img src="docs/sponsors/congeryanzhi.png" width="64" height="64" alt="从而言之y" /><br />**从而言之y** | <img src="docs/sponsors/bozi.png" width="64" height="64" alt="波子汽水" /><br />**波子汽水** | <img src="docs/sponsors/cong12110.png" width="64" height="64" alt="cong12110" /><br />**cong12110**<br />**大力支持 · 3 次** |
+| <img src="docs/sponsors/shencha.png" width="64" height="64" alt="参苓" /><br />**参苓** | <img src="docs/sponsors/taibai.png" width="64" height="64" alt="太白猕猴桃🥝" /><br />**太白猕猴桃🥝** | <img src="docs/sponsors/murong.png" width="64" height="64" alt="慕容狗尾巴草" /><br />**慕容狗尾巴草** |
+| <img src="docs/sponsors/xiaohongshu-66d7cb02.png" width="64" height="64" alt="小红薯66D7CB02" /><br />**小红薯66D7CB02** | <img src="docs/sponsors/gui-fei.png" width="64" height="64" alt="贵妃刷红薯" /><br />**贵妃刷红薯** | <img src="docs/sponsors/xie-huang-tang-bao.png" width="64" height="64" alt="想吃蟹黄汤包" /><br />**想吃蟹黄汤包** |
+| <img src="docs/sponsors/wu-suo-bu-cheng-win.png" width="64" height="64" alt="无所不成win" /><br />**无所不成win** | <img src="docs/sponsors/bu-ao-ye.png" width="64" height="64" alt="再也不熬夜了！" /><br />**再也不熬夜了！** | <img src="docs/sponsors/lucas.png" width="64" height="64" alt="LUCAS" /><br />**LUCAS** |
+| <img src="docs/sponsors/zao-an-jiu-niu.png" width="64" height="64" alt="早安啾妞" /><br />**早安啾妞** | <img src="docs/sponsors/xiaoxiong.png" width="64" height="64" alt="小熊崽崽" /><br />**小熊崽崽** |  |
 
 ## 素材赞助鸣谢
 
@@ -75,7 +79,7 @@ npm test                 # 养成、存档、窗口与更新测试
 
 | | |
 | :---: | :---: |
-| ![叔权](docs/sponsors/shuquan.png) **叔权** | |
+| <img src="docs/sponsors/shuquan.png" width="64" height="64" alt="叔权" /><br />**叔权** | |
 
 ## 素材声明与免责声明
 
