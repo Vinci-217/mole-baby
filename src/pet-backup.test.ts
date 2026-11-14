@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest'
 import {createPet} from './game'
 import {createMemory,memoryKey,recordEvent} from './companion-memory'
-import {restorePetBackup,PET_SAVE_KEY,MAX_BACKUP_BYTES} from './pet-backup'
+import {restorePetBackup,PET_SAVE_KEY,MAX_BACKUP_BYTES,petBackupText,recoverLocalPet} from './pet-backup'
 const now=1_700_000_000_000
 function store(initial:Record<string,string>={},failKey?:string){const values=new Map(Object.entries(initial));return{values,getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{if(key===failKey)throw Error('Quota exceeded');values.set(key,value)},removeItem:(key:string)=>{values.delete(key)}}}
 describe('pet backup imports',()=>{
@@ -45,4 +45,19 @@ describe('pet backup imports',()=>{
   expect(()=>restorePetBackup(JSON.stringify(pet),storage,now)).toThrow('Quota')
   expect([...storage.values]).toEqual([[PET_SAVE_KEY,'original']])
  })
+ it('round-trips preferences with the complete pet, house and memories and ignores unrelated keys',()=>{
+  const pet={...createPet('小叶','blue',now),color:'#6b399f' as const,growth:840,evolution:'super' as const,wardrobe:['wizard-cap' as const],wearing:'wizard-cap' as const,notes:[{id:'a',text:'明天见',done:false,createdAt:now}]},memory=recordEvent(createMemory(pet),{kind:'care',detail:'已有回忆',at:now}),source=store({'ramu-house-preferences-v2':'{"sound":false}','ramu-room-media-v1':'{"backgroundId":"mystery-flower-sea"}','unrelated':'leave me'});
+  const exported=JSON.parse(petBackupText(pet,memory,source));exported.localData.unrelated='attack';const target=store({unrelated:'original'}),restored=restorePetBackup(JSON.stringify(exported),target,now);
+  expect(restored.pet).toMatchObject({createdAt:now,color:'#6b399f',evolution:'super',wearing:'wizard-cap',notes:pet.notes});expect(restored.memory.events[0].detail).toBe('已有回忆');expect(target.getItem('ramu-house-preferences-v2')).toBe('{"sound":false}');expect(target.getItem('unrelated')).toBe('original');
+ });
+ it('rolls back imported settings too when the final pet write fails',()=>{
+  const p=createPet('小叶','blue',now),storage=store({[PET_SAVE_KEY]:'original','ramu-house-preferences-v2':'old'},PET_SAVE_KEY);
+  expect(()=>restorePetBackup(JSON.stringify({...p,localData:{'ramu-house-preferences-v2':'new'}}),storage,now)).toThrow();expect(storage.getItem('ramu-house-preferences-v2')).toBe('old');
+ });
+ it('recovers only a missing browser record, never overwrites a broken/existing one or a concurrent new save',async()=>{
+  const p=createPet('小叶','blue',now),storage=store(),api={read:async()=>JSON.stringify(p)} as NonNullable<NonNullable<Window['desktop']>['localSaves']>;
+  expect(await recoverLocalPet(storage,api)).toBe(true);expect(JSON.parse(storage.getItem(PET_SAVE_KEY)!).createdAt).toBe(now);
+  storage.setItem(PET_SAVE_KEY,'broken');expect(await recoverLocalPet(storage,api)).toBe(false);expect(storage.getItem(PET_SAVE_KEY)).toBe('broken');
+  storage.removeItem(PET_SAVE_KEY);const racing={read:async()=>{storage.setItem(PET_SAVE_KEY,'new adoption');return JSON.stringify(p)}} as typeof api;expect(await recoverLocalPet(storage,racing)).toBe(false);expect(storage.getItem(PET_SAVE_KEY)).toBe('new adoption');
+ });
 })

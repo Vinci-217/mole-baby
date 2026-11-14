@@ -9,8 +9,32 @@ import {getItemMotion} from './item-motion'
 import {DAILY_FRAME_ACTIONS} from './daily-frames'
 import calibration from '../research/tuya-size-calibration.json'
 import visibility from '../electron/edge-visibility.json'
+import {OFFICIAL_CLIPS,supportsOfficial} from './official-clips'
 
 describe('complete supplied motion library',()=>{
+ it('uses the same calibrated local frames for menu IDs, automatic IDs and direct toy playback',()=>{
+  let cases=0;
+  for(const clip of OFFICIAL_CLIPS.filter(c=>c.kind==='care'))for(const form of ['seed','junior','middle','senior','classic'] as const){
+   const id=clip.path.split('/').at(-1)!.replace(/\.swf$/,'');
+   const spec=uploadedSpec(form,id);if(!spec||!supportsOfficial(clip,form))continue;
+   expect(uploadedMotion(form,'official-'+clip.id)).toBe(spec);
+   expect(uploadedMotion(form,'ambient-'+clip.id)).toBe(spec);cases++;
+  }
+  expect(cases).toBeGreaterThanOrEqual(200);
+  const junior=OFFICIAL_CLIPS.find(c=>c.kind==='care'&&c.level===2&&c.path.endsWith('/tuya1.swf'))!;
+  expect(uploadedMotion('super','official-'+junior.id)).toBe(uploadedSpec('classic','tuya1'));
+ })
+ it('reuses the already-selected classic care fallback on later forms at their own body size',()=>{
+  const clip=OFFICIAL_CLIPS.find(c=>c.kind==='care'&&c.level===101&&c.path.endsWith('/tuya1.swf'))!;
+  const spec=uploadedSpec('classic','tuya1')!,base=uploadedEffectRect(spec,'classic');
+  for(const form of ['super','water','wood','fire'] as const){
+   expect(uploadedMotion(form,'official-'+clip.id)).toBe(spec);
+   const rect=uploadedEffectRect(spec,form),body=visibility.forms[form].body,reference=visibility.forms.classic.body;
+   expect(rect.width/base.width).toBeCloseTo((body[2]-body[0])/(reference[2]-reference[0]),6);
+   expect(rect.height/rect.width).toBeCloseTo(spec.height/spec.width,6);
+  }
+  expect(uploadedMotion('seed','official-'+clip.id)).toBeUndefined();
+ })
  it('registers graffiti to the first body pose instead of its shrinking ending',()=>{
   expect(calibration.records).toHaveLength(16)
   for(const record of calibration.records){
@@ -38,10 +62,10 @@ describe('complete supplied motion library',()=>{
   }
   expect(ITEMS.filter(i=>i.sourceId==='180060')).toHaveLength(1)
  })
- it('does not silently replace a seed or elemental form with a different original body',()=>{
+ it('keeps seed limits, while special forms share classic original tools and consumables',()=>{
   for(const form of ['seed','super','water','wood','fire']){
-   expect(uploadedMotion(form,'uploaded-180004')).toBeUndefined()
-   expect(uploadedMotion(form,'feed','biscuit')).toBeUndefined()
+   expect(uploadedMotion(form,'uploaded-180004')).toBe(form==='seed'?undefined:uploadedSpec('classic','180004'))
+   expect(uploadedMotion(form,'feed','biscuit')).toBe(form==='seed'?undefined:uploadedSpec('classic','180017'))
   }
   for(const color of ['#125789','#000000','#ffffff'])expect(uploadedMotion('middle','use',`mix-${color.slice(1)}`)?.id).toBe('180005')
  })

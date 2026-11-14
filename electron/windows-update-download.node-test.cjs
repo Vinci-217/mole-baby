@@ -31,3 +31,7 @@ test('Windows selects full replacement before downloading package ranges and kee
 test('Windows without an old installer skips difference indexes and selects a full download',async t=>{
  const f=await fixture(t,{missing:true});assert.equal(await f.run(),true);assert.equal(f.plans[0].reason,'baseline-missing');assert.equal(f.server.requests.length,0);
 });
+test('a stale cached index after a full update is refreshed instead of unnecessarily abandoning the next differential update',async t=>{
+ const f=await fixture(t);fs.copyFileSync(f.old+'.blockmap',path.join(path.dirname(f.old),'current.blockmap'));const wrong=require('node:zlib').gzipSync(JSON.stringify({version:'2',files:[{name:'old',offset:0,sizes:[10],checksums:[Buffer.alloc(18).toString('base64')]}]}));fs.writeFileSync(path.join(path.dirname(f.old),'current.blockmap'),wrong);
+ assert.equal(await f.run(),false);assert.equal(f.plans[0].mode,'differential');assert.deepEqual(fs.readFileSync(f.target),f.after);assert.ok(f.server.requests.some(request=>request.path==='/old.blockmap'));
+});

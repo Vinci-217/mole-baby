@@ -1,4 +1,7 @@
 /* Every pet image comes from the original game atlas; no decorative body artwork. */
+.ram-outfit-source,.ram-outfit-action{position:absolute;inset:0;display:block}
+.ram-outfit-source[hidden]{display:none!important}
+.ram-outfit-action>.ram-sprite{width:100%;height:100%;position:absolute;inset:0;--social-x:0%;--social-lift:0%;--social-angle:0deg;--social-scaleX:1;--social-scaleY:1;--social-readTilt:0deg;--social-opacity:0;--pull-x:0%;--pull-y:0%;--pull-angle:0deg;--pull-sx:1;--pull-sy:1;--pull-skew:0deg}
 .ram-sprite {
   position: relative;
   display: inline-block;
@@ -142,11 +145,9 @@
 @keyframes ram-snore-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.85}55%{opacity:.65}100%{opacity:0;transform:translate(23px,-50px) scale(1.2)}}
 @media(prefers-reduced-motion:reduce){.ram-sleep-particles>img{animation:none!important;opacity:.7;transform:translate(12px,-22px)}.ram-sleep-particles>img+img{display:none}}
 
-.ram-wear{position:absolute;object-fit:fill;visibility:hidden;translate:none;transform-origin:50% 100%;pointer-events:none;z-index:2}
 .ram-sprite canvas.ram-classic-frame{object-fit:fill}
 .ram-pose-layer{isolation:isolate}
-.ram-pose-layer>canvas:not(.ram-wear){position:relative;z-index:1}
-.ram-wear[data-layer="behind"]{z-index:0}
+.ram-pose-layer>canvas{position:relative;z-index:1}
 .ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-flight-layer,.ram-sprite:is(.action-mood-joy,.action-mood-grumpy) .ram-pose-layer{animation:none;transform:none}
 
 /* Local little performances reuse source props and the unchanged source face. */
@@ -159,7 +160,6 @@
 @media(prefers-reduced-motion:reduce){.ram-life-cue *,.life-balance .ram-pose-layer{animation:none!important;transform:none!important}.life-wand,.life-balance-book{opacity:1}.life-magic-star{opacity:.5}}
 
 .ram-sprite.is-gentle-eating:not(.is-dragging) .ram-pose-layer{transform:scale(calc(1 + var(--care-jaw,0)*.006),calc(1 - var(--care-jaw,0)*.012))}
-.ram-pose-layer.using-reading-book>.ram-wear{opacity:0}
 
 /* Only the body and its registered outfit stretch. The seed pot and native
    grab point stay exact, and release retains the damped spring. */

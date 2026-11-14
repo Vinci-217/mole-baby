@@ -31,6 +31,11 @@ async function main() {
   assert.equal(execFileSync('/usr/bin/lipo',['-archs',executable],{encoding:'utf8'}).trim(),arch==='x64'?'x86_64':'arm64');
   execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',app],{stdio:'pipe'});
   const archive=path.join(contents,'Resources/app.asar');
+  const bundleOnly=process.argv.includes('--bundle-only');
+  if(bundleOnly){
+    assert.equal(process.env.MOLE_ANIMATION_PREVIEW,'1','Bundle-only verification is restricted to explicit animation test builds');
+    assert.equal(JSON.parse(require('@electron/asar').extractFile(archive,'package.json')).animationPreview,true,'Only a test bundle may separate container and application checks');
+  }
   // Verify the disk image that users download, including its application payload.
   execFileSync('/usr/bin/hdiutil',['verify',path.join(release,files[0])],{stdio:'pipe'});
   const mount=fs.mkdtempSync(path.join(os.tmpdir(),'mole-dmg-check-'));
@@ -58,7 +63,7 @@ async function main() {
   }finally{await fs.promises.rm(zipFolder,{recursive:true,force:true})}
   const trust = verifyMacTrust({ app, dmg: path.join(release,files[0]), mode: process.env.MOLE_MAC_DISTRIBUTION || 'local' });
   console.log(`PASS: macOS ${arch} DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=${trust.mode}`);
-  await verifyApplication({executable,archive,screenshot:`mac-${arch}-smoke.png`});
+  if(!bundleOnly)await verifyApplication({executable,archive,screenshot:`mac-${arch}-smoke.png`});
   await writeChecksums(release,files,`SHA256SUMS-mac-${arch}.txt`);
   fs.writeFileSync(path.join(release,`macos-trust-${arch}.json`),JSON.stringify({ architecture:arch, sourceSha:process.env.GITHUB_SHA || null, ...trust },null,2)+'\n');
 }

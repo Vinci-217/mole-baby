@@ -27,3 +27,6 @@
 .wardrobe-pages{min-height:30px;flex-shrink:0}
 .wardrobe-mirror{touch-action:none;cursor:grab}.wardrobe-mirror[data-dragging=true]{cursor:grabbing}
 @media(max-width:380px){.wardrobe-mirror>.ram-sprite{width:90px}.wardrobe-grid img{width:32px;height:32px}.wardrobe-grid b{font-size:12px}.wardrobe-grid span{font-size:11px}}
+.wardrobe-load-notice{min-height:58px;max-width:220px;font-size:12px;line-height:1.6;color:#95703e;text-align:center}
+.wardrobe-load-actions{display:flex;justify-content:center;gap:8px;margin-top:4px}
+.wardrobe-load-notice button{border:1px solid #dfc399;border-radius:6px;padding:3px 6px;background:#fffaf0;color:#795332;font:inherit;cursor:pointer}

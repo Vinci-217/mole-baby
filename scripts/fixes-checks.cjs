@@ -42,13 +42,13 @@ async function verifyFixes(page,desktop){
    await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];w.show()});
   }
   await expect(page.locator('.compact-bubble:not(.visible)')).toHaveCount(0);
-  await require('./room-upgrade-checks.cjs').verifyRoomUpgrade(page);
-  await require('./school-spells-checks.cjs').verifySchoolSpells(page);
-  await require('./spell-care-checks.cjs').verifySpellCare(page,desktop);
-  await require('./growth-settings-checks.cjs').verifyGrowthSettings(page,desktop);
-  await require('./original-room-checks.cjs').verifyOriginalRoom(page,desktop);
+  console.log('START room-upgrade-checks.cjs');await require('./room-upgrade-checks.cjs').verifyRoomUpgrade(page);console.log('FINISH room-upgrade-checks.cjs');
+  console.log('START school-spells-checks.cjs');await require('./school-spells-checks.cjs').verifySchoolSpells(page);console.log('FINISH school-spells-checks.cjs');
+  console.log('START spell-care-checks.cjs');await require('./spell-care-checks.cjs').verifySpellCare(page,desktop);console.log('FINISH spell-care-checks.cjs');
+  console.log('START growth-settings-checks.cjs');await require('./growth-settings-checks.cjs').verifyGrowthSettings(page,desktop);console.log('FINISH growth-settings-checks.cjs');
+  console.log('START original-room-checks.cjs');await require('./original-room-checks.cjs').verifyOriginalRoom(page,desktop);console.log('FINISH original-room-checks.cjs');
   await require('./color-mixer-checks.cjs').verifyColorMixer(page,{label:desktop?'native':'browser'});
-  await require('./uploaded-motion-checks.cjs').verifyUploadedMotion(page,desktop);
+  console.log('START uploaded-motion-checks.cjs');await require('./uploaded-motion-checks.cjs').verifyUploadedMotion(page,desktop);console.log('FINISH uploaded-motion-checks.cjs');
   console.log('PASS fixes: language enrolment/reopen, five selectable divine choices/classic pixels, persisted stage lock, opt-in background music, no faded bubble node');
  }catch(error){failed=true;console.error('Fixes original error:',error);console.error('Fixes diagnostic',await page.evaluate(()=>({visible:document.visibilityState,state:window.desktop?true:false,media:localStorage.getItem('ramu-room-media-v1'),audio:window.__fixAudio?.map(a=>({src:a.src,paused:a.paused,error:a.error?.code}))})));throw error;}finally{
   await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(error=>{if(!failed)throw error});

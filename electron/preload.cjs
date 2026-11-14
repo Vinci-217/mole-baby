@@ -30,6 +30,13 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
   }),
   platform: process.platform,
   flushSave:()=>ipcRenderer.invoke('desktop:flush-save'),
+  localSaves:Object.freeze({
+    inspect:()=>ipcRenderer.invoke('saves:inspect'),
+    checkpoint:(text,reason='automatic')=>ipcRenderer.invoke('saves:checkpoint',text,reason),
+    read:profile=>ipcRenderer.invoke('saves:read',profile),
+    openFolder:kind=>ipcRenderer.invoke('saves:open-folder',kind),
+    forget:petId=>ipcRenderer.invoke('saves:forget',petId),
+  }),
   messageBoard:Object.freeze({
     open:snapshot=>ipcRenderer.invoke('desktop:open-board',snapshot),
     publish:snapshot=>ipcRenderer.invoke('desktop:board-snapshot',snapshot),

@@ -49,6 +49,13 @@ test('Mac installer includes an accessible pre-launch guide outside the blocked 
  const config=macBuildConfig(source,{});assert.equal(source.dmg.contents.length,2);assert.equal(config.dmg.contents.length,3);
  const guide=config.dmg.contents[2];assert.equal(path.basename(guide.path),'Mac 打开说明.html');assert.ok(fs.readFileSync(guide.path,'utf8').includes('x-apple.systempreferences:'));
 });
+test('an animation test build preserves app identity and explicitly disables its updater',()=>{
+ const source={...base,appId:'com.molebaby.ramuhouse',productName:'拉姆'};
+ const config=macBuildConfig(source,{MOLE_ANIMATION_PREVIEW:'1'});
+ assert.equal(config.appId,source.appId);assert.equal(config.productName,source.productName);assert.equal(config.extraMetadata.animationPreview,true);
+ assert.equal(macBuildConfig(source,{}).extraMetadata.animationPreview,undefined);
+ assert.match(fs.readFileSync(path.join(__dirname,'../electron/main.cjs'),'utf8'),/disabled:[^\n]*applicationMetadata\.animationPreview===true/);
+});
 
 test('Gatekeeper acceptance requires a real Developer ID, both tickets and both policy assessments', () => {
   const calls=[];

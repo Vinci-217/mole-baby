@@ -51,7 +51,8 @@ async function verifyGrowthSettings(page,desktop){
   if(desktop&&await desktop.evaluate(()=>process.platform==='win32'))await require('./windows-window-chrome.cjs').verifyWindowsChrome(page,desktop);
   await enterHome(page);await roomTab(page,'设置');
   const titles=await page.locator('.settings-panel>section').evaluateAll(items=>items.map(s=>s.querySelector('h3')?.textContent));
-  assert.deepEqual(titles,['拉姆信息','陪伴与桌面','声音与音乐','专注计时','存档与送别',...(desktop?['软件与帮助']:[])]);
+  assert.deepEqual(titles,['拉姆信息','陪伴与桌面','声音与音乐','专注计时','动画与素材','存档与送别',...(desktop?['软件与帮助']:[])]);
+  await expect(page.getByRole('region',{name:'动画与素材',exact:true}).getByRole('button',{name:'导出动画日志',exact:true})).toBeEnabled();
   await expect(stagePanel()).toHaveCount(0);await roomTab(page,'成长');
   await expect(stagePanel().getByRole('region',{name:'成长进度',exact:true})).toContainText('5天 13小时');
   const baseline=(await save()).growth;

@@ -7,6 +7,7 @@ const digest=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).dig
 function files(dir){return fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]);}
 async function prepare(){
  if(!fs.existsSync(path.join(source,'index.html')))throw Error('先运行 npm run build');
+ require('../verify-offline-assets.cjs').verifyOfflineAssets(source);
  fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});
  const media=[],entries=[],renderer=[];
  for(const file of files(source)){

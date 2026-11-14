@@ -1,0 +1,13 @@
+.ram-outfit-host .ram-outfit-source .ram-pose-layer{animation:none!important;transform:translate(var(--social-x,0%),var(--social-lift,0%)) rotate(var(--social-angle,0deg)) scale(var(--social-scaleX,1),var(--social-scaleY,1))!important}
+.ram-outfit-host .social-ball{width:var(--outfit-ball-size,20%)}
+.ram-outfit-host .social-book{width:var(--outfit-book-size,49%)}
+.outfit-action-cue{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:var(--social-opacity,1)}
+.outfit-moving-prop{position:absolute;left:var(--outfit-prop-x,80%);top:var(--outfit-prop-y,60%);width:var(--outfit-prop-size,24%);height:auto;translate:-50% -50%;rotate:var(--outfit-prop-angle,0deg)}
+.outfit-spring{position:absolute;left:var(--outfit-prop-x,50%);top:var(--outfit-prop-y,90%);width:28%;height:18%;translate:-50% -50%;transform:scaleY(var(--outfit-spring-scale,1));transform-origin:50% 100%}
+.outfit-spring i{position:absolute;left:0;top:0;width:100%;height:38%;border:2px solid #7f89c2;border-radius:50%;background:linear-gradient(90deg,#dce5ff55,#8796d280);box-sizing:border-box}.outfit-spring i:nth-child(2){top:25%}.outfit-spring i:nth-child(3){top:50%}.outfit-spring i:nth-child(4){top:75%}
+.outfit-gum{position:absolute;left:var(--outfit-prop-x,50%);top:var(--outfit-prop-y,65%);width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 33% 27%,#fff8 0 8%,#ffcdeebd 13%,#fa8bcbcc 80%);border:1px solid #d573b4;translate:-50% -50%;transform:scale(var(--outfit-toy-scale,1))}
+.outfit-doodle{position:absolute;left:65%;top:62%;width:60%;height:36%;overflow:visible;color:#e77e98}.outfit-doodle path{stroke-dasharray:1;stroke-dashoffset:calc(1 - var(--outfit-ink,0))}.toy-tuya2 .outfit-doodle{color:#7da5d9}.toy-tuya3 .outfit-doodle{color:#88b979}.toy-tuya4 .outfit-doodle{color:#c39add}
+.outfit-musical-notes,.outfit-rest-mark,.outfit-thought{position:absolute;left:var(--social-affection-x,75%);top:var(--social-affection-y,25%);font:22px/1.3 Georgia,serif;color:#bd9560;animation:outfit-note 1.8s ease-in-out infinite}.outfit-thought{width:13%;height:auto}.outfit-rest-mark{font-size:16px}
+.outfit-snores{position:absolute;left:var(--outfit-prop-x,75%);top:var(--outfit-prop-y,50%)}.outfit-snores img{position:absolute;width:9px;height:10px;opacity:0;animation:ram-snore-rise 3.6s linear infinite}
+@keyframes outfit-note{0%,100%{translate:0 0;opacity:.4}50%{translate:2px -6px;opacity:1}}
+@media(prefers-reduced-motion:reduce){.outfit-action-cue *{animation:none!important}.outfit-snores img:first-child{opacity:.7}.ram-outfit-host .ram-outfit-source .ram-pose-layer{transform:none!important}}

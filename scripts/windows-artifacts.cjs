@@ -14,6 +14,12 @@ function crc32(bytes) {
   for (const value of bytes) crc = CRC_TABLE[(crc ^ value) & 255] ^ (crc >>> 8);
   return (crc ^ 0xffffffff) >>> 0;
 }
+function updateCrc32(bytes, previous = 0) {
+  if (typeof zlib.crc32 === 'function') return zlib.crc32(bytes, previous);
+  let crc = (previous ^ 0xffffffff) >>> 0;
+  for (const value of bytes) crc = CRC_TABLE[(crc ^ value) & 255] ^ (crc >>> 8);
+  return (crc ^ 0xffffffff) >>> 0;
+}
 function check(condition, message) { if (!condition) throw new Error(message); }
 function range(bytes, offset, size, label) {
   check(Number.isSafeInteger(offset) && Number.isSafeInteger(size) && offset >= 0 && size >= 0 && offset + size <= bytes.length, `${label}: truncated or invalid bounds`);
@@ -64,6 +70,48 @@ function inspectPe(bytes, { architectures = ['x64'], label = 'Windows executable
     if (size) range(bytes, offset, size, `${label} certificate`);
   }
   return { architecture, sectionCount, bytes: bytes.length };
+}
+
+/** Match NSIS loadHeaders' startup CRC, independently of the embedded 7z CRC.
+ * NSIS excludes the first 512 bytes and stops at its declared CRC position;
+ * an Authenticode certificate may follow. See NSIS Source/exehead/fileform.c.
+ */
+async function verifyNsisInstaller(filename) {
+  const handle = await fs.promises.open(filename, 'r');
+  try {
+    const { size } = await handle.stat();
+    const prefix = Buffer.alloc(Math.min(size, 2 * 1024 * 1024));
+    const read = await handle.read(prefix, 0, prefix.length, 0);
+    check(read.bytesRead === prefix.length, 'NSIS: incomplete executable header');
+    range(prefix, 0, 64, 'NSIS executable stub');
+    check(prefix.readUInt16LE(0) === 0x5a4d, 'NSIS: missing executable DOS header');
+    const pe = prefix.readUInt32LE(0x3c);
+    range(prefix, pe, 24, 'NSIS PE header');
+    check(prefix.readUInt32LE(pe) === 0x4550 && [0x14c, 0x8664].includes(prefix.readUInt16LE(pe + 4)), 'NSIS: invalid executable stub');
+    const signature = Buffer.from('efbeadde4e756c6c736f6674496e7374', 'hex');
+    let header = -1;
+    for (let offset = 512; offset + 28 <= prefix.length; offset += 512) {
+      if ((prefix.readUInt32LE(offset) & ~15) === 0 && prefix.subarray(offset + 4, offset + 20).equals(signature)) { header = offset; break; }
+    }
+    check(header >= 512, 'NSIS: installer firstheader is missing');
+    const flags = prefix.readUInt32LE(header), following = prefix.readUInt32LE(header + 24);
+    check((flags & 4) === 0 || (flags & 8) !== 0, 'NSIS: startup integrity check is disabled');
+    check(prefix.readUInt32LE(header + 20) > 0 && following >= 32, 'NSIS: invalid data lengths');
+    const end = header + following;
+    check(end <= size, `NSIS: truncated installer; expected at least ${end} bytes, got ${size}`);
+    const crcOffset = end - 4, expected = Buffer.alloc(4);
+    check((await handle.read(expected, 0, 4, crcOffset)).bytesRead === 4, 'NSIS: missing CRC');
+    const buffer = Buffer.alloc(4 * 1024 * 1024);
+    let crc = 0;
+    for (let offset = 512; offset < crcOffset;) {
+      const length = Math.min(buffer.length, crcOffset - offset);
+      const { bytesRead } = await handle.read(buffer, 0, length, offset);
+      check(bytesRead === length, 'NSIS: truncated data during startup CRC validation');
+      crc = updateCrc32(buffer.subarray(0, bytesRead), crc); offset += bytesRead;
+    }
+    check(crc === expected.readUInt32LE(0), 'NSIS: startup CRC mismatch (installer integrity check would fail)');
+    return { bytes: size, headerOffset: header, crcOffset, crc32: crc.toString(16).padStart(8, '0'), startupCRC: 'passed' };
+  } finally { await handle.close(); }
 }
 
 function zipDirectory(bytes) {
@@ -147,4 +195,4 @@ async function verifyPortableZip(filename, unpackedDirectory, executableName, ar
   }
   return { files: files.length, bytes: bytes.length };
 }
-module.exports = { inspectPe, zipDirectory, zipEntryBytes, verifyPortableZip, crc32 };
+module.exports = { inspectPe, verifyNsisInstaller, zipDirectory, zipEntryBytes, verifyPortableZip, crc32 };

@@ -7,6 +7,7 @@ import {createPetSoundClock} from '../pet-audio'
 import {itemSoundScore,socialSoundScore} from '../pet-sound-score'
 import type {ItemMotion} from '../item-motion'
 import {tintAtlas} from '../atlas-tint'
+import {OFFICIAL_LOAD_TIMEOUT} from '../official-clips'
 
 type Painted={clip:UploadedClip;pages:HTMLCanvasElement[];bytes:number;rasterScale:number}
 const cache=new Map<string,{ready:Promise<Painted>;bytes:number}>()
@@ -21,9 +22,17 @@ function raster(spec:UploadedSpec,color:PetColor){
   if(window.mobile)for(const cached of cache.keys())if(cached!==key)cache.delete(cached);
   const offsets=petColorOffsets(color)
   const pages:HTMLCanvasElement[]=[]
-  for(const page of clip.pages){
-   const read=(name:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>{im.onload=im.onerror=null;resolve(im)};im.onerror=()=>{im.onload=im.onerror=null;reject(new Error(`无法读取原版动画图集：${spec.assetKey}/${name}`))};im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;})
-   const[neutral,mask]=await Promise.all([read(page.neutral),read(page.mask)]),canvas=document.createElement('canvas');canvas.width=Math.ceil(page.width*rasterScale);canvas.height=Math.ceil(page.height*rasterScale)
+  const read=(name:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>{im.onload=im.onerror=null;resolve(im)};im.onerror=()=>{im.onload=im.onerror=null;reject(new Error(`无法读取原版动画图集：${spec.assetKey}/${name}`))};im.src=`./assets/original/${spec.assetRoot??'uploaded-actions'}/${spec.assetKey}/${name}`;});
+  const readPage=(index:number)=>{
+   const page=clip.pages[index];if(!page)return;
+   const request=Promise.all([read(page.neutral),read(page.mask)]);void request.catch(()=>{});return request;
+  };
+  // Decode only one page ahead while the current page is being recoloured.
+  // Never decode the complete multi-page source concurrently on small devices.
+  let next=readPage(0);
+  for(let index=0;index<clip.pages.length;index++){
+   const page=clip.pages[index],[neutral,mask]=await next!;next=readPage(index+1);
+   const canvas=document.createElement('canvas');canvas.width=Math.ceil(page.width*rasterScale);canvas.height=Math.ceil(page.height*rasterScale)
    const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('无法打开原版动作图集。')
    ctx.drawImage(neutral,0,0,page.width*rasterScale,page.height*rasterScale);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height)
    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(mask,0,0,page.width*rasterScale,page.height*rasterScale);const m=ctx.getImageData(0,0,canvas.width,canvas.height).data
@@ -36,6 +45,9 @@ function raster(spec:UploadedSpec,color:PetColor){
  }).catch(error=>{if(cache.get(key)===entry)cache.delete(key);throw error})
  cache.set(key,entry);return entry.ready
 }
+/** Hover/focus warms only the selected action, sharing the bounded playback
+ * cache. No background download or recolour of the complete asset library. */
+export const preloadUploadedFrames=(spec:UploadedSpec,color:PetColor)=>raster(spec,color).then(()=>undefined);
 /** Every pose comes from the supplied SWF frame table. No live deformation,
  * prop interpolation, leaf replacement or ActionScript playback is involved. */
 export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion,sound,onEnd,loop=false,limit,action,fallback}:{spec:UploadedSpec;form:RamForm;color:PetColor;fromColor?:PetColor;itemMotion?:ItemMotion;sound:boolean;fallback?:ReactNode;loop?:boolean;limit?:number;action?:string;onEnd?:(completed?:boolean)=>void}){
@@ -43,17 +55,17 @@ export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion
  const ref=useRef<HTMLCanvasElement>(null),end=useRef(onEnd),voice=useRef(sound);end.current=onEnd;voice.current=sound
  useEffect(()=>{
   let live=true,frame=0,finished=false,firstPaint=false,deadline:ReturnType<typeof setTimeout>|undefined,redraw:(()=>void)|undefined;setReady(false);const media=matchMedia('(prefers-reduced-motion: reduce)')
-  const finish=()=>{if(!live||finished)return;finished=true;cancelAnimationFrame(frame);audio?.stop();end.current?.(true)}
+  const finish=(completed=true)=>{if(!live||finished)return;finished=true;cancelAnimationFrame(frame);clearTimeout(deadline);audio?.stop();end.current?.(completed)}
   const visibility=()=>{cancelAnimationFrame(frame);if(document.hidden)audio?.stop();else redraw?.()}
   document.addEventListener('visibilitychange',visibility)
   const audio=itemMotion?createPetSoundClock(itemSoundScore({...itemMotion,duration:spec.durationMs}),()=>voice.current):action?createPetSoundClock(socialSoundScore(action),()=>voice.current):null
-  // Start the hard deadline when the action starts. Atlas decoding can take
-  // seconds on Electron 22/older WebViews; waiting to schedule the deadline
-  // until decoding finishes would leave a stale canvas mounted indefinitely.
-  if(limit!==undefined)deadline=setTimeout(finish,limit)
+  // Loading has its own budget. A slow decode must not consume the entire
+  // reading/action duration before the first original frame is ever visible.
+  deadline=setTimeout(()=>finish(false),OFFICIAL_LOAD_TIMEOUT)
   const prepared=Promise.all([raster(spec,color),fromColor&&fromColor!==color?raster(spec,fromColor):null])
   void prepared.then(([current,old])=>{
-   if(!live)return;const began=performance.now(),canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return
+   if(!live||finished)return;const began=performance.now(),canvas=ref.current,ctx=canvas?.getContext('2d');if(!canvas||!ctx)return
+   clearTimeout(deadline);if(limit!==undefined||!loop)deadline=setTimeout(()=>finish(),limit??spec.durationMs)
    let lastSource=-1,lastPalette:Painted|undefined
    const draw=(now:number)=>{
     if(!live||finished||document.hidden)return
@@ -68,10 +80,9 @@ export default function UploadedLamuFrames({spec,form,color,fromColor,itemMotion
     if(limit!==undefined?elapsed>=limit:!loop&&elapsed>=spec.durationMs){finish();return}
    if(!media.matches||!loop||limit!==undefined)frame=requestAnimationFrame(draw)
    };redraw=()=>{frame=requestAnimationFrame(draw)};redraw()
-   if(limit===undefined&&!loop)deadline=setTimeout(finish,spec.durationMs)
-  }).catch(error=>{if(live){if(ref.current){ref.current.dataset.failed='true';ref.current.dataset.failureReason=error instanceof Error?error.message:String(error);}end.current?.(false)}})
+  }).catch(error=>{if(live){if(ref.current){ref.current.dataset.failed='true';ref.current.dataset.failureReason=error instanceof Error?error.message:String(error);}finish(false)}})
   return()=>{live=false;cancelAnimationFrame(frame);clearTimeout(deadline);document.removeEventListener('visibilitychange',visibility);audio?.stop()}
  },[spec,color,fromColor,itemMotion,loop,limit,action])
  const rect=uploadedEffectRect(spec,form)
- return <>{!ready&&fallback}<canvas ref={ref} width={spec.width} height={spec.height} className={spec.assetRoot==='daily-frames'?'ram-classic-frame ram-daily-frame':'ram-uploaded-frame'} style={{visibility:ready?'visible':'hidden',position:'absolute',left:`${rect.x}%`,top:`${rect.y/108*100}%`,width:`${rect.width}%`,height:'auto',pointerEvents:'none'}} data-sheet={spec.assetRoot==='daily-frames'?'daily':'uploaded'} data-form={form} data-uploaded-id={spec.id} data-color={color} data-source-frames={spec.frames} aria-hidden="true"/></>
+ return <>{!ready&&fallback}<canvas ref={ref} width={spec.width} height={spec.height} className={spec.assetRoot==='daily-frames'?'ram-classic-frame ram-daily-frame':'ram-uploaded-frame'} style={{visibility:ready?'visible':'hidden',position:'absolute',left:`${rect.x}%`,top:`${rect.y/108*100}%`,width:`${rect.width}%`,height:'auto',pointerEvents:'none'}} data-sheet={spec.assetRoot==='daily-frames'?'daily':'uploaded'} data-form={form} data-source-form={spec.form} data-uploaded-id={spec.id} data-color={color} data-source-frames={spec.frames} aria-hidden="true"/></>
 }

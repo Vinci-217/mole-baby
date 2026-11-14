@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
 """Report actual exported files, source-level failures and bytecode fallbacks."""
-import collections,json
+import collections,gzip,json
 from pathlib import Path
 from library import VAULT,save_json
 
 def main():
-    counts=collections.Counter();byte_counts=collections.Counter();warnings=[];empty_audio=[];fallbacks=[];embedded_swfs=[];errors=[];image_sources=set();binary_sources=set()
+    counts=collections.Counter();byte_counts=collections.Counter();warnings=[];empty_audio=[];fallbacks=[];embedded_swfs=[];errors=[];image_sources=set();binary_sources=set();archives=0
     for file in (VAULT/'extracted').rglob('*'):
         if not file.is_file():continue
-        suffix=file.suffix.lower();length=file.stat().st_size;counts[suffix]+=1;byte_counts[suffix]+=length
+        suffix=file.suffix.lower();length=file.stat().st_size;archived=file.name.endswith('.pcode.gz')
+        if archived:
+            archives+=1;suffix='.pcode';length=0;script_warning=False;tail=b''
+            with gzip.open(file,'rb') as stream:
+                while block:=stream.read(1024*1024):
+                    length+=len(block);window=tail+block
+                    script_warning=script_warning or any(marker in window for marker in [b'Error during decompilation',b'Decompilation error',b'Decompilation timeout'])
+                    tail=window[-32:]
+        counts[suffix]+=1;byte_counts[suffix]+=length
         source,separator,export=file.relative_to(VAULT/'extracted').as_posix().partition('.swf/')
         if separator and length:
             if export.startswith('images/'):image_sources.add(source+'.swf')
             if export.startswith('binaryData/'):binary_sources.add(source+'.swf')
         if suffix in ('.as','.pcode'):
-            text=file.read_text(errors='replace')
-            if any(marker in text for marker in ['Error during decompilation','Decompilation error','Decompilation timeout']):warnings.append(str(file.relative_to(VAULT/'extracted')))
+            if not archived:
+                text=file.read_text(errors='replace');script_warning=any(marker in text for marker in ['Error during decompilation','Decompilation error','Decompilation timeout'])
+            if script_warning:warnings.append(str(file.relative_to(VAULT/'extracted')))
         if suffix in ('.wav','.mp3') and length<=44:empty_audio.append(str(file.relative_to(VAULT/'extracted')))
         if suffix=='.bin':
             with file.open('rb') as stream:signature=stream.read(3)
@@ -33,6 +42,7 @@ def main():
     warning_sources=sorted({name.split('.swf/')[0]+'.swf' for name in warnings})
     uncovered=[name for name in warning_sources if not (VAULT/'extracted'/name/'pcode/complete.txt').exists()]
     result={'source':json.loads((VAULT/'source-status.json').read_text()),'index':json.loads((VAULT/'index-status.json').read_text()),'exportSources':len(jobs),'exportedSources':len(jobs)-len(missing),'incompleteSources':missing,'missingDeclaredMedia':missing_media,'exportErrors':errors,'fileCounts':dict(counts),'bytesByType':dict(byte_counts),'highLevelScriptWarnings':warnings,'highLevelWarningSources':warning_sources,'warningsWithoutPcode':uncovered,'pcodeFallbackSources':fallbacks,'emptyAudioHeaders':empty_audio,'validEmbeddedAudioFiles':counts['.mp3']+counts['.wav']-len(empty_audio),'unexpandedEmbeddedSwfs':embedded_swfs,'complete':not missing and not missing_media and not uncovered and not errors}
+    result['compressedPcodeFiles']=archives
     save_json(VAULT/'export-audit.json',result);print(json.dumps({key:value for key,value in result.items() if key not in ['source','index','highLevelScriptWarnings','emptyAudioHeaders','incompleteSources']},ensure_ascii=False,indent=2));print('Incomplete:',len(missing),'High-level warnings:',len(warnings),'Empty audio headers:',len(empty_audio))
     if not result['complete']:raise SystemExit(1)
 if __name__=='__main__':main()

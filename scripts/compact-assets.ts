@@ -6,6 +6,8 @@ import {createHash} from 'node:crypto'
 import {transformAsync,type PluginObj} from '@babel/core'
 import sharp from 'sharp'
 import type {Plugin} from 'vite'
+import {writeOfflineResources} from './offline-resources'
+import {writeWebAppFiles} from './web-app-assets'
 
 const root=process.cwd(),publicRoot=path.join(root,'public','assets')
 const names=new Set<string>()
@@ -15,6 +17,19 @@ export function compactUrl(value:string):string {
  if(!value.endsWith('.png')||/^(https?:|data:)|^(?:\.\/|\/)?icons\//.test(value))return value
  const relative=value.replace(/^\.?\/?assets\//,'')
  return names.has(relative)||names.has(value)||names.has(path.posix.basename(value))?value.slice(0,-4)+'.webp':value
+}
+/** CSS lives under assets/, while packaged apps and subpath previews have no
+ * website root. Resolve bundled art from the emitted stylesheet itself. */
+export function bundledCssUrls(code:string,cssFile:string):string {
+ return code.replace(/url\((['"]?)([^)'"\s]+)\1\)/g,(original,quote:string,url:string)=>{
+  if(/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(url))return original;
+  let target=compactUrl(url);
+  if(target.startsWith('/assets/')){
+   target=path.posix.relative(path.posix.dirname(cssFile.replaceAll('\\','/')),target.slice(1));
+   if(!target.startsWith('.'))target='./'+target;
+  }
+  return `url(${quote}${target}${quote})`;
+ });
 }
 function imageLiterals():PluginObj {return {name:'lossless-image-urls',visitor:{
  StringLiteral(p){p.node.value=compactUrl(p.node.value)},
@@ -62,9 +77,12 @@ export function compactAssets():Plugin {
   // Clean retired files from incremental build outputs as well.
   const directory=path.join(output,'assets');
   for(const file of await files(directory)){
-   if(file.endsWith('.css')){const {readFile}=await import('node:fs/promises');const text=await readFile(file,'utf8');await writeFile(file,text.replace(/url\((['"]?)([^)'"\s]+\.png)\1\)/g,(_all,quote,url)=>`url(${quote}${url.slice(0,-4)}.webp${quote})`));}
+   if(file.endsWith('.css')){const text=await readFile(file,'utf8');await writeFile(file,bundledCssUrls(text,path.relative(output,file)));}
   }
   await writeFile(path.join(output,'asset-size-report.json'),JSON.stringify({format:'lossless WebP + original SWF',pixelVerification:'identical visible RGBA and all alpha values',omitted:[],supersededAtlasBytes:0,count:report.length,before,after,saved:before-after,files:report.sort((a,b)=>a.file.localeCompare(b.file))},null,2));
+  if(process.env.VITE_WEB_APP==='1')await writeWebAppFiles(output);
+  const bundled=await writeOfflineResources(output,candidates.map(file=>{const name=path.relative(sourceRoot,file).replaceAll('\\','/');return name.startsWith('assets/')&&name.endsWith('.png')?name.slice(0,-4)+'.webp':name}));
+  console.log(`Offline resources: ${bundled.files.length} local files; ${(bundled.bytes/1e6).toFixed(2)} MB; complete installation coverage verified.`);
   console.log(`Lossless assets: ${report.length} images; ${(before/1e6).toFixed(2)} → ${(after/1e6).toFixed(2)} MB; all application raster fallbacks retained. Authoring library unchanged.`);
  }
  }

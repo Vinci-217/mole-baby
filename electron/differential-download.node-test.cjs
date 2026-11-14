@@ -4,7 +4,7 @@ const{parseBlockMap}=require('./differential-download.cjs');
 const{createUpdates}=require('./updates.cjs');
 const{createUpdateServer,mappedFetch}=require('../scripts/incremental-test-server.cjs');
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
-async function fixture(t,{baseline=true,corruptBase=false,corruptIndex=false,unrelated=false}={}){
+async function fixture(t,{baseline=true,corruptBase=false,corruptIndex=false,unrelated=false,prepareInstall}={}){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mole-delta-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
  const cache=path.join(dir,'cache');fs.mkdirSync(cache);
  const oldName='mole-baby-1.0.0-mac-arm64.dmg',name='mole-baby-1.0.1-mac-arm64.dmg';
@@ -17,7 +17,7 @@ async function fixture(t,{baseline=true,corruptBase=false,corruptIndex=false,unr
  if(baseline){const bytes=Buffer.from(before);if(corruptBase)bytes.fill(0);fs.writeFileSync(path.join(cache,oldName),bytes);fs.writeFileSync(path.join(cache,oldName+'.blockmap'),oldMap)}
  const server=await createUpdateServer(files);t.after(()=>server.close());
  const states=[];let opened;
- const updates=createUpdates({version:'1.0.0',platform:'darwin',arch:'arm64',macSigned:false,configFile:path.join(dir,'updates.json'),cacheDirectory:cache,fetch:mappedFetch(server.origin,'1.0.1'),openPath:async file=>{opened=file;return''},onChange:state=>states.push(state)});t.after(()=>updates.dispose());
+ const updates=createUpdates({version:'1.0.0',platform:'darwin',arch:'arm64',macSigned:false,configFile:path.join(dir,'updates.json'),cacheDirectory:cache,prepareInstall,fetch:mappedFetch(server.origin,'1.0.1'),openPath:async file=>{opened=file;return''},onChange:state=>states.push(state)});t.after(()=>updates.dispose());
  return{updates,server,states,cache,name,oldName,before,after,map,file,dir,get opened(){return opened}};
 }
 test('Mac reconstructs a byte-identical package with range downloads and retains separate consent',async t=>{
@@ -89,4 +89,19 @@ test('cache cleanup preserves the installed baseline and removes unrelated old r
  await f.updates.check();assert.equal(await f.updates.download(true),true);
  assert.equal(fs.existsSync(path.join(f.cache,stale)),false);assert.equal(fs.existsSync(path.join(f.cache,stale+'.blockmap')),false);
  assert.equal(fs.readFileSync(path.join(f.cache,'preferences.json'),'utf8'),'keep');assert.ok(fs.existsSync(path.join(f.cache,f.oldName)));
+});
+for(const mode of ['differential','full'])test(`${mode} download and manual installation preserve browser storage and independent save backups byte for byte`,async t=>{
+ const f=await fixture(t),files=['Local Storage/leveldb/000001.log','Local Storage/leveldb/000002.ldb','save-backups/latest.json','save-backups/old-memory.json'];
+ const original=new Map(files.map(file=>[file,Buffer.from('original colour, clothes, identity, growth and memories '+file)]));
+ for(const[file,bytes]of original){const target=path.join(f.dir,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes)}
+ if(mode==='full')f.updates.setDownloadPolicy('full');
+ await f.updates.check();assert.equal(await f.updates.download(true),true);assert.equal(f.updates.getState().downloadMode,mode);assert.equal(await f.updates.install(true),true);
+ for(const[file,bytes]of original)assert.deepEqual(fs.readFileSync(path.join(f.dir,file)),bytes,file);
+});
+test('manual Mac installation stops if the save checkpoint fails, and only opens the DMG after a successful retry',async t=>{
+ let allowed=false,saves=0;const f=await fixture(t,{prepareInstall:async()=>{saves++;return allowed}});await f.updates.check();await f.updates.download(true);
+ assert.equal(await f.updates.install(true),false);assert.equal(f.opened,undefined);assert.equal(f.updates.getState().status,'ready');allowed=true;assert.equal(await f.updates.install(true),true);assert.equal(saves,2);assert.equal(f.opened,path.join(f.cache,f.name));
+});
+test('the update cache cannot be the profile, its ancestor, browser storage or backup directory',()=>{
+ const directory=path.resolve('isolated-profile');for(const cacheDirectory of [directory,path.dirname(directory),path.join(directory,'Local Storage'),path.join(directory,'save-backups')])assert.throws(()=>createUpdates({version:'1.0.0',platform:'darwin',arch:'arm64',configFile:path.join(directory,'updates.json'),cacheDirectory}),/Unsafe update cache/);
 });

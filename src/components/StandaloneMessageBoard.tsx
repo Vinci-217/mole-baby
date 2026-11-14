@@ -18,7 +18,11 @@ export default function StandaloneMessageBoard(){
   const bridge=window.desktop?.messageBoard;if(!snapshot||!bridge||busy.current)return false;
   busy.current=true;setSaving(true);setError('');
   try{setSnapshot(await bridge.change({petId:snapshot.createdAt,baseNotes:JSON.stringify(snapshot.notes??[]),notes}));return true}
-  catch{setError('留言未保存，请重试。');void bridge.get().then(setSnapshot).catch(()=>{});return false}
+  catch(reason){
+   const raw=reason instanceof Error?reason.message:'';
+   const message=raw.includes('已有更新')?'留言已有更新，已读取最新内容。你的输入仍保留，请再点一次保存。':raw.includes('超时')?'保存超时，输入内容已保留。请稍后重试。':raw.includes('存储')?'本地存储写入失败，输入内容已保留。请检查存储空间后重试。':'留言未保存，输入内容已保留，请重试。';
+   setError(message);try{setSnapshot(await bridge.get())}catch{/* Keep the last readable board and the user's input. */}throw new Error(message);
+  }
   finally{busy.current=false;setSaving(false)}
  }
  return <main className="standalone-board" aria-busy={saving}>{snapshot?<MessageBoard pet={snapshot} onChange={change} onClose={()=>void window.desktop?.messageBoard?.close()}/>:<p role="status">{error||'正在打开留言板……'}</p>}{error&&snapshot&&<div className="board-save-error" role="alert">{error}</div>}</main>;

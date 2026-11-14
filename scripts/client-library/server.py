@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Local, read-only source browser with a bounded cached frame renderer."""
-import argparse,concurrent.futures,hashlib,json,mimetypes,shutil,sqlite3,subprocess,threading,time
+import argparse,concurrent.futures,gzip,hashlib,json,mimetypes,shutil,sqlite3,subprocess,threading,time
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs,urlsplit
@@ -69,14 +69,23 @@ class Handler(SimpleHTTPRequestHandler):
                 target=ROOT/'extracted'/relative;exports=[]
                 if target.exists():
                     for path in target.rglob('*'):
-                        if path.is_file() and path.suffix in ['.png','.jpg','.jpeg','.gif','.mp3','.wav','.as','.pcode','.bin']:
-                            exports.append({'name':str(path.relative_to(target)),'url':'/'+str(path.relative_to(ROOT))})
+                        archived=path.name.endswith('.pcode.gz')
+                        if path.is_file() and (archived or path.suffix in ['.png','.jpg','.jpeg','.gif','.mp3','.wav','.as','.pcode','.bin']):
+                            name=str(path.relative_to(target));location=str(path.relative_to(ROOT))
+                            exports.append({'name':name[:-3] if archived else name,'url':'/'+(location[:-3] if archived else location),'archived':archived})
                             if len(exports)>=200:break
                 marker=target/'complete.txt'
                 return self.json({'asset':dict(row),'timeline':read_json(ROOT/'timelines'/(relative+'.json'),{}),'exports':exports,'exportComplete':marker.exists(),'pcodeComplete':(target/'pcode/complete.txt').exists(),'sourceFallback':marker.exists() and 'fallback' in marker.read_text()})
             if url.path=='/api/job':return self.json(JOBS.get(query.get('key',[''])[0],{'state':'missing'}))
             if url.path.startswith('/api/'):return self.json({'error':'Unknown endpoint'},404)
-            contained(url.path.lstrip('/'));return super().do_GET()
+            file=contained(url.path.lstrip('/'))
+            if file.suffix=='.pcode' and not file.exists():
+                archived=contained(url.path.lstrip('/')+'.gz')
+                if archived.is_file():
+                    self.send_response(200);self.send_header('Content-Type','text/plain; charset=utf-8');self.end_headers()
+                    with gzip.open(archived,'rb') as stream:shutil.copyfileobj(stream,self.wfile)
+                    return
+            return super().do_GET()
         except (ValueError,sqlite3.Error) as error:return self.json({'error':str(error)},400)
     def do_POST(self):
         if self.path!='/api/preview':return self.json({'error':'Unknown endpoint'},404)

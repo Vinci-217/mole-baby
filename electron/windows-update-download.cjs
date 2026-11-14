@@ -11,7 +11,7 @@ async function downloadWindowsDifference(engine,args,onPlan){
  const urls=await provider.getBlockMapFiles(fileInfo.url,engine.app.version,options.updateInfoAndProvider.info.version);
  const read=async url=>parseBlockMap(await engine.httpExecutor.downloadToBuffer(url,{headers:options.requestHeaders,cancellationToken:options.cancellationToken}));
  const newMap=await read(urls[1]);if(newMap.size!==fileInfo.info.size)throw Error('New installer index size mismatch');
- let oldMap;try{oldMap=parseBlockMap(await fs.readFile(path.join(cache.cacheDir,'current.blockmap')))}catch{oldMap=await read(urls[0])}
+ let oldMap;try{oldMap=parseBlockMap(await fs.readFile(path.join(cache.cacheDir,'current.blockmap')));if(oldMap.size!==stat.size)throw Error('Cached index belongs to a different installer')}catch{oldMap=await read(urls[0])}
  if(!stat.isFile()||stat.size!==oldMap.size)throw Error('Cached installer and index do not match');
  const plan=planUpdate(oldMap,newMap);onPlan(plan);
  // Even a deliberate full download needs the new map beside the new installer

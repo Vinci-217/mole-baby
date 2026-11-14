@@ -28,3 +28,12 @@ test('failed save does not acknowledge or replace the last saved board',async()=
  r.reply(r.main.sent[1].id,{ok:false});await assert.rejects(pending,/未保存/);assert.deepEqual(r.invoke('board:get'),r.snapshot);
  r.controller.update(null);assert.equal(r.invoke('board:get'),null);
 });
+test('a stale owner returns the latest board without overwriting concurrent notes',async()=>{
+ const r=setup(),pending=r.invoke('board:change',{petId:r.snapshot.createdAt,baseNotes:'[]',notes:[]});
+ const current={...r.snapshot,notes:[{id:'latest',text:'另一处保存的留言',done:false,createdAt:1700000000002}]};
+ r.reply(r.main.sent[1].id,{ok:false,reason:'stale',snapshot:current});
+ await assert.rejects(pending,/已有更新/);assert.deepEqual(r.invoke('board:get'),current);
+ const second=r.invoke('board:change',{petId:current.createdAt,baseNotes:JSON.stringify(current.notes),notes:current.notes});
+ r.reply(r.main.sent[1].id,{ok:false,reason:'storage'});await assert.rejects(second,/存储/);
+ assert.deepEqual(r.invoke('board:get'),current);
+});

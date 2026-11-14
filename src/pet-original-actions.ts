@@ -6,6 +6,8 @@ import {OFFICIAL_CLIPS,supportsOfficial,officialOutfitForm,type OfficialClip} fr
 import {learned} from './pet-school';
 import {petActionAppearance} from './wardrobe';
 import {ELEMENT_SKILLS,learnedElementSkill} from './element-skills';
+import {PLAY_TOOLS,playToolClip} from './original-play-tools';
+export {normalizeRamAction} from './ram-action';
 
 export const FORM_NAMES:Record<RamForm,string>={seed:'种子',junior:'初级拉姆',middle:'中级拉姆',senior:'高级拉姆',classic:'经典超级拉姆',super:'神力超级拉姆',water:'水系拉姆',wood:'木系拉姆',fire:'火系拉姆'};
 export const playableOriginal=(clip:OfficialClip)=>!clip.path.includes('/tatter/');
@@ -53,9 +55,9 @@ export function originalMagicActions(form:RamForm):OriginalChoice[]{
  const grouped=new Map<string,OfficialClip[]>();for(const clip of OFFICIAL_CLIPS.filter(clip=>clip.kind==='magic')){const key=sourceNumber(clip);if(magicNames[key])grouped.set(key,[...(grouped.get(key)??[]),clip]);}
  return [...grouped].flatMap(([key,clips])=>{const clip=clips.find(clip=>supportsOfficial(clip,form))??clips.find(clip=>playbackForm(clip,form));return clip?[{id:clip.id,name:magicNames[key],clip,image:originalActionIcon(clip)}]:[];});
 }
-const tools=[['180004','足球'],['180011','逗逗一'],['180012','逗逗二'],['180013','逗逗三'],['180023','弹簧'],['180026','乐刷刷'],['180097','泡泡糖'],['tuya1','涂鸦一'],['tuya2','涂鸦二'],['tuya3','涂鸦三'],['tuya4','涂鸦四']] as const;
+const tools=PLAY_TOOLS;
 export function originalPlayTools(form:RamForm):OriginalChoice[]{
- return tools.flatMap(([source,name])=>{const clips=OFFICIAL_CLIPS.filter(clip=>clip.kind==='care'&&sourceNumber(clip)===source),clip=clips.find(clip=>supportsOfficial(clip,form))??clips.find(clip=>playbackForm(clip,form));const item=getItem(source);return clip?[{id:clip.id,name,clip,image:item?.image}]:[];});
+ return tools.flatMap(([source,name])=>{const clip=playToolClip(form,'uploaded-'+source),item=getItem(source);return clip?[{id:clip.id,name,clip,image:item?.image}]:[];});
 }
 export function originalSpecialActions(form:RamForm):OriginalChoice[]{
  const seen=new Set<string>();return OFFICIAL_CLIPS.filter(clip=>['transform','skill'].includes(clip.kind)&&clip.animated&&playableOriginal(clip)&&playbackForm(clip,form)).flatMap(clip=>{
@@ -76,4 +78,22 @@ export function autonomousOriginalActions(pet:GameState):string[]{
 export function chooseAutonomousOriginal(pet:GameState,previous?:string,random=Math.random):string|undefined{
  const choices=autonomousOriginalActions(pet).filter(action=>action!==previous);if(!choices.length)return;
  const roll=random();return choices[Math.min(choices.length-1,Math.max(0,Math.floor((Number.isFinite(roll)?roll:0)*choices.length)))];
+}
+/** Short visible speech for every self-directed performance, including the
+ * source IDs used by classroom and care timelines. Never expose file names. */
+export function autonomousActionLine(action:string):string{
+ const normalized=action.startsWith('ambient-element-')?action.slice(8):action;
+ if(normalized.startsWith('element-')){
+  const skill=ELEMENT_SKILLS.find(skill=>skill.id===normalized.slice(8));
+  return skill?`我要试试${skill.name}魔法，变完再回来陪你！`:'我要练习一下变身魔法，变完就回来！';
+ }
+ const clip=/^(official-|ambient-)[a-f0-9]{16}$/.test(action)?originalActionClip(action):undefined;
+ if(clip){
+  const number=sourceNumber(clip),tool=tools.find(([id])=>id===number);
+  if(tool)return number.startsWith('tuya')?'我要拿起画笔，画一幅小涂鸦！':`我要玩一会儿${tool[1]}！`;
+  const natural=naturalNames[number];if(clip.kind==='school'&&natural)return `我想${natural}，一会儿再来陪你。`;
+  return `我要表演${magicNames[number]??clip.name}魔法，变完再回来！`;
+ }
+ const lines:Record<string,string>={'look-around':'我想转过头，看看周围有什么新鲜事。','watch-butterfly':'我想和小蝴蝶玩一会儿！',happy:'今天心情真好，想开心地晃一晃！',waving:'我来和你挥挥手，打个招呼！','mood-joy':'开心得想伸个懒腰！','mood-content':'我就在这里，安心地陪着你。','mood-dozy':'有点困啦，让我打个小哈欠。','mood-grumpy':'有一点点闷，我缓一会儿就好。'};
+ return lines[normalized]??'我想活动一下，一会儿再来陪你。';
 }

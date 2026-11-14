@@ -98,6 +98,7 @@ async function musicStore<T>(mode: IDBTransactionMode, operation: (store: IDBObj
  * Background music has independent volume and enable settings. */
 export function useRoomMedia(inRoom: boolean, hasPet = true, sceneMusic?:string): RoomMediaController {
   const [settings, setSettings] = useState(loadPreferences);
+  useEffect(()=>{const restored=()=>setSettings(loadPreferences());window.addEventListener('ram-save-imported',restored);return()=>window.removeEventListener('ram-save-imported',restored)},[]);
   const localPhase = useLocalScenePhase();
   // Preview is transient. Stored preferences always follow the real local time.
   const [timeMode, setTimeMode] = useState<SceneTimeMode>('auto');

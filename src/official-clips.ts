@@ -9,7 +9,8 @@ export const OFFICIAL_LOAD_TIMEOUT=45_000
 export const OFFICIAL_FORM:Record<RamForm,string>={seed:'level1',junior:'level2',middle:'level3',senior:'level4',classic:'level101',super:'level101_7',water:'level5_2',wood:'level5_4',fire:'level5_1'}
 const levels:Record<RamForm,number>={seed:1,junior:2,middle:3,senior:4,classic:101,super:101,water:5,wood:5,fire:5}
 export const isOfficialAction=(action:string)=>action.startsWith('official-')||/^ambient-[a-f0-9]{16}$/.test(action)
-export const officialClip=(id:string)=>OFFICIAL_CLIPS.find(clip=>clip.id===id)
+const clipsById=new Map(OFFICIAL_CLIPS.map(clip=>[clip.id,clip]));
+export const officialClip=(id:string)=>clipsById.get(id)
 export const officialOutfit=(id?:string)=>ORIGINAL_OUTFITS.find(outfit=>outfit.id===id)
 export function supportsOfficial(clip:OfficialClip,form:RamForm){
  if(form==='seed')return clip.kind==='care'&&clip.level===1||clip.kind==='body'&&clip.forms.includes('level1')

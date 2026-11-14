@@ -1,0 +1,184 @@
+name: Private desktop test packages (on demand)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Test package to build
+        type: choice
+        required: true
+        default: mac
+        options: [mac, windows, both]
+  # A workflow_dispatch entry must also exist on the default branch for the
+  # GitHub UI/API. These explicit branches allow an on-demand build while the
+  # reviewed code stays isolated from that branch. Ordinary preview pushes
+  # never launch paid desktop runners.
+  push:
+    branches: [preview/build-mac-test, preview/build-windows-test]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-mac-animation-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac-arm64:
+    if: github.repository == 'Vinci-217/mole-baby-client' && github.event.repository.private == true && (inputs.target == 'mac' || inputs.target == 'both' || github.ref == 'refs/heads/preview/build-mac-test')
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      MOLE_ANIMATION_PREVIEW: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Run the full test suite
+        timeout-minutes: 3
+        run: |
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/wardrobe-unit-tests.log
+      - run: npm run build
+      - run: node scripts/verify-offline-assets.cjs
+      - name: Package local test DMG and verification ZIP
+        run: npx --no-install electron-builder --config electron-builder.mac.cjs --mac dmg zip --arm64 --publish never
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Reproduce the reported sick-pet wardrobe case in the packaged application
+        timeout-minutes: 3
+        run: node scripts/wardrobe-condition-regression.cjs 2>&1 | tee artifacts/wardrobe-condition-run.log
+        env:
+          MOLE_QA_EXECUTABLE: ${{ github.workspace }}/release/mac-arm64/拉姆.app/Contents/MacOS/拉姆
+      - name: Verify DMG, signature and bundled resources
+        timeout-minutes: 3
+        run: node scripts/verify-mac-package.cjs arm64 --bundle-only 2>&1 | tee artifacts/wardrobe-mac-container.log
+      - name: Verify the dressed animation state machine in the packaged Mac application
+        timeout-minutes: 5
+        run: node scripts/costume-state-machine-regression.cjs --native 2>&1 | tee artifacts/costume-state-machine-mac.log
+        env:
+          MOLE_QA_EXECUTABLE: ${{ github.workspace }}/release/mac-arm64/拉姆.app/Contents/MacOS/拉姆
+      - name: Verify local save inspection, export, import and recovery in the packaged Mac application
+        timeout-minutes: 4
+        run: node scripts/loading-save-regression.cjs --native 2>&1 | tee artifacts/loading-save-native.log
+        env:
+          MOLE_QA_EXECUTABLE: ${{ github.workspace }}/release/mac-arm64/拉姆.app/Contents/MacOS/拉姆
+      - name: Verify actual Mac application
+        timeout-minutes: 10
+        run: |
+          node <<'NODE' 2>&1 | tee artifacts/wardrobe-mac-smoke.log
+          const path=require('node:path');
+          const contents=path.resolve('release/mac-arm64/拉姆.app/Contents');
+          require('./scripts/package-smoke.cjs').verifyApplication({
+            executable:path.join(contents,'MacOS/拉姆'),
+            archive:path.join(contents,'Resources/app.asar'),
+            screenshot:'mac-arm64-smoke.png',
+          }).catch(error=>{console.error(error);process.exitCode=1});
+          NODE
+      - name: Verify message saving, local artwork and house pet resizing
+        timeout-minutes: 5
+        run: node scripts/board-scale-regression.cjs --native 2>&1 | tee artifacts/board-scale-native.log
+        env:
+          MOLE_QA_EXECUTABLE: ${{ github.workspace }}/release/mac-arm64/拉姆.app/Contents/MacOS/拉姆
+      - name: Label the test DMG and record its checksum
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),{version}=require('./package.json');
+          const source=`release/mole-baby-${version}-mac-arm64.dmg`,target=`release/mole-baby-${version}-wardrobe-test-mac-arm64.dmg`;
+          fs.renameSync(source,target);
+          fs.writeFileSync('release/SHA256SUMS-wardrobe-test.txt',`${crypto.createHash('sha256').update(fs.readFileSync(target)).digest('hex')}  ${target.split('/').pop()}\n`);
+          fs.writeFileSync('release/测试版安装说明.txt',[
+            '拉姆 v'+version+' · Apple 芯片装扮测试版',
+            '先从托盘完全退出旧版，再将 DMG 中的拉姆.app 拖入应用程序覆盖。',
+            '沿用原来的存档路径；不会主动清理旧存档。',
+            '此测试包已关闭自动更新，不是正式 Release。',
+            '已完成原生 Mac DMG 挂载、签名与素材校验、装扮动作专项回归和通用界面检查。',
+            '本地签名，未进行 Apple 公证；如被系统阻止，请参考 DMG 内的 Mac 打开说明.html。',
+            '重点测试：换衣、摸头、摇晃、拖动、足球、成长形态恢复，以及重开后保留衣服和成长。',
+            '日志入口：试衣间或设置 → 动画与素材 → 导出动画日志。',
+            '构建提交：'+process.env.GITHUB_SHA,
+          ].join('\n')+'\n');
+          NODE
+      - name: Upload only the private test package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mole-baby-wardrobe-test-mac-arm64
+          path: |
+            release/*-wardrobe-test-mac-arm64.dmg
+            release/SHA256SUMS-wardrobe-test.txt
+            release/测试版安装说明.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - name: Upload native verification diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: wardrobe-mac-test-diagnostics
+          path: |
+            artifacts/wardrobe-unit-tests.log
+            artifacts/wardrobe-condition-run.log
+            artifacts/wardrobe-mac-container.log
+            artifacts/wardrobe-mac-smoke.log
+            artifacts/costume-state-machine-mac.log
+            artifacts/costume-state-review/electron-checks.json
+            artifacts/costume-state-review/electron.png
+            artifacts/costume-state-review/last-failure.json
+            artifacts/mac-arm64-smoke.png
+            artifacts/wardrobe-condition/packaged-after.png
+            artifacts/wardrobe-condition/packaged-checks.json
+            artifacts/wardrobe-condition/packaged-log.json
+            artifacts/loading-save-native.log
+            artifacts/loading-save-review/native-checks.json
+            artifacts/board-scale-native.log
+            artifacts/board-scale-review/native-checks.json
+            artifacts/board-scale-review/native-*.png
+          if-no-files-found: ignore
+          retention-days: 14
+
+  windows-x64:
+    if: github.repository == 'Vinci-217/mole-baby-client' && github.event.repository.private == true && (inputs.target == 'windows' || inputs.target == 'both' || github.ref == 'refs/heads/preview/build-windows-test')
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      ELECTRON_DEV: '0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      MOLE_BABY_DISABLE_UPDATES: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Build the complete Windows installer and ZIP without publishing
+        run: node scripts/package-windows.cjs
+      - name: Verify installed exe, real shortcuts and repair of deliberately broken entries
+        run: node scripts/verify-windows-package.cjs
+      - name: Verify real differential installation preserves the save
+        run: node scripts/verify-windows-update.cjs
+      - name: Verify real full installation preserves the save
+        run: node scripts/verify-windows-update.cjs --full-download
+      - name: Upload Windows installation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-loading-save-verification
+          path: |
+            artifacts/windows-entrypoints-*.json
+            artifacts/windows-smoke.png
+            artifacts/windows-update-fixture.log
+            artifacts/incremental-windows-x64.json
+            artifacts/full-update-windows-x64.json
+          if-no-files-found: ignore
+          retention-days: 14

@@ -7,9 +7,11 @@ const {ramBodyPosition,openActions,adopt,enterHome,roomTab,toDesktop}=require('.
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/animation-repair');
 const native=process.argv.includes('--native'),mobile=process.argv.includes('--mobile'),quick=process.argv.includes('--quick'),base='http://127.0.0.1:5173/';
 const {snapshot,pet:original}=require('./animation-repair-fixture.cjs')(out);
+let expected=original;
 const checks=[],errors=[],missing=[];
 function observe(page){page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)missing.push(r.url())});}
 async function worn(page){
+ await expect(page.locator('.desktop-character .ram-outfit-source')).toBeVisible({timeout:45000});
  try{await expect(page.locator('.desktop-character .official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:45000});}
  catch(error){
   console.log('Outfit diagnostics',await page.evaluate(()=>({visibility:document.visibilityState,clips:[...document.querySelectorAll('.desktop-character iframe')].map(n=>({src:n.src,...n.dataset}))})));
@@ -20,8 +22,8 @@ async function worn(page){
 async function playMenu(page,tab){const actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();await page.getByRole('tab',{name:tab,exact:true}).click();}
 async function identity(page){
  const pet=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
- for(const key of ['createdAt','name','color','growth','naturalGrowth','highestGrowth','evolution','wearing','coins','inventory'])assert.deepEqual(pet[key],original[key],key);
- assert.deepEqual([...pet.wardrobe].sort(),[...original.wardrobe].sort(),'owned costumes');
+ for(const key of ['createdAt','name','color','growth','naturalGrowth','highestGrowth','evolution','wearing','coins','inventory'])assert.deepEqual(pet[key],expected[key],key);
+ assert.deepEqual([...pet.wardrobe].sort(),[...expected.wardrobe].sort(),'owned costumes');
  const key='ramu-companion-memory-v1:'+original.createdAt,old=JSON.parse(snapshot[key]);
  const memory=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
  for(const event of old.events)assert(memory.events.some(next=>next.id===event.id),'old memory survives');
@@ -39,6 +41,10 @@ async function exercise(page){
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')).education?.lessons?.['element-fire'])).toBe(1);
   await toDesktop(page);
  }else await reloadWithStorage(page,{...snapshot,'ramu-house-save-v1':JSON.stringify({...original,lastTick:Date.now()})});
+ const imported=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
+ for(const key of ['createdAt','name','color','growth','evolution','wearing','coins','inventory'])assert.deepEqual(imported[key],original[key],key);
+ assert(imported.naturalGrowth>=original.naturalGrowth&&imported.highestGrowth>=original.highestGrowth,'Backup restoration must not reduce previously earned growth');
+ expected=imported;
  await worn(page);
  console.log('Loaded QA record',native?'Electron':'Chromium',await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ramu-house-save-v1'));return {growth:p.growth,evolution:p.evolution,education:p.education}}));
  await playMenu(page,'活动');await page.getByRole('button',{name:'摸摸拉姆',exact:true}).click();
@@ -51,10 +57,14 @@ async function exercise(page){
  await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:12000});await worn(page);
  checks.push('rapid clothed petting retains the original dizziness reaction and restores the costume');
  await playMenu(page,'道具');await page.getByRole('button',{name:'播放足球',exact:true}).click();
- const football=page.locator('.desktop-character .ram-football-frame');await expect(football).toHaveAttribute('data-form','super');await expect(football).toHaveAttribute('data-loaded','true');
+ const football=page.locator('.desktop-character .ram-original-tool canvas[data-sheet=uploaded]');await expect(football).toHaveAttribute('data-loaded','true',{timeout:45000});
+ await expect(football).toHaveAttribute('data-source-form','classic');
+ await expect(page.locator('.desktop-character .ram-outfit-source')).toBeHidden();
  const first=await football.getAttribute('data-source-frame');await expect.poll(()=>football.getAttribute('data-source-frame')).not.toBe(first);
+ await expect(page.locator('.desktop-character>.ram-sprite')).toHaveAttribute('data-growth-form','super');
+ await expect(page.locator('.desktop-character>.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:12000});
  await page.screenshot({path:path.join(out,(native?'electron':'browser')+'-football.png')});
- await worn(page);await identity(page);checks.push('toy football uses divine original frames and restores the clothed appearance');
+ await worn(page);await identity(page);checks.push('football temporarily plays the complete classic source, restores clothing and preserves actual growth');
  await playMenu(page,'魔法');
  const menu=page.locator('.official-clip-grid');assert.equal(await menu.getByRole('button').count(),19);
  const names=await menu.getByRole('button').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label')));

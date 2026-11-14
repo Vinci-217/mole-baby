@@ -4,6 +4,10 @@
 !macro customFinishPage
   !ifndef HIDE_RUN_AFTER_FINISH
     Function MoleStartApp
+      ${IfNot} ${FileExists} "$INSTDIR\${APP_EXECUTABLE_FILENAME}"
+        MessageBox MB_OK|MB_ICONSTOP "无法启动：主程序不存在。请用本安装包覆盖修复，勿删除存档。$\r$\n$INSTDIR\${APP_EXECUTABLE_FILENAME}"
+        Return
+      ${EndIf}
       HideWindow
       ${If} ${isUpdated}
         StrCpy $1 "--updated"
@@ -39,6 +43,22 @@
     MessageBox MB_OK|MB_ICONSTOP "主程序未成功安装或已被系统移除。请保留存档，检查 Windows 安全中心的保护历史记录，再重新运行安装包。$\r$\n安装目录：$INSTDIR$\r$\n主程序：${APP_EXECUTABLE_FILENAME}"
     Abort
   ${EndIf}
+  ${IfNot} ${FileExists} "$INSTDIR\resources\app.asar"
+    MessageBox MB_OK|MB_ICONSTOP "应用文件未完整写入，不能完成安装。请保留存档后重试。$\r$\n$INSTDIR\resources\app.asar"
+    Abort
+  ${EndIf}
+  ClearErrors
+  FileOpen $R0 "$appExe" r
+  ${If} ${Errors}
+    MessageBox MB_OK|MB_ICONSTOP "主程序无法读取，不能完成安装。请检查磁盘权限后覆盖安装。存档无需删除。$\r$\n$appExe"
+    Abort
+  ${EndIf}
+  FileSeek $R0 0 END $R1
+  FileClose $R0
+  ${If} $R1 < 1000000
+    MessageBox MB_OK|MB_ICONSTOP "主程序不完整，不能完成安装。请重新下载安装包并覆盖安装，存档会保留。$\r$\n$appExe"
+    Abort
+  ${EndIf}
   SetOutPath "$INSTDIR"
   ClearErrors
   CreateShortCut "$INSTDIR\${PRODUCT_FILENAME}.lnk" "$appExe" "" "$appExe" 0 "" "" "${APP_DESCRIPTION}"
@@ -59,9 +79,8 @@
   !endif
   !ifndef DO_NOT_CREATE_DESKTOP_SHORTCUT
     ${IfNot} ${isNoDesktopShortcut}
-      ; Keep the user's choice to remove a desktop icon during automatic
-      ; updates. Existing icons must always be repaired, even with KeepShortcuts.
-      ${If} ${FileExists} "$newDesktopLink"
+      ; The application requests createDesktopShortcut=always. Recreate an
+      ; absent entry too, unless /NoDesktopShortcut was explicitly requested.
         ClearErrors
         CreateShortCut "$newDesktopLink" "$appExe" "" "$appExe" 0 "" "" "${APP_DESCRIPTION}"
         ${If} ${Errors}
@@ -69,10 +88,12 @@
           Abort
         ${EndIf}
         WinShell::SetLnkAUMI "$newDesktopLink" "${APP_ID}"
-      ${EndIf}
     ${EndIf}
   !endif
   System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+  FileOpen $R0 "$INSTDIR\安装入口检查.txt" w
+  FileWriteUTF16LE $R0 "主程序：$appExe$\r$\n工作目录：$INSTDIR$\r$\n桌面入口：$newDesktopLink$\r$\n开始菜单：$newStartMenuLink$\r$\n主程序及 resources\app.asar 已通过安装完成检查。$\r$\n若以后提示主程序不存在，请保留存档并覆盖修复安装；设置中的本地存档检查可显示真实存档目录。$\r$\n"
+  FileClose $R0
 !macroend
 ; Explain the supported edition before extracting an incompatible runtime.
 !macro customInit

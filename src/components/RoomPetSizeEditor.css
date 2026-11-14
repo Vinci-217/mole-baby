@@ -1,0 +1,8 @@
+.room-pet-size-frame{position:absolute;pointer-events:none;border:1px dashed #fff9d5;border-radius:12px;box-shadow:0 0 0 1px #946c3c88;z-index:4}
+.room-pet-size-handle{position:absolute;width:22px;height:22px;min-width:22px;min-height:22px;padding:0;border:2px solid #a47a3f;border-radius:6px;background:#fff4cf;pointer-events:auto;touch-action:none;translate:-50% -50%;transform:none!important;box-shadow:0 2px 5px #3d2a2240}
+.room-pet-size-handle.handle-nw{left:0;top:0;cursor:nwse-resize}.room-pet-size-handle.handle-ne{left:100%;top:0;cursor:nesw-resize}.room-pet-size-handle.handle-sw{left:0;top:100%;cursor:nesw-resize}.room-pet-size-handle.handle-se{left:100%;top:100%;cursor:nwse-resize}
+.room-pet-size-handle:focus-visible{outline:2px solid #197cb4;outline-offset:3px}
+.room-pet-size-actions{position:absolute;top:85px;left:50%;translate:-50% 0;z-index:145;display:flex;align-items:center;justify-content:center;gap:8px;width:max-content;max-width:calc(100% - 20px);padding:8px 12px;border:1px solid #b08a53;border-radius:12px;background:#fff4daee;box-shadow:0 3px 12px #42261524;pointer-events:auto;font:12px/1.5 system-ui,sans-serif;color:#75552e}
+.room-pet-size-actions output{min-width:35px;font-variant-numeric:tabular-nums}.room-pet-size-actions button{padding:5px 9px;border:1px solid #bd9558;border-radius:6px;background:#fff8e8;color:#74512d;font:inherit;white-space:nowrap}.room-pet-size-actions button:last-child{background:#f6d58e}
+.room-walker.is-sizing .scene-character{pointer-events:none}
+@media(max-width:700px){.room-pet-size-actions{top:68px;gap:5px;padding:7px 9px;font-size:11px}.room-pet-size-handle{width:26px;height:26px}}

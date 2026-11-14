@@ -1,7 +1,7 @@
 import OfficialClipMenu from './components/OfficialClipMenu';
 import {officialClip,isOfficialAction,OFFICIAL_DURATION,OFFICIAL_LOAD_TIMEOUT} from './official-clips';
 import {drawingUnion,useNativeDrawingBounds} from './original-viewport';
-import {chooseAutonomousOriginal,isAmbientAction,originalItemClip,playbackForm,usesTransformationSmoke} from './pet-original-actions';
+import {autonomousActionLine,chooseAutonomousOriginal,isAmbientAction,originalItemClip,playbackForm,usesTransformationSmoke} from './pet-original-actions';
 import RestaurantWorkShowcase from './components/RestaurantWorkShowcase';
 import {DESKTOP_WORK_BOUNDS} from './desktop-restaurant-work';
 import {WorkPresence} from './work-presence';
@@ -11,7 +11,7 @@ import {normalizeNotes,recordStatChange} from './pet-records';
 import type {PetNote} from './pet-records';
 import {dailyFrameSpec} from './daily-frames';
 import {animationBlockReason} from './interaction-state';
-import {isUploadedAction,uploadedMotion,uploadedSpec,uploadedEffectRect,UPLOADED_TOYS} from './uploaded-actions';
+import {isUploadedAction,uploadedMotion,uploadedEffectRect,UPLOADED_TOYS} from './uploaded-actions';
 import ColorMixerGame from './components/ColorMixerGame';
 import {brewColourPotion} from './color-mixing';
 import UpdateSettings from './components/UpdateSettings';
@@ -29,7 +29,9 @@ import DesktopCompanion from './components/DesktopCompanion';
 import type { CompanionPanel } from './components/DesktopCompanion';
 import ShopBook from './components/ShopBook';
 import Wardrobe from './components/Wardrobe';
-import {buyOutfit,wearOutfit,getOutfit,petAppearance,petActionAppearance} from './wardrobe';
+import {buyOutfit,wearOutfit,getOutfit,petAppearance,petActionAppearance,costumePlayback} from './wardrobe';
+import {costumeAction} from './costume-action';
+import {normalizeRamAction} from './ram-action';
 import {isMoodAction,isEmotionClip} from './mood-motion';
 import {moodResponse} from './mood-companion';
 import TimeScene from './components/TimeScene';
@@ -48,12 +50,17 @@ import StageSettings from './components/StageSettings';
 import RoomDock from './components/RoomDock';
 import {openManorSite} from './external-sites';
 import SettingsPanel,{SettingsSection} from './components/SettingsPanel';
+import AnimationDiagnostics from './components/AnimationDiagnostics';
+import LocalSaveInspector from './components/LocalSaveInspector';
 import StatusPocket from './components/StatusPocket';
 import {useRoomFullscreen} from './use-room-fullscreen';
 import RoomResizeHandles from './components/RoomResizeHandles';
 import AndroidSettings from './components/AndroidSettings';
 import RoomSettings from './components/RoomSettings';
 import RoomWalker from './components/RoomWalker';
+import {isWebApp} from './web-app';
+import WebAppHelp from './components/WebAppHelp';
+import {roomPetScale} from './room-pet-size';
 import {isRamBodyPoint} from './ram-hit-test';
 import { useRoomMedia } from './room-media';
 import { createMemory, loadMemory, recordCare, recordEvent, saveMemory, memoryKey, getCompanionMood } from './companion-memory';
@@ -78,7 +85,7 @@ import {elementSkillById,learnedElementSkill} from './element-skills';
 import RamSchoolPanel,{ActivityCard} from './components/RamSchoolPanel';
 import {activityAction,beginActivity,cancelActivity,finishRestaurantWork,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
 import {RoomFurnishingLayer,RoomFurnishingEditor} from './components/RoomFurnishings';
-import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup} from './pet-backup';
+import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup,petBackupText} from './pet-backup';
 import {buyFurniture,placeFurniture,removeFurniture} from './room-furnishings';
 
 const SAVE_KEY = PET_SAVE_KEY;
@@ -86,7 +93,7 @@ const PREFS_KEY = 'ramu-house-preferences-v2';
 type Panel = CompanionPanel | 'shop' | 'games' | 'growth' | 'settings' | 'decor' | 'wardrobe' | 'status' | 'memories' | 'school' | 'notes' | null;
 type GameKind = 'fruit' | 'memory' | 'treasure' | ExtraGame | 'color-mixer' | 'restaurant';
 const GAME_LABELS: Record<GameKind, string> = {restaurant:'拉姆餐厅','color-mixer':'拉姆换色游戏', fruit:'拉姆接果子',memory:'口袋翻翻乐',rhythm:'拉姆拍拍乐',orchard:'草地采果',puzzle:'小屋拼拼乐',treasure:'小屋寻宝' };
-type Preferences = { roomWander:boolean; gameSound:boolean; sound: boolean; soundVolume: number; lively: boolean; outings: boolean; quiet: boolean; reminders: boolean; reminderMinutes: number; reminderSound: boolean; timerDirection:TimerDirection; presence: boolean; presenceMinutes: number };
+type Preferences = { roomPetScale:number; roomWander:boolean; gameSound:boolean; sound: boolean; soundVolume: number; lively: boolean; outings: boolean; quiet: boolean; reminders: boolean; reminderMinutes: number; reminderSound: boolean; timerDirection:TimerDirection; presence: boolean; presenceMinutes: number };
 type Result = { state: GameState; message: string; ok: boolean };
 const titles = { notes:'小屋留言板',status:'我的拉姆',food:'拉姆的背包',play:'一起玩耍',shop:'拉姆用品商店',games:'小屋游戏',growth:'一起长大',memories:'回忆',settings:'小屋设置',decor:'布置小屋',wardrobe:'拉姆小衣橱',school:'拉姆学院' };
 function readSave() {
@@ -97,7 +104,7 @@ function readSave() {
   const restored=parseSave(JSON.stringify(stored),Date.now(),selected);return restored&&stored.stats?recordStatChange(stored,restored,'离线期间的消耗、休息与活动结算',restored.lastTick):restored;
  }catch{return null}
 }
-function readPrefs(): Preferences { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}'); return { roomWander:p.roomWander!==false, gameSound:typeof p.gameSound==='boolean'?p.gameSound:p.sound!==false, sound: p.sound !== false, soundVolume: typeof p.soundVolume === 'number' && Number.isFinite(p.soundVolume) ? Math.max(0,Math.min(1,p.soundVolume)) : .45, lively: p.lively !== false, outings: p.outings !== false, quiet: p.quiet === true, reminders: p.reminders !== false, reminderMinutes: validReminderMinutes(p.reminderMinutes), reminderSound: p.reminderSound !== false, timerDirection: p.timerDirection==='countup'?'countup':'countdown', presence: p.presence !== false, presenceMinutes: [10,20,40].includes(p.presenceMinutes)?p.presenceMinutes:20 }; } catch { return { roomWander:true, gameSound:true, sound: true, soundVolume: .45, lively: true, outings: true, quiet: false, reminders: true, reminderMinutes: 40, reminderSound: true, timerDirection:'countdown', presence: true, presenceMinutes: 20 }; } }
+function readPrefs(): Preferences { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}'); return { roomPetScale:roomPetScale(p.roomPetScale), roomWander:p.roomWander!==false, gameSound:typeof p.gameSound==='boolean'?p.gameSound:p.sound!==false, sound: p.sound !== false, soundVolume: typeof p.soundVolume === 'number' && Number.isFinite(p.soundVolume) ? Math.max(0,Math.min(1,p.soundVolume)) : .45, lively: p.lively !== false, outings: p.outings !== false, quiet: p.quiet === true, reminders: p.reminders !== false, reminderMinutes: validReminderMinutes(p.reminderMinutes), reminderSound: p.reminderSound !== false, timerDirection: p.timerDirection==='countup'?'countup':'countdown', presence: p.presence !== false, presenceMinutes: [10,20,40].includes(p.presenceMinutes)?p.presenceMinutes:20 }; } catch { return { roomPetScale:1, roomWander:true, gameSound:true, sound: true, soundVolume: .45, lively: true, outings: true, quiet: false, reminders: true, reminderMinutes: 40, reminderSound: true, timerDirection:'countdown', presence: true, presenceMinutes: 20 }; } }
 function GameDialog({ title, children, onClose, wide = false }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
   const dialog = useRef<HTMLDivElement>(null); const close = useRef(onClose); close.current = onClose;
   useEffect(() => {
@@ -109,6 +116,7 @@ function GameDialog({ title, children, onClose, wide = false }: { title: string;
 }
 
 export default function App() {
+  const webEdition=isWebApp();
   const nativeDrawingBounds=useNativeDrawingBounds();
   const [pet, setPetRaw] = useState<GameState | null>(readSave);
   const setPet=useCallback((change:SetStateAction<GameState|null>,reason='自然消耗与休息')=>{
@@ -117,6 +125,7 @@ export default function App() {
   const [unreadableSave,setUnreadableSave]=useState(()=>{try{return localStorage.getItem(SAVE_KEY)!==null&&readSave()===null}catch{return true}});
   const [prefs, setPrefs] = useState<Preferences>(readPrefs);
   const [panel, setPanel] = useState<Panel>(null);
+  const [roomSizeDraft,setRoomSizeDraft]=useState<number|null>(null);
   const [warehouseCollapsed,setWarehouseCollapsed]=useState(false);
   const [color, setColor] = useState<PetColor>('pink');
   const [name, setName] = useState(pet?.name ?? '小拉姆');
@@ -135,12 +144,13 @@ export default function App() {
   const [action, setAction] = useState('idle');
   const [courseCompletion,setCourseCompletion]=useState('');
   const [petMode, setPetMode] = useState(false);
-  const [preview, setPreview] = useState(() => !window.desktop && readSave() !== null);
+  const [preview, setPreview] = useState(() => !webEdition && !window.desktop && readSave() !== null);
   const [actionId, setActionId] = useState(0);
   const [desktopState, setDesktopState] = useState<DesktopState>({ petMode:false,alwaysOnTop:false,wandering:true,companionPanel:false,panelSide:'right',edgeHiding:true,edgeSide:null,edgePose:'visible' });
   const roomScreen=useRoomFullscreen(Boolean(desktopState.roomFullscreen));
   const [toast, setToast] = useState('');
   const [bubble, setBubble] = useState('拉姆～ 我来陪你啦！');
+  const [bubbleIsDescription,setBubbleIsDescription]=useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [invitation, setInvitation] = useState<{ petId:number; at:number; offer:CompanionInvitation } | null>(null);
   const invitationRef = useRef(invitation); invitationRef.current = invitation;
@@ -167,29 +177,45 @@ export default function App() {
   useEffect(()=>()=>{importSequence.current++},[]);
 
   const updateSnapshot=useRef<()=>boolean>(()=>false);
-  useEffect(()=>window.desktop?.updates?.onPrepare(()=>updateSnapshot.current()),[]);
+  const diskSnapshot=useRef<()=>string|null>(()=>null);
+  const [backupError,setBackupError]=useState(false);
+  useEffect(()=>window.desktop?.updates?.onPrepare(async()=>{
+    if(!updateSnapshot.current())return false;
+    const text=diskSnapshot.current();
+    if(text&&window.desktop?.localSaves)await window.desktop.localSaves.checkpoint(text,'before-update');
+    return true;
+  }),[]);
   const adoptionFocus = useRef<HTMLInputElement>(null);
   const hasPet = pet !== null;
   const current = pet ?? createPet('小拉姆', color);
   const stage = getStage(current.growth, current.evolution);
   const appearance=petAppearance(current);
   const floating = petMode || preview;
+  useEffect(()=>{if(floating||panel!==null||game!==null||!pet)setRoomSizeDraft(null)},[floating,panel,game,pet?.createdAt]);
+  function finishRoomSize(commit:boolean){if(commit&&roomSizeDraft!==null)setPrefs(p=>({...p,roomPetScale:roomPetScale(roomSizeDraft)}));setRoomSizeDraft(null)}
   const condition = getPetCondition(current);
-  const spokenBubble=petSpeech(current,bubble);
+  const spokenBubble=bubbleIsDescription?bubble:petSpeech(current,bubble);
   const workingAway = current.activity?.kind==='restaurant';
   const renderedAction = (workingAway?'still':activityAction(current.activity)) ?? (action !== 'idle' ? action : desktopState.motion === 'left' ? 'walk-left' : desktopState.motion === 'right' ? 'walk-right' : condition.action);
-  const actionAppearance=petActionAppearance(current,current.sleeping?'sleep':renderedAction);
+  const actionAppearance=petActionAppearance(current,current.sleeping?'sleep':renderedAction,actionItemId);
   const roomMedia = useRoomMedia(hasPet && !floating, hasPet, game==='restaurant'&&workingAway?'./assets/original/restaurant/audio/bgSound.mp3':undefined);
   useEffect(()=>window.desktop?.onMusicToggle?.(enabled=>roomMedia.update({backgroundPlayback:enabled})),[roomMedia.update]);
   useEffect(()=>{void window.desktop?.setMusicState?.({playing:roomMedia.playing,enabled:roomMedia.settings.musicEnabled||roomMedia.settings.backgroundPlayback,background:roomMedia.settings.backgroundPlayback})?.catch(()=>{})},[roomMedia.playing,roomMedia.settings.musicEnabled,roomMedia.settings.backgroundPlayback]);
   useEffect(()=>{configurePetSound({enabled:prefs.sound,gameEnabled:prefs.gameSound,volume:prefs.soundVolume})},[prefs.sound,prefs.gameSound,prefs.soundVolume]);
   const currentMemory = memory?.petId === String(current.createdAt) ? memory : createMemory(current);
+  diskSnapshot.current=()=>{const saved=petRef.current;return saved&&!awaitingAdoption.current&&currentMemory.petId===String(saved.createdAt)?petBackupText(saved,currentMemory,localStorage):null};
   updateSnapshot.current=()=>{try{const saved=petRef.current;if(awaitingAdoption.current)return false;if(saved){localStorage.setItem(SAVE_KEY,JSON.stringify(saved));if(currentMemory.petId===String(saved.createdAt)&&!saveMemory(saved,currentMemory))return false}localStorage.setItem(PREFS_KEY,JSON.stringify(prefs));return true}catch{return false}};
+  useEffect(()=>{
+    const api=window.desktop?.localSaves;if(!api||!pet||awaitingAdoption.current)return;
+    let live=true;
+    const timer=setTimeout(()=>{try{const text=diskSnapshot.current();if(text)void api.checkpoint(text).then(()=>{if(live)setBackupError(false)},()=>{if(live)setBackupError(true)})}catch{if(live)setBackupError(true)}},400);
+    return()=>{live=false;clearTimeout(timer)};
+  },[pet,memory,prefs]);
   const snoozed = companionSnoozeUntil(currentMemory) > Date.now();
   const openInvitation = invitation?.petId === current.createdAt && Date.now()-invitation.at < 5*60000 ? invitation.offer : null;
   const days = Math.max(1, Math.floor((Date.now() - current.createdAt) / 86400000) + 1);
 
-  const speak = useCallback((text: string, duration = 6500) => { ambient.current = null; setBubble(text); setBubbleVisible(true); clearTimeout(timers.current.bubble); timers.current.bubble = setTimeout(() => setBubbleVisible(false), duration); }, []);
+  const speak = useCallback((text: string, duration = 6500, description=false) => { ambient.current = null; setBubble(text);setBubbleIsDescription(description); setBubbleVisible(true); clearTimeout(timers.current.bubble); timers.current.bubble = setTimeout(() => setBubbleVisible(false), duration); }, []);
   const notify = useCallback((text: string) => { setToast(text); clearTimeout(timers.current.toast); timers.current.toast = setTimeout(() => setToast(''), 3800); }, []);
   useEffect(()=>{if(roomScreen.error)notify(roomScreen.error)},[roomScreen.error,notify]);
   useEffect(() => { setCourseCompletion('');clearTimeout(timers.current.course);clearInvitation(); suggestionSequence.current=0; nameSequence.current=0; nameCallUntil.current=0; }, [pet?.createdAt]);
@@ -205,12 +231,12 @@ export default function App() {
   useEffect(()=>{void window.desktop?.messageBoard?.publish(pet?{name:pet.name,createdAt:pet.createdAt,notes:pet.notes??[]}:null).catch(()=>{})},[pet?.createdAt,pet?.name,pet?.notes]);
   useEffect(()=>window.desktop?.messageBoard?.onPatch(request=>{
     const saved=petRef.current;
-    if(!saved||saved.createdAt!==request.petId||JSON.stringify(saved.notes??[])!==request.baseNotes)return {ok:false};
-    if(!updateNotes(request.notes))return {ok:false};
+    if(!saved||saved.createdAt!==request.petId||JSON.stringify(saved.notes??[])!==request.baseNotes)return {ok:false,reason:'stale',snapshot:saved?{name:saved.name,createdAt:saved.createdAt,notes:saved.notes??[]}:undefined};
+    if(!updateNotes(request.notes))return {ok:false,reason:'storage'};
     const next=petRef.current!;return {ok:true,snapshot:{name:next.name,createdAt:next.createdAt,notes:next.notes??[]}};
   }),[]);
   useEffect(()=>{
-    const checkpoint=()=>{if(updateSnapshot.current())void window.desktop?.flushSave?.().catch(()=>{})};
+    const checkpoint=()=>{if(updateSnapshot.current()){void window.desktop?.flushSave?.().catch(()=>{});try{const text=diskSnapshot.current();if(text)void window.desktop?.localSaves?.checkpoint(text).catch(()=>{})}catch{}}};
     window.addEventListener('pagehide',checkpoint);window.addEventListener('blur',checkpoint);
     return()=>{window.removeEventListener('pagehide',checkpoint);window.removeEventListener('blur',checkpoint)};
   },[]);
@@ -271,8 +297,8 @@ export default function App() {
   useIdleLife({petId:pet?.createdAt,pet:pet??undefined,memory:currentMemory,enabled:prefs.lively&&!wantsQuiet(currentMemory),blocked:Boolean(desktopState.petResizing)||prefs.quiet||snoozed||current.sleeping||Boolean(current.activity)||Boolean(current.outing)||timer.running||panel!==null||game!==null||action!=='idle'||bubbleVisible||floating&&(desktopState.edgeSide!==null||(desktopState.motion!==undefined&&desktopState.motion!=='idle'))||current.stats.health<35||current.stats.energy<25||current.stats.hunger<25||current.stats.thirst<25,onAction:(next,sequence)=>{
     if(prefs.outings&&sequence%5===4&&startOuting(false,sequence))return;
     const original=chooseAutonomousOriginal(current,previousNaturalAction.current);
-    if(original&&Math.random()<.7){previousNaturalAction.current=original;setBubbleVisible(false);animate(original);return;}
-    if(isPastime(next))startPastime(next==='spell'&&!learned(current,'magic')?'read-alone':next);else animate(next);
+    if(original&&Math.random()<.7){previousNaturalAction.current=original;animate(original);speak(autonomousActionLine(original),6500,true);return;}
+    if(isPastime(next))startPastime(next==='spell'&&!learned(current,'magic')?'read-alone':next);else{animate(next);speak(autonomousActionLine(next),6500,true);}
   }});
   const returnRef=useRef((manual=false)=>recallPet(manual));returnRef.current=recallPet;
   useEffect(()=>{
@@ -359,14 +385,15 @@ export default function App() {
     const blocked=animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});if(blocked){notify(blocked);return;}
     if(kind==='spell'&&!learned(saved,'magic')){notify('先到拉姆学院学会魔术，再展示变身本领吧。');return}
     clearInvitation();if(!floating)setPanel(null);preparePetSound(prefs.sound);animate(kind);pastimeRun.current={petId:saved.createdAt,kind};
-    if(prefs.presence&&!prefs.quiet)speak(PASTIME_LINES[kind],9500);
+    if(!prefs.quiet)speak(PASTIME_LINES[kind],9500,true);
   }
   function startUploaded(id:string){
-    const saved=petRef.current;if(!saved)return;const clip=uploadedSpec(petActionAppearance(saved,`uploaded-${id}`).form,id),toy=UPLOADED_TOYS.find(t=>t.id===id)
+    const saved=petRef.current;if(!saved)return;const clip=uploadedMotion(petActionAppearance(saved,`uploaded-${id}`).form,`uploaded-${id}`),toy=UPLOADED_TOYS.find(t=>t.id===id)
     if(!clip||!toy)return
     const reason=playBlockReason(saved);if(reason){notify(reason);return}
     const blocked=animationBlockReason({action,timerRunning:timer.running,careUntil:careUntil.current,dizzyUntil:dizzyUntil.current});if(blocked){notify(blocked);return}
-    clearInvitation();setPanel(null);setBubbleVisible(false);animate(`uploaded-${id}`);uploadedRun.current={petId:saved.createdAt,id,endsAt:performance.now()+clip.durationMs};
+    const duration=clip.durationMs;
+    clearInvitation();setPanel(null);setBubbleVisible(false);animate(`uploaded-${id}`);uploadedRun.current={petId:saved.createdAt,id,endsAt:performance.now()+duration};
   }
   function startOfficial(id:string){
     const saved=petRef.current,clip=officialClip(id);if(!saved||!clip||clip.path.includes('/tatter/')||!playbackForm(clip,petActionAppearance(saved,`official-${id}`).form))return;
@@ -403,7 +430,7 @@ export default function App() {
   }
   function checkIn(){
     const saved=petRef.current;if(!saved)return;const result=claimDailyCheckIn(saved);petRef.current=result.state;setPet(result.state);speak(result.message);
-    if(result.ok){playGameSound('reward',prefs.gameSound);setMemory(m=>m?recordEvent(m,{kind:'check-in',detail:'我们收好了今天签到的 1000 摩尔豆。'}):m)}
+    if(result.ok){setMemory(m=>m?recordEvent(m,{kind:'check-in',detail:'我们收好了今天签到的 1000 摩尔豆。'}):m)}
   }
   function respondMood(){
     const saved=petRef.current;if(document.hidden||!saved||interactionBusy)return
@@ -459,15 +486,14 @@ export default function App() {
   }
   useDesktopPetStatus(pet);
   useEffect(()=>{
-    // The uncostumed body already fits the fixed 160×240 desktop frame. The
-    // native player reports a temporary iframe surface while it handshakes;
-    // using that surface for the plain body expands the window to the room
-    // width on some Windows/macOS runners. Only widen the native frame when a
-    // costume actually needs the extra drawing area.
-    const bounds=petMode&&!workingAway&&current.wearing?drawingUnion([...(nativeDrawingBounds?[nativeDrawingBounds]:[]),...(reading?[]:[{x:-100,y:-80,width:360,height:420}])]):null;
+    // Idle bodies keep their compact frame. A costume or active original
+    // action can publish a larger drawing surface without changing body size.
+    const needsSurface=Boolean(current.wearing)||isOfficialAction(action)||Boolean(actionItemId);
+    const bounds=petMode&&!workingAway&&needsSurface?drawingUnion([...(nativeDrawingBounds?[nativeDrawingBounds]:[]),...(current.wearing&&!reading?[{x:-100,y:-80,width:360,height:420}]:[])]):null;
     void window.desktop?.setPetArtworkBounds?.(bounds).catch(()=>{});
-  },[petMode,current.wearing,reading,workingAway,nativeDrawingBounds]);
-  const effectId=action.startsWith('element-')?action.slice(8):null;
+  },[petMode,current.wearing,reading,workingAway,nativeDrawingBounds,action,actionItemId]);
+  const normalizedEffectAction=normalizeRamAction(action,stage);
+  const effectId=normalizedEffectAction.startsWith('element-')?normalizedEffectAction.slice(8):null;
   const importedEffect=uploadedMotion(actionAppearance.form,action,actionItemId);
   const previousEffectMode=useRef(floating);
   useEffect(()=>{
@@ -506,21 +532,23 @@ export default function App() {
     if(!isUploadedAction(next))uploadedRun.current=null;
     const motion = itemId ? getItemMotion(itemId) : null;
     const p=petRef.current;
-    const form=p?petActionAppearance(p,next).form:'seed';
+    const form=p?petActionAppearance(p,next,itemId).form:'seed';
+    const outfit=p?costumePlayback(getStage(p.growth,p.evolution),p.evolution,p.wearing):undefined;
+    const adapted=outfit?.clip?costumeAction(normalizeRamAction(motion?.action??next,getStage(p!.growth,p!.evolution)),form,itemId):undefined;
     const original=uploadedMotion(form,next,itemId);
     const recorded=dailyFrameSpec(form,next);
     const embeddedItem=p&&itemId?originalItemClip(itemId,form):undefined;
-    const duration = (isOfficialAction(next)||embeddedItem?OFFICIAL_DURATION:undefined) ?? original?.durationMs ?? (recorded&&!['focus','sleep','read-alone'].includes(next)?recorded.durationMs:undefined) ?? motion?.duration ?? getRamActionDuration(next.startsWith('ambient-element-')?next.slice(8):next,form) ?? 900;
+    const duration = original?.durationMs ?? adapted?.duration ?? (isOfficialAction(next)||embeddedItem?OFFICIAL_DURATION:undefined) ?? (recorded&&!['focus','sleep','read-alone'].includes(next)?recorded.durationMs:undefined) ?? motion?.duration ?? getRamActionDuration(next.startsWith('ambient-element-')?next.slice(8):next,form) ?? 900;
     setActionId(n => n + 1); setActionFromColor(fromColor); setActionItemId(itemId); setAction(motion?.action ?? next);
     careUntil.current = itemId ? Date.now() + duration + 50 : 0;
     if(feedback?.gains.length){pendingCareFeedback.current=mergeCareFeedback(pendingCareFeedback.current,feedback);clearTimeout(timers.current.feedback);setCareFeedback(null);}
     else if(!itemId)finishCareFeedback();
     const transformed=isOfficialAction(next)?officialClip(next.replace(/^(official-|ambient-)/,'')):undefined;
-    const sourcePlayback=isOfficialAction(next)||Boolean(motion||embeddedItem||original)||Boolean(p?.wearing&&next==='pet');
+    const sourcePlayback=isOfficialAction(next)||Boolean(motion||embeddedItem||original||recorded||outfit?.clip);
     const fallbackDelay=sourcePlayback?OFFICIAL_LOAD_TIMEOUT+Math.max(duration,OFFICIAL_DURATION)+(transformed&&usesTransformationSmoke(transformed)?8000:3000):duration+(next==='read-alone'?50:(next==='play'||next==='play-alone'||next==='skill-magic'||next==='spell'||next.startsWith('element-')||isAmbientAction(next)||recorded||isEmotionClip(next)?15000:50));
     clearTimeout(timers.current.animation); timers.current.animation = setTimeout(() => { uploadedRun.current=null;careUntil.current=0;finishCareFeedback();finishPastime();setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); },fallbackDelay);
   }
-  function finishPerformance(completed=true){if(isAmbientAction(action)||isOfficialAction(action)||action==='play'||action==='pet'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(petActionAppearance(current,action).form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
+  function finishPerformance(completed=true){if(action==='dizzy'||getRamActionDuration(action,petActionAppearance(current,action).form)!==null||isAmbientAction(action)||isOfficialAction(action)||action==='play'||action==='pet'||isMoodAction(action)||isPastime(action)||isSchoolAction(action)||isUploadedAction(action)||Boolean(actionItemId)||Boolean(dailyFrameSpec(petActionAppearance(current,action).form,action))){finishUploaded(completed);if(completed)finishPastime();else pastimeRun.current=null;finishCareFeedback();clearTimeout(timers.current.animation);setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);careUntil.current=0}}
   function apply(result: Result, nextAction?: string, detail?: string, itemId?: string) {
     const before = petRef.current;
     if(result.ok&&before&&before.color!==result.state.color){
@@ -586,7 +614,10 @@ export default function App() {
     clearInvitation();apply(result)
     if(result.ok){
       if(kind==='buy')playGameSound('purchase',prefs.gameSound)
-      else if(!saved.sleeping&&action==='idle'&&!timer.running&&Date.now()>=careUntil.current)animate('mood-content')
+      else if(!saved.sleeping&&!timer.running&&!saved.activity){
+        clearTimeout(timers.current.animation);careUntil.current=0;dizzyUntil.current=0;
+        setAction('idle');setActionItemId(undefined);setActionFromColor(undefined);setActionId(n=>n+1);
+      }
       setMemory(m=>m?recordEvent(m,{kind:kind==='buy'?'buy':'dress',detail:kind==='buy'?`你为我买了${getOutfit(id)?.name}。`:id?`你给我戴上了${getOutfit(id)?.name}。`:'你把我的装扮收好，让我恢复原来的样子。'}):m)
     }
   }
@@ -599,7 +630,7 @@ export default function App() {
     speak(`记住啦，我叫${value}，还是一直陪着你的我。`);
   }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
-  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
+  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }
@@ -641,7 +672,7 @@ export default function App() {
     const saved = petRef.current; if (!saved) return;
     importSequence.current++;
     clearInvitation();awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
-    try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
+    try { await window.desktop?.localSaves?.forget(saved.createdAt);localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
     pendingCareFeedback.current=null;setCareFeedback(null);clearTimeout(timers.current.feedback);setPet(null); setMemory(null); setReset(false); setPanel(null); setGame(null); timer.cancel(); setPreview(false); setName('小拉姆'); setAdoptionStep('color'); setWaitingForReopen(true); setAction('idle'); setActionItemId(undefined);setActionFromColor(undefined); careUntil.current = 0;
     clearTimeout(timers.current.animation); clearTimeout(timers.current.bubble); setBubbleVisible(false); setToast('');
@@ -652,13 +683,16 @@ export default function App() {
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); } catch { /* Initial removal succeeded. */ }
     window.desktop?.hideToTray();
   }
-  function exportSave() { if (!pet) return;const text=JSON.stringify({ ...pet, companionMemory: currentMemory }, null, 2),filename=`ramu-${new Date().toISOString().slice(0, 10)}.json`;if(window.mobile){void window.mobile.exportSave(text,filename).then(ok=>{if(ok)notify('存档已经导出，记得收好。');}).catch(error=>notify(error instanceof Error?error.message:'存档导出失败，请重试。'));return;} const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); notify('存档已经导出，记得收好。'); }
-  async function importSave(file?: File) {
-    if (!file) return;
+  function exportSave() { if (!pet) return;const text=petBackupText(pet,currentMemory,localStorage),filename=`ramu-${new Date().toISOString().slice(0, 19).replaceAll(':','-')}.json`;if(window.mobile){void window.mobile.exportSave(text,filename).then(ok=>{if(ok)notify('存档已经导出，记得收好。');}).catch(error=>notify(error instanceof Error?error.message:'存档导出失败，请重试。'));return;} const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); notify('存档已经导出，记得收好。'); }
+  async function importSave(file?: File,backupText?:string) {
+    if (!file&&backupText===undefined) return;
     const sequence=++importSequence.current,originalPetId=petRef.current?.createdAt;
     try {
-      if (file.size > MAX_BACKUP_BYTES) throw Error();
-      const text=await file.text();
+      if (file&&file.size > MAX_BACKUP_BYTES) throw Error();
+      const text=backupText??await file!.text();
+      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return;
+      const before=diskSnapshot.current();
+      if(before){if(window.desktop?.localSaves)await window.desktop.localSaves.checkpoint(before,'before-import');else localStorage.setItem(`ramu-before-import-v1:${Date.now()}`,before)}
       if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return;
       const {pet:restored,memory:restoredMemory}=restorePetBackup(text,localStorage);
       clearInvitation();clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
@@ -667,6 +701,7 @@ export default function App() {
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
       petRef.current = restored; setPet(restored,'导入存档恢复数值');
       setMemory(restoredMemory);
+      setPrefs(readPrefs());window.dispatchEvent(new Event('ram-save-imported'));
       setUnreadableSave(false);setName(restored.name); notify('存档已恢复，欢迎回来！');
     } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); }
     if (sequence===importSequence.current&&importInput.current) importInput.current.value = '';
@@ -702,9 +737,9 @@ export default function App() {
   useEffect(()=>{window.desktop?.updates?.setBusy((!window.mobile&&(!pet||!floating))||panel==='food'||panel==='status'||panel==='play'||game!==null||timer.running||Boolean(pet?.activity)||action!=='idle'||saveError||memorySaveError)},[pet?.createdAt,floating,panel,game,timer.running,pet?.activity,action,saveError,memorySaveError]);
   const settingsContent = <SettingsPanel>
     <SettingsSection title="拉姆信息"><form className="settings-identity" onSubmit={e=>{e.preventDefault();renamePet(name)}}><label htmlFor="rename">拉姆的名字</label><input id="rename" aria-label="拉姆的新名字" value={name} maxLength={16} onChange={e=>setName(e.target.value)}/><button className="game-button small" disabled={!name.trim()}>保存</button></form></SettingsSection>
-    <SettingsSection title="陪伴与桌面">
-      {window.desktop?.platform !== 'android'&&<div className="settings-row"><span>桌面拉姆大小 · {Math.round((desktopState.petScale??1)*100)}%</span><button className="game-button small" onClick={()=>void window.desktop?.openSizeEditor?.().catch(()=>notify('暂时无法打开大小设置，请重试。'))}>大小变换</button></div>}
-      {([['安静陪伴',prefs.quiet,()=>setPrefs(p=>({...p,quiet:!p.quiet})),false],['桌面散步',desktopState.wandering,()=>void toggleWander(),!window.desktop],['角落躲藏',desktopState.edgeHiding,()=>void window.desktop?.setEdgeHiding(!desktopState.edgeHiding),!window.desktop]] as const).map(([label,checked,callback,disabled])=><label className="settings-row" key={label}><span>{label}</span><button role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={callback}>{checked?'开启':'关闭'}</button></label>)}
+    <SettingsSection title={webEdition?"陪伴与小屋":"陪伴与桌面"}>
+      {!webEdition&&window.desktop?.platform !== 'android'&&<div className="settings-row"><span>桌面拉姆大小 · {Math.round((desktopState.petScale??1)*100)}%</span><button className="game-button small" onClick={()=>void window.desktop?.openSizeEditor?.().catch(()=>notify('暂时无法打开大小设置，请重试。'))}>大小变换</button></div>}
+      {([['安静陪伴',prefs.quiet,()=>setPrefs(p=>({...p,quiet:!p.quiet})),false],['桌面散步',desktopState.wandering,()=>void toggleWander(),!window.desktop],['角落躲藏',desktopState.edgeHiding,()=>void window.desktop?.setEdgeHiding(!desktopState.edgeHiding),!window.desktop]] as const).filter(([label])=>!webEdition||label==='安静陪伴').map(([label,checked,callback,disabled])=><label className="settings-row" key={label}><span>{label}</span><button role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={callback}>{checked?'开启':'关闭'}</button></label>)}
       <label className="settings-row"><span>小屋随机走动</span><input type="checkbox" aria-label="小屋随机走动" checked={prefs.roomWander} onChange={e=>setPrefs(p=>({...p,roomWander:e.target.checked}))}/></label>
       <label className="settings-row"><span>自然小动作</span><input type="checkbox" aria-label="自然小动作" checked={prefs.lively} onChange={e=>setPrefs(p=>({...p,lively:e.target.checked}))}/></label>
       <label className="settings-row"><span>允许短暂出游</span><input type="checkbox" aria-label="允许短暂出游" checked={prefs.outings} onChange={e=>setPrefs(p=>({...p,outings:e.target.checked}))}/></label>
@@ -717,7 +752,7 @@ export default function App() {
       <label className="settings-row"><span>拉姆音量</span><input type="range" min={0} max={100} step={1} aria-label="拉姆音量" value={Math.round(prefs.soundVolume*100)} onChange={e=>setPrefs(p=>({...p,soundVolume:Number(e.target.value)/100}))}/></label>
       <div className="effect-previews" aria-label="互动音效试听">{([['smack','吃东西'],['gulp','喝水'],['clean','洗干净'],['sparkle','眼前一亮'],['boing','蹦跳']] as const).map(([kind,label])=><button className="game-button small" key={kind} disabled={!prefs.sound||prefs.soundVolume===0} onClick={()=>playInteractionPreview(kind,true)} aria-label={`试听${label}音效`}>{label}</button>)}</div>
       <label className="settings-row"><span>播放音乐</span><input type="checkbox" aria-label="播放背景音乐" checked={roomMedia.settings.musicEnabled} onChange={e=>roomMedia.update({musicEnabled:e.target.checked})}/></label>
-      <label className="settings-row"><span>{window.mobile?'允许后台播放（悬浮陪伴和后台）':'允许后台播放（桌面和托盘）'}</span><input type="checkbox" aria-label="允许后台播放音乐" checked={roomMedia.settings.backgroundPlayback} onChange={e=>roomMedia.update({backgroundPlayback:e.target.checked})}/></label>
+      <label className="settings-row"><span>{webEdition?'允许后台播放（以浏览器支持为准）':window.mobile?'允许后台播放（悬浮陪伴和后台）':'允许后台播放（桌面和托盘）'}</span><input type="checkbox" aria-label="允许后台播放音乐" checked={roomMedia.settings.backgroundPlayback} onChange={e=>roomMedia.update({backgroundPlayback:e.target.checked})}/></label>
       <div className="settings-actions"><button className="game-button small" onClick={()=>setPanel('decor')}>选择配乐</button></div>
     </SettingsSection>
     <SettingsSection title="专注计时">
@@ -727,8 +762,10 @@ export default function App() {
       <label className="settings-row"><span>结束提示音</span><input type="checkbox" aria-label="计时结束提示音" checked={prefs.reminderSound} onChange={e=>setPrefs(p=>({...p,reminderSound:e.target.checked}))}/></label>
       <div className="timer-settings-actions"><button className="game-button small" disabled={!prefs.reminders} onClick={focusToggle}>{timer.running?'取消计时':'开始计时'}</button><span>{timer.running?reminderTime(timer.seconds):timer.finished?'已结束，等待下次开始':'点击开始后才计时'}</span></div>
     </SettingsSection>
+    {webEdition&&<SettingsSection title="网页版与离线使用"><WebAppHelp/></SettingsSection>}
     <AndroidSettings/>
-    <SettingsSection title="存档与送别"><p className="settings-hint">备份包含拉姆、成长进度、物品与回忆。送别前可以先导出存档。</p><div className="settings-actions"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={()=>setReset(true)}>送别拉姆</button></div>{memorySaveError&&<p role="alert">回忆暂未保存，请导出备份。</p>}</SettingsSection>
+    <SettingsSection title="动画与素材"><AnimationDiagnostics/></SettingsSection>
+    <SettingsSection title="存档与送别"><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><p className="settings-hint">导出包含拉姆身份、颜色、成长、装扮、物品、小屋、回忆与偏好设置。收到 JSON 备份后，点击“导入存档”选择文件恢复。</p><div className="settings-actions"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={()=>setReset(true)}>送别拉姆</button></div>{memorySaveError&&<p role="alert">回忆暂未保存，请导出备份。</p>}{backupError&&<p role="alert">独立备份暂时写入失败，请检查磁盘空间并导出存档；原来的浏览器存档仍保留。</p>}</SettingsSection>
     {window.desktop&&<SettingsSection title="软件与帮助"><UpdateSettings/><MacHelp/></SettingsSection>}
   </SettingsPanel>;
   const gameOverlay = <>{game==='restaurant'&&<RestaurantWorkShowcase pet={current} onClose={()=>setGame(null)} onStart={()=>startActivity('restaurant')} onStop={stopActivity}/>} {game&&game!=='restaurant'&&<GameSoundToggle game={game} enabled={prefs.gameSound} onToggle={()=>setPrefs(p=>({...p,gameSound:!p.gameSound}))}/>} {game==='color-mixer'&&<ColorMixerGame pet={current} sound={prefs.gameSound} onBrew={color=>{const saved=petRef.current;if(!saved)return {ok:false,message:'先领养一只拉姆吧。'};const result=brewColourPotion(saved,color);apply(result);if(result.ok)setMemory(m=>m?recordEvent(m,{kind:'craft-potion',detail:`你调制了${color.toUpperCase()}颜色的药水，装进了背包。`}):m);return result}} onClose={()=>setGame(null)} onBackpack={()=>{setGame(null);setPocketCategory('medicine');setPanel('food')}}/>}{game === 'fruit' && <FruitGame costume={current.wearing} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'memory' && <MemoryGame sound={prefs.gameSound} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'treasure' && <TreasureGame costume={current.wearing} background={roomMedia.background} phase={roomMedia.phase} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game && !['fruit','memory','treasure','color-mixer','restaurant'].includes(game) && <MoreGames sound={prefs.gameSound} kind={game as ExtraGame} onClose={() => setGame(null)} onComplete={completeGame}/>}</>;
@@ -743,7 +780,7 @@ export default function App() {
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
   </div>;
 
-  if(!pet&&unreadableSave)return <main className="save-recovery"><h1>先把原来的拉姆存档保管好</h1><p>本机有存档，但暂时无法完整读取。原记录仍然保留，修复或导入有效备份后再继续。</p><button className="game-button" onClick={()=>{let raw='';try{raw=localStorage.getItem(SAVE_KEY)??''}catch{}if(window.mobile){void window.mobile.exportSave(raw,'ramu-recovery.json').catch(()=>{});return;}const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='ramu-recovery.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}}>导出原始存档</button><button className="game-button" onClick={()=>importInput.current?.click()}>导入有效备份</button><input hidden ref={importInput} type="file" accept=".json,application/json" onChange={e=>void importSave(e.target.files?.[0])}/>{toast&&<p role="status">{toast}</p>}</main>;
+  if(!pet&&unreadableSave)return <main className="save-recovery"><h1>先把原来的拉姆存档保管好</h1><p>本机有存档，但暂时无法完整读取。原记录仍然保留，修复或导入有效备份后再继续。</p><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><button className="game-button" onClick={()=>{let raw='';try{raw=localStorage.getItem(SAVE_KEY)??''}catch{}if(window.mobile){void window.mobile.exportSave(raw,'ramu-recovery.json').catch(()=>{});return;}const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='ramu-recovery.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}}>导出原始存档</button><button className="game-button" onClick={()=>importInput.current?.click()}>导入有效备份</button><input hidden ref={importInput} type="file" accept=".json,application/json" onChange={e=>void importSave(e.target.files?.[0])}/>{toast&&<p role="status">{toast}</p>}</main>;
   if (!pet && waitingForReopen && !window.desktop) return <div className="farewell-page"><img src="./icons/ramu.png" alt=""/><h1>好好说了再见</h1><p>这只拉姆和它的回忆已从本机移除。</p><button className="game-button" onClick={() => location.reload()}>重新打开领养处</button></div>;
 
   return <div className={`classic-app ramu-v6 ${roomScreen.fullscreen?'is-room-fullscreen':''}`}>
@@ -751,9 +788,9 @@ export default function App() {
     <header className="classic-titlebar"><div>拉姆</div><div>{window.desktop && <><button onClick={() => window.desktop?.minimize()} aria-label="最小化到托盘">－</button><button onClick={() => window.desktop?.close()} aria-label="关闭窗口">×</button></>}</div></header>
     <TimeScene media={roomMedia}>
       {pet&&<RoomFurnishingLayer pet={current} edit={panel==='decor'} onPlace={updateFurniture} onActivate={id=>id==='message-board'&&void openBoard()} onRemove={id=>updateFurniture(id)}/>}
-      <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button className="room-change-button manor-site-button" onClick={()=>void openManorSite().catch(()=>notify('暂时无法打开浏览器，请稍后重试。'))}>进入摩尔庄园</button><button className="room-change-button" onClick={() => setPanel(p=>p==='decor'?null:'decor')}>{panel==='decor'?'完成布置':'布置小屋'}</button><button className="room-change-button" aria-label={roomScreen.fullscreen?'退出小屋全屏':'全屏查看小屋'} aria-pressed={roomScreen.fullscreen} disabled={roomScreen.busy} onClick={()=>void roomScreen.toggle()}>{roomScreen.fullscreen?'退出全屏':'全屏查看'}</button><button className="daily-check-in" disabled={checkedInToday(current)} onClick={checkIn} aria-label={checkedInToday(current)?"今日已签到":"每日签到领取1000摩尔豆"}>{checkedInToday(current)?"今日已签到":"签到 +1000 豆"}</button><span className="coin-sign">{current.coins} 摩尔豆</span><button className="game-button" onClick={() => void toDesktop()}>{window.mobile?'悬浮陪伴':'回到桌面'}</button></div>}</div>
+      <div className="cottage-top"><div className="classic-logo"><img src="./icons/ramu.png" alt="两叶拉姆"/><span>拉姆</span></div>{pet && <div className="scene-top-actions"><button type="button" className="room-change-button" aria-label="调整小屋拉姆大小" aria-pressed={roomSizeDraft!==null} onClick={()=>{if(roomSizeDraft!==null){finishRoomSize(false);return}setPanel(null);setGame(null);setRoomSizeDraft(prefs.roomPetScale)}}>拉姆大小</button><button className="room-change-button manor-site-button" onClick={()=>void openManorSite().catch(()=>notify('暂时无法打开浏览器，请稍后重试。'))}>进入摩尔庄园</button><button className="room-change-button" onClick={() => setPanel(p=>p==='decor'?null:'decor')}>{panel==='decor'?'完成布置':'布置小屋'}</button><button className="room-change-button" aria-label={roomScreen.fullscreen?'退出小屋全屏':'全屏查看小屋'} aria-pressed={roomScreen.fullscreen} disabled={roomScreen.busy} onClick={()=>void roomScreen.toggle()}>{roomScreen.fullscreen?'退出全屏':'全屏查看'}</button><button className="daily-check-in" disabled={checkedInToday(current)} onClick={checkIn} aria-label={checkedInToday(current)?"今日已签到":"每日签到领取1000摩尔豆"}>{checkedInToday(current)?"今日已签到":"签到 +1000 豆"}</button><span className="coin-sign">{current.coins} 摩尔豆</span>{!webEdition&&<button className="game-button" onClick={() => void toDesktop()}>{window.mobile?'悬浮陪伴':'回到桌面'}</button>}</div>}</div>
       {pet && panel!=='decor' && <><button className="pet-plaque" onClick={() => setPanel('status')}><span>我的拉姆</span><strong>{current.name}</strong><small>{STAGES[stage].name} · 第 {days} 天</small></button>
-        <RoomWalker randomWalk={prefs.roomWander} stage={appearance.stage} evolution={appearance.evolution} blocked={reading||isAmbientAction(action)||interactionBusy||current.sleeping||Boolean(current.outing)||panel!==null||game!==null||reset}>{walkAction=><div className={`scene-pet ${current.outing?"pet-is-away":""} ${workingAway?"pet-at-work":""}`}><CareFeedback feedback={workingAway||panel==='food'||panel==='status'?null:careFeedback?.petId===current.createdAt?careFeedback:null}/>{bubbleVisible && !workingAway && <button type="button" className="scene-bubble visible" aria-label="收起拉姆提示" onClick={respondToBubble}><span role="status">{spokenBubble}</span></button>}<button className="scene-character" aria-label="摸摸拉姆" onPointerDown={event=>{const hit=isRamBodyPoint(event.currentTarget,event.clientX,event.clientY);event.currentTarget.dataset.ramHit=String(hit);if(!hit)event.currentTarget.dispatchEvent(new CustomEvent('room-walk-redirect',{bubbles:true,detail:{clientX:event.clientX,clientY:event.clientY}}))}} onClick={event=>{if(event.detail!==0&&event.currentTarget.dataset.ramHit!=='true'){delete event.currentTarget.dataset.ramHit;return}delete event.currentTarget.dataset.ramHit;doCare('pet')}}><Ram companionId={current.createdAt} costume={current.wearing} onActionEnd={finishPerformance} sound={prefs.sound} gameSound={prefs.gameSound} soundVolume={prefs.soundVolume} color={current.color} stage={stage} evolution={current.evolution} action={walkAction??(timer.running && action === 'idle' ? 'focus' : renderedAction)} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button>{workingAway&&<div className="room-work-note" role="status"><img src="./assets/generated/school/icons/restaurant.png" alt=""/><strong>拉姆去餐厅打工了</strong><ActivityCard pet={current} onCancel={stopActivity}/></div>}<span className="scene-pet-name">{current.outing&&<button className="game-button small" onClick={()=>recallPet()}>去{current.outing.place}了 · 叫回来</button>}{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>}</RoomWalker>
+        <RoomWalker scale={roomSizeDraft??prefs.roomPetScale} sizing={roomSizeDraft!==null} onScale={setRoomSizeDraft} onSizeFinish={finishRoomSize} randomWalk={prefs.roomWander} stage={appearance.stage} evolution={appearance.evolution} blocked={reading||isAmbientAction(action)||interactionBusy||current.sleeping||Boolean(current.outing)||panel!==null||game!==null||reset}>{walkAction=><div className={`scene-pet ${current.outing?"pet-is-away":""} ${workingAway?"pet-at-work":""}`}><CareFeedback feedback={workingAway||panel==='food'||panel==='status'?null:careFeedback?.petId===current.createdAt?careFeedback:null}/>{bubbleVisible && !workingAway && <button type="button" className="scene-bubble visible" aria-label="收起拉姆提示" onClick={respondToBubble}><span role="status">{spokenBubble}</span></button>}<button className="scene-character" aria-label="摸摸拉姆" onPointerDown={event=>{const hit=isRamBodyPoint(event.currentTarget,event.clientX,event.clientY);event.currentTarget.dataset.ramHit=String(hit);if(!hit)event.currentTarget.dispatchEvent(new CustomEvent('room-walk-redirect',{bubbles:true,detail:{clientX:event.clientX,clientY:event.clientY}}))}} onClick={event=>{if(event.detail!==0&&event.currentTarget.dataset.ramHit!=='true'){delete event.currentTarget.dataset.ramHit;return}delete event.currentTarget.dataset.ramHit;doCare('pet')}}><Ram paused={panel!==null||game!==null} companionId={current.createdAt} costume={current.wearing} onActionEnd={finishPerformance} sound={prefs.sound} gameSound={prefs.gameSound} soundVolume={prefs.soundVolume} color={current.color} stage={stage} evolution={current.evolution} action={walkAction??(timer.running && action === 'idle' ? 'focus' : renderedAction)} actionId={actionId} itemId={actionItemId} fromColor={actionFromColor} sleeping={current.sleeping}/></button>{workingAway&&<div className="room-work-note" role="status"><img src="./assets/generated/school/icons/restaurant.png" alt=""/><strong>拉姆去餐厅打工了</strong><ActivityCard pet={current} onCancel={stopActivity}/></div>}<span className="scene-pet-name">{current.outing&&<button className="game-button small" onClick={()=>recallPet()}>去{current.outing.place}了 · 叫回来</button>}{current.name}<small>{current.sleeping ? '睡着了' : mood.label}</small>{current.sleeping && <button className="scene-wake" onClick={()=>doCare('sleep')}>轻轻叫醒</button>}</span></div>}</RoomWalker>
         {(!workingAway&&current.activity||courseCompletion)&&<div className="school-scene-status">{current.activity?<ActivityCard pet={current} onCancel={stopActivity}/>:<span role="status">{courseCompletion}</span>}</div>}
         <RoomDock onSelect={destination=>{if(destination==='restaurant'){void enterRestaurant();return;}if(destination==='food')setPocketCategory('food');setPanel(destination)}}/></>}
       {pet&&panel==='decor'&&<aside className={`room-decor-drawer ${warehouseCollapsed?'is-collapsed':''}`} aria-label="小屋布置工具"><header><strong>布置小屋</strong><button className="warehouse-collapse" aria-label={warehouseCollapsed?'展开家具仓库':'收起家具仓库'} aria-expanded={!warehouseCollapsed} onClick={()=>setWarehouseCollapsed(value=>!value)}>{warehouseCollapsed?'仓库':'收起'}</button><button aria-label="完成布置" onClick={()=>setPanel(null)}>完成</button></header><RoomFurnishingEditor inline pet={current} media={roomMedia} onBuy={id=>apply(buyFurniture(petRef.current!,id))} onPlace={updateFurniture} onRemove={id=>updateFurniture(id)}/><RoomSettings media={roomMedia}/></aside>}
@@ -764,7 +801,7 @@ export default function App() {
         : <><div className="adoption-selected"><Ram color={color} stage={0}/></div><div className="adoption-name"><label htmlFor="pet-name">它的名字</label><input ref={adoptionFocus} id="pet-name" maxLength={12} value={name} onChange={e => setName(e.target.value)} onInput={e => setName(e.currentTarget.value)} placeholder="给拉姆起个名字" required autoFocus/></div></>}
       <button type="submit" className="game-button adopt-cta" disabled={adoptionStep === 'name' && !name.trim()}>{adoptionStep === 'color' ? '给它起名' : '带拉姆回家！'}</button>
       {adoptionStep === 'name' && <button type="button" className="adoption-back" onClick={() => setAdoptionStep('color')}>重新选颜色</button>}
-      <p className="adoption-note">从一颗种子慢慢养大。赠送 1000 摩尔豆，用品到小屋挑选。</p>
+      <p className="adoption-note">从一颗种子慢慢养大。赠送 1000 摩尔豆，用品到小屋挑选。</p>{webEdition&&<WebAppHelp compact/>}<details className="adoption-save-help"><summary>以前养过拉姆？检查存档或导入备份</summary><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><button type="button" className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input hidden ref={importInput} type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/></details>
     </form></section></div>}
     {panel && panel!=='decor' && panel!=='notes' && pet && <GameDialog title={titles[panel]} wide={['shop','growth','games','settings','wardrobe','status','food','memories','school'].includes(panel)} onClose={() => setPanel(null)}>
       <nav className="paper-tabs" aria-label="小屋页面">{(['status','food','shop','wardrobe','games','growth','school','memories','settings'] as const).map(p => <button key={p} onClick={() => setPanel(p)} className={panel === p ? 'active' : ''}>{({status:'状态',food:'背包',shop:'商店',games:'游戏',growth:'成长',memories:'回忆',decor:'布置',wardrobe:'衣橱',school:'学院',settings:'设置'})[p]}</button>)}</nav>

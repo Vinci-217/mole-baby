@@ -3,9 +3,9 @@ export interface RoomWalkArea {width:number;height:number;left:number;right:numb
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n))
 /** Pixel coordinates, shared by pointer targets, keyboard and resize handling.
  * Keep the complete 150px pet clear of walls, screen edges and the room dock. */
-export function roomWalkArea(width:number,height:number,dockTop=height-145):RoomWalkArea {
+export function roomWalkArea(width:number,height:number,dockTop=height-145,petScale=1):RoomWalkArea {
  // Keep all travel on the middle/lower floor, below the wall decorations.
- const inset=Math.min(42,Math.max(18,width*.035)),left=inset,right=Math.max(left,width-inset)
+ const inset=Math.min(width/2,Math.max(Math.min(42,Math.max(18,width*.035)),75*petScale+16)),left=inset,right=Math.max(left,width-inset)
  const bottom=clamp(dockTop-18,24,height-12),top=Math.min(height*.55,Math.max(0,bottom-44))
  return {width,height,left,right,top,bottom}
 }

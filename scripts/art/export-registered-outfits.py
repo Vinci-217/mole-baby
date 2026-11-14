@@ -12,7 +12,7 @@ import xml.etree.ElementTree as E
 import numpy as np
 from PIL import Image
 p=argparse.ArgumentParser();p.add_argument('--sources',type=Path,required=True);p.add_argument('--ordinary',type=Path,required=True);p.add_argument('--evolutions',type=Path,required=True);p.add_argument('--work',type=Path,required=True);p.add_argument('--ffdec',required=True);p.add_argument('--repo',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--missing-only',action='store_true');p.add_argument('--preview',action='store_true');p.add_argument('--reuse-render',action='store_true');p.add_argument('--ids',default='gold-feather:1200018,wizard-cap:1200020,star-wand:1200021,magic-book:1200026,rabbit-hood:1200033,leaf-hood:1200036,sport-goggles:1200047,warm-scarf:1200052');p.add_argument('--forms');p.add_argument('--kinds');p.add_argument('--out',type=Path);p.add_argument('--registration',choices=['source','fitted'],default='source');a=p.parse_args();a.work.mkdir(parents=True,exist_ok=True)
-out=a.out or (a.work/'preview-out' if a.preview else a.repo/'public/assets/original/wardrobe-motion');out.mkdir(exist_ok=True)
+out=a.out or (a.work/'preview-out' if a.preview else a.repo/'local-assets/retired/v0333-wardrobe/generated-wardrobe-motion');out.mkdir(exist_ok=True)
 from original_costume_timeline import Timeline,matrix,bounds,union,FORMS
 
 base={}

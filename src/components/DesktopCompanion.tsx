@@ -45,7 +45,6 @@ export default function DesktopCompanion(p: Props) {
   const appearance=petAppearance(p.pet);
   const reading=p.timerRunning||p.action==='focus'||p.action==='read-alone';
   const [tools, setTools] = useState(false), [dragging, setDragging] = useState(false);
-  const [shaking, setShaking] = useState(false);
   const [detailsHovered,setDetailsHovered]=useState(false),[detailsFocused,setDetailsFocused]=useState(false);
   const detailsTarget='.desktop-character,.compact-pet-name,.compact-pet-condition';
   const [previewResizing,setPreviewResizing]=useState(false),[previewScale,setPreviewScale]=useState(1);
@@ -84,7 +83,6 @@ export default function DesktopCompanion(p: Props) {
     if(edgeHover.current===hovered)return;edgeHover.current=hovered;
     void window.desktop?.setEdgeHovered(hovered);
   };
-  const shakeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const revealTools = () => { clearTimeout(hideTimer.current); hideTimer.current=undefined;if(dockedRef.current){setTools(false);peek(true);return;} if(!drag.current?.moved) setTools(true); };
   const hideTools = () => {
@@ -94,10 +92,10 @@ export default function DesktopCompanion(p: Props) {
   };
   const elastic=useElasticDrag(root,appearance.stage,p.native,reaction=>{
     if(p.pet.sleeping)return;
-    if(reaction==='dizzy'&&!p.itemId){setShaking(true);clearTimeout(shakeTimer.current);shakeTimer.current=setTimeout(()=>setShaking(false),3200);p.onShake();}
+    if(reaction==='dizzy'&&!p.itemId)p.onShake();
     else if(reaction==='turn')p.onTug?.();
   });
-  const drag = useRef<{ x: number; y: number; lastX: number; lastY: number; moved: boolean; direction: number; turns: number; turnAt: number; offset: { x: number; y: number } } | null>(null);
+  const drag = useRef<{ x: number; y: number; lastX: number; lastY: number; moved: boolean; direction: number; turns: number; turnAt: number; offset: { x: number; y: number }; prepared?:Promise<boolean> } | null>(null);
   useEffect(() => {
     if (!p.native) return;
     const hit = (e: MouseEvent) => {
@@ -117,12 +115,11 @@ export default function DesktopCompanion(p: Props) {
     document.addEventListener('mousemove', hit);
     return () => { document.removeEventListener('mousemove', hit); window.desktop?.setMousePassthrough(false); };
   }, [p.native]);
-  const selfBusy=isOfficialAction(p.action)||reading||isUploadedAction(p.action)||Boolean(p.itemId)||isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
+  const selfBusy=p.action==='dizzy'||isOfficialAction(p.action)||reading||isUploadedAction(p.action)||Boolean(p.itemId)||isPastime(p.action)||isSchoolAction(p.action)||Boolean(p.pet.activity)||Boolean(p.pet.outing);
   useEffect(() => { void window.desktop?.setInteracting((tools&&!docked) || dragging || p.panel !== null || selfBusy); }, [tools, dragging, p.panel,docked,selfBusy]);
   useEffect(()=>{if(p.desktopState.mouseThrough){setTools(false);if(p.panel)p.onPanel(null)}},[p.desktopState.mouseThrough,p.panel]);
   useEffect(()=>{if(docked){setTools(false);if(p.panel)p.onPanel(null);}else edgeHover.current=false;},[docked,p.panel]);
   useEffect(() => () => { void window.desktop?.setInteracting(false); }, []);
-  useEffect(() => () => clearTimeout(shakeTimer.current), []);
   useEffect(() => () => clearTimeout(hideTimer.current), []);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') { p.onPanel(null); setTools(false); } };
@@ -130,18 +127,15 @@ export default function DesktopCompanion(p: Props) {
   }, [p.onPanel]);
   const touchPet = () => {if(reading||p.moodBusy&&p.action!=='pet')return;if(dockedRef.current){peek(true);return;} void window.desktop?.revealPet(); revealTools(); p.onPet(); };
   function down(e: PointerEvent<HTMLButtonElement>) {
-    if (reading || resizing || p.moodBusy&&p.action!=='pet' || e.button !== 0) return;
+    if (reading || resizing || p.pet.sleeping || p.pet.activity || p.pet.outing || e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     if (p.panel) p.onPanel(null);
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
-    if(p.native)void window.desktop?.preparePetDrag();
-    drag.current = { x, y, lastX: x, lastY: y, moved: false, direction: 0, turns: 0, turnAt: performance.now(), offset };
+    const prepared=p.native?Promise.resolve(window.desktop?.preparePetDrag()).then(Boolean).catch(()=>false):undefined;
+    drag.current = { x, y, lastX: x, lastY: y, moved: false, direction: 0, turns: 0, turnAt: performance.now(), offset,prepared };
   }
   function move(e: PointerEvent<HTMLButtonElement>) {
     const d = drag.current; if (!d) {revealTools();return;}
-    // Repeated taps retain App's rapid-touch reaction; a busy petting action
-    // accepts taps without starting a second drag/animation at the same time.
-    if(p.moodBusy&&!d.moved)return;
     const x = p.native ? e.screenX : e.clientX, y = p.native ? e.screenY : e.clientY;
     if (!d.moved && Math.hypot(x - d.x, y - d.y) < 5) return;
     if (!d.moved) {
@@ -149,7 +143,19 @@ export default function DesktopCompanion(p: Props) {
       const held = painted ? paintedEdgeOffset(getComputedStyle(painted).transform) : { x: 0, y: 0 };
       // Freeze the painted point while IPC transfers that offset to the native
       // window. Disabling a live transition at its target would otherwise snap.
-      setHeldEdgeOffset(held);d.moved = true;void window.desktop?.startPetDrag(held);
+      setHeldEdgeOffset(held);d.moved = true;
+      // Manual pickup interrupts a finite performance, without changing its
+      // already committed care result, growth or saved clothing. Clear only
+      // the temporary drawing surface before asking the native window to move.
+      if(!['idle','still','waiting'].includes(p.action)||p.itemId)p.onStopUploaded();
+      if(p.native)void (async()=>{
+        const prepared=await d.prepared;
+        await window.desktop?.setPetEffectBounds?.(null);
+        if(drag.current!==d)return;
+        if(!prepared&&!await window.desktop?.preparePetDrag())throw Error('Native pickup unavailable');
+        if(drag.current!==d)return;
+        await window.desktop?.startPetDrag(held);
+      })().catch(()=>{if(drag.current===d){drag.current=null;setDragging(false);elastic.release();void window.desktop?.endPetDrag()}});
       setDragging(true); setTools(false); p.onPanel(null); playPetVoice('lift', p.sound);
       const body=e.currentTarget.getBoundingClientRect();elastic.start({x:d.x,y:d.y,at:performance.now()-16},(e.clientX-body.left)/body.width*100,(e.clientY-body.top)/body.height*100);
     }
@@ -203,7 +209,7 @@ export default function DesktopCompanion(p: Props) {
       <button className={`compact-pet-name ${p.pet.sleeping ? 'sleeping-badge' : ''}`} aria-label={p.pet.sleeping ? '叫醒拉姆' : '打开拉姆背包'} aria-hidden={detailsHidden} tabIndex={detailsHidden?-1:0} disabled={detailsHidden} onClick={() => p.pet.sleeping ? p.onCare('sleep') : show('food')}>{p.pet.name}</button>
       <button className="compact-pet-condition" data-testid="desktop-condition" data-condition={condition.id} data-attention={condition.attention} aria-label={p.pet.sleeping?'叫醒拉姆：睡梦中':`查看拉姆状态：${condition.label}`} aria-hidden={detailsHidden} tabIndex={detailsHidden?-1:0} disabled={detailsHidden} onClick={()=>p.pet.sleeping?p.onCare('sleep'):show('status')}>{condition.label}</button>
       <button className="desktop-character" data-testid="desktop-character" aria-label={reading?'拉姆正在看书':'拉姆：悬停互动，点击摸摸，按住拖动'} onPointerEnter={()=>{setDetailsHovered(true);revealTools();}} onPointerDown={down} onPointerMove={move} onPointerUp={e => up(e)} onPointerCancel={e => up(e, true)} onClick={e => { if (e.detail === 0) touchPet(); }}>
-        {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} gameSound={p.gameSound&&!docked} soundVolume={p.soundVolume} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} shaking={shaking} onActionEnd={p.onActionEnd}/>}
+        {!working&&<Ram companionId={p.pet.createdAt} costume={p.pet.wearing} gaze={gaze} sound={p.sound&&!docked} gameSound={p.gameSound&&!docked} soundVolume={p.soundVolume} color={p.pet.color} stage={p.stage} evolution={p.pet.evolution} action={displayAction} actionId={p.actionId} itemId={p.itemId} fromColor={p.fromColor} sleeping={p.pet.sleeping} peeking={docked && edge==='peek'} peekSide={edgeSide ?? undefined} edgeEntry={entering ? edgeSide ?? undefined : undefined} dragging={dragging} dragTilt={0} onActionEnd={p.onActionEnd}/>}
       </button>
       {working&&<DesktopRestaurantWork pet={p.pet} onView={p.onViewRestaurant} onStop={p.onStopWork}/>}
       {p.pet.outing&&<div className="pet-away-note" role="status"><img src="./assets/original/ui/icon-book-large.png" alt=""/><span>去{p.pet.outing.place}啦</span><small>{new Date(p.pet.outing.returnsAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} 回来</small><button onClick={p.onRecall}>叫拉姆回来</button></div>}

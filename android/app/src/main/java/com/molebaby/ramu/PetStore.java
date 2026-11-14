@@ -12,10 +12,11 @@ final class PetStore {
     PetStore(Context context){this.context=context;prefs=context.getSharedPreferences("mole-pet",Context.MODE_PRIVATE);}
     static boolean allowed(String key){return key!=null&&key.startsWith("ramu-")&&key.length()<160;}
     synchronized JSONObject snapshot(){JSONObject result=new JSONObject();for(Map.Entry<String,?> entry:prefs.getAll().entrySet())if(allowed(entry.getKey())&&entry.getValue() instanceof String)try{result.put(entry.getKey(),entry.getValue());}catch(JSONException ignored){}return result;}
+    synchronized JSONArray deletedKeys(){JSONArray result=new JSONArray();for(Map.Entry<String,?> entry:prefs.getAll().entrySet())if(entry.getKey().startsWith("deleted:")&&Boolean.TRUE.equals(entry.getValue())&&allowed(entry.getKey().substring(8)))result.put(entry.getKey().substring(8));return result;}
     synchronized boolean put(String key,String value){
         if(!allowed(key)||value!=null&&value.length()>1024*1024)return false;
-        String before=prefs.getString(key,null);SharedPreferences.Editor edit=prefs.edit();if(value==null)edit.remove(key);else edit.putString(key,value);
-        boolean ok=edit.commit();if(!ok){SharedPreferences.Editor rollback=prefs.edit();if(before==null)rollback.remove(key);else rollback.putString(key,before);rollback.apply();}return ok;
+        String before=prefs.getString(key,null),marker="deleted:"+key;boolean wasDeleted=prefs.getBoolean(marker,false);SharedPreferences.Editor edit=prefs.edit();if(value==null)edit.remove(key).putBoolean(marker,true);else edit.putString(key,value).remove(marker);
+        boolean ok=edit.commit();if(!ok){SharedPreferences.Editor rollback=prefs.edit();if(before==null)rollback.remove(key);else rollback.putString(key,before);if(wasDeleted)rollback.putBoolean(marker,true);else rollback.remove(marker);rollback.apply();}return ok;
     }
     boolean flush(){return prefs.edit().putLong("flushedAt",System.currentTimeMillis()).commit();}
     JSONObject pet(){return Json.parse(prefs.getString(SAVE,"{}"));}

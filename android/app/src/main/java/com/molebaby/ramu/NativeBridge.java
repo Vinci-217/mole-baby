@@ -7,7 +7,7 @@ import org.json.*;
 public final class NativeBridge {
     final RamuHost host;
     NativeBridge(RamuHost host){this.host=host;}
-    @JavascriptInterface public String bootstrap(){return Json.of("storage",host.store.snapshot(),"permissions",host.permissions(),"state",host.controller.state()).toString();}
+    @JavascriptInterface public String bootstrap(){return Json.of("storage",host.store.snapshot(),"deletedKeys",host.store.deletedKeys(),"permissions",host.permissions(),"state",host.controller.state()).toString();}
     @JavascriptInterface public boolean persist(String key,String value){boolean ok=host.store.put(key,value);if(ok)host.main.post(host::syncActivity);return ok;}
     @JavascriptInterface public void invoke(String id,String method,String raw){if(id==null||id.length()>64||method==null||raw==null||raw.length()>1200000)return;JSONObject args=Json.parse(raw);host.main.post(()->{try{Object result=call(method,args,id);if(result!=Deferred.INSTANCE)host.reply(id,result,null);}catch(Exception e){host.reply(id,null,e.getMessage()==null?"安卓操作暂时失败，请重试":e.getMessage());}});}
     private enum Deferred{INSTANCE}

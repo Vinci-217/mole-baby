@@ -23,14 +23,26 @@ declare global {
   }
 }
 
+const allowedStorageKey=(key:string)=>key.startsWith('ramu-')&&key.length<160;
+/** Missing mirror entries can belong to an older WebView/version. Preserve
+ * them and backfill the native store; only explicit deletion markers remove
+ * browser data. A failed mirror write must leave the original record intact. */
+export function hydrateAndroidStorage(storage:Storage,snapshot:Record<string,string>,deletedKeys:unknown,persist:(key:string,value:string|null)=>boolean){
+ const deleted=new Set(Array.isArray(deletedKeys)?deletedKeys.filter((key):key is string=>typeof key==='string'&&allowedStorageKey(key)):[]);
+ for(const key of Object.keys(storage))if(allowedStorageKey(key)&&!Object.hasOwn(snapshot,key)){
+  if(deleted.has(key))storage.removeItem(key);
+  else{const value=storage.getItem(key);if(value!==null)persist(key,value)}
+ }
+ for(const [key,value]of Object.entries(snapshot))if(allowedStorageKey(key)&&typeof value==='string')storage.setItem(key,value);
+}
+
 export function installAndroidHost(){
   const native=window.MoleAndroid;if(!native)return;
-  const bootstrap=JSON.parse(native.bootstrap()) as {storage:Record<string,string>;permissions:AndroidPermissions;state:DesktopState};
+  const bootstrap=JSON.parse(native.bootstrap()) as {storage:Record<string,string>;deletedKeys?:string[];permissions:AndroidPermissions;state:DesktopState};
   document.documentElement.classList.add('android-host');
   const original={set:Storage.prototype.setItem,remove:Storage.prototype.removeItem,clear:Storage.prototype.clear};
-  const allowed=(key:string)=>key.startsWith('ramu-')&&key.length<160;
-  for(const key of Object.keys(localStorage))if(allowed(key)&&!(key in bootstrap.storage))original.remove.call(localStorage,key);
-  for(const [key,value] of Object.entries(bootstrap.storage))if(allowed(key)&&typeof value==='string')original.set.call(localStorage,key,value);
+  const allowed=allowedStorageKey;
+  hydrateAndroidStorage(localStorage,bootstrap.storage,bootstrap.deletedKeys,(key,value)=>native.persist(key,value));
   Storage.prototype.setItem=function(key,value){
     const k=String(key),v=String(value),previous=this.getItem(k);original.set.call(this,k,v);
     if(this===localStorage&&allowed(k)&&!native.persist(k,v)){

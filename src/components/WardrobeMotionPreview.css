@@ -1,2 +1,41 @@
-.wardrobe-motion-page{min-height:100vh;padding:16px 20px 10px;box-sizing:border-box;background:#f6eedb;color:#795332;font-family:system-ui,sans-serif}.wardrobe-motion-page header{max-width:1000px;margin:auto;padding:0 4px 10px}.wardrobe-motion-page h1{font-size:20px;margin:0 0 4px}.wardrobe-motion-page header p{font-size:12px;margin:0 0 8px;color:#9c7f59}.wardrobe-motion-page header label{font-size:12px}.wardrobe-motion-page select,.wardrobe-motion-page header button{border:1px solid #d9c099;border-radius:6px;padding:4px 8px;background:#fff9ec;color:#795332;font:inherit;font-size:12px}.wardrobe-motion-page header button{margin-left:10px;cursor:pointer}.wardrobe-motion-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:1000px;margin:auto}.wardrobe-motion-grid figure{margin:0;background:#fffbf1;border:1px solid #e5d3af;border-radius:14px;overflow:hidden}.wardrobe-motion-track{height:163px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#edf6ec 0%,#edf6ec 89%,#dbe6d6 90%,#eef0df 91%);overflow:hidden}.wardrobe-moving-pet{width:100px;height:109px;position:relative;transform:translateX(var(--walking-x,0px))}.wardrobe-motion-grid figcaption{font-size:12px;text-align:center;padding:7px}.wardrobe-motion-page footer{text-align:center;font-size:10px;margin:10px;color:#9c7f59}@media(max-width:600px){.wardrobe-motion-page{padding:12px 8px}.wardrobe-motion-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}}
-.wardrobe-review-zoom{margin-left:12px}.wardrobe-motion-page.is-closeup .wardrobe-motion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wardrobe-motion-page.is-closeup .wardrobe-motion-track{height:326px}.wardrobe-motion-page.is-closeup .wardrobe-moving-pet{width:200px;height:218px}@media(max-width:600px){.wardrobe-motion-page.is-closeup .wardrobe-motion-grid{grid-template-columns:minmax(0,1fr)}}
+.wardrobe-motion-page {
+ min-height:100vh; padding:16px 20px 10px; box-sizing:border-box;
+ background:#f6eedb; color:#795332; font-family:system-ui,sans-serif;
+}
+.wardrobe-motion-page header {max-width:1000px;margin:auto;padding:0 4px 10px}
+.wardrobe-motion-page h1 {font-size:20px;margin:0 0 4px}
+.wardrobe-motion-page header p {font-size:12px;margin:0 0 8px;color:#9c7f59}
+.wardrobe-motion-page header label {font-size:12px}
+.wardrobe-motion-page select,.wardrobe-motion-page header button {
+ border:1px solid #d9c099;border-radius:6px;padding:4px 8px;
+ background:#fff9ec;color:#795332;font:inherit;font-size:12px;
+}
+.wardrobe-motion-page header button {margin-left:10px;cursor:pointer}
+.wardrobe-review-zoom {margin-left:12px}
+.wardrobe-motion-grid {
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:10px;max-width:1000px;margin:auto;
+}
+.wardrobe-motion-grid figure {
+ margin:0;background:#fffbf1;border:1px solid #e5d3af;border-radius:14px;overflow:hidden;
+}
+.wardrobe-motion-track {
+ height:240px;display:flex;align-items:center;justify-content:center;overflow:visible;
+ background:linear-gradient(180deg,#edf6ec 0%,#edf6ec 89%,#dbe6d6 90%,#eef0df 91%);
+}
+.wardrobe-moving-pet {width:120px;height:130px;position:relative;transform:translateX(var(--walking-x,0px))}
+.wardrobe-motion-grid figcaption {font-size:12px;text-align:center;padding:7px}
+.wardrobe-motion-grid figcaption small {display:block;line-height:1.5;color:#9a805f;font-size:10px;margin-top:4px}
+.wardrobe-motion-pages {display:flex;align-items:center;justify-content:center;gap:20px;margin:22px auto;font-size:13px}
+.wardrobe-motion-pages button {padding:7px 16px;border:1px solid #d9c099;border-radius:8px;color:#795332;background:#fff9ec}
+.wardrobe-motion-pages button:disabled {opacity:.4}
+.wardrobe-motion-page footer {text-align:center;font-size:10px;margin:10px;color:#9c7f59}
+.wardrobe-motion-page.is-closeup .wardrobe-motion-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+.wardrobe-motion-page.is-closeup .wardrobe-motion-track {height:326px}
+.wardrobe-motion-page.is-closeup .wardrobe-moving-pet {width:200px;height:218px}
+@media(max-width:600px) {
+ .wardrobe-motion-page {padding:12px 8px}
+ .wardrobe-motion-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .wardrobe-motion-track {height:220px}
+ .wardrobe-motion-page.is-closeup .wardrobe-motion-grid {grid-template-columns:minmax(0,1fr)}
+}

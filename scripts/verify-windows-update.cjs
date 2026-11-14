@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{spawn,execFileSync}=require('node:child_process'),asar=require('@electron/asar'),YAML=require('yaml');
 const {createUpdateServer}=require('./incremental-test-server.cjs');
 const root=path.resolve(__dirname,'..'),temporary=fs.mkdtempSync(path.join(os.tmpdir(),'mole-real-update-')),profile=path.join(temporary,'profile'),install=path.join(temporary,'MoleBabyUpdateFixture'),fixture=path.join(root,'artifacts/update-fixture-app'),config=path.join(root,'artifacts/update-fixture-builder.cjs');
-const args=process.argv.slice(2),legacy=args.includes('--legacy'),fullPayload=args.includes('--full-payload'),arch=args.includes('--ia32')?'ia32':'x64';
+const args=process.argv.slice(2),legacy=args.includes('--legacy'),fullPayload=args.includes('--full-payload'),forceFull=args.includes('--full-download'),arch=args.includes('--ia32')?'ia32':'x64';
 let service,log;
 function run(command,args,options={}){return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd:root,stdio:['ignore',log,log],windowsHide:true,...options});child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(Error(`Fixture command exited ${code}: ${command}`)))})}
 function powershell(script){return execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{encoding:'utf8',timeout:60000,windowsHide:true})}
@@ -9,6 +9,7 @@ const quote=value=>"'"+value.replaceAll("'","''")+"'";
 (async()=>{
  assert.equal(process.platform,'win32');fs.mkdirSync(profile,{recursive:true});fs.mkdirSync(fixture,{recursive:true});log=fs.openSync(path.join(root,'artifacts/windows-update-fixture.log'),'a');
  const payload={name:'小更新',color:'blue',growth:180,coins:1234,memories:['我们一起读过书。']},save=path.join(profile,'pet-save.json');fs.writeFileSync(save,JSON.stringify(payload));
+ if(forceFull)fs.writeFileSync(path.join(profile,'updates.json'),JSON.stringify({enabled:true,downloadPolicy:'full'}));
  const files=new Map();service=await createUpdateServer(files);
  fs.copyFileSync(path.join(root,'scripts/windows-update-fixture-main.cjs'),path.join(fixture,'main.cjs'));
  fs.writeFileSync(path.join(fixture,'config.json'),JSON.stringify({profile,feed:service.origin,arch,channel:legacy?`legacy-${arch}`:'latest'}));
@@ -35,12 +36,12 @@ const quote=value=>"'"+value.replaceAll("'","''")+"'";
  assert.deepEqual(fs.readFileSync(path.join(profile,'consents.jsonl'),'utf8').trim().split('\n').map(JSON.parse),[{operation:'download',version:'1.0.0'},{operation:'install',version:'1.0.0'}]);
  assert.deepEqual(JSON.parse(fs.readFileSync(save,'utf8')),payload);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(profile,'checkpoint.json'),'utf8')),{saved:true,version:'1.0.0'});
  assert.equal(JSON.parse(asar.extractFile(path.join(install,'resources/app.asar'),'package.json')).version,'1.0.1');
- const state=JSON.parse(fs.readFileSync(path.join(profile,'download-result.json'),'utf8'));assert.equal(state.downloadMode,'differential');assert.ok(state.reusedBytes>0);
- const downloads=service.requests.filter(r=>r.path.endsWith('.exe'));assert.ok(downloads.length>0);assert.ok(downloads.every(r=>r.range&&r.status===206),'Successful update must never request the entire installer');
+ const state=JSON.parse(fs.readFileSync(path.join(profile,'download-result.json'),'utf8'));assert.equal(state.downloadMode,forceFull?'full':'differential');if(!forceFull)assert.ok(state.reusedBytes>0);
+ const downloads=service.requests.filter(r=>r.path.endsWith('.exe'));assert.ok(downloads.length>0);assert.ok(downloads.every(r=>forceFull?!r.range&&r.status===200:r.range&&r.status===206),'Transfer must match the selected full/differential policy');
  const bytes=downloads.reduce((sum,r)=>sum+r.bodyBytes,0),indices=service.requests.filter(r=>r.path.endsWith('.blockmap')).reduce((sum,r)=>sum+r.bodyBytes,0);
- assert.ok(bytes<newSize);assert.ok(service.requests.some(r=>r.path.includes('/v1.0.0/')&&r.path.endsWith('.blockmap')),'Must find the old index in its own release');
+ if(forceFull)assert.equal(bytes,newSize);else{assert.ok(bytes<newSize);assert.ok(service.requests.some(r=>r.path.includes('/v1.0.0/')&&r.path.endsWith('.blockmap')),'Must find the old index in its own release');}
  const report={platform:'win32',arch,edition:legacy?'legacy':'modern',runtime:legacy?'22.3.27':require('../package.json').devDependencies.electron,fullProductPayload:fullPayload,fixtureVersions:['1.0.0','1.0.1'],fullPackageBytes:newSize,packageBytesTransferred:bytes,blockmapBytesTransferred:indices,totalUpdateBytesTransferred:service.requests.reduce((sum,r)=>sum+r.bodyBytes,0),savedPercent:Number(((1-(bytes+indices)/newSize)*100).toFixed(2)),rangeRequests:downloads.length,mode:state.downloadMode,installedVersion:'1.0.1',savePreserved:true,applicationRelaunched:true,limitation:'Two isolated installers contain the current product payload with a test main process and a version change; production release-to-release savings will vary'};
- fs.writeFileSync(path.join(root,`artifacts/incremental-windows-${legacy?'legacy-':''}${arch}.json`),JSON.stringify(report,null,2)+'\n');console.log('INCREMENTAL_REPORT '+JSON.stringify(report));
+ fs.writeFileSync(path.join(root,`artifacts/${forceFull?'full-update':'incremental'}-windows-${legacy?'legacy-':''}${arch}.json`),JSON.stringify(report,null,2)+'\n');console.log('INCREMENTAL_REPORT '+JSON.stringify(report));
  console.log('PASS: real Windows differential download, separate download/install consent, NSIS installation and relaunch, SHA512 verification, save checkpoint and companion data preservation');
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{
  try{powershell(`Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -and $_.Path.StartsWith(${quote(install)},[StringComparison]::OrdinalIgnoreCase)} | Stop-Process -Force -ErrorAction SilentlyContinue`)}catch{}

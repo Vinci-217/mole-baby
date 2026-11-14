@@ -6,9 +6,11 @@ const root=path.resolve(__dirname,'..'),manifest=require('../public/assets/origi
 const label=process.env.AUDIT_LABEL||'after',base=process.env.PREVIEW_URL||'http://127.0.0.1:5173';
 const out=path.join(root,'artifacts/wardrobe-interactions');fs.mkdirSync(out,{recursive:true});
 (async()=>{
- const rows=[],clips=manifest.clips.filter(c=>c.kind==='outfit'&&(!process.env.AUDIT_IDS||process.env.AUDIT_IDS.split(',').some(id=>c.path.endsWith('/'+id+'.swf')))).slice(Number(process.env.AUDIT_START||0),process.env.AUDIT_END?Number(process.env.AUDIT_END):undefined);
+ const journal=path.join(out,`${label}-pixels.jsonl`);
+ const rows=process.env.AUDIT_RESUME==='1'&&fs.existsSync(journal)?fs.readFileSync(journal,'utf8').trim().split('\n').filter(Boolean).map(JSON.parse):[];
+ const clips=manifest.clips.filter(c=>c.kind==='outfit'&&(!process.env.AUDIT_IDS||process.env.AUDIT_IDS.split(',').some(id=>c.path.endsWith('/'+id+'.swf')))).slice(Number(process.env.AUDIT_START||0),process.env.AUDIT_END?Number(process.env.AUDIT_END):undefined);
  let context,page,sequence=0;
- const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/local/bin/chromium',ignoreDefaultArgs:['--disable-dev-shm-usage'],args:['--disk-cache-size=10485760']});
+ const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/local/share/ms-playwright/chromium-1223/chrome-linux64/chrome',ignoreDefaultArgs:['--disable-dev-shm-usage'],args:['--disk-cache-size=10485760']});
  try{for(const [index,clip] of clips.entries()){
   if(index%8===0){await context?.close();context=await browser.newContext({viewport:{width:600,height:648}});page=await context.newPage();await page.goto(base+'/assets/original/official/runtime.html?token=audit');sequence=0;}
   const loadSequence=++sequence;

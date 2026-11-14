@@ -19,3 +19,4 @@
 @media(max-width:600px){.settings-panel .settings-section{padding:14px}.settings-panel .stage-settings .stage-choices,.settings-panel .stage-settings .stage-evolutions{grid-template-columns:repeat(3,minmax(0,1fr))}.settings-identity{flex-wrap:wrap;gap:9px}.settings-row{gap:10px}.stage-settings .growth-apply{align-items:flex-start;flex-direction:column}.growth-mode-choices small{font-size:10px}}
 
 .classic-app.is-room-fullscreen .classic-titlebar{display:none}.classic-app.is-room-fullscreen .cottage-scene{inset:0}
+.local-save-paths{font-size:12px;line-height:1.7;margin:14px 0}.local-save-paths dt{font-weight:600;margin-top:8px}.local-save-paths dd{margin:4px 0;padding:8px;background:#f4eddf;border-radius:6px;user-select:text;overflow-wrap:anywhere}.local-save-inspector .settings-hint{overflow-wrap:anywhere}

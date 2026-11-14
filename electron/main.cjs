@@ -62,14 +62,10 @@ const legacyProfiles = [
   originalUserDataPath,
 ];
 const explicitProfile = app.commandLine?.getSwitchValue('user-data-dir');
-const stableUserDataPath = explicitProfile ? path.resolve(explicitProfile)
-  : windowsEdition?.edition==='legacy' ? path.join(app.getPath('appData'),windowsEdition.userDataName)
-  : app.isPackaged
-    ? legacyProfiles.find(profile => ['Local Storage', 'window-state.json', 'companion-ai-key.json']
-      .some(filename => fs.existsSync(path.join(profile, filename)))) || legacyProfiles[0]
-    : originalUserDataPath;
+const stableUserDataPath = require('./profile-location.cjs').selectProfile({appData:app.getPath('appData'),original:originalUserDataPath,packaged:app.isPackaged,explicit:explicitProfile,legacyName:windowsEdition?.edition==='legacy'?windowsEdition.userDataName:undefined});
 app.setPath('userData', stableUserDataPath);
 app.setName(windowsEdition?.productName??'拉姆');
+const petStorage=require('./pet-storage.cjs').createPetStorage({directory:stableUserDataPath,profiles:legacyProfiles,version:applicationMetadata.version});
 
 let mainWindow = null;
 let rendererURL = '';
@@ -885,7 +881,7 @@ function startUpdates(){
  updates=createUpdates({
   version:applicationMetadata.version,platform:process.platform,arch:process.arch==='arm64'||app.runningUnderARM64Translation?'arm64':'x64',
   configFile:path.join(app.getPath('userData'),'updates.json'),cacheDirectory:path.join(app.getPath('userData'),'update-downloads'),
-  disabled:!app.isPackaged||process.env.MOLE_BABY_DISABLE_UPDATES==='1',
+  disabled:!app.isPackaged||applicationMetadata.animationPreview===true||process.env.MOLE_BABY_DISABLE_UPDATES==='1',
   installed:process.platform==='win32'&&fs.existsSync(path.join(path.dirname(process.execPath),windowsEdition.uninstallerName)),
   macSigned:applicationMetadata.macUpdateSigned===true,
   fetch:(url,options)=>net.fetch(url,options),openPath:file=>shell.openPath(file),
@@ -917,6 +913,11 @@ function updateTrayStatus(status){
 }
 
 function registerIPC() {
+  handle('saves:inspect',()=>petStorage.inspect());
+  handle('saves:checkpoint',(text,reason)=>petStorage.checkpoint(text,reason));
+  handle('saves:read',profile=>petStorage.read(profile));
+  handle('saves:open-folder',kind=>shell.openPath(petStorage.folder(kind)));
+  handle('saves:forget',petId=>petStorage.forget(petId));
   handle('desktop:set-pet-status',updateTrayStatus);
   handle('desktop:flush-save',()=>{mainWindow.webContents.session.flushStorageData();return true});
   handle('desktop:open-board',snapshot=>messageBoard.open(snapshot));

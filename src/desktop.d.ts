@@ -33,6 +33,13 @@ declare global {
       updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setDownloadPolicy:(policy:'auto'|'full')=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
       platform: string;
       flushSave?:()=>Promise<boolean>;
+      localSaves?:{
+        inspect:()=>Promise<{version:string;profileDirectory:string;storageDirectory:string;backupDirectory:string;profiles:{directory:string;active:boolean;hasBrowserData:boolean;hasBackup:boolean;backupAt:number|null;backupBytes:number}[]}>;
+        checkpoint:(text:string,reason?:'automatic'|'before-update'|'before-import')=>Promise<boolean>;
+        read:(profile?:string)=>Promise<string|null>;
+        openFolder:(kind:'profile'|'backups')=>Promise<string>;
+        forget:(petId:number)=>Promise<boolean>;
+      };
       messageBoard?:{
         open:(snapshot:import('./components/MessageBoard').BoardSnapshot)=>Promise<boolean>;
         publish:(snapshot:import('./components/MessageBoard').BoardSnapshot|null)=>Promise<unknown>;
@@ -40,7 +47,7 @@ declare global {
         change:(change:{petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>Promise<import('./components/MessageBoard').BoardSnapshot>;
         close:()=>Promise<void>;
         onSnapshot:(callback:(snapshot:import('./components/MessageBoard').BoardSnapshot|null)=>void)=>()=>void;
-        onPatch:(callback:(request:{id:number;petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>{ok:boolean;snapshot?:import('./components/MessageBoard').BoardSnapshot})=>()=>void;
+        onPatch:(callback:(request:{id:number;petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>{ok:boolean;reason?:string;snapshot?:import('./components/MessageBoard').BoardSnapshot})=>()=>void;
       };
       setMusicState:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
       onMusicToggle:(callback:(enabled:boolean)=>void)=>()=>void;

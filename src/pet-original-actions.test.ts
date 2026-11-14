@@ -4,12 +4,22 @@ import {restorePetBackup} from './pet-backup';
 import {createMemory,recordEvent} from './companion-memory';
 import {ITEMS} from './catalog';
 import {OFFICIAL_CLIPS,supportsOfficial} from './official-clips';
-import {FORM_NAMES,naturalOriginalActions,originalMagicActions,originalItemClip,originalPlayTools,playbackForm,autonomousOriginalActions,chooseAutonomousOriginal} from './pet-original-actions';
+import {FORM_NAMES,naturalOriginalActions,originalMagicActions,originalItemClip,originalPlayTools,playbackForm,autonomousOriginalActions,chooseAutonomousOriginal,autonomousActionLine} from './pet-original-actions';
 import type {RamForm} from './original-actions';
 
 const now=1_700_000_000_000;
 const pet=()=>({...createPet('小紫','blue',now),color:'#9c5fd4' as const,growth:60,stats:{hunger:90,thirst:90,cleanliness:90,happiness:90,health:100,energy:90}});
 describe('curated original interactions',()=>{
+ it('gives self-directed actions a readable intention instead of a raw source ID',()=>{
+  const base=pet();
+  const learned={...base,growth:840,evolution:'super' as const,education:{lessons:{magic:1,'element-fire':1,'element-water':1,'element-wood':1},graduated:{magic:now,'element-fire':now,'element-water':now,'element-wood':now}}};
+  for(const p of [base,learned])for(const action of autonomousOriginalActions(p)){
+   const line=autonomousActionLine(action);expect(line.length).toBeGreaterThan(5);expect(line).not.toMatch(/swf|ambient-|[a-f\d]{16}|tuya\d/);
+  }
+  expect(autonomousActionLine('ambient-element-fire-1')).toContain('小火苗魔法');
+  const drawing=originalPlayTools('junior').find(row=>row.name==='涂鸦一')!;
+  expect(autonomousActionLine('ambient-'+drawing.id)).toContain('涂鸦');
+ })
  it('uses each ordinary stage’s native classroom actors, excluding interfaces and duplicate content',()=>{
   const all=new Set<string>();
   for(const form of ['junior','middle','senior','classic'] as RamForm[]){

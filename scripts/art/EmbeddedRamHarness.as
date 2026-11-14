@@ -56,6 +56,7 @@ package §1200026_fla§ {
     ExternalInterface.addCallback("previewPrepare",previewPrepare);
     ExternalInterface.addCallback("previewPlay",previewPlay);
     ExternalInterface.addCallback("setBodyColor",setBodyColor);
+    ExternalInterface.addCallback("previewTextCount",previewTextCount);
    }
    sourceLoader=new Loader();
    var info:LoaderInfo=sourceLoader.contentLoaderInfo;
@@ -70,6 +71,10 @@ package §1200026_fla§ {
    info.addEventListener(IOErrorEvent.IO_ERROR,onError);
    info.addEventListener(SecurityErrorEvent.SECURITY_ERROR,onError);
    addEventListener(Event.ENTER_FRAME,onFrame);
+   // ENTER_FRAME runs before nested timeline scripts. Direction changes can
+   // recreate lamu_txt after that event, flashing the original ??? placeholder.
+   // EXIT_FRAME runs after those scripts and before the display is painted.
+   addEventListener(Event.EXIT_FRAME,cleanFrame);
    var params:Object=loaderInfo.parameters;
    requestedSymbol=String(params.symbol||"");
    form=String(params.form||"");
@@ -116,6 +121,17 @@ package §1200026_fla§ {
     if(child is TextField)node.removeChild(child);
     else if(child is DisplayObjectContainer)stripNameFields(child as DisplayObjectContainer);
    }
+  }
+  public function cleanFrame(e:Event):void {stripNameFields(holder);}
+  public function previewTextCount():int {return countText(holder);}
+  public function countText(node:DisplayObjectContainer):int {
+   var count:int=0;
+   for(var i:int=0;i<node.numChildren;i++){
+    var child:DisplayObject=node.getChildAt(i);
+    if(child is TextField&&child.visible)count++;
+    else if(child is DisplayObjectContainer)count+=countText(child as DisplayObjectContainer);
+   }
+   return count;
   }
   public function tintBodies(container:DisplayObjectContainer):void {
    for(var i:int=0;i<container.numChildren;i++){
@@ -176,6 +192,7 @@ package §1200026_fla§ {
     else if(direction&&hasLabel(mc,direction))mc.gotoAndStop(direction);
    }
    settle=12;
+   stripNameFields(holder);
    if(holding)holdTimelines(holder);
   }
   public function onLevel(e:Event):void {

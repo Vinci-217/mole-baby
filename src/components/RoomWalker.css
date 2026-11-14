@@ -4,7 +4,9 @@
 .room-walk-surface:disabled{pointer-events:none;cursor:default}
 .room-walk-surface:focus-visible{outline:2px dashed #fff6d3aa;outline-offset:-5px;border-radius:20px}
 .room-pet-position{position:absolute;width:0;height:0;pointer-events:none;z-index:2}
-.classic-app .room-pet-position>.scene-pet{left:0;bottom:0;transform:translateX(-50%);pointer-events:auto}
+.classic-app .room-pet-position>.scene-pet{left:0;bottom:0;width:var(--room-pet-width,150px);height:calc(var(--room-pet-height,163px) + 20px);transform:translateX(-50%);pointer-events:none}
+.classic-app .room-pet-position .scene-character{width:var(--room-pet-width,150px);height:var(--room-pet-height,163px);pointer-events:auto}
+.room-pet-position :is(.scene-bubble,.scene-pet-name button,.room-work-note){pointer-events:auto}
 .room-walk-target{position:absolute;width:20px;height:9px;border:2px solid #fff8d3bd;border-radius:50%;translate:-50% -50%;box-shadow:0 0 0 3px #9c723329;animation:room-target-pulse 1.2s ease-in-out infinite;z-index:1}
 @keyframes room-target-pulse{0%,100%{opacity:.65;scale:.85}50%{opacity:1;scale:1.1}}
 @media(prefers-reduced-motion:reduce){.room-walker *{animation:none!important}}

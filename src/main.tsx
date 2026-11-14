@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import LocalDebugSwitch from './components/LocalDebugSwitch';
 import {installLocalDebug} from './local-debug';
+import {recoverLocalPet} from './pet-backup';
 import RestaurantPreview from './components/RestaurantPreview';
 import ReadingPreview from './components/ReadingPreview';
 import WardrobePreview from './components/WardrobePreview';
@@ -22,6 +23,12 @@ import './improvements.css';
 const viewport=()=>document.documentElement.style.setProperty('--app-height',`${window.innerHeight}px`);
 viewport();window.addEventListener('resize',viewport);
 import {installAndroidHost} from './android-host';
+import {installWebApp} from './web-app';
 installAndroidHost();
 installLocalDebug();
+installWebApp();
+async function mount(){
+ if(location.hash!=='#message-board')try{await recoverLocalPet(localStorage,window.desktop?.localSaves)}catch{/* An unreadable backup stays available for manual inspection. */}
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><LocalDebugSwitch/>{location.hash==='#message-board'?<StandaloneMessageBoard/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='all-animations'?<AllAnimationsPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='size-review'?<AnimationSizePreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='official'?<OfficialAnimationPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='reading'?<ReadingPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe-motion'?<WardrobeMotionPreview/>:!window.desktop&&!window.mobile&&new URLSearchParams(location.search).get('preview')==='wardrobe'?<WardrobePreview/>:!window.desktop&&!window.mobile&&['restaurant','desktop-work'].includes(new URLSearchParams(location.search).get('preview')??'')?<RestaurantPreview/>:<App />}</React.StrictMode>);
+}
+void mount();

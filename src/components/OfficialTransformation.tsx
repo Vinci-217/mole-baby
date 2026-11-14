@@ -7,9 +7,9 @@ import OfficialRamClip from './OfficialRamClip';
 import SharedMagicBox from './SharedMagicBox';
 
 /** Prepare the source once, hold its clock, then play between two smoke clouds. */
-export default function OfficialTransformation({clip,form,bodyForm=form,color,startedAt,sound,volume,children,onEnd}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;startedAt:number;sound:boolean;volume:number;children:ReactNode;onEnd?:(completed?:boolean)=>void}){
+export default function OfficialTransformation({clip,form,bodyForm=form,color,startedAt,sound,volume,children,onEnd,onSubject}:{clip:OfficialClip;form:RamForm;bodyForm?:RamForm;color:PetColor;startedAt:number;sound:boolean;volume:number;children:ReactNode;onEnd?:(completed?:boolean)=>void;onSubject?:(subject:string)=>void}){
  const [visible,setVisible]=useState(false);
  const load=useMemo(()=>{let resolve!:()=>void,reject!:(reason:Error)=>void;const ready=new Promise<void>((yes,no)=>{resolve=yes;reject=no});return {ready,resolve,reject}},[]);
- const subject=useCallback((value:string)=>setVisible(value==='box'),[]);
- return <SharedMagicBox startedAt={startedAt} prepare={load.ready} targetDuration={OFFICIAL_DURATION} onSubject={subject} onEnd={onEnd} label={`烟雾变身 · ${clip.name} · 恢复原形`} target={<OfficialRamClip clip={clip} form={form} bodyForm={bodyForm} color={color} paused={!visible} sound={visible&&sound} volume={volume} onReady={load.resolve} onError={()=>load.reject(new Error('原版变身素材加载失败'))} fallback={children}/>}>{children}</SharedMagicBox>;
+ const subject=useCallback((value:string)=>{setVisible(value==='box');onSubject?.(value)},[onSubject]);
+ return <SharedMagicBox startedAt={startedAt} form={bodyForm} prepare={load.ready} targetDuration={OFFICIAL_DURATION} onSubject={subject} onEnd={onEnd} label={`烟雾变身 · ${clip.name} · 恢复原形`} target={<OfficialRamClip clip={clip} form={form} bodyForm={bodyForm} color={color} paused={!visible} sound={visible&&sound} volume={volume} onReady={load.resolve} onError={()=>load.reject(new Error('原版变身素材加载失败'))} fallback={children}/>}>{children}</SharedMagicBox>;
 }

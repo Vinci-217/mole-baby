@@ -11,6 +11,10 @@ async function hashFile(file){const h=crypto.createHash('sha256');for await(cons
 /** No renderer-supplied URLs, executable paths, versions or feed overrides. */
 function createUpdates(options){
  const{version,platform,arch,configFile,cacheDirectory,fetch:fetcher,openPath,prepareInstall,onChange=()=>{},onAvailable=()=>{},onReady=()=>{}}=options;
+ // The update cache is a disposable package directory, never the profile or
+ // one of its user-storage directories. Downloads cannot clean user records.
+ const profile=path.resolve(path.dirname(configFile)),cache=path.resolve(cacheDirectory);
+ if(cache===profile||profile.startsWith(cache+path.sep)||cache.split(path.sep).some(part=>['Local Storage','save-backups'].includes(part)))throw Error('Unsafe update cache directory');
  const supported=['win32','darwin'].includes(platform),disabled=Boolean(options.disabled)||!supported;
  const preferences=readPreferences(configFile),initiallyEnabled=preferences.enabled;
  const automaticInstall=platform==='win32'?Boolean(options.installed):platform==='darwin'&&options.macSigned===true;
@@ -160,7 +164,7 @@ function createUpdates(options){
  }
  async function install(confirmed=false){
   if(confirmed!==true||disabled||disposed||state.status!=='ready')return false;
-  if(!automaticInstall){if(!downloadedFile)return false;try{const error=await openPath(downloadedFile);if(error)throw Error(error);if(platform==='darwin')publish({message:'DMG 已打开：将「拉姆」拖到「应用程序」并选择替换，然后退出旧版并重新打开。打开 DMG 本身还没有完成更新。'});return !disposed}catch{publish({message:'安装包暂时无法打开，请稍后重试。'});return false}}
+  if(!automaticInstall){if(!downloadedFile)return false;try{if(prepareInstall&&!await prepareInstall()){publish({message:'存档备份尚未完成，请稍后重试更新。'});return false}ensureActive();const error=await openPath(downloadedFile);if(error)throw Error(error);if(platform==='darwin')publish({message:'存档已备份。DMG 已打开：将「拉姆」拖到「应用程序」并选择替换，然后退出旧版并重新打开。打开 DMG 本身还没有完成更新。'});return !disposed}catch{publish({message:'存档备份或安装包打开未完成，请稍后重试。'});return false}}
   publish({status:'installing',message:'正在保存拉姆，确认更新后会自动回来。'});
   try{if(!await prepareInstall())throw Error('Save was not acknowledged');ensureActive();loadEngine().quitAndInstall(true,true);return true}
   catch{publish({status:'ready',message:'存档尚未准备好，请稍后重试更新。'});return false}

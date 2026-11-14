@@ -12,7 +12,7 @@ export function pointInPaintedRect(data:Uint8ClampedArray,width:number,height:nu
   return alphaAt(data,width,height,(clientX-rect.left)/rect.width*width,(clientY-rect.top)/rect.height*height,threshold)
 }
 export function isRamBodyPoint(root:HTMLElement,clientX:number,clientY:number):boolean {
-  const canvases=[...root.querySelectorAll<HTMLCanvasElement>('canvas.ram-classic-frame,canvas.seed-body-frame')].filter(canvas=>getComputedStyle(canvas).visibility!=='hidden'&&canvas.width>0&&canvas.height>0)
+  const canvases=[...root.querySelectorAll<HTMLCanvasElement>('canvas.ram-classic-frame,canvas.seed-body-frame')].filter(canvas=>getComputedStyle(canvas).visibility!=='hidden'&&canvas.getClientRects().length>0&&(!canvas.classList.contains('official-hit-mask')||canvas.dataset.loaded==='true')&&canvas.width>0&&canvas.height>0)
   let painted=false
   for(const canvas of canvases){
     const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');if(!ctx)continue

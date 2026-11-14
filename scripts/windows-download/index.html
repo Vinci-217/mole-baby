@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; object-src 'none'">
+  <title>拉姆 · Windows 测试包</title>
+  <style>
+    :root{color-scheme:light;font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;color:#573d27;background:#f7f2e8}
+    *{box-sizing:border-box}body{margin:0;padding:60px 20px}main{max-width:680px;margin:auto;padding:36px;border:1px solid #e3d7c4;background:#fffdf8;border-radius:22px;box-shadow:0 15px 45px #6246210a}
+    .eyebrow{color:#96764e;font-size:13px;letter-spacing:.08em}h1{font-size:28px;line-height:1.3;margin:8px 0 20px}p{margin:12px 0}.muted{font-size:14px;color:#806d57}
+    progress{display:block;width:100%;height:15px;margin:24px 0 12px;accent-color:#8c642d}#status{min-height:3.3em;overflow-wrap:anywhere}#status[data-error=true]{color:#a53527}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}button{border:0;border-radius:10px;background:#805728;color:white;font:inherit;font-weight:600;padding:12px 20px;cursor:pointer}button.secondary{background:#efe5d4;color:#634a2d}button:disabled{opacity:.45;cursor:default}[hidden]{display:none!important}
+    details{margin-top:26px;border-top:1px solid #eadecc;padding-top:16px;font-size:13px;color:#806d57}summary{cursor:pointer}code{display:block;word-break:break-all;font:12px/1.6 ui-monospace,monospace;margin-top:8px}a{color:#805728}
+    @media(max-width:520px){body{padding:24px 12px}main{padding:24px}h1{font-size:24px}button{width:100%}}
+  </style>
+</head>
+<body>
+<main>
+  <span class="eyebrow">WINDOWS 10 / 11 · x64 · 本地测试版</span>
+  <h1>把完整的拉姆带回电脑</h1>
+  <p id="size">正在读取安装包信息…</p>
+  <p class="muted">分段下载并逐段校验。网络中断后，重新打开本页即可继续；全部通过校验后才能保存安装包。</p>
+  <progress id="progress" max="100" value="0" aria-label="已校验的下载进度"></progress>
+  <p id="status" role="status" aria-live="polite">准备中…</p>
+  <div class="actions">
+    <button id="start" disabled>开始下载并校验</button>
+    <button id="pause" class="secondary" hidden>暂停</button>
+    <button id="save" hidden>保存完整安装包</button>
+  </div>
+  <p class="muted">保存完成后双击安装。原有拉姆存档继续保留。若旧文件只有四百多 MB，请使用本页重新取得完整文件。</p>
+  <p class="muted">推荐使用 Windows Edge 或 Chrome。内嵌窗口无法保存时，可<a href="./" target="_blank" rel="noopener">在独立窗口打开本页</a>。</p>
+  <details><summary>文件校验信息</summary><p id="filename"></p><code id="sha"></code><p id="checks"></p></details>
+  <noscript>请使用开启 JavaScript 的 Edge 或 Chrome 浏览器打开本页。</noscript>
+</main>
+<script type="module" src="./download.mjs"></script>
+</body>
+</html>

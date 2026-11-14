@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
 const root=path.resolve(__dirname,'..');
-const compiled=require('esbuild').buildSync({stdin:{contents:"export {createPet,parseSave} from './src/game';export {createMemory,recordEvent} from './src/companion-memory';",resolveDir:root},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text;
+const compiled=Module.createRequire(require.resolve('vite'))('esbuild').buildSync({stdin:{contents:"export {createPet,parseSave} from './src/game';export {createMemory,recordEvent} from './src/companion-memory';",resolveDir:root},bundle:true,platform:'node',format:'cjs',write:false}).outputFiles[0].text;
 const name=path.join(__dirname,'qa-fixture-bundle.cjs'),bundle=new Module(name);bundle.paths=module.paths;bundle._compile(compiled,name);
 const {createPet,parseSave,createMemory,recordEvent}=bundle.exports;
 module.exports=function loadFixture(out){
@@ -13,6 +13,10 @@ module.exports=function loadFixture(out){
  const snapshot=JSON.parse(fs.readFileSync(file,'utf8'));
  // Compare the application's ordinary normalized save, not inconsistent raw
  // legacy fields. Never rewrite the persisted fixture or a player's profile.
- const pet=parseSave(snapshot['ramu-house-save-v1'],Date.now());if(!pet)throw Error('Invalid QA fixture');
+ // Keep the same persisted QA identity/inventory/memories, but start a visual
+ // test at the recorded needs. Offline decay is covered separately and would
+ // otherwise turn an animation assertion into a thirst/sleep condition test.
+ const now=Date.now(),raw=JSON.parse(snapshot['ramu-house-save-v1']);
+ const pet=parseSave(JSON.stringify({...raw,lastTick:now}),now);if(!pet)throw Error('Invalid QA fixture');
  return {snapshot,pet};
 };

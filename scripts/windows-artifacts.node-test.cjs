@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const zlib = require('node:zlib');
-const { inspectPe, zipDirectory, zipEntryBytes, verifyPortableZip, crc32 } = require('./windows-artifacts.cjs');
+const { inspectPe, verifyNsisInstaller, zipDirectory, zipEntryBytes, verifyPortableZip, crc32 } = require('./windows-artifacts.cjs');
 
 function executable(architecture = 'x64') {
   const bytes = Buffer.alloc(1024), pe = 128, optional = pe + 24;
@@ -64,6 +64,28 @@ test('PE validation rejects truncated certificate data without altering signatur
   const bytes = executable(), optional = 128 + 24;
   bytes.writeUInt32LE(16, optional + 108); bytes.writeUInt32LE(1000, optional + 112 + 32); bytes.writeUInt32LE(100, optional + 112 + 36);
   assert.throws(() => inspectPe(bytes), /certificate.*truncated/);
+});
+test('NSIS startup CRC rejects truncation and payload corruption even with an intact executable stub', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mole-nsis-crc-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const filename = path.join(root, 'Setup.exe');
+  const bytes = Buffer.concat([executable('x86'), Buffer.alloc(1024, 42)]), header = 1024;
+  bytes.writeUInt32LE(0, header);
+  Buffer.from('efbeadde4e756c6c736f6674496e7374', 'hex').copy(bytes, header + 4);
+  bytes.writeUInt32LE(200, header + 20); bytes.writeUInt32LE(bytes.length - header, header + 24);
+  bytes.writeUInt32LE(crc32(bytes.subarray(512, -4)), bytes.length - 4);
+  fs.writeFileSync(filename, bytes);
+  assert.equal((await verifyNsisInstaller(filename)).startupCRC, 'passed');
+  fs.writeFileSync(filename, bytes.subarray(0, 1800));
+  await assert.rejects(verifyNsisInstaller(filename), /truncated installer/);
+  const damaged = Buffer.from(bytes); damaged[1500] ^= 1; fs.writeFileSync(filename, damaged);
+  await assert.rejects(verifyNsisInstaller(filename), /startup CRC mismatch/);
+  const stubDamage = Buffer.from(bytes); stubDamage[700] ^= 1; fs.writeFileSync(filename, stubDamage);
+  await assert.rejects(verifyNsisInstaller(filename), /startup CRC mismatch/);
+  fs.writeFileSync(filename, Buffer.concat([bytes, Buffer.alloc(300, 12)]));
+  assert.equal((await verifyNsisInstaller(filename)).startupCRC, 'passed', 'Trailing signature data does not participate in startup CRC');
+  const disabled = Buffer.from(bytes); disabled.writeUInt32LE(4, header); fs.writeFileSync(filename, disabled);
+  await assert.rejects(verifyNsisInstaller(filename), /disabled/);
 });
 test('ZIP validates stored and deflated bytes with CRC and local/central agreement', () => {
   assert.equal(crc32(Buffer.from('123456789')), 0xcbf43926);

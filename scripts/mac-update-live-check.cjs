@@ -8,7 +8,7 @@ async function verifyMacUpdateNetwork(desktop){
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'mole-mac-update-live-'));
   const{createUpdates}=require(path.join(app.getAppPath(),'electron/updates.cjs'));
   const{createUpdatePrompts}=require(path.join(app.getAppPath(),'electron/update-prompts.cjs'));
-  let opened=false,consent=false,dialogCount=0,mountedVersion,signalAvailable,signalError;
+  let opened=false,consent=false,dialogCount=0,mountedVersion,signalAvailable,signalError,saveAllowed=false,saveCheckpoints=0;
   const available=new Promise((resolve,reject)=>{signalAvailable=resolve;signalError=reject});
   const updates=createUpdates({version:'0.0.0',platform:'darwin',arch:process.arch,macSigned:false,
    configFile:path.join(directory,'config.json'),cacheDirectory:path.join(directory,'downloads'),
@@ -24,7 +24,7 @@ async function verifyMacUpdateNetwork(desktop){
      if(mountedVersion!==updates.getState().version)throw Error('Mounted application version mismatch');
      opened=true;return'';
     }finally{if(attached)execFileSync('/usr/bin/hdiutil',['detach',mount],{timeout:30000,stdio:'pipe'})}
-   },engineFactory:()=>{throw Error('Unsigned Mac must use verified DMG')},prepareInstall:async()=>false});
+   },engineFactory:()=>{throw Error('Unsigned Mac must use verified DMG')},prepareInstall:async()=>{saveCheckpoints++;return saveAllowed}});
   const prompts=createUpdatePrompts({getUpdates:()=>updates,platform:'darwin',showMessageBox:async()=>{dialogCount++;return{response:consent?0:1}}});
   let timeout;
   try{
@@ -34,10 +34,12 @@ async function verifyMacUpdateNetwork(desktop){
    if(fs.existsSync(path.join(directory,'downloads')))throw Error('Downloaded without consent');
    if(await prompts.offerDownload()||fs.existsSync(path.join(directory,'downloads')))throw Error('Dismissing download prompt granted consent');
    consent=true;if(!await prompts.download()||updates.getState().status!=='ready')throw Error(updates.getState().message);
-   if(!await prompts.install()||!opened||dialogCount!==3)throw Error('Confirmed DMG open did not complete');
-   return {version,mountedVersion,arch:process.arch,verified:true};
+   if(await prompts.install()||opened||saveCheckpoints!==1||updates.getState().status!=='ready')throw Error('A failed save checkpoint must block opening the DMG');
+   saveAllowed=true;
+   if(!await prompts.install()||!opened||dialogCount!==4||saveCheckpoints!==2)throw Error('Confirmed DMG open did not complete after a successful save checkpoint');
+   return {version,mountedVersion,arch:process.arch,verified:true,saveCheckpoints};
   }finally{clearTimeout(timeout);prompts.dispose();updates.dispose();fs.rmSync(directory,{recursive:true,force:true})}
  });
- console.log(`PASS Mac live updater: real 8s startup check fetched v${result.version} ${result.arch}; decline/confirm prompts, DMG download + SHA256 and mounted app v${result.mountedVersion} verified; application replacement not performed`);
+ console.log(`PASS Mac live updater: real 8s startup check fetched v${result.version} ${result.arch}; decline/confirm prompts, failed-save blocking and successful-save retry, DMG download + SHA256 and mounted app v${result.mountedVersion} verified; application replacement not performed`);
 }
 module.exports={verifyMacUpdateNetwork};

@@ -14,7 +14,7 @@ ITEMS=[('flower-crown','1200006','鲜花花冠'),('knight-shield','1200024','骑
 framesPerDirection=24;rows=[];receipt=[]
 withBody='--with-body' in sys.argv
 bodyTimeline=Timeline(ROOT/'local-assets/research/wardrobe-expansion/lamubone.xml') if withBody else None
-registrations=json.loads((ROOT/'public/assets/original/wardrobe-motion/runtime.json').read_text())['outfits']
+registrations=json.loads((ROOT/'local-assets/retired/v0333-wardrobe/generated-wardrobe-motion/runtime.json').read_text())['outfits']
 for name,sid,label in ITEMS:
  src=ROOT/f'local-assets/research/wardrobe-expansion/{sid}.xml';tl=Timeline(src);dirs,outer=tl.stage('middle')
  assert dirs and all(d in tl.labels(dirs) for d,_ in DIRECTIONS)

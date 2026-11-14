@@ -12,5 +12,5 @@ const root=path.resolve(__dirname,'../..');
   }
   result[kind]={source:file,sha256:crypto.createHash('sha256').update(source).digest('hex'),bounds};
  }
- fs.writeFileSync(path.join(root,'public/assets/original/wardrobe-motion/super-body-bounds.json'),JSON.stringify(result)+'\n');
+ fs.writeFileSync(path.join(root,'local-assets/retired/v0333-wardrobe/generated-wardrobe-motion/super-body-bounds.json'),JSON.stringify(result)+'\n');
 })().catch(error=>{console.error(error);process.exitCode=1});

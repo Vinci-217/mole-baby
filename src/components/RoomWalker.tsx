@@ -1,28 +1,31 @@
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
-import type {KeyboardEvent,PointerEvent,ReactNode} from 'react'
+import type {CSSProperties,KeyboardEvent,PointerEvent,ReactNode} from 'react'
 import type {Stage,Evolution} from '../game'
 import visibility from '../../electron/edge-visibility.json'
 import {ramForm} from '../original-actions'
 import {roomWalkArea,roomWalkClickTop,roomWalkTarget,stepRoomWalk,type RoomPoint} from '../room-walk'
 import './RoomWalker.css'
+import {ROOM_PET_BASE,roomPetScale,roomPetMaxScale} from '../room-pet-size'
+import RoomPetSizeEditor,{RoomPetSizeActions} from './RoomPetSizeEditor'
 
-export default function RoomWalker({stage,evolution,blocked:interactionBlocked,randomWalk=true,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;children:(action:string|null)=>ReactNode}) {
- const blocked=interactionBlocked||stage===0
- const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),placedByUser=useRef(false)
+export default function RoomWalker({stage,evolution,blocked:interactionBlocked,randomWalk=true,scale=1,sizing=false,onScale,onSizeFinish,children}:{stage:Stage;evolution?:Evolution;blocked:boolean;randomWalk?:boolean;scale?:number;sizing?:boolean;onScale?:(scale:number)=>void;onSizeFinish?:(commit:boolean)=>void;children:(action:string|null)=>ReactNode}) {
+ const blocked=interactionBlocked||stage===0||sizing
+ const root=useRef<HTMLDivElement>(null),point=useRef<RoomPoint>({x:0,y:0}),positioned=useRef(false)
  const [area,setArea]=useState(()=>roomWalkArea(1000,750)),[position,setPosition]=useState<RoomPoint|null>(null)
+ const maxScale=roomPetMaxScale(area.width),effectiveScale=Math.min(maxScale,roomPetScale(scale))
  const [target,setTarget]=useState<RoomPoint|null>(null),[moving,setMoving]=useState(false),[direction,setDirection]=useState('walk-right')
  useLayoutEffect(()=>{
   const element=root.current;if(!element)return
   const measure=()=>{
    const box=element.getBoundingClientRect(),dock=element.parentElement?.querySelector('.room-dock')?.getBoundingClientRect()
-   const next=roomWalkArea(box.width,box.height,dock?dock.top-box.top:undefined);setArea(next)
-   point.current=roomWalkTarget(placedByUser.current?point.current:{x:box.width/2,y:next.bottom-25},next)
+   const next=roomWalkArea(box.width,box.height,dock?dock.top-box.top:undefined,Math.min(roomPetMaxScale(box.width),roomPetScale(scale)));setArea(next)
+   point.current=roomWalkTarget(positioned.current?point.current:{x:box.width/2,y:next.bottom-25},next);positioned.current=true
    setPosition(point.current);setTarget(t=>t?roomWalkTarget(t,next):null)
   }
   const observer=new ResizeObserver(measure);observer.observe(element)
   const dock=element.parentElement?.querySelector('.room-dock');if(dock)observer.observe(dock)
   measure();return()=>observer.disconnect()
- },[])
+ },[scale])
  useEffect(()=>{
   if(blocked||!target){setMoving(false);if(blocked)setTarget(null);return}
   const media=window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -48,7 +51,7 @@ export default function RoomWalker({stage,evolution,blocked:interactionBlocked,r
   },10000+Math.random()*8000);
   return()=>window.clearInterval(timer);
  },[randomWalk,blocked,target,stage,area]);
- const go=(next:RoomPoint,manual=false)=>{if(!blocked&&( !manual || next.y>=roomWalkClickTop(area) )){placedByUser.current=true;setTarget(roomWalkTarget(next,area))}}
+ const go=(next:RoomPoint,manual=false)=>{if(!blocked&&( !manual || next.y>=roomWalkClickTop(area) ))setTarget(roomWalkTarget(next,area))}
  useEffect(()=>{
   const element=root.current;if(!element)return
   const redirect=(event:Event)=>{
@@ -72,11 +75,12 @@ export default function RoomWalker({stage,evolution,blocked:interactionBlocked,r
  const motion=(!blocked&&moving)?direction:null
  // Match the measured original body baseline, rather than the name label.
  // Room CSS fixes the character at 150x163, 20px above its name anchor.
- const footOffset=183-visibility.forms[ramForm(stage,evolution)].body[3]*1.5
- return <div ref={root} className={`room-walker ${moving&&!blocked?'is-moving':''}`} data-stage={stage} data-moving={moving&&!blocked}>
+ const footOffset=ROOM_PET_BASE.nameOffset+(ROOM_PET_BASE.height-visibility.forms[ramForm(stage,evolution)].body[3]*1.5)*effectiveScale
+ return <div ref={root} className={`room-walker ${moving&&!blocked?'is-moving':''} ${sizing?'is-sizing':''}`} data-stage={stage} data-moving={moving&&!blocked} data-pet-scale={effectiveScale} style={{'--room-pet-width':`${ROOM_PET_BASE.width*effectiveScale}px`,'--room-pet-height':`${ROOM_PET_BASE.height*effectiveScale}px`} as CSSProperties}>
   <button className="room-walk-surface" aria-label="小屋地面，点击让拉姆走过去" disabled={blocked} onPointerDown={down} onKeyDown={key}
   style={{left:area.left,top:roomWalkClickTop(area),width:area.right-area.left,height:area.bottom-roomWalkClickTop(area)}}/>
   {!blocked&&target&&<span className="room-walk-target" aria-hidden="true" style={{left:target.x,top:target.y}}/>}
-  <div className="room-pet-position" style={{left:position?.x??'50%',top:position?position.y+footOffset:'72%'}} data-speech-side={(position?.x??area.width/2)>area.width/2?'left':'right'} data-x={position?.x.toFixed(2)} data-y={position?.y.toFixed(2)}>{children(motion)}</div>
+  <div className="room-pet-position" style={{left:position?.x??'50%',top:position?position.y+footOffset:'72%'}} data-speech-side={(position?.x??area.width/2)>area.width/2?'left':'right'} data-x={position?.x.toFixed(2)} data-y={position?.y.toFixed(2)}>{children(motion)}{sizing&&onScale&&onSizeFinish&&<RoomPetSizeEditor scale={effectiveScale} maxScale={maxScale} onChange={onScale}/>}</div>
+  {sizing&&onScale&&onSizeFinish&&<RoomPetSizeActions scale={effectiveScale} onDefault={()=>onScale(1)} onFinish={onSizeFinish}/>}
  </div>
 }

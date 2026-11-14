@@ -34,7 +34,11 @@ function createMessageBoard({ipcMain,BrowserWindow,getMain,isMain,preload,indexP
  ipcMain.on('board:reply',(event,id,result)=>{
   if(!isMain(event)||!pending||pending.id!==id)return;
   const task=pending;pending=null;clearTimeout(task.timer);
-  if(result?.ok&&valid(result.snapshot)){update(result.snapshot);task.resolve(snapshot)}else task.reject(new Error('留言未保存，请重试。'));
+  if(result?.ok&&valid(result.snapshot)){update(result.snapshot);task.resolve(snapshot)}
+  else{
+   if(result?.reason==='stale'&&valid(result.snapshot))update(result.snapshot);
+   task.reject(new Error(result?.reason==='stale'?'留言已有更新，请重试。':result?.reason==='storage'?'本地存储写入失败，请检查存储空间。':'留言未保存，请重试。'));
+  }
  });
  ipcMain.handle('board:close',event=>{requireBoard(event);window.close()});
  return{open,update,isOpen:()=>Boolean(window&&!window.isDestroyed())};
