@@ -15,6 +15,7 @@ async function main(){
   const choose=value=>page.evaluate(value=>window.animationSizeReview.select(value),value);
   const rows=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('ramu-original-frame-cache-v1',1);r.onsuccess=()=>{const db=r.result;if(!db.objectStoreNames.contains('frames')){db.close();resolve([]);return}const q=db.transaction('frames').objectStore('frames').getAll();q.onsuccess=()=>{resolve(q.result.map(row=>row.key));db.close()};q.onerror=()=>reject(q.error)};r.onerror=()=>reject(r.error)}));
   await expect(clip).toHaveAttribute('data-loaded','true',{timeout:45000});
+  await expect(clip.locator('iframe')).toHaveCSS('opacity','1');
   const iframe=await clip.locator('iframe').elementHandle(),runtime=await iframe.contentFrame();
   const origin=await runtime.evaluate(()=>{window.__cacheOriginalPlayer=window.player;return performance.timeOrigin});
   await expect.poll(async()=>(await rows()).some(key=>key.includes(':junior:super:')),{timeout:10000}).toBe(true);
@@ -25,6 +26,7 @@ async function main(){
    assert(await iframe.evaluate(node=>node.isConnected),'The ready engine stays connected while parked');
    const began=Date.now();await choose({form:'super',outfit:'leaf-hood',action:'idle'});
    await expect(clip).toHaveAttribute('data-loaded','true',{timeout:10000});
+   await expect(clip.locator('iframe')).toHaveCSS('opacity','1');
    assert(await subject.locator('iframe').evaluate((node,previous)=>node===previous,iframe),'The same live iframe returns');
    assert.equal(await runtime.evaluate(()=>performance.timeOrigin),origin,'Iframe document was not reloaded');
    assert(await runtime.evaluate(()=>window.__cacheOriginalPlayer===window.player),'The original AVM is reused');

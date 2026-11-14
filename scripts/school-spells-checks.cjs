@@ -60,7 +60,7 @@ async function verifySchoolSpells(page){
   }
   console.log('PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, three desktop magic tabs and apex entries, three apex casts with pure-white smoke and restored outfit');
  }catch(error){failed=true;console.error('School/spells error:',error);throw error;}finally{
-  if(clock)await page.clock.resume();await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(e=>{if(!failed)throw e});
+  if(clock){await page.clock.resume();await page.clock.setSystemTime(new Date())}await page.evaluate(s=>{localStorage.clear();for(const[k,v]of Object.entries(s))localStorage.setItem(k,v)},snapshot);await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor().catch(e=>{if(!failed)throw e});
  }
 }
 module.exports={verifySchoolSpells};

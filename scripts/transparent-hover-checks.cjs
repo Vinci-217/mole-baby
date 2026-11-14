@@ -57,7 +57,7 @@ async function verifyTransparentHover(page,desktop,options={}){
   await pocket.getByRole('tab',{name:'饮品',exact:true}).click();await expect(hint).toHaveCount(0);
   const juice=pocket.locator('[data-item-id="juice"]');await juice.hover();await expect(hint).toContainText('水分');
   await juice.click();await expect(hint).toHaveCount(0);
-  await pocket.getByRole('button',{name:'关闭小窗',exact:true}).click();
+  await expect(pocket).toHaveCount(0); // Complete original care closes the pocket.
   await expect(hint).toHaveCount(0);await noTitles();await captureClearTop('after-pocket-close');
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'状态',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await page.locator('[role=tab][data-category=food]').click();
   await expect(pocket).toBeVisible();await expect(hint).toHaveCount(0);await noTitles();

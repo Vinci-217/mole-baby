@@ -31,7 +31,8 @@ async function verifyV32Native(page,desktop){
  }finally{
   await page.evaluate(async values=>{await window.desktop.setPetScale(1);localStorage.clear();for(const[key,value]of Object.entries(values))localStorage.setItem(key,value)},snapshot);
   await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0],b=w.getBounds();w.setBounds({...b,width:1180,height:820})});
-  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
+  await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.evaluate(()=>window.desktop.setPetMode(true));
+  try{await page.getByTestId('desktop-character').waitFor()}catch(error){console.error('V32 restore state:',await page.evaluate(async()=>({native:await window.desktop.getState(),body:document.body.innerText.slice(0,1000),saved:localStorage.getItem('ramu-house-save-v1')?.slice(0,200)})));throw error}
  }
 }
 module.exports={verifyV32Native};

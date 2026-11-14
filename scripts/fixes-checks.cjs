@@ -20,7 +20,7 @@ async function verifyFixes(page,desktop){
   const locked=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));assert.equal(locked.growthLocked,true);assert.equal(locked.evolution,'classic');
   await toDesktop(page);
   const actions=await require('./smoke-helpers.cjs').openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();await page.getByRole('button',{name:'一起玩球',exact:true}).click();
-  const football=page.getByTestId('desktop-character').locator('canvas[data-form=classic][data-sheet=football]');await expect(football).toBeVisible();await expect(football).toHaveAttribute('data-loaded','true');await expect(football).toHaveCount(0,{timeout:12000});
+  const football=page.getByTestId('desktop-character').locator('canvas[data-source-form=classic][data-uploaded-id="180004"]');await expect(football).toBeVisible();await expect(football).toHaveAttribute('data-loaded','true');await expect(football).toHaveCount(0,{timeout:12000});
   await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'设置');
   const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await expect(background).not.toBeChecked();
   if(desktop){

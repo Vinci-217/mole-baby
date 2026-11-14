@@ -101,7 +101,7 @@ async function verifySpellCare(page,desktop){
   console.log('PASS fixed-size academy apex spells, safe panel/mode interruption, explicit need limits, quick sleep+reopen, live hidden tray stats, random receipts matching actual inventory');
  }finally{
   if(originalDesktop)await page.evaluate(async s=>{await window.desktop.setEdgeHiding(s.edgeHiding);await window.desktop.wander(s.wandering)},originalDesktop);
-  if(clock)await page.clock.resume();
+  if(clock){await page.clock.resume();await page.clock.setSystemTime(new Date())}
   await page.evaluate(values=>{localStorage.clear();for(const[k,v]of Object.entries(values))localStorage.setItem(k,v)},snapshot);
   if(desktop)await page.evaluate(async()=>{await window.desktop.setCompanionPanel(false);await window.desktop.setPetMode(true)});
   await require('./smoke-storage.cjs').reloadStoredFixture(page);await page.getByTestId('desktop-character').waitFor();
