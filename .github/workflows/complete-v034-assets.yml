@@ -1,0 +1,40 @@
+name: Complete verified v0.34.0 Android attachments
+on:
+  push:
+    branches: ['maintenance/complete-v034-assets']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test uploaded-release gate
+        run: node --test scripts/verify-release-uploads.node-test.cjs
+      - name: Verify and copy the same previously checked Android resources
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          gh release download v0.34.0 --pattern 'SHA256SUMS*.txt' --dir release
+          gh release download android-preview --pattern 'latest-android.json' --pattern 'resources-275eabc413f5e5b9342a6900.zip' --pattern 'resources-275eabc413f5e5b9342a6900.json' --dir release
+          node -e 'const a=require("node:assert/strict"),m=require("./release/latest-android.json");a.equal(m.versionName,"0.34.0");a.equal(m.packageName,"com.molebaby.ramu.preview")'
+          node <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+          (async()=>{const rows=fs.readFileSync('release/SHA256SUMS-android.txt','utf8').trim().split('\n');
+          for(const name of ['resources-275eabc413f5e5b9342a6900.zip','resources-275eabc413f5e5b9342a6900.json','latest-android.json']){
+            const row=rows.find(row=>row.endsWith('  '+name));assert(row,name+' is absent from the validated checksum list');
+            const hash=crypto.createHash('sha256');for await(const data of fs.createReadStream('release/'+name))hash.update(data);assert.equal(hash.digest('hex'),row.split('  ')[0],name);
+          }})().catch(error=>{console.error(error);process.exitCode=1});
+          NODE
+          gh release upload v0.34.0 release/resources-275eabc413f5e5b9342a6900.zip release/resources-275eabc413f5e5b9342a6900.json release/latest-android.json --clobber
+          gh api repos/$GH_REPO/releases/tags/v0.34.0 > "$RUNNER_TEMP/release-uploads.json"
+          node scripts/verify-release-uploads.cjs "$RUNNER_TEMP/release-uploads.json"
