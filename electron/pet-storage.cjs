@@ -6,6 +6,25 @@ function validBackup(text){
  if(!pet||Array.isArray(pet)||!Number.isFinite(pet.createdAt)||pet.createdAt<=0||typeof pet.name!=='string'||!pet.stats||typeof pet.stats!=='object'||!Number.isFinite(pet.growth))throw Error('无法识别拉姆存档');
  return pet;
 }
+// Archives are named `${ISO time with ':' → '-'}-${reason}-${uuid}.json`, so a
+// plain string sort is chronological. Anything else in the folder is left alone.
+const ARCHIVE_NAME=/^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.\d{3}Z-(automatic|before-update|before-import)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.json$/;
+const ARCHIVE_LIMITS={automatic:30,'before-update':10,'before-import':10};
+function archivedPetId(file){try{const id=JSON.parse(fs.readFileSync(file,'utf8'))?.createdAt;return Number.isFinite(id)?id:null}catch{return null}}
+/** Keep the newest archives of each kind, plus the newest archive of every pet
+ * that ever had one, so a farewelled or replaced companion is never lost. */
+function pruneArchives(backups,limits=ARCHIVE_LIMITS){
+ let names;try{names=fs.readdirSync(backups)}catch{return}
+ const archives=names.filter(name=>ARCHIVE_NAME.test(name)).sort().reverse();
+ const kept={},pets=new Set();
+ for(const name of archives){
+  const reason=ARCHIVE_NAME.exec(name)[1],file=path.join(backups,name),petId=archivedPetId(file);
+  const withinLimit=(kept[reason]??0)<limits[reason],lastOfPet=petId!==null&&!pets.has(petId);
+  if(petId!==null)pets.add(petId);
+  if(withinLimit||lastOfPet){kept[reason]=(kept[reason]??0)+1;continue}
+  try{fs.unlinkSync(file)}catch{}
+ }
+}
 function atomicWrite(file,text){
  const temporary=file+'.'+crypto.randomUUID()+'.tmp';
  try{fs.writeFileSync(temporary,text,{mode:0o600,flag:'wx'});fs.renameSync(temporary,file)}
@@ -36,7 +55,7 @@ function createPetStorage({directory,profiles=[],version}){
    let previous;try{previous=fs.readFileSync(latest)}catch(error){if(error.code!=='ENOENT')throw error}
    const archived=reason==='automatic'?previous:text;
    if(archived){const name=`${new Date().toISOString().replaceAll(':','-')}-${reason}-${crypto.randomUUID()}.json`;fs.writeFileSync(path.join(backups,name),archived,{mode:0o600,flag:'wx'})}
-   sessionArchived=true;
+   pruneArchives(backups);sessionArchived=true;
   }
   if(text!==lastText||!fs.existsSync(latest)){atomicWrite(latest,text);lastText=text}
   // An explicit new adoption/import after farewell is a new active save.
@@ -55,4 +74,4 @@ function createPetStorage({directory,profiles=[],version}){
   forget(petId){if(!Number.isFinite(petId))throw Error('无效的拉姆身份');fs.mkdirSync(backups,{recursive:true,mode:0o700});atomicWrite(forgotten,JSON.stringify({petId,at:Date.now()}));lastText='';return true},
  };
 }
-module.exports={createPetStorage,validBackup,SAVE_LIMIT};
+module.exports={createPetStorage,validBackup,pruneArchives,ARCHIVE_LIMITS,SAVE_LIMIT};
