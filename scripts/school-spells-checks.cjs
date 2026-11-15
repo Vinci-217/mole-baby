@@ -35,16 +35,24 @@ async function verifySchoolSpells(page){
   const wornSource=page.locator('.scene-character .ram-outfit-source .official-ram-clip');
   await expect(wornSource).toHaveAttribute('data-loaded','true',{timeout:45000});
   console.log('School spells: wand earned, persisted, equipped and loaded');
-  // Course progress and AVM2 frame playback have separate clocks. The
-  // original outfit has just been verified; run the large course jumps in
-  // the native bare form, then restore the wand for every spell assertion.
+  // Course progress and original playback have separate clocks. The wand
+  // was verified above; complete the simulated deadlines in the bare form.
   await page.getByRole('button',{name:'收好装扮',exact:true}).click();assert.equal((await save()).wearing,undefined);assert.equal((await save()).evolution,'super');
   await expect(page.locator('.scene-character .ram-sprite').first()).toHaveAttribute('data-evolution','super');
   await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
-  for(const name of ['火系变身课','水系变身课','木系变身课']){
-   await roomTab(page,'学院');await course(name).getByRole('button',{name:'上这一课',exact:true}).click();await expect(room.getByRole('timer')).toHaveText('3:00');console.log('School spells: completing '+name);await page.clock.fastForward(180150);console.log('School spells: completed '+name);
+  for(const [name,id] of [['火系变身课','element-fire'],['水系变身课','element-water'],['木系变身课','element-wood']]){
+   await roomTab(page,'学院');await course(name).getByRole('button',{name:'上这一课',exact:true}).click();await expect(room.getByRole('timer')).toHaveText('3:00');console.log('School spells: completing '+name);
+   await page.clock.fastForward(180150);
+   await expect.poll(async()=>(await save()).education.lessons[id]).toBe(1);await expect(room.getByRole('timer')).toHaveCount(0);console.log('School spells: completed '+name);
   }
+  // Unequipping retains the original iframe for normal appearance reuse.
+  // Reload before resuming so that hidden AVM2 instance cannot catch up
+  // through nine minutes of simulated frames on the native Mac renderer.
+  console.log('School spells: reloading after simulated course deadlines');
+  await page.reload();
   await page.clock.resume();
+  console.log('School spells: restoring wand for spell assertions');
+  await enterHome(page);
   await roomTab(page,'衣橱');await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await page.getByRole('button',{name:'给拉姆戴上',exact:true}).click();assert.equal((await save()).wearing,'star-wand');
   await expect(wornSource).toHaveAttribute('data-loaded','true',{timeout:45000});
   await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
