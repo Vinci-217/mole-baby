@@ -194,7 +194,6 @@ describe('save validation', () => {
     { inventory: { berry: -1 } },
     { inventory: { berry: 0.5 } },
     { inventory: { berry: 10_000 } },
-    { inventory: { mystery: 1 } },
     { inventory: [] },
   ])('rejects corrupted fields: %j', (override) => {
     expect(parseSave(JSON.stringify({ ...fresh(), ...override }), NOW)).toBeNull();
@@ -204,7 +203,32 @@ describe('save validation', () => {
     const raw = JSON.stringify(fresh()).replace('"coins":1000', '"coins":1e999');
     expect(parseSave(raw, NOW)).toBeNull();
     const hostile = JSON.stringify(fresh()).replace('"berry":0', '"__proto__":5');
-    expect(parseSave(hostile, NOW)).toBeNull();
+    const parsed = parseSave(hostile, NOW);
+    expect(parsed).not.toBeNull();
+    expect(Object.hasOwn(parsed!.inventory, '__proto__')).toBe(false);
+    expect(Object.getPrototypeOf(parsed!.inventory)).toBe(Object.prototype);
+    expect(parsed!.inventory.berry).toBe(0);
+  });
+
+  it('drops unknown inventory items instead of rejecting the save', () => {
+    const save = fresh();
+    save.inventory.biscuit = 3;
+    const parsed = parseSave(JSON.stringify({ ...save, inventory: { ...save.inventory, 'removed-item': 4 } }), NOW);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.inventory.biscuit).toBe(3);
+    expect(Object.hasOwn(parsed!.inventory, 'removed-item')).toBe(false);
+  });
+
+  it('keeps a save written while the clock ran ahead, frozen until the clock catches up', () => {
+    const ahead = { ...fresh(), lastTick: NOW + 8 * HOUR, lastRewardAt: NOW + 8 * HOUR, completedGames: 1 };
+    const parsed = parseSave(JSON.stringify(ahead), NOW);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.lastTick).toBe(NOW + 8 * HOUR);
+    expect(parsed!.stats).toEqual(ahead.stats);
+    expect(parsed!.growth).toBe(0);
+    expect(tick(parsed!, NOW + 9 * HOUR).stats.hunger).toBe(ahead.stats.hunger - 2.5);
+    const adoptedAhead = createPet('小芽', 'pink', NOW + 8 * HOUR);
+    expect(parseSave(JSON.stringify(adoptedAhead), NOW)?.createdAt).toBe(NOW + 8 * HOUR);
   });
 });
 
