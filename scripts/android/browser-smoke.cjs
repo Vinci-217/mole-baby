@@ -38,11 +38,14 @@ async function fitLandscapeSpeech(page,label){
   assert.ok(bubble.y>=top.y+top.height&&bubble.y+bubble.height<=dock.y,'Landscape speech must clear top controls and bottom navigation');
  };
  await check();
- const floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true}),bounds=await floor.boundingBox();
+ const floor=page.getByRole('button',{name:'小屋地面，点击让拉姆走过去',exact:true});
  if((await save(page)).growth<60){await expect(floor).toBeDisabled();await expect(page.locator('.room-walker')).toHaveAttribute('data-moving','false');await page.screenshot({path:path.join(output,`${label}-seed-speech.png`)});return;}
  // The expanded room surface also spans the speech bubble's height. Tap a
  // clear floor point, rather than waiting for that bubble to expire first.
- await floor.tap({position:{x:bounds.width*.82,y:bounds.height*.86}});
+ await expect(floor).toBeEnabled();
+ const clearPoint=await floor.evaluate(node=>{const r=node.getBoundingClientRect();for(const x of [.98,.9,.82])for(const y of [.86,.5,.98]){const point={x:r.width*x,y:r.height*y};if(document.elementFromPoint(r.x+point.x,r.y+point.y)===node)return point}return null});
+ assert.ok(clearPoint,'A visible floor point must remain beside the speech bubble');
+ await floor.tap({position:clearPoint});
  await expect(page.locator('.room-pet-position')).toHaveAttribute('data-speech-side','left');
  await expect(page.locator('.room-walker')).toHaveAttribute('data-moving','false');
  await check();await page.screenshot({path:path.join(output,`${label}-speech.png`)});
