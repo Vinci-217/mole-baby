@@ -19,7 +19,7 @@ import {useDesktopPetStatus} from './use-desktop-pet-status';
 import {elementEffectRect} from './element-playback';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode, SetStateAction } from 'react';
-import { COLORS, STAGES, EVOLUTIONS, legacyUnlockedGrowth, configureGrowth, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
+import { COLORS, STAGES, EVOLUTIONS, cleanPetName, legacyUnlockedGrowth, configureGrowth, buyItem, care, createPet, getItem, getPetCondition, getStage, parseSave, rewardGame, tick } from './game';
 import type { Action, GameState, PetColor, GrowthSelection } from './game';
 import Ram from './components/Ram';
 import FruitGame from './components/FruitGame';
@@ -623,14 +623,14 @@ export default function App() {
   }
   function renamePet(nextName:string) {
     const saved=petRef.current;if(!saved)return;
-    const value=Array.from(nextName.replace(/[\u0000-\u001f\u007f]/g,'').trim()).slice(0,16).join('');
+    const value=cleanPetName(nextName);
     if(!value||value===saved.name)return;
     const updated={...saved,name:value};petRef.current=updated;setPet(updated);setName(value);
     setMemory(m=>m?recordEvent(m,{kind:'rename',detail:`你给我起了新名字：${value}。`}):m);
     speak(`记住啦，我叫${value}，还是一直陪着你的我。`);
   }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
-  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
+  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(cleanPetName(name, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }
