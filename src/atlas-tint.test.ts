@@ -1,4 +1,5 @@
 import {describe,it,expect} from 'vitest';
+import assert from 'node:assert/strict';
 import {tintAtlas} from './atlas-tint';
 
 describe('responsive atlas recolouring without changing artwork',()=>{
@@ -13,7 +14,10 @@ describe('responsive atlas recolouring without changing artwork',()=>{
     const w=mask[i]/255,g=mask[i+1]/255,d=mask[i+2]/255;
     for(let c=0;c<3;c++)expected[i+c]=clamp(expected[i+c]+deltas[0][c]*w+deltas[1][c]*g+deltas[2][c]*d);
    }
-   await tintAtlas(actual,mask,offsets,replaceAlpha);expect(actual).toEqual(expected);
+   await tintAtlas(actual,mask,offsets,replaceAlpha);
+   // Native typed-array comparison still checks every byte without the
+   // generic assertion traversal dominating slow native CI runners.
+   assert.deepEqual(actual,expected);
   }
  });
  it('preserves unmasked artwork and opacity, including white, grey and dark body shading',async()=>{
