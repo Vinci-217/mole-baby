@@ -55,16 +55,16 @@ async function verifySchoolSpells(page){
   await enterHome(page);
   await roomTab(page,'衣橱');await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await page.getByRole('button',{name:'给拉姆戴上',exact:true}).click();assert.equal((await save()).wearing,'star-wand');
   await expect(wornSource).toHaveAttribute('data-loaded','true',{timeout:45000});
-  await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
+  console.log('School spells: native wand restored; verifying spells on a live clock');
   await toDesktop(page);const actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();const panel=page.getByTestId('companion-panel');await expect(panel.getByRole('tab')).toHaveText(['活动','道具','魔法']);await panel.getByRole('tab',{name:'魔法',exact:true}).click();await expect(panel.getByRole('button',{name:'播放星火涅槃',exact:true})).toBeVisible();await expect(panel.getByRole('button',{name:'播放水上狂舞',exact:true})).toHaveCount(1);await expect(panel.getByRole('button',{name:'播放上天入地',exact:true})).toHaveCount(1);await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
-  // The original raster school spells remain available in the academy;
-  // desktop magic uses the separately verified native source timelines.
+  // Keep the restored original player on a live clock while checking the
+  // raster school spells. Pausing every frame would also pause that AVM2.
   for(const id of ['fire-6','water-6','wood-6']){
    await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clips[id].name}).getByRole('button',{name:'变身',exact:true}).click();
-   const magic=page.locator('.scene-character .magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
-   await page.clock.runFor(950);const smoke=magic.locator('.magic-box-smoke');await expect(smoke).toHaveCount(1);
+   const magic=page.locator('.scene-character .magic-box-performance');await expect(magic).toHaveAttribute('data-ready','true',{timeout:15000});
+   const smoke=magic.locator('.magic-box-smoke');await expect(smoke).toHaveCount(1,{timeout:10000});
    const white=await smoke.evaluate(im=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const ctx=c.getContext('2d');ctx.filter=getComputedStyle(im).filter;ctx.drawImage(im,0,0);const d=ctx.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+3]>200){if(d[i]!==255||d[i+1]!==255||d[i+2]!==255)return false;n++}return n>100});assert.equal(white,true,'Transformation smoke must be pure white');
-   await page.clock.runFor(1700);await expect(magic.locator(`canvas[data-element-skill="${id}"]`)).toBeVisible();await page.clock.fastForward(clips[id].durationMs+5000);await expect(magic).toHaveCount(0);assert.deepEqual((await save()).wardrobe,['star-wand']);
+   await expect(magic.locator(`canvas[data-element-skill="${id}"]`)).toBeVisible({timeout:10000});await expect(magic).toHaveCount(0,{timeout:clips[id].durationMs+10000});assert.deepEqual((await save()).wardrobe,['star-wand']);assert.equal((await save()).wearing,'star-wand');await expect(wornSource).toHaveAttribute('data-loaded','true',{timeout:45000});console.log('School spells: completed live '+id);
   }
   console.log('PASS school spells: visible 3-minute course progress in room and desktop/reload, finish-only wand reward and no purchase, three desktop magic tabs and apex entries, three apex casts with pure-white smoke and restored outfit');
  }catch(error){failed=true;console.error('School/spells error:',error);throw error;}finally{
