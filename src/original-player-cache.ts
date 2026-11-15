@@ -26,7 +26,7 @@ export function acquireOriginalPlayer(host:HTMLElement,key:string,source:string)
  if(!entry){
   const frame=document.createElement('iframe'),token=Math.random().toString(36).slice(2);
   frame.className='official-clip-player';frame.tabIndex=-1;frame.setAttribute('aria-hidden','true');frame.allow='autoplay';
-  frame.src=source+`runtime.html?v=12&token=${token}`;
+  frame.src=source+`runtime.html?v=13&token=${token}`;
   entry={frame,token,sequence:0,key,source,pose:undefined,ready:false};host.append(frame);
  }
  const player=entry;let released=false;

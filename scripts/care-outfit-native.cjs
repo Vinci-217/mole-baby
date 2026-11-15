@@ -70,6 +70,23 @@ async function main(){
    assert(await runtime.evaluate(()=>window.__nativeCachedAVM===window.player),'No original AVM reload');
    viewSwitches.push({round:round+1,view:petMode?'desktop':'room',readyMs:Date.now()-began,sameFrame:true,sameAVM:true});
   }
+  // Opening room panels suspends the original engine without replacing its
+  // painted character with Ruffle's native play button or splash logo.
+  await page.evaluate(()=>window.desktop.setPetMode(false));
+  const room=page.locator('.scene-character .official-ram-clip');
+  await expect(room).toHaveAttribute('data-loaded','true',{timeout:10000});
+  const roomRuntime=await (await room.locator('iframe').elementHandle()).contentFrame();
+  for(const panel of ['成长手册','拉姆小衣橱']){
+   await page.locator('.room-dock').getByRole('button',{name:panel,exact:true}).click();
+   await expect(page.locator('.game-panel')).toBeVisible();
+   await expect.poll(()=>roomRuntime.evaluate(()=>window.player.ruffle().isPlaying)).toBe(false);
+   await expect.poll(()=>roomRuntime.evaluate(()=>{const root=window.player.shadowRoot;return ['#play-button','#unmute-overlay','#splash-screen'].every(selector=>getComputedStyle(root.querySelector(selector)).display==='none')})).toBe(true);
+   await page.getByRole('button',{name:'关闭面板',exact:true}).click();
+   await expect.poll(()=>roomRuntime.evaluate(()=>window.player.ruffle().isPlaying)).toBe(true);
+   checks.push({label:panel,pausedWithoutNativeOverlay:true,resumed:true});
+  }
+  await page.evaluate(()=>window.desktop.setPetMode(true));
+  await expect(cached).toHaveAttribute('data-loaded','true',{timeout:10000});
   // Reading remains deliberately stationary even though other finite actions
   // can be interrupted. The same real pointer must not start a native drag.
   const actions=await openActions(page);await actions.getByRole('button',{name:'开始计时',exact:true}).click();

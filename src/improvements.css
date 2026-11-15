@@ -47,6 +47,16 @@
 /* Small navigation controls scroll as one row, including in narrow rooms. */
 .classic-app.ramu-v6 .game-panel .paper-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;gap:4px;padding-bottom:8px;margin-bottom:12px}
 .classic-app.ramu-v6 .game-panel .paper-tabs>button{flex:0 0 auto;min-width:42px;min-height:26px;height:26px;padding:3px 9px;font-size:11px;line-height:20px;white-space:nowrap}
+
+/* On narrow screens the room actions scroll as one strip. The return action
+   stays outside that strip so it remains reachable at the upper right. */
+.scene-top-scroll{display:contents}
+@media(max-width:700px),(max-height:600px){
+ .classic-app.ramu-v6 .cottage-top .scene-top-actions{overflow:visible;flex:1;min-width:0}
+ .classic-app.ramu-v6 .scene-top-scroll{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto;overflow-x:auto;scrollbar-width:thin;padding-bottom:3px}
+ .classic-app.ramu-v6 .scene-top-scroll>*{flex:0 0 auto}
+ .classic-app.ramu-v6 .desktop-return-action{position:relative;z-index:3;flex:0 0 auto!important;box-shadow:0 2px 0 #6b401b, -7px 0 10px #96653066}
+}
 .android-host.pet-mode .care-inventory.pocket-compact{grid-template-columns:minmax(0,1fr) 42px;grid-template-rows:28px minmax(0,1fr) 24px}
 .android-host.pet-mode .care-inventory.pocket-compact>.pocket-items{width:100%;max-width:232px}
 .android-host.pet-mode .care-inventory.pocket-compact>.pocket-categories>button{height:30px;min-height:30px;font-size:11px;line-height:24px}

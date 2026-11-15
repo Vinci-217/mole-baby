@@ -52,7 +52,22 @@ async function scenario(viewport,label){
  await page.getByRole('button',{name:'选择蓝色拉姆',exact:true}).click();await page.getByRole('button',{name:'给它起名',exact:true}).click();await page.locator('#pet-name').fill('安卓小蓝');await page.getByRole('button',{name:'带拉姆回家！',exact:true}).click();await expect(page.locator('.room-dock')).toBeVisible();assert.equal(await page.evaluate(()=>window.__androidTest.state.petMode),false);await fit(page);
  await expect.poll(async()=>JSON.parse(await page.evaluate(()=>window.__androidTest.storage['ramu-house-save-v1'])).name).toBe('安卓小蓝');
  await expect.poll(()=>page.evaluate(()=>{const audio=document.querySelector('audio[data-ramu-bgm]');return Boolean(audio&&!audio.paused&&audio.readyState>=2)}),{timeout:15000}).toBe(true);
- await artwork(page);await page.screenshot({path:path.join(output,`${label}-house.png`)});await fitLandscapeSpeech(page,label);await swipeDock(page);
+ await artwork(page);
+ if(viewport.width<=700||viewport.height<=600){
+  const strip=page.locator('.scene-top-scroll'),back=page.getByRole('button',{name:'悬浮陪伴',exact:true});
+  const before=await back.boundingBox(),first=await strip.locator('button').first().boundingBox();
+  assert.ok(before.x>=0&&before.x+before.width<=viewport.width,'The return action stays inside the viewport');
+  assert.equal(await strip.locator('.desktop-return-action').count(),0,'The return action is outside the scrolling actions');
+  if(await strip.evaluate(n=>n.scrollWidth>n.clientWidth)){
+   await strip.evaluate(n=>{n.scrollLeft=n.scrollWidth});
+   await expect.poll(()=>strip.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0);
+   const after=await back.boundingBox(),moved=await strip.locator('button').first().boundingBox();
+   assert.equal(after.x,before.x,'Scrolling actions does not move the return button');
+   assert.ok(moved.x<first.x,'The other room actions scroll');
+   await strip.evaluate(n=>{n.scrollLeft=0});
+  }
+ }
+ await page.screenshot({path:path.join(output,`${label}-house.png`)});await fitLandscapeSpeech(page,label);await swipeDock(page);
  await panel(page,'进入商店');await expect(page.locator('.book-product')).toHaveCount(9);const selected=await page.locator('.book-item-detail').getAttribute('data-selected-item');const prior=await save(page);await page.locator('.book-buy').click();await expect.poll(async()=>(await save(page)).inventory[selected]).toBe((prior.inventory[selected]||0)+1);await fit(page);await artwork(page);await page.screenshot({path:path.join(output,`${label}-shop.png`)});
  await panel(page,'打开背包');await expect(page.locator('.pocket-slot')).toHaveCount(16);const slot=page.locator('.pocket-slot[data-item-id]').first(),id=await slot.getAttribute('data-item-id'),before=await save(page);await slot.click();await expect.poll(async()=>(await save(page)).inventory[id]).toBe(before.inventory[id]-1);assert.equal(await page.locator('.pocket-slot').first().evaluate(e=>Math.abs(e.getBoundingClientRect().width-e.getBoundingClientRect().height)<1),true);await fit(page);
  await panel(page,'陪伴设置');await expect(page.getByRole('region',{name:'安卓陪伴设置',exact:true})).toBeVisible();await page.getByRole('button',{name:'设置悬浮窗权限',exact:true}).click();await expect.poll(async()=>page.evaluate(()=>window.__androidTest.permissions.overlay)).toBe(true);await page.getByRole('switch',{name:'Wi-Fi 下自动下载更新',exact:true}).click();await expect(page.getByRole('switch',{name:'Wi-Fi 下自动下载更新',exact:true})).toHaveAttribute('aria-checked','true');await fit(page);

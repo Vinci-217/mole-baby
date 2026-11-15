@@ -18,6 +18,11 @@ async function main(){
   await expect(clip.locator('iframe')).toHaveCSS('opacity','1');
   const iframe=await clip.locator('iframe').elementHandle(),runtime=await iframe.contentFrame();
   const origin=await runtime.evaluate(()=>{window.__cacheOriginalPlayer=window.player;return performance.timeOrigin});
+  await runtime.evaluate(()=>window.player.ruffle().suspend());
+  await expect.poll(()=>runtime.evaluate(()=>{const root=window.player.shadowRoot;return ['#play-button','#unmute-overlay','#splash-screen'].every(selector=>getComputedStyle(root.querySelector(selector)).display==='none')})).toBe(true);
+  assert(await runtime.evaluate(()=>{const canvas=window.player.shadowRoot.querySelector('canvas');return Boolean(canvas&&canvas.width&&canvas.height)}),'Pausing retains the painted character canvas');
+  await runtime.evaluate(()=>window.player.ruffle().resume());
+  checks.push({case:'paused-original-player',nativeOverlaysHidden:true,characterCanvasRetained:true});
   await expect.poll(async()=>(await rows()).some(key=>key.includes(':junior:super:')),{timeout:10000}).toBe(true);
   for(let n=0;n<3;n++){
    await choose({form:'super',outfit:'leaf-hood',action:'still'});

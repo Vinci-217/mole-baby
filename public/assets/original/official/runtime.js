@@ -3,12 +3,29 @@
  const token=new URLSearchParams(location.search).get('token'),pollLimit=900; // 45s at 50ms, matching the host's cold-start budget
  let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,clip,looping,pose,requestAcknowledged=false,viewportScale=3.2,prepared=false,disposed=false;
  const engines=new Map();let engineKey='';
+ let nativeControlRoot=null,nativeControlObserver=null;
  let previewTimer,lastPreview='',queuedPreview='';
  let manifestRequest;
  // A failed first request must not poison every later outfit in this iframe.
  const manifest=()=>manifestRequest??(manifestRequest=fetch('manifest.json?v=9').then(response=>{if(!response.ok)throw Error('Manifest unavailable: '+response.status);return response.json()}).catch(error=>{manifestRequest=undefined;throw error}));
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
  const call=(name,...args)=>player&&player.ruffle().callExternalInterface(name,...args);
+ // Ruffle exposes its own play/unmute controls when its timeline is paused.
+ // This player is fully driven by the parent app, so those controls must
+ // never cover the character while a panel is open or a cached engine resumes.
+ function hideNativeControls(){
+  const root=nativeControlRoot||player?.shadowRoot;if(!root)return;
+  for(const selector of ['#play-button','#unmute-overlay','#splash-screen']){
+   const node=root.querySelector(selector);if(!node)continue;
+   if(node.style.getPropertyValue('display')!=='none'||node.style.getPropertyPriority('display')!=='important')node.style.setProperty('display','none','important');
+  }
+ }
+ function watchNativeControls(){
+  const root=player?.shadowRoot;if(!root)return;
+  if(nativeControlRoot!==root){nativeControlObserver?.disconnect();nativeControlRoot=root;nativeControlObserver=new MutationObserver(hideNativeControls);nativeControlObserver.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});}
+  hideNativeControls();
+ }
+ function releaseNativeControls(){nativeControlObserver?.disconnect();nativeControlObserver=null;nativeControlRoot=null;}
  const maskCanvas=document.createElement('canvas');maskCanvas.width=100;maskCanvas.height=108;
  function pixels(){
   const canvas=player.shadowRoot.querySelector('canvas'),ctx=maskCanvas.getContext('2d',{willReadFrequently:true});
@@ -34,6 +51,7 @@
  }
  function apply(){
   if(disposed||!ready||!player?.isConnected)return;
+  watchNativeControls();
   const playing=player.ruffle().isPlaying;
   if(!(typeof playing==='function'?playing.call(player.ruffle()):playing))player.ruffle().resume();
   call('setBodyColor',...pose.color);
@@ -50,7 +68,7 @@
   // Inactive sources have no audio and no running timeline.
   if(player){
    if(ready&&visible&&clip?.kind==='outfit'&&engineKey){player.ruffle().volume=0;player.ruffle().suspend();player.style.visibility='hidden';engines.set(engineKey,{player,clip,lastPose});}
-   else player.remove();
+   else {releaseNativeControls();player.remove();}
    player=null;
   }
   ready=false;visible=false;poseSettling=false;requestAcknowledged=false;prepared=false;clearInterval(timer);clearTimeout(previewTimer);lastPreview='';queuedPreview='';lastPose=null;
@@ -79,6 +97,7 @@
    send('diagnostic',{phase:'source'});
    player.ruffle().volume=0;
    }
+   watchNativeControls();
    while(engines.size>1){const oldest=engines.keys().next().value;engines.get(oldest).player.remove();engines.delete(oldest);}
    let tries=0,lastMask=0,lastStatus=0;
    timer=setInterval(()=>{
@@ -86,10 +105,12 @@
      // Catch initial readiness and pose changes sooner, without increasing
      // steady-state status/mask work once the outfit is actually playing.
      const now=performance.now();if(ready&&visible&&!poseSettling&&now-lastStatus<150)return;lastStatus=now;
+     hideNativeControls();
      // A suspended Ruffle timeline does not reliably service ExternalInterface.
      // Its loaded state remains valid; repeat the handshake and pixel mask
      // without asking the paused engine to run code.
      if(ready&&visible&&!poseSettling&&(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)){
+      hideNativeControls();
       if(!requestAcknowledged){send('ready',{path:clip.path,sha256:clip.sha256});sendMask();}
       return;
      }
@@ -132,5 +153,5 @@
  send('boot');
  const initial=new URLSearchParams(location.search);if(initial.get('id'))load({sequence:1,value:{id:initial.get('id'),loop:initial.get('loop')==='1',registerBody:initial.get('registerBody')==='1',pose:{form:initial.get('form')||'level2',direction:'down',moving:false,color:(initial.get('color')||'0,-21,-255').split(',').map(Number),sound:false,volume:.45}}});
  document.addEventListener('visibilitychange',()=>{if(player)player.ruffle()[document.hidden||pose?.paused?'suspend':'resume']();});
- addEventListener('pagehide',()=>{disposed=true;ready=false;sequence++;clearInterval(timer);clearTimeout(previewTimer);const retired=player;player=null;if(retired)retired.remove();for(const saved of engines.values())saved.player.remove();engines.clear();});
+ addEventListener('pagehide',()=>{disposed=true;ready=false;sequence++;clearInterval(timer);clearTimeout(previewTimer);const retired=player;player=null;releaseNativeControls();if(retired)retired.remove();for(const saved of engines.values())saved.player.remove();engines.clear();});
 })();

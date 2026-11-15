@@ -68,6 +68,8 @@ test('publication waits for modern, legacy and Mac package verification and uplo
  const publish=workflow.jobs.release.steps.find(s=>s.name==='Create release or replace its build attachments').run;
  assert.match(publish,/release\/legacy-x64.yml release\/legacy-ia32.yml/);
  assert.match(publish,/release\/\*\.blockmap/);
+ const androidUpload=publish.split('\n').find(line=>line.includes('gh release upload "$RELEASE_TAG" release/*.apk'));
+ for(const file of ['release/*.apk','release/*.xapk','release/resources-*.zip','release/resources-*.json','release/resources-*.blockmap','release/latest-android.json','release/SHA256SUMS-android.txt'])assert.ok(androidUpload.includes(file),'The stable release contains '+file);
  const check=workflow.jobs.release.steps.find(s=>s.name==='Check artifact checksums').run;
  assert.ok(check.indexOf('sha256sum --check SHA256SUMS.txt')<check.indexOf('prepare-update-blockmaps.cjs'));
  assert.ok(check.indexOf('prepare-update-blockmaps.cjs')<check.indexOf('update-metadata.cjs'));
