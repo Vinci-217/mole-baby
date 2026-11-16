@@ -34,7 +34,7 @@ final class RamuHost {
     int prepareProgress;
     String prepareError;
     ValueCallback<Uri[]> chooser;
-    private String alarmActivity="";
+    private final ActivityReminder.Tracker activityReminders=new ActivityReminder.Tracker();
     private final ConcurrentHashMap<String,CompletableFuture<Boolean>> saveWaiters=new ConcurrentHashMap<>();
     RamuHost(Context context){this.context=context;store=new PetStore(context);resources=new ResourcePack(context);controller=new PetController(this);updates=new AndroidUpdates(this);}
     void ensure(){if(web!=null){if(activity!=null)activity.attachWeb();return;}if(preparing)return;preparing=true;prepareError=null;
@@ -119,8 +119,10 @@ final class RamuHost {
         try{intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);context.startActivity(intent);}catch(android.content.ActivityNotFoundException e){context.startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+context.getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));}
     }
     void openUrl(String url){if(!url.startsWith("https://"))return;try{context.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));}catch(ActivityNotFoundException ignored){}}
-    void syncActivity(){JSONObject pet=store.pet(),active=pet.optJSONObject("activity");String id=active==null?"":active.optString("id");if(id.equals(alarmActivity))return;if(!alarmActivity.isEmpty())ReminderReceiver.cancel(context,"activity:"+alarmActivity);alarmActivity=id;
-        ActivityReminder.Reminder reminder=ActivityReminder.of(active);if(reminder!=null)ReminderReceiver.schedule(context,reminder.id(),reminder.at(),reminder.title(),reminder.body());
+    void syncActivity(){
+        activityReminders.sync(store.pet().optJSONObject("activity"),
+            id->ReminderReceiver.cancel(context,id),
+            reminder->ReminderReceiver.schedule(context,reminder.id(),reminder.at(),reminder.title(),reminder.body()));
     }
     CompletableFuture<Boolean> prepareSave(){String token=UUID.randomUUID().toString();CompletableFuture<Boolean> future=new CompletableFuture<>();saveWaiters.put(token,future);event("prepare",Json.of("token",token));main.postDelayed(()->{CompletableFuture<Boolean> wait=saveWaiters.remove(token);if(wait!=null)wait.complete(false);},8000);return future;}
     void saved(String token,boolean ok){CompletableFuture<Boolean> future=saveWaiters.remove(token);if(future!=null)io.execute(()->future.complete(ok&&store.flush()));}

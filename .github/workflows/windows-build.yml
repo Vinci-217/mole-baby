@@ -395,7 +395,10 @@ jobs:
             gh release create "$RELEASE_TAG" release/*.dmg release/mole-baby-*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
           gh release upload "$RELEASE_TAG" release/*.apk release/*.xapk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/latest-android.json release/SHA256SUMS-android.txt --clobber
-          gh api "repos/$GH_REPO/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/ramu-release-uploads.json"
+          # Resolve drafts by ID: the public tag endpoint can return 404 until publication.
+          release_id=$(gh api "repos/$GH_REPO/releases?per_page=100" --jq '.[] | select(.tag_name == env.RELEASE_TAG) | .id')
+          test -n "$release_id"
+          gh api "repos/$GH_REPO/releases/$release_id" > "$RUNNER_TEMP/ramu-release-uploads.json"
           node scripts/verify-release-uploads.cjs "$RUNNER_TEMP/ramu-release-uploads.json"
           gh release edit "$RELEASE_TAG" --draft=false --latest --notes-file release/RELEASE_NOTES.md
 
