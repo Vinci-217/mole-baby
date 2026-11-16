@@ -396,7 +396,7 @@ jobs:
           fi
           gh release upload "$RELEASE_TAG" release/*.apk release/*.xapk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/latest-android.json release/SHA256SUMS-android.txt --clobber
           # Resolve drafts by ID: the public tag endpoint can return 404 until publication.
-          release_id=$(gh api "repos/$GH_REPO/releases?per_page=100" --jq '.[] | select(.tag_name == env.RELEASE_TAG) | .id')
+          release_id=$(gh api "repos/$GH_REPO/releases?per_page=100" --jq ".[] | select(.tag_name == \"$RELEASE_TAG\") | .id")
           test -n "$release_id"
           gh api "repos/$GH_REPO/releases/$release_id" > "$RUNNER_TEMP/ramu-release-uploads.json"
           node scripts/verify-release-uploads.cjs "$RUNNER_TEMP/ramu-release-uploads.json"
