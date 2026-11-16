@@ -18,6 +18,14 @@ function samePet(actual,expected){
  for(const key of ['createdAt','name','color','growth','highestGrowth','naturalGrowth','growthLocked','evolution','coins','wearing','inventory','notes','room','education'])assert.deepEqual(actual[key],expected[key],key);
  assert.deepEqual([...actual.wardrobe].sort(),[...expected.wardrobe].sort());
 }
+async function receiptAllowsRoomActions(page){
+ await enterHome(page);
+ const receipt=page.locator('.save-operation-receipt .save-operation-feedback');await expect(receipt).toBeVisible();
+ await page.getByRole('button',{name:'布置小屋',exact:true}).click();
+ await expect(page.getByRole('complementary',{name:'小屋布置工具'})).toBeVisible();await expect(receipt).toBeVisible();
+ await page.locator('.cottage-top').getByRole('button',{name:'完成布置',exact:true}).click();
+ await receipt.getByRole('button',{name:'收起存档操作提示',exact:true}).click();await expect(receipt).toHaveCount(0);
+}
 async function roundTrip(page,desktop){
  await enterHome(page);await roomTab(page,'设置');
  await expect(page.locator('.save-manager')).toHaveCount(1);await expect(input(page)).toHaveCount(1);
@@ -64,6 +72,7 @@ async function browserChecks(browser){
   await expect(page.locator('.adoption-screen')).toHaveCount(0);
   const receipt=page.locator('.save-operation-receipt .save-operation-feedback');await expect(receipt).toContainText('存档已恢复');await expect(receipt).toBeInViewport();
   await page.waitForTimeout(4200);await expect(receipt).toBeVisible();
+  await receiptAllowsRoomActions(page);
   const result=await roundTrip(page);
   await page.evaluate(()=>{const get=Storage.prototype.getItem;window.restoreSaveInspection=()=>Storage.prototype.getItem=get;Storage.prototype.getItem=function(key){if(key==='ramu-house-save-v1')throw Error('Storage unavailable');return get.call(this,key)}});
   await page.getByRole('button',{name:'检查本地存档',exact:true}).click();
@@ -79,7 +88,7 @@ async function browserChecks(browser){
   await page.evaluate(()=>window.mobile.exportSave=async()=>{throw Error('已取消导出')});await page.getByRole('button',{name:'导出存档',exact:true}).click();await expect(feedback(page)).toHaveAttribute('role','status');await expect(feedback(page)).toContainText('已取消导出');
   await page.evaluate(()=>delete window.mobile);
   assert.deepEqual(errors,[]);
-  return {...result,adoptionInvalidEmptyOversizeFeedback:true,pickerAndSameFileRetry:true,cancelFeedback:true,adoptionSuccessSurvivesScreenChange:true,inspectionFailureAndRetry:true,mobileBridgeResponses:true,errors};
+  return {...result,adoptionInvalidEmptyOversizeFeedback:true,pickerAndSameFileRetry:true,cancelFeedback:true,adoptionSuccessSurvivesScreenChange:true,receiptAllowsRoomActionsAndDismissal:true,inspectionFailureAndRetry:true,mobileBridgeResponses:true,errors};
  }catch(error){await page.screenshot({path:path.join(out,'browser-failure.png'),fullPage:true}).catch(()=>{});throw error}finally{await context.close()}
 }
 async function recoveryChecks(browser){
@@ -106,6 +115,7 @@ async function nativeChecks(){
   await page.getByRole('button',{name:'导入这份备份',exact:true}).click();await expect(page.locator('.local-save-inspector [role=alert]')).toContainText('暂时无法读取');await expect(page.locator('.local-save-inspector [role=alert]')).toBeInViewport();assert.equal(await saved(page),null);
   fs.renameSync(path.join(legacy,'retained.json'),path.join(legacy,'latest.json'));
   await page.getByRole('button',{name:'导入这份备份',exact:true}).click();await expect(page.locator('.save-operation-receipt')).toContainText('存档已恢复');
+  await receiptAllowsRoomActions(page);
   const imported=await saved(page);
   const result=await roundTrip(page,desktop),info=await page.evaluate(()=>window.desktop.localSaves.inspect());assert.equal(info.profileDirectory,profile);
   assert(fs.readdirSync(info.backupDirectory).some(name=>name.includes('before-import')));
