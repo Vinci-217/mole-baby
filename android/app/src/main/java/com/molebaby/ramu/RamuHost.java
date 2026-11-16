@@ -120,7 +120,7 @@ final class RamuHost {
     }
     void openUrl(String url){if(!url.startsWith("https://"))return;try{context.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));}catch(ActivityNotFoundException ignored){}}
     void syncActivity(){JSONObject pet=store.pet(),active=pet.optJSONObject("activity");String id=active==null?"":active.optString("id");if(id.equals(alarmActivity))return;if(!alarmActivity.isEmpty())ReminderReceiver.cancel(context,"activity:"+alarmActivity);alarmActivity=id;
-        if(active!=null){boolean course=active.optString("kind").equals("course");ReminderReceiver.schedule(context,"activity:"+id,active.optLong("endsAt"),course?"拉姆下课啦":"餐厅打工完成啦",course?"回来看看新学会的本领吧！":"辛苦啦，回小屋领取打工收获吧！");}
+        ActivityReminder.Reminder reminder=ActivityReminder.of(active);if(reminder!=null)ReminderReceiver.schedule(context,reminder.id(),reminder.at(),reminder.title(),reminder.body());
     }
     CompletableFuture<Boolean> prepareSave(){String token=UUID.randomUUID().toString();CompletableFuture<Boolean> future=new CompletableFuture<>();saveWaiters.put(token,future);event("prepare",Json.of("token",token));main.postDelayed(()->{CompletableFuture<Boolean> wait=saveWaiters.remove(token);if(wait!=null)wait.complete(false);},8000);return future;}
     void saved(String token,boolean ok){CompletableFuture<Boolean> future=saveWaiters.remove(token);if(future!=null)io.execute(()->future.complete(ok&&store.flush()));}
