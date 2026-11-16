@@ -1,0 +1,7 @@
+.save-operation-feedback{display:flex;align-items:flex-start;gap:10px;margin:12px 0;padding:12px 14px;border:1px solid #bba475;border-radius:10px;background:#fff8dd;color:#674d2d;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.save-operation-feedback.is-error{border-color:#b85542;background:#fff0e8;color:#873c2e}
+.save-operation-feedback.is-success{border-color:#7c9748;background:#f2f8df;color:#405b25}
+.save-operation-feedback>span{flex:1}
+.save-operation-feedback>button{flex:none;padding:0 4px;font-size:20px;line-height:1.2;color:inherit;background:transparent;border:0}
+.save-operation-receipt{position:fixed;top:max(16px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(430px,calc(100% - 32px));z-index:2200}
+.save-operation-receipt .save-operation-feedback{margin:0;box-shadow:0 4px 18px #38240d40}

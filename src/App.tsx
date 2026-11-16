@@ -51,7 +51,7 @@ import RoomDock from './components/RoomDock';
 import {openManorSite} from './external-sites';
 import SettingsPanel,{SettingsSection} from './components/SettingsPanel';
 import AnimationDiagnostics from './components/AnimationDiagnostics';
-import LocalSaveInspector from './components/LocalSaveInspector';
+import SaveManager,{SaveOperationFeedback,type SaveFeedback,type SaveImport} from './components/SaveManager';
 import StatusPocket from './components/StatusPocket';
 import {useRoomFullscreen} from './use-room-fullscreen';
 import RoomResizeHandles from './components/RoomResizeHandles';
@@ -85,7 +85,7 @@ import {elementSkillById,learnedElementSkill} from './element-skills';
 import RamSchoolPanel,{ActivityCard} from './components/RamSchoolPanel';
 import {activityAction,beginActivity,cancelActivity,finishRestaurantWork,courseById,isSchoolAction,learned,petSpeech,JOB_PAY,type CourseId} from './pet-school';
 import {RoomFurnishingLayer,RoomFurnishingEditor} from './components/RoomFurnishings';
-import {PET_SAVE_KEY,MAX_BACKUP_BYTES,restorePetBackup,petBackupText} from './pet-backup';
+import {PET_SAVE_KEY,MAX_BACKUP_BYTES,InvalidPetBackup,validatePetBackup,restorePetBackup,petBackupText} from './pet-backup';
 import {buyFurniture,placeFurniture,removeFurniture} from './room-furnishings';
 
 const SAVE_KEY = PET_SAVE_KEY;
@@ -149,6 +149,7 @@ export default function App() {
   const [desktopState, setDesktopState] = useState<DesktopState>({ petMode:false,alwaysOnTop:false,wandering:true,companionPanel:false,panelSide:'right',edgeHiding:true,edgeSide:null,edgePose:'visible' });
   const roomScreen=useRoomFullscreen(Boolean(desktopState.roomFullscreen));
   const [toast, setToast] = useState('');
+  const [saveFeedback,setSaveFeedback]=useState<SaveFeedback|null>(null);
   const [bubble, setBubble] = useState('拉姆～ 我来陪你啦！');
   const [bubbleIsDescription,setBubbleIsDescription]=useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
@@ -172,7 +173,6 @@ export default function App() {
   const pastimeRun=useRef<{petId:number;kind:Pastime}|null>(null);
   const previousNaturalAction=useRef<string|undefined>(undefined);
   const uploadedRun=useRef<{petId:number;id:string;endsAt:number}|null>(null);
-  const importInput = useRef<HTMLInputElement>(null);
   const importSequence=useRef(0);
   useEffect(()=>()=>{importSequence.current++},[]);
 
@@ -630,7 +630,7 @@ export default function App() {
     speak(`记住啦，我叫${value}，还是一直陪着你的我。`);
   }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
-  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
+  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; importSequence.current++;setSaveFeedback(null);const adopted = createPet(name.trim().slice(0, 12), color); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }
@@ -670,7 +670,7 @@ export default function App() {
   }
   async function abandonPet() {
     const saved = petRef.current; if (!saved) return;
-    importSequence.current++;
+    importSequence.current++;setSaveFeedback(null);
     clearInvitation();awaitingAdoption.current = true; petRef.current = null; touches.current = []; dizzyUntil.current = 0;
     try { await window.desktop?.localSaves?.forget(saved.createdAt);localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); }
     catch { awaitingAdoption.current = false; petRef.current = saved; notify('暂时无法移除存档，请稍后重试。'); return; }
@@ -683,28 +683,58 @@ export default function App() {
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(memoryKey(saved)); localStorage.removeItem(presenceKey(saved)); } catch { /* Initial removal succeeded. */ }
     window.desktop?.hideToTray();
   }
-  function exportSave() { if (!pet) return;const text=petBackupText(pet,currentMemory,localStorage),filename=`ramu-${new Date().toISOString().slice(0, 19).replaceAll(':','-')}.json`;if(window.mobile){void window.mobile.exportSave(text,filename).then(ok=>{if(ok)notify('存档已经导出，记得收好。');}).catch(error=>notify(error instanceof Error?error.message:'存档导出失败，请重试。'));return;} const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); notify('存档已经导出，记得收好。'); }
-  async function importSave(file?: File,backupText?:string) {
-    if (!file&&backupText===undefined) return;
+  async function exportSave(raw=false) {
+    setSaveFeedback({kind:'pending',message:'正在准备导出存档…'});
+    try{
+      const saved=petRef.current;
+      if(!raw&&!saved)throw Error();
+      const text=raw?localStorage.getItem(SAVE_KEY):petBackupText(saved!,currentMemory,localStorage);
+      if(text===null)throw Error();
+      const filename=raw?'ramu-recovery.json':`ramu-${new Date().toISOString().slice(0,19).replaceAll(':','-')}.json`;
+      if(window.mobile){
+        const ok=await window.mobile.exportSave(text,filename);
+        setSaveFeedback(ok?{kind:'success',message:`存档已经导出：${filename}，记得收好。`}:{kind:'info',message:'已取消导出，当前存档未更改。'});
+      }else{
+        const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+        try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+        finally{setTimeout(()=>URL.revokeObjectURL(url),1000)}
+        setSaveFeedback({kind:'success',message:`已发起存档下载：${filename}。请在浏览器下载记录中确认文件已保存。`});
+      }
+    }catch(error){setSaveFeedback(error instanceof Error&&error.message==='已取消导出'?{kind:'info',message:'已取消导出，当前存档未更改。'}:{kind:'error',message:'存档导出失败，请检查保存位置和存储空间后重试，当前存档仍然保留。'})}
+  }
+  async function importSave(source:SaveImport):Promise<boolean> {
+    const file='file' in source?source.file:undefined;
     const sequence=++importSequence.current,originalPetId=petRef.current?.createdAt;
+    let step:'read'|'backup'|'restore'='read';
+    setSaveFeedback({kind:'pending',message:'正在读取、校验并导入存档，请稍候…'});
     try {
-      if (file&&file.size > MAX_BACKUP_BYTES) throw Error();
-      const text=backupText??await file!.text();
-      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return;
+      if (file&&file.size > MAX_BACKUP_BYTES) throw new InvalidPetBackup('size');
+      const text='text' in source?source.text:await source.file.text();
+      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return false;
+      validatePetBackup(text);
+      step='backup';
       const before=diskSnapshot.current();
       if(before){if(window.desktop?.localSaves)await window.desktop.localSaves.checkpoint(before,'before-import');else localStorage.setItem(`ramu-before-import-v1:${Date.now()}`,before)}
-      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return;
+      else{const raw=localStorage.getItem(SAVE_KEY);if(raw!==null)localStorage.setItem(`ramu-before-import-v1:${Date.now()}`,raw)}
+      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return false;
+      step='restore';
       const {pet:restored,memory:restoredMemory}=restorePetBackup(text,localStorage);
       clearInvitation();clearTimeout(timers.current.animation); clearTimeout(timers.current.feedback);
       careUntil.current = 0; touches.current = []; dizzyUntil.current = 0;
       pendingCareFeedback.current=null;setCareFeedback(null); setActionItemId(undefined); setActionFromColor(undefined);
       setAction('idle'); setActionId(n => n + 1); timer.cancel();
-      petRef.current = restored; setPet(restored,'导入存档恢复数值');
+      awaitingAdoption.current=false;petRef.current = restored; setPetRaw(restored);
       setMemory(restoredMemory);
       setPrefs(readPrefs());window.dispatchEvent(new Event('ram-save-imported'));
-      setUnreadableSave(false);setName(restored.name); notify('存档已恢复，欢迎回来！');
-    } catch { notify('这个存档无法读取，原来的拉姆仍然保留。'); }
-    if (sequence===importSequence.current&&importInput.current) importInput.current.value = '';
+      setUnreadableSave(false);setName(restored.name);
+      setSaveFeedback({kind:'success',message:`存档已恢复，欢迎回来！已导入「${restored.name}」的记录。`});
+      return true;
+    } catch(error) {
+      if(sequence!==importSequence.current||petRef.current?.createdAt!==originalPetId)return false;
+      const reason=error instanceof InvalidPetBackup?(error.reason==='size'?'文件超过 1 MB，无法导入。':'这个存档无法读取，请选择有效的拉姆 JSON 备份。'):step==='read'?'未能读取所选文件，请确认文件已下载到本机后重试。':step==='backup'?'导入前备份失败，请检查存储空间后重试。':'存档写入失败，请检查存储空间或应用权限后重试。';
+      setSaveFeedback({kind:'error',message:`${reason}${originalPetId?'原来的拉姆仍然保留。':'当前记录未更改。'}`});
+      return false;
+    }
   }
 
   function completeGame(score: number,round?:import('./economy').RewardRound): GameReceipt {
@@ -765,7 +795,7 @@ export default function App() {
     {webEdition&&<SettingsSection title="网页版与离线使用"><WebAppHelp/></SettingsSection>}
     <AndroidSettings/>
     <SettingsSection title="动画与素材"><AnimationDiagnostics/></SettingsSection>
-    <SettingsSection title="存档与送别"><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><p className="settings-hint">导出包含拉姆身份、颜色、成长、装扮、物品、小屋、回忆与偏好设置。收到 JSON 备份后，点击“导入存档”选择文件恢复。</p><div className="settings-actions"><button className="game-button small" onClick={exportSave}>导出存档</button><button className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/><button className="plain-danger" onClick={()=>setReset(true)}>送别拉姆</button></div>{memorySaveError&&<p role="alert">回忆暂未保存，请导出备份。</p>}{backupError&&<p role="alert">独立备份暂时写入失败，请检查磁盘空间并导出存档；原来的浏览器存档仍保留。</p>}</SettingsSection>
+    <SettingsSection title="存档与送别"><SaveManager onImport={importSave} onExport={()=>exportSave()} feedback={saveFeedback} onFeedback={setSaveFeedback}/><button type="button" className="plain-danger" onClick={()=>setReset(true)}>送别拉姆</button>{memorySaveError&&<p role="alert">回忆暂未保存，请导出备份。</p>}{backupError&&<p role="alert">独立备份暂时写入失败，请检查磁盘空间并导出存档；原来的浏览器存档仍保留。</p>}</SettingsSection>
     {window.desktop&&<SettingsSection title="软件与帮助"><UpdateSettings/><MacHelp/></SettingsSection>}
   </SettingsPanel>;
   const gameOverlay = <>{game==='restaurant'&&<RestaurantWorkShowcase pet={current} onClose={()=>setGame(null)} onStart={()=>startActivity('restaurant')} onStop={stopActivity}/>} {game&&game!=='restaurant'&&<GameSoundToggle game={game} enabled={prefs.gameSound} onToggle={()=>setPrefs(p=>({...p,gameSound:!p.gameSound}))}/>} {game==='color-mixer'&&<ColorMixerGame pet={current} sound={prefs.gameSound} onBrew={color=>{const saved=petRef.current;if(!saved)return {ok:false,message:'先领养一只拉姆吧。'};const result=brewColourPotion(saved,color);apply(result);if(result.ok)setMemory(m=>m?recordEvent(m,{kind:'craft-potion',detail:`你调制了${color.toUpperCase()}颜色的药水，装进了背包。`}):m);return result}} onClose={()=>setGame(null)} onBackpack={()=>{setGame(null);setPocketCategory('medicine');setPanel('food')}}/>}{game === 'fruit' && <FruitGame costume={current.wearing} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'memory' && <MemoryGame sound={prefs.gameSound} onClose={() => setGame(null)} onComplete={completeGame}/>} {game === 'treasure' && <TreasureGame costume={current.wearing} background={roomMedia.background} phase={roomMedia.phase} sound={prefs.gameSound} color={current.color} stage={stage} evolution={current.evolution} onClose={() => setGame(null)} onComplete={completeGame}/>} {game && !['fruit','memory','treasure','color-mixer','restaurant'].includes(game) && <MoreGames sound={prefs.gameSound} kind={game as ExtraGame} onClose={() => setGame(null)} onComplete={completeGame}/>}</>;
@@ -778,12 +808,14 @@ export default function App() {
       onBoard={()=>void openBoard()} onOuting={()=>startOuting(true)} onPanel={next => { if (next === 'food') setPocketCategory('food'); void openPanel(next); }} onCare={doCare} onHome={() => void enterHome()} onWork={()=>startActivity('restaurant')} onViewRestaurant={()=>void enterRestaurant()} onStopWork={stopActivity} onSchool={()=>void enterHome('school')} onOriginalPlay={startOfficial} onUploadedPlay={startUploaded} onStopUploaded={stopUploaded} uploadedPlaying={isUploadedAction(action)} courseCompletion={courseCompletion} onElementSkill={showElementSkill} magicLearned={learned(current,'magic')} onMagic={()=>showSkill('magic')} onShop={visitToyShop} onWardrobe={()=>void enterHome('wardrobe')} onFocus={focusToggle} onSay={speak} onTug={tugReaction} onShake={showDizzy} onBubble={respondToBubble} onRecall={()=>recallPet()} onPresence={()=>tellPresence(true)} onCurious={()=>watchButterfly()} onPet={() => doCare('pet')}/>
     {panel==='notes'&&<MessageBoard pet={current} onChange={updateNotes} onClose={()=>setPanel(null)}/>}
     {toast && toast !== bubble && <div className="compact-toast" role="status">{toast}</div>}
+    <div className="save-operation-receipt"><SaveOperationFeedback feedback={saveFeedback} onDismiss={()=>setSaveFeedback(null)}/></div>
   </div>;
 
-  if(!pet&&unreadableSave)return <main className="save-recovery"><h1>先把原来的拉姆存档保管好</h1><p>本机有存档，但暂时无法完整读取。原记录仍然保留，修复或导入有效备份后再继续。</p><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><button className="game-button" onClick={()=>{let raw='';try{raw=localStorage.getItem(SAVE_KEY)??''}catch{}if(window.mobile){void window.mobile.exportSave(raw,'ramu-recovery.json').catch(()=>{});return;}const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='ramu-recovery.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}}>导出原始存档</button><button className="game-button" onClick={()=>importInput.current?.click()}>导入有效备份</button><input hidden ref={importInput} type="file" accept=".json,application/json" onChange={e=>void importSave(e.target.files?.[0])}/>{toast&&<p role="status">{toast}</p>}</main>;
+  if(!pet&&unreadableSave)return <main className="save-recovery"><h1>先把原来的拉姆存档保管好</h1><p>本机有存档，但暂时无法完整读取。原记录仍然保留，修复或导入有效备份后再继续。</p><SaveManager onImport={importSave} onExport={()=>exportSave(true)} exportLabel="导出原始存档" importLabel="导入有效备份" feedback={saveFeedback} onFeedback={setSaveFeedback}/></main>;
   if (!pet && waitingForReopen && !window.desktop) return <div className="farewell-page"><img src="./icons/ramu.png" alt=""/><h1>好好说了再见</h1><p>这只拉姆和它的回忆已从本机移除。</p><button className="game-button" onClick={() => location.reload()}>重新打开领养处</button></div>;
 
   return <div className={`classic-app ramu-v6 ${roomScreen.fullscreen?'is-room-fullscreen':''}`}>
+    {pet&&panel!=='settings'&&!reset&&<div className="save-operation-receipt"><SaveOperationFeedback feedback={saveFeedback} onDismiss={()=>setSaveFeedback(null)}/></div>}
     {pet&&window.desktop&&window.desktop.platform!=='android'&&!roomScreen.fullscreen&&!roomScreen.busy&&<RoomResizeHandles/>}
     <header className="classic-titlebar"><div>拉姆</div><div>{window.desktop && <><button onClick={() => window.desktop?.minimize()} aria-label="最小化到托盘">－</button><button onClick={() => window.desktop?.close()} aria-label="关闭窗口">×</button></>}</div></header>
     <TimeScene media={roomMedia}>
@@ -801,7 +833,7 @@ export default function App() {
         : <><div className="adoption-selected"><Ram color={color} stage={0}/></div><div className="adoption-name"><label htmlFor="pet-name">它的名字</label><input ref={adoptionFocus} id="pet-name" maxLength={12} value={name} onChange={e => setName(e.target.value)} onInput={e => setName(e.currentTarget.value)} placeholder="给拉姆起个名字" required autoFocus/></div></>}
       <button type="submit" className="game-button adopt-cta" disabled={adoptionStep === 'name' && !name.trim()}>{adoptionStep === 'color' ? '给它起名' : '带拉姆回家！'}</button>
       {adoptionStep === 'name' && <button type="button" className="adoption-back" onClick={() => setAdoptionStep('color')}>重新选颜色</button>}
-      <p className="adoption-note">从一颗种子慢慢养大。赠送 1000 摩尔豆，用品到小屋挑选。</p>{webEdition&&<WebAppHelp compact/>}<details className="adoption-save-help"><summary>以前养过拉姆？检查存档或导入备份</summary><LocalSaveInspector onRestore={text=>importSave(undefined,text)}/><button type="button" className="game-button small" onClick={()=>importInput.current?.click()}>导入存档</button><input hidden ref={importInput} type="file" accept="application/json,.json" onChange={e=>void importSave(e.target.files?.[0])}/></details>
+      <p className="adoption-note">从一颗种子慢慢养大。赠送 1000 摩尔豆，用品到小屋挑选。</p>{webEdition&&<WebAppHelp compact/>}<details className="adoption-save-help"><summary>以前养过拉姆？检查存档或导入备份</summary><SaveManager onImport={importSave} feedback={saveFeedback} onFeedback={setSaveFeedback}/></details>
     </form></section></div>}
     {panel && panel!=='decor' && panel!=='notes' && pet && <GameDialog title={titles[panel]} wide={['shop','growth','games','settings','wardrobe','status','food','memories','school'].includes(panel)} onClose={() => setPanel(null)}>
       <nav className="paper-tabs" aria-label="小屋页面">{(['status','food','shop','wardrobe','games','growth','school','memories','settings'] as const).map(p => <button key={p} onClick={() => setPanel(p)} className={panel === p ? 'active' : ''}>{({status:'状态',food:'背包',shop:'商店',games:'游戏',growth:'成长',memories:'回忆',decor:'布置',wardrobe:'衣橱',school:'学院',settings:'设置'})[p]}</button>)}</nav>
@@ -829,7 +861,7 @@ export default function App() {
       {panel === 'settings' && settingsContent}
     </GameDialog>}
     {panel==='notes'&&pet&&<MessageBoard pet={current} onChange={updateNotes} onClose={()=>setPanel(null)}/>}
-    {reset && pet && <GameDialog title="和拉姆说再见？" onClose={() => setReset(false)}><div className="farewell-confirm"><div><Ram costume={current.wearing} color={current.color} stage={stage} evolution={current.evolution}/></div><h3>送别 {current.name}</h3><p>这会删除它的成长、物品和本机回忆。重新打开后，可以领养一颗新的种子。</p><div className="confirm-buttons"><button className="game-button" onClick={exportSave}>先导出存档</button><button className="game-button" onClick={() => void abandonPet()}>确认送别</button></div></div></GameDialog>}
+    {reset && pet && <GameDialog title="和拉姆说再见？" onClose={() => setReset(false)}><div className="farewell-confirm"><div><Ram costume={current.wearing} color={current.color} stage={stage} evolution={current.evolution}/></div><h3>送别 {current.name}</h3><p>这会删除它的成长、物品和本机回忆。重新打开后，可以领养一颗新的种子。</p><SaveOperationFeedback feedback={saveFeedback}/><div className="confirm-buttons"><button className="game-button" onClick={()=>void exportSave()}>先导出存档</button><button className="game-button" onClick={() => void abandonPet()}>确认送别</button></div></div></GameDialog>}
     {gameOverlay}
   </div>;
 }

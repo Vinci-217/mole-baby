@@ -5,6 +5,9 @@ import type {CompanionMemory} from './companion-memory'
 
 export const PET_SAVE_KEY='ramu-house-save-v1'
 export const MAX_BACKUP_BYTES=1_000_000
+export class InvalidPetBackup extends Error {
+ constructor(public reason:'size'|'format'){super(reason==='size'?'Backup is too large':'Invalid pet save')}
+}
 export type BackupStorage=Pick<Storage,'getItem'|'setItem'|'removeItem'>
 export interface RestoredPetBackup {pet:GameState;memory:CompanionMemory}
 const LOCAL_DATA_KEYS=['ramu-house-preferences-v2','ramu-room-media-v1'];
@@ -23,15 +26,20 @@ export async function recoverLocalPet(storage:BackupStorage,api:NonNullable<Wind
  restorePetBackup(text,storage);return true;
 }
 
-/** Validate and persist before replacing the live pet. A rejected storage write
- * must not report a successful import or discard the existing live companion. */
-export function restorePetBackup(text:string,storage:BackupStorage,now=Date.now()):RestoredPetBackup {
- if(new TextEncoder().encode(text).byteLength>MAX_BACKUP_BYTES)throw new Error('Backup is too large')
- const raw:unknown=JSON.parse(text)
- if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('Invalid backup')
+/** Validate before creating a pre-import archive, so invalid files cannot fill storage. */
+export function validatePetBackup(text:string,now=Date.now()) {
+ if(new TextEncoder().encode(text).byteLength>MAX_BACKUP_BYTES)throw new InvalidPetBackup('size')
+ let raw:unknown;try{raw=JSON.parse(text)}catch{throw new InvalidPetBackup('format')}
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new InvalidPetBackup('format')
  const {companionMemory,localData,...saved}=raw as Record<string,unknown>
- let pet=parseSave(JSON.stringify(saved),now)
- if(!pet)throw new Error('Invalid pet save')
+ const pet=parseSave(JSON.stringify(saved),now)
+ if(!pet)throw new InvalidPetBackup('format')
+ return {pet,companionMemory,localData};
+}
+/** Persist before replacing the live pet; roll back staged data on write failure. */
+export function restorePetBackup(text:string,storage:BackupStorage,now=Date.now()):RestoredPetBackup {
+ const decoded=validatePetBackup(text,now),{companionMemory,localData}=decoded;
+ let {pet}=decoded;
  const key=memoryKey(pet),previousMemory=storage.getItem(key)
  const memory=parseMemory(companionMemory??previousMemory,pet)
  pet={...pet,highestGrowth:Math.max(earnedGrowth(pet),pet.naturalGrowth===undefined?legacyUnlockedGrowth(memory.events):0)}
