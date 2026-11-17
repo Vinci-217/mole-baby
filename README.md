@@ -71,7 +71,10 @@ npm test                 # 养成、存档、窗口与更新测试
 | <img src="docs/sponsors/shencha.png" width="64" height="64" alt="参苓" /><br />**参苓** | <img src="docs/sponsors/taibai.png" width="64" height="64" alt="太白猕猴桃🥝" /><br />**太白猕猴桃🥝** | <img src="docs/sponsors/murong.png" width="64" height="64" alt="慕容狗尾巴草" /><br />**慕容狗尾巴草** |
 | <img src="docs/sponsors/xiaohongshu-66d7cb02.png" width="64" height="64" alt="小红薯66D7CB02" /><br />**小红薯66D7CB02** | <img src="docs/sponsors/gui-fei.png" width="64" height="64" alt="贵妃刷红薯" /><br />**贵妃刷红薯** | <img src="docs/sponsors/xie-huang-tang-bao.png" width="64" height="64" alt="想吃蟹黄汤包" /><br />**想吃蟹黄汤包** |
 | <img src="docs/sponsors/wu-suo-bu-cheng-win.png" width="64" height="64" alt="无所不成win" /><br />**无所不成win** | <img src="docs/sponsors/bu-ao-ye.png" width="64" height="64" alt="再也不熬夜了！" /><br />**再也不熬夜了！** | <img src="docs/sponsors/lucas.png" width="64" height="64" alt="LUCAS" /><br />**LUCAS** |
-| <img src="docs/sponsors/zao-an-jiu-niu.png" width="64" height="64" alt="早安啾妞" /><br />**早安啾妞** | <img src="docs/sponsors/xiaoxiong.png" width="64" height="64" alt="小熊崽崽" /><br />**小熊崽崽** |  |
+| <img src="docs/sponsors/zao-an-jiu-niu.png" width="64" height="64" alt="早安啾妞" /><br />**早安啾妞** | <img src="docs/sponsors/xiaoxiong.png" width="64" height="64" alt="小熊崽崽" /><br />**小熊崽崽** | <img src="docs/sponsors/qing-gong.png" width="64" height="64" alt="轻功踩塌别人房顶" /><br />**轻功踩塌别人房顶** |
+| <img src="docs/sponsors/yi-zhi-hai-shen.png" width="64" height="64" alt="一只海参" /><br />**一只海参** | <img src="docs/sponsors/mao-shua-o.png" width="64" height="64" alt="毛刷O（限流版）" /><br />**毛刷O（限流版）** | <img src="docs/sponsors/xin-dong-224.png" width="64" height="64" alt="心动224" /><br />**心动224** |
+| <img src="docs/sponsors/mo-er-shi-shang.png" width="64" height="64" alt="摩尔时尚秋季刊特约模特" /><br />**摩尔时尚秋季刊特约模特** | <img src="docs/sponsors/genm.png" width="64" height="64" alt="Genm幻梦" /><br />**Genm幻梦** | <img src="docs/sponsors/dandan.png" width="64" height="64" alt="DanDan" /><br />**DanDan** |
+| <img src="docs/sponsors/sha-shi-hou-chi-fan.png" width="64" height="64" alt="啥时候吃饭" /><br />**啥时候吃饭** | <img src="docs/sponsors/wan-dou.png" width="64" height="64" alt="豌豆豌豆豌豆嘭" /><br />**豌豆豌豆豌豆嘭** | <img src="docs/sponsors/bai-cai.png" width="64" height="64" alt="白菜" /><br />**白菜** |
 
 ## 素材赞助鸣谢
 
