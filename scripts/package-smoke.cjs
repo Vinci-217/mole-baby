@@ -23,6 +23,7 @@ async function verifyApplication({executable,archive,screenshot}){
   for(const form of ['junior','middle','senior','super','water','wood','fire'])for(const layer of ['neutral','mask'])assert.ok(paths.has(`dist/assets/original/affection/${form}-${layer}.webp`));
   assert.ok(![...paths].some(p=>p.includes('/node_modules/sharp/')||p.endsWith('.node-test.cjs')),'Build tools and tests must stay out of the installed app');
   for(const retired of['electron/deepseek.cjs','electron/speech.cjs'])assert.ok(!paths.has(retired),'Retired conversation backend must not be packaged');
+  assert.ok(paths.has('electron/startup-recovery.cjs'),'Packaged application is missing native startup recovery');
   const metadata=JSON.parse(asar.extractFile(archive,'package.json'));
   assert.equal(metadata.version,version);console.log('PASS: complete original pet/outfit payload; retired AI and speech backends absent');
   profile=fs.mkdtempSync(path.join(os.tmpdir(),'mole-package-'));fs.writeFileSync(path.join(profile,'companion-ai-key.json'),'retired-test-key');

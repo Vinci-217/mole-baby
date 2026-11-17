@@ -35,6 +35,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
       this.webContents.mainFrame = { url: '' };
       this.webContents.send = () => {};
       this.webContents.setZoomFactor=value=>{this.zoom=value;};
+      this.webContents.reloadIgnoringCache=()=>{stats.reloads=(stats.reloads??0)+1;this.webContents.emit('did-start-navigation',{},this.webContents.mainFrame.url,false,true)};
       this.webContents.setWindowOpenHandler = () => {};
       this.webContents.session = { setPermissionRequestHandler() {}, setPermissionCheckHandler() {} };
       windows.push(this);
@@ -271,6 +272,34 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   assert.equal(run.tray.tooltip, '拉姆 · 等待领养');
   assert.equal(run.tray.image.template, false);
   assert.equal(path.basename(run.tray.image.path), 'tray.png');
+});
+
+for(const arch of ['x64','ia32'])test(`legacy ${arch} reports an early renderer crash instead of leaving an invisible application`,async t=>{
+ const run=await launch(undefined,false,'win32',{edition:'legacy',arch,dialogAnswers:[2]});t.after(()=>run.cleanup());
+ const file=path.join(run.app.userData,'Local Storage','existing-pet');fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,'retained pet record');
+ assert.equal(run.window.isVisible(),false);
+ run.window.webContents.emit('render-process-gone',{}, {reason:'crashed',exitCode:1});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run.stats.dialogs.length,1,'A native failure prompt must work before the renderer can paint');
+ assert.equal(run.stats.dialogs[0].parent,null,'A hidden or crashed renderer must not own the recovery prompt');
+ assert.match(run.stats.dialogs[0].options.message,/未能正常打开/);
+ const log=fs.readFileSync(path.join(run.app.userData,'logs','startup.log'),'utf8');
+ assert.match(log,/renderer-gone/);assert.match(log,/crashed/);
+ assert.equal(fs.readFileSync(file,'utf8'),'retained pet record');
+ run.tray.emit('click');await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run.stats.dialogs.length,2,'The tray can reopen recovery even before renderer readiness');
+});
+
+test('a loaded pet can recover from a renderer crash without losing its readiness handshake or tray lifecycle',async t=>{
+ const run=await launch(undefined,false,'win32',{edition:'legacy',dialogAnswers:[0]});t.after(()=>run.cleanup());
+ run.send('desktop:ready-to-show',true);run.send('desktop:hide-to-tray');
+ run.window.webContents.emit('render-process-gone',{}, {reason:'oom',exitCode:134});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run.stats.reloads,1);
+ run.send('desktop:ready-to-show',true);
+ assert.equal(run.window.isVisible(),true,'A recovered renderer must be able to reveal its hidden native window again');
+ run.send('desktop:hide-to-tray');run.tray.emit('click');
+ assert.equal(run.window.isVisible(),true);assert.equal(run.stats.dialogs.length,1);
 });
 
 test('existing legacy named profiles are reused without moving or deleting their save', async t => {

@@ -29,6 +29,7 @@ const macHelp=createMacHelp({platform:process.platform,shell,guidePath:path.join
 
 const {createUpdates}=require('./updates.cjs');
 const {createUpdatePrompts}=require('./update-prompts.cjs');
+const {createStartupRecovery}=require('./startup-recovery.cjs');
 const applicationMetadata=require('../package.json');
 const {windowsRuntime}=require('./windows-runtime.cjs');
 const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetadata,process.arch):null;
@@ -91,6 +92,7 @@ let mousePassthrough = false;
 let tray = null;
 let quitting = false;
 let rendererReady = false;
+let startupRecovery=null;
 let hasPet = false;
 let wanderPreference = true;
 let edgeHiding = true;
@@ -811,7 +813,7 @@ function hideToTray() {
 
 function showFromTray(home = false) {
   if (!mainWindow || mainWindow.isDestroyed()) { createWindow(); return; }
-  if (!rendererReady) return;
+  if (!rendererReady) { void startupRecovery?.show(); return; }
   if(!home&&(roomFullscreen.isFullscreen()||roomFullscreen.isChanging())){void roomFullscreen.set(false).then(()=>showFromTray(home)).catch(error=>console.error(error.message));return;}
   revealPet();
   changePetMode(hasPet && !home);
@@ -830,6 +832,7 @@ function markRendererReady(adopted) {
   // React calls this after painting its first correctly sized mode. It also
   // updates adoption state later, without reopening a window hidden to tray.
   if (rendererReady || !mainWindow || mainWindow.isDestroyed()) return;
+  startupRecovery?.markReady();
   rendererReady = true;
   mainWindow.show();
   scheduleWander();
@@ -1029,6 +1032,7 @@ function createWindow() {
   });
 
   const window = mainWindow;
+  startupRecovery?.watch(window);
   window.webContents.on('page-title-updated', event => {
     event.preventDefault();
     if (!window.isDestroyed()) window.setTitle('');
@@ -1062,10 +1066,9 @@ function createWindow() {
   window.webContents.on('did-finish-load', () => {
     if (!window.isDestroyed()) publishState(true);
   });
-  window.webContents.on('preload-error', (_event, _filename, error) => { console.error('Desktop preload failed:', error.name, error.message); });
-  window.webContents.on('render-process-gone', () => { });
+  window.webContents.on('render-process-gone', () => { rendererReady=false; });
   window.webContents.on('did-start-navigation', (_event, _url, isInPlace, isMainFrame) => {
-    if (isMainFrame && !isInPlace) { }
+    if (isMainFrame && !isInPlace) rendererReady=false;
   });
   window.webContents.on('will-navigate', (event, target) => {
     if (!isOurURL(target)) event.preventDefault();
@@ -1078,8 +1081,7 @@ function createWindow() {
 
   const loading = useDevelopmentServer ? window.loadURL(rendererURL) : window.loadFile(INDEX_PATH);
   loading.catch((error) => {
-    console.error('Unable to load the pet application:', error.code || error.message);
-    if (!window.isDestroyed()) window.show();
+    if (!window.isDestroyed()&&error.code!=='ERR_ABORTED') void startupRecovery?.fail('page-load-failed',error);
   });
 }
 
@@ -1090,6 +1092,11 @@ if (!app.requestSingleInstanceLock()) {
     showFromTray();
   });
   app.whenReady().then(() => {
+    startupRecovery=createStartupRecovery({directory:stableUserDataPath,
+      details:{version:applicationMetadata.version,edition:windowsEdition?.edition??process.platform,platform:process.platform,arch:process.arch,os:require('node:os').release(),electron:process.versions.electron,node:process.versions.node,chrome:process.versions.chrome},
+      showMessageBox:options=>dialog.showMessageBox(options),openPath:file=>shell.openPath(file),isQuitting:()=>quitting,
+      retry:window=>{if(window&&!window.isDestroyed())window.webContents.reloadIgnoringCache();else{app.relaunch();app.quit();}},quit:()=>app.quit(),
+    });
     registerOriginalAssets(protocol,path.join(__dirname,'..','dist','assets','original','official'));
     if (process.platform === 'win32') app.setAppUserModelId(windowsEdition.appId);
     if (process.platform === 'darwin') {
@@ -1140,11 +1147,12 @@ if (!app.requestSingleInstanceLock()) {
       showFromTray();
     });
   }).catch((error) => {
-    console.error('Unable to start the pet application:', error.message);
-    app.quit();
+    if(startupRecovery)void startupRecovery.fail('main-startup-failed',error);
+    else{dialog.showErrorBox('拉姆启动遇到问题','启动未能完成，请保留存档并重试。\n'+error.message);app.quit();}
   });
   nativeAutoUpdater?.on('before-quit-for-update',()=>{quitting=true;saveWindowState();try{mainWindow?.webContents.session.flushStorageData()}catch{}});
   app.on('before-quit', () => {
+    startupRecovery?.dispose();
     roomResizer.end();stopPetResizeDrag();
     quitting = true;clearInterval(dragPoll);
     try{mainWindow?.webContents.session.flushStorageData()}catch{}
