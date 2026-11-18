@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buyFood, buyItem, care, changePetStage, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick, WAKE_GRACE_MS } from './game';
+import { buyFood, buyItem, care, changePetStage, cleanPetName, evolvePet, EVOLUTIONS, COLORS, createPet, GAME_REWARD_COOLDOWN_MS, getItem, getNextStage, getPetCondition, getStage, GROWTH_MAX, GROWTH_STAGE_HOURS, ITEMS, parseSave, rewardGame, STAGES, tick, WAKE_GRACE_MS } from './game';
 
 const NOW = 1_800_000_000_000;
 const HOUR = 3_600_000;
@@ -494,4 +494,16 @@ describe('manual stage selection stays fixed',()=>{
   const time=1_700_000_000_000,p={...createPet('豆','red',time),growth:60};
   expect(parseSave(JSON.stringify(p),time+3_600_000,true)!.growth).toBe(60);
  });
+});
+
+describe('pet names', () => {
+  it('truncates by code point so an emoji at the limit is never split', () => {
+    const name = '拉姆拉姆拉姆拉姆拉姆拉🐹';
+    expect(name.length).toBe(13);
+    expect(name.slice(0, 12)).not.toBe('拉姆拉姆拉姆拉姆拉姆拉🐹');
+    expect(cleanPetName(name, 12)).toBe('拉姆拉姆拉姆拉姆拉姆拉🐹');
+    expect(cleanPetName('🐹'.repeat(20), 12)).toBe('🐹'.repeat(12));
+    expect(cleanPetName('  小芽\u0007  ')).toBe('小芽');
+    expect(createPet('🐹'.repeat(20), 'pink', NOW).name).toBe('🐹'.repeat(16));
+  });
 });

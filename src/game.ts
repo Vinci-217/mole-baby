@@ -142,9 +142,15 @@ function growForHours(growth: number, hours: number): number {
   return result;
 }
 
+/** Strip control characters, trim, and keep at most `max` code points, so an
+ * emoji is never cut in half the way String#slice can split a surrogate pair. */
+export function cleanPetName(name: string, max = 16): string {
+  return Array.from(name.replace(/[\u0000-\u001f\u007f]/g, '').trim()).slice(0, max).join('');
+}
+
 export function createPet(name: string, color: PetColor, now = Date.now()): GameState {
   if (!COLORS.some(entry => entry.id === color)) throw new RangeError('拉姆只有粉、黄、蓝、红四种基础颜色。');
-  const safeName = Array.from(name.replace(/[\u0000-\u001f\u007f]/g, '').trim()).slice(0, 16).join('') || '小拉姆';
+  const safeName = cleanPetName(name) || '小拉姆';
   return {
     version: 1,
     name: safeName,
@@ -327,7 +333,7 @@ export function care(state: GameState, action: Action, foodId?: string, now = Da
     const rightCategory = action === 'use' || (action === 'feed' && (item.category === 'food' || item.id === 'juice'))
       || (action === 'drink' && item.category === 'drink') || (action === 'wash' && item.category === 'clean');
     if (!rightCategory) return { state: current, message: '这种用品需要在对应的照料分类里使用。', ok: false };
-    if (getStage(current.growth) < item.minStage) return { state: current, message: `${item.name}要等到${STAGES[item.minStage].name}才能使用，先留在背包里吧。`, ok: false };
+    if (getStage(current.growth, current.evolution) < item.minStage) return { state: current, message: `${item.name}要等到${STAGES[item.minStage].name}才能使用，先留在背包里吧。`, ok: false };
     if(item.category==='toy'){
       if(current.activity||current.outing)return {state:current,ok:false,message:'先结束当前活动，再一起玩吧。'};
       return {state:current,ok:true,message:`来玩${item.name}吧！`};

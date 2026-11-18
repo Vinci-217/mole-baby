@@ -28,7 +28,7 @@ export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopB
   const count = selected ? pet.inventory[selected.id] ?? 0 : 0;
   const full = count >= (selected?.reusable?1:9_999);
   const enough = selected && pet.coins >= selected.price;
-  const locked = selected && getStage(pet.growth) < selected.minStage;
+  const locked = selected && getStage(pet.growth, pet.evolution) < selected.minStage;
 
   function changeBook(next: ItemCategory) { setCategory(next); setPage(0); setSelectedId(null); }
   function turnPage(next: number) { setPage(Math.max(0, Math.min(pages - 1, next))); setSelectedId(null); }
