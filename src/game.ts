@@ -122,6 +122,8 @@ export const WAKE_ENERGY = 85;
 export const WAKE_GRACE_MS = 15 * 60 * 1000;
 const MAX_INVENTORY = 9_999;
 const MAX_COINS = 1_000_000_000;
+/** Largest timestamp a JavaScript Date can represent. */
+const MAX_DATE_MS = 8_640_000_000_000_000;
 
 const clamp = (value: number, max = 100): number => Math.min(max, Math.max(0, value));
 const rounded = (value: number): number => Math.round(value * 1_000_000) / 1_000_000;
@@ -444,7 +446,10 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     if (!isRecord(value) || value.version !== 1) return null;
     if (typeof value.name !== 'string' || !value.name.trim() || Array.from(value.name).length > 16 || /[\u0000-\u001f\u007f]/.test(value.name)) return null;
     if (!isPetColor(value.color)) return null;
-    if (!isIntegerIn(value.createdAt, 0, now + 300_000) || !isIntegerIn(value.lastTick, value.createdAt, now + 300_000)) return null;
+    // A save written while the system clock ran ahead stays readable after the
+    // clock is corrected. tick() leaves time frozen until the clock catches up,
+    // so rolling the clock back never grants extra growth or decay.
+    if (!isIntegerIn(value.createdAt, 0, MAX_DATE_MS) || !isIntegerIn(value.lastTick, value.createdAt, MAX_DATE_MS)) return null;
     if (!isNumberIn(value.growth, 0, GROWTH_MAX) || !isIntegerIn(value.coins, 0, MAX_COINS)) return null;
     if (value.growthLocked !== undefined && typeof value.growthLocked !== 'boolean') return null;
     if (value.evolution !== undefined && (!EVOLUTIONS.some(form => form.id === value.evolution) || value.growth < GROWTH_MAX)) return null;
@@ -460,7 +465,10 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     const inventory: Record<string, number> = {};
     for (const [id, count] of Object.entries(value.inventory)) {
       const item = getItem(id);
-      if (!item || !isIntegerIn(count, 0, MAX_INVENTORY) || Object.hasOwn(inventory, item.id)) return null;
+      // Items from a newer or older catalogue are dropped, not fatal: one
+      // unknown key must not lock the player out of the whole save.
+      if (!item) continue;
+      if (!isIntegerIn(count, 0, MAX_INVENTORY) || Object.hasOwn(inventory, item.id)) return null;
       inventory[item.id] = count;
     }
     if(Object.keys(inventory).filter(id=>customPotionColor(id)).length>MAX_CUSTOM_POTION_COLORS)return null;

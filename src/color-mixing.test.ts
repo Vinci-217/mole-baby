@@ -22,7 +22,7 @@ describe('original RGB mixing adapted to bottled pet colours',()=>{
   let p=pet();for(let i=0;i<MAX_CUSTOM_POTION_COLORS;i++)p=brewColourPotion(p,mixColour([i,0,255]),NOW).state
   expect(brewColourPotion(p,'#ffffff',NOW).ok).toBe(false);expect(brewColourPotion(p,'#0000ff',NOW).state.inventory['mix-0000ff']).toBe(2)
   const consumed=care(p,'use','mix-0000ff',NOW).state;expect(brewColourPotion(consumed,'#ffffff',NOW).ok).toBe(true)
-  expect(parseSave(JSON.stringify({...p,color:'#bad'}),NOW)).toBeNull();expect(parseSave(JSON.stringify({...p,inventory:{...p.inventory,'mix-<script>':1}}),NOW)).toBeNull()
+  expect(parseSave(JSON.stringify({...p,color:'#bad'}),NOW)).toBeNull();const forged=parseSave(JSON.stringify({...p,inventory:{...p.inventory,'mix-<script>':1}}),NOW);expect(forged).not.toBeNull();expect(Object.hasOwn(forged!.inventory,'mix-<script>')).toBe(false)
  })
  it('preserves legacy palettes and supplies bounded custom body offsets',()=>{
   expect(petColorOffsets('red')).toEqual([255,-199,-250]);expect(petColorOffsets('#45ba87')).toEqual([-186,-69,-120]);expect(petColorOffsets('#000000')).toEqual([-255,-255,-255])
