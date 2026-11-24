@@ -48,17 +48,21 @@ def check_bundle(app, version):
 def verify_assets(dist):
     manifest = json.loads((dist / "offline-resources.json").read_text())
     expected_bytes = 0
-    originals = 0
+    entries = {}
     for item in manifest["files"]:
         path = (dist / item["path"]).resolve()
         assert path.is_relative_to(dist.resolve())
         assert path.stat().st_size == item["bytes"] and hash_file(path) == item["sha256"], item["path"]
         expected_bytes += item["bytes"]
-        originals += path.suffix == ".swf"
+        entries[item["path"]] = item
     assert manifest["bytes"] == expected_bytes
     assert len(json.loads((dist / "book-packs.json").read_text())["books"]) == 245
-    assert len(manifest["files"]) > 5700 and originals == 567
-    print(f'PASS mounted app media {len(manifest["files"])} files, {originals} SWFs, renderer {manifest["revision"]}')
+    clips = json.loads((dist / "assets/original/official/manifest.json").read_text())["clips"]
+    assert len(manifest["files"]) > 5700 and len(clips) == 567
+    for clip in clips:
+        entry = entries["assets/original/official/files/" + clip["path"]]
+        assert entry["sha256"] == clip["sha256"] and entry["bytes"] == clip["bytes"]
+    print(f'PASS mounted app media {len(manifest["files"])} files, {len(clips)} original SWFs, renderer {manifest["revision"]}')
 
 def detach(mount):
     for second in range(5):
@@ -89,9 +93,11 @@ def main():
         image_files.mkdir()
         run("/usr/bin/ditto", "-x", "-k", str(preview_zip), str(image_files))
         app = image_files / "拉姆.app"
-        check_bundle(app, version)
+        executable, _ = check_bundle(app, version)
+        native_test = Path(__file__).with_name("smoke-mac-preview.cjs")
         run("/usr/bin/codesign", "--force", "--deep", "--sign", "-", "--preserve-metadata=identifier,entitlements,flags", str(app))
         run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(app))
+        run("node", str(native_test), str(executable), str(root / "preflight-profile"), "staging")
         (image_files / "Applications").symlink_to("/Applications")
         dmg = root / f"mole-baby-{version}-mac-arm64.dmg"
         run("/usr/bin/hdiutil", "create", "-fs", "HFS+", "-format", "UDZO", "-volname", "拉姆预发布试装",
@@ -110,8 +116,7 @@ def main():
             executable, renderer = check_bundle(mounted, version)
             run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(mounted))
             verify_assets(renderer)
-            native_test = Path(__file__).with_name("smoke-mac-preview.cjs")
-            run("node", str(native_test), str(executable), str(root / "qa-profile"))
+            run("node", str(native_test), str(executable), str(root / "qa-profile"), "mounted DMG")
         finally:
             detach(mount)
         checksum = hash_file(dmg)

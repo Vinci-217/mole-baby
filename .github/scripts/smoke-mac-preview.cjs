@@ -44,7 +44,7 @@ async function connect(url){
 }
 async function main(){
  assert.equal(process.platform,'darwin');assert.equal(process.arch,'arm64');
- const [executable,profile]=process.argv.slice(2),port=await freePort();
+ const [executable,profile,source]=process.argv.slice(2),port=await freePort();
  const child=spawn(executable,[`--user-data-dir=${profile}`,`--remote-debugging-port=${port}`],{
   env:{...process.env,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},stdio:['ignore','ignore','pipe'],
  });
@@ -73,7 +73,7 @@ async function main(){
   await actor.evaluate('window.desktop.setPetMode(false)');
   await waitFor(()=>actor.evaluate("Boolean(document.querySelector('.cottage-scene .scene-character canvas[data-loaded=true]'))"),
    'The native room pet did not paint');
-  console.log('PASS launched and painted the desktop pet and room from the mounted arm64 DMG');
+  console.log(`PASS launched and painted the desktop pet and room from the ${source} (arm64)`);
  }catch(error){
   if(diagnostics)console.error(diagnostics);
   throw error;
