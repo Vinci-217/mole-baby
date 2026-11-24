@@ -58,7 +58,10 @@ async function scenario(viewport,label){
  await page.getByRole('button',{name:'选择蓝色拉姆',exact:true}).click();await page.getByRole('button',{name:'给它起名',exact:true}).click();await page.locator('#pet-name').fill('安卓小蓝');await page.getByRole('button',{name:'带拉姆回家！',exact:true}).click();await expect(page.locator('.room-dock')).toBeVisible();assert.equal(await page.evaluate(()=>window.__androidTest.state.petMode),false);await fit(page);
  await expect.poll(async()=>JSON.parse(await page.evaluate(()=>window.__androidTest.storage['ramu-house-save-v1'])).name).toBe('安卓小蓝');
  await expect(page.locator('audio[data-ramu-bgm]')).toHaveCount(0);
- await require('../smoke-helpers.cjs').placeMusicBox(page);
+ const musicBox=await require('../smoke-helpers.cjs').placeMusicBox(page);
+ await musicBox.tap();
+ await expect(page.getByRole('switch',{name:'允许后台播放音乐',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'关闭面板',exact:true}).tap();
  await expect.poll(()=>page.evaluate(()=>{const audio=document.querySelector('audio[data-ramu-bgm]');return Boolean(audio&&!audio.paused&&audio.readyState>=2)}),{timeout:15000}).toBe(true);
  await artwork(page);
  if(viewport.width<=700||viewport.height<=600){

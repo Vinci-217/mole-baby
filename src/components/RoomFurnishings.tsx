@@ -5,7 +5,7 @@ import type {CSSProperties,PointerEvent} from 'react';
 import type {GameState} from '../game';
 import type {RoomMediaController} from '../room-media';
 import {COURSES,learned} from '../pet-school';
-import {canOwn,placementKey,furnitureScale,frontFurnitureOrder,MAX_PLACED_FURNITURE,isRoomInteractiveFurniture,type Placement} from '../room-furnishings';
+import {canOwn,placementKey,furnitureScale,frontFurnitureOrder,MAX_PLACED_FURNITURE,isRoomInteractiveFurniture,MUSIC_BOX_ID,MUSIC_BOX_HOME_POSITION,type Placement} from '../room-furnishings';
 import {FURNITURE,furnitureById,furnitureImage,furniturePixelWidth} from '../furniture-catalog';
 import {READING_SHELF_ID,SHELF_PAGE_COUNT,normalizeShelfPage,shelfBooks,type RamBookId} from '../reading-books';
 import {ReadingShelfArt,ReadingShelfSpines} from './ReadingShelf';
@@ -273,6 +273,10 @@ export function RoomFurnishingEditor({pet, media, onBuy, onPlace, bookShelfAvail
   }
 
   function put(id: string) {
+    if (id === MUSIC_BOX_ID && !placed.some(piece => piece.id === id)) {
+      onPlace(id, MUSIC_BOX_HOME_POSITION.x, MUSIC_BOX_HOME_POSITION.y);
+      return;
+    }
     const count = placed.length;
     onPlace(id, 38 + count % 4 * 8, 58 + Math.floor(count / 4) % 3 * 6);
   }

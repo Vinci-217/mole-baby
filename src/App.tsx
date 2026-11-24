@@ -91,7 +91,7 @@ import {DeferredView,RoomFurnishingLayer,RoomFurnishingEditor,OriginalReadingBoo
   RestaurantWorkShowcase,FruitGame,MemoryGame,TreasureGame,MoreGames,ColorMixerGame} from './deferred-views';
 import {RAM_HANDBOOK_ID,READING_SHELF_ID,type RamBookId,type ReadingProgress} from './reading-progress';
 import {PET_SAVE_KEY,MAX_BACKUP_BYTES,InvalidPetBackup,validatePetBackup,restorePetBackup,petBackupText} from './pet-backup';
-import {buyFurniture,placeFurniture,duplicateFurniture,removeFurniture,changeReadingShelfPage,placementKey,hasPlacedMusicBox,MUSIC_BOX_ID,type Placement} from './room-furnishings';
+import {buyFurniture,placeFurniture,duplicateFurniture,removeFurniture,changeReadingShelfPage,placementKey,hasPlacedMusicBox,MUSIC_BOX_ID,MUSIC_BOX_HOME_POSITION,type Placement} from './room-furnishings';
 import {roomFurnitureAction,type RoomFurniturePlayback} from './room-furniture-actions';
 
 const SAVE_KEY = PET_SAVE_KEY;
@@ -820,7 +820,7 @@ export default function App({startInRoom=false}:{startInRoom?:boolean}={}) {
     speak(`记住啦，我叫${value}，还是一直陪着你的我。`);
   }
   function buy(id: string) { if (floating) { notify('到小屋商店挑选用品吧。'); return; } if (petRef.current) apply(buyItem(petRef.current, id), 'buy', `你为我买了${getItem(id)?.name ?? '用品'}。`); }
-  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; importSequence.current++;setSaveFeedback(null);const adopted = placeFurniture(createPet(name.trim().slice(0, 12), color),MUSIC_BOX_ID,74,66); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!startInRoom&&!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
+  function adopt(e: FormEvent) { e.preventDefault(); if (!name.trim()) return; importSequence.current++;setSaveFeedback(null);const adopted = placeFurniture(createPet(name.trim().slice(0, 12), color),MUSIC_BOX_ID,MUSIC_BOX_HOME_POSITION.x,MUSIC_BOX_HOME_POSITION.y); awaitingAdoption.current = false; setWaitingForReopen(false); setPet(adopted); setMemory(recordEvent(createMemory(adopted), { kind: 'adoption', detail: '你把我接回了家，我们开始一起生活。' })); if (!startInRoom&&!window.desktop&&!webEdition) setPreview(true); speak('从今天起，我就是你的小拉姆啦。请多关照！', 10000); }
   function beginWorkViewSwitch(targetMode:boolean){
     if(window.mobile&&petRef.current?.activity?.kind==='restaurant'){workPresence.current.beginViewSwitch(targetMode);workHeartbeat.current=Date.now()}
   }

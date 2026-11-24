@@ -14,6 +14,7 @@ export interface FurnitureDefinition {
  image?:string;sourceId?:string;originalArea?:'house'|'garden';dragOnly?:boolean;
 }
 export const MUSIC_BOX_ID='music-box';
+export const MUSIC_BOX_HOME_POSITION = {x:74,y:66} as const;
 const musicBox: FurnitureDefinition = {id:MUSIC_BOX_ID,name:'音乐盒',surface:'floor',price:FURNITURE_PRICE,width:10,image:'./assets/original/furniture/music-box.png',sourceId:'160169'};
 export const GAME_PRIZE_FURNITURE:readonly FurnitureDefinition[]=[
  {id:READING_SHELF_ID,name:'拉姆书架',surface:'floor',price:0,width:20,image:'./assets/original/reading-books/shelf.svg'},
