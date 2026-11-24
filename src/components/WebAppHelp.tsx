@@ -8,7 +8,7 @@ export default function WebAppHelp({compact=false}:{compact?:boolean}){
   try{setStorage(await navigator.storage?.persist?.()?'已申请保留本地数据，仍建议定期导出备份。':'浏览器暂未授予长期存储，请定期导出存档。')}
   catch{setStorage('暂时无法申请长期存储，请先导出存档备份。')}
  }
- return <details className={`web-app-help ${compact?'is-compact':''}`} open={!compact}>
+ return <details className={`web-app-help ${compact?'is-compact':''}`}>
   <summary>添加到主屏幕 · 网页存档</summary>
   <p>iPhone／iPad：用 Safari 打开，点击“分享”→“添加到主屏幕”。安卓和电脑可在浏览器菜单中选择“安装应用”或“添加到主屏幕”。</p>
   <p>苹果主屏幕版与 Safari 的存档各自独立。建议先添加到主屏幕，再领养；已有拉姆请先导出存档，在主屏幕版导入。</p>

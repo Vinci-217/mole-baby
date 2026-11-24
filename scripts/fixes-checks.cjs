@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),{expect}=require('@playwright/test');
-const{enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
+const{enterHome,roomTab,toDesktop,placeMusicBox}=require('./smoke-helpers.cjs');
 async function verifyFixes(page,desktop){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));let failed=false;
  await page.addInitScript(()=>{const Base=window.Audio;window.__fixAudio=[];window.Audio=class extends Base{constructor(...args){super(...args);window.__fixAudio.push(this)}}});
@@ -21,15 +21,16 @@ async function verifyFixes(page,desktop){
   await toDesktop(page);
   const actions=await require('./smoke-helpers.cjs').openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();await page.getByRole('button',{name:'一起玩球',exact:true}).click();
   const football=page.getByTestId('desktop-character').locator('canvas[data-source-form=classic][data-uploaded-id="180004"]');await expect(football).toBeVisible();await expect(football).toHaveAttribute('data-loaded','true');await expect(football).toHaveCount(0,{timeout:12000});
-  await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);await roomTab(page,'设置');
-  const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await expect(background).not.toBeChecked();
+  await page.reload();await page.getByTestId('desktop-character').waitFor();await enterHome(page);
+  const musicBox=await placeMusicBox(page);await musicBox.press('Enter');
+  const background=page.getByRole('switch',{name:'允许后台播放音乐',exact:true});await expect(background).not.toBeChecked();
   if(desktop){
    assert.equal(await desktop.evaluate(()=>Number(process.versions.node.split('.')[0])<22||typeof process.getBuiltinModule('module').createRequire==='function'),true);
    await page.evaluate(()=>window.desktop.hideToTray());
    await expect.poll(()=>page.evaluate(()=>window.__fixAudio.filter(a=>a.src.includes('/audio/castle.mp3')).every(a=>a.paused))).toBe(true);
    await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());
   }
-  await background.check();
+  await background.press('ArrowRight');
   await expect.poll(async()=>JSON.parse(await page.evaluate(()=>localStorage.getItem('ramu-room-media-v1'))).backgroundPlayback).toBe(true);
   await toDesktop(page);await expect.poll(async()=>page.evaluate(()=>window.__fixAudio.some(a=>a.src.includes('/audio/castle.mp3')))).toBe(true);
   await expect.poll(()=>page.evaluate(()=>window.__fixAudio.some(a=>a.src.includes('/audio/castle.mp3')&&!a.paused))).toBe(true);
@@ -37,10 +38,10 @@ async function verifyFixes(page,desktop){
   if(desktop){
    await page.evaluate(()=>window.desktop.hideToTray());await page.waitForTimeout(500);await expect.poll(()=>page.evaluate(()=>window.__fixAudio.some(a=>a.src.includes('/audio/castle.mp3')&&!a.paused))).toBe(true);
    const state=await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].isVisible());assert.equal(state,false);
-   await desktop.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows()[0].webContents.send('desktop:music-toggle',false)});
-   await expect.poll(()=>page.evaluate(()=>window.__fixAudio.filter(a=>a.src.includes('/audio/castle.mp3')).every(a=>a.paused))).toBe(true);
    await desktop.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];w.show()});
   }
+  await enterHome(page);await musicBox.press('Enter');await background.press('ArrowLeft');await toDesktop(page);
+  await expect.poll(()=>page.evaluate(()=>window.__fixAudio.filter(a=>a.src.includes('/audio/castle.mp3')).every(a=>a.paused))).toBe(true);
   await expect(page.locator('.compact-bubble:not(.visible)')).toHaveCount(0);
   console.log('START room-upgrade-checks.cjs');await require('./room-upgrade-checks.cjs').verifyRoomUpgrade(page);console.log('FINISH room-upgrade-checks.cjs');
   console.log('START school-spells-checks.cjs');await require('./school-spells-checks.cjs').verifySchoolSpells(page);console.log('FINISH school-spells-checks.cjs');

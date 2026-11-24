@@ -60,10 +60,10 @@ const save=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1
  }
  fs.writeFileSync(path.join(root,'artifacts/v15-review/index.json'),JSON.stringify(pictures));
  console.log('PASS 32 original form/colour butterfly interactions, clipped-area guards, finite exits, seed pot isolation and preserved flight registration');
- await enterHome(p);await roomTab(p,'设置');await p.getByRole('checkbox',{name:'自然小动作',exact:true}).uncheck();await p.getByRole('slider',{name:'拉姆音量',exact:true}).fill('23');await toDesktop(p);await p.reload();await p.clock.fastForward(300000);await expect(ram).toHaveAttribute('data-action','idle');
- await enterHome(p);await roomTab(p,'设置');await expect(p.getByRole('checkbox',{name:'自然小动作',exact:true})).not.toBeChecked();await expect(p.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('23');assert.deepEqual(errors,[]);
+ await enterHome(p);await roomTab(p,'设置');await p.getByRole('switch',{name:'自然小动作',exact:true}).press('ArrowLeft');await p.getByRole('slider',{name:'拉姆音量',exact:true}).fill('23');await toDesktop(p);await p.reload();await p.clock.fastForward(300000);await expect(ram).toHaveAttribute('data-action','idle');
+ await enterHome(p);await roomTab(p,'设置');await expect(p.getByRole('switch',{name:'自然小动作',exact:true})).not.toBeChecked();await expect(p.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('23');assert.deepEqual(errors,[]);
  console.log('PASS persisted natural-motion toggle and volume, no forced timer or renderer errors');
- await p.getByRole('checkbox',{name:'自然小动作',exact:true}).check();await p.getByRole('switch',{name:'安静陪伴',exact:true}).click();await toDesktop(p);await p.clock.fastForward(300000);await expect(ram).toHaveAttribute('data-action','idle');
+ await p.getByRole('switch',{name:'自然小动作',exact:true}).press('ArrowRight');await p.getByRole('switch',{name:'安静陪伴',exact:true}).click();await toDesktop(p);await p.clock.fastForward(300000);await expect(ram).toHaveAttribute('data-action','idle');
  await enterHome(p);await roomTab(p,'设置');await p.getByRole('switch',{name:'安静陪伴',exact:true}).click();await toDesktop(p);await openActions(p);await p.getByRole('button',{name:'开始计时',exact:true}).click();await p.clock.fastForward(300000);await p.clock.runFor(50);await expect(ram).toHaveAttribute('data-action','focus');
  console.log('PASS quiet mode and a running manual timer suppress autonomous curiosity');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill('SIGTERM')});

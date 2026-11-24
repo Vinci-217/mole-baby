@@ -1,5 +1,6 @@
 import {loadOutfitPreview,rememberOutfitPreview} from './outfit-preview-cache';
 import {version} from '../package.json';
+import {loadAnimationImage} from './animation-image';
 
 const kinds=new Set(['seed','classic','grounded','flight']);
 /** Only lossless, fully recoloured base atlases are persisted. Transient
@@ -11,8 +12,7 @@ export async function loadGrowthAtlas(key:string|undefined,width:number,height:n
  if(!key)return;
  const data=await loadOutfitPreview(key);if(!data)return;
  try{
-  const image=await new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=data});
-  if(image.naturalWidth!==width||image.naturalHeight!==height)return;
+  const image=await loadAnimationImage(data,{width,height});
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const ctx=canvas.getContext('2d');if(!ctx)return;ctx.drawImage(image,0,0);return canvas;
  }catch{/* Optional cache corruption never prevents rebuilding the real source. */}

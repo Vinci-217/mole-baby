@@ -64,6 +64,12 @@ jobs:
           cache-dependency-path: |
             android/**/*.gradle
             android/gradle/wrapper/gradle-wrapper.properties
+      - name: Get the shared Android book index
+        if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v')
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-canonical-book-index
+          path: ${{ runner.temp }}/android-book-index
       - name: Build the complete offline game and resource blockmap
         run: |
           set -o pipefail
@@ -71,7 +77,12 @@ jobs:
           npm ci 2>&1 | tee mobile-release/dependencies.log
           npm test 2>&1 | tee mobile-release/renderer-tests.log
           npm run build 2>&1 | tee mobile-release/renderer-build.log
-          node scripts/android/prepare-assets.cjs 2>&1 | tee mobile-release/resource-pack.log
+          renderer=dist
+          if [[ "$GITHUB_REF" == refs/tags/v* || "$GITHUB_REF" == refs/heads/release/v* ]]; then
+            python3 scripts/split-resource-packs.py dist "$RUNNER_TEMP/android-book-index" --book-index "$RUNNER_TEMP/android-book-index/book-packs.json" --light-renderer dist-android-main
+            renderer=dist-android-main
+          fi
+          node scripts/android/prepare-assets.cjs "$renderer" 2>&1 | tee mobile-release/resource-pack.log
           node - <<'NODE'
           const fs=require('fs'),v=require('./package.json').version,[major,minor,patch]=v.split('.').map(Number);
           if(major>1000||minor>99||patch>99)throw Error('Android versionCode range exceeded');
@@ -136,6 +147,14 @@ jobs:
           path: mobile-release/android-release/*
           retention-days: 14
           compression-level: 0
+      - name: Retain the Android book index for release matching
+        if: success() && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v'))
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ramu-book-index-android
+          path: ${{ runner.temp }}/android-book-index/book-packs.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Save APK, screenshots and test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

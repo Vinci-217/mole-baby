@@ -160,25 +160,49 @@ async function checkFourSeedColors() {
   await expect(page.getByText('接到的果子用于本局计分', { exact: false })).toBeVisible(); await page.screenshot({ path: path.join(artifacts, 'v6-contact-game.png') }); await page.getByRole('button', { name: '再来一局', exact: true }).click(); await page.keyboard.press('Escape'); assert.equal((await save(page)).completedGames, afterFruit.completedGames);
   console.log('PASS complete memory/catch games, contact feedback, actual rewards and no game-based growth');
 
-  await roomTab(page, '设置'); const settings = page.locator('.room-settings'); const backgrounds = settings.getByRole('group', { name: '选择小屋背景', exact: true }); assert.equal(await backgrounds.getByRole('button').count(), 9);
+  await page.getByRole('button', { name: '布置小屋', exact: true }).click();
+  const decoration = page.getByRole('complementary', { name: '小屋布置工具', exact: true });
+  const musicBox = page.locator('.room-placed-item[data-furniture="music-box"]').first();
+  if (!await musicBox.count()) {
+    const item = decoration.locator('article[data-furniture-item="music-box"]');
+    const purchase = item.getByRole('button', {name:'购买',exact:true});
+    if (await purchase.count()) await purchase.click();
+    await item.getByRole('button', {name:'放进小屋',exact:true}).click();
+  }
+  await decoration.getByRole('tab', { name: '小屋风景', exact: true }).click();
+  const backgrounds = decoration.getByRole('group', { name: '选择小屋背景', exact: true }); assert.equal(await backgrounds.getByRole('button').count(), 28);
   for (const [label, id, suffix] of [['晨光书桌','morning','morning-study.png'],['拉姆小屋','ramu-home','ramu-home.png'],['神秘湖木屋','lake-cabin','lake-cabin.png'],['树洞房','earthen-home','original-earthen-home.png'],['星光温室','starlight-greenhouse','v6-starlight-greenhouse.png'],['溪畔树屋','creek-treehouse','v6-creek-treehouse.png'],['浆果野餐地','berry-picnic','v18-berry-picnic.png'],['海风贝壳屋','seashell-cottage','v18-seashell-cottage.png'],['晴空观星阁','sky-observatory','v18-sky-observatory.png']]) {
     await backgrounds.getByRole('button', { name: label, exact: true }).click(); await expect(backgrounds.getByRole('button', { name: label, exact: true })).toHaveAttribute('aria-pressed','true'); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background', id);
     const image = page.locator('.time-scene-art img'); await image.evaluate(i => i.decode()); assert.ok((await image.getAttribute('src')).endsWith(suffix));
-    for (const [phase, phaseLabel] of [['morning','早晨'],['noon','白天'],['dusk','傍晚'],['night','夜晚']]) { await settings.getByRole('button', { name: `预览${phaseLabel}`, exact:true }).click(); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-phase', phase); }
-    await settings.getByRole('button', { name: '跟随时间', exact: true }).click(); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-time-mode', 'auto');
+    for (const [phase, phaseLabel] of [['morning','早晨'],['noon','白天'],['dusk','傍晚'],['night','夜晚']]) { await decoration.getByRole('button', { name: `预览${phaseLabel}`, exact:true }).click(); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-phase', phase); }
+    await decoration.getByRole('button', { name: '跟随时间', exact: true }).click(); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-time-mode', 'auto');
   }
-  const tracks = settings.getByRole('group', { name: '选择背景音乐', exact:true }); assert.equal(await tracks.getByRole('button').count(), 12);
+  await page.getByRole('button', { name: '完成布置', exact: true }).click();
+  const music = page.getByRole('dialog', { name: '音乐盒', exact: true });
+  const tracks = music.getByRole('group', { name: '选择背景音乐', exact: true });
+  const closePanel = () => page.getByRole('button', { name: '关闭面板', exact: true }).click();
+  await musicBox.press('Enter'); assert.equal(await tracks.getByRole('button').count(), 14);
   for (const button of await tracks.getByRole('button').all()) { await button.click(); await expect(button).toHaveAttribute('aria-pressed','true'); await expect.poll(() => page.evaluate(() => window.__ramuAudio.some(audio => audio.src.endsWith(`/audio/${JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId}.mp3`) && !audio.paused && Number.isFinite(audio.duration) && audio.duration > 0))).toBe(true); }
   await toDesktop(page); await expect.poll(() => page.evaluate(() => window.__ramuAudio.every(audio => audio.paused))).toBe(true);
   await enterHome(page); await roomTab(page,'设置');
-  await settings.locator('input[type=file][accept^="audio/"]').setInputFiles(path.join(root,'public/assets/original/audio/mystery-lake.mp3')); await expect(tracks.getByRole('button',{name:/mystery-lake\.mp3/})).toHaveAttribute('aria-pressed','true');
-  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page); await roomTab(page,'设置'); await expect(tracks.getByRole('button',{name:/mystery-lake\.mp3/})).toHaveAttribute('aria-pressed','true');
-  await settings.getByRole('button',{name:'删除本地音乐',exact:true}).click(); await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId)).toBe('castle');
-  await settings.locator('input[type=file][accept^="audio/"]').setInputFiles({name:'broken.mp3',mimeType:'audio/mpeg',buffer:Buffer.from('not audio')}); await expect(settings.getByRole('status').filter({hasText:'无法读取这段音频'})).toBeVisible(); assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId),'castle');
-  await settings.getByLabel('小屋背景音乐',{exact:true}).uncheck(); await tracks.getByRole('button',{name:'宠物店',exact:true}).click(); await settings.getByLabel('背景音乐音量',{exact:true}).fill('32');
-  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page); await roomTab(page,'设置'); await expect(backgrounds.getByRole('button',{name:'晴空观星阁',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background','sky-observatory'); await expect(settings.getByLabel('小屋背景音乐',{exact:true})).not.toBeChecked(); await expect(tracks.getByRole('button',{name:'宠物店',exact:true})).toHaveAttribute('aria-pressed','true'); await expect(settings.getByLabel('背景音乐音量',{exact:true})).toHaveValue('32');
+  await expect(page.getByRole('switch',{name:'播放背景音乐',exact:true})).toHaveCount(0);
+  await closePanel(); await musicBox.press('Enter');
+  await music.locator('input[type=file][accept^="audio/"]').setInputFiles(path.join(root,'public/assets/original/audio/church.mp3'));
+  await expect(music.getByRole('status').filter({hasText:'音乐已保存在这台电脑'})).toBeVisible();
+  await expect(tracks.getByRole('button',{name:/church\.mp3/})).toHaveAttribute('aria-pressed','true');
+  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page); await musicBox.press('Enter');
+  await expect(tracks.getByRole('button',{name:/church\.mp3/})).toHaveAttribute('aria-pressed','true');
+  await music.getByRole('button',{name:'删除本地音乐',exact:true}).click(); await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId)).toBe('castle');
+  await music.locator('input[type=file][accept^="audio/"]').setInputFiles({name:'broken.mp3',mimeType:'audio/mpeg',buffer:Buffer.from('not audio')}); await expect(music.getByRole('status').filter({hasText:'无法读取这段音频'})).toBeVisible(); assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicId),'castle');
+  await music.getByRole('switch',{name:'播放背景音乐',exact:true}).press('ArrowLeft'); await music.getByLabel('背景音乐音量',{exact:true}).fill('32');
+  await tracks.getByRole('button',{name:'宠物店',exact:true}).click();
+  await page.reload(); await character.locator('.ram-classic-frame[data-loaded=true]').waitFor(); await enterHome(page);
+  await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background','sky-observatory');
+  await musicBox.press('Enter'); await expect(tracks.getByRole('button',{name:'宠物店',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(music.getByRole('switch',{name:'播放背景音乐',exact:true})).not.toBeChecked(); await expect(music.getByLabel('背景音乐音量',{exact:true})).toHaveValue('32');
+  await closePanel(); await roomTab(page,'设置');
   await page.screenshot({path:path.join(artifacts,'v6-room-settings.png')}); await toDesktop(page); await openActions(page);await actions.getByRole('button',{name:'状态',exact:true}).click(); await page.setViewportSize({width:390,height:844}); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false); await expect(pocket).toBeVisible();
   assert.deepEqual(errors,[]); assert.deepEqual(assetFailures,[]); assert.deepEqual(aiRequests,[]);
-  console.log('PASS nine backgrounds/four real-time phases including three new scenes, all 12 real audio decodes, room-only playback, IndexedDB music import/restart/delete/invalid guards and narrow-screen layout');
+  console.log('PASS scenery and four phases, all 14 real audio decodes through the music box, room-only playback, IndexedDB music import/restart/delete/invalid guards and narrow-screen layout');
   await checkReminders(initial);
 })().catch(async e => {console.error(e); if (activePage) { console.error('Renderer errors:', diagnosticErrors); console.error(await activePage.evaluate(() => { const pet = JSON.parse(localStorage.getItem('ramu-house-save-v1') || 'null'); return { pet: pet && {name:pet.name,color:pet.color,growth:pet.growth}, desktop:document.querySelectorAll('.desktop-character').length, classic:document.querySelectorAll('.ram-classic-frame[data-loaded=true]').length, fallback:document.querySelectorAll('[data-fallback]').length, text:document.body.innerText.slice(0,1000) }; }).catch(() => 'page unavailable')); await activePage.screenshot({path:path.join(artifacts,'v6-browser-failure.png')}).catch(()=>{}); } process.exitCode=1;}).finally(async()=>{await browser?.close();server.kill();});

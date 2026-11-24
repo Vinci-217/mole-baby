@@ -15,6 +15,7 @@ async function main() {
   const prefix=`mole-baby-${version}${legacy?`-legacy-${arch}`:''}`;
   const files=[`${prefix}${legacy?'':'-x64'}.zip`,`${prefix}-Setup.exe`];
   const unpacked=path.join(release,arch==='ia32'?'win-ia32-unpacked':'win-unpacked');
+  const archive=path.join(unpacked,'resources/app.asar');
   const name=`${legacy?runtime.productName:build.productName}.exe`,executable=path.join(unpacked,name);
   const architectures=[arch==='ia32'?'x86':'x64'];
   for(const guide of ['先看这里-启动说明.txt','启动拉姆.cmd'])requireFile(path.join(unpacked,guide));
@@ -24,7 +25,14 @@ async function main() {
   console.log(`PASS: ${runtime.edition}/${arch} PE architecture and complete ZIP integrity (${zip.files} matching files)`);
   const yaml=require('yaml'),feed=yaml.parse(fs.readFileSync(path.join(unpacked,'resources/app-update.yml'),'utf8'));
   if(legacy){assert.equal(feed.provider,'generic');assert.equal(feed.channel,runtime.channel)}
-  await verifyApplication({executable,archive:path.join(unpacked,'resources/app.asar'),screenshot:legacy?`windows-legacy-${arch}-smoke.png`:'windows-smoke.png'});
+  const bookIndex=option('--book-index',null);
+  if(bookIndex){
+    const asar=require('@electron/asar');
+    assert.deepEqual(asar.extractFile(archive,'dist/book-packs.json'),fs.readFileSync(bookIndex));
+    assert(!asar.listPackage(archive).some(file=>/reading-books[\\/][^\\/]+[\\/][^\\/]+\.(?:webp|png|jpg|jpeg)$/i.test(file)),'Book pages entered the Windows main installer');
+    console.log('PASS: Windows app contains the exact release book index and no downloadable book pages');
+  }
+  await verifyApplication({executable,archive,screenshot:legacy?`windows-legacy-${arch}-smoke.png`:'windows-smoke.png'});
   require('node:child_process').execFileSync('pwsh',['-NoProfile','-NonInteractive','-File',path.join(__dirname,'windows-installer-smoke.ps1'),'-Installer',path.join(release,files[1]),'-ProductName',runtime.productName,'-InstallDirName',legacy?'mole-baby-legacy':'mole-baby'],{stdio:'inherit',timeout:600000});
   await writeChecksums(release,files,legacy?`SHA256SUMS-legacy-${arch}.txt`:'SHA256SUMS.txt');
 }

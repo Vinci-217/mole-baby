@@ -4,7 +4,7 @@
 
 ## 安装和常驻
 
-从 GitHub Release 下载对应 DMG，打开后将“拉姆”拖到 Applications，然后从应用程序启动。也可以解压对应 ZIP，再把“拉姆.app”移到 Applications。
+从 GitHub Release 下载对应 DMG，打开后将“拉姆”拖到 Applications，然后从应用程序启动。Mac 试装包也使用 DMG。
 
 每次发布都在 GitHub Release 顶部列出实际签名与公证状态。标为“本地签名”的版本尚未通过 Apple 公证，会触发首次打开确认；标为“已公证”的版本须经过两种架构的 Gatekeeper 验证后才会发布。下载后若 Gatekeeper 拦截，先尝试打开应用，再到“系统设置 → 隐私与安全”核对来源并选择“仍要打开”。保留系统安全设置；不需要执行清除隔离标记或关闭 Gatekeeper 的命令。
 
@@ -26,6 +26,6 @@ DMG中附有「Mac 打开说明.html」，不依赖拉姆启动即可打开。�
 
 ## 开发和验证
 
-在 Mac 安装 Node.js 22 或 24，运行 `npm ci`、`npm run desktop:dev`。`npm run dist:mac` 构建当前架构，`dist:mac:arm64` / `dist:mac:x64` 可指定架构。
+在 Mac 安装 Node.js 22 或 24，运行 `npm ci`、`npm run desktop:dev`。`npm run dist:mac` 构建当前架构的 DMG，`dist:mac:arm64` / `dist:mac:x64` 可指定架构。
 
-CI 使用明确的原生构建机：`macos-15` 为 arm64，`macos-15-intel` 为 x64。每种架构都校验 Mach-O、Info.plist、本地签名、DMG 挂载、ZIP 以及实际 `.app` 的领养、渲染、背包商店、动作、睡眠、背景、拖拽、菜单栏恢复和 Command+V。自动化使用隔离配置，不接触用户的真实存档。
+CI 使用明确的原生构建机。`macos-26` 为 arm64，`macos-15-intel` 为 x64。每种架构都校验 Mach-O、Info.plist、本地签名、DMG 挂载以及实际 `.app` 的领养、渲染、背包商店、动作、睡眠、背景、拖拽、菜单栏恢复和 Command+V。正式发布流程另外验证标准签名版所需的自动更新 ZIP。自动化使用隔离配置处理测试存档。

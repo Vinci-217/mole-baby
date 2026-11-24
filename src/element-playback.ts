@@ -1,6 +1,7 @@
 import clips from '../public/assets/original/element-skills/clips.json';
 import visibility from '../electron/edge-visibility.json';
 import type {RamForm} from './original-actions';
+import {registeredFrameRect} from './frame-registration';
 
 export const originalElementClip=(id:string)=>clips[id as keyof typeof clips];
 /** Coordinates in the shared 100×108 character space, independent of host. */
@@ -9,7 +10,7 @@ export function elementEffectRect(id:string,form:RamForm){
  const r=clip.registration;
  const body=visibility.forms[form].body;
  const k=r.referenceBodyWidth?(body[2]-body[0])/r.referenceBodyWidth:r.cssPixelsPerAtlasPixel;
- return {x:50-r.centerX*k,y:body[3]-r.baseY*k,width:clip.width*k,height:clip.height*k};
+ return registeredFrameRect(clip,body[3],k);
 }
 export function elementDecodedBytes(id:string){
  const clip=originalElementClip(id);if(!clip)return 0;

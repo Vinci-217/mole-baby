@@ -61,6 +61,12 @@ npm test                 # 养成、存档、窗口与更新测试
 
 提交问题时，请附上系统、软件版本、复现步骤，以及完整报错文字。涉及存档的问题请先导出备份。
 
+## 开源协议
+
+本项目原创代码与文字文档采用 [MIT License](LICENSE)，允许学习、修改、分发、商用和闭源衍生；复制或分发全部或实质性部分时须保留版权与许可声明。完整适用范围见 [LICENSING.md](LICENSING.md)。
+
+**MIT 授权不覆盖《摩尔庄园》官方素材、其他媒体素材或第三方代码。** 第三方代码沿用各自许可；角色、图片、动画、音乐、图标等素材的来源与权益见 [ASSETS.md](ASSETS.md)，本项目的开源许可不代表获得这些素材的使用授权。
+
 ## Token 赞助鸣谢
 
 感谢以下朋友对开发所需 Token 的支持。名单按**首次支持时间从早到晚**排列（从左到右、从上到下），同一位赞助者合并展示。
@@ -71,7 +77,10 @@ npm test                 # 养成、存档、窗口与更新测试
 | <img src="docs/sponsors/shencha.png" width="64" height="64" alt="参苓" /><br />**参苓** | <img src="docs/sponsors/taibai.png" width="64" height="64" alt="太白猕猴桃🥝" /><br />**太白猕猴桃🥝** | <img src="docs/sponsors/murong.png" width="64" height="64" alt="慕容狗尾巴草" /><br />**慕容狗尾巴草** |
 | <img src="docs/sponsors/xiaohongshu-66d7cb02.png" width="64" height="64" alt="小红薯66D7CB02" /><br />**小红薯66D7CB02** | <img src="docs/sponsors/gui-fei.png" width="64" height="64" alt="贵妃刷红薯" /><br />**贵妃刷红薯** | <img src="docs/sponsors/xie-huang-tang-bao.png" width="64" height="64" alt="想吃蟹黄汤包" /><br />**想吃蟹黄汤包** |
 | <img src="docs/sponsors/wu-suo-bu-cheng-win.png" width="64" height="64" alt="无所不成win" /><br />**无所不成win** | <img src="docs/sponsors/bu-ao-ye.png" width="64" height="64" alt="再也不熬夜了！" /><br />**再也不熬夜了！** | <img src="docs/sponsors/lucas.png" width="64" height="64" alt="LUCAS" /><br />**LUCAS** |
-| <img src="docs/sponsors/zao-an-jiu-niu.png" width="64" height="64" alt="早安啾妞" /><br />**早安啾妞** | <img src="docs/sponsors/xiaoxiong.png" width="64" height="64" alt="小熊崽崽" /><br />**小熊崽崽** |  |
+| <img src="docs/sponsors/zao-an-jiu-niu.png" width="64" height="64" alt="早安啾妞" /><br />**早安啾妞** | <img src="docs/sponsors/xiaoxiong.png" width="64" height="64" alt="小熊崽崽" /><br />**小熊崽崽** | <img src="docs/sponsors/qing-gong.png" width="64" height="64" alt="轻功踩塌别人房顶" /><br />**轻功踩塌别人房顶** |
+| <img src="docs/sponsors/yi-zhi-hai-shen.png" width="64" height="64" alt="一只海参" /><br />**一只海参** | <img src="docs/sponsors/mao-shua-o.png" width="64" height="64" alt="毛刷O（限流版）" /><br />**毛刷O（限流版）** | <img src="docs/sponsors/xin-dong-224.png" width="64" height="64" alt="心动224" /><br />**心动224** |
+| <img src="docs/sponsors/mo-er-shi-shang.png" width="64" height="64" alt="摩尔时尚秋季刊特约模特" /><br />**摩尔时尚秋季刊特约模特** | <img src="docs/sponsors/genm.png" width="64" height="64" alt="Genm幻梦" /><br />**Genm幻梦** | <img src="docs/sponsors/dandan.png" width="64" height="64" alt="DanDan" /><br />**DanDan** |
+| <img src="docs/sponsors/sha-shi-hou-chi-fan.png" width="64" height="64" alt="啥时候吃饭" /><br />**啥时候吃饭** | <img src="docs/sponsors/wan-dou.png" width="64" height="64" alt="豌豆豌豆豌豆嘭" /><br />**豌豆豌豆豌豆嘭** | <img src="docs/sponsors/bai-cai.png" width="64" height="64" alt="白菜" /><br />**白菜** |
 
 ## 素材赞助鸣谢
 

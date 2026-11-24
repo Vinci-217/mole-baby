@@ -34,6 +34,7 @@
 - Room 网页交付大体积 Windows 测试包时，运行 `node scripts/prepare-windows-download.cjs` 和 `node scripts/windows-download-regression.cjs`，提供 `downloads/windows/` 的分段校验与续传页面。核验原包 NSIS 启动 CRC、实际浏览器完整保存后的 SHA-256；不能仅凭直链 HEAD、短 Range 请求或 7-Zip 容器测试宣称下载完整。下载 Worker 与缓存仅限下载目录，不动游戏存档。
 - 质量检查结束后可运行 `node scripts/clean-workspace.cjs` 查看计划，`--apply` 清理明确的未跟踪构建缓存。不能清理 QA profile、用户记录、原始素材或运行中的产物。大体积派生 P-code 用 `compact_pcode.py` 无损归档，保留逐文件 SHA256 恢复索引。
 - 修改外观缓存或播放器生命周期后，运行 `node scripts/appearance-cache-regression.cjs`，并通过 `scripts/care-outfit-native.cjs` 检查实际桌面/小屋切换。不要把普通 iframe DOM 移动当作引擎复用；旧运行时必须保留正常加载与缓存图片回退。机制见 `docs/APPEARANCE-CACHE.md`。
+- 交付用户的 macOS 安装包和试装包统一使用 DMG。Mac ZIP 作为标准签名版自动更新文件保留在正式发布流程中。
 - 当前 Mac 流程需要 macOS 的签名、DMG 挂载和实际应用启动验证。Linux 可准备代码与完整素材，不能把未完成 Mac 签名和验证的文件标为可交付 DMG。Mac 收尾使用可访问的 Mac，或明确需要时才使用云端 Mac Runner。
 - `.github/workflows/wardrobe-mac-preview.yml` 改为按需构建，普通 `preview/v0333-wardrobe-audit` 推送不再启动 Mac/Windows。手动触发时可选择 `mac`、`windows` 或 `both`，只构建需要的平台。
 - 该工作流若尚未出现在私有仓库默认分支，可在确实需要云构建时，显式推送当前审核提交到 `preview/build-mac-test` 或 `preview/build-windows-test`，分别只触发对应平台。不要为了注册手动工作流而合并尚未审核的源码或改仓库默认分支。

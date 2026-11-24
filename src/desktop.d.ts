@@ -1,16 +1,26 @@
 export {};
 declare global {
+  interface BookDownloadStatus {
+    phase:'idle'|'downloading'|'pausing'|'paused'|'error';
+    downloaded:number;
+    total:number;
+    downloadedBytes:number;
+    totalBytes:number;
+  }
   interface UpdateState {downloadPolicy?:'auto'|'full';status:'disabled'|'idle'|'checking'|'available'|'downloading'|'ready'|'installing'|'current'|'error';currentVersion:string;version:string|null;percent:number;enabled:boolean;automaticInstall:boolean;checkedAt:number|null;message:string;downloadMode?:'differential'|'full'|'cached'|null;transferredBytes?:number;totalBytes?:number;fullSize?:number;reusedBytes?:number;fallbackReason?:string|null}
   interface DesktopState {
     petMode: boolean;
     petScale?:number;
     petResizing?:boolean;
     roomFullscreen?:boolean;
+    roomMinimized?:boolean;
     effectExpanded?:boolean;
     trayTooltip?:string;
     windowVisible?: boolean;
     dragPoint?:{x:number;y:number;at:number};
     petOffset?:{x:number;y:number};
+    petPaintArea?:{x:number;y:number;width:number;height:number}|null;
+    petWorkArea?:{x:number;y:number;width:number;height:number}|null;
     mouseThrough?:boolean;
     petDetailsOnHover?:boolean;
     mousePassthrough?:boolean;
@@ -30,8 +40,17 @@ declare global {
   interface Window {
     desktop?: {
       isElectron: boolean;
+      prepareBookPages?:(id:string)=>Promise<Record<string,string>|null>;
+      bookDownloads?: {
+        getStatus:()=>Promise<BookDownloadStatus>;
+        downloadAll:()=>Promise<BookDownloadStatus>;
+        pauseAll:()=>Promise<BookDownloadStatus>;
+        onStatus:(callback:(status:BookDownloadStatus)=>void)=>()=>void;
+      };
       updates:{openRelease:()=>Promise<void>;getState:()=>Promise<UpdateState|null>;check:()=>Promise<boolean>;download:()=>Promise<boolean>;install:()=>Promise<boolean>;setEnabled:(enabled:boolean)=>Promise<UpdateState>;setDownloadPolicy:(policy:'auto'|'full')=>Promise<UpdateState>;setBusy:(busy:boolean)=>void;onStateChanged:(callback:(state:UpdateState)=>void)=>()=>void;onPrepare:(callback:()=>boolean|Promise<boolean>)=>()=>void};
       platform: string;
+      getLaunchAtLogin?:()=>Promise<boolean|null>;
+      setLaunchAtLogin?:(enabled:boolean)=>Promise<boolean|null>;
       flushSave?:()=>Promise<boolean>;
       localSaves?:{
         inspect:()=>Promise<{version:string;profileDirectory:string;storageDirectory:string;backupDirectory:string;profiles:{directory:string;active:boolean;hasBrowserData:boolean;hasBackup:boolean;backupAt:number|null;backupBytes:number}[]}>;
@@ -49,8 +68,8 @@ declare global {
         onSnapshot:(callback:(snapshot:import('./components/MessageBoard').BoardSnapshot|null)=>void)=>()=>void;
         onPatch:(callback:(request:{id:number;petId:number;baseNotes:string;notes:import('./pet-records').PetNote[]})=>{ok:boolean;reason?:string;snapshot?:import('./components/MessageBoard').BoardSnapshot})=>()=>void;
       };
-      setMusicState:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
-      onMusicToggle:(callback:(enabled:boolean)=>void)=>()=>void;
+      setMusicState?:(state:{playing:boolean;enabled:boolean;background:boolean})=>Promise<void>;
+      onMusicToggle?:(callback:(enabled:boolean)=>void)=>()=>void;
       openMacSettings: (kind:'security')=>Promise<boolean>;
       openMacGuide: ()=>Promise<boolean>;
       getState: () => Promise<DesktopState>;

@@ -18,5 +18,5 @@ it('exports dated diagnostics through the Android file picker without exposing t
  exportAnimationLoadLog();
  const [text,name]=exportSave.mock.calls[0];
  expect(name).toMatch(/^拉姆动画日志-\d{4}-\d\d-\d\dT\d\d-\d\d-\d\d\.json$/);
- expect(JSON.parse(text)).toEqual({version:2,animationBuild:'2026-11-13-reused-runtime-and-local-save',exportedAt:expect.any(String),browser:'test',players:[],events:[]});
+ expect(JSON.parse(text)).toEqual({version:3,animationBuild:'2026-11-21-desktop-idle-playback',exportedAt:expect.any(String),browser:'test',visibility:{pageHidden:false,reducedMotion:false},players:[],events:[]});
 });

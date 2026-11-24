@@ -33,9 +33,17 @@ final class PetController {
     float dp(float px){return px/host.context.getResources().getDisplayMetrics().density;}
     Point area(){Point size=new Point();if(Build.VERSION.SDK_INT>=30){var bounds=windows.getMaximumWindowMetrics().getBounds();size.set(Math.round(dp(bounds.width())),Math.round(dp(bounds.height())));}else{windows.getDefaultDisplay().getRealSize(size);size.set(Math.round(dp(size.x)),Math.round(dp(size.y)));}return size;}
     boolean permission(){return Settings.canDrawOverlays(host.context);}
+    private JSONObject paintArea(){
+        if(!petMode||!attached)return null;
+        Point display=area();
+        float left=Math.max(0,-x),top=Math.max(0,-y);
+        float visibleWidth=Math.min(width,display.x-x)-left;
+        float visibleHeight=Math.min(height,display.y-y)-top;
+        return visibleWidth>0&&visibleHeight>0?Json.of("x",left,"y",top,"width",visibleWidth,"height",visibleHeight):null;
+    }
     JSONObject state(){
         JSONObject geometry=panel?Json.of("petX",panelPetX,"petY",panelPetY,"panelX",widePanel?168:8,"panelY",panelTop,"panelWidth",widePanel?width-176:width-16,"panelHeight",height-panelTop-8,"scale",1):null;
-        JSONObject result=Json.of("petMode",petMode,"alwaysOnTop",true,"wandering",wandering,"companionPanel",panel,"panelSide","right","panelLayout","compact","panelGeometry",geometry,"petOffset",Json.of("x",effectX,"y",effectY),"edgeHiding",edgeHiding,"edgeSide",edgeSide,"edgePose",edgePose,"motion",motion,"mouseThrough",mouseThrough,"mousePassthrough",false,"roomFullscreen",fullscreen,"windowVisible",attached||host.activityVisible,"effectExpanded",effectExpanded);
+        JSONObject result=Json.of("petMode",petMode,"alwaysOnTop",true,"wandering",wandering,"companionPanel",panel,"panelSide","right","panelLayout","compact","panelGeometry",geometry,"petOffset",Json.of("x",effectX,"y",effectY),"petPaintArea",paintArea(),"edgeHiding",edgeHiding,"edgeSide",edgeSide,"edgePose",edgePose,"motion",motion,"mouseThrough",mouseThrough,"mousePassthrough",false,"roomFullscreen",fullscreen,"windowVisible",attached||host.activityVisible,"effectExpanded",effectExpanded);
         if(dragging)try{result.put("dragPoint",Json.of("x",rawX,"y",rawY,"at",System.currentTimeMillis()));}catch(JSONException ignored){}
         return result;
     }

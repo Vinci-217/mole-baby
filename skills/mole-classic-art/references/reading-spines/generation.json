@@ -1,0 +1,356 @@
+{
+  "generatedOn": "2026-11-18",
+  "tool": "image_gen",
+  "purpose": "小屋木架上的原创正视书脊和徽记。书名和期号由应用排版。",
+  "transparentBackground": true,
+  "observations": [
+    "小屋和道具都以连续深棕线勾出轮廓，转折干净，内部线条更细。",
+    "小屋木构有短折角，饼干和果实靠略不对称的圆润剪影辨认。",
+    "蜂蜜木色配草绿和亮蓝，单件道具用两至四块实色。",
+    "原面板和饼干只在边缘放短浅色带与一块硬边反光。",
+    "道具独立透明、细节集中。新增正视书脊与顶端徽记，中央留给应用排真实书名，小屋角色与阅读区沿用现有图层。"
+  ],
+  "sheets": [
+    {
+      "filename": "ram-and-story-spines.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "f65fe426a31887ba9f71e7d39f629e08c90ea0249ac7bf553d23191911d12517",
+      "references": [
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png",
+        "public/assets/original/items/180027.png"
+      ],
+      "prompt": "Draw a transparent sprite sheet of fourteen ORIGINAL illustrated hardback BOOK SPINES for a small Chinese Flash-era pet game's wooden library. These are new book designs, not replicas of any reference prop. Attached image 1 (tree house) guides warm brown ink and broad color shapes; image 2 (orange UI) guides clean contours and short gold details, not any panel layout or character; images 3 and 4 (cookie and fruit) guide the simple shapes and hard highlights on tiny emblems only. Do not include characters or copy the room.\n\nUse a 1536x1024 landscape canvas. Arrange exactly fourteen separate upright spines, in TWO clearly separated rows of SEVEN, aligned like a well-spaced game asset sheet. Each isolated book spine is about 115px wide and 380px high, fully visible with a generous transparent gutter on EACH side. Bodies are straight, tall rectangular strips with subtly rounded corners. Front-on orthographic view of the narrow bound edge only, no full cover, turning pages, bookshelf, oblique perspective, external cast shadow, floating decoration, or touching objects. Keep every spine silhouette whole. Leave all space between the fourteen connected objects truly transparent.\n\nGive each binding a distinct color and structure. Bold darker-local-color or warm brown outline, one narrow edge highlight, a flat shaded edge, two to four hard-edged main color shapes. Bindings should feel like cheerful collectible adventure books, with different illustrated endcaps and simple inlaid designs. One large unmistakable emblem near the top QUARTER of each spine drawn with clean silhouettes. The middle 55% of the height below it must remain a solid mid-to-dark field of the binding color for a vertical cream title to be typeset later. Put a small contrasting band or patch near the bottom. Avoid gold frames repeated across all books. Use flat attractive colors with contrast, not leather photo textures, blur, fine ornament, grain or shiny 3D rendering. No visible type: absolutely no letters, numbers, words, marks that resemble glyphs, Chinese, captions, or watermarks.\n\nTop row, left to right:\n1. Burnt apricot and honey handbook, small two-leaf jade sprout in a warm ivory shield and honey endcaps.\n2. Jade and lagoon care handbook, pale curved leaf and water-drop badge, two diagonal sage endbands.\n3. Ink blue and sunflower lesson book, large ivory quill in a sunny lozenge, two broad pale-blue cloth corner patches.\n4. Cherry red and biscuit gold recipe book, a round cookie medallion with chunky dots, simple checker trim at the ends.\n5. Terracotta and amber tutor book, tiny bold bell in a golden scallop, wide ochre cloth lip.\n6. Plum and lavender secret book, one cream star and crescent in a deep violet ring, contrasting angular violet endcaps.\n7. Ocean teal and mint first-aid guide, a simple warm coral heart over a pale mint badge, two clean mint horizontal stripes.\n\nBottom row, left to right:\n8. Dark moss and apple green woodland story, pine silhouette in a rounded pale green crest, stripe of green needles at the bottom edge.\n9. Copper red and amber adventure book, bright oak-acorn crest, warm leaf-colored corner cuts.\n10. Berry pink and sunny peach anthology, one light pink five-petal rosette, repeating scallop at the spine foot.\n11. Royal cobalt and orange sports album, bright triangular pennant emblem, contrasting yellow–orange bands across spine ends.\n12. Fern green and chartreuse field guide, ivory mushroom emblem with one accent red dot, bold light green branching trims near ends.\n13. Crimson and warm cream civic chronicle, small antique-gold shield badge, cream checker accents at the base.\n14. Deep ocean navy and cream travel guide, simple compass diamond emblem, pale blue wavy bands near tips.\n\nKeep tops, bottoms and edges crisp. The fourteen book bodies should be clearly differentiated even rendered at 15px wide and 45px high. No foreground objects outside the silhouettes. No decorative labels or text: book titles are live HTML. The output MUST be transparent RGBA, with no canvas color or fake checkerboard.",
+      "crops": {
+        "sprout": {
+          "bounds": {
+            "left": 112,
+            "top": 22,
+            "width": 151,
+            "height": 447
+          },
+          "width": 86,
+          "height": 256,
+          "sha256": "f767b7d2770d961d7d513d6569d330651d4aae1a1f11847015db6573df6bef3c"
+        },
+        "care": {
+          "bounds": {
+            "left": 321,
+            "top": 22,
+            "width": 148,
+            "height": 447
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "fa24b863235adfc88b36826650f415050feab8d9d1fff9d342debf3a58b63621"
+        },
+        "quill": {
+          "bounds": {
+            "left": 524,
+            "top": 22,
+            "width": 144,
+            "height": 447
+          },
+          "width": 82,
+          "height": 256,
+          "sha256": "1e561ab03fca666151f03a7d934fc91a2c2100afa7b8482ff639f3cf3d4eee24"
+        },
+        "cookie": {
+          "bounds": {
+            "left": 717,
+            "top": 22,
+            "width": 145,
+            "height": 447
+          },
+          "width": 83,
+          "height": 256,
+          "sha256": "36aad2653567e5674639e7825c19181df9a8518ec14ece31a78dcf9aadb53c86"
+        },
+        "bell": {
+          "bounds": {
+            "left": 911,
+            "top": 22,
+            "width": 147,
+            "height": 446
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "6a98cef2d6b70a5af9eb799ccabd277af0c0e95a31660b3e4aa88ba737e07a91"
+        },
+        "moon": {
+          "bounds": {
+            "left": 1110,
+            "top": 21,
+            "width": 147,
+            "height": 447
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "6830c99fe3108ad5e25649a7008ef1081a5ac5f15d8b73611a5b39d84c84165f"
+        },
+        "heart": {
+          "bounds": {
+            "left": 1307,
+            "top": 22,
+            "width": 148,
+            "height": 447
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "95ed0e2a4b1410defec6715a1bc632d0683429ca2626adb80afaf33516f8ffb5"
+        },
+        "pine": {
+          "bounds": {
+            "left": 109,
+            "top": 531,
+            "width": 149,
+            "height": 454
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "926e9977f614d04b86dbdbc6258360ba4b449e935c328f3af57f48069dfdf17c"
+        },
+        "acorn": {
+          "bounds": {
+            "left": 309,
+            "top": 531,
+            "width": 150,
+            "height": 454
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "41ab327362b482ea1bf31581ee25ed05f0a03b1a2aa1530f998d4853dcdc2bc2"
+        },
+        "rosette": {
+          "bounds": {
+            "left": 510,
+            "top": 531,
+            "width": 151,
+            "height": 453
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "89b0fae9bd6615d22d26ab9fb6fec6a70dff98cf3bddfc595dcda061ea555353"
+        },
+        "pennant": {
+          "bounds": {
+            "left": 713,
+            "top": 531,
+            "width": 149,
+            "height": 454
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "ef7e20ff3b3c1a8298e3666b278388eb33d15043686a4d03a560515525a510db"
+        },
+        "mushroom": {
+          "bounds": {
+            "left": 913,
+            "top": 530,
+            "width": 149,
+            "height": 455
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "4cc14feb5de52c89975e1a859dbe09b60526422fb7be8215e2907a7a9d56b250"
+        },
+        "shield": {
+          "bounds": {
+            "left": 1112,
+            "top": 531,
+            "width": 149,
+            "height": 453
+          },
+          "width": 84,
+          "height": 256,
+          "sha256": "a488bd181ec0d85bfabfcacecfba48beb043971efff310628edb4b2c1a55637c"
+        },
+        "compass": {
+          "bounds": {
+            "left": 1312,
+            "top": 531,
+            "width": 147,
+            "height": 454
+          },
+          "width": 83,
+          "height": 256,
+          "sha256": "e2422f4b55639541138d1b331767087ffda6d7ac1e9211b4e5acb4308cc8ded9"
+        }
+      }
+    },
+    {
+      "filename": "library-spines.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "908d26fd2bfcc36516adaeab86c53057d7e85b9fdcd2aef380eccca03012cd68",
+      "references": [
+        "skills/mole-classic-art/references/reading-spines/ram-and-story-spines.png",
+        "public/assets/original/scenes/ramu-home.png",
+        "public/assets/original/ui/reference-pet-panel.png",
+        "public/assets/original/items/180017.png",
+        "public/assets/original/items/180027.png"
+      ],
+      "prompt": "Make an alternate set of fourteen illustrated book spines by editing the FIRST reference. Preserve its two rows of seven separate straight, tall slim upright hardback spines, front-on view, complete uncut silhouettes and large transparent channels between objects. It is a template for relative scale, lighting and spacing ONLY. Replace every enamel emblem, trim pattern and spine's whole palette with new designs. Draw in the same clean original Flash cartoon object language: warmer dark-local-color outline, two to four clear color shapes, one short edge highlight and playful simplified silhouettes. Also use the attached tree house, orange UI, cookie and fruit as references for the warm outlines, minimal flat shading and tiny easy-to-read emblems, without copying characters, fruit, cookie, interface, objects or the room.\n\nKeep the 1536×1024 landscape layout. Exactly fourteen distinct books in regular two rows of seven, each around 140 × 440 pixels and fully contained within its cell. All fourteen have a sizeable illustrated emblem in the upper two fifths, a plain medium dark field from 42% to 88% of the spine height for vertical typography, and unique trim accents at the ends. No human, character, faces, letters, text, number, glyph, watermark, external object, shadows cast beyond the book outlines, grain, realistic 3D or cut-off edges. Make the entire canvas transparent outside the individual book silhouettes. Keep each book readable at roughly 15px wide.\n\nTOP, left to right:\n1. Field reporter: dark dusty burgundy and pale apricot, simplified lens camera medallion on a stenciled cream burst, strip of pale film perforations only at bottom.\n2. Angel garden: blue-violet book with a tiny gold star nestled in a pair of ivory wings in the upper medallion, soft mint arch tips.\n3. Knight's chronicle: deep reddish purple book with rounded silver helmet crest and amber ridged binding bands.\n4. DJ / dance album: wisteria and deep blueberry, one simple vinyl disc with a small coral star at center, warm lavender geometric corner tabs.\n5. Celebration album: burnt orange-ruby book with a simple golden lantern, geometric cutouts in honey at the tips.\n6. Black Forest treasure: deep green-brown and jade with a gold key emblem and ivy green corner flourishes.\n7. Astronomy / flying creatures: deep indigo with a light blue comet and soft yellow star, simple cream dots along top and bottom only.\n\nBOTTOM, left to right:\n8. Community event / sports cup: pomegranate-red book and warm gold edge strips, gold trophy cup with two ribbon trails.\n9. History / keepsake travel: navy slate cloth panels with sepia map-fold motif and cream rectangle surround, muted gold endcaps.\n10. Professions / construction: rich petrol blue binding with a gold drafting triangle, two navy/orange panel strips.\n11. Rainforest adventure: warm dark jade cloth, bold chartreuse palm-leaf medallion, two small fern green tessellated bands.\n12. Celebrations and harvest: saturated berry-to-plum book, large crescent-shaped leaf curling around a bright red berry cluster, pale blush dot bands.\n13. Design and dressing: magenta-plum with a broad pale peach bow ribbon medallion, complementary deep coral apron-style bottom fold.\n14. Dragon atlas: smoky dark teal with a simple jacaranda dragon wing emblem in a silver teardrop, distinctive mint scale-pattern cap bands.\n\nThe entire space between books should have zero alpha. Draw no lettering in the art; exact book titles will be added in software.",
+      "crops": {
+        "camera": {
+          "bounds": {
+            "left": 109,
+            "top": 21,
+            "width": 153,
+            "height": 449
+          },
+          "width": 87,
+          "height": 256,
+          "sha256": "328dc436fcc5e83bd7bf9688519e0ee0621eb2bf803fac1279a454928068b757"
+        },
+        "angel": {
+          "bounds": {
+            "left": 318,
+            "top": 22,
+            "width": 149,
+            "height": 448
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "5b9f68a95092d6fffe6a2cf0231023ddd0c401c70ae7347fd176a041f36f0cf4"
+        },
+        "helmet": {
+          "bounds": {
+            "left": 519,
+            "top": 22,
+            "width": 149,
+            "height": 449
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "702c3b0b26b77d02a2cd91786f75b8e5ddad7387dfc391e9f0c22afe2220aed8"
+        },
+        "vinyl": {
+          "bounds": {
+            "left": 714,
+            "top": 21,
+            "width": 150,
+            "height": 450
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "0ac2e0a5d0652c01d67750ac7e0ed7c02dc0117be7a5bae4e75c9f83cc24e1c4"
+        },
+        "lantern": {
+          "bounds": {
+            "left": 909,
+            "top": 21,
+            "width": 151,
+            "height": 449
+          },
+          "width": 86,
+          "height": 256,
+          "sha256": "a332a6f3792fe37275c6a62eeb8690c3f674031bdd204a7335e43264596e405d"
+        },
+        "key": {
+          "bounds": {
+            "left": 1106,
+            "top": 22,
+            "width": 153,
+            "height": 449
+          },
+          "width": 87,
+          "height": 256,
+          "sha256": "858f2ba635c8a1077ce08e76ec48e7b0f6002b97fe6d32800f4eecbe05eae7f8"
+        },
+        "comet": {
+          "bounds": {
+            "left": 1306,
+            "top": 22,
+            "width": 150,
+            "height": 448
+          },
+          "width": 86,
+          "height": 256,
+          "sha256": "eb771731f8690d62f5584e6b58fd60e863f1676e87bb4f7e4778210fee329c0b"
+        },
+        "trophy": {
+          "bounds": {
+            "left": 108,
+            "top": 530,
+            "width": 154,
+            "height": 457
+          },
+          "width": 86,
+          "height": 256,
+          "sha256": "5f1f1d610e0cf440d4bedda2c0ff4a4125bb991632a81c3d1e02c3ea678f1a93"
+        },
+        "map": {
+          "bounds": {
+            "left": 307,
+            "top": 530,
+            "width": 156,
+            "height": 457
+          },
+          "width": 87,
+          "height": 256,
+          "sha256": "dea70858c301d64428a31153e9a0a207d09497eaac6a7f5e2e949af067d7aeba"
+        },
+        "drafting": {
+          "bounds": {
+            "left": 510,
+            "top": 530,
+            "width": 156,
+            "height": 456
+          },
+          "width": 88,
+          "height": 256,
+          "sha256": "045d18323a69e7fb81c78334e20fe77b21ae3d191482e0c368c9fb3c13a5204c"
+        },
+        "palm": {
+          "bounds": {
+            "left": 713,
+            "top": 530,
+            "width": 152,
+            "height": 456
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "7a372efd10c6ce99e5f78901ddb6ab4e49337095ee03bd2dd6949087a52c6ebe"
+        },
+        "berries": {
+          "bounds": {
+            "left": 909,
+            "top": 530,
+            "width": 154,
+            "height": 457
+          },
+          "width": 86,
+          "height": 256,
+          "sha256": "8df93f4cc6ce9859abf6418902875d3dff391fbe81037cc60dbdaa02e240a4dd"
+        },
+        "ribbon": {
+          "bounds": {
+            "left": 1108,
+            "top": 530,
+            "width": 155,
+            "height": 457
+          },
+          "width": 87,
+          "height": 256,
+          "sha256": "6adf3f1446477cfbc5ee444f6febef307917be289596ad9c1c5ed5817f5ddfa1"
+        },
+        "dragon-wing": {
+          "bounds": {
+            "left": 1308,
+            "top": 530,
+            "width": 151,
+            "height": 457
+          },
+          "width": 85,
+          "height": 256,
+          "sha256": "c626f28223c92e16617037f3474763c422e8c4f188e4f72c895ffd645f4fa286"
+        }
+      }
+    }
+  ],
+  "derivatives": "public/assets/generated/reading-spines",
+  "processing": "按透明通道裁出完整书脊，透明边缘外留一至两像素。Sharp/Lanczos3 等比缩放到高 256 px，再以无损 WebP 导出。应用为部分同主题册调整色相，报刊使用棕金装订和期号。书页来自本地原档。"
+}

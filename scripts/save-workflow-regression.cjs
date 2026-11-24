@@ -23,7 +23,7 @@ async function receiptAllowsRoomActions(page){
  const receipt=page.locator('.save-operation-receipt .save-operation-feedback');await expect(receipt).toBeVisible();
  await page.getByRole('button',{name:'布置小屋',exact:true}).click();
  await expect(page.getByRole('complementary',{name:'小屋布置工具'})).toBeVisible();await expect(receipt).toBeVisible();
- await page.locator('.cottage-top').getByRole('button',{name:'完成布置',exact:true}).click();
+ await page.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
  await receipt.getByRole('button',{name:'收起存档操作提示',exact:true}).click();await expect(receipt).toHaveCount(0);
 }
 async function roundTrip(page,desktop){
@@ -58,6 +58,7 @@ async function browserChecks(browser){
  page.on('pageerror',error=>errors.push(error.message));
  try{
   await page.goto(base);await page.locator('.adoption-save-help summary').click();
+  await page.getByRole('button',{name:'检查本地存档',exact:true}).click();
   await expect(page.locator('.local-save-inspector [role=status]')).toContainText('未找到');
   for(const text of ['{broken','','null','{}','x'.repeat(1_000_001)]){
    await upload(page,'retry.json',text);await expect(feedback(page)).toHaveAttribute('role','alert');await expect(feedback(page)).toBeInViewport();assert.equal(await saved(page),null);assert.equal(await input(page).inputValue(),'');
@@ -109,6 +110,7 @@ async function nativeChecks(){
  const desktop=await _electron.launch({args:[root,'--no-sandbox','--user-data-dir='+profile],env:{...process.env,XDG_CONFIG_HOME:config,ELECTRON_DEV:'0',MOLE_BABY_DISABLE_UPDATES:'1'},timeout:45000});
  try{
   const page=await desktop.firstWindow();await page.waitForLoadState('domcontentloaded');await page.locator('.adoption-save-help summary').click();
+  await page.getByRole('button',{name:'检查本地存档',exact:true}).click();
   await expect(page.locator('.local-save-paths')).toContainText(profile);await expect(page.locator('.local-save-inspector')).toContainText('旧版本目录备份');
   // Actual disk failure, with the original QA backup retained under another name.
   fs.renameSync(path.join(legacy,'latest.json'),path.join(legacy,'retained.json'));

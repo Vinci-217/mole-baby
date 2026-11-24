@@ -83,6 +83,18 @@ async function toDesktop(page) {
   await page.getByRole('button', { name: '回到桌面', exact: true }).click();
   await page.locator('[data-testid="desktop-character"]:visible,.pet-work-note').first().waitFor();
 }
+async function placeMusicBox(page) {
+  const piece = page.locator('.room-placed-item[data-furniture="music-box"]').first();
+  if (await piece.count()) return piece;
+  await page.getByRole('button', {name:'布置小屋',exact:true}).click();
+  const tile = page.locator('[data-furniture-item="music-box"]');
+  const buyBox = tile.getByRole('button', {name:'购买',exact:true});
+  if (await buyBox.count()) await buyBox.click();
+  await tile.getByRole('button', {name:'放进小屋',exact:true}).click();
+  await page.getByRole('button', {name:'完成布置',exact:true}).click();
+  await expect(piece).toBeVisible();
+  return piece;
+}
 async function selectPocket(page, id, label) {
   const pocket = page.locator('.classic-pet-book');
   const item = pocket.locator(`.pocket-slot[data-item-id="${id}"]`);
@@ -345,15 +357,17 @@ async function verifyPetLife(page){
   const scroll=await page.locator('.companion-content').evaluate(n=>({height:n.clientHeight,content:n.scrollHeight}));expect(scroll.content).toBeLessThanOrEqual(scroll.height+1);
   console.log('PASS: familiar habits from two real interactions keep every play card inside the compact panel');
   await expect(ram).not.toHaveAttribute('data-action','watch-butterfly',{timeout:8500});await expect(ram.locator('.social-butterfly')).toHaveCount(0);await page.getByRole('button',{name:'关闭小窗',exact:true}).click();
-  await enterHome(page);await roomTab(page,'设置');await page.getByRole('slider',{name:'拉姆音量',exact:true}).fill('31');await page.getByRole('checkbox',{name:'自然小动作',exact:true}).uncheck();
-  await toDesktop(page);await page.reload();await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('31');await expect(page.getByRole('checkbox',{name:'自然小动作',exact:true})).not.toBeChecked();await toDesktop(page);
+  await enterHome(page);await roomTab(page,'设置');await page.getByRole('slider',{name:'拉姆音量',exact:true}).fill('31');await page.getByRole('switch',{name:'自然小动作',exact:true}).press('ArrowLeft');
+  await toDesktop(page);await page.reload();await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('slider',{name:'拉姆音量',exact:true})).toHaveValue('31');await expect(page.getByRole('switch',{name:'自然小动作',exact:true})).not.toBeChecked();await toDesktop(page);
 }
 
 async function verifyRoomIteration(page){
   await enterHome(page);const close=page.getByRole('button',{name:'关闭面板',exact:true});if(await close.isVisible())await close.click();
   await page.getByRole('button',{name:'布置小屋',exact:true}).click();
-  const decor=page.getByRole('dialog',{name:'布置小屋',exact:true}),gallery=decor.getByRole('group',{name:'选择小屋背景',exact:true});
-  await expect(gallery).toBeInViewport();await expect(gallery.getByRole('button')).toHaveCount(9);
+  const decor=page.getByRole('complementary',{name:'小屋布置工具',exact:true});
+  await decor.getByRole('tab',{name:'小屋风景',exact:true}).click();
+  const gallery=decor.getByRole('group',{name:'选择小屋背景',exact:true});
+  await expect(gallery).toBeInViewport();await expect(gallery.getByRole('button')).toHaveCount(15);
   const previous=await gallery.locator('[aria-pressed=true]').getAttribute('aria-label');
   for(const [id,label] of [['berry-picnic','浆果野餐地'],['seashell-cottage','海风贝壳屋'],['sky-observatory','晴空观星阁']]){
     await gallery.getByRole('button',{name:label,exact:true}).click();await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background',id);
@@ -362,7 +376,8 @@ async function verifyRoomIteration(page){
       await page.locator('.time-scene-art img').evaluate(n=>n.decode());
     }
   }
-  console.log('PASS: nine scene choices and three original-style four-phase backgrounds render in the actual application');
+  await page.getByRole('button',{name:'完成布置',exact:true}).click();
+  console.log('PASS: scene choices and original-style four-phase backgrounds render in the actual application');
   const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1'))),before=await save();
   const remaining=Math.max(0,before.lastRewardAt+10000-Date.now());if(remaining)await page.waitForTimeout(remaining+50);
   await roomTab(page,'游戏');await page.getByRole('button',{name:'开始寻宝',exact:true}).click();
@@ -381,8 +396,11 @@ async function verifyRoomIteration(page){
   await expect(game.locator('.treasure-receipt')).toContainText('+24');
   const memory=await page.evaluate(()=>{const pet=JSON.parse(localStorage.getItem('ramu-house-save-v1'));return JSON.parse(localStorage.getItem(`ramu-companion-memory-v1:${pet.createdAt}`));});
   expect(memory.events.filter(e=>e.kind==='game').at(-1).detail).toContain('在晴空观星阁完成了《小屋寻宝》');
-  await game.getByRole('button',{name:'完成',exact:true}).click();await roomTab(page,'布置');
-  await gallery.getByRole('button',{name:previous,exact:true}).click();await decor.getByRole('button',{name:'跟随时间',exact:true}).click();await toDesktop(page);
+  await game.getByRole('button',{name:'完成',exact:true}).click();
+  await page.getByRole('button',{name:'布置小屋',exact:true}).click();
+  await decor.getByRole('tab',{name:'小屋风景',exact:true}).click();
+  await gallery.getByRole('button',{name:previous,exact:true}).click();await decor.getByRole('button',{name:'跟随时间',exact:true}).click();
+  await page.getByRole('button',{name:'完成布置',exact:true}).click();await toDesktop(page);
   console.log('PASS: actual room treasure hunt has no abandoned reward, one explicit receipt and a retained scene-specific shared memory');
 }
 
@@ -501,4 +519,4 @@ async function verifyMoodWardrobe(page) {
   }
 }
 
-module.exports = { ramBodyPosition,enterBackpack,applyGrowthSettings,adopt, openActions, enterHome, roomTab, toDesktop, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };
+module.exports = { ramBodyPosition,enterBackpack,applyGrowthSettings,adopt, openActions, enterHome, roomTab, toDesktop, placeMusicBox, selectPocket, buy, makeTired,verifyEdgePeek,verifyStageSettings,verifyRecolorPotion,verifyPetLife,verifyRoomIteration,verifyPetSpirit,verifyComfortMotion,verifyMoodWardrobe };

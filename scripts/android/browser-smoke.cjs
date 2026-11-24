@@ -8,24 +8,27 @@ const save=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-s
 async function artwork(page){await expect.poll(()=>page.evaluate(()=>[...document.images].filter(im=>im.getBoundingClientRect().width>0&&im.getBoundingClientRect().height>0).filter(im=>!im.complete||im.naturalWidth===0).map(im=>im.currentSrc||im.src)),{timeout:20000,message:'Visible original artwork must load before review screenshots'}).toEqual([]);}
 async function panel(page,name){if(await page.locator('.game-panel').isVisible())await page.getByRole('button',{name:'关闭面板',exact:true}).click();await page.locator('.room-dock').getByRole('button',{name,exact:true}).click();await expect(page.locator('.game-panel')).toBeVisible();}
 async function fit(page){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'The page must not overflow horizontally');const header=page.locator('.game-panel .panel-header');if(await header.isVisible()){const box=await header.boundingBox();assert.ok(box.y>=0&&box.y+box.height<=page.viewportSize().height,'Dialog heading and close control must remain on screen');}}
-async function swipeDock(page){
- const dock=page.locator('.room-dock');
- if(!await dock.evaluate(n=>n.scrollWidth>n.clientWidth+1))return;
- const bounds=await dock.boundingBox(),x=bounds.x+bounds.width-20,y=bounds.y+bounds.height/2;
+async function swipeHorizontally(page,x,y,distance){
  const input=await page.context().newCDPSession(page);
  try{
   await input.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
   for(let step=1;step<=12;step++){
-   await input.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-(bounds.width-40)*step/12,y,id:1}]});
+   await input.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+distance*step/12,y,id:1}]});
    await page.waitForTimeout(20);
   }
   await input.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  await expect.poll(()=>dock.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0);
-  const settings=dock.getByRole('button',{name:'陪伴设置',exact:true});
-  await expect.poll(()=>settings.evaluate(n=>{const r=n.getBoundingClientRect(),p=n.parentElement.getBoundingClientRect();return r.left>=p.left&&r.right<=p.right})).toBe(true);
-  await settings.tap();await expect(page.getByRole('region',{name:'安卓陪伴设置',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'关闭面板',exact:true}).tap();
  }finally{await input.detach();}
+}
+async function swipeDock(page){
+ const dock=page.locator('.room-dock');
+ if(!await dock.evaluate(n=>n.scrollWidth>n.clientWidth+1))return;
+ const bounds=await dock.boundingBox();
+ await swipeHorizontally(page,bounds.x+bounds.width-20,bounds.y+bounds.height/2,40-bounds.width);
+ await expect.poll(()=>dock.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0);
+ const settings=dock.getByRole('button',{name:'陪伴设置',exact:true});
+ await expect.poll(()=>settings.evaluate(n=>{const r=n.getBoundingClientRect(),p=n.parentElement.getBoundingClientRect();return r.left>=p.left&&r.right<=p.right})).toBe(true);
+ await settings.tap();await expect(page.getByRole('region',{name:'安卓陪伴设置',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'关闭面板',exact:true}).tap();
 }
 async function fitLandscapeSpeech(page,label){
  if(page.viewportSize().height>500||page.viewportSize().width<600)return;
@@ -54,6 +57,8 @@ async function scenario(viewport,label){
  const page=await browser.newPage({viewport,deviceScaleFactor:1,isMobile:true,hasTouch:true,timezoneId:'Asia/Shanghai'});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(mockNative);await page.goto(origin);
  await page.getByRole('button',{name:'选择蓝色拉姆',exact:true}).click();await page.getByRole('button',{name:'给它起名',exact:true}).click();await page.locator('#pet-name').fill('安卓小蓝');await page.getByRole('button',{name:'带拉姆回家！',exact:true}).click();await expect(page.locator('.room-dock')).toBeVisible();assert.equal(await page.evaluate(()=>window.__androidTest.state.petMode),false);await fit(page);
  await expect.poll(async()=>JSON.parse(await page.evaluate(()=>window.__androidTest.storage['ramu-house-save-v1'])).name).toBe('安卓小蓝');
+ await expect(page.locator('audio[data-ramu-bgm]')).toHaveCount(0);
+ await require('../smoke-helpers.cjs').placeMusicBox(page);
  await expect.poll(()=>page.evaluate(()=>{const audio=document.querySelector('audio[data-ramu-bgm]');return Boolean(audio&&!audio.paused&&audio.readyState>=2)}),{timeout:15000}).toBe(true);
  await artwork(page);
  if(viewport.width<=700||viewport.height<=600){
@@ -73,7 +78,14 @@ async function scenario(viewport,label){
  await page.screenshot({path:path.join(output,`${label}-house.png`)});await fitLandscapeSpeech(page,label);await swipeDock(page);
  await panel(page,'进入商店');await expect(page.locator('.book-product')).toHaveCount(9);const selected=await page.locator('.book-item-detail').getAttribute('data-selected-item');const prior=await save(page);await page.locator('.book-buy').click();await expect.poll(async()=>(await save(page)).inventory[selected]).toBe((prior.inventory[selected]||0)+1);await fit(page);await artwork(page);await page.screenshot({path:path.join(output,`${label}-shop.png`)});
  await panel(page,'打开背包');await expect(page.locator('.pocket-slot')).toHaveCount(16);const slot=page.locator('.pocket-slot[data-item-id]').first(),id=await slot.getAttribute('data-item-id'),before=await save(page);await slot.click();await expect.poll(async()=>(await save(page)).inventory[id]).toBe(before.inventory[id]-1);assert.equal(await page.locator('.pocket-slot').first().evaluate(e=>Math.abs(e.getBoundingClientRect().width-e.getBoundingClientRect().height)<1),true);await fit(page);
- await panel(page,'陪伴设置');await expect(page.getByRole('region',{name:'安卓陪伴设置',exact:true})).toBeVisible();await page.getByRole('button',{name:'设置悬浮窗权限',exact:true}).click();await expect.poll(async()=>page.evaluate(()=>window.__androidTest.permissions.overlay)).toBe(true);await page.getByRole('switch',{name:'Wi-Fi 下自动下载更新',exact:true}).click();await expect(page.getByRole('switch',{name:'Wi-Fi 下自动下载更新',exact:true})).toHaveAttribute('aria-checked','true');await fit(page);
+ await panel(page,'陪伴设置');await expect(page.getByRole('region',{name:'安卓陪伴设置',exact:true})).toBeVisible();await page.getByRole('button',{name:'设置悬浮窗权限',exact:true}).click();await expect.poll(async()=>page.evaluate(()=>window.__androidTest.permissions.overlay)).toBe(true);
+ const wifi=page.getByRole('switch',{name:'Wi-Fi 下自动下载更新',exact:true});
+ await expect(wifi).toHaveAttribute('aria-checked','false');
+ await wifi.scrollIntoViewIfNeeded();
+ const wifiBounds=await wifi.boundingBox();
+ await swipeHorizontally(page,wifiBounds.x+wifiBounds.width/4,wifiBounds.y+wifiBounds.height/2,wifiBounds.width/2);
+ await expect(wifi).toHaveAttribute('aria-checked','true');
+ await fit(page);
  await page.evaluate(()=>{localStorage.setItem('ramu-write-test','original');window.__androidTest.failWrites=true;let failed=false;try{localStorage.setItem('ramu-write-test','bad')}catch{failed=true}window.__androidTest.failWrites=false;if(!failed||localStorage.getItem('ramu-write-test')!=='original')throw Error('Native save failure must roll back the renderer storage');localStorage.removeItem('ramu-write-test');});
  await panel(page,'成长手册');await expect(page.getByRole('button',{name:'切换到初级拉姆',exact:true})).toBeEnabled();
  // Restore through the public import flow. Directly rewriting localStorage
@@ -86,7 +98,23 @@ async function scenario(viewport,label){
  await panel(page,'进入拉姆学院');const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});await expect(language.getByRole('button',{name:'上这一课',exact:true})).toBeEnabled({timeout:25000});await language.getByRole('button',{name:'上这一课',exact:true}).click();await expect.poll(async()=>(await save(page)).activity?.course).toBe('language');let activity=(await save(page)).activity;assert.equal(activity.endsAt-activity.startedAt,180000);await expect(page.getByRole('progressbar',{name:'语言课进度',exact:true})).toHaveAttribute('max','180000');
  await page.clock.setFixedTime(new Date(activity.endsAt+1000));await page.evaluate(()=>window.__androidTest.emit('resume',{}));await expect.poll(async()=>(await save(page)).education?.graduated?.language).toBeTruthy();const learned=await save(page);await page.evaluate(()=>window.__androidTest.emit('resume',{}));await expect.poll(async()=>(await save(page)).education.graduated.language).toBe(learned.education.graduated.language);await fit(page);await artwork(page);await page.screenshot({path:path.join(output,`${label}-school.png`)});
  await panel(page,'游乐时光');await page.getByRole('button',{name:'开始寻宝',exact:true}).click();await expect(page.locator('.treasure-dialog')).toBeVisible();await fit(page);await page.evaluate(()=>window.__androidTest.emit('back',{}));await expect(page.locator('.treasure-dialog')).toHaveCount(0);
- await panel(page,'陪伴设置');await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect.poll(()=>page.evaluate(()=>localStorage.getItem('ramu-android-focus-v1'))).not.toBeNull();const timer=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-android-focus-v1')));await page.reload();await expect(page.locator('.room-dock')).toBeVisible();await panel(page,'陪伴设置');await expect(page.getByRole('button',{name:'取消计时',exact:true})).toBeVisible();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-android-focus-v1')).deadline),timer.deadline);await page.getByRole('button',{name:'取消计时',exact:true}).click();await expect.poll(()=>page.evaluate(()=>localStorage.getItem('ramu-android-focus-v1'))).toBeNull();await artwork(page);await page.screenshot({path:path.join(output,`${label}-settings.png`)});
+ await panel(page,'陪伴设置');await page.getByRole('button',{name:'开始计时',exact:true}).click();await expect.poll(()=>page.evaluate(()=>localStorage.getItem('ramu-android-focus-v1'))).not.toBeNull();const timer=await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-android-focus-v1')));await page.reload();await expect(page.locator('.room-dock')).toBeVisible();await panel(page,'陪伴设置');await expect(page.getByRole('button',{name:'取消计时',exact:true})).toBeVisible();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-android-focus-v1')).deadline),timer.deadline);await page.getByRole('button',{name:'取消计时',exact:true}).click();await expect.poll(()=>page.evaluate(()=>localStorage.getItem('ramu-android-focus-v1'))).toBeNull();
+ const startFocus=page.getByRole('button',{name:'开始计时',exact:true}),cancelFocus=page.getByRole('button',{name:'取消计时',exact:true});
+ await page.evaluate(()=>{
+  const persist=window.MoleAndroid.persist;
+  window.__androidTest.restoreFocusWrites=()=>{window.MoleAndroid.persist=persist};
+  window.MoleAndroid.persist=(key,value)=>key==='ramu-android-focus-v1'?false:persist(key,value);
+ });
+ await startFocus.click();
+ await expect(cancelFocus).toBeVisible();
+ await cancelFocus.click();
+ await expect(startFocus).toBeVisible();
+ await page.evaluate(()=>window.__androidTest.restoreFocusWrites());
+ await startFocus.click();
+ await expect(cancelFocus).toBeVisible();
+ await cancelFocus.click();
+ await expect(startFocus).toBeVisible();
+ await artwork(page);await page.screenshot({path:path.join(output,`${label}-settings.png`)});
  // The Android house permits saving/installing while idle; the desktop's
  // "in the house" busy restriction must not strand updates in settings.
  await expect.poll(()=>page.evaluate(()=>window.__androidTest.calls.filter(c=>c.method==='updatesBusy').at(-1)?.args.busy)).toBe(false);

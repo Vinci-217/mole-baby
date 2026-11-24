@@ -29,9 +29,10 @@ describe('public original art/audio provenance and full poses',()=>{
   expect(slumber.forms.classic.mouthPoint[1]).toBeGreaterThan(50);expect(gentle.forms.classic.mouthPoint[1]).toBeGreaterThan(50);
   for(const kind of ['slumber','gentle-care'])for(const layer of ['neutral','mask'])expect(fs.existsSync(`public/assets/original/${kind}/classic-${layer}.png`)).toBe(true);
  });
- it('keeps new navigation exports traceable to three distinct original symbols',()=>{
+ it('keeps the navigation, warehouse, manor and Mole Bean graphics traceable to original symbols',()=>{
   expect(new Set(icons.files.map(i=>i.characterId)).size).toBe(3);
-  for(const meta of icons.files)expect(hash('public/assets/original/room-icons/'+meta.file)).toBe(meta.sha256);
+  expect(icons.houseIcons.map(icon=>icon.file)).toEqual(['decorate.png','manor.png','mole-bean.png']);
+  for(const meta of [...icons.files,...icons.houseIcons])expect(hash('public/assets/original/room-icons/'+meta.file)).toBe(meta.sha256);
  });
  it('keeps complete visible original poses and original source frame identities within bounded atlases',async()=>{
   for(const [form,meta]of Object.entries(flight.forms)){

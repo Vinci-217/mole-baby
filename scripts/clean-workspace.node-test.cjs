@@ -15,10 +15,16 @@ test('cleanup protects tracked frames, mixed folders, assets, saved profiles and
     'artifacts/mixed-frames/save.json', 'artifacts/player-profile/pose-frames/01.png',
     'artifacts/player-profile/save.json', 'public/old-frames/01.png', 'local-assets/raw/source.swf',
     'scripts/__pycache__/generated.pyc', 'scripts/tracked/__pycache__/keep.pyc',
-    'tsconfig.app.tsbuildinfo', 'node_modules/.vite/cache.json', 'node_modules/keep/index.js']) write(file);
-  execFileSync('git', ['add', '-f', 'artifacts/tracked-frames/01.png', 'scripts/tracked/__pycache__/keep.pyc'], { cwd: root });
+    'tsconfig.app.tsbuildinfo', 'node_modules/.vite/cache.json', 'node_modules/keep/index.js',
+    'local-assets/research/wardrobe-motion-recording/junior/001.png',
+    'local-assets/research/wardrobe-motion-recording/kept-profile/001.png',
+    'local-assets/research/wardrobe-polish-recording/mixed/001.png',
+    'local-assets/research/wardrobe-polish-recording/mixed/notes.json',
+    'local-assets/research/wardrobe-fit-recording/tracked/001.png',
+    'local-assets/extracted/frames/001.png']) write(file);
+  execFileSync('git', ['add', '-f', 'artifacts/tracked-frames/01.png', 'scripts/tracked/__pycache__/keep.pyc', 'local-assets/research/wardrobe-fit-recording/tracked/001.png'], { cwd: root });
   fs.symlinkSync(path.join(root, 'artifacts/player-profile'), path.join(root, 'artifacts/linked-frames'));
   const candidates = planCleanup(root).map(entry => path.relative(root, entry.path).split(path.sep).join('/')).sort();
-  assert.deepEqual(candidates, ['artifacts/old-frames', 'node_modules/.vite', 'scripts/__pycache__', 'tsconfig.app.tsbuildinfo']);
+  assert.deepEqual(candidates, ['artifacts/old-frames', 'local-assets/research/wardrobe-motion-recording/junior', 'node_modules/.vite', 'scripts/__pycache__', 'tsconfig.app.tsbuildinfo']);
   assert(fs.existsSync(path.join(root, 'artifacts/player-profile/save.json')));
 });

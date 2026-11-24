@@ -22,6 +22,18 @@ function planCleanup(root) {
   for (const entry of fs.readdirSync(root, { withFileTypes: true }))
     if (entry.isFile() && entry.name.endsWith('.tsbuildinfo')) add(path.join(root, entry.name), 'regenerable TypeScript build metadata');
   for (const name of ['.vite', '.vite-temp']) add(path.join(root, 'node_modules', name), 'regenerable Vite cache');
+  // These are screen captures of the retired costume prototype, not source
+  // sprites. Do not generalize this to the extracted/raw asset library.
+  for (const name of ['wardrobe-motion-recording', 'wardrobe-polish-recording', 'wardrobe-fit-recording']) {
+    const directory = path.join(root, 'local-assets', 'research', name);
+    if (!fs.existsSync(directory) || fs.lstatSync(directory).isSymbolicLink()) continue;
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (!entry.isDirectory() || /profile|backup|save/i.test(entry.name)) continue;
+      const folder = path.join(directory, entry.name), files = fs.readdirSync(folder, { withFileTypes: true });
+      if (files.length && files.every(file => file.isFile() && /^\d+\.png$/.test(file.name)))
+        add(folder, 'numeric screen captures of the retired costume prototype');
+    }
+  }
   function pythonCaches(folder) {
     for (const entry of fs.readdirSync(folder, { withFileTypes: true })) if (entry.isDirectory()) {
       const child = path.join(folder, entry.name);

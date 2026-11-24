@@ -38,5 +38,213 @@
       1297
     ],
     "sha256": "c31d3951226a50cef8d38ec2ea18151d5a0d337af16108878db66c4f1e704ba2"
+  },
+  {
+    "id": "original-160031",
+    "name": "小型鲸鱼房",
+    "file": "room-160031.webp",
+    "goodsId": 160031,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160031.swf",
+    "sourceSha256": "c9eff045a44a5cc02cdb48d54cc9231d5fc858e872826059ac55e3b13af08702",
+    "spriteId": 16,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1480,
+      864
+    ],
+    "sha256": "67eedc595b57f677c83cf68875d8d54b179b4fa19c5dcd4890d13045a9c4bbb3"
+  },
+  {
+    "id": "original-160039",
+    "name": "奇幻蜂窝",
+    "file": "room-160039.webp",
+    "goodsId": 160039,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160039.swf",
+    "sourceSha256": "3ba3785e0fe5c96e54399082f8eef1b9a933140368512ee8a2b01bfeb041dc20",
+    "spriteId": 16,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1709,
+      943
+    ],
+    "sha256": "a8b89a28ef2b10ebf780f476121833e2c4aee8454ecca8e8731f7ab71934d44d"
+  },
+  {
+    "id": "original-160113",
+    "name": "万圣节小屋",
+    "file": "room-160113.webp",
+    "goodsId": 160113,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160113.swf",
+    "sourceSha256": "628126883c92aa05f74b53f67e46a35ff6d8e9e7441932284e974173af8cd572",
+    "spriteId": 21,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1231,
+      760
+    ],
+    "sha256": "84c3f574e4fc282de366834e63caca56dc3b32ef79d986028b5ca5dadb5bf237"
+  },
+  {
+    "id": "original-160167",
+    "name": "圣诞小屋",
+    "file": "room-160167.webp",
+    "goodsId": 160167,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160167.swf",
+    "sourceSha256": "f1ca2e0ea92f30066eafd89dbcfa0dbc8a74c9bef356150cd28c3b9a5eff0daa",
+    "spriteId": 50,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1293,
+      832
+    ],
+    "sha256": "c0a97b80229fbd791a610206128643429b5ded0df818dffd957cadd333a02034"
+  },
+  {
+    "id": "original-160193",
+    "name": "骑士城堡",
+    "file": "room-160193.webp",
+    "goodsId": 160193,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160193.swf",
+    "sourceSha256": "c23170720bc8ca3443288be195b037ab54fde5164896e86a442159428708120c",
+    "spriteId": 29,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1237,
+      835
+    ],
+    "sha256": "03c7590f58f5d6984491f5f0fca7e5ee8e6f79d2c54f9519ad0b14f281b2382b"
+  },
+  {
+    "id": "original-160205",
+    "name": "拉姆健身小屋",
+    "file": "room-160205.webp",
+    "goodsId": 160205,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160205.swf",
+    "sourceSha256": "9bef2e5f2450aaa219c8b3d03b3fb91b54f0028f68cda640a4f178475a0d0c2a",
+    "spriteId": 26,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1321,
+      751
+    ],
+    "sha256": "99ef23916e0189c7286783cc5089132f1a3079f870b9dd0d20787aeb896c5f55"
+  },
+  {
+    "id": "original-160213",
+    "name": "梦幻春天小屋",
+    "file": "room-160213.webp",
+    "goodsId": 160213,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160213.swf",
+    "sourceSha256": "735379b392048a973ba798d94a38a3cd7b43c6efc8577bfd0cb0b63373b76624",
+    "spriteId": 33,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1225,
+      785
+    ],
+    "sha256": "e3728f8711376b10ed6358841a1d12b9f02771a3a2a3f7b5dd07d8b3e9480f61"
+  },
+  {
+    "id": "original-160242",
+    "name": "玩具房",
+    "file": "room-160242.webp",
+    "goodsId": 160242,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160242.swf",
+    "sourceSha256": "f335696d49e3801b69b074d7ca76d054b54410b2949b07c6a3a9508b3e7ddbf0",
+    "spriteId": 15,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1469,
+      845
+    ],
+    "sha256": "1572faa6b5110b2af364a9eaf24d159def75dd486155eb9bb16e335c3f7a4902"
+  },
+  {
+    "id": "original-160250",
+    "name": "梦幻蛋糕屋",
+    "file": "room-160250.webp",
+    "goodsId": 160250,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160250.swf",
+    "sourceSha256": "f4530b30f44e8efef4b49af68246b3ae569e01b144c91e40f067d71e2936b6e4",
+    "spriteId": 40,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1337,
+      748
+    ],
+    "sha256": "754cb1a6bcf17c82b02036886bafade088819760fca0e5c81abce1601c2ec06b"
+  },
+  {
+    "id": "original-160343",
+    "name": "森林小屋",
+    "file": "room-160343.webp",
+    "goodsId": 160343,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160343.swf",
+    "sourceSha256": "8cd1a9a32108e5e6e371d335437fffcca41e0a48f5f37cb8d9f80782c930221f",
+    "spriteId": 28,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1376,
+      812
+    ],
+    "sha256": "94bda1757b865a49f2de8a1bdfb5d1b6ede7239c7036232cb398ec2617d8bc93"
+  },
+  {
+    "id": "original-161163",
+    "name": "清新小木屋",
+    "file": "room-161163.webp",
+    "goodsId": 161163,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/161163.swf",
+    "sourceSha256": "a99f6dd09b0cf5782b54de36cf0baebb81ab3876efa388579b3a3a62fe30c59d",
+    "spriteId": 16,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1200,
+      700
+    ],
+    "sha256": "66ae4a48d5881a69465b24da68701beafe9c935aa5fb51b25fd20f408697660c"
+  },
+  {
+    "id": "original-161274",
+    "name": "摩尔小书屋",
+    "file": "room-161274.webp",
+    "goodsId": 161274,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/161274.swf",
+    "sourceSha256": "c97acdb62b1de93ed86df1fc6b47460339f7c372532de7fadb9446b7155d949e",
+    "spriteId": 16,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1200,
+      700
+    ],
+    "sha256": "be149b6d3f2d84fd5358d2846c40a8f7fd8cba66db585f6753cac4be69b5c6f2"
+  },
+  {
+    "id": "original-160911",
+    "name": "海洋泡泡屋",
+    "file": "room-160911.webp",
+    "goodsId": 160911,
+    "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/goods/swf/160911.swf",
+    "sourceSha256": "d28b462a02e273bc385d5723160a8a3a7eb0d79f3b36abed67b546e841659512",
+    "spriteId": 37,
+    "sourceFrame": 1,
+    "zoom": 1.25,
+    "size": [
+      1391,
+      948
+    ],
+    "sha256": "e68394c6d129987b0e8c1fe2b028efbb14b984d6c866def853d1fa78183f68af"
   }
 ]

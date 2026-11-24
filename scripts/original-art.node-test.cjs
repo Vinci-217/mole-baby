@@ -32,3 +32,25 @@ test('new furniture and room images match their archived source receipts',()=>{
  const record=require('../public/assets/original/furniture/source-record.json'),catalog=require('../public/assets/original/furniture/catalog.json');assert.equal(catalog.length,19);assert.equal(record.items.filter(i=>i.kind!=='furniture').length,5);
  for(const item of record.items)assert.equal(sha(fs.readFileSync(path.join(root,item.output))),item.output_sha256);
 });
+test('bulk furniture assets use unique original IDs, preserve their source artwork, and exclude the filtered themes',()=>{
+ const audit=require('../research/original-furniture-import.json');
+ const catalog=require('../public/assets/original/furniture/archive-catalog.json');
+ assert.deepEqual(require('../src/archived-furniture-ids.json'),catalog.map(item=>item.id));
+ const bounds=require('../public/assets/original/furniture/bounds.json');
+ const added=new Map(catalog.map(item=>[item.sourceId,item]));
+ assert.equal(added.size,catalog.length);
+ assert.equal(catalog.length,audit.newlyAvailable);
+ assert.equal(audit.records.length,catalog.length+1);
+ assert.ok(audit.areaCounts.house>1000&&audit.areaCounts.garden>350);
+ assert.deepEqual(audit.unrenderable,[]);
+ for(const item of audit.excluded)assert.equal(added.has(item.id),false);
+ for(const row of audit.records){
+  const item=added.get(row.id),isMusicBox=row.id===audit.musicBoxSource;
+  const id=isMusicBox?'music-box':item.id;
+  const image=fs.readFileSync(path.join(root,'public/assets/original/furniture',row.image));
+  assert.equal(sha(image),row.imageSha256);
+  assert.deepEqual([bounds[id].imageWidth,bounds[id].imageHeight],row.size);
+  assert.ok(bounds[id].mask.some(bits=>bits!=='00000000'));
+  if(!isMusicBox)assert.equal(item.image,'./assets/original/furniture/'+row.image);
+ }
+});

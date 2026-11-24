@@ -4,7 +4,8 @@ import index from '../public/assets/original/uploaded-actions/index.json'
 import daily from '../public/assets/original/daily-frames/index.json'
 import sources from '../research/references/uploaded-lamu-actions/sources.json'
 import {ITEMS,getItem} from './catalog'
-import {UPLOADED_TOYS,uploadedMotion,uploadedEffectRect,uploadedSpec} from './uploaded-actions'
+import {UPLOADED_TOYS,uploadedMotion,uploadedSpec} from './uploaded-actions'
+import {frameClipRect} from './frame-clip-spec'
 import {getItemMotion} from './item-motion'
 import {DAILY_FRAME_ACTIONS} from './daily-frames'
 import calibration from '../research/tuya-size-calibration.json'
@@ -26,10 +27,10 @@ describe('complete supplied motion library',()=>{
  })
  it('reuses the already-selected classic care fallback on later forms at their own body size',()=>{
   const clip=OFFICIAL_CLIPS.find(c=>c.kind==='care'&&c.level===101&&c.path.endsWith('/tuya1.swf'))!;
-  const spec=uploadedSpec('classic','tuya1')!,base=uploadedEffectRect(spec,'classic');
+  const spec=uploadedSpec('classic','tuya1')!,base=frameClipRect(spec,'classic');
   for(const form of ['super','water','wood','fire'] as const){
    expect(uploadedMotion(form,'official-'+clip.id)).toBe(spec);
-   const rect=uploadedEffectRect(spec,form),body=visibility.forms[form].body,reference=visibility.forms.classic.body;
+   const rect=frameClipRect(spec,form),body=visibility.forms[form].body,reference=visibility.forms.classic.body;
    expect(rect.width/base.width).toBeCloseTo((body[2]-body[0])/(reference[2]-reference[0]),6);
    expect(rect.height/rect.width).toBeCloseTo(spec.height/spec.width,6);
   }
@@ -39,7 +40,7 @@ describe('complete supplied motion library',()=>{
   expect(calibration.records).toHaveLength(16)
   for(const record of calibration.records){
    const spec=uploadedSpec(...record.key.split('-')as [string,string])!;
-   const rect=uploadedEffectRect(spec,spec.form as 'middle');
+   const rect=frameClipRect(spec,spec.form as 'middle');
    const width=record.bodyAtlasWidth/spec.width*rect.width;
    const body=visibility.forms[spec.form as 'middle'].body;
    expect(width).toBeCloseTo(body[2]-body[0],5);
@@ -56,7 +57,7 @@ describe('complete supplied motion library',()=>{
    expect(getItem(file.id)||UPLOADED_TOYS.find(t=>t.id===file.id)).toBeDefined()
    if(getItem(file.id))expect(uploadedMotion(file.form,getItemMotion(file.id).action,file.id)).toBe(spec)
    else expect(uploadedMotion(file.form,`uploaded-${file.id}`)).toBe(spec)
-   const rect=uploadedEffectRect(spec,file.form as 'middle')
+   const rect=frameClipRect(spec,file.form as 'middle')
    expect(Object.values(rect).every(Number.isFinite)).toBe(true)
    expect(fs.existsSync(`public/assets/original/uploaded-actions/${spec.assetKey}/poster.png`)).toBe(true)
   }

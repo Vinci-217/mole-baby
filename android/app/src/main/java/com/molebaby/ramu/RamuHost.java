@@ -24,6 +24,7 @@ final class RamuHost {
     final ResourcePack resources;
     final PetController controller;
     final AndroidUpdates updates;
+    private Map<String, BookAssetSource.Book> bookAssets;
     final Handler main=new Handler(Looper.getMainLooper());
     final ExecutorService io=Executors.newSingleThreadExecutor();
     RamuActivity activity;
@@ -57,7 +58,7 @@ final class RamuHost {
         WebViewAssetLoader loader=new WebViewAssetLoader.Builder().addPathHandler("/",this::asset).build();
         web.addJavascriptInterface(new NativeBridge(this),"MoleAndroid");
         web.setWebViewClient(new WebViewClient(){
-            @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){WebResourceResponse media=media(request);if(media!=null)return media;WebResourceResponse response=loader.shouldInterceptRequest(request.getUrl());return response!=null?response:blocked();}
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){WebResourceResponse book=book(request);if(book!=null)return book;WebResourceResponse media=media(request);if(media!=null)return media;WebResourceResponse response=loader.shouldInterceptRequest(request.getUrl());return response!=null?response:blocked();}
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){String value=request.getUrl().toString();if(value.startsWith(ORIGIN)&&!request.isForMainFrame())return false;if(request.hasGesture()&&request.isForMainFrame()&&value.startsWith("https://"))openUrl(value);return true;}
             @Override public void onPageFinished(WebView view,String url){if(!url.equals(ORIGIN+"index.html"))return;loaded=true;event("state",controller.state());event("permissions",permissions());if(controller.petMode)controller.attach();else if(activity!=null)activity.attachWeb();main.postDelayed(()->{io.execute(resources::prune);if(updates.enabled())updates.check();},8000);}
             @Override public boolean onRenderProcessGone(WebView view,RenderProcessGoneDetail detail){controller.detach();detachWeb();view.destroy();web=null;loaded=false;store.flush();if(activity!=null){activity.showFailure("系统回收了画面，存档仍然保留。点击重新打开。");}return true;}
@@ -83,6 +84,29 @@ final class RamuHost {
         }catch(Exception e){return blocked();}
     }
     private static WebResourceResponse blocked(){return new WebResourceResponse("text/plain","UTF-8",403,"Forbidden",Map.of("X-Content-Type-Options","nosniff"),new ByteArrayInputStream(new byte[0]));}
+    private synchronized BookAssetSource.Book bookAsset(String path) throws IOException, JSONException {
+        if (bookAssets == null) {
+            byte[] json = SafeFiles.readLimited(context.getAssets().open("web/book-packs.json"), 1024 * 1024);
+            bookAssets = BookAssetSource.readIndex(new JSONObject(new String(json, java.nio.charset.StandardCharsets.UTF_8)));
+        }
+        return bookAssets.get(path);
+    }
+    private WebResourceResponse book(WebResourceRequest request) {
+        String path = request.getUrl().getPath();
+        if (path == null || !path.startsWith(BookAssetSource.PREFIX)) return null;
+        if (!"GET".equals(request.getMethod()) || !request.getUrl().toString().startsWith(ORIGIN)
+                || request.isForMainFrame() || request.getUrl().getEncodedQuery() != null) return blocked();
+        try {
+            BookAssetSource.Book book = bookAsset(path);
+            if (book == null) return blocked();
+            return new WebResourceResponse("application/zip", null, 200, "OK",
+                    Map.of("Content-Length", String.valueOf(book.size()), "Cache-Control", "no-store",
+                           "X-Content-Type-Options", "nosniff"), BookAssetSource.open(book));
+        } catch (IOException | JSONException error) {
+            return new WebResourceResponse("text/plain", "UTF-8", 503, "Unavailable",
+                    Map.of("Cache-Control", "no-store"), new ByteArrayInputStream(new byte[0]));
+        }
+    }
     private WebResourceResponse media(WebResourceRequest request){
         String url=request.getUrl().toString(),path=request.getUrl().getPath();if(!url.startsWith(ORIGIN)||path==null||!path.matches("(?i)/assets/.+\\.(mp3|ogg|wav)"))return null;
         try{if(resources.active==null)return blocked();File file=SafeFiles.child(resources.active,path.substring(1));if(!file.isFile())return blocked();String range=null;for(var header:request.getRequestHeaders().entrySet())if(header.getKey().equalsIgnoreCase("Range"))range=header.getValue();MediaRange.Slice slice=MediaRange.parse(range,file.length());

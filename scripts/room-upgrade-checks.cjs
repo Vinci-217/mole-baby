@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),path=require('node:path'),{expect}=require('@playwright/test');
-const{enterHome,roomTab,toDesktop}=require('./smoke-helpers.cjs');
+const{enterHome,roomTab,toDesktop,placeMusicBox}=require('./smoke-helpers.cjs');
 /** Real controls, actual Audio transport and persisted single-course credit. */
 async function verifyRoomUpgrade(page){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));let clock=false,failed=false;
@@ -10,6 +10,8 @@ async function verifyRoomUpgrade(page){
    const p=JSON.parse(localStorage.getItem('ramu-house-save-v1')),now=Date.now();
    Object.assign(p,{growth:180,growthLocked:true,evolution:undefined,sleeping:false,activity:undefined,outing:undefined,wearing:undefined,lastTick:now,education:{lessons:{language:1},graduated:{}}});
    p.stats={hunger:95,thirst:95,happiness:95,cleanliness:95,health:100,energy:95};
+   p.room={owned:['original-160206'],placed:[{id:'original-160206',x:75,y:70}]};
+   p.coins=Math.max(p.coins,80);
    localStorage.setItem('ramu-house-save-v1',JSON.stringify(p));localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,sound:false,roomWander:false}));
    localStorage.setItem('ramu-room-media-v1',JSON.stringify({musicEnabled:true,backgroundPlayback:false,musicId:'castle',volume:.1}));
   });
@@ -41,7 +43,20 @@ async function verifyRoomUpgrade(page){
   await page.mouse.click(box.x+box.width-20,box.y+20);await expect(walker).toHaveAttribute('data-moving','true');
   const pet=await page.locator('.scene-character').boundingBox();await page.mouse.click(pet.x+pet.width/2,pet.y+pet.height/2);await expect(walker).toHaveAttribute('data-moving','false');await expect(floor).toBeDisabled();await expect(floor).toBeEnabled({timeout:5000});
   await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.click(box.x+box.width-20,box.y+20);await expect.poll(()=>position.getAttribute('data-x')).not.toBe(settled);await expect(walker).toHaveAttribute('data-moving','false');await page.emulateMedia({reducedMotion:'no-preference'});
+  const swing=page.locator('.room-placed-item[data-furniture="original-160206"]');
+  await swing.press('Enter');
+  const swingFrame=swing.locator('canvas.room-furniture-frame');
+  await expect(swingFrame).toHaveAttribute('data-loaded','true',{timeout:20000});
+  await page.waitForTimeout(3650);
+  await expect(swing).toHaveAttribute('aria-pressed','true');
+  const sourceFrame=await swingFrame.getAttribute('data-source-frame');
+  await expect.poll(()=>swingFrame.getAttribute('data-source-frame')).not.toBe(sourceFrame);
+  await floor.press('ArrowLeft');
+  await expect(swing).toHaveAttribute('aria-pressed','false');
+  await expect(walker).toHaveAttribute('data-moving','true');
+  await expect(walker).toHaveAttribute('data-moving','false');
   const audio=()=>page.evaluate(()=>window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src'))?.currentTime);
+  const musicBox=await placeMusicBox(page);
   await expect.poll(()=>page.evaluate(()=>window.__roomAudio.some(a=>a.src.includes('/audio/castle.mp3')&&!a.paused))).toBe(true);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=12});await toDesktop(page);
   await expect.poll(()=>page.evaluate(()=>window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).paused)).toBe(true);
@@ -50,9 +65,9 @@ async function verifyRoomUpgrade(page){
   // An explicit return with background playback off restarts the track.
   // Pausing in the room preserves the track position. Ordinary clicks
   // must not reset it either; background playback remains a separate setting.
-  await roomTab(page,'设置');const music=page.getByRole('checkbox',{name:'播放背景音乐',exact:true});await music.uncheck();await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.check();await expect.poll(audio).toBeGreaterThanOrEqual(18);
-  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'声音与音乐',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
-  const background=page.getByRole('checkbox',{name:'允许后台播放音乐',exact:true});await background.check();await toDesktop(page);
+  await musicBox.press('Enter');const music=page.getByRole('switch',{name:'播放背景音乐',exact:true});await music.press('ArrowLeft');await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&a.getAttribute('src')).currentTime=18});await music.press('ArrowRight');await expect.poll(audio).toBeGreaterThanOrEqual(18);
+  await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=8});await page.getByRole('heading',{name:'音乐盒',exact:true}).click();assert.ok(await audio()>=8,'A regular pointer unlock must not rewind playing music');
+  const background=page.getByRole('switch',{name:'允许后台播放音乐',exact:true});await background.press('ArrowRight');await toDesktop(page);
   await page.evaluate(()=>{window.__roomAudio.find(a=>a.src.includes('/audio/castle.mp3')&&!a.paused).currentTime=14});await enterHome(page);await expect.poll(audio).toBeGreaterThanOrEqual(14);
   // A previous one-session save is already graduated, without another class.
   await roomTab(page,'学院');let language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});await expect(language.getByRole('button',{name:'展示本领',exact:true})).toBeEnabled();await expect(language.getByRole('button',{name:'上这一课',exact:true})).toHaveCount(0);

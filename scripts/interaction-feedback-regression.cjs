@@ -23,8 +23,8 @@ async function main(){
   await roomTab(page,'设置');
   const gameSound=page.getByRole('switch',{name:'游戏音效',exact:true});
   if(await gameSound.getAttribute('aria-checked')!=='true')await gameSound.click();
-  await page.getByRole('checkbox',{name:'自然小动作',exact:true}).check();
-  await page.getByRole('checkbox',{name:'允许短暂出游',exact:true}).uncheck();
+  await page.getByRole('switch',{name:'自然小动作',exact:true}).press('ArrowRight');
+  await page.getByRole('switch',{name:'允许短暂出游',exact:true}).press('ArrowLeft');
   await page.getByRole('button',{name:'关闭面板',exact:true}).click();
   const count=await page.evaluate(()=>window.qaAudioPlays.length);
   const check=page.getByRole('button',{name:'每日签到领取1000摩尔豆',exact:true});

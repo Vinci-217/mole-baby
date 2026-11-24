@@ -1,0 +1,212 @@
+{
+  "resource/besmearBook/other/107.swf": {
+    "title": "拉姆救治师手册",
+    "group": "优先加入",
+    "note": "拉姆救治职业、救治流程和病房说明；与名为‘拉姆救治手册’的手持道具是两个资源。"
+  },
+  "resource/besmearBook/other/2.swf": {
+    "title": "黑森林的向往",
+    "group": "优先加入",
+    "note": "以拉姆小牛牛为主角的成长和冒险故事。原封面署名作者团子。"
+  },
+  "resource/besmearBook/other/8.swf": {
+    "title": "来自黑森林的超级拉姆",
+    "group": "优先加入",
+    "note": "超级拉姆克尔的故事，与现有《超级拉姆的秘密》内容不同。"
+  },
+  "resource/besmearBook/other/31.swf": {
+    "title": "拉姆世界征文大赛获奖作品集",
+    "group": "优先加入",
+    "note": "原玩家征文作品集，讲述拉姆世界的冒险经历；209.swf 是同一原文件。部分静态导出的文字超出纸面，接入前需要处理排版。"
+  },
+  "resource/besmearBook/other/224.swf": {
+    "title": "拉姆运动会纪念册·第二届",
+    "group": "优先加入",
+    "note": "原拉姆运动会的比赛与投稿纪念册。"
+  },
+  "resource/besmearBook/naturalnessBook.swf": {
+    "title": "自然课本",
+    "group": "其他可读",
+    "note": "菩提大伯的自然科普，采用卷轴画面而非对开书本；原客户端明确以‘自然课本’打开。"
+  },
+  "module/external/BooksUI/playerBook.swf": {
+    "title": "公民手册",
+    "group": "其他可读",
+    "note": "庄园背景、拉姆、小屋与基础操作介绍。封面题名‘公民手册’。"
+  },
+  "module/external/BooksUI/guideBook.swf": {
+    "title": "向导手册",
+    "group": "其他可读",
+    "note": "SMC 向导历史、入职和帮助他人的说明。"
+  },
+  "resource/pressman/pressmanBook.swf": {
+    "title": "记者手册",
+    "group": "其他可读",
+    "note": "原客户端从编辑部打开的记者职业说明。"
+  },
+  "module/external/BooksUI/angelGuideBook.swf": {
+    "title": "天使园指南",
+    "group": "其他可读",
+    "note": "原封面题名‘天使园指南’，包含种子、培育、变异和契约说明；部分帧有离开书面的小标记，接入时需按原书边界对齐。"
+  },
+  "module/external/BooksUI/chevalierClothBook.swf": {
+    "title": "骑士荣耀",
+    "group": "其他可读",
+    "note": "原客户端以‘骑士荣耀’打开；骑士服饰相关书页，旧商城按钮需保持为历史画面。"
+  },
+  "module/external/XihaBook.swf": {
+    "title": "2010嘻哈纪念册",
+    "group": "其他可读",
+    "note": "有独立封面和纪念册内页。"
+  },
+  "module/external/tenYearsAgo.swf": {
+    "title": "十年前的黑森林",
+    "group": "其他可读",
+    "note": "有独立封面；原期刊书架的第35个入口指向本文件。"
+  },
+  "module/external/heroWarBook.swf": {
+    "title": "摩尔勇士之战",
+    "group": "其他可读",
+    "note": "原书架入口加载的剧情读物，封面题名已核对。"
+  },
+  "module/external/ZhuangYuanGoodPlayBookPanel.swf": {
+    "title": "庄园好好玩·贺岁版（2014）",
+    "group": "其他可读",
+    "note": "原书架2014入口打开的节日游玩手册，封面题名已核对。"
+  },
+  "resource/besmearBook/other/5.swf": {
+    "title": "摩尔庄园历史",
+    "group": "其他可读",
+    "note": "庄园过去与黑森林、SMC、拉姆复活等历史内容。"
+  },
+  "resource/besmearBook/other/6.swf": {
+    "title": "黑森林探险之摩尔王的宝藏",
+    "group": "其他可读",
+    "note": "黑森林探险的剧情记录。"
+  },
+  "resource/besmearBook/other/10.swf": {
+    "title": "我在星星上",
+    "group": "其他可读",
+    "note": "菩提大伯的星球冒险故事。"
+  },
+  "resource/besmearBook/other/17.swf": {
+    "title": "中秋神话我演绎",
+    "group": "其他可读",
+    "note": "中秋主题纪念书。"
+  },
+  "resource/besmearBook/other/32.swf": {
+    "title": "我爱网络征文获奖作品集",
+    "group": "其他可读",
+    "note": "原玩家征文集；210.swf 是同一原文件。"
+  },
+  "resource/besmearBook/other/101.swf": {
+    "title": "消防员手册",
+    "group": "其他可读",
+    "note": "SMC 消防员职业说明。"
+  },
+  "resource/besmearBook/other/102.swf": {
+    "title": "驾驶员手册",
+    "group": "其他可读",
+    "note": "SMC 驾驶员、驾驶考试与交通规则说明。"
+  },
+  "resource/besmearBook/other/103.swf": {
+    "title": "骑士手册",
+    "group": "其他可读",
+    "note": "皇家骑士团历史与训练说明。"
+  },
+  "resource/besmearBook/other/106.swf": {
+    "title": "警官手册",
+    "group": "其他可读",
+    "note": "SMC 警官职业、庄园事件与治安故事。"
+  },
+  "resource/besmearBook/other/108.swf": {
+    "title": "建筑师手册",
+    "group": "其他可读",
+    "note": "SMC 建筑师入职、任务与等级说明。"
+  },
+  "resource/besmearBook/other/11.swf": {
+    "title": "拉姆学习手册·另一源文件",
+    "group": "版本待合并",
+    "note": "与现有学习手册题名和主体用途相同，不能直接增加一本计数；需逐页比较版本差别。"
+  },
+  "resource/besmearBook/other/12.swf": {
+    "title": "公民手册·另一源文件",
+    "group": "版本待合并",
+    "note": "与 playerBook 相同题名，需逐页比较后选用。"
+  },
+  "resource/besmearBook/other/14.swf": {
+    "title": "超级拉姆的秘密·另一版本",
+    "group": "版本待合并",
+    "note": "与已接入书籍题名相同，但时间轴画面数不同；应按版本处理。"
+  },
+  "resource/besmearBook/other/104.swf": {
+    "title": "向导手册·另一源文件",
+    "group": "版本待合并",
+    "note": "与 guideBook 相同职业及主要文字，需比较版本。"
+  },
+  "resource/besmearBook/other/105.swf": {
+    "title": "记者手册·另一源文件",
+    "group": "版本待合并",
+    "note": "与 pressmanBook 同为记者职业说明，需比较版本。"
+  },
+  "module/external/CardUI/JJLCardBookUI.swf": {
+    "title": "卡牌册",
+    "group": "需单独适配",
+    "note": "有书页，但卡牌收藏和数值依赖原游戏数据，不能将静态导出当作完整收藏功能。"
+  },
+  "module/external/CardUI/JJLCardBookView.swf": {
+    "title": "卡牌册列表界面",
+    "group": "需单独适配",
+    "note": "脚本创建界面，根时间轴没有可直接翻阅的静态书。"
+  },
+  "module/external/NewAngelHandbookPanel.swf": {
+    "title": "新版天使图鉴",
+    "group": "需单独适配",
+    "note": "有图鉴壳与分类，物种内容由原脚本和数据组装，不是一条完整顺序书页时间轴。"
+  },
+  "module/external/ClothBookShopPanel.swf": {
+    "title": "服饰购物书",
+    "group": "需单独适配",
+    "note": "商品目录，静态页面不包含完整旧商城功能。"
+  },
+  "module/external/HomeBookShopPanel.swf": {
+    "title": "家居购物书",
+    "group": "需单独适配",
+    "note": "商品目录，静态页面不包含完整旧商城功能。"
+  },
+  "module/external/HousePastureShopBookPanel.swf": {
+    "title": "牧场购物目录",
+    "group": "需单独适配",
+    "note": "界面由脚本和商品数据组装，不能直接当成完整读物。"
+  },
+  "module/external/CoinBookUI/pwdBook.swf": {
+    "title": "神奇密码相关目录",
+    "group": "需单独适配",
+    "note": "主要为周边兑换和促销说明，旧兑换服务不可用；不建议优先加入阅读书架。"
+  },
+  "resource/siren/compoment/handBook.swf": {
+    "title": "场景玩法手册（siren）",
+    "group": "需单独适配",
+    "note": "场景玩法提示，需结合原调用环境判断，不优先当成独立藏书。"
+  },
+  "resource/besmearBook/other/besmearBook.swf": {
+    "title": "书刊目录入口",
+    "group": "目录入口",
+    "note": "这是多本书的选择目录，不是新增的一本完整书。"
+  },
+  "resource/besmearBook/other/contributeBook.swf": {
+    "title": "投稿书刊目录入口",
+    "group": "目录入口",
+    "note": "索引201—224号作品，与其中的独立书分别保存。"
+  },
+  "resource/besmearBook/other/smcBook.swf": {
+    "title": "SMC手册目录入口",
+    "group": "目录入口",
+    "note": "索引101—108号职业手册，本身不算额外一本书。"
+  },
+  "resource/besmearBook/other/16.swf": {
+    "title": "飞龙手册",
+    "group": "需单独适配",
+    "note": "内嵌文字表明是飞龙与龙骑士手册；当前根时间轴只有一个画面，需要继续定位脚本切换的正文组件。"
+  }
+}

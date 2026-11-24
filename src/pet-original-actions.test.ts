@@ -3,8 +3,8 @@ import {createPet,care,buyItem,changePetStage,configureGrowth,parseSave,STAGES,G
 import {restorePetBackup} from './pet-backup';
 import {createMemory,recordEvent} from './companion-memory';
 import {ITEMS} from './catalog';
-import {OFFICIAL_CLIPS,supportsOfficial} from './official-clips';
-import {FORM_NAMES,naturalOriginalActions,originalMagicActions,originalItemClip,originalPlayTools,playbackForm,autonomousOriginalActions,chooseAutonomousOriginal,autonomousActionLine} from './pet-original-actions';
+import {originalActionForms,supportsOfficial} from './official-clips';
+import {FORM_NAMES,naturalOriginalActions,originalMagicActions,originalItemClip,originalPlayTools,playbackForm,autonomousOriginalActions,autonomousMagicActions,isAutonomousMagic,chooseAutonomousOriginal,autonomousActionLine,ambientOriginalClip,ambientPerformanceClip,usesAmbientAdaptation} from './pet-original-actions';
 import type {RamForm} from './original-actions';
 
 const now=1_700_000_000_000;
@@ -13,7 +13,7 @@ describe('curated original interactions',()=>{
  it('gives self-directed actions a readable intention instead of a raw source ID',()=>{
   const base=pet();
   const learned={...base,growth:840,evolution:'super' as const,education:{lessons:{magic:1,'element-fire':1,'element-water':1,'element-wood':1},graduated:{magic:now,'element-fire':now,'element-water':now,'element-wood':now}}};
-  for(const p of [base,learned])for(const action of autonomousOriginalActions(p)){
+  for(const p of [base,learned])for(const action of [...autonomousOriginalActions(p),...autonomousMagicActions(p)]){
    const line=autonomousActionLine(action);expect(line.length).toBeGreaterThan(5);expect(line).not.toMatch(/swf|ambient-|[a-f\d]{16}|tuya\d/);
   }
   expect(autonomousActionLine('ambient-element-fire-1')).toContain('小火苗魔法');
@@ -43,25 +43,53 @@ describe('curated original interactions',()=>{
   }
   expect(originalPlayTools('seed')).toEqual([]);
  });
- it('selects exact forms for free toys and care, without replacing a missing form with junior',()=>{
+ it('selects the same original pool with clothes, sharing classic Super Ram sources across later forms',()=>{
+  const shapes=[['junior',60,2],['middle',180,3],['senior',420,4],
+   ['classic',840,101],['super',840,101],['water',840,101],['wood',840,101],['fire',840,101]] as const;
+  for(const [form,growth,level] of shapes){
+   const current={...pet(),growth,evolution:growth===840?form as GameState['evolution']:undefined};
+   const choices=autonomousOriginalActions(current);
+   expect(autonomousOriginalActions({...current,wearing:'wizard-cap'})).toEqual(choices);
+   const school=choices.flatMap(action=>{
+    const clip=ambientOriginalClip(action);
+    return clip?.kind==='school'?[{action,clip}]:[];
+   });
+   expect(school.length).toBeGreaterThan(8);
+   for(const {action,clip} of school){
+    expect(clip.level).toBe(level);
+    expect(playbackForm(clip,form)).toBe(level===101?'classic':form);
+    expect(clip.effectFrames).toBeGreaterThan(1);
+    expect(ambientPerformanceClip(form,action)).toBe(clip);
+    expect(usesAmbientAdaptation(form,action)).toBe(false);
+    expect(usesAmbientAdaptation(form,action,true)).toBe(false);
+   }
+  }
+ });
+ it('prefers the exact item in the current form, using the same item in the classic form if needed',()=>{
   const toys=ITEMS.filter(item=>item.category==='toy');expect(toys.length).toBe(6);
   for(const item of toys){expect(item.price).toBe(0);expect(item.reusable).toBe(true);expect(originalItemClip(item.id,'junior')).toBeDefined();}
-  for(const form of Object.keys(FORM_NAMES) as RamForm[])for(const item of ITEMS){const clip=originalItemClip(item.id,form);if(clip)expect(supportsOfficial(clip,form)).toBe(true);}
-  expect(originalItemClip('180004','super')).toBeUndefined();
+  for(const form of Object.keys(FORM_NAMES) as RamForm[])for(const item of ITEMS){const clip=originalItemClip(item.id,form);if(clip)expect(originalActionForms[form]).toContain(playbackForm(clip,form));}
+  expect(originalItemClip('180004','super')).toBe(originalItemClip('180004','classic'));
   const drawing=Array.from({length:4},(_,i)=>originalItemClip('drawing-kit','junior',i)?.id);
   expect(new Set(drawing).size).toBe(4);
  });
- it('adds free toys and learned magic, pauses when occupied, and avoids immediate repeats',()=>{
+ it('keeps free toys in the ordinary pool and only offers actually learned magic through the optional pool',()=>{
   const plain=pet(),before=autonomousOriginalActions(plain),football=originalItemClip('180004','junior')!;
   expect(before).toContain('ambient-'+football.id);
   const owned={...plain,inventory:{...plain.inventory,'180004':1},education:{lessons:{magic:1},graduated:{magic:now}}};
   const choices=autonomousOriginalActions(owned);expect(choices).toContain('ambient-'+football.id);
-  expect(choices.length).toBeGreaterThan(before.length);
+  expect(choices).toEqual(before);
   const first=chooseAutonomousOriginal(owned,undefined,()=>0);expect(chooseAutonomousOriginal(owned,first,()=>0)).not.toBe(first);
   for(const row of [{...owned,sleeping:true},{...owned,growth:0},{...owned,stats:{...owned.stats,energy:5}}])expect(autonomousOriginalActions(row)).toEqual([]);
-  expect(choices).toContain('spell');
-  for(const id of choices.filter(id=>id!=='spell'&&!id.startsWith('ambient-element-')))expect(OFFICIAL_CLIPS.some(clip=>id==='ambient-'+clip.id)).toBe(true);
-  for(const clip of OFFICIAL_CLIPS.filter(clip=>['magic','transform','skill'].includes(clip.kind)))expect(choices).not.toContain('ambient-'+clip.id);
+  expect(choices.some(isAutonomousMagic)).toBe(false);
+  expect(autonomousMagicActions(plain)).toEqual([]);
+  expect(autonomousMagicActions(owned)).toEqual(['spell','ambient-8fb29945ea6f9d22']);
+  const water={...owned,growth:840,evolution:'super' as const,education:{lessons:{magic:1,'element-water':1},graduated:{magic:now,'element-water':now}}};
+  const spells=autonomousMagicActions(water);
+  expect(spells.filter(id=>id.startsWith('ambient-element-'))).toEqual(Array.from({length:6},(_,i)=>`ambient-element-water-${i+1}`));
+  expect(spells).toContain('ambient-2227b145ce375822');
+  expect(spells.every(isAutonomousMagic)).toBe(true);
+  expect(autonomousMagicActions({...water,sleeping:true})).toEqual([]);
  });
 });
 describe('free stage selection without losing natural progress',()=>{

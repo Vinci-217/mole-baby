@@ -1,13 +1,14 @@
 {
   "name": "mole-baby",
-  "version": "0.34.2",
+  "version": "0.35.0",
   "private": true,
   "description": "拉姆 · mole-baby 桌面宠物",
   "author": "mole-baby",
+  "license": "MIT",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && node scripts/build-renderer.cjs",
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run --maxWorkers=2 && node scripts/run-node-tests.cjs",
     "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
@@ -15,14 +16,14 @@
     "dist:win": "npm run build && electron-builder --win nsis --x64",
     "dist:win:portable": "npm run build && electron-builder --win zip --x64",
     "test:desktop:cloud": "npm run build && node scripts/desktop-smoke.cjs",
-    "dist:mac": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip && node scripts/notarize-mac-dmg.cjs",
-    "dist:mac:arm64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --arm64 && node scripts/notarize-mac-dmg.cjs arm64",
-    "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg zip --x64 && node scripts/notarize-mac-dmg.cjs x64",
+    "dist:mac": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg && node scripts/notarize-mac-dmg.cjs",
+    "dist:mac:arm64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg --arm64 && node scripts/notarize-mac-dmg.cjs arm64",
+    "dist:mac:x64": "npm run build && electron-builder --config electron-builder.mac.cjs --mac dmg --x64 && node scripts/notarize-mac-dmg.cjs x64",
     "test:registered-wardrobe": "node scripts/registered-wardrobe-regression.cjs",
     "review:wardrobe": "node scripts/record-lively-review.cjs",
     "test:browser": "npm run build && node scripts/compact-care-regression.cjs",
     "clean:previews": "node scripts/clean-preview-frames.cjs --apply",
-    "build:legacy": "tsc -b && vite build --config vite.legacy.config.ts",
+    "build:legacy": "tsc -b && node scripts/build-renderer.cjs --config vite.legacy.config.ts",
     "dist:win:legacy:x64": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch x64",
     "dist:win:legacy:ia32": "npm run build:legacy && node scripts/package-windows.cjs --legacy --arch ia32",
     "android:build": "node scripts/android/build.cjs",
@@ -52,7 +53,7 @@
     "electron-builder": "^26.0.12",
     "sharp": "^0.34.5",
     "typescript": "~5.7.3",
-    "vite": "^6.1.0",
+    "vite": "^6.4.5",
     "vitest": "^3.0.5",
     "wait-on": "^8.0.2",
     "yaml": "^2.9.1"
@@ -102,8 +103,7 @@
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "category": "public.app-category.entertainment",
       "artifactName": "mole-baby-${version}-mac-${arch}.${ext}",
@@ -152,7 +152,8 @@
     "compression": "normal",
     "asarUnpack": [
       "dist/assets/original/uploaded-actions/**/*",
-      "dist/assets/original/daily-frames/**/*"
+      "dist/assets/original/daily-frames/**/*",
+      "dist/assets/original/reading-books/**/*.webp"
     ]
   }
 }

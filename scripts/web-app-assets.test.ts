@@ -15,10 +15,12 @@ async function fixture(){
  await writeFile(path.join(root,'index.html'),'<script type="module" src="./assets/main.js"></script><link rel="stylesheet" href="./assets/main.css">');
  await writeFile(path.join(root,'assets/main.js'),'original application');await writeFile(path.join(root,'assets/main.css'),'original style');return root;
 }
-it('ships installable icons and a relative shell that works under a deployed subdirectory',async()=>{
- const root=await fixture(),{manifest,shell}=await writeWebAppFiles(root);
+it('ships installable icons and the offline panel code under a deployed subdirectory',async()=>{
+ const root=await fixture();
+ await writeFile(path.join(root,'assets/shop.js'),'optional UI code');
+ const {manifest,shell}=await writeWebAppFiles(root,['assets/shop.js']);
  expect(manifest.display).toBe('standalone');expect(manifest.start_url).toBe('./');expect(manifest.scope).toBe('./');
- expect(shell).toContain('assets/main.js');expect(shell).toContain('assets/main.css');
+ expect(shell).toContain('assets/main.js');expect(shell).toContain('assets/main.css');expect(shell).toContain('assets/shop.js');
  for(const size of [180,192,512]){const meta=await sharp(path.join(root,`icons/ramu-${size}.png`)).metadata();expect([meta.width,meta.height]).toEqual([size,size])}
  for(const base of ['https://example.com/','https://example.com/mole-baby/']){
   const url=new URL('manifest.webmanifest',base);expect(new URL(manifest.start_url,url).href).toBe(base);

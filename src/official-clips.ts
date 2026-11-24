@@ -8,6 +8,12 @@ export const OFFICIAL_DURATION=16_000
 export const OFFICIAL_LOAD_TIMEOUT=45_000
 export const OFFICIAL_FORM:Record<RamForm,string>={seed:'level1',junior:'level2',middle:'level3',senior:'level4',classic:'level101',super:'level101_7',water:'level5_2',wood:'level5_4',fire:'level5_1'}
 const levels:Record<RamForm,number>={seed:1,junior:2,middle:3,senior:4,classic:101,super:101,water:5,wood:5,fire:5}
+/** Care and autonomous actions look for the same performance in earlier forms. */
+export const originalActionForms:Record<RamForm,readonly RamForm[]>={
+ seed:['seed'],junior:['junior'],middle:['middle','junior'],senior:['senior','middle','junior'],
+ classic:['classic','senior','middle','junior'],super:['super','classic','senior','middle','junior'],
+ water:['water','classic','senior','middle','junior'],wood:['wood','classic','senior','middle','junior'],fire:['fire','classic','senior','middle','junior'],
+}
 export const isOfficialAction=(action:string)=>action.startsWith('official-')||/^ambient-[a-f0-9]{16}$/.test(action)
 const clipsById=new Map(OFFICIAL_CLIPS.map(clip=>[clip.id,clip]));
 export const officialClip=(id:string)=>clipsById.get(id)
@@ -20,6 +26,23 @@ export function supportsOfficial(clip:OfficialClip,form:RamForm){
  // own labelled timeline; sharing the number 101 does not make it compatible.
  if(clip.level===101)return form==='classic'
  return !clip.level||clip.level===levels[form]
+}
+
+/** Keep the action and its source family fixed when borrowing another form. */
+export function originalActionVariant(clip:OfficialClip,form:RamForm):OfficialClip{
+ if(supportsOfficial(clip,form)||clip.kind==='outfit'||clip.kind==='body')return clip;
+ const family=clipVariantPath(clip);
+ const variants=OFFICIAL_CLIPS.filter(candidate=>candidate.kind===clip.kind&&clipVariantPath(candidate)===family);
+ return originalClipForForms(variants,originalActionForms[form])??clip;
+}
+function clipVariantPath(clip:OfficialClip){
+ return clip.path.replace(/\/pet\d+(?:_\d+)?(Movie)?\//,'/pet$1/');
+}
+export function originalClipForForms(clips:readonly OfficialClip[],forms:readonly RamForm[]){
+ for(const form of forms){
+  const clip=clips.find(candidate=>candidate.animated&&supportsOfficial(candidate,form));
+  if(clip)return clip;
+ }
 }
 /** Clothes can use their original junior body without changing earned growth.
  * Keep this separate from spells and care, which require their exact form. */

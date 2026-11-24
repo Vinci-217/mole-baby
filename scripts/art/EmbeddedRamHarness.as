@@ -41,6 +41,7 @@ package §1200026_fla§ {
   public var effectBounds:Rectangle;
   public var effectFrames:int=0;
   public var playedFrames:int=0;
+  public var finite:Boolean=false;
   public var holding:Boolean=false;
   public var heldTimelines:Array=[];
   public var bodyReference:Rectangle;
@@ -82,6 +83,7 @@ package §1200026_fla§ {
    referenceBounds=String(params.referenceBounds||"17.11472,35.95208,82.03084,81.50964").split(",");
    for(var coordinate:int=0;coordinate<referenceBounds.length;coordinate++)referenceBounds[coordinate]=Number(referenceBounds[coordinate]);
    costume=params.kind=="outfit";
+   finite=params.finite=="1";
    viewportScale=Math.max(3.2,Math.min(32,Number(params.viewportScale)||3.2));
    viewportRatio=3.2/viewportScale;
    if(params.effectBounds){var envelope:Array=String(params.effectBounds).split(",");effectBounds=new Rectangle(Number(envelope[0]),Number(envelope[1]),Number(envelope[2])-Number(envelope[0]),Number(envelope[3])-Number(envelope[1]));effectFrames=int(params.effectFrames);}
@@ -122,7 +124,10 @@ package §1200026_fla§ {
     else if(child is DisplayObjectContainer)stripNameFields(child as DisplayObjectContainer);
    }
   }
-  public function cleanFrame(e:Event):void {stripNameFields(holder);}
+  public function cleanFrame(e:Event):void {
+   stripNameFields(holder);
+   if(finite&&ended)holdTimelines(holder);
+  }
   public function previewTextCount():int {return countText(holder);}
   public function countText(node:DisplayObjectContainer):int {
    var count:int=0;
@@ -177,7 +182,7 @@ package §1200026_fla§ {
    holdTimelines(holder);
   }
   public function previewPlay():void {
-   if(!holding)return;holding=false;
+   if(!holding||ended)return;holding=false;
    for each(var mc:MovieClip in heldTimelines)if(mc.parent)mc.play();
    heldTimelines=[];
   }

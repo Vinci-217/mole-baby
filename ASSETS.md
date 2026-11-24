@@ -1,5 +1,7 @@
 # 拉姆素材记录
 
+本项目的 [MIT License](LICENSE) 仅适用于原创代码与文字文档。下列游戏素材、图片、图标、动画、音频及其他媒体素材（包括导出、适配和生成素材）不因项目开源而获得 MIT 授权；第三方代码沿用各自许可。完整边界见 [LICENSING.md](LICENSING.md)，来源记录不构成权利人的授权证明。
+
 当前预览分支补齐高级／两种超级拉姆的原版飞行动作，重新导出三系18段动画以清除结尾占位石头，并加入12段原版游戏录音和3个不同的原版导航图标。来源、适配范围和接手说明见 [本轮交接记录](research/original-room-handoff.md)。高级叶冠转速与经典超级拉姆睡眠属于桌宠适配，并非官方独立交互动画。
 
 v0.30.1 新增三系18个官网原版变身完整动作、19件原版家具和5间原版小屋。三系来源、完整帧导出与运行时占位道具处理见 [逆向与导出记录](research/original-element-skills.md)；家具／小屋来源与哈希见 [source-record.json](public/assets/original/furniture/source-record.json)。蓝紫色魔术盒与烟雾是自制共用图层，4张盒子、16张烟复用于全部形态和来回变身；见 [生成记录](skills/mole-classic-art/references/v45/generation.json)。角色原形与装扮保持独立，不把自制过渡称为官方动画。
@@ -31,6 +33,10 @@ v0.4.0 重构小尺寸桌面交互，并从原 SWF 补齐真正种子盆栽与�
 生成流程见 [mole-classic-art skill](skills/mole-classic-art/SKILL.md)，画法分析见 [style-guide.md](skills/mole-classic-art/references/style-guide.md)，可复用模板见 [prompt-templates.md](skills/mole-classic-art/references/prompt-templates.md)。它从原图提炼轮廓、色面、勾线、透视和场景留白，通过图片参考引导生成，不涉及专用模型训练，也不表示获得官方授权。
 
 本次背景采用新的树洞书桌构图，背景不预画拉姆、按钮或文字；原拉姆动画由应用独立叠加。最终图、参考路径与生成过程以 [generation-record.json](public/assets/generated/generation-record.json) 为准。下一版实际界面预览见 [v4-home.png](artifacts/v4-home.png)。
+
+## 小屋书架书脊
+
+小屋书架的 28 张原创书脊由 `mole-classic-art` 流程参考树洞小屋、原面板、熊熊饼干和可可果后用 `image_gen` 生成。应用按书目选图、配色及排入书名。《摩尔时报》采用统一棕金装订，书籍的阅读画面沿用本地原档。参考图、提示词、源图和切图记录见[书脊生成记录](skills/mole-classic-art/references/reading-spines/generation.json)。
 
 ## 原客户端素材总览
 
@@ -182,6 +188,22 @@ JPEXS 将原始 `DefineShape`、`DefineSprite` 或 `DefineButton` 静态渲染�
 
 本次未找到能确认身份的原版拉姆说话、吃饭录音。`src/pet-audio.ts` 的叫声、咀嚼、喝水、泡泡、呼吸、唤醒等声效为本地程序合成，不标记为原版录音。查找过程、实际证据及声音设计见 [audio-sources.md](research/audio-sources.md)。用户还可自行选择并在本机保存一份音乐文件，支持重启恢复与删除；该用户文件不属于仓库素材。
 
+小屋音乐盒采用原作「圣诞音乐盒」。`original/furniture/music-box.png` 取自 `root/resource/goods/swf/160169.swf` 的摆放图层 `mc2`，精灵 34 第一帧以 3 倍导出。旧档的 `music-box` 家具按原位置和缩放显示这款。选曲界面由本项目实现。服装店配乐沿用素材库的 `BGM_051.mp3` 原字节，地图对应表第 20 号标记为「服装店」。[家具导入回执](research/original-furniture-import.json) · [音频来源清单](public/assets/original/audio/sources.json)
+
+### 原作家具仓库
+
+本地配置表 `ClientConfigDLL.swf` 提供名称、资源 ID 与摆放层。已补入 1,644 件家具，其中小屋家具 1,261 件、可摆放的家园家具 383 件。1,600 张摆放图（含圣诞音乐盒）取自原 `mc2`，45 款采用本地原商品图标作为摆放静帧。导入回执记录每件原件路径、帧、图像尺寸和 SHA-256，另列原配置的房型、占位条目、缺图条目和魔灵相关筛选结果。[家具导入回执](research/original-furniture-import.json)
+
+筛选交叉核对了原物品名、《摩灵传说》任务奖励、角色与关卡名单，以及 `HomeSpecialGoods` 的场景入口。缺图的 51 个条目包括 49 个摩尔模特编号和两件家园花灯。批量导入只读取原档，生成无损 WebP 和独立的点击遮罩。
+
+### 家具里的拉姆动作
+
+拉姆跳舞机、跑步机、小秋千、弹跳小床、拉姆小窝、拉姆城堡小窝、南瓜猫车拉姆窝和花骨朵拉姆小床复用原客户端的家具与拉姆合成时间轴。原 `newEditHouseView.changeStatus` 通过 `needPet` 把第一朝向设为互动状态；本地按这一状态栅格化 302 帧，沿用 24 fps 时间和固定相机。待机图按原脚本隐藏家具内的拉姆，动作中的身体填色来自当前存档。演出使用家具自带的造型和配饰，结束时恢复用户当前形态及装扮。点击同一件家具或按 Escape 可提前结束。[原始时间轴与素材校验记录](public/assets/original/furniture-actions/sources.json)
+
+茶具 160688 与摩摩茶具套装 160752 的完整原时间轴分别为 205 帧与 200 帧，内容为茶壶给茶杯倒茶。按当前的家具档案、名称与时间轴搜索，对饮片段仍缺少可核对的来源。生成本轮家具帧的工具为 `scripts/art/export-room-furniture-actions.py`。
+
+在有 JPEXS 和 Pillow 的本地素材库中，可运行 `python scripts/client-library/import_furniture.py --work /tmp/mole-furniture-import` 导出和检查，再用同一命令加 `--install` 安装已核验的资产。
+
 ## v0.5 四色种子与原照料动作
 
 种子继续使用原 `lamubone.swf` 的独立身体和花盆；新增 `seed/body-mask.png` 只标记原身体灰阶覆盖率，运行时应用已有四种颜色偏移，眼白、瞳孔、叶片和花盆保持原色。种子延续领养配色是用户要求的桌宠适配，不声称原版白色胚胎本来就有四色。闭眼采用原 sprite 37 第 5 帧。探针方法、原文件哈希和新增遮罩哈希见 [seed/source.json](public/assets/original/seed/source.json)。
@@ -279,6 +301,8 @@ Mac状态栏复用现有 `tray-mac.png` 与 `tray-mac@2x.png` 的双叶拉姆透
 `public/assets/original/color-mixer/`导出自原调色模块`colorEditor.swf`。官网请求被环境拒绝，实际文件来自固定提交的Miigon/RecMoleRes社区归档；下载记录、原SWF、原客户端控制类见`research/references/color-mixing/`。原玩法给摩尔玩家调色，本项目新增装瓶、背包与拉姆持久换色流程。
 
 中性WebP纹理允许最多1级RGB压缩差，无损遮罩恢复精确透明度；全纹理校验、952个源整帧透明度重建和每页散列见转换/核验脚本及来源目录。`docs/previews/v31/`的71组GIF从同一帧表重建，全部原件和日常动作可在README预览；GIF、SWF、研究目录不进入安装包。完整覆盖与限制见[本轮调研](research/v31-original-actions-and-colour-mixing.md)。
+
+图集的共用规则、动作登记和安装核验见[动画播放与本地素材](docs/LOCAL-ANIMATION-ASSETS.md)。
 
 ## v0.32 · 神秘花海与留言板入口
 

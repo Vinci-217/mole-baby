@@ -50,6 +50,7 @@ test('standalone preview configuration validates without inheriting the live web
   const {FileMatcher}=require('app-builder-lib/out/fileMatcher');
   const match=new FileMatcher(process.cwd(),process.cwd(),value=>value,config.asarUnpack).createFilter();
   for(const group of ['uploaded-actions','daily-frames'])assert(match(require('node:path').join(process.cwd(),'release/windows-preview/renderer/assets/original',group,'sample.webp'),{isDirectory:()=>false}));
+  assert(match(require('node:path').join(process.cwd(),'release/windows-preview/renderer/assets/original/reading-books/gazette-1/1.webp'),{isDirectory:()=>false}));
  })().catch(error=>{console.error(error);process.exitCode=1})`],{cwd:path.resolve(__dirname,'..'),encoding:'utf8'});
  assert.equal(child.status,0,child.stderr||child.stdout);
 });

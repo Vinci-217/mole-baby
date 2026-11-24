@@ -11,23 +11,29 @@ import Ram from './components/Ram';
 describe('original food and care follow earned growth, independently of clothes',()=>{
  afterEach(()=>vi.unstubAllGlobals());
  const forms=['junior','middle','senior','classic','super','water','wood','fire'] as const;
+ const originalForms:Record<number,string>={2:'junior',3:'middle',4:'senior',101:'classic'};
  it('resolves aliases, direct buttons and stale source IDs to the same stage-specific source',()=>{
   for(const form of forms){
-   const target=['junior','middle','senior'].includes(form)?form:'classic';
    for(const item of ITEMS.filter(item=>item.category!=='toy'&&!item.changesColor)){
     const clip=originalCareClip(form,'use',item.id);if(!clip)continue;
-    expect(clip.path).toContain(`/pet${{junior:2,middle:3,senior:4,classic:101}[target as 'classic']}/`);
     expect(originalCareClip(form,getItemMotion(item.id).action,item.id)).toBe(clip);
     const stale=originalCareClip('junior','use',item.id);
     if(stale)expect(originalCareClip(form,'official-'+stale.id)?.path).toBe(clip.path);
     const source=clip.path.split('/').at(-1)!.replace('.swf','');
-    const frames=uploadedSpec(target,source);
+    const frames=uploadedSpec(originalForms[clip.level],source);
     if(frames)expect(uploadedMotion(form,getItemMotion(item.id).action,item.id)).toBe(frames);
    }
    expect(originalCareClip(form,'feed','biscuit')?.path).toContain('/180017.swf');
    expect(originalCareClip(form,'drink','energy-drink')?.path).toContain('/180014.swf');
    expect(originalCareClip(form,'feed','180071')?.path).toContain('/180070.swf');
    expect(originalCareClip(form,'drink','180073')?.path).toContain('/180002.swf');
+  }
+ });
+ it('chooses classic care where available and steps down to advanced for the cross',()=>{
+  for(const form of ['classic','super','water','wood','fire'] as const){
+   expect(originalCareClip(form,'feed','biscuit')?.path).toContain('/pet101/');
+   expect(originalCareClip(form,'use','180006')?.path).toBe('resource/pet/swf/pet4/180006.swf');
+   expect(uploadedMotion(form,'use','180006')).toBe(uploadedSpec('senior','180006'));
   }
  });
  it('provides an original eating/drinking source for every edible item at its allowed stage',()=>{

@@ -1,0 +1,130 @@
+{
+  "1468433a04775239": {
+    "assetRoot": "study-frames",
+    "assetKey": "classic-write",
+    "id": "write",
+    "form": "classic",
+    "frames": 116,
+    "durationMs": 4834,
+    "width": 158,
+    "height": 217,
+    "registration": {
+      "scale": 1.0416818181818182,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 77.0010909090909,
+      "baseY": 119.71004545454545
+    }
+  },
+  "2b2e413bcf2f4b7e": {
+    "assetRoot": "study-frames",
+    "assetKey": "classic-read",
+    "id": "read",
+    "form": "classic",
+    "frames": 95,
+    "durationMs": 3959,
+    "width": 167,
+    "height": 197,
+    "registration": {
+      "scale": 1.0416818181818182,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 83.25118181818182,
+      "baseY": 135.33527272727272
+    }
+  },
+  "a0968d9ede330ebb": {
+    "assetRoot": "study-frames",
+    "assetKey": "junior-write",
+    "id": "write",
+    "form": "junior",
+    "frames": 150,
+    "durationMs": 6250,
+    "width": 216,
+    "height": 260,
+    "registration": {
+      "scale": 1.527438117647059,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 111.21182541176472,
+      "baseY": 153.21637364705884
+    }
+  },
+  "ca45652bf3b15ee6": {
+    "assetRoot": "study-frames",
+    "assetKey": "junior-read",
+    "id": "read",
+    "form": "junior",
+    "frames": 100,
+    "durationMs": 4167,
+    "width": 178,
+    "height": 175,
+    "registration": {
+      "scale": 1.5642438554216869,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 82.55855855421687,
+      "baseY": 94.29038746987952
+    }
+  },
+  "0689bb10c5c5c365": {
+    "assetRoot": "study-frames",
+    "assetKey": "middle-write",
+    "id": "write",
+    "form": "middle",
+    "frames": 115,
+    "durationMs": 4792,
+    "width": 199,
+    "height": 280,
+    "registration": {
+      "scale": 1.3730914942528736,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 96.05676735632184,
+      "baseY": 151.66697287356322
+    }
+  },
+  "50bca9840fd5f8eb": {
+    "assetRoot": "study-frames",
+    "assetKey": "middle-read",
+    "id": "read",
+    "form": "middle",
+    "frames": 96,
+    "durationMs": 4000,
+    "width": 216,
+    "height": 229,
+    "registration": {
+      "scale": 1.3574881818181819,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 114.6715190909091,
+      "baseY": 143.17877090909093
+    }
+  },
+  "666e70fb4c91df17": {
+    "assetRoot": "study-frames",
+    "assetKey": "senior-write",
+    "id": "write",
+    "form": "senior",
+    "frames": 122,
+    "durationMs": 5084,
+    "width": 189,
+    "height": 362,
+    "registration": {
+      "scale": 1.2874606741573034,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 95.3408988764045,
+      "baseY": 219.58085393258426
+    }
+  },
+  "4a1f426b3f1830cc": {
+    "assetRoot": "study-frames",
+    "assetKey": "senior-read",
+    "id": "read",
+    "form": "senior",
+    "frames": 111,
+    "durationMs": 4625,
+    "width": 189,
+    "height": 294,
+    "registration": {
+      "scale": 1.2874606741573034,
+      "cssPixelsPerAtlasPixel": 0.5,
+      "centerX": 90.19105617977527,
+      "baseY": 196.4065617977528
+    }
+  }
+}

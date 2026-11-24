@@ -39,5 +39,41 @@
       "sha256": "e8f0c415baabfff183b8d9a7933d7bbd55d6047924a8b3c4572088de0dbf0491",
       "adaptation": "Direct raster export of original UI. Semantic use as desktop room navigation."
     }
+  ],
+  "houseIcons": [
+    {
+      "file": "decorate.png",
+      "characterId": 390,
+      "kind": "DefineSprite",
+      "instance": "houseTool.depot_mc",
+      "sourceFrame": 1,
+      "zoom": 3,
+      "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/house/house.swf",
+      "sourceSha256": "68de91ecab97c720ed5343fdf12c2cf3ed0d8174bad639f7c36545285d8a98ad",
+      "sha256": "a37bda7bce4ada24f25a3b6466f7cda8519aa712523dfb3ef470952064eea9d8"
+    },
+    {
+      "file": "manor.png",
+      "characterId": 395,
+      "kind": "DefineSprite",
+      "instance": "houseTool.molehome_btn",
+      "excludedLayer": 394,
+      "sourceFrame": 1,
+      "zoom": 3,
+      "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/module/house/house.swf",
+      "sourceSha256": "68de91ecab97c720ed5343fdf12c2cf3ed0d8174bad639f7c36545285d8a98ad",
+      "sha256": "f96ee39ac74c13a3ff16c5ed1479f6a78646db6d0549f45ecde1951a5ab1feab"
+    },
+    {
+      "file": "mole-bean.png",
+      "characterId": 0,
+      "kind": "Root timeline",
+      "instance": "GoodsInfo.GetFullURLByItemId(0)",
+      "sourceFrame": 1,
+      "zoom": 4,
+      "source": "https://raw.githubusercontent.com/Miigon/RecMoleRes/7a6d6b3c7037a85afb28ad6abd4d7f4adfddb5ff/root/resource/allJob/mainJobIcon/small/dou.swf",
+      "sourceSha256": "5ca65103059e79b33a9f5f4209e9f4cfbdf4b4fd474b5be2e60f5b2e4f5e8222",
+      "sha256": "56d6fb96eb9646281d0175d2e8f3c626450b6bc607131862e29ca30b0730de2c"
+    }
   ]
 }

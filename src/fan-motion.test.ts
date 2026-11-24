@@ -1,5 +1,18 @@
 import {describe,it,expect} from 'vitest';
-import {createFanMotion,stepFanMotion} from './fan-motion';
+import {createFanMotion,sourceFlightPose,stepFanMotion} from './fan-motion';
+import flight from '../public/assets/original/flight/runtime.json';
+
+it('plays the original senior and classic loops across their control frames',()=>{
+ for(const form of ['senior','classic'] as const){
+  const clip=flight.forms[form].clips.down;
+  for(const pose of clip.frames)expect(sourceFlightPose(clip,(pose.sourceFrame-1+.5)*1000/flight.fps,flight.fps)).toEqual(pose);
+  for(const sourceFrame of clip.emptyControlFrames){
+   const visible=sourceFlightPose(clip,(sourceFrame-1+.5)*1000/flight.fps,flight.fps);
+   expect(visible.sourceFrame).toBe(sourceFrame-1);
+  }
+  expect(sourceFlightPose(clip,(clip.sourceFrameCount+.5)*1000/flight.fps,flight.fps)).toEqual(clip.frames[0]);
+ }
+});
 import {createElasticDrag,pullElasticDrag,stepElasticDrag,releaseElasticDrag} from './drag-motion';
 
 describe('senior original crown interaction',()=>{

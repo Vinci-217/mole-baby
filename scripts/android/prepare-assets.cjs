@@ -2,7 +2,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),cp=require('node:child_process');
 const {buildBlockMap}=require('app-builder-lib/out/targets/blockmap/blockmap');
-const root=path.resolve(__dirname,'../..'),source=path.join(root,'dist'),target=path.join(root,'android/app/src/main/assets/web');
+const root=path.resolve(__dirname,'../..'),source=path.resolve(process.argv[2]||path.join(root,'dist')),target=path.join(root,'android/app/src/main/assets/web');
 const digest=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 function files(dir){return fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en')).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]);}
 async function prepare(){
@@ -10,8 +10,10 @@ async function prepare(){
  require('../verify-offline-assets.cjs').verifyOfflineAssets(source);
  fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});
  const media=[],entries=[],renderer=[];
+ const optionalBooks=fs.existsSync(path.join(source,'book-packs.json'));
  for(const file of files(source)){
   const name=path.relative(source,file).split(path.sep).join('/');
+  if(optionalBooks&&/^assets\/original\/reading-books\/[^/]+\/[^/]+\.(?:png|webp|jpe?g)$/i.test(name))throw Error('Book pages entered the Android update resources: '+name);
   if(/\.(?:js|css|html|wasm)$/.test(name)||/^assets\/original\/official\/ruffle\/LICENSE(?:_APACHE|_MIT)?$/.test(name)||!name.startsWith('assets/')){const out=path.join(target,name);fs.mkdirSync(path.dirname(out),{recursive:true});fs.copyFileSync(file,out);if(/\.(?:js|css|html|wasm)$/.test(name))renderer.push({path:name,sha256:digest(file)});continue;}
   if(!/\.(?:webp|png|jpg|jpeg|gif|mp3|ogg|wav|swf|json|svg|woff2?|ttf|xml|md)$/i.test(name))throw Error('未归类的安卓素材: '+name);
   media.push(name);entries.push({path:name,size:fs.statSync(file).size,sha256:digest(file)});

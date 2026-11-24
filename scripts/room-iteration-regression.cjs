@@ -25,8 +25,9 @@ async function openDecor(page) {
   const close = page.getByRole('button', { name: '关闭面板', exact: true });
   if (await close.isVisible()) await close.click();
   await page.getByRole('button', { name: '布置小屋', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: '布置小屋', exact: true });
+  const dialog = page.getByRole('complementary', { name: '小屋布置工具', exact: true });
   await expect(dialog).toBeVisible();
+  await dialog.getByRole('tab', { name: '小屋风景', exact: true }).click();
   const gallery = dialog.getByRole('group', { name: '选择小屋背景', exact: true });
   await expect(gallery).toBeInViewport();
   return { dialog, gallery, settings: dialog.locator('.room-settings') };
@@ -55,12 +56,12 @@ async function inspectSheet(page, phase, selector = '.cottage-scene > .time-scen
 async function reviewRooms(page) {
   const backgrounds = await page.evaluate(async () => (await import('/src/room-media.ts')).ROOM_BACKGROUNDS);
   const added = backgrounds.filter(background => background.src.includes('/v18-'));
-  assert.equal(backgrounds.length, 9); assert.equal(added.length, 3);
+  assert.equal(backgrounds.length, 15); assert.equal(added.length, 3);
   const phases = [['morning', '早晨'], ['noon', '白天'], ['dusk', '傍晚'], ['night', '夜晚']];
   for (const viewport of [{ width: 1180, height: 820 }, { width: 1000, height: 720 }]) {
     await page.setViewportSize(viewport);
-    const { dialog, gallery, settings } = await openDecor(page);
-    await expect(gallery.getByRole('button')).toHaveCount(9);
+    const { gallery, settings } = await openDecor(page);
+    await expect(gallery.getByRole('button')).toHaveCount(15);
     for (const background of added) {
       const choice = gallery.getByRole('button', { name: background.label, exact: true });
       await choice.click(); await expect(choice).toHaveAttribute('aria-pressed', 'true');
@@ -72,7 +73,7 @@ async function reviewRooms(page) {
       }
     }
     await page.screenshot({ path: path.join(root, `artifacts/v18-decor${viewport.width === 1000 ? '-compact' : ''}.png`) });
-    await dialog.getByRole('button', { name: '关闭面板', exact: true }).click();
+    await page.getByRole('button', { name: '完成布置', exact: true }).click();
     await page.screenshot({ path: path.join(root, `artifacts/v18-room${viewport.width === 1000 ? '-compact' : ''}.png`) });
   }
   const last = added.at(-1);

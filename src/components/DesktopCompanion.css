@@ -20,11 +20,11 @@
 .companion-layout .compact-save-error{position:absolute;bottom:0;left:6px;font-size:9px;background:#fff4e5;color:#a64f2d}
 .companion-layout .companion-panel{position:absolute;left:160px;top:8px;width:332px;height:374px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #dbb56c;border-radius:11px;background:#fffefa;box-shadow:0 3px 10px #35230018;animation:compact-appear .12s ease-out}
 .companion-layout.panel-left .companion-panel{left:8px}
-.companion-panel>header{height:37px;min-height:37px;padding:8px 11px;background:#fff4d7;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0e0b9}
-.companion-panel>header strong{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is(.companion-panel,.message-board-list)>header{height:37px;min-height:37px;padding:8px 11px;background:#fff4d7;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0e0b9}
+.companion-panel .message-board-list>header strong,.companion-panel>header strong{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .companion-panel>header strong span{font-size:10px;color:#9b845d;font-weight:400}
-.companion-panel>header button{width:23px;height:23px;font-size:20px;color:#9d8b6b;line-height:1;border-radius:5px;padding:0}
-.companion-panel>header button:hover{background:#f7e6bf;color:#705123}
+.companion-panel .message-board-list>header button,.companion-panel>header button{width:23px;height:23px;font-size:20px;color:#9d8b6b;line-height:1;border-radius:5px;padding:0}
+.companion-panel .message-board-list>header button:hover,.companion-panel>header button:hover{background:#f7e6bf;color:#705123}
 .companion-panel .companion-tabs{display:flex;gap:2px;padding:7px 8px 5px;flex-shrink:0;border-bottom:1px solid #f4ead2}
 .companion-panel .companion-tabs button{flex:1;min-width:0;font-size:10px;padding:4px 1px;border-radius:5px;color:#9a8664;white-space:nowrap;translate:none}
 .companion-panel .companion-tabs button[aria-selected=true]{background:#fff0c6;color:#aa6416;font-weight:600}
@@ -257,3 +257,4 @@ html.pet-mode,html.pet-mode body,html.pet-mode #root{width:100vw;height:100vh;ov
 .companion-layout .pet-actions .timer-tool.running{width:25px;flex-basis:25px;background:#f8eed7;box-shadow:inset 0 0 0 1px #d3b882}.companion-layout .timer-tool.running>img{display:block}
 .pet-focus-time{position:absolute;left:26px;top:37px;width:108px;height:27px;display:flex;align-items:center;justify-content:center;gap:5px;padding:3px 7px;border:1px solid #d4c09a;border-radius:10px;background:#fffaf0ee;color:#795b36;box-shadow:0 2px 6px #49321714;font:600 14px/20px 'Microsoft YaHei',sans-serif;font-variant-numeric:tabular-nums;pointer-events:none;z-index:5}
 .pet-focus-time>img{width:19px;height:19px;object-fit:contain}.companion-layout .desktop-play>button>svg{width:24px;height:24px;flex-shrink:0}
+.pet-focus-time.with-bubble { top: 62px; }

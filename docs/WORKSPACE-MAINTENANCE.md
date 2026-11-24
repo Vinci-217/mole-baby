@@ -67,6 +67,12 @@ node scripts/clean-workspace.cjs --apply
 
 只清理未跟踪的纯数字录制 PNG 帧、TypeScript/Vite/Python 可再生成缓存，以及空的旧 artifact 目录。Git 跟踪文件、混有其他内容的帧目录、符号链接指向、所有 QA profile 与用户记录均受保护。清理回执写入 `artifacts/workspace-cleanup.json`。不要在其他构建、测试或素材导出仍运行时执行清理。
 
+旧服装原型的逐帧屏幕录制仅允许清理 `local-assets/research/` 下的 `wardrobe-motion-recording`、`wardrobe-polish-recording`、`wardrobe-fit-recording` 三个已确认目录中的纯数字 PNG 子目录。含说明文件、已跟踪文件或存档名称的子目录继续保留；此规则不能扩展到 `raw/`、`extracted/` 或其他原素材目录。最终 GIF 预览继续保留。
+
+2026-11-13 本轮清理了 1,836 张废弃原型录屏帧、构建缓存、npm 下载缓存，以及已经与 `/opt/jpexs/26.4.0/` 逐文件核对一致的临时工具副本和旧诊断文件。文件逻辑大小合计 346,797,650 字节；实际可用空间增加 351,342,592 字节，从 1,127,469,056 增至 1,478,811,648 字节。未删除原素材、运行依赖、Git 历史或下载分片。
+
+清理前后的 4,077 个 QA 档案文件和当前安装包等 10 个保留文件逐一核对 SHA-256，内容未变；4,328 个运行文件（含 567 个官方 SWF）和 81 个安装包下载分片全部通过完整性核验。详见 `artifacts/cleanup-verification-2026-11-13.json`；外部缓存的逐项删除回执为 `artifacts/external-cache-cleanup-2026-11-13.json`。
+
 ## 反编译文本的无损归档
 
 ```sh

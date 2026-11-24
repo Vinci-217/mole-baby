@@ -56,21 +56,27 @@ test('rejects duplicate checksum names and stale manifest sizes or SHA512 values
  }
 });
 
-test('publication waits for modern, legacy and Mac package verification and uploads isolated feeds',()=>{
+test('publication waits for every platform and publishes the shared book sources before update feeds',()=>{
  const workflow=YAML.parse(fs.readFileSync(path.join(__dirname,'../.github/workflows/windows-build.yml'),'utf8'));
- assert.deepEqual(workflow.jobs.release.needs,['build','legacy','mac','android']);
+ const release=workflow.jobs.release;
+ assert.deepEqual(release.needs,['book-assets','build','legacy','mac','android','web']);
+ for(const platform of ['build','legacy','mac','android','web'])assert.equal(workflow.jobs[platform].needs,'book-assets');
  assert.equal(workflow.jobs.android.uses,'./.github/workflows/android-preview.yml');
- assert.match(workflow.jobs.release.steps.find(s=>s.name==='Check artifact checksums').run,/SHA256SUMS-android/);
  assert.deepEqual(workflow.jobs.legacy.strategy.matrix.arch,['x64','ia32']);
- assert.match(workflow.jobs.release.if,/refs\/tags\/v/);
+ assert.match(release.if,/refs\/tags\/v/);
  const upload=workflow.jobs.legacy.steps.find(s=>s.name==='Upload checked legacy downloads');
  assert.match(upload.with.path,/legacy-\$\{\{ matrix.arch \}\}.yml/);
- const publish=workflow.jobs.release.steps.find(s=>s.name==='Create release or replace its build attachments').run;
+ const publishBooks=release.steps.findIndex(s=>s.run?.includes('scripts/publish-book-assets.cjs'));
+ const publishClients=release.steps.findIndex(s=>s.name==='Create release or replace its build attachments');
+ assert(publishBooks>=0&&publishBooks<publishClients);
+ const publish=release.steps[publishClients].run;
  assert.match(publish,/release\/legacy-x64.yml release\/legacy-ia32.yml/);
  assert.match(publish,/release\/\*\.blockmap/);
  const androidUpload=publish.split('\n').find(line=>line.includes('gh release upload "$RELEASE_TAG" release/*.apk'));
  for(const file of ['release/*.apk','release/*.xapk','release/resources-*.zip','release/resources-*.json','release/resources-*.blockmap','release/latest-android.json','release/SHA256SUMS-android.txt'])assert.ok(androidUpload.includes(file),'The stable release contains '+file);
- const check=workflow.jobs.release.steps.find(s=>s.name==='Check artifact checksums').run;
+ const check=release.steps.find(s=>s.name==='Check artifact checksums').run;
+ assert.match(check,/SHA256SUMS-android/);
+ assert.match(check,/SHA256SUMS-web/);
  assert.ok(check.indexOf('sha256sum --check SHA256SUMS.txt')<check.indexOf('prepare-update-blockmaps.cjs'));
  assert.ok(check.indexOf('prepare-update-blockmaps.cjs')<check.indexOf('update-metadata.cjs'));
  for(const job of ['build','legacy','mac']){

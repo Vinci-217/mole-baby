@@ -1,0 +1,2153 @@
+[
+  {
+    "id": "rescue",
+    "title": "拉姆救治师手册",
+    "description": "拉姆救治职业、救治流程和病房说明；与名为‘拉姆救治手册’的手持道具是两个资源。",
+    "source": "resource/besmearBook/other/107.swf",
+    "sprite": 0,
+    "sourceFrames": 7,
+    "candidateId": "2c478efa72e4"
+  },
+  {
+    "id": "forest-longing",
+    "title": "黑森林的向往",
+    "description": "以拉姆小牛牛为主角的成长和冒险故事。原封面署名作者团子。",
+    "source": "resource/besmearBook/other/2.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "candidateId": "a2990edf41be"
+  },
+  {
+    "id": "forest-super",
+    "title": "来自黑森林的超级拉姆",
+    "description": "超级拉姆克尔的故事，与现有《超级拉姆的秘密》内容不同。",
+    "source": "resource/besmearBook/other/8.swf",
+    "sprite": 0,
+    "sourceFrames": 8,
+    "candidateId": "2309da226c57"
+  },
+  {
+    "id": "ram-world",
+    "title": "拉姆世界征文大赛获奖作品集",
+    "description": "原玩家征文作品集，讲述拉姆世界的冒险经历；209.swf 是同一原文件。部分静态导出的文字超出纸面，接入前需要处理排版。",
+    "source": "resource/besmearBook/other/31.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "candidateId": "4a208eadff8e"
+  },
+  {
+    "id": "ram-sports",
+    "title": "拉姆运动会纪念册·第二届",
+    "description": "原拉姆运动会的比赛与投稿纪念册。",
+    "source": "resource/besmearBook/other/224.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "candidateId": "b601810483ef"
+  },
+  {
+    "id": "library-naturalnessbook",
+    "title": "自然课本",
+    "description": "菩提大伯的自然科普，采用卷轴画面而非对开书本；原客户端明确以‘自然课本’打开。",
+    "source": "resource/besmearBook/naturalnessBook.swf",
+    "sprite": 142,
+    "sourceFrames": 32,
+    "candidateId": "743afae74c3c"
+  },
+  {
+    "id": "library-playerbook",
+    "title": "公民手册",
+    "description": "庄园背景、拉姆、小屋与基础操作介绍。封面题名‘公民手册’。",
+    "source": "module/external/BooksUI/playerBook.swf",
+    "sprite": 535,
+    "sourceFrames": 19,
+    "candidateId": "157c8daf9d7c"
+  },
+  {
+    "id": "library-guidebook",
+    "title": "向导手册",
+    "description": "SMC 向导历史、入职和帮助他人的说明。",
+    "source": "module/external/BooksUI/guideBook.swf",
+    "sprite": 274,
+    "sourceFrames": 8,
+    "candidateId": "6a9b6cb06f7f"
+  },
+  {
+    "id": "library-pressmanbook",
+    "title": "记者手册",
+    "description": "原客户端从编辑部打开的记者职业说明。",
+    "source": "resource/pressman/pressmanBook.swf",
+    "sprite": 96,
+    "sourceFrames": 5,
+    "candidateId": "b8afde746a78"
+  },
+  {
+    "id": "library-angelguidebook",
+    "title": "天使园指南",
+    "description": "原封面题名‘天使园指南’，包含种子、培育、变异和契约说明；部分帧有离开书面的小标记，接入时需按原书边界对齐。",
+    "source": "module/external/BooksUI/angelGuideBook.swf",
+    "sprite": 527,
+    "sourceFrames": 11,
+    "candidateId": "e14a5f534cb7"
+  },
+  {
+    "id": "library-chevalierclothbook",
+    "title": "骑士荣耀",
+    "description": "原客户端以‘骑士荣耀’打开；骑士服饰相关书页，旧商城按钮需保持为历史画面。",
+    "source": "module/external/BooksUI/chevalierClothBook.swf",
+    "sprite": 151,
+    "sourceFrames": 6,
+    "candidateId": "be1d80a39552"
+  },
+  {
+    "id": "library-xihabook",
+    "title": "2010嘻哈纪念册",
+    "description": "有独立封面和纪念册内页。",
+    "source": "module/external/XihaBook.swf",
+    "sprite": 489,
+    "sourceFrames": 9,
+    "candidateId": "d7a94436d182"
+  },
+  {
+    "id": "library-zhuangyuangoodplaybookpanel",
+    "title": "庄园好好玩·贺岁版（2014）",
+    "description": "原书架2014入口打开的节日游玩手册，封面题名已核对。",
+    "source": "module/external/ZhuangYuanGoodPlayBookPanel.swf",
+    "sprite": 289,
+    "sourceFrames": 6,
+    "candidateId": "379b576cfcdb"
+  },
+  {
+    "id": "library-herowarbook",
+    "title": "摩尔勇士之战",
+    "description": "原书架入口加载的剧情读物，封面题名已核对。",
+    "source": "module/external/heroWarBook.swf",
+    "sprite": 103,
+    "sourceFrames": 9,
+    "candidateId": "2d6cfa6d8ca9"
+  },
+  {
+    "id": "library-tenyearsago",
+    "title": "十年前的黑森林",
+    "description": "有独立封面；原期刊书架的第35个入口指向本文件。",
+    "source": "module/external/tenYearsAgo.swf",
+    "sprite": 286,
+    "sourceFrames": 11,
+    "candidateId": "2ac019d708a7"
+  },
+  {
+    "id": "library-5",
+    "title": "摩尔庄园历史",
+    "description": "庄园过去与黑森林、SMC、拉姆复活等历史内容。",
+    "source": "resource/besmearBook/other/5.swf",
+    "sprite": 191,
+    "sourceFrames": 25,
+    "candidateId": "40d24e63205d"
+  },
+  {
+    "id": "library-6",
+    "title": "黑森林探险之摩尔王的宝藏",
+    "description": "黑森林探险的剧情记录。",
+    "source": "resource/besmearBook/other/6.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "candidateId": "bd793173e3ee"
+  },
+  {
+    "id": "library-10",
+    "title": "我在星星上",
+    "description": "菩提大伯的星球冒险故事。",
+    "source": "resource/besmearBook/other/10.swf",
+    "sprite": 226,
+    "sourceFrames": 7,
+    "candidateId": "a0f599010b18"
+  },
+  {
+    "id": "library-17",
+    "title": "中秋神话我演绎",
+    "description": "中秋主题纪念书。",
+    "source": "resource/besmearBook/other/17.swf",
+    "sprite": 494,
+    "sourceFrames": 8,
+    "candidateId": "3bfb038058ad"
+  },
+  {
+    "id": "library-32",
+    "title": "我爱网络征文获奖作品集",
+    "description": "原玩家征文集；210.swf 是同一原文件。",
+    "source": "resource/besmearBook/other/32.swf",
+    "sprite": 0,
+    "sourceFrames": 27,
+    "candidateId": "79b526ae0bd6"
+  },
+  {
+    "id": "library-101",
+    "title": "消防员手册",
+    "description": "SMC 消防员职业说明。",
+    "source": "resource/besmearBook/other/101.swf",
+    "sprite": 189,
+    "sourceFrames": 5,
+    "candidateId": "a54606586d87"
+  },
+  {
+    "id": "library-102",
+    "title": "驾驶员手册",
+    "description": "SMC 驾驶员、驾驶考试与交通规则说明。",
+    "source": "resource/besmearBook/other/102.swf",
+    "sprite": 758,
+    "sourceFrames": 10,
+    "candidateId": "a639f9a49633"
+  },
+  {
+    "id": "library-103",
+    "title": "骑士手册",
+    "description": "皇家骑士团历史与训练说明。",
+    "source": "resource/besmearBook/other/103.swf",
+    "sprite": 133,
+    "sourceFrames": 14,
+    "candidateId": "b6e0ca02e690"
+  },
+  {
+    "id": "library-106",
+    "title": "警官手册",
+    "description": "SMC 警官职业、庄园事件与治安故事。",
+    "source": "resource/besmearBook/other/106.swf",
+    "sprite": 146,
+    "sourceFrames": 8,
+    "candidateId": "da6b60ab1a6d"
+  },
+  {
+    "id": "library-108",
+    "title": "建筑师手册",
+    "description": "SMC 建筑师入职、任务与等级说明。",
+    "source": "resource/besmearBook/other/108.swf",
+    "sprite": 172,
+    "sourceFrames": 6,
+    "candidateId": "c007b643a935"
+  },
+  {
+    "id": "library-1",
+    "title": "公主游记·照片集",
+    "description": "原客户端书刊：公主游记·照片集。",
+    "source": "resource/besmearBook/other/1.swf",
+    "sprite": 122,
+    "sourceFrames": 9,
+    "candidateId": "2f20bc21baf4"
+  },
+  {
+    "id": "library-3",
+    "title": "火神杯08大事记",
+    "description": "原客户端书刊：火神杯08大事记。",
+    "source": "resource/besmearBook/other/3.swf",
+    "sprite": 0,
+    "sourceFrames": 10,
+    "candidateId": "05886963f940"
+  },
+  {
+    "id": "library-4",
+    "title": "摩尔2008年·我们的纪念册",
+    "description": "原客户端书刊：摩尔2008年·我们的纪念册。",
+    "source": "resource/besmearBook/other/4.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "candidateId": "71ce9c662c2d"
+  },
+  {
+    "id": "library-7",
+    "title": "摩尔庄园一周年纪念册",
+    "description": "原客户端书刊：摩尔庄园一周年纪念册。",
+    "source": "resource/besmearBook/other/7.swf",
+    "sprite": 341,
+    "sourceFrames": 18,
+    "candidateId": "bbb0869f1edd"
+  },
+  {
+    "id": "library-9",
+    "title": "2009摩尔庄园大事记",
+    "description": "原客户端书刊：2009摩尔庄园大事记。",
+    "source": "resource/besmearBook/other/9.swf",
+    "sprite": 401,
+    "sourceFrames": 15,
+    "candidateId": "5ad7f0ca8b40"
+  },
+  {
+    "id": "library-13",
+    "title": "伊莲小理财",
+    "description": "原客户端书刊：伊莲小理财。",
+    "source": "resource/besmearBook/other/13.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "candidateId": "4e263fe6e9cd"
+  },
+  {
+    "id": "library-15",
+    "title": "和平村的火神杯",
+    "description": "原客户端书刊：和平村的火神杯。",
+    "source": "resource/besmearBook/other/15.swf",
+    "sprite": 189,
+    "sourceFrames": 9,
+    "candidateId": "0f18c74d5096"
+  },
+  {
+    "id": "library-18",
+    "title": "黑森林探险纪念册",
+    "description": "原客户端书刊：黑森林探险纪念册。",
+    "source": "resource/besmearBook/other/18.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "candidateId": "085414111dfe"
+  },
+  {
+    "id": "library-19",
+    "title": "热带雨林之旅①公主出逃",
+    "description": "原客户端书刊：热带雨林之旅①公主出逃。",
+    "source": "resource/besmearBook/other/19.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "candidateId": "a9b81802eaff"
+  },
+  {
+    "id": "library-20",
+    "title": "瑞琪！骑士的荣耀！",
+    "description": "原客户端书刊：瑞琪！骑士的荣耀！。",
+    "source": "resource/besmearBook/other/20.swf",
+    "sprite": 0,
+    "sourceFrames": 9,
+    "candidateId": "b003af034e9e"
+  },
+  {
+    "id": "library-21",
+    "title": "小摩尔历险记二·穿越火神节",
+    "description": "原客户端书刊：小摩尔历险记二·穿越火神节。",
+    "source": "resource/besmearBook/other/21.swf",
+    "sprite": 0,
+    "sourceFrames": 92,
+    "candidateId": "ab1d2e3df1ec"
+  },
+  {
+    "id": "library-22",
+    "title": "激烈的火神杯·团结的我们",
+    "description": "原客户端书刊：激烈的火神杯·团结的我们。",
+    "source": "resource/besmearBook/other/22.swf",
+    "sprite": 0,
+    "sourceFrames": 8,
+    "candidateId": "029606da9d53"
+  },
+  {
+    "id": "library-23",
+    "title": "热带雨林之旅②勇斗大鳄鱼",
+    "description": "原客户端书刊：热带雨林之旅②勇斗大鳄鱼。",
+    "source": "resource/besmearBook/other/23.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "candidateId": "7f18616ed689"
+  },
+  {
+    "id": "library-24",
+    "title": "热带雨林之旅③马蜂来袭",
+    "description": "原客户端书刊：热带雨林之旅③马蜂来袭。",
+    "source": "resource/besmearBook/other/24.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "candidateId": "25b2361b0270"
+  },
+  {
+    "id": "library-25",
+    "title": "热带雨林之旅④小魔女",
+    "description": "原客户端书刊：热带雨林之旅④小魔女。",
+    "source": "resource/besmearBook/other/25.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "candidateId": "50b7a22a696c"
+  },
+  {
+    "id": "library-26",
+    "title": "热带雨林之旅⑤蚂蚁围攻",
+    "description": "原客户端书刊：热带雨林之旅⑤蚂蚁围攻。",
+    "source": "resource/besmearBook/other/26.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "candidateId": "c9e1157c9d22"
+  },
+  {
+    "id": "library-27",
+    "title": "热带雨林之旅⑥魔花螳螂",
+    "description": "原客户端书刊：热带雨林之旅⑥魔花螳螂。",
+    "source": "resource/besmearBook/other/27.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "candidateId": "6a2203f574d9"
+  },
+  {
+    "id": "library-28",
+    "title": "热带雨林之旅⑦深入蚁穴",
+    "description": "原客户端书刊：热带雨林之旅⑦深入蚁穴。",
+    "source": "resource/besmearBook/other/28.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "candidateId": "200b14f46456"
+  },
+  {
+    "id": "library-30",
+    "title": "四好摩尔童谣征集活动·优秀作品集",
+    "description": "原客户端书刊：四好摩尔童谣征集活动·优秀作品集。",
+    "source": "resource/besmearBook/other/30.swf",
+    "sprite": 156,
+    "sourceFrames": 11,
+    "candidateId": "f03e4b21d424"
+  },
+  {
+    "id": "library-201",
+    "title": "凯文杯征文大赛·我是XX队",
+    "description": "原客户端书刊：凯文杯征文大赛·我是XX队。",
+    "source": "resource/besmearBook/other/201.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "candidateId": "0c2b11bdc63f"
+  },
+  {
+    "id": "library-202",
+    "title": "摩尔们的感恩节",
+    "description": "原客户端书刊：摩尔们的感恩节。",
+    "source": "resource/besmearBook/other/202.swf",
+    "sprite": 0,
+    "sourceFrames": 6,
+    "candidateId": "cb0f970bebcb"
+  },
+  {
+    "id": "library-203",
+    "title": "摩尔爱心行动纪念册",
+    "description": "原客户端书刊：摩尔爱心行动纪念册。",
+    "source": "resource/besmearBook/other/203.swf",
+    "sprite": 0,
+    "sourceFrames": 9,
+    "candidateId": "3ab2e8459398"
+  },
+  {
+    "id": "library-204",
+    "title": "拉姆运动会征文纪念册",
+    "description": "原客户端书刊：拉姆运动会征文纪念册。",
+    "source": "resource/besmearBook/other/204.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "candidateId": "87317768e5e9"
+  },
+  {
+    "id": "library-211",
+    "title": "小摩尔历险记·浆果森林的秘密",
+    "description": "原客户端书刊：小摩尔历险记·浆果森林的秘密。",
+    "source": "resource/besmearBook/other/211.swf",
+    "sprite": 0,
+    "sourceFrames": 75,
+    "candidateId": "8eb32f130bd7"
+  },
+  {
+    "id": "library-213",
+    "title": "庄园装潢我做主·第一届",
+    "description": "原客户端书刊：庄园装潢我做主·第一届。",
+    "source": "resource/besmearBook/other/213.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "candidateId": "06dac9a38dfd"
+  },
+  {
+    "id": "library-214",
+    "title": "我有绝版装扮·我有我漂亮",
+    "description": "原客户端书刊：我有绝版装扮·我有我漂亮。",
+    "source": "resource/besmearBook/other/214.swf",
+    "sprite": 0,
+    "sourceFrames": 10,
+    "candidateId": "4d9f7d8b5499"
+  },
+  {
+    "id": "library-215",
+    "title": "庄园装扮我做主·第一届",
+    "description": "原客户端书刊：庄园装扮我做主·第一届。",
+    "source": "resource/besmearBook/other/215.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "candidateId": "b46356ca81cc"
+  },
+  {
+    "id": "library-216",
+    "title": "摩尔装扮我做主·第二届",
+    "description": "原客户端书刊：摩尔装扮我做主·第二届。",
+    "source": "resource/besmearBook/other/216.swf",
+    "sprite": 0,
+    "sourceFrames": 10,
+    "candidateId": "b71cce5c9990"
+  },
+  {
+    "id": "dragon-handbook",
+    "title": "飞龙图鉴",
+    "description": "黑森林的飞龙、龙骑士以及庄园驯龙旧事。",
+    "source": "resource/besmearBook/other/16.swf",
+    "sprite": 260,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "super-ram-introduction",
+    "title": "超级拉姆特权宣传册",
+    "description": "介绍超级拉姆的能力、活动和历年的特权。",
+    "source": "module/external/SuperLahmIntroPanel.swf",
+    "sprite": 596,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-1",
+    "title": "摩尔时报·第1期",
+    "description": "庄园早期《摩尔时报》档案，第 1 期。",
+    "source": "resource/monthly/2008/1.swf",
+    "sprite": 236,
+    "sourceFrames": 7,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-2",
+    "title": "摩尔时报·第2期",
+    "description": "庄园早期《摩尔时报》档案，第 2 期。",
+    "source": "resource/monthly/2008/2.swf",
+    "sprite": 474,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-3",
+    "title": "摩尔时报·第3期",
+    "description": "庄园早期《摩尔时报》档案，第 3 期。",
+    "source": "resource/monthly/2008/3.swf",
+    "sprite": 431,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-4",
+    "title": "摩尔时报·第4期",
+    "description": "庄园早期《摩尔时报》档案，第 4 期。",
+    "source": "resource/monthly/2008/4.swf",
+    "sprite": 332,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-5",
+    "title": "摩尔时报·第5期",
+    "description": "庄园早期《摩尔时报》档案，第 5 期。",
+    "source": "resource/monthly/2008/5.swf",
+    "sprite": 346,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-6",
+    "title": "摩尔时报·第6期",
+    "description": "庄园早期《摩尔时报》档案，第 6 期。",
+    "source": "resource/monthly/2008/6.swf",
+    "sprite": 359,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-7",
+    "title": "摩尔时报·第7期",
+    "description": "庄园早期《摩尔时报》档案，第 7 期。",
+    "source": "resource/monthly/2008/7.swf",
+    "sprite": 294,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-8",
+    "title": "摩尔时报·第8期",
+    "description": "庄园早期《摩尔时报》档案，第 8 期。",
+    "source": "resource/monthly/2008/8.swf",
+    "sprite": 306,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-9",
+    "title": "摩尔时报·第9期",
+    "description": "庄园早期《摩尔时报》档案，第 9 期。",
+    "source": "resource/monthly/2008/9.swf",
+    "sprite": 317,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-10",
+    "title": "摩尔时报·第10期",
+    "description": "庄园早期《摩尔时报》档案，第 10 期。",
+    "source": "resource/monthly/2008/10.swf",
+    "sprite": 319,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-11",
+    "title": "摩尔时报·第11期",
+    "description": "庄园早期《摩尔时报》档案，第 11 期。",
+    "source": "resource/monthly/2008/11.swf",
+    "sprite": 304,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-12",
+    "title": "摩尔时报·第12期",
+    "description": "庄园早期《摩尔时报》档案，第 12 期。",
+    "source": "resource/monthly/2008/12.swf",
+    "sprite": 414,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-13",
+    "title": "摩尔时报·第13期",
+    "description": "庄园早期《摩尔时报》档案，第 13 期。",
+    "source": "resource/monthly/2008/13.swf",
+    "sprite": 393,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-14",
+    "title": "摩尔时报·第14期",
+    "description": "庄园早期《摩尔时报》档案，第 14 期。",
+    "source": "resource/monthly/2008/14.swf",
+    "sprite": 338,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-15",
+    "title": "摩尔时报·第15期",
+    "description": "庄园早期《摩尔时报》档案，第 15 期。",
+    "source": "resource/monthly/2008/15.swf",
+    "sprite": 451,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-16",
+    "title": "摩尔时报·第16期",
+    "description": "庄园早期《摩尔时报》档案，第 16 期。",
+    "source": "resource/monthly/2008/16.swf",
+    "sprite": 485,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-17",
+    "title": "摩尔时报·第17期",
+    "description": "庄园早期《摩尔时报》档案，第 17 期。",
+    "source": "resource/monthly/2008/17.swf",
+    "sprite": 523,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-18",
+    "title": "摩尔时报·第18期",
+    "description": "庄园早期《摩尔时报》档案，第 18 期。",
+    "source": "resource/monthly/2008/18.swf",
+    "sprite": 470,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-19",
+    "title": "摩尔时报·第19期",
+    "description": "庄园早期《摩尔时报》档案，第 19 期。",
+    "source": "resource/monthly/2008/19.swf",
+    "sprite": 513,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-20",
+    "title": "摩尔时报·第20期",
+    "description": "庄园早期《摩尔时报》档案，第 20 期。",
+    "source": "resource/monthly/2008/20.swf",
+    "sprite": 380,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-21",
+    "title": "摩尔时报·第21期",
+    "description": "庄园早期《摩尔时报》档案，第 21 期。",
+    "source": "resource/monthly/2008/21.swf",
+    "sprite": 826,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-22",
+    "title": "摩尔时报·第22期",
+    "description": "庄园早期《摩尔时报》档案，第 22 期。",
+    "source": "resource/monthly/2008/22.swf",
+    "sprite": 895,
+    "sourceFrames": 23,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-23",
+    "title": "摩尔时报·第23期",
+    "description": "庄园早期《摩尔时报》档案，第 23 期。",
+    "source": "resource/monthly/2008/23.swf",
+    "sprite": 438,
+    "sourceFrames": 23,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-24",
+    "title": "摩尔时报·第24期",
+    "description": "庄园早期《摩尔时报》档案，第 24 期。",
+    "source": "resource/monthly/2008/24.swf",
+    "sprite": 426,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-25",
+    "title": "摩尔时报·第25期",
+    "description": "庄园早期《摩尔时报》档案，第 25 期。",
+    "source": "resource/monthly/2008/25.swf",
+    "sprite": 437,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-26",
+    "title": "摩尔时报·第26期",
+    "description": "庄园早期《摩尔时报》档案，第 26 期。",
+    "source": "resource/monthly/2008/26.swf",
+    "sprite": 387,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-27",
+    "title": "摩尔时报·第27期",
+    "description": "庄园早期《摩尔时报》档案，第 27 期。",
+    "source": "resource/monthly/2008/27.swf",
+    "sprite": 456,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-28",
+    "title": "摩尔时报·第28期",
+    "description": "庄园早期《摩尔时报》档案，第 28 期。",
+    "source": "resource/monthly/2008/28.swf",
+    "sprite": 370,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-29",
+    "title": "摩尔时报·第29期",
+    "description": "庄园早期《摩尔时报》档案，第 29 期。",
+    "source": "resource/monthly/2008/29.swf",
+    "sprite": 682,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-30",
+    "title": "摩尔时报·第30期",
+    "description": "庄园早期《摩尔时报》档案，第 30 期。",
+    "source": "resource/monthly/2008/30.swf",
+    "sprite": 553,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-31",
+    "title": "摩尔时报·第31期",
+    "description": "庄园早期《摩尔时报》档案，第 31 期。",
+    "source": "resource/monthly/2008/31.swf",
+    "sprite": 538,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-32",
+    "title": "摩尔时报·第32期",
+    "description": "庄园早期《摩尔时报》档案，第 32 期。",
+    "source": "resource/monthly/2008/32.swf",
+    "sprite": 514,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-33",
+    "title": "摩尔时报·第33期",
+    "description": "庄园早期《摩尔时报》档案，第 33 期。",
+    "source": "resource/monthly/2008/33.swf",
+    "sprite": 469,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-34",
+    "title": "摩尔时报·第34期",
+    "description": "庄园早期《摩尔时报》档案，第 34 期。",
+    "source": "resource/monthly/2008/34.swf",
+    "sprite": 515,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-35",
+    "title": "摩尔时报·第35期",
+    "description": "庄园早期《摩尔时报》档案，第 35 期。",
+    "source": "resource/monthly/2008/35.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-36",
+    "title": "摩尔时报·第36期",
+    "description": "庄园早期《摩尔时报》档案，第 36 期。",
+    "source": "resource/monthly/2009/36.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-37",
+    "title": "摩尔时报·第37期",
+    "description": "庄园早期《摩尔时报》档案，第 37 期。",
+    "source": "resource/monthly/2009/37.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-38",
+    "title": "摩尔时报·第38期",
+    "description": "庄园早期《摩尔时报》档案，第 38 期。",
+    "source": "resource/monthly/2009/38.swf",
+    "sprite": 0,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-39",
+    "title": "摩尔时报·第39期",
+    "description": "庄园早期《摩尔时报》档案，第 39 期。",
+    "source": "resource/monthly/2009/39.swf",
+    "sprite": 0,
+    "sourceFrames": 23,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-40",
+    "title": "摩尔时报·第40期",
+    "description": "庄园早期《摩尔时报》档案，第 40 期。",
+    "source": "resource/monthly/2009/40.swf",
+    "sprite": 0,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-41",
+    "title": "摩尔时报·第41期",
+    "description": "庄园早期《摩尔时报》档案，第 41 期。",
+    "source": "resource/monthly/2009/41.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-42",
+    "title": "摩尔时报·第42期",
+    "description": "庄园早期《摩尔时报》档案，第 42 期。",
+    "source": "resource/monthly/2009/42.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-43",
+    "title": "摩尔时报·第43期",
+    "description": "庄园早期《摩尔时报》档案，第 43 期。",
+    "source": "resource/monthly/2009/43.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-44",
+    "title": "摩尔时报·第44期",
+    "description": "庄园早期《摩尔时报》档案，第 44 期。",
+    "source": "resource/monthly/2009/44.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-45",
+    "title": "摩尔时报·第45期",
+    "description": "庄园早期《摩尔时报》档案，第 45 期。",
+    "source": "resource/monthly/2009/45.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-46",
+    "title": "摩尔时报·第46期",
+    "description": "庄园早期《摩尔时报》档案，第 46 期。",
+    "source": "resource/monthly/2009/46.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-47",
+    "title": "摩尔时报·第47期",
+    "description": "庄园早期《摩尔时报》档案，第 47 期。",
+    "source": "resource/monthly/2009/47.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-48",
+    "title": "摩尔时报·第48期",
+    "description": "庄园早期《摩尔时报》档案，第 48 期。",
+    "source": "resource/monthly/2009/48.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-49",
+    "title": "摩尔时报·第49期",
+    "description": "庄园早期《摩尔时报》档案，第 49 期。",
+    "source": "resource/monthly/2009/49.swf",
+    "sprite": 0,
+    "sourceFrames": 22,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-50",
+    "title": "摩尔时报·第50期",
+    "description": "庄园早期《摩尔时报》档案，第 50 期。",
+    "source": "resource/monthly/2009/50.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-51",
+    "title": "摩尔时报·第51期",
+    "description": "庄园早期《摩尔时报》档案，第 51 期。",
+    "source": "resource/monthly/2009/51.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-52",
+    "title": "摩尔时报·第52期",
+    "description": "庄园早期《摩尔时报》档案，第 52 期。",
+    "source": "resource/monthly/2009/52.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-53",
+    "title": "摩尔时报·第53期",
+    "description": "庄园早期《摩尔时报》档案，第 53 期。",
+    "source": "resource/monthly/2009/53.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-54",
+    "title": "摩尔时报·第54期",
+    "description": "庄园早期《摩尔时报》档案，第 54 期。",
+    "source": "resource/monthly/2009/54.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-55",
+    "title": "摩尔时报·第55期",
+    "description": "庄园早期《摩尔时报》档案，第 55 期。",
+    "source": "resource/monthly/2009/55.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-56",
+    "title": "摩尔时报·第56期",
+    "description": "庄园早期《摩尔时报》档案，第 56 期。",
+    "source": "resource/monthly/2009/56.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-57",
+    "title": "摩尔时报·第57期",
+    "description": "庄园早期《摩尔时报》档案，第 57 期。",
+    "source": "resource/monthly/2009/57.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-58",
+    "title": "摩尔时报·第58期",
+    "description": "庄园早期《摩尔时报》档案，第 58 期。",
+    "source": "resource/monthly/2009/58.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-59",
+    "title": "摩尔时报·第59期",
+    "description": "庄园早期《摩尔时报》档案，第 59 期。",
+    "source": "resource/monthly/2009/59.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-60",
+    "title": "摩尔时报·第60期",
+    "description": "庄园早期《摩尔时报》档案，第 60 期。",
+    "source": "resource/monthly/2009/60.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-61",
+    "title": "摩尔时报·第61期",
+    "description": "庄园早期《摩尔时报》档案，第 61 期。",
+    "source": "resource/monthly/2009/61.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-62",
+    "title": "摩尔时报·第62期",
+    "description": "庄园早期《摩尔时报》档案，第 62 期。",
+    "source": "resource/monthly/2009/62.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-63",
+    "title": "摩尔时报·第63期",
+    "description": "庄园早期《摩尔时报》档案，第 63 期。",
+    "source": "resource/monthly/2009/63.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-64",
+    "title": "摩尔时报·第64期",
+    "description": "庄园早期《摩尔时报》档案，第 64 期。",
+    "source": "resource/monthly/2009/64.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-65",
+    "title": "摩尔时报·第65期",
+    "description": "庄园早期《摩尔时报》档案，第 65 期。",
+    "source": "resource/monthly/2009/65.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-66",
+    "title": "摩尔时报·第66期",
+    "description": "庄园早期《摩尔时报》档案，第 66 期。",
+    "source": "resource/monthly/2009/66.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-67",
+    "title": "摩尔时报·第67期",
+    "description": "庄园早期《摩尔时报》档案，第 67 期。",
+    "source": "resource/monthly/2009/67.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-68",
+    "title": "摩尔时报·第68期",
+    "description": "庄园早期《摩尔时报》档案，第 68 期。",
+    "source": "resource/monthly/2009/68.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-69",
+    "title": "摩尔时报·第69期",
+    "description": "庄园早期《摩尔时报》档案，第 69 期。",
+    "source": "resource/monthly/2009/69.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-70",
+    "title": "摩尔时报·第70期",
+    "description": "庄园早期《摩尔时报》档案，第 70 期。",
+    "source": "resource/monthly/2009/70.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-71",
+    "title": "摩尔时报·第71期",
+    "description": "庄园早期《摩尔时报》档案，第 71 期。",
+    "source": "resource/monthly/2009/71.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-72",
+    "title": "摩尔时报·第72期",
+    "description": "庄园早期《摩尔时报》档案，第 72 期。",
+    "source": "resource/monthly/2009/72.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-73",
+    "title": "摩尔时报·第73期",
+    "description": "庄园早期《摩尔时报》档案，第 73 期。",
+    "source": "resource/monthly/2009/73.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-74",
+    "title": "摩尔时报·第74期",
+    "description": "庄园早期《摩尔时报》档案，第 74 期。",
+    "source": "resource/monthly/2009/74.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-75",
+    "title": "摩尔时报·第75期",
+    "description": "庄园早期《摩尔时报》档案，第 75 期。",
+    "source": "resource/monthly/2009/75.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-76",
+    "title": "摩尔时报·第76期",
+    "description": "庄园早期《摩尔时报》档案，第 76 期。",
+    "source": "resource/monthly/2009/76.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-77",
+    "title": "摩尔时报·第77期",
+    "description": "庄园早期《摩尔时报》档案，第 77 期。",
+    "source": "resource/monthly/2009/77.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-78",
+    "title": "摩尔时报·第78期",
+    "description": "庄园早期《摩尔时报》档案，第 78 期。",
+    "source": "resource/monthly/2009/78.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-79",
+    "title": "摩尔时报·第79期",
+    "description": "庄园早期《摩尔时报》档案，第 79 期。",
+    "source": "resource/monthly/2009/79.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-80",
+    "title": "摩尔时报·第80期",
+    "description": "庄园早期《摩尔时报》档案，第 80 期。",
+    "source": "resource/monthly/2009/80.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-81",
+    "title": "摩尔时报·第81期",
+    "description": "庄园早期《摩尔时报》档案，第 81 期。",
+    "source": "resource/monthly/2009/81.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-82",
+    "title": "摩尔时报·第82期",
+    "description": "庄园早期《摩尔时报》档案，第 82 期。",
+    "source": "resource/monthly/2009/82.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-83",
+    "title": "摩尔时报·第83期",
+    "description": "庄园早期《摩尔时报》档案，第 83 期。",
+    "source": "resource/monthly/2009/83.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-84",
+    "title": "摩尔时报·第84期",
+    "description": "庄园早期《摩尔时报》档案，第 84 期。",
+    "source": "resource/monthly/2009/84.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-85",
+    "title": "摩尔时报·第85期",
+    "description": "庄园早期《摩尔时报》档案，第 85 期。",
+    "source": "resource/monthly/2009/85.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-86",
+    "title": "摩尔时报·第86期",
+    "description": "庄园早期《摩尔时报》档案，第 86 期。",
+    "source": "resource/monthly/2010/86.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-87",
+    "title": "摩尔时报·第87期",
+    "description": "庄园早期《摩尔时报》档案，第 87 期。",
+    "source": "resource/monthly/2010/87.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-88",
+    "title": "摩尔时报·第88期",
+    "description": "庄园早期《摩尔时报》档案，第 88 期。",
+    "source": "resource/monthly/2010/88.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-89",
+    "title": "摩尔时报·第89期",
+    "description": "庄园早期《摩尔时报》档案，第 89 期。",
+    "source": "resource/monthly/2010/89.swf",
+    "sprite": 0,
+    "sourceFrames": 20,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-90",
+    "title": "摩尔时报·第90期",
+    "description": "庄园早期《摩尔时报》档案，第 90 期。",
+    "source": "resource/monthly/2010/90.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-91",
+    "title": "摩尔时报·第91期",
+    "description": "庄园早期《摩尔时报》档案，第 91 期。",
+    "source": "resource/monthly/2010/91.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-92",
+    "title": "摩尔时报·第92期",
+    "description": "庄园早期《摩尔时报》档案，第 92 期。",
+    "source": "resource/monthly/2010/92.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-93",
+    "title": "摩尔时报·第93期",
+    "description": "庄园早期《摩尔时报》档案，第 93 期。",
+    "source": "resource/monthly/2010/93.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-94",
+    "title": "摩尔时报·第94期",
+    "description": "庄园早期《摩尔时报》档案，第 94 期。",
+    "source": "resource/monthly/2010/94.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-95",
+    "title": "摩尔时报·第95期",
+    "description": "庄园早期《摩尔时报》档案，第 95 期。",
+    "source": "resource/monthly/2010/95.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-96",
+    "title": "摩尔时报·第96期",
+    "description": "庄园早期《摩尔时报》档案，第 96 期。",
+    "source": "resource/monthly/2010/96.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-97",
+    "title": "摩尔时报·第97期",
+    "description": "庄园早期《摩尔时报》档案，第 97 期。",
+    "source": "resource/monthly/2010/97.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-98",
+    "title": "摩尔时报·第98期",
+    "description": "庄园早期《摩尔时报》档案，第 98 期。",
+    "source": "resource/monthly/2010/98.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-99",
+    "title": "摩尔时报·第99期",
+    "description": "庄园早期《摩尔时报》档案，第 99 期。",
+    "source": "resource/monthly/2010/99.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-100",
+    "title": "摩尔时报·第100期",
+    "description": "庄园早期《摩尔时报》档案，第 100 期。",
+    "source": "resource/monthly/2010/100.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-101",
+    "title": "摩尔时报·第101期",
+    "description": "庄园早期《摩尔时报》档案，第 101 期。",
+    "source": "resource/monthly/2010/101.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-102",
+    "title": "摩尔时报·第102期",
+    "description": "庄园早期《摩尔时报》档案，第 102 期。",
+    "source": "resource/monthly/2010/102.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-103",
+    "title": "摩尔时报·第103期",
+    "description": "庄园早期《摩尔时报》档案，第 103 期。",
+    "source": "resource/monthly/2010/103.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-104",
+    "title": "摩尔时报·第104期",
+    "description": "庄园早期《摩尔时报》档案，第 104 期。",
+    "source": "resource/monthly/2010/104.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-105",
+    "title": "摩尔时报·第105期",
+    "description": "庄园早期《摩尔时报》档案，第 105 期。",
+    "source": "resource/monthly/2010/105.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-106",
+    "title": "摩尔时报·第106期",
+    "description": "庄园早期《摩尔时报》档案，第 106 期。",
+    "source": "resource/monthly/2010/106.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-107",
+    "title": "摩尔时报·第107期",
+    "description": "庄园早期《摩尔时报》档案，第 107 期。",
+    "source": "resource/monthly/2010/107.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-108",
+    "title": "摩尔时报·第108期",
+    "description": "庄园早期《摩尔时报》档案，第 108 期。",
+    "source": "resource/monthly/2010/108.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-109",
+    "title": "摩尔时报·第109期",
+    "description": "庄园早期《摩尔时报》档案，第 109 期。",
+    "source": "resource/monthly/2010/109.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-110",
+    "title": "摩尔时报·第110期",
+    "description": "庄园早期《摩尔时报》档案，第 110 期。",
+    "source": "resource/monthly/2010/110.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-111",
+    "title": "摩尔时报·第111期",
+    "description": "庄园早期《摩尔时报》档案，第 111 期。",
+    "source": "resource/monthly/2010/111.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-112",
+    "title": "摩尔时报·第112期",
+    "description": "庄园早期《摩尔时报》档案，第 112 期。",
+    "source": "resource/monthly/2010/112.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-113",
+    "title": "摩尔时报·第113期",
+    "description": "庄园早期《摩尔时报》档案，第 113 期。",
+    "source": "resource/monthly/2010/113.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-114",
+    "title": "摩尔时报·第114期",
+    "description": "庄园早期《摩尔时报》档案，第 114 期。",
+    "source": "resource/monthly/2010/114.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-115",
+    "title": "摩尔时报·第115期",
+    "description": "庄园早期《摩尔时报》档案，第 115 期。",
+    "source": "resource/monthly/2010/115.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-116",
+    "title": "摩尔时报·第116期",
+    "description": "庄园早期《摩尔时报》档案，第 116 期。",
+    "source": "resource/monthly/2010/116.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-117",
+    "title": "摩尔时报·第117期",
+    "description": "庄园早期《摩尔时报》档案，第 117 期。",
+    "source": "resource/monthly/2010/117.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-118",
+    "title": "摩尔时报·第118期",
+    "description": "庄园早期《摩尔时报》档案，第 118 期。",
+    "source": "resource/monthly/2010/118.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-119",
+    "title": "摩尔时报·第119期",
+    "description": "庄园早期《摩尔时报》档案，第 119 期。",
+    "source": "resource/monthly/2010/119.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-120",
+    "title": "摩尔时报·第120期",
+    "description": "庄园早期《摩尔时报》档案，第 120 期。",
+    "source": "resource/monthly/2010/120.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-121",
+    "title": "摩尔时报·第121期",
+    "description": "庄园早期《摩尔时报》档案，第 121 期。",
+    "source": "resource/monthly/2010/121.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-122",
+    "title": "摩尔时报·第122期",
+    "description": "庄园早期《摩尔时报》档案，第 122 期。",
+    "source": "resource/monthly/2010/122.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-123",
+    "title": "摩尔时报·第123期",
+    "description": "庄园早期《摩尔时报》档案，第 123 期。",
+    "source": "resource/monthly/2010/123.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-124",
+    "title": "摩尔时报·第124期",
+    "description": "庄园早期《摩尔时报》档案，第 124 期。",
+    "source": "resource/monthly/2010/124.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-125",
+    "title": "摩尔时报·第125期",
+    "description": "庄园早期《摩尔时报》档案，第 125 期。",
+    "source": "resource/monthly/2010/125.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-126",
+    "title": "摩尔时报·第126期",
+    "description": "庄园早期《摩尔时报》档案，第 126 期。",
+    "source": "resource/monthly/2010/126.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-127",
+    "title": "摩尔时报·第127期",
+    "description": "庄园早期《摩尔时报》档案，第 127 期。",
+    "source": "resource/monthly/2010/127.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-128",
+    "title": "摩尔时报·第128期",
+    "description": "庄园早期《摩尔时报》档案，第 128 期。",
+    "source": "resource/monthly/2010/128.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-129",
+    "title": "摩尔时报·第129期",
+    "description": "庄园早期《摩尔时报》档案，第 129 期。",
+    "source": "resource/monthly/2010/129.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-130",
+    "title": "摩尔时报·第130期",
+    "description": "庄园早期《摩尔时报》档案，第 130 期。",
+    "source": "resource/monthly/2010/130.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-131",
+    "title": "摩尔时报·第131期",
+    "description": "庄园早期《摩尔时报》档案，第 131 期。",
+    "source": "resource/monthly/2010/131.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-132",
+    "title": "摩尔时报·第132期",
+    "description": "庄园早期《摩尔时报》档案，第 132 期。",
+    "source": "resource/monthly/2010/132.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-133",
+    "title": "摩尔时报·第133期",
+    "description": "庄园早期《摩尔时报》档案，第 133 期。",
+    "source": "resource/monthly/2010/133.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-134",
+    "title": "摩尔时报·第134期",
+    "description": "庄园早期《摩尔时报》档案，第 134 期。",
+    "source": "resource/monthly/2010/134.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-135",
+    "title": "摩尔时报·第135期",
+    "description": "庄园早期《摩尔时报》档案，第 135 期。",
+    "source": "resource/monthly/2010/135.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-136",
+    "title": "摩尔时报·第136期",
+    "description": "庄园早期《摩尔时报》档案，第 136 期。",
+    "source": "resource/monthly/2011/136.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-137",
+    "title": "摩尔时报·第137期",
+    "description": "庄园早期《摩尔时报》档案，第 137 期。",
+    "source": "resource/monthly/2011/137.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-138",
+    "title": "摩尔时报·第138期",
+    "description": "庄园早期《摩尔时报》档案，第 138 期。",
+    "source": "resource/monthly/2011/138.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-139",
+    "title": "摩尔时报·第139期",
+    "description": "庄园早期《摩尔时报》档案，第 139 期。",
+    "source": "resource/monthly/2011/139.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-140",
+    "title": "摩尔时报·第140期",
+    "description": "庄园早期《摩尔时报》档案，第 140 期。",
+    "source": "resource/monthly/2011/140.swf",
+    "sprite": 0,
+    "sourceFrames": 15,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-141",
+    "title": "摩尔时报·第141期",
+    "description": "庄园早期《摩尔时报》档案，第 141 期。",
+    "source": "resource/monthly/2011/141.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-142",
+    "title": "摩尔时报·第142期",
+    "description": "庄园早期《摩尔时报》档案，第 142 期。",
+    "source": "resource/monthly/2011/142.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-143",
+    "title": "摩尔时报·第143期",
+    "description": "庄园早期《摩尔时报》档案，第 143 期。",
+    "source": "resource/monthly/2011/143.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-144",
+    "title": "摩尔时报·第144期",
+    "description": "庄园早期《摩尔时报》档案，第 144 期。",
+    "source": "resource/monthly/2011/144.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-145",
+    "title": "摩尔时报·第145期",
+    "description": "庄园早期《摩尔时报》档案，第 145 期。",
+    "source": "resource/monthly/2011/145.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-146",
+    "title": "摩尔时报·第146期",
+    "description": "庄园早期《摩尔时报》档案，第 146 期。",
+    "source": "resource/monthly/2011/146.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-147",
+    "title": "摩尔时报·第147期",
+    "description": "庄园早期《摩尔时报》档案，第 147 期。",
+    "source": "resource/monthly/2011/147.swf",
+    "sprite": 0,
+    "sourceFrames": 10,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-148",
+    "title": "摩尔时报·第148期",
+    "description": "庄园早期《摩尔时报》档案，第 148 期。",
+    "source": "resource/monthly/2011/148.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-149",
+    "title": "摩尔时报·第149期",
+    "description": "庄园早期《摩尔时报》档案，第 149 期。",
+    "source": "resource/monthly/2011/149.swf",
+    "sprite": 0,
+    "sourceFrames": 10,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-150",
+    "title": "摩尔时报·第150期",
+    "description": "庄园早期《摩尔时报》档案，第 150 期。",
+    "source": "resource/monthly/2011/150.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-151",
+    "title": "摩尔时报·第151期",
+    "description": "庄园早期《摩尔时报》档案，第 151 期。",
+    "source": "resource/monthly/2011/151.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-152",
+    "title": "摩尔时报·第152期",
+    "description": "庄园早期《摩尔时报》档案，第 152 期。",
+    "source": "resource/monthly/2011/152.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-153",
+    "title": "摩尔时报·第153期",
+    "description": "庄园早期《摩尔时报》档案，第 153 期。",
+    "source": "resource/monthly/2011/153.swf",
+    "sprite": 0,
+    "sourceFrames": 12,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-154",
+    "title": "摩尔时报·第154期",
+    "description": "庄园早期《摩尔时报》档案，第 154 期。",
+    "source": "resource/monthly/2011/154.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-155",
+    "title": "摩尔时报·第155期",
+    "description": "庄园早期《摩尔时报》档案，第 155 期。",
+    "source": "resource/monthly/2011/155.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-156",
+    "title": "摩尔时报·第156期",
+    "description": "庄园早期《摩尔时报》档案，第 156 期。",
+    "source": "resource/monthly/2011/156.swf",
+    "sprite": 0,
+    "sourceFrames": 9,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-157",
+    "title": "摩尔时报·第157期",
+    "description": "庄园早期《摩尔时报》档案，第 157 期。",
+    "source": "resource/monthly/2011/157.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-158",
+    "title": "摩尔时报·第158期",
+    "description": "庄园早期《摩尔时报》档案，第 158 期。",
+    "source": "resource/monthly/2011/158.swf",
+    "sprite": 0,
+    "sourceFrames": 11,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-159",
+    "title": "摩尔时报·第159期",
+    "description": "庄园早期《摩尔时报》档案，第 159 期。",
+    "source": "resource/monthly/2011/159.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-160",
+    "title": "摩尔时报·第160期",
+    "description": "庄园早期《摩尔时报》档案，第 160 期。",
+    "source": "resource/monthly/2011/160.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-161",
+    "title": "摩尔时报·第161期",
+    "description": "庄园早期《摩尔时报》档案，第 161 期。",
+    "source": "resource/monthly/2011/161.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-162",
+    "title": "摩尔时报·第162期",
+    "description": "庄园早期《摩尔时报》档案，第 162 期。",
+    "source": "resource/monthly/2011/162.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-163",
+    "title": "摩尔时报·第163期",
+    "description": "庄园早期《摩尔时报》档案，第 163 期。",
+    "source": "resource/monthly/2011/163.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-164",
+    "title": "摩尔时报·第164期",
+    "description": "庄园早期《摩尔时报》档案，第 164 期。",
+    "source": "resource/monthly/2011/164.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-165",
+    "title": "摩尔时报·第165期",
+    "description": "庄园早期《摩尔时报》档案，第 165 期。",
+    "source": "resource/monthly/2011/165.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-166",
+    "title": "摩尔时报·第166期",
+    "description": "庄园早期《摩尔时报》档案，第 166 期。",
+    "source": "resource/monthly/2011/166.swf",
+    "sprite": 0,
+    "sourceFrames": 18,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-167",
+    "title": "摩尔时报·第167期",
+    "description": "庄园早期《摩尔时报》档案，第 167 期。",
+    "source": "resource/monthly/2011/167.swf",
+    "sprite": 0,
+    "sourceFrames": 19,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-168",
+    "title": "摩尔时报·第168期",
+    "description": "庄园早期《摩尔时报》档案，第 168 期。",
+    "source": "resource/monthly/2011/168.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-169",
+    "title": "摩尔时报·第169期",
+    "description": "庄园早期《摩尔时报》档案，第 169 期。",
+    "source": "resource/monthly/2011/169.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-170",
+    "title": "摩尔时报·第170期",
+    "description": "庄园早期《摩尔时报》档案，第 170 期。",
+    "source": "resource/monthly/2011/170.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-171",
+    "title": "摩尔时报·第171期",
+    "description": "庄园早期《摩尔时报》档案，第 171 期。",
+    "source": "resource/monthly/2011/171.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-172",
+    "title": "摩尔时报·第172期",
+    "description": "庄园早期《摩尔时报》档案，第 172 期。",
+    "source": "resource/monthly/2011/172.swf",
+    "sprite": 0,
+    "sourceFrames": 21,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-173",
+    "title": "摩尔时报·第173期",
+    "description": "庄园早期《摩尔时报》档案，第 173 期。",
+    "source": "resource/monthly/2011/173.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-174",
+    "title": "摩尔时报·第174期",
+    "description": "庄园早期《摩尔时报》档案，第 174 期。",
+    "source": "resource/monthly/2011/174.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-175",
+    "title": "摩尔时报·第175期",
+    "description": "庄园早期《摩尔时报》档案，第 175 期。",
+    "source": "resource/monthly/2011/175.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-176",
+    "title": "摩尔时报·第176期",
+    "description": "庄园早期《摩尔时报》档案，第 176 期。",
+    "source": "resource/monthly/2011/176.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-177",
+    "title": "摩尔时报·第177期",
+    "description": "庄园早期《摩尔时报》档案，第 177 期。",
+    "source": "resource/monthly/2011/177.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-178",
+    "title": "摩尔时报·第178期",
+    "description": "庄园早期《摩尔时报》档案，第 178 期。",
+    "source": "resource/monthly/2011/178.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-179",
+    "title": "摩尔时报·第179期",
+    "description": "庄园早期《摩尔时报》档案，第 179 期。",
+    "source": "resource/monthly/2011/179.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-180",
+    "title": "摩尔时报·第180期",
+    "description": "庄园早期《摩尔时报》档案，第 180 期。",
+    "source": "resource/monthly/2011/180.swf",
+    "sprite": 0,
+    "sourceFrames": 13,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-181",
+    "title": "摩尔时报·第181期",
+    "description": "庄园早期《摩尔时报》档案，第 181 期。",
+    "source": "resource/monthly/2011/181.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-182",
+    "title": "摩尔时报·第182期",
+    "description": "庄园早期《摩尔时报》档案，第 182 期。",
+    "source": "resource/monthly/2011/182.swf",
+    "sprite": 0,
+    "sourceFrames": 14,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-183",
+    "title": "摩尔时报·第183期",
+    "description": "庄园早期《摩尔时报》档案，第 183 期。",
+    "source": "resource/monthly/2011/183.swf",
+    "sprite": 0,
+    "sourceFrames": 17,
+    "pageFormat": "webp"
+  },
+  {
+    "id": "gazette-184",
+    "title": "摩尔时报·第184期",
+    "description": "庄园早期《摩尔时报》档案，第 184 期。",
+    "source": "resource/monthly/2011/184.swf",
+    "sprite": 0,
+    "sourceFrames": 16,
+    "pageFormat": "webp"
+  }
+]

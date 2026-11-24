@@ -13,6 +13,6 @@ const dependencies=[
  const generated=path.join(cache,'generated/com/molebaby/ramu/BuildConfig.java'),classes=path.join(cache,'classes');fs.mkdirSync(path.dirname(generated),{recursive:true});fs.mkdirSync(classes,{recursive:true});
  fs.writeFileSync(generated,'package com.molebaby.ramu; final class BuildConfig { static final String VERSION_NAME="transport-test"; }\n');
  const source=path.join(root,'android/app/src/main/java/com/molebaby/ramu'),test=path.join(root,'android/app/src/test/java/com/molebaby/ramu');
- cp.execFileSync('javac',['--release','17','-cp',path.join(cache,'*'),'-d',classes,generated,...['DeltaPlan','UpdateTransport','SafeFiles','Json'].map(n=>path.join(source,n+'.java')),...['DeltaDownloadTest','HttpDeltaIntegrationTest'].map(n=>path.join(test,n+'.java'))],{stdio:'inherit'});
- cp.execFileSync('java',['-cp',path.join(cache,'*')+path.delimiter+classes,'org.junit.runner.JUnitCore','com.molebaby.ramu.DeltaDownloadTest','com.molebaby.ramu.HttpDeltaIntegrationTest'],{stdio:'inherit'});
+ cp.execFileSync('javac',['--release','17','-cp',path.join(cache,'*'),'-d',classes,generated,...['DeltaPlan','UpdateTransport','SafeFiles','Json','BookAssetSource'].map(n=>path.join(source,n+'.java')),...['DeltaDownloadTest','HttpDeltaIntegrationTest','BookAssetSourceTest'].map(n=>path.join(test,n+'.java'))],{stdio:'inherit'});
+ cp.execFileSync('java',['-cp',path.join(cache,'*')+path.delimiter+classes,'org.junit.runner.JUnitCore','com.molebaby.ramu.DeltaDownloadTest','com.molebaby.ramu.HttpDeltaIntegrationTest','com.molebaby.ramu.BookAssetSourceTest'],{stdio:'inherit'});
 })().catch(e=>{console.error(e);process.exitCode=1});

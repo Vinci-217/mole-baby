@@ -1,6 +1,6 @@
 import {gamePrizeChoices} from './game-prizes';
 import {ALL_OUTFITS} from './wardrobe';
-import {FURNITURE} from './room-furnishings';
+import {FURNITURE} from './furniture-catalog';
 import {ITEMS} from './catalog';
 import {gameBeans} from './economy';
 import {describe,it,expect} from 'vitest';

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { chooseIdleBehavior, idleCandidates, idleDelay, IDLE_ACTIONS } from './idle-behavior'
+import { canShowIdleGesture, chooseIdleBehavior, chooseScheduledIdleAction, idleCandidates, validIdleIntervalSeconds, IDLE_ACTIONS } from './idle-behavior'
 import type { IdleAction } from './idle-behavior'
 import {  createMemory, recordCare } from './companion-memory'
-import { createPet, STAGES } from './game'
+import { createPet, getPetCondition, STAGES } from './game'
 import type { Evolution, Stage } from './game'
 import { getRamActionDuration, sampleFlyingPose, sampleSeedPose } from './components/ram-animation'
 import { groundedMotion, usesGroundedPose } from './grounded-motion'
@@ -10,10 +10,13 @@ import { socialSoundScore } from './pet-sound-score'
 import {ramForm} from './original-actions'
 import {isPastime} from './pet-pastimes'
 import {isEmotionClip} from './mood-motion'
+import {autonomousOriginalActions, isAutonomousMagic, naturalOriginalActions} from './pet-original-actions'
 
 const NOW = Date.UTC(2026, 9, 22, 9)
 function petAt(stage: Stage) {
-  return { ...createPet('团团', 'red', NOW - 86_400_000), growth: STAGES[stage].threshold, ...(stage === 4 ? { evolution: 'super' as const } : {}) }
+  return { ...createPet('团团', 'red', NOW - 86_400_000), growth: STAGES[stage].threshold,
+    ...(stage >= 2 ? { education: { lessons: { magic: 1 }, graduated: { magic: NOW } } } : {}),
+    ...(stage === 4 ? { evolution: 'super' as const } : {}) }
 }
 function sequence(stage: Stage, count = 240) {
   const pet = petAt(stage), memory = { ...createMemory(pet), personality: '喜欢留意小细节，语气轻快' }
@@ -30,7 +33,7 @@ describe('stage-aware spontaneous original gestures', () => {
   it('varies every stage without successive repeats, walks, user props or indefinite actions', () => {
     const stages = ([0, 1, 2, 3, 4] as Stage[]).map(stage => sequence(stage))
     for (const [stage,entries] of stages.entries()) {
-      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS.filter(action=>!['mood-dozy','mood-grumpy'].includes(action)&&(stage>=2||action!=='spell'))))
+      expect(new Set(entries.map(entry => entry.action))).toEqual(new Set(IDLE_ACTIONS.filter(action=>!['mood-dozy','mood-grumpy','spell'].includes(action))))
       for (const entry of entries) {
         expect(entry.duration).toBe(getRamActionDuration(entry.action,ramForm(stage as Stage,stage===4?'super':undefined)))
         expect(entry.duration).toBeGreaterThan(0)
@@ -77,21 +80,73 @@ describe('stage-aware spontaneous original gestures', () => {
     expect(JSON.stringify({ pet: cheerfulPet, memory: cared })).toBe(before)
   })
 
-  it('never starts a gesture while asleep or when critical care should remain visible', () => {
-    const pet = petAt(0), memory = createMemory(pet)
+  it('keeps quiet gestures available for a pet that needs care while guarding active play', () => {
+    const pet = petAt(2), memory = createMemory(pet)
     expect(chooseIdleBehavior({ ...pet, sleeping: true }, memory, 0, undefined, NOW)).toBeNull()
     for (const [key, value] of [['health', 35], ['hunger', 29], ['thirst', 29], ['cleanliness', 29], ['energy', 24]] as const) {
-      expect(chooseIdleBehavior({ ...pet, stats: { ...pet.stats, [key]: value } }, memory, 0, undefined, NOW)).toBeNull()
+      const needsCare = { ...pet, stats: { ...pet.stats, [key]: value } }
+      expect(canShowIdleGesture(needsCare)).toBe(true)
+      expect(autonomousOriginalActions(needsCare)).toEqual([])
+      const first = chooseScheduledIdleAction(needsCare, memory, 0, undefined, () => 0)
+      if(key==='hunger'||key==='thirst'){
+        const action=key==='hunger'?'ambient-hungry':'ambient-thirsty'
+        expect(first).toBe(action)
+        const second = chooseScheduledIdleAction(needsCare, memory, 1, first, () => 0)
+        expect(['mood-content','look-around','waving']).toContain(second)
+        expect(chooseScheduledIdleAction(needsCare, memory, 2, second, () => 0)).toBe(action)
+        continue
+      }
+      expect(['mood-dozy','mood-content','look-around','waving']).toContain(first)
+      expect(chooseScheduledIdleAction(needsCare, memory, 1, first, () => 0)).not.toBe(first)
     }
   })
 
-  it('keeps the existing 2–4 minute cadence finite and deterministic for every pet', () => {
-    const delays = Array.from({ length: 200 }, (_, index) => idleDelay(NOW, index))
-    expect(Math.min(...delays)).toBeGreaterThanOrEqual(120_000)
-    expect(Math.max(...delays)).toBeLessThanOrEqual(240_000)
-    expect(new Set(delays).size).toBe(delays.length)
-    expect(idleDelay(NOW, 5)).toBe(delays[5])
-    expect(idleDelay(NaN, Infinity)).toBe(120_000)
+  it('takes turns showing hunger and thirst on every form without applying care', () => {
+    for(const stage of [0,1,2,3,4] as const){
+      const base=petAt(stage),pet={...base,stats:{...base.stats,hunger:27,thirst:18}}
+      const before=JSON.stringify(pet)
+      const first=chooseScheduledIdleAction(pet,undefined,0,undefined,()=>0)
+      expect(first).toBe('ambient-thirsty')
+      expect(chooseScheduledIdleAction(pet,undefined,1,first,()=>0)).toBe('ambient-hungry')
+      expect(chooseScheduledIdleAction({...pet,sleeping:true},undefined,1,first,()=>0)).toBeUndefined()
+      expect(JSON.stringify(pet)).toBe(before)
+    }
+  })
+
+  it('plays light expressions while still visibly well at 25–29 energy', () => {
+    const base = petAt(2)
+    for (const energy of [25, 28, 29.999]) {
+      const tired = { ...base, stats: { ...base.stats, energy } }
+      expect(getPetCondition(tired).id).toBe('healthy')
+      expect(canShowIdleGesture(tired)).toBe(true)
+      expect(autonomousOriginalActions(tired)).toEqual([])
+      expect(['mood-dozy', 'mood-content', 'look-around']).toContain(chooseScheduledIdleAction(tired, undefined, 0, undefined, () => 0))
+    }
+  })
+
+  it('plays original classroom actions by default and mixes in infrequent learned magic only when enabled', () => {
+    const middle = petAt(2)
+    const classroom = naturalOriginalActions('middle').map(row => 'ambient-' + row.id)
+    const first = chooseScheduledIdleAction(middle, undefined, 0, undefined, () => 0)
+    expect(classroom).toContain(first)
+    expect(chooseScheduledIdleAction(middle, undefined, 1, first, () => 0)).not.toBe(first)
+    expect(isAutonomousMagic(chooseScheduledIdleAction(middle, undefined, 0, undefined, () => .999, NOW))).toBe(false)
+    expect(chooseScheduledIdleAction(middle, undefined, 0, undefined, () => .1, NOW, true)).toBe('spell')
+    expect(isAutonomousMagic(chooseScheduledIdleAction(middle, undefined, 1, 'spell', () => .1, NOW, true))).toBe(false)
+    expect(isAutonomousMagic(chooseScheduledIdleAction(middle, undefined, 0, undefined, () => .3, NOW, true))).toBe(false)
+    const untrained = { ...middle, education: undefined }
+    expect(idleCandidates(untrained).map(candidate => candidate.action)).not.toContain('spell')
+    expect(autonomousOriginalActions(untrained)).not.toContain('spell')
+    expect(isAutonomousMagic(chooseScheduledIdleAction(untrained, undefined, 0, undefined, () => .1, NOW, true))).toBe(false)
+  })
+
+  it('defaults old or invalid preferences to 120 seconds and accepts custom whole seconds', () => {
+    for (const invalid of [undefined, null, '30', NaN, Infinity, -120, 0, 9, 30.5, 3601]) {
+      expect(validIdleIntervalSeconds(invalid)).toBe(120)
+    }
+    for (const seconds of [10, 30, 120, 180, 3600]) {
+      expect(validIdleIntervalSeconds(seconds)).toBe(seconds)
+    }
   })
 
   it('uses bounded original seed/grounded expressions and completes them instead of moving the pot', () => {

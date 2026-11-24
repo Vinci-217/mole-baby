@@ -57,11 +57,12 @@ self.addEventListener('fetch',event=>{
    try{return await fetch(request)}catch{return new Response('<!doctype html><meta charset="utf-8"><p>页面尚未缓存，请联网打开一次。原有存档仍保存在此浏览器中。</p>',{status:503,headers:{'Content-Type':'text/html; charset=utf-8'}})}
   })());return;
  }
- if(!relative.startsWith('assets/')&&!relative.startsWith('icons/')&&relative!=='manifest.webmanifest')return;
+ if(!relative.startsWith('assets/')&&!relative.startsWith('icons/')&&relative!=='manifest.webmanifest'&&relative!=='book-packs.json')return;
  event.respondWith((async()=>{
   const key=keyFor(url),cached=await cachedAsset(key);
   if(cached)return fromCache(cached,relative.endsWith('.html'));
-  const response=await fetch(request);
+  let response;
+  try{response=await fetch(request)}catch{return Response.error()}
   // Never permanently cache an auth page or an SPA fallback for missing art.
   const html=response.headers.get('Content-Type')?.includes('text/html');
   if(response.status===200&&(!html||relative.endsWith('.html')))event.waitUntil(remember(key,response.clone()));

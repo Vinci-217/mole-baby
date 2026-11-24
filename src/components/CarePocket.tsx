@@ -6,7 +6,7 @@ import {inventoryItems} from '../catalog';
 import {petColorName} from '../pet-color';
 import {ramForm} from '../original-actions';
 import {uploadedMotion} from '../uploaded-actions';
-import {preloadUploadedFrames} from './UploadedLamuFrames';
+import {loadFrameClip} from '../frame-clips';
 export type PocketCategory=ItemCategory;
 export function itemEffectLine(item:PetItem){if(item.changesColor)return `变为${petColorName(item.changesColor)}`;if(item.reusable)return '可反复玩 · 不消耗数量';return ([['hunger','饱食'],['thirst','水分'],['cleanliness','清洁'],['happiness','心情'],['health','健康'],['energy','精力']] as const).filter(([key])=>(item[key]??0)>0).map(([key,label])=>`${label} +${item[key]}`).join(' · ')}
 export interface CarePocketProps{pet:GameState;initialCategory?:PocketCategory;visit?:number;onCare:(action:Action,id?:string)=>void;onVisitShop?:()=>void;busy?:boolean;busyItemId?:string;compact?:boolean;onClose?:()=>void}
@@ -26,7 +26,7 @@ export default function CarePocket({pet,initialCategory='food',visit,onCare,onVi
  const owned=slots.map(id=>getItem(id)!).filter(item=>item&&item.category===category),pages=Math.max(1,Math.ceil(owned.length/16)),currentPage=Math.min(page,pages-1),visible=owned.slice(currentPage*16,currentPage*16+16),stage=getStage(pet.growth,pet.evolution);
  const reasonFor=(item:PetItem)=>!(pet.inventory[item.id]??0)?'已经用完':pet.sleeping&&!['180006','energy-drink'].includes(item.id)?'先叫醒拉姆':stage<item.minStage?'长大一点再用':item.changesColor===pet.color?'已经是这个颜色':undefined;
  const describe=(item:PetItem)=>`${item.name} ×${pet.inventory[item.id]??0} · ${reasonFor(item)??itemEffectLine(item)}`;
- const warm=(item:PetItem)=>{if(reasonFor(item))return;const spec=uploadedMotion(ramForm(stage,pet.evolution),'use',item.id);if(spec)void preloadUploadedFrames(spec,pet.color).catch(()=>{})};
+ const warm=(item:PetItem)=>{if(reasonFor(item))return;const spec=uploadedMotion(ramForm(stage,pet.evolution),'use',item.id);if(spec)void loadFrameClip(spec).catch(()=>{})};
  const hintItem=visible.find(item=>item.id===(hovered??focused));
  useEffect(clearHint,[category,currentPage,visit,pet.createdAt,compact,pet.inventory]);
  return <section className={`care-pocket care-inventory ${compact?'pocket-compact':''}`} aria-label="拉姆用品背包" aria-busy={Boolean(busyItemId)}>

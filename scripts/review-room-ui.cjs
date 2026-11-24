@@ -18,7 +18,7 @@ async function placeBoard(p){
   const start=await card.boundingBox(),target=await layer.boundingBox(),x=start.x+start.width/2,y=start.y+start.height/2,end={x:target.x+target.width*.3,y:target.y+target.height*.35},input=await p.context().newCDPSession(p);
   try{await input.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});for(let i=1;i<=15;i++){await input.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+(end.x-x)*i/15,y:y+(end.y-y)*i/15,id:1}]});await p.waitForTimeout(20)}await input.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}finally{await input.detach()}
  }else{const rect=await layer.boundingBox();await card.dragTo(layer,{targetPosition:{x:rect.width*.3,y:rect.height*.35}})}
- await expect.poll(async()=>(await saved(p)).room.placed.some(item=>item.id==='message-board')).toBe(true);await expect(p.getByRole('dialog',{name:'小屋留言板',exact:true})).toHaveCount(0);await drawer.getByRole('button',{name:'完成布置',exact:true}).click();
+ await expect.poll(async()=>(await saved(p)).room.placed.some(item=>item.id==='message-board')).toBe(true);await expect(p.getByRole('dialog',{name:'小屋留言板',exact:true})).toHaveCount(0);await p.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
 }
 async function pocketLayout(p,compact){
  const pocket=p.locator('.care-inventory');await expect(pocket).toBeVisible();
@@ -35,7 +35,17 @@ async function pocketLayout(p,compact){
   await expect(p.getByTestId('desktop-character').locator('canvas[data-loaded=true]').first()).toBeVisible({timeout:15000});
   await p.getByRole('button',{name:'打开拉姆背包',exact:true}).click();await pocketLayout(p,true);await p.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await p.getByTestId('desktop-condition').click();const status=p.locator('.status-pocket');await expect(status).toBeVisible();const bars=await status.locator('progress').evaluateAll(xs=>xs.map(e=>e.getBoundingClientRect().width));assert.equal(bars.length,6);assert.ok(bars.every(w=>w>90),'Status uses the full pocket width');await p.screenshot({path:path.join(out,`desktop-status-${viewport.width}.png`)});await p.getByRole('button',{name:'关闭小窗',exact:true}).click();
-  await enterHome(p);await placeBoard(p);await roomTab(p,'状态');assert.equal(await p.getByRole('button',{name:/看看我的心情|回应心情/}).count(),0);const profile=await p.locator('.room-pet-card').evaluate(e=>({right:e.getBoundingClientRect().right,save:e.querySelector('form button').getBoundingClientRect().right}));assert.ok(profile.save<=profile.right-8,'Name form fits inside the status card');await p.screenshot({path:path.join(out,`room-status-${viewport.width}.png`)});
+  await enterHome(p);await placeBoard(p);await roomTab(p,'状态');
+  const portrait=p.locator('.room-pet-portrait > .ram-sprite');
+  const canvas=portrait.locator('canvas[data-loaded=true]').first();
+  await expect(canvas).toBeVisible();
+  const pixels=()=>canvas.evaluate(node=>node.toDataURL());
+  const firstFrame=await pixels();
+  await expect.poll(pixels,{timeout:8000}).not.toBe(firstFrame);
+  await p.getByRole('button',{name:'回应心情',exact:true}).click();
+  await expect(portrait).toHaveAttribute('data-action','mood-joy');
+  await expect(p.locator('.room-pet-mood-reply')).toContainText('bibo');
+  const profile=await p.locator('.room-pet-card').evaluate(e=>({right:e.getBoundingClientRect().right,save:e.querySelector('form button').getBoundingClientRect().right}));assert.ok(profile.save<=profile.right-8,'Name form fits inside the status card');await p.screenshot({path:path.join(out,`room-status-${viewport.width}.png`)});
   await p.locator('.paper-tabs').getByRole('button',{name:'背包',exact:true}).click();await pocketLayout(p,false);const nav=await p.locator('.paper-tabs button').evaluateAll(xs=>xs.map(x=>x.getBoundingClientRect().toJSON()));assert.ok(nav.every(x=>x.height<=28&&Math.abs(x.y-nav[0].y)<2),'Room tabs remain a small single row');await p.getByRole('button',{name:'关闭面板',exact:true}).click();
   await p.getByRole('button',{name:'小屋留言板',exact:true}).click();const board=p.getByRole('dialog',{name:'小屋留言板',exact:true});await expect(board).toBeVisible();assert.equal(await board.locator('.paper-tabs').count(),0);await expect(board.locator('.message-card-content')).toHaveCount(6);const artwork=await board.locator('.message-board-original-art').evaluate(async im=>{await im.decode();return {src:im.src,width:im.naturalWidth}});assert.ok(artwork.src.includes('message-board/window.'));assert.equal(artwork.width,1540);
   await p.screenshot({path:path.join(out,`official-board-${viewport.width}.png`)});

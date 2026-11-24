@@ -14,6 +14,9 @@ import type {Stage,Evolution} from '../game';
 import type {RamForm} from '../original-actions';
 import {playToolClip,playToolSource} from '../original-play-tools';
 import {originalCareClip} from '../original-care';
+import {keepsOutfitForIdleAction} from '../ram-action';
+import {originalStudyClip} from '../ram-study';
+import {usesBareBodyMotion} from '../pet-original-actions';
 
 const forms:[Stage,Evolution|undefined,RamForm][]=[[1,undefined,'junior'],[2,undefined,'middle'],[3,undefined,'senior'],[4,'classic','classic'],[4,'super','super'],[4,'water','water'],[4,'wood','wood'],[4,'fire','fire']];
 describe('every costume retains its rig throughout ordinary interactions',()=>{
@@ -28,16 +31,16 @@ describe('every costume retains its rig throughout ordinary interactions',()=>{
     expect(html).toContain(`data-form="${officialOutfitForm(clip,form)}"`);
     expect(html).toContain(`data-growth-stage="${stage}"`);
     expect(html).not.toContain('ram-outfit-action');
-    expect(html).not.toContain('ram-football-frame');
     if(action==='pet')expect(html).toContain('data-petting-adaptation="project"');
     if(action==='drag')expect(html).toContain('data-drag-adaptation="project"');
     if(action==='dizzy')expect(html).toContain('social-dizzy-stars');
     if(action==='play'){
-     expect(html).not.toContain('social-ball');expect(html).toContain('data-animation-mode="original-tool"');
-     expect(html).toContain(`data-tool-source="${playToolClip(form,'play')!.path}"`);
-     expect(html).toContain('class="ram-original-tool"');expect(html).toContain('data-uploaded-id="180004"');
+     expect(html).not.toContain('social-ball');expect(html).toContain('data-animation-mode="body"');
+     expect(html).toContain('class="ram-original-body"');expect(html).toContain('ram-football-frame');
     }
-    if(action==='focus')expect(html).toContain('social-book');
+    if(action==='focus'){
+     expect(html).toContain(`data-source="${originalStudyClip(form,'read')!.path}"`);
+    }
    }
   }
  },20000);
@@ -56,7 +59,10 @@ describe('every costume retains its rig throughout ordinary interactions',()=>{
  it('keeps growth, colour, possessions and earned memories independent of adapted gestures',()=>{
   const pet={...createPet('保留旧记忆','blue',Date.UTC(2026,10,8)),growth:840,evolution:'super' as const,naturalGrowth:180,highestGrowth:420,growthLocked:true,wearing:'warm-scarf' as const,wardrobe:['warm-scarf' as const],color:'#9c5fd4' as const};
   const snapshot=JSON.stringify(pet);
-  for(const action of RAM_ACTIONS)expect(petActionAppearance(pet,action).form).toBe(playToolSource(action)||originalCareClip('super',action)?'super':'junior');
+  for(const action of RAM_ACTIONS){
+   const usesStandaloneClip=usesBareBodyMotion('super',action)||!keepsOutfitForIdleAction(action)&&(playToolSource(action)||originalCareClip('super',action));
+   expect(petActionAppearance(pet,action).form).toBe(usesStandaloneClip?'super':'junior');
+  }
   expect(petAppearance(pet).form).toBe('junior');expect(autonomousOriginalActions(pet).length).toBeGreaterThan(0);
   expect(JSON.stringify(pet)).toBe(snapshot);
   const undressed={...pet,wearing:undefined};expect(petActionAppearance(undressed,'idle').form).toBe('super');
@@ -68,6 +74,56 @@ describe('every costume retains its rig throughout ordinary interactions',()=>{
   for(const [stage,evolution] of forms){
    const props={stage,evolution,color:'blue' as const,costume:'warm-scarf'};
    expect(renderToStaticMarkup(<Ram {...props} action="official-9e6191f95c9ab5ea"/>)).toBe(renderToStaticMarkup(<Ram {...props} action="play"/>));
+  }
+ });
+ it('uses the current form’s original football frames during scheduled play and preserves the outfit for afterward',()=>{
+  vi.stubGlobal('window',{});
+  for(const [stage,evolution,form] of forms){
+   const football=`ambient-${playToolClip(form,'play')!.id}`;
+   for(const action of [football,'play-alone']){
+    const props={stage,evolution,color:'blue' as const,action};
+    const dressed=renderToStaticMarkup(<Ram {...props} costume="warm-scarf"/>);
+    expect(dressed).toContain('class="ram-outfit-source" style="visibility:hidden"');
+    expect(dressed).toContain('ram-football-frame');
+    expect(dressed).not.toContain('social-ball');
+    expect(dressed).not.toContain('class="ram-original-tool"');
+    if(stage===4&&form!=='classic'){
+     const bare=renderToStaticMarkup(<Ram {...props}/>);
+     expect(bare).toContain('ram-football-frame');
+     expect(bare).toContain(`data-form="${form}"`);
+     expect(bare).not.toContain('data-source-form="classic"');
+    }
+   }
+  }
+ });
+ it('plays the scheduled classic school timeline with or without a divine outfit',()=>{
+  vi.stubGlobal('window',{});
+  const clip=OFFICIAL_CLIPS.find(c=>c.path.endsWith('/pet101Movie/15.swf'))!;
+  const younger=OFFICIAL_CLIPS.find(c=>c.path.endsWith('/pet2Movie/15.swf'))!;
+  const action='ambient-'+younger.id;
+  for(const costume of [undefined,'wizard-cap','magic-book']){
+   const html=renderToStaticMarkup(<Ram stage={4} evolution="super" costume={costume} color="blue" action={action}/>);
+   expect(html).toContain(`data-source="${clip.path}"`);
+   expect(html).toContain('data-form="classic"');
+   if(costume){
+    expect(html).toContain('data-animation-mode="original-ambient"');
+    expect(html).toContain(`data-source="${outfitAnimation(costume)!.path}"`);
+    expect(html).toContain('data-growth-form="super"');
+   }
+  }
+ });
+ it('plays the next available resurrection cross frames without changing the saved form or outfit',()=>{
+  vi.stubGlobal('window',{});
+  for(const evolution of ['classic','super','water','wood','fire'] as const){
+   const pet={...createPet('小叶','blue'),growth:840,evolution,wearing:'wizard-cap' as const};
+   const action='original-use-180006';
+   expect(petActionAppearance(pet,action,'180006').form).toBe(evolution);
+   const html=renderToStaticMarkup(<Ram stage={4} evolution={evolution} costume={pet.wearing} color={pet.color} action={action} itemId="180006"/>);
+   expect(html).toContain('data-animation-mode="original-care"');
+   expect(html).toContain('data-care-source="resource/pet/swf/pet4/180006.swf"');
+   expect(html).toContain('data-source-form="senior"');
+   expect(html).toContain('data-uploaded-id="180006"');
+   expect(html).toContain(`data-growth-form="${evolution}"`);
   }
  });
 });

@@ -1,5 +1,6 @@
 'use strict';
 const {chromium,expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
+const {placeMusicBox}=require('./smoke-helpers.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v32'),origin=process.env.MOLE_UPGRADE_URL||'http://127.0.0.1:5244';
 const server=process.env.MOLE_UPGRADE_URL?null:spawn(process.execPath,[path.join(root,'node_modules/vite/bin/vite.js'),'preview','--host','127.0.0.1','--port','5244','--strictPort'],{cwd:root,stdio:'ignore'});
 function fixture({corrupt=false,seed=false}={}){
@@ -7,10 +8,10 @@ function fixture({corrupt=false,seed=false}={}){
  if(localStorage.getItem('ramu-house-save-v1')===null)localStorage.setItem('ramu-house-save-v1',corrupt?'broken original save':JSON.stringify(save));
  if(localStorage.getItem('ramu-house-preferences-v2')===null)localStorage.setItem('ramu-house-preferences-v2',JSON.stringify({lively:false,presence:false,outings:false,reminders:false,sound:false,roomWander:false}));
  const state={petMode:false,alwaysOnTop:true,wandering:false,companionPanel:false,panelSide:'right',edgeHiding:false,edgeSide:null,edgePose:'visible',windowVisible:true},listeners=new Set(),modes=new Set();
- window.__upgradeNative={state,music:null,toggleMusic:null,tracks:[]};
+ window.__upgradeNative={state,music:null,tracks:[]};
  const NativeAudio=window.Audio;window.Audio=function(...args){const element=new NativeAudio(...args);window.__upgradeNative.tracks.push(element);return element;};window.Audio.prototype=NativeAudio.prototype;
  window.desktop=new Proxy({isElectron:false,platform:'darwin',messageBoard:undefined,getState:async()=>({...state}),updates:{onPrepare:()=>()=>{},onStateChanged:()=>()=>{},getState:async()=>null,setBusy(){}},
- onStateChanged:callback=>{listeners.add(callback);queueMicrotask(()=>callback({...state}));return()=>listeners.delete(callback)},onPetModeChanged:callback=>{modes.add(callback);return()=>modes.delete(callback)},onMusicToggle:callback=>{window.__upgradeNative.toggleMusic=callback;return()=>{}},setMusicState:async value=>{window.__upgradeNative.music=value},
+ onStateChanged:callback=>{listeners.add(callback);queueMicrotask(()=>callback({...state}));return()=>listeners.delete(callback)},onPetModeChanged:callback=>{modes.add(callback);return()=>modes.delete(callback)},setMusicState:async value=>{window.__upgradeNative.music=value},
  setPetMode:async enabled=>{state.petMode=enabled;for(const callback of listeners)callback({...state});for(const callback of modes)callback(enabled);return enabled},
  },{get(object,key){if(key in object)return object[key];if(String(key).startsWith('on'))return()=>()=>{};return()=>Promise.resolve(true)}});
 }
@@ -24,7 +25,7 @@ async function openBoard(p){
  assert.equal(await p.locator('.room-dock').getByRole('button',{name:/留言板/}).count(),0);
  if(!await p.locator('.room-placed-item[data-furniture=message-board]').count()){
   await p.getByRole('button',{name:'布置小屋',exact:true}).click();const drawer=p.getByRole('complementary',{name:'小屋布置工具'}),card=drawer.locator('.warehouse-drag-card'),layer=p.locator('.time-scene>.room-furnishing-layer.is-editing');
-  await card.scrollIntoViewIfNeeded();const box=await layer.boundingBox();await card.dragTo(layer,{targetPosition:{x:box.width*.3,y:box.height*.35}});await expect(p.locator('.room-placed-item[data-furniture=message-board]')).toHaveCount(1);await drawer.getByRole('button',{name:'完成布置',exact:true}).click();
+  await card.scrollIntoViewIfNeeded();const box=await layer.boundingBox();await card.dragTo(layer,{targetPosition:{x:box.width*.3,y:box.height*.35}});await expect(p.locator('.room-placed-item[data-furniture=message-board]')).toHaveCount(1);await p.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
  }
  // Verify keyboard access even when the pet overlaps the furnishing in a short room.
  const trigger=p.getByRole('button',{name:'小屋留言板',exact:true});await trigger.focus();await trigger.press('Enter');const board=p.getByRole('dialog',{name:'小屋留言板',exact:true});await expect(board).toBeVisible();return board;
@@ -37,14 +38,23 @@ async function openBoard(p){
  const board=await openBoard(p);await board.getByRole('button',{name:'我要留言',exact:true}).click();await p.locator('#board-note').fill('明天陪拉姆去学院\n记得喝水');await p.getByRole('button',{name:'保存',exact:true}).click();await expect.poll(async()=>(await save(p)).notes.length).toBe(1);await expect(board.locator('.message-card')).toHaveCount(1);
  await board.getByRole('button',{name:'□ 待完成',exact:true}).click();await board.getByRole('button',{name:/编辑留言：明天陪拉姆/}).click();await p.locator('#board-note').fill('已经完成学院计划');await p.getByRole('button',{name:'保存',exact:true}).click();await expect.poll(async()=>(await save(p)).notes[0].text).toBe('已经完成学院计划');
  await board.getByRole('button',{name:'删除留言：已经完成学院计划',exact:true}).click();await p.getByRole('button',{name:'保留',exact:true}).click();assert.equal((await save(p)).notes.length,1);await p.screenshot({path:path.join(out,'message-board.png')});await p.keyboard.press('Escape');
- await panel(p,'陪伴设置');await expect.poll(async()=>(await music(p)).playing).toBe(true);await p.getByRole('checkbox',{name:'小屋随机走动',exact:true}).check();await p.getByRole('checkbox',{name:'小屋随机走动',exact:true}).uncheck();
+ await panel(p,'陪伴设置');await expect(p.getByRole('switch',{name:'播放背景音乐',exact:true})).toHaveCount(0);assert.equal((await music(p)).playing,false);await p.getByRole('switch',{name:'小屋随机走动',exact:true}).press('ArrowRight');await p.getByRole('switch',{name:'小屋随机走动',exact:true}).press('ArrowLeft');
  const downloadPromise=p.waitForEvent('download');await p.getByRole('button',{name:'导出存档',exact:true}).click();const download=await downloadPromise;await download.saveAs(path.join(out,'review-save.json'));const backup=JSON.parse(fs.readFileSync(path.join(out,'review-save.json')));assert.equal(backup.notes[0].text,'已经完成学院计划');assert.equal(backup.name,original.name);assert.ok(backup.companionMemory);
- await p.getByRole('button',{name:'关闭面板',exact:true}).click();await p.getByRole('button',{name:'回到桌面',exact:true}).click();await expect.poll(async()=>(await music(p)).paused).toBe(true);assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-room-media-v1')).musicEnabled),true);
- await p.evaluate(()=>window.__upgradeNative.toggleMusic(true));await expect.poll(async()=>(await music(p)).playing).toBe(true);await p.evaluate(()=>window.__upgradeNative.toggleMusic(false));await expect.poll(async()=>(await music(p)).paused).toBe(true);
+ await p.getByRole('button',{name:'关闭面板',exact:true}).click();const box=await placeMusicBox(p);await expect.poll(async()=>(await music(p)).playing).toBe(true);
+ await box.press('Enter');await p.getByRole('switch',{name:'允许后台播放音乐',exact:true}).press('ArrowRight');await p.getByRole('button',{name:'关闭面板',exact:true}).click();
+ await p.getByRole('button',{name:'回到桌面',exact:true}).click();await expect.poll(async()=>(await music(p)).playing).toBe(true);
  await p.evaluate(()=>window.desktop.setPetMode(false));await expect.poll(async()=>(await music(p)).playing).toBe(true);
- await p.getByRole('button',{name:'布置小屋',exact:true}).click();await p.getByRole('checkbox',{name:'随机播放背景音乐',exact:true}).check();let previous=(await music(p)).src;
+ await box.press('Enter');await p.getByRole('switch',{name:'允许后台播放音乐',exact:true}).press('ArrowLeft');await p.getByRole('combobox',{name:'背景音乐播放方式',exact:true}).selectOption('shuffle');await p.getByRole('button',{name:'关闭面板',exact:true}).click();let previous=(await music(p)).src;
  for(let n=0;n<8;n++){await p.evaluate(()=>window.__upgradeNative.tracks.filter(a=>a.src.includes('/original/audio/')).at(-1).dispatchEvent(new Event('ended')));await expect.poll(async()=>(await music(p)).src).not.toBe(previous);previous=(await music(p)).src;}
- const gallery=p.getByRole('group',{name:'选择小屋背景',exact:true});await gallery.getByRole('button',{name:'神秘花海',exact:true}).click();await p.getByRole('group',{name:'选择背景音乐',exact:true}).getByRole('button',{name:'神秘花海',exact:true}).click();await expect.poll(async()=>(await music(p)).ready).toBeGreaterThanOrEqual(2);await p.locator('.cottage-top').getByRole('button',{name:'完成布置',exact:true}).click();await expect(p.locator('.cottage-scene')).toHaveAttribute('data-background','mystery-flower-sea');await p.screenshot({path:path.join(out,'mystery-flower-sea.png')});
+ await p.getByRole('button',{name:'布置小屋',exact:true}).click();
+ await p.getByRole('tab',{name:'小屋风景',exact:true}).click();
+ const gallery=p.getByRole('group',{name:'选择小屋背景',exact:true});await gallery.getByRole('button',{name:'神秘花海',exact:true}).click();
+ await p.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
+ await p.locator('.room-placed-item[data-furniture="music-box"]').press('Enter');
+ await p.getByRole('group',{name:'选择背景音乐',exact:true}).getByRole('button',{name:'神秘花海',exact:true}).click();
+ await expect.poll(async()=>(await music(p)).ready).toBeGreaterThanOrEqual(2);
+ await p.getByRole('button',{name:'关闭面板',exact:true}).click();
+ await expect(p.locator('.cottage-scene')).toHaveAttribute('data-background','mystery-flower-sea');await p.screenshot({path:path.join(out,'mystery-flower-sea.png')});
  await p.reload();await home(p);assert.equal((await save(p)).notes[0].done,true);assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-preferences-v2')).roomWander),false);
  await panel(p,'成长手册');await p.getByRole('button',{name:'固定形态',exact:true}).click();await p.getByRole('button',{name:'切换到初级拉姆',exact:true}).click();await p.getByRole('button',{name:'应用成长设置',exact:true}).click();await p.getByRole('button',{name:'确认切换',exact:true}).click();assert.ok((await save(p)).highestGrowth>=original.highestGrowth);await expect(p.getByRole('button',{name:'切换到神力拉姆',exact:true})).toBeEnabled();
  for(const viewport of [{width:360,height:320},{width:480,height:360},{width:1000,height:720}]){await p.setViewportSize(viewport);if(await p.locator('.game-panel').isVisible())await p.getByRole('button',{name:'关闭面板',exact:true}).click();assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);const dock=await p.locator('.room-dock').boundingBox();assert.ok(dock.x>=0&&dock.x+dock.width<=viewport.width+.5&&dock.y+dock.height<=viewport.height);const board=await openBoard(p),box=await board.boundingBox();assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=viewport.width+.5&&box.y+box.height<=viewport.height+.5);await expect(board.locator('.paper-tabs')).toHaveCount(0);await expect(board.locator('.message-card')).toHaveCount(1);await p.screenshot({path:path.join(out,`room-${viewport.width}x${viewport.height}.png`)});await p.keyboard.press('Escape');}

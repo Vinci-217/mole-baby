@@ -1,6 +1,10 @@
 const { app, BrowserWindow, ipcMain, Notification, dialog, screen, Tray, Menu, nativeImage, shell, net, protocol, autoUpdater:nativeAutoUpdater } = require('electron');
 const {registerOriginalAssets}=require('./original-assets.cjs');
-protocol.registerSchemesAsPrivileged([{scheme:'ram-original',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true}}]);
+const {createBookResources,requestBookPack}=require('./book-resources.cjs');
+protocol.registerSchemesAsPrivileged([
+  {scheme:'ram-original',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true}},
+  {scheme:'ram-book',privileges:{standard:true,secure:true}},
+]);
 const fs = require('node:fs');
 const {nativePosition,movementProgress}=require('./native-position.cjs');
 const path = require('node:path');
@@ -15,7 +19,7 @@ const cornerBounds=(b,a,s)=>geometry.cornerBounds(b,a,s,petScale);
 const edgeOffset=(s,p,f)=>geometry.edgeOffset(s,p,f,petScale);
 const nearbyWanderTarget=(b,a,h)=>geometry.nearbyWanderTarget(b,a,h,Math.random,petScale);
 const compactPanelBounds=(b,a)=>geometry.compactPanelBounds(b,a,petScale);
-const effectWindowBounds=(b,a,e)=>geometry.effectWindowBounds(b,a,e,petScale);
+const effectWindowBounds=(b,a,e,inward=false)=>geometry.effectWindowBounds(b,a,e,petScale,inward);
 function applyPetMetrics(scale){petScale=scale;const metrics=geometry.scaledPetMetrics(scale);PET_SIZE=metrics.size;PET_PADDING=metrics.padding;}
 
 const { edgeDelay } = require('./edge-timing.cjs');
@@ -33,6 +37,9 @@ const {createStartupRecovery}=require('./startup-recovery.cjs');
 const applicationMetadata=require('../package.json');
 const {windowsRuntime}=require('./windows-runtime.cjs');
 const windowsEdition=process.platform==='win32'?windowsRuntime(applicationMetadata,process.arch):null;
+const supportsLaunchAtLogin=app.isPackaged&&(windowsEdition!==null||process.platform==='darwin');
+// Electron 22 and 37 parse this Windows path as a command line when reading it.
+const loginItemOptions=windowsEdition?{path:`"${process.execPath}"`}:{};
 // This is a transparent Canvas2D desktop pet. Some Windows GPU/driver paths
 // present its alpha surface as an opaque black rectangle even though the DOM
 // and BrowserWindow backgrounds are transparent. Select software composition
@@ -53,6 +60,9 @@ const NORMAL_SIZE = { width: 1180, height: 820 };
 const NORMAL_MINIMUM = ROOM_MINIMUM;
 const DEVELOPMENT_URL = 'http://127.0.0.1:5173';
 const INDEX_PATH = path.join(__dirname, '..', 'dist', 'index.html');
+const BOOK_PACK_INDEX = path.join(path.dirname(INDEX_PATH), 'book-packs.json');
+const deferredBooks = fs.existsSync(BOOK_PACK_INDEX);
+let bookResources;
 
 // Keep the complete old Chromium profile (save, memories and encrypted Key)
 // when the visible product name changes. Development keeps its existing path.
@@ -99,7 +109,6 @@ let edgeHiding = true;
 let petDetailsOnHover = false;
 let edgeSide = null;
 let petAppearance='seed';
-let musicState={playing:false,enabled:true,background:false};
 let edgePose = 'visible';
 let edgeTimer = null;
 let edgeTuckUntil = null;
@@ -122,11 +131,13 @@ const roomFullscreen=createRoomFullscreen({platform:process.platform,getWindow:(
 const roomResizer=createRoomResizer({getWindow:()=>mainWindow,screen,canResize:()=>Boolean(mainWindow&&!mainWindow.isDestroyed()&&mainWindow.isVisible()&&!mainWindow.isMinimized()&&hasPet&&!petMode&&!changingMode&&!roomFullscreen.isFullscreen()&&!roomFullscreen.isChanging()),onResize:()=>scheduleSave(),onEnd:()=>saveWindowState()});
 
 function getDesktopState() {
+  const petWorkArea=petMode&&mainWindow&&!mainWindow.isDestroyed()?screen.getDisplayMatching(currentPetBounds()).workArea:null;
   return {
     petMode,
     roomFullscreen:Boolean(mainWindow&&!mainWindow.isDestroyed()&&roomFullscreen.isFullscreen()),
-    windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
-    petScale,petResizing,petOffset:{x:petOffset.x/petScale,y:petOffset.y/petScale},mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
+    windowVisible: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible() && !mainWindow.isMinimized()),
+    roomMinimized: Boolean(!petMode && mainWindow && !mainWindow.isDestroyed() && mainWindow.isMinimized()),
+    petScale,petResizing,petWorkArea,petOffset:{x:petOffset.x/petScale,y:petOffset.y/petScale},mouseThrough,mousePassthrough,effectExpanded:Boolean(petEffectBounds),trayTooltip,
     ...(dragging?{dragPoint:{...screen.getCursorScreenPoint(),at:Date.now()}}:{}),
     alwaysOnTop: Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isAlwaysOnTop()),
     wandering,
@@ -146,7 +157,15 @@ function getDesktopState() {
 
 function publishState(includePetMode = false) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  mainWindow.webContents.send('desktop:state-changed', getDesktopState());
+  const state = getDesktopState();
+  const contents = mainWindow.webContents;
+  // Keep the Windows desktop pet drawing while other apps hold focus. Hidden
+  // tray windows and the ordinary room use Chromium's regular throttling.
+  if (windowsEdition) {
+    const throttle = !state.petMode || !state.windowVisible;
+    if (contents.getBackgroundThrottling() !== throttle) contents.setBackgroundThrottling(throttle);
+  }
+  contents.send('desktop:state-changed', state);
   if (includePetMode) mainWindow.webContents.send('desktop:pet-mode-changed', petMode);
   refreshTrayMenu();
 }
@@ -267,7 +286,8 @@ function changeInteracting(enabled) {
   if (enabled === interacting) return interacting;
   interacting = enabled;
   if (enabled) { stopMovement(); if(!edgeSide)revealPet(); }
-  else if(edgeSide)schedulePeek();else if (!tuckIntoCorner()) scheduleWander();
+  // Ending a performance or hover is independent of a drag release at the edge.
+  else if(edgeSide)schedulePeek();else scheduleWander();
   return interacting;
 }
 
@@ -340,7 +360,7 @@ function walkAlongDesktop() {
 function artworkWindowBounds(base){
  if(!petArtworkBounds||petResizing)return base;
  const physical=Object.fromEntries(Object.entries(petArtworkBounds).map(([key,value])=>[key,value*petScale]));
- return effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physical);
+ return effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physical,!edgeSide);
 }
 function placePetAt(target,force=false){
   if(!mainWindow||mainWindow.isDestroyed()||quitting)return;
@@ -368,7 +388,8 @@ function placePetAt(target,force=false){
   }finally{changingMode=false;}
   const actual=mainWindow.getBounds(),previousOffset=petOffset;petOffset={x:target.x-actual.x,y:target.y-actual.y};
   if(petArtworkBounds)petArtworkAnchor={x:target.x,y:target.y};
-  petBounds={...PET_SIZE,x:target.x,y:target.y};if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y)publishState();
+  petBounds={...PET_SIZE,x:target.x,y:target.y};
+  if(previousOffset.x!==petOffset.x||previousOffset.y!==petOffset.y||screen.getDisplayMatching(previous).id!==screen.getDisplayMatching(petBounds).id)publishState();
 }
 function preparePetDrag(){
   if(!petMode||mouseThrough||petEffectBounds)return false;
@@ -382,6 +403,7 @@ function startPetDrag(paintedOffset){
   const base=currentPetBounds();revealPet();dragging=true;stopMovement();
   const painted={...base,x:base.x+Math.round(offset.x),y:base.y+Math.round(offset.y)};placePetAt(painted);
   if(pointerPress){cursorDrag={point:pointerPress.point,base:painted};clearInterval(dragPoll);dragPoll=setInterval(dragPetToCursor,16);dragPetToCursor();}
+  publishState();
   return true;
 }
 function dragPetToCursor(){
@@ -398,7 +420,9 @@ function endPetDrag(){
   if(clickOnly)return true;
   dragging=false;
   if(petMode&&!companionPanel)placePetAt(clampBounds(currentPetBounds(),PET_SIZE));
-  draggingFromEdge=false;interacting=false;wanderAnchor={...currentPetBounds()};scheduleSave();if(!tuckIntoCorner())scheduleWander();return true;
+  draggingFromEdge=false;interacting=false;wanderAnchor={...currentPetBounds()};scheduleSave();
+  if(!tuckIntoCorner()){publishState();scheduleWander();}
+  return true;
 }
 
 function movePet(dx, dy) {
@@ -504,7 +528,7 @@ function changePetEffectBounds(effect){
  if(effect)revealPet();
  const base=currentPetBounds();
  const physicalEffect=effect?Object.fromEntries(Object.entries(effect).map(([key,value])=>[key,value*petScale])):null;
- const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physicalEffect):artworkWindowBounds(clampBounds(base,PET_SIZE));
+ const target=effect?effectWindowBounds(base,screen.getDisplayMatching(base).workArea,physicalEffect,true):artworkWindowBounds(clampBounds(base,PET_SIZE));
  petEffectBounds=effect?{x:effect.x,y:effect.y,width:effect.width,height:effect.height}:null;
  petEffectAnchor=effect?{x:base.x,y:base.y}:null;
  if(petArtworkBounds)petArtworkAnchor={x:base.x,y:base.y};
@@ -783,6 +807,7 @@ function changePetMode(enabled) {
     normalBounds = target;
   }
   changingMode = false;
+  mainWindow.setSkipTaskbar(petMode);
   if (process.platform === 'darwin') {
     mainWindow.setVisibleOnAllWorkspaces(enabled, { visibleOnFullScreen: enabled, skipTransformProcessType: true });
   }
@@ -809,6 +834,25 @@ function hideToTray() {
   saveWindowState();
   mainWindow.hide();
   publishState();
+}
+
+function minimizeWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (petMode) { hideToTray(); return; }
+  roomResizer.end();
+  mainWindow.minimize();
+}
+
+function closeWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (!hasPet || petMode) { hideToTray(); return; }
+  const window=mainWindow;
+  void Promise.resolve(changePetMode(true)).then(()=>{
+    if(window!==mainWindow||window.isDestroyed())return;
+    if(window.isMinimized())window.restore();
+    if(!window.isVisible())window.showInactive();
+    publishState();
+  }).catch(error=>console.error('Could not return to desktop:',error.message));
 }
 
 function showFromTray(home = false) {
@@ -841,12 +885,11 @@ function markRendererReady(adopted) {
 function refreshTrayMenu() {
   if (!tray || tray.isDestroyed() || !mainWindow || mainWindow.isDestroyed() || quitting) return;
   const movable = hasPet && petCanMove;
-  const key=JSON.stringify([hasPet,petScale,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petDetailsOnHover,petAlwaysOnTop,musicState,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
+  const key=JSON.stringify([hasPet,petScale,petMode,petCanMove,wandering,edgeHiding,mouseThrough,petDetailsOnHover,petAlwaysOnTop,mainWindow.isAlwaysOnTop(),updates?.getState().status,Math.floor((updates?.getState().percent??0)/5),updates?.getState().enabled]);if(key===trayMenuKey)return;trayMenuKey=key;
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: hasPet ? '显示拉姆' : '领养拉姆', click: () => showFromTray() },
     { label: '进入小屋', enabled: hasPet, click: () => showFromTray(true) },
     { label: `大小变换（${Math.round(petScale*100)}%）`,enabled:hasPet,click:openSizeEditor },
-    { label: '后台播放背景音乐',type:'checkbox',checked:musicState.background,enabled:hasPet,click:item=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('desktop:music-toggle',item.checked)} },
     { type: 'separator' },
     { label: '拉姆置顶',type:'checkbox',checked:petMode?mainWindow.isAlwaysOnTop():petAlwaysOnTop,click:item=>changeAlwaysOnTop(item.checked,true)},
     { label: '鼠标穿透',type:'checkbox',checked:mouseThrough,click:item=>changeMouseThrough(item.checked)},
@@ -915,7 +958,29 @@ function updateTrayStatus(status){
  if(tray&&!tray.isDestroyed())tray.setToolTip(text);
 }
 
+function readLaunchAtLogin() {
+  if (!supportsLaunchAtLogin) return null;
+  const item = app.getLoginItemSettings(loginItemOptions);
+  return item.openAtLogin && (!windowsEdition || item.executableWillLaunchAtLogin);
+}
+
 function registerIPC() {
+  if (bookResources) {
+    handle('books:prepare', id => bookResources.prepareCached(id));
+    handle('books:status', () => bookResources.getStatus());
+    handle('books:download-all', () => bookResources.downloadAll());
+    handle('books:pause-all', () => bookResources.pauseAll());
+  }
+  listen('desktop:renderer-entry-failed',source=>{
+    if(!rendererReady&&typeof source==='string')void startupRecovery?.fail('renderer-entry-failed',{message:source.slice(0,500)});
+  });
+  handle('desktop:get-launch-at-login',readLaunchAtLogin);
+  handle('desktop:set-launch-at-login',enabled=>{
+    if(typeof enabled!=='boolean')throw new TypeError('Launch at login needs a boolean');
+    if(!supportsLaunchAtLogin)return null;
+    app.setLoginItemSettings({...loginItemOptions,openAtLogin:enabled});
+    return readLaunchAtLogin();
+  });
   handle('saves:inspect',()=>petStorage.inspect());
   handle('saves:checkpoint',(text,reason)=>petStorage.checkpoint(text,reason));
   handle('saves:read',profile=>petStorage.read(profile));
@@ -932,10 +997,9 @@ function registerIPC() {
   handle('desktop:open-size-editor',openSizeEditor);
   handle('desktop:set-pet-effect-bounds',changePetEffectBounds);
   handle('desktop:set-pet-artwork-bounds',changePetArtworkBounds);
-  handle('desktop:set-music-state',state=>{if(!state||['playing','enabled','background'].some(k=>typeof state[k]!=='boolean'))throw new TypeError('Invalid music state');musicState={playing:state.playing,enabled:state.enabled,background:state.background};refreshTrayMenu()});
   handle('updates:open-release',()=>shell.openExternal('https://github.com/Vinci-217/mole-baby/releases/latest'));
-  listen('desktop:minimize', hideToTray);
-  listen('desktop:close', hideToTray);
+  listen('desktop:minimize', minimizeWindow);
+  listen('desktop:close', closeWindow);
   listen('desktop:hide-to-tray', hideToTray);
   listen('desktop:ready-to-show', markRendererReady);
   handle('updates:get-state',()=>updates?.getState()??null);
@@ -1015,7 +1079,7 @@ function createWindow() {
     backgroundColor: '#00000000',
     hasShadow: false,
     show: false,
-    skipTaskbar: true,
+    skipTaskbar: false,
     autoHideMenuBar: true,
     alwaysOnTop: normalAlwaysOnTop,
     ...(process.platform==='win32'?{backgroundMaterial:'none',roundedCorners:false}:{}),
@@ -1027,6 +1091,7 @@ function createWindow() {
       sandbox: true,
       webSecurity: true,
       spellcheck: false,
+      ...(deferredBooks ? {additionalArguments:['--ramu-on-demand-books']} : {}),
       autoplayPolicy: 'no-user-gesture-required',
     },
   });
@@ -1049,11 +1114,11 @@ function createWindow() {
   window.on('always-on-top-changed', () => publishState());
   window.on('enter-full-screen',()=>publishState());
   window.on('leave-full-screen',()=>{publishState();scheduleSave()});
-  window.on('minimize', event => { event.preventDefault(); hideToTray(); });
-  window.on('restore', scheduleWander);
+  window.on('minimize', () => { if(petMode)hideToTray();else{roomResizer.end();publishState();} });
+  window.on('restore', () => { publishState(); scheduleWander(); });
   window.on('blur', () => { if (dragging) endPetDrag(); });
   window.on('close', event => {
-    if (!quitting) { event.preventDefault(); hideToTray(); return; }
+    if (!quitting) { event.preventDefault(); closeWindow(); return; }
     saveWindowState();
   });
   window.on('closed', () => {
@@ -1098,6 +1163,22 @@ if (!app.requestSingleInstanceLock()) {
       retry:window=>{if(window&&!window.isDestroyed())window.webContents.reloadIgnoringCache();else{app.relaunch();app.quit();}},quit:()=>app.quit(),
     });
     registerOriginalAssets(protocol,path.join(__dirname,'..','dist','assets','original','official'));
+    if (deferredBooks) {
+      try {
+        bookResources = createBookResources({
+          manifest: JSON.parse(fs.readFileSync(BOOK_PACK_INDEX, 'utf8')),
+          directory: path.join(stableUserDataPath, 'resource-packs', 'books'),
+          request: (url, options) => requestBookPack(net, url, options),
+          mirrors: applicationMetadata.animationPreview ? applicationMetadata.bookResourceMirrors : undefined,
+          onStatus: status => {
+            if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('books:status-changed', status);
+          },
+        });
+        protocol.registerBufferProtocol('ram-book', (request, respond) => {
+          bookResources.readPage(request.url).then(page => respond(page ?? {error:-6}), () => respond({error:-6}));
+        });
+      } catch (error) { console.warn('Unable to load book resource index:', error.message); }
+    }
     if (process.platform === 'win32') app.setAppUserModelId(windowsEdition.appId);
     if (process.platform === 'darwin') {
       app.dock.hide();

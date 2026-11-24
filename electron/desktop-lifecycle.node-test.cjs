@@ -15,13 +15,18 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   if(options.windowState){const dir=path.join(profile,customProfile?'isolated-cli':'mole-baby');fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,'window-state.json'),JSON.stringify(options.windowState));}
   if(options.key){fs.mkdirSync(path.join(profile,'mole-baby'),{recursive:true});fs.writeFileSync(path.join(profile,'mole-baby','companion-ai-key.json'),'retired-test-key');}
   const app = new EventEmitter();
-  app.isPackaged = true;
+  app.isPackaged = options.packaged !== false;
   app.commandLine = { getSwitchValue: () => customProfile ? path.join(profile, 'isolated-cli') : '',appendSwitch:name=>{(stats.switches??=[]).push(name)} };
   app.disableHardwareAcceleration=()=>{assert.equal(windows.length,0,'CPU rendering must be selected before creating a window');stats.hardwareAccelerationDisabled=true};
   app.getPath = key => key === 'appData' ? profile : app.userData || path.join(profile, '拉姆');
   app.setPath = (key, value) => { if (key === 'userData') app.userData = value; };
   app.setName = value => { app.name = value; };
   app.setAppUserModelId = value => {stats.appId=value};
+  app.getLoginItemSettings = options => {
+    stats.lastLoginLookup = options;
+    return { openAtLogin: stats.loginItem?.openAtLogin === true, executableWillLaunchAtLogin: stats.startupApproved !== false };
+  };
+  app.setLoginItemSettings = options => { stats.loginItem = options; stats.startupApproved = true; };
   app.dock = { hide() { stats.dockHidden = true; } };
   app.requestSingleInstanceLock = () => true;
   app.whenReady = () => Promise.resolve();
@@ -30,10 +35,12 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     static getAllWindows() { return windows; }
     constructor(options) {
       super(); this.options = options; this.bounds = { x: options.x, y: options.y, width: options.width, height: options.height };
-      this.visible = false; this.top = options.alwaysOnTop;
+      this.visible = false; this.top = options.alwaysOnTop; this.skipTaskbar=options.skipTaskbar;
       this.webContents = new EventEmitter();
       this.webContents.mainFrame = { url: '' };
       this.webContents.send = () => {};
+      this.webContents.getBackgroundThrottling = () => this.throttling ?? true;
+      this.webContents.setBackgroundThrottling = allowed => { this.throttling = allowed; };
       this.webContents.setZoomFactor=value=>{this.zoom=value;};
       this.webContents.reloadIgnoringCache=()=>{stats.reloads=(stats.reloads??0)+1;this.webContents.emit('did-start-navigation',{},this.webContents.mainFrame.url,false,true)};
       this.webContents.setWindowOpenHandler = () => {};
@@ -43,7 +50,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     loadFile(filename) { this.webContents.mainFrame.url = require('node:url').pathToFileURL(filename).href; return Promise.resolve(); }
     loadURL(url) { this.webContents.mainFrame.url = url; return Promise.resolve(); }
     isDestroyed() { return false; }
-    isMinimized() { return false; }
+    isMinimized() { return Boolean(this.minimized); }
     isAlwaysOnTop() { return Boolean(this.top); }
     isVisible() { return this.visible; }
     isFullScreen() {return this.fullscreen===true}
@@ -59,8 +66,14 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     setAlwaysOnTop(value) { this.top = value; }
     setVisibleOnAllWorkspaces(value, options) { this.allSpaces = value; this.spaceOptions = options; }
     setTitle(value) { this.title = value; }
+    setSkipTaskbar(value) { this.skipTaskbar=value; }
     setMinimumSize(w,h) {this.minimum=[w,h]} setMaximumSize(w,h) {this.maximum=[w,h]} setResizable(value) {this.resizeChanges??=[];this.resizeChanges.push(value)} setIgnoreMouseEvents() {} setMenu() {}
-    show() { this.visible = true; } hide() { this.visible = false; } focus() {} restore() {}
+    show() { if (!this.visible) { this.visible = true; this.emit('show'); } }
+    hide() { if (this.visible) { this.visible = false; this.emit('hide'); } }
+    showInactive() { this.show(); }
+    focus() {}
+    minimize() { this.minimized=true; this.emit('minimize'); }
+    restore() { this.minimized=false; this.emit('restore'); }
   }
   class FakeTray extends EventEmitter {
     constructor(image) { super(); this.image = image; FakeTray.instance = this; }
@@ -73,9 +86,17 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   const display = { workArea: { x: 0, y: 0, width: 1920, height: 1040 } };
   screen.getCursorScreenPoint=()=>({...cursor});screen.getDisplayNearestPoint=()=>display;
   screen.getPrimaryDisplay = screen.getDisplayMatching = () => display;
+  const imageFromPath = value => ({
+    path: value, template: false, representations: [],
+    setTemplateImage(flag) { this.template = flag; },
+    getScaleFactors() { return [1, 2]; },
+    resize({ width, height }) { return { ...this, size: { width, height }, representations: [] }; },
+    toPNG() { return this; },
+    addRepresentation(representation) { this.representations.push(representation); },
+  });
   const electron = { app, shell:{openExternal:async url=>{(stats.openedExternal??=[]).push(url)}}, BrowserWindow: FakeWindow, screen, safeStorage: {}, Tray: FakeTray,
     protocol:{registerSchemesAsPrivileged:schemes=>{stats.protocolSchemes=schemes},registerBufferProtocol:scheme=>{stats.assetProtocol=scheme}},
-    Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: value => ({path:value,template:false,setTemplateImage(flag){this.template=flag;}}) },
+    Menu: { buildFromTemplate: template => template, setApplicationMenu: menu => { stats.appMenu = menu; } }, nativeImage: { createFromPath: imageFromPath, createFromBuffer: value => value },
     ipcMain: { handle: (channel, fn) => handles.set(channel, fn), on: (channel, fn) => listeners.set(channel, fn) },
     Notification: { isSupported: () => false }, dialog:{showMessageBox:async(...args)=>{stats.dialogs.push({parent:args.length===2?args[0]:null,options:args.at(-1)});return{response:options.dialogAnswers?.shift()??1}}} };
   const localRequire = name => name === 'electron' ? electron : name==='../package.json'&&options.edition ? {...require('../package.json'),windowsEdition:options.edition} : name==='./updates.cjs'&&options.updateFactory ? {createUpdates:options.updateFactory} : name.startsWith('./') ? require(path.join(__dirname,name)) : require(name);
@@ -84,6 +105,7 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
   // The simulated Windows app is x64 regardless of the host running tests
   // (including Apple Silicon); explicit ia32 fixtures override this default.
   Object.defineProperty(runtimeProcess,'arch',{value:options.arch??(platform==='win32'?'x64':process.arch)});
+  if(options.execPath)Object.defineProperty(runtimeProcess,'execPath',{value:options.execPath});
   Object.defineProperty(runtimeProcess,'env',{value:{...process.env,MOLE_BABY_DISABLE_UPDATES:'1'}});
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'main.cjs'), 'utf8'), {
     require: localRequire, __dirname, console, URL, Date, process: runtimeProcess,
@@ -99,6 +121,58 @@ async function launch(legacyName, customProfile = false, platform = 'win32', opt
     cleanup() { app.emit('before-quit'); app.emit('will-quit'); fs.rmSync(profile, { recursive: true, force: true }); },
   };
 }
+
+test('Windows keeps the visible pet ticking and throttles again in the room or tray',async t=>{
+  const run=await launch(undefined,false,'win32',{edition:'legacy'});t.after(()=>run.cleanup());
+  const throttles=()=>run.window.webContents.getBackgroundThrottling();
+  assert.equal(throttles(),true);
+  await run.invoke('desktop:set-pet-mode',true);
+  assert.equal(throttles(),true);
+  run.send('desktop:ready-to-show',true);
+  assert.equal(run.invoke('desktop:get-state').windowVisible,true);
+  assert.equal(throttles(),false);
+  run.send('desktop:hide-to-tray');
+  assert.equal(run.invoke('desktop:get-state').windowVisible,false);
+  assert.equal(throttles(),true);
+  run.tray.emit('click');
+  assert.equal(throttles(),false);
+  await run.invoke('desktop:set-pet-mode',false);
+  assert.equal(throttles(),true);
+});
+
+test('dropping a stationary desktop pet clears the drag state sent to the renderer',async t=>{
+  const run=await launch();t.after(()=>run.cleanup());
+  run.invoke('desktop:set-pet-mode',true);
+  run.send('desktop:ready-to-show',true);
+  run.invoke('desktop:wander',false);
+  run.invoke('desktop:set-edge-hiding',false);
+  let state;
+  run.window.webContents.send=(channel,next)=>{if(channel==='desktop:state-changed')state=next;};
+  assert.equal(run.invoke('desktop:start-pet-drag',{x:0,y:0}),true);
+  assert.ok(state.dragPoint);
+  run.invoke('desktop:end-pet-drag');
+  assert.equal(state.dragPoint,undefined);
+});
+
+test('Windows login switch reads real approval and uses a quoted path for both editions',async t=>{
+  for(const edition of ['modern','legacy']){
+    const execPath=`C:\\Program Files\\拉姆 ${edition}\\拉姆.exe`;
+    const run=await launch(undefined,false,'win32',{edition,execPath});t.after(()=>run.cleanup());
+    assert.equal(run.invoke('desktop:get-launch-at-login'),false);
+    assert.equal(run.invoke('desktop:set-launch-at-login',true),true);
+    assert.equal(run.stats.lastLoginLookup.path,`"${execPath}"`);
+    assert.equal(run.stats.loginItem.path,`"${execPath}"`);
+    run.stats.startupApproved=false;
+    assert.equal(run.invoke('desktop:get-launch-at-login'),false);
+    assert.equal(run.invoke('desktop:set-launch-at-login',false),false);
+    assert.throws(()=>run.invoke('desktop:set-launch-at-login','true'),/boolean/);
+    assert.throws(()=>run.handles.get('desktop:set-launch-at-login')({sender:{},senderFrame:{}},true),/Untrusted/);
+  }
+  const dev=await launch(undefined,false,'win32',{packaged:false});t.after(()=>dev.cleanup());
+  assert.equal(dev.invoke('desktop:get-launch-at-login'),null);
+  assert.equal(dev.invoke('desktop:set-launch-at-login',true),null);
+  assert.equal(dev.stats.loginItem,undefined);
+});
 
 for(const platform of ['win32','darwin'])test(`${platform} tray hover-only details toggle publishes, persists and restores without touching pet data`,async t=>{
  const run=await launch(undefined,false,platform);t.after(()=>run.cleanup());
@@ -163,6 +237,35 @@ for(const platform of ['win32','darwin','linux'])test(`${platform}: expanded spe
  for(const bad of [{...effect,width:Infinity},{...effect,x:-5000},{...effect,height:0},[],true])assert.throws(()=>run.invoke('desktop:set-pet-effect-bounds',bad));
 });
 
+test('a top-right effect reserves its complete drawing surface inside the display',async t=>{
+ const run=await launch(undefined,false,'win32');t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.invoke('desktop:set-edge-hiding',false);run.invoke('desktop:move-pet',1400,-1000);
+ const base=run.window.getBounds(),effect={x:30,y:-200,width:320,height:410};
+ run.invoke('desktop:set-pet-effect-bounds',effect);
+ const bounds=run.window.getBounds(),state=run.invoke('desktop:get-state');
+ assert.ok(bounds.width>=effect.width&&bounds.height>=effect.height);
+ assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=1920&&bounds.y+bounds.height<=1040);
+ assert.equal(bounds.x+state.petOffset.x,base.x);assert.equal(bounds.y+state.petOffset.y,base.y);
+ run.invoke('desktop:set-pet-effect-bounds',null);assert.deepEqual(run.window.getBounds(),base);
+});
+
+test('finishing a performance at the screen edge leaves the pet available for the next action',async t=>{
+ const run=await launch(undefined,false,'win32');t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.invoke('desktop:move-pet',5000,-240);
+ const anchor=run.window.getBounds();
+ assert.equal(run.invoke('desktop:get-state').edgeHiding,true);
+ assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+ run.invoke('desktop:set-interacting',true);
+ run.invoke('desktop:set-pet-artwork-bounds',{x:-65,y:-90,width:290,height:390});
+ run.invoke('desktop:set-pet-artwork-bounds',null);
+ run.invoke('desktop:set-interacting',false);
+ assert.equal(run.invoke('desktop:get-state').edgeSide,null);
+ assert.equal(run.invoke('desktop:get-state').edgePose,'visible');
+ assert.deepEqual(run.window.getBounds(),anchor);
+});
+
 test('delayed Windows placement preserves the spell anchor and the position restored afterward',async t=>{
  const run=await launch(undefined,false,'win32',{delayedMove:true});t.after(()=>run.cleanup());
  run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
@@ -192,6 +295,24 @@ for(const platform of ['win32','darwin','linux'])test(`${platform}: wide native 
  const afterMonitor=anchor();run.invoke('desktop:set-pet-artwork-bounds',null);assert.deepEqual(anchor(),afterMonitor);assert.equal(run.window.bounds.width,240);assert.equal(run.window.bounds.height,360);
  if(platform==='win32')assert.deepEqual(run.window.maximum,[240,360]);
  for(const bad of [{...art,x:NaN},{...art,width:0},{...art,height:Infinity},true,[]])assert.throws(()=>run.invoke('desktop:set-pet-artwork-bounds',bad));
+});
+
+test('artwork at a work-area edge reserves inward space without moving the saved pet',async t=>{
+ const run=await launch(undefined,false,'win32');t.after(()=>run.cleanup());
+ run.invoke('desktop:set-pet-mode',true);run.send('desktop:ready-to-show',true);
+ run.invoke('desktop:set-edge-hiding',false);run.invoke('desktop:move-pet',-4000,-4000);
+ const base=run.window.getBounds();
+ assert.equal(base.x,-30);assert.equal(base.y,-71);
+ let state=run.invoke('desktop:get-state');
+ assert.deepEqual({...state.petWorkArea},run.display.workArea);
+ state=run.invoke('desktop:set-pet-artwork-bounds',{x:-28,y:-40,width:150,height:310});
+ const frame=run.window.getBounds();
+ assert.equal(frame.x,0);assert.equal(frame.y,0);
+ assert.ok(frame.height>=310);
+ assert.deepEqual({...state.petWorkArea},run.display.workArea);
+ assert.equal(frame.x+state.petOffset.x,base.x);assert.equal(frame.y+state.petOffset.y,base.y);
+ run.invoke('desktop:set-pet-artwork-bounds',null);
+ assert.deepEqual(run.window.getBounds(),base);
 });
 
 test('delayed Windows movement does not drift the enlarged outfit body or saved anchor',async t=>{
@@ -261,11 +382,12 @@ test('startup waits for the correctly painted mode, and keeps the old profile th
   run.window.webContents.emit('page-title-updated',{preventDefault(){titlePrevented=true}},'拉姆 · mole-baby');
   assert.equal(titlePrevented,true,'web page titles cannot restore a Windows caption');
   assert.equal(run.window.title,'');
-  assert.equal(run.window.options.skipTaskbar, true);
+  assert.equal(run.window.options.skipTaskbar, false);
   assert.equal(run.window.options.enableLargerThanScreen, false);
   run.window.emit('ready-to-show');
   assert.equal(run.window.isVisible(), false, 'Electron paint readiness must not flash the large room');
   run.invoke('desktop:set-pet-mode', true);
+  assert.equal(run.window.skipTaskbar, true);
   run.send('desktop:ready-to-show', true);
   assert.equal(run.window.isVisible(), true);
   assert.deepEqual(run.window.getBounds(), { x: 1754, y: 792, width: 160, height: 240 });
@@ -288,6 +410,23 @@ for(const arch of ['x64','ia32'])test(`legacy ${arch} reports an early renderer 
  assert.equal(fs.readFileSync(file,'utf8'),'retained pet record');
  run.tray.emit('click');await new Promise(resolve=>setImmediate(resolve));
  assert.equal(run.stats.dialogs.length,2,'The tray can reopen recovery even before renderer readiness');
+});
+
+test('a missing renderer entry opens recovery before the startup timeout',async t=>{
+ const run=await launch(undefined,false,'win32',{edition:'legacy',dialogAnswers:[2]});t.after(()=>run.cleanup());
+ const report=run.listeners.get('desktop:renderer-entry-failed');
+ report({sender:{},senderFrame:{}},'untrusted.js');
+ assert.equal(run.stats.dialogs.length,0);
+ run.send('desktop:renderer-entry-failed','./assets/missing-update-module.js');
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run.stats.dialogs.length,1);
+ const log=fs.readFileSync(path.join(run.app.userData,'logs','startup.log'),'utf8');
+ assert.match(log,/renderer-entry-failed.*missing-update-module/);
+ assert.doesNotMatch(log,/untrusted\.js/);
+ run.send('desktop:ready-to-show',true);
+ run.send('desktop:renderer-entry-failed','./assets/late-module.js');
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run.stats.dialogs.length,1);
 });
 
 test('a loaded pet can recover from a renderer crash without losing its readiness handshake or tray lifecycle',async t=>{
@@ -314,7 +453,7 @@ test('explicit test/user profiles take priority over migration and leave old dat
   assert.equal(fs.existsSync(path.join(path.dirname(run.app.userData), 'mole-baby', 'Local Storage')), true);
 });
 
-test('window close and minimize hide to tray, cancel pending audio/model work, and can restore', async t => {
+test('compact pet close and minimize hide to tray and can restore', async t => {
   const run = await launch(); t.after(() => run.cleanup());
   run.invoke('desktop:set-pet-mode', true); run.send('desktop:ready-to-show', true);
   let prevented = false;
@@ -334,8 +473,18 @@ test('window close and minimize hide to tray, cancel pending audio/model work, a
 
 test('renderer close has no quit authority; only tray exit quits and destroys the tray', async t => {
   const run = await launch(); t.after(() => run.cleanup());
-  run.send('desktop:ready-to-show', true); run.send('desktop:close');
-  assert.equal(run.stats.quit, 0); assert.equal(run.window.isVisible(), false);
+  run.send('desktop:ready-to-show', true);
+  assert.equal(run.window.skipTaskbar,false);
+  run.send('desktop:minimize');
+  assert.equal(run.invoke('desktop:get-state').roomMinimized,true);
+  assert.equal(run.window.skipTaskbar,false);
+  run.window.restore();
+  assert.equal(run.invoke('desktop:get-state').windowVisible,true);
+  run.send('desktop:close');
+  assert.equal(run.stats.quit, 0);
+  assert.equal(run.window.isVisible(), true);
+  assert.equal(run.invoke('desktop:get-state').petMode,true);
+  assert.equal(run.window.skipTaskbar,true);
   assert.equal(run.handles.has('desktop:quit'), false); assert.equal(run.listeners.has('desktop:quit'), false);
   run.tray.menu.find(item => item.label === '退出拉姆').click();
   assert.equal(run.stats.quit, 1); assert.equal(run.tray.destroyed, true);
@@ -373,6 +522,9 @@ test('macOS is menu-bar resident, never flashes before readiness, and uses nativ
   assert.equal(run.window.options.enableLargerThanScreen, true, 'frameless Mac windows must be able to place their transparent top margin beyond the menu bar');
   assert.equal(run.tray.image.template, true, 'AppKit must tint the Mac menu-bar glyph');
   assert.equal(path.basename(run.tray.image.path), 'tray-mac.png');
+  assert.deepEqual(run.tray.image.size,{width:20,height:20});
+  assert.equal(run.tray.image.representations[0].scaleFactor,2);
+  assert.deepEqual(run.tray.image.representations[0].buffer.size,{width:40,height:40});
   assert.ok(run.stats.appMenu.some(item => item.role === 'editMenu'));
   run.app.emit('activate');
   assert.equal(run.window.isVisible(), false, 'early macOS activation cannot flash the room');

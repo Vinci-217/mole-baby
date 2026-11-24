@@ -1,6 +1,8 @@
 /* Every pet image comes from the original game atlas; no decorative body artwork. */
 .ram-outfit-source,.ram-outfit-action{position:absolute;inset:0;display:block}
 .ram-outfit-source[hidden]{display:none!important}
+.ram-study-shot{position:absolute;inset:0;display:block}
+.ram-outfit-host:has(>.ram-study-action [data-study-visible="true"])>.ram-outfit-source{opacity:0}
 .ram-outfit-action>.ram-sprite{width:100%;height:100%;position:absolute;inset:0;--social-x:0%;--social-lift:0%;--social-angle:0deg;--social-scaleX:1;--social-scaleY:1;--social-readTilt:0deg;--social-opacity:0;--pull-x:0%;--pull-y:0%;--pull-angle:0deg;--pull-sx:1;--pull-sy:1;--pull-skew:0deg}
 .ram-sprite {
   position: relative;
@@ -35,6 +37,7 @@
   height: 100%;
   object-fit: contain;
 }
+.ram-need-cue{position:absolute;top:9%;right:-5%;width:24%;height:auto;z-index:6;pointer-events:none}
 .ram-sprite .ram-sleep-mark {
   position: absolute;
   top: 25%;

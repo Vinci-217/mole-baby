@@ -21,23 +21,20 @@ export default function SaveManager({onImport,onExport,exportLabel='导出存档
 }){
  const input=useRef<HTMLInputElement>(null),busy=feedback?.kind==='pending';
  useEffect(()=>{
-  const picker=input.current,cancel=()=>onFeedback({kind:'info',message:'已取消选择存档，当前记录未更改。'});
+  const picker=input.current,cancel=()=>onFeedback({kind:'info',message:'已取消选择存档。'});
   picker?.addEventListener('cancel',cancel);return()=>picker?.removeEventListener('cancel',cancel);
  },[onFeedback]);
  return <div className="save-manager" aria-busy={busy}>
-  <LocalSaveInspector busy={busy} onRestore={text=>onImport({text})}/>
-  <p className="settings-hint">JSON 备份包含拉姆身份、颜色、成长、装扮、物品、小屋、回忆与偏好设置。选择备份文件后会自动导入。</p>
   <div className="settings-actions">
    {onExport&&<button type="button" className="game-button small" disabled={busy} onClick={()=>void onExport()}>{exportLabel}</button>}
-   <button type="button" className="game-button small" disabled={busy} onClick={()=>{
-    onFeedback({kind:'info',message:'请选择 JSON 存档文件；选好后会自动开始导入。'});input.current?.click();
-   }}>{importLabel}</button>
+   <button type="button" className="game-button small" disabled={busy} onClick={()=>input.current?.click()}>{importLabel}</button>
    <input ref={input} hidden type="file" accept="application/json,.json" onChange={event=>{
     const file=event.currentTarget.files?.[0];event.currentTarget.value='';
     if(file)void onImport({file});
-    else onFeedback({kind:'info',message:'已取消选择存档，当前记录未更改。'});
+    else onFeedback({kind:'info',message:'已取消选择存档。'});
    }}/>
   </div>
   <SaveOperationFeedback feedback={feedback}/>
+  <LocalSaveInspector busy={busy} onRestore={text=>onImport({text})}/>
  </div>;
 }

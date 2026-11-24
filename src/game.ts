@@ -15,8 +15,9 @@ import type {PetOuting} from './pet-pastimes';
 import {normalizeEducation,normalizeActivity,settleActivity,cancelActivity} from './pet-school';
 import type {Education,PetActivity} from './pet-school';
 import {normalizeRoom} from './room-furnishings';
-import {NEED_RATES,HEALTH_RECOVERY_PER_HOUR,HEALTH_LOSS_PER_HOUR} from './pet-status';
+import {NEED_RATES,HEALTH_RECOVERY_PER_HOUR,HEALTH_LOSS_PER_HOUR,TIRED_ENERGY} from './pet-status';
 import type {RoomFurnishings} from './room-furnishings';
+import {normalizeReadingProgress,type ReadingProgress} from './reading-progress';
 export { ITEMS, getItem, CATEGORY_LABELS } from './catalog';
 export type { PetItem, ItemCategory } from './catalog';
 
@@ -81,6 +82,7 @@ export interface GameState {
   education?: Education;
   activity?: PetActivity;
   room?: RoomFurnishings;
+  reading?: ReadingProgress;
   restaurant?: RestaurantState;
 }
 
@@ -395,7 +397,7 @@ export function getPetCondition(state: GameState): PetCondition {
   if (state.stats.thirst < 30) return { id: 'thirsty', label: '口渴了', action: 'thirsty', description: '需要喝一点麦香牛奶、果汁或其他饮品。' };
   if (state.stats.cleanliness < 30) return { id: 'dirty', label: '需要清洁', action: 'dirty', description: '使用泡泡浴、洗面奶或沐浴露清洁一下吧。' };
   if (state.stats.happiness < 30) return { id: 'sad', label: '有点难过', action: 'sad', description: '摸摸它，或者一起玩一会儿。' };
-  if (state.stats.energy < 25) return { id: 'tired', label: '有点困了', action: 'tired', description: '困了会自己闭眼休息，睡着后可以轻轻叫醒。' };
+  if (state.stats.energy < TIRED_ENERGY) return { id: 'tired', label: '有点困了', action: 'tired', description: '困了会自己闭眼休息，睡着后可以轻轻叫醒。' };
   return { id: 'healthy', label: '状态很好', action: 'idle', description: '吃得饱、喝得足，正在安心地陪伴你。' };
 }
 
@@ -437,10 +439,17 @@ const isIntegerIn = (value: unknown, min: number, max: number): value is number 
   isNumberIn(value, min, max) && Number.isInteger(value);
 
 /** Validate untrusted local storage, normalize known fields, then apply offline time. */
+export const MAX_SAVE_LENGTH = 1_000_000;
+
 export function parseSave(raw: string | null, now = Date.now(), manualStageSelected = false): GameState | null {
-  if (!raw || raw.length > 100_000 || !Number.isFinite(now) || now < 0) return null;
+  if (!raw || raw.length > MAX_SAVE_LENGTH) return null;
+  try { return normalizeSavedPet(JSON.parse(raw),now,manualStageSelected); }
+  catch { return null; }
+}
+
+export function normalizeSavedPet(value:unknown, now = Date.now(), manualStageSelected = false): GameState | null {
+  if(!Number.isFinite(now)||now<0)return null;
   try {
-    const value: unknown = JSON.parse(raw);
     if (!isRecord(value) || value.version !== 1) return null;
     if (typeof value.name !== 'string' || !value.name.trim() || Array.from(value.name).length > 16 || /[\u0000-\u001f\u007f]/.test(value.name)) return null;
     if (!isPetColor(value.color)) return null;
@@ -466,7 +475,9 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
     if(Object.keys(inventory).filter(id=>customPotionColor(id)).length>MAX_CUSTOM_POTION_COLORS)return null;
     for (const item of ITEMS) inventory[item.id] ??= 0;
     const importedOuting=value.growth>=STAGES[1].threshold?normalizeOuting(value.outing,now,value.createdAt):undefined;
-    const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room);
+    const education=normalizeEducation(value.education,now),room=normalizeRoom(value.room),reading=normalizeReadingProgress(value.reading);
+    const checkIn=normalizeCheckIn(value.checkIn,now),gameRewards=normalizeGameRewards(value.gameRewards,localDay(now));
+    const restaurant=normalizeRestaurant(value.restaurant);
     const activity=value.growth>=STAGES[1].threshold&&!value.sleeping&&!importedOuting?normalizeActivity((value.activity as PetActivity)?.kind==='restaurant'?undefined:value.activity,{createdAt:value.createdAt,education,growth:value.growth,evolution:value.evolution as Evolution|undefined},now):undefined;
     return tick(reconcileCourseRewards({
       version: 1,
@@ -489,11 +500,12 @@ export function parseSave(raw: string | null, now = Date.now(), manualStageSelec
       ...(isIntegerIn(value.sleepUntil,0,now+60_000)?{sleepUntil:value.sleepUntil}:{}),
       completedGames: value.completedGames,
       lastRewardAt: value.lastRewardAt,
-      ...(normalizeCheckIn(value.checkIn,now)?{checkIn:normalizeCheckIn(value.checkIn,now)}:{}),
-      ...(normalizeGameRewards(value.gameRewards,localDay(now))?{gameRewards:normalizeGameRewards(value.gameRewards,localDay(now))}:{}),
+      ...(checkIn?{checkIn}:{}),
+      ...(gameRewards?{gameRewards}:{}),
       ...(importedOuting?{outing:importedOuting}:{}),
-      ...(normalizeRestaurant(value.restaurant)?{restaurant:normalizeRestaurant(value.restaurant)}:{}),
+      ...(restaurant?{restaurant}:{}),
       ...(education?{education}:{}),...(activity?{activity}:{}),...(room?{room}:{}),
+      ...(reading?{reading}:{}),
       ...(isIntegerIn(value.lastOutingAt,value.createdAt,now+300000)?{lastOutingAt:value.lastOutingAt}:{}),
     }), now);
   } catch {

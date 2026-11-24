@@ -6,6 +6,8 @@ import type {Stage,Evolution} from './game'
 import {OUTFIT_PRICE} from './economy'
 import {playToolSource} from './original-play-tools'
 import {originalCareClip} from './original-care'
+import {keepsOutfitForIdleAction} from './ram-action'
+import {ambientPerformanceClip,usesBareBodyMotion} from './pet-original-actions'
 
 /** Original accessory graphics. Names and prices are this desktop adaptation. */
 export const OUTFITS=[
@@ -48,7 +50,8 @@ export function costumePlayback(stage:Stage,evolution?:Evolution,id?:string,acti
 export const costumeAppearance=(stage:Stage,evolution?:Evolution,id?:string)=>costumePlayback(stage,evolution,id).appearance;
 export const petAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>)=>costumeAppearance(getStage(pet.growth,pet.evolution),pet.evolution,pet.wearing);
 export const petActionAppearance=(pet:Pick<GameState,'growth'|'evolution'|'wearing'>,action:string,itemId?:string)=>{
- const stage=getStage(pet.growth,pet.evolution),original=playToolSource(action,itemId)||originalCareClip(ramForm(stage,pet.evolution),action,itemId);
+ const stage=getStage(pet.growth,pet.evolution),form=ramForm(stage,pet.evolution);
+ const original=usesBareBodyMotion(form,action)||ambientPerformanceClip(form,action)||!keepsOutfitForIdleAction(action)&&(playToolSource(action,itemId)||originalCareClip(form,action,itemId));
  return costumePlayback(stage,pet.evolution,original?undefined:pet.wearing,action).appearance;
 };
 export function normalizeWardrobe(owned:unknown,wearing:unknown):{wardrobe?:OutfitId[];wearing?:OutfitId} {

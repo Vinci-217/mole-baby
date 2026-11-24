@@ -51,7 +51,7 @@ async function verifyGrowthSettings(page,desktop){
   if(desktop&&await desktop.evaluate(()=>process.platform==='win32'))await require('./windows-window-chrome.cjs').verifyWindowsChrome(page,desktop);
   await enterHome(page);await roomTab(page,'设置');
   const titles=await page.locator('.settings-panel>section').evaluateAll(items=>items.map(s=>s.querySelector('h3')?.textContent));
-  assert.deepEqual(titles,['拉姆信息','陪伴与桌面','声音与音乐','专注计时','动画与素材','存档与送别',...(desktop?['软件与帮助']:[])]);
+  assert.deepEqual(titles,['拉姆信息','陪伴与桌面','音效','专注计时','动画与素材','存档与送别',...(desktop?['软件与帮助']:[])]);
   await expect(page.getByRole('region',{name:'动画与素材',exact:true}).getByRole('button',{name:'导出动画日志',exact:true})).toBeEnabled();
   await expect(stagePanel()).toHaveCount(0);await roomTab(page,'成长');
   await expect(stagePanel().getByRole('region',{name:'成长进度',exact:true})).toContainText('5天 13小时');
@@ -99,7 +99,7 @@ async function verifyGrowthSettings(page,desktop){
   await roomTab(page,'成长');await stagePanel().scrollIntoViewIfNeeded();await painted('.stage-settings canvas.ram-classic-frame');await screenshot('growth');
   await stagePanel().getByRole('button',{name:'固定形态',exact:true}).click();await stagePanel().getByRole('button',{name:'应用成长设置',exact:true}).click();await screenshot('confirmation');await page.keyboard.press('Escape');
   await roomTab(page,'设置');
-  for(const name of ['声音与音乐','专注计时']){await page.getByRole('region',{name,exact:true}).scrollIntoViewIfNeeded();await screenshot(name==='声音与音乐'?'sound':'timer')}
+  for(const name of ['音效','专注计时']){await page.getByRole('region',{name,exact:true}).scrollIntoViewIfNeeded();await screenshot(name==='音效'?'sound':'timer')}
   assert.equal(await page.locator('.settings-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);
   if(!desktop){
    await page.setViewportSize({width:1000,height:720});await roomTab(page,'成长');await stagePanel().scrollIntoViewIfNeeded();assert.equal(await page.locator('.settings-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);await screenshot('small-growth');await page.setViewportSize({width:1180,height:820});

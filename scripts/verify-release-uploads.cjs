@@ -15,7 +15,9 @@ function verifyReleaseUploads(assets,checksums,required=[]){
 }
 if(require.main===module){
  const release=path.resolve(__dirname,'../release'),data=JSON.parse(fs.readFileSync(process.argv[2]));
- const sums=['SHA256SUMS.txt','SHA256SUMS-android.txt'].map(name=>fs.readFileSync(path.join(release,name),'utf8')).join('\n');
- console.log('PASS uploaded release:',verifyReleaseUploads(data.assets,sums,['SHA256SUMS.txt','SHA256SUMS-android.txt','latest.yml','latest-mac.yml','legacy-x64.yml','legacy-ia32.yml','latest-android.json']));
+ const names=['SHA256SUMS.txt','SHA256SUMS-android.txt'];
+ if(fs.existsSync(path.join(release,'SHA256SUMS-web.txt')))names.push('SHA256SUMS-web.txt');
+ const sums=names.map(name=>fs.readFileSync(path.join(release,name),'utf8')).join('\n');
+ console.log('PASS uploaded release:',verifyReleaseUploads(data.assets,sums,[...names,'latest.yml','latest-mac.yml','legacy-x64.yml','legacy-ia32.yml','latest-android.json']));
 }
 module.exports={verifyReleaseUploads};

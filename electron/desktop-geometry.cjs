@@ -82,12 +82,22 @@ function compactPanelBounds(base, area,scale=1) {
 }
 module.exports.compactPanelBounds=compactPanelBounds;
 
-/** Expand the transparent host, keeping the pet's screen anchor unchanged.
- * Only the physical display clips effects; their scale never depends on it. */
-function effectWindowBounds(base,area,effect,scale=1){
+/** Reserve transparent space around the pet's logical screen anchor. */
+function effectWindowBounds(base,area,effect,scale=1,allowInwardPadding=false){
  const {size:PET_SIZE}=scaledPetMetrics(scale);
  // Reserve a few pixels for fractional CSS registration and antialiased ink.
  const margin=4*scale;
+ if(allowInwardPadding){
+  const fit=(anchor,length,start,extent,areaStart,areaLength)=>{
+   const near=Math.floor(Math.min(anchor,anchor+start-margin));
+   const far=Math.ceil(Math.max(anchor+length,anchor+start+extent+margin));
+   const size=Math.min(areaLength,far-near);
+   return [Math.max(areaStart,Math.min(near,areaStart+areaLength-size)),size];
+  };
+  const [x,width]=fit(base.x,PET_SIZE.width,effect.x,effect.width,area.x,area.width);
+  const [y,height]=fit(base.y,PET_SIZE.height,effect.y,effect.height,area.y,area.height);
+  return {x,y,width,height};
+ }
  const x=Math.floor(Math.min(base.x,Math.max(area.x,base.x+effect.x-margin)));
  const y=Math.floor(Math.min(base.y,Math.max(area.y,base.y+effect.y-margin)));
  const right=Math.ceil(Math.max(base.x+PET_SIZE.width,Math.min(area.x+area.width,base.x+effect.x+effect.width+margin)));

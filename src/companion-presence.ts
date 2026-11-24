@@ -1,6 +1,7 @@
 import { getStage } from './game';
 import type { GameState } from './game';
-import type { CompanionMemory } from './companion-memory';
+import { getCompanionMood, type CompanionMemory } from './companion-memory';
+import { localDay } from './daily-check-in';
 import { companionFeeling } from './companion-feeling';
 import { ITEMS } from './catalog';
 import {todaysTimers} from './companion-moments';
@@ -11,6 +12,7 @@ export type PresenceTopic='growth'|'work'|'progress'|'culture'|'life'|'memory'|'
 export interface PresenceLine { id:string; topic:PresenceTopic; text:string; invitation?:CompanionInvitation }
 export interface PresenceJournal { version:1; petId:string; history:{id:string;topic:PresenceTopic;at:number}[] }
 export const presenceKey=(pet:Pick<GameState,'createdAt'>)=>`ramu-presence-v1:${pet.createdAt}`;
+export const greetingKey=(pet:Pick<GameState,'createdAt'>)=>`ramu-daily-greeting:${pet.createdAt}`;
 const MINUTE=60000;
 export const CULTURE = [
   {id:'culture-steps',quote:'不积跬步，无以至千里',text:'“不积跬步，无以至千里。”我也不是一下就长出叶子的，陪你一点点来。'},
@@ -116,9 +118,26 @@ export function choosePresence(pet:GameState,memory:CompanionMemory,journal:Pres
 export function welcomeLine(pet:GameState,memory:CompanionMemory,now=Date.now()):string {
  const nickname=memory.facts.find(f=>f.kind==='nickname'&&f.at<=now&&Array.from(f.value).length<=8)?.value;
  const address=nickname?`${nickname}，`:'';
- if(pet.sleeping)return `${address}我还在安心打盹，想我时可以轻轻叫醒。`;
- const hour=new Date(now).getHours(),hello=hour>=6&&hour<11?'早上好':hour>=11&&hour<18?'午好':hour>=18&&hour<23?'晚上好':'夜深啦';
- if(pet.stats.health<35)return `${address}${hello}。我有点不舒服，等你方便时照顾我一下吧。`;
- const days=new Set(memory.events.filter(e=>['feed','drink','wash','play','pet','game'].includes(e.kind)&&e.at<=now).map(e=>new Date(e.at).toDateString())).size;
- return `${address}${hello}。${days>=3?'又能和你一起过一个普通的小日子，真好。':'我在这里，陪你慢慢来。'}`;
+ const hour=new Date(now).getHours(),hello=hour>=6&&hour<11?'早上好':hour>=11&&hour<18?'下午好':hour>=18&&hour<23?'晚上好':'夜深啦';
+ const mood=getCompanionMood(memory,pet,now).id;
+ const lines = {
+  sleepy: ['唔……听见你来了。让我再窝一小会儿。','我刚梦见一颗好大的果子……原来是你回来了。'],
+  unwell: ['你来啦。我今天有点蔫，想在你旁边歇一歇。','看见你就安心些了。我有点不舒服，先靠一会儿呀。'],
+  downcast: ['今天心里有一点点乌云。看到你，乌云让了个小缝。','我刚刚还闷闷的。你来啦，坐我旁边一小会儿嘛。'],
+  drowsy: ['你来了呀，我还攒着一个哈欠。要不要一起慢慢醒过来？','唔，眼睛还没完全睁开，可我已经在心里和你打招呼了。'],
+  concerned: ['你回来啦，给你留了个挨着我的位置。','看见你，我心里踏实多了。今天也慢慢来呀。'],
+  cheerful: ['我正攒了一肚子高兴呢，分给刚进门的你！','bibo！今天一见到你，连身子都忍不住晃起来了。'],
+  peaceful: ['今天看到你真高兴。我把身边这个位置留给你啦。','你来啦！我刚刚还在想，今天会和你遇到什么小事。','bibo，听到动静我就抬头了。果然是你呀！'],
+ };
+ const choices=pet.stats.happiness>=80&&mood==='peaceful'?lines.cheerful:lines[mood];
+ return `${address}${hello}！${choices[(Date.parse(localDay(now))/86400000+Math.floor(pet.createdAt/1000))%choices.length]}`;
+}
+
+export function claimDailyGreeting(pet:GameState,now=Date.now()):boolean {
+ const key=greetingKey(pet),day=localDay(now);
+ try {
+  if(localStorage.getItem(key)===day)return false;
+  localStorage.setItem(key,day);
+ } catch { /* Storage restrictions may allow a greeting on another launch. */ }
+ return true;
 }

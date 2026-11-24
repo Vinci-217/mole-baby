@@ -9,11 +9,6 @@ export type Pastime = typeof PASTIMES[number]
 export const isPastime = (action: string): action is Pastime => (PASTIMES as readonly string[]).includes(action)
 export const pastimeBody = (action: string) => action==='read-alone'?'focus':action==='play-alone'?'play':action==='spell'?'idle':action
 export const PASTIME_LABELS: Record<Pastime,string> = {'read-alone':'翻翻书','play-alone':'自己玩球',spell:'变魔术'}
-export const PASTIME_LINES: Record<Pastime,string> = {
-  'read-alone':'我翻几页书，你忙你的。读到有趣的再告诉你。',
-  'play-alone':'小球滚过来啦！我自己玩一会儿，也给你留个位置。',
-  spell:'魔术练习！冒一股烟，变成蓝紫色魔术盒，再变回我。',
-}
 export const PASTIME_MEMORIES: Record<Pastime,string> = {
   'read-alone':'我自己翻了几页书，把喜欢的那页多看了一会儿。',
   'play-alone':'我在桌边自己玩了一会儿小球。',

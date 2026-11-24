@@ -20,7 +20,7 @@ node scripts/package-web.cjs
 
 ## 部署与打开
 
-把部署包解压后的全部内容上传到静态网站目录，保留 assets、icons 等目录结构。根目录或子目录部署均可，相对地址自动适配。无需数据库、Node 常驻后端或安装 GitHub Actions。
+把部署包解压后的全部内容上传到静态网站目录，保留 assets、icons 和 optional-books 等目录结构。根目录或子目录部署均可，相对地址自动适配。读者在设置确认下载后才会取对应书包。图书也可以从 GitHub 上同版本的素材 Release 恢复到 optional-books 下的版本目录。静态托管即可部署。
 
 正式分享给玩家使用稳定的 HTTPS 地址；本地开发的 localhost 也可以启用 PWA。不要双击 index.html 以 file:// 方式打开：浏览器对模块与素材读取有限制。
 

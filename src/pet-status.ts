@@ -11,6 +11,7 @@ export const NEED_RATES = {
 } as const;
 export const HEALTH_RECOVERY_PER_HOUR = 2;
 export const HEALTH_LOSS_PER_HOUR = 6;
+export const TIRED_ENERGY = 25;
 
 export interface NeedRequirement {key:keyof PetStats;minimum:number;exclusive?:boolean}
 export const ACTIVITY_REQUIREMENTS:readonly NeedRequirement[]=[

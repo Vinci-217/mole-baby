@@ -72,6 +72,7 @@ export function renderFoley(audio: BaseAudioContext, kind: Foley, at: number, st
  * sounds: cancel, hidden windows and delayed frames cannot produce a burst. */
 export function createPetSoundClock(score: SoundScore, enabled: boolean | (()=>boolean)) {
   let previous=-1, output: GainNode | null=null, stopped=false
+  const silence=()=>{if(output)dispose(output);output=null}
   return {
     tick(elapsed: number) {
       if(stopped||!Number.isFinite(elapsed)||elapsed<previous)return
@@ -81,7 +82,8 @@ export function createPetSoundClock(score: SoundScore, enabled: boolean | (()=>b
       if(!due.length||!canPlay(typeof enabled==='function'?enabled():enabled))return
       try {const audio=audioContext();void audio.resume().catch(()=>{});output??=channel(audio);for(const cue of due)renderFoley(audio,cue.kind,audio.currentTime,cue.strength,output)}catch{/* Optional audio device. */}
     },
-    stop(){stopped=true;if(output)dispose(output);output=null},
+    pause:silence,
+    stop(){stopped=true;silence()},
   }
 }
 function oneShot(play:(audio:AudioContext,output:GainNode)=>void) {

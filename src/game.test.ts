@@ -74,6 +74,16 @@ describe('time and sleep', () => {
     expect(many.growth).toBeCloseTo(once.growth, 5);
     expect(many.stats).toEqual(once.stats);
   });
+
+  it('crosses a growth stage when a closed app restores the saved elapsed time', () => {
+    const saved = {...fresh(), growth: 59, naturalGrowth: 59};
+    const restored = parseSave(JSON.stringify(saved), NOW + HOUR)!;
+    expect(getStage(restored.growth)).toBe(1);
+    expect(restored.naturalGrowth).toBe(restored.growth);
+    expect(parseSave(JSON.stringify(restored), NOW + HOUR)?.growth).toBe(restored.growth);
+    const fixed = parseSave(JSON.stringify({...saved, growthLocked: true}), NOW + HOUR)!;
+    expect(fixed.growth).toBe(saved.growth);
+  });
 });
 
 describe('autonomous rest',()=>{

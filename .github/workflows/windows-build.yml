@@ -16,8 +16,41 @@ concurrency:
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
+  book-assets:
+    name: Build the shared book library
+    if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build and verify the shared book data
+        run: |
+          npm ci
+          npm run build
+          python3 scripts/split-resource-packs.py dist "$RUNNER_TEMP/ramu-book-assets" --light-renderer "$RUNNER_TEMP/main"
+          node scripts/verify-offline-assets.cjs "$RUNNER_TEMP/main"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ramu-book-assets
+          path: ${{ runner.temp }}/ramu-book-assets/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ramu-canonical-book-index
+          path: ${{ runner.temp }}/ramu-book-assets/book-packs.json
+          if-no-files-found: error
+          retention-days: 7
+
   build:
     name: Build and check Windows x64
+    needs: book-assets
+    if: always() && (needs.book-assets.result == 'success' || needs.book-assets.result == 'skipped')
     runs-on: windows-latest
     timeout-minutes: 30
     env:
@@ -59,6 +92,22 @@ jobs:
           set -o pipefail
           npm run build 2>&1 | tee -a artifacts/windows-smoke.log
 
+      - name: Get the shared Windows book index
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-canonical-book-index
+          path: ${{ runner.temp }}/windows-book-index
+      - name: Prepare the Windows main package
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/split-resource-packs.py dist "$RUNNER_TEMP/windows-book-index" --book-index "$RUNNER_TEMP/windows-book-index/book-packs.json" --light-renderer dist-windows-light
+          node scripts/verify-offline-assets.cjs dist-windows-light
+          mv dist dist-windows-full
+          mv dist-windows-light dist
+
       - name: Package installer and portable ZIP
         shell: bash
         run: |
@@ -72,7 +121,10 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          node scripts/verify-windows-package.cjs 2>&1 | tee -a artifacts/windows-smoke.log
+          book_args=()
+          book_index="$RUNNER_TEMP/windows-book-index/book-packs.json"
+          if [[ -f "$book_index" ]]; then book_args=(--book-index "$book_index"); fi
+          node scripts/verify-windows-package.cjs "${book_args[@]}" 2>&1 | tee -a artifacts/windows-smoke.log
 
       - name: Verify a confirmed Windows upgrade and saved data
         shell: bash
@@ -117,6 +169,8 @@ jobs:
 
   legacy:
     name: Build and check legacy Windows ${{ matrix.arch }}
+    needs: book-assets
+    if: always() && (needs.book-assets.result == 'success' || needs.book-assets.result == 'skipped')
     strategy:
       fail-fast: false
       matrix:
@@ -157,6 +211,21 @@ jobs:
         run: |
           set -o pipefail
           npm run build:legacy 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Get the shared compatible Windows book index
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-canonical-book-index
+          path: ${{ runner.temp }}/legacy-book-index
+      - name: Prepare the compatible Windows main package
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/split-resource-packs.py dist "$RUNNER_TEMP/legacy-book-index" --book-index "$RUNNER_TEMP/legacy-book-index/book-packs.json" --light-renderer dist-legacy-main
+          node scripts/verify-offline-assets.cjs dist-legacy-main
+          mv dist dist-legacy-full
+          mv dist-legacy-main dist
       - name: Package isolated Electron 22 installer and portable ZIP
         shell: bash
         run: |
@@ -166,7 +235,18 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          node scripts/verify-windows-package.cjs --legacy --arch ${{ matrix.arch }} --directory release/legacy-${{ matrix.arch }} 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+          book_args=()
+          book_index="$RUNNER_TEMP/legacy-book-index/book-packs.json"
+          if [[ -f "$book_index" ]]; then book_args=(--book-index "$book_index"); fi
+          node scripts/verify-windows-package.cjs --legacy --arch ${{ matrix.arch }} --directory release/legacy-${{ matrix.arch }} "${book_args[@]}" 2>&1 | tee -a artifacts/legacy-${{ matrix.arch }}-smoke.log
+      - name: Retain the compatible Windows book index
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ramu-book-index-legacy-${{ matrix.arch }}
+          path: ${{ runner.temp }}/legacy-book-index/book-packs.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Upload checked legacy downloads
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -203,6 +283,8 @@ jobs:
 
   mac:
     name: Build and check macOS ${{ matrix.arch }}
+    needs: book-assets
+    if: always() && (needs.book-assets.result == 'success' || needs.book-assets.result == 'skipped')
     strategy:
       fail-fast: false
       matrix:
@@ -257,7 +339,22 @@ jobs:
         run: |
           set -o pipefail
           npm run build 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
-      - name: Package native DMG and ZIP (${{ steps.mac_signing.outputs.mode }})
+      - name: Get the shared Mac book index
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-canonical-book-index
+          path: ${{ runner.temp }}/mac-book-index
+      - name: Prepare the Mac main package
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/split-resource-packs.py dist "$RUNNER_TEMP/mac-book-index" --book-index "$RUNNER_TEMP/mac-book-index/book-packs.json" --light-renderer dist-mac-main
+          node scripts/verify-offline-assets.cjs dist-mac-main
+          mv dist dist-mac-full
+          mv dist-mac-main dist
+      - name: Package native DMG and updater archive (${{ steps.mac_signing.outputs.mode }})
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ steps.mac_signing.outputs.mode == 'notarized' && 'true' || 'false' }}
           CSC_LINK: ${{ secrets.MACOS_CERTIFICATE || secrets.CSC_LINK }}
@@ -275,8 +372,16 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts
-          node scripts/verify-mac-package.cjs ${{ matrix.arch }} 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
+          node scripts/verify-mac-package.cjs ${{ matrix.arch }} --with-update-zip 2>&1 | tee -a artifacts/mac-${{ matrix.arch }}-smoke.log
           cp release/latest-mac.yml release/latest-mac-${{ matrix.arch }}.yml
+      - name: Retain the Mac book index for release matching
+        if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ramu-book-index-mac-${{ matrix.arch }}
+          path: ${{ runner.temp }}/mac-book-index/book-packs.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Upload checked Mac downloads
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -312,16 +417,50 @@ jobs:
 
   android:
     name: Build and verify fixed-signed Android preview
+    needs: book-assets
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v')
     uses: ./.github/workflows/android-preview.yml
     permissions:
       contents: write
     secrets: inherit
 
+  web:
+    name: Prepare the static web release
+    needs: book-assets
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-book-assets
+          path: ${{ runner.temp }}/ramu-book-assets
+      - name: Package the site and its optional books
+        run: |
+          set -euo pipefail
+          npm ci
+          MOLE_WEB_BOOK_ASSETS="$RUNNER_TEMP/ramu-book-assets" node scripts/package-web.cjs
+          zip=$(node -p 'require("./release/web-package-report.json").zip')
+          mv "release/$zip.sha256" release/SHA256SUMS-web.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mole-baby-web
+          path: |
+            release/mole-baby-*-web-preview.zip
+            release/SHA256SUMS-web.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v')
-    needs: [build, legacy, mac, android]
+    needs: [book-assets, build, legacy, mac, android, web]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -344,6 +483,25 @@ jobs:
           merge-multiple: true
           path: release
 
+      - name: Download the checked shared book archives
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ramu-book-assets
+          path: ${{ runner.temp }}/ramu-book-assets
+      - name: Download the other platform book indexes
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: ramu-book-index-*
+          path: ${{ runner.temp }}/ramu-book-indexes
+
+      - name: Require identical books across all native platforms
+        shell: bash
+        run: |
+          set -euo pipefail
+          for platform in legacy-x64 legacy-ia32 mac-arm64 mac-x64 android; do
+            cmp "$RUNNER_TEMP/ramu-book-assets/book-packs.json" "$RUNNER_TEMP/ramu-book-indexes/ramu-book-index-$platform/book-packs.json"
+          done
+
       - name: Check artifact checksums
         working-directory: release
         run: |
@@ -351,10 +509,17 @@ jobs:
           mv combined.sha256 SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
           node ../scripts/prepare-update-blockmaps.cjs
-          node ../scripts/prepare-release-notes.cjs
+          MOLE_BOOKS_ON_DEMAND=1 node ../scripts/prepare-release-notes.cjs
           node ../scripts/update-metadata.cjs
           sha256sum --check SHA256SUMS.txt
           sha256sum --check SHA256SUMS-android.txt
+          sha256sum --check SHA256SUMS-web.txt
+
+      - name: Verify and publish GitHub book sources before client updates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: node scripts/publish-book-assets.cjs "$RUNNER_TEMP/ramu-book-assets"
 
       - name: Create release or replace its build attachments
         env:
@@ -394,7 +559,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" release/*.dmg release/mole-baby-*.zip release/*-Setup.exe release/*.blockmap release/SHA256SUMS.txt release/macos-trust-*.json release/mole-baby-mac-help.html release/latest.yml release/legacy-x64.yml release/legacy-ia32.yml release/latest-mac.yml --draft --verify-tag --title "拉姆 $RELEASE_TAG" --notes-file release/RELEASE_NOTES.md
           fi
-          gh release upload "$RELEASE_TAG" release/*.apk release/*.xapk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/latest-android.json release/SHA256SUMS-android.txt --clobber
+          gh release upload "$RELEASE_TAG" release/*.apk release/*.xapk release/resources-*.zip release/resources-*.json release/resources-*.blockmap release/*.apk.blockmap release/latest-android.json release/SHA256SUMS-android.txt release/SHA256SUMS-web.txt --clobber
           # Resolve drafts by ID: the public tag endpoint can return 404 until publication.
           release_id=$(gh api "repos/$GH_REPO/releases?per_page=100" --jq ".[] | select(.tag_name == \"$RELEASE_TAG\") | .id")
           test -n "$release_id"

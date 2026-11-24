@@ -12,7 +12,7 @@ export function installWebApp(){
  if(!isWebApp())return;
  document.documentElement.classList.add('web-edition');
  if(!window.isSecureContext||!('serviceWorker'in navigator)){setState('unavailable');return}
- void navigator.serviceWorker.register(new URL('./sw.js',document.baseURI),{scope:'./',updateViaCache:'none'}).then(registration=>{
+ const register=()=>void navigator.serviceWorker.register(new URL('./sw.js',document.baseURI),{scope:'./',updateViaCache:'none'}).then(registration=>{
   const status=()=>setState(registration.waiting?'update-ready':registration.active?'ready':'starting');
   const observe=()=>{registration.installing?.addEventListener('statechange',status);status()};
   registration.addEventListener('updatefound',observe);navigator.serviceWorker.addEventListener('controllerchange',status);observe();
@@ -20,4 +20,6 @@ export function installWebApp(){
   // original SWF could mix old metadata with new source bytes.
   void registration.update().catch(()=>{});
  }).catch(()=>setState('unavailable'));
+ if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(register,{timeout:1000});
+ else setTimeout(register,100);
 }

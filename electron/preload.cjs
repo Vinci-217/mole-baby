@@ -1,5 +1,14 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+// An entry module may be missing or fail to load even though index.html did
+// load. Report it from the preload before the app's renderer can acknowledge.
+window.addEventListener('error', event => {
+  const script = event.target;
+  if (script instanceof HTMLScriptElement && script.type === 'module') {
+    ipcRenderer.send('desktop:renderer-entry-failed', script.getAttribute('src') ?? '');
+  }
+}, true);
+
 function subscribeToState(channel, callback, selectInitial) {
   if (typeof callback !== 'function') throw new TypeError('A callback is required');
   let active = true;
@@ -20,6 +29,19 @@ function subscribeToState(channel, callback, selectInitial) {
 
 contextBridge.exposeInMainWorld('desktop', Object.freeze({
   isElectron: true,
+  ...(process.argv.includes('--ramu-on-demand-books') ? {
+    prepareBookPages: id => ipcRenderer.invoke('books:prepare', id),
+    bookDownloads: Object.freeze({
+      getStatus: () => ipcRenderer.invoke('books:status'),
+      downloadAll: () => ipcRenderer.invoke('books:download-all'),
+      pauseAll: () => ipcRenderer.invoke('books:pause-all'),
+      onStatus: callback => {
+        const listener = (_event, status) => callback(status);
+        ipcRenderer.on('books:status-changed', listener);
+        return () => ipcRenderer.removeListener('books:status-changed', listener);
+      },
+    }),
+  } : {}),
   updates:Object.freeze({
     openRelease:()=>ipcRenderer.invoke('updates:open-release'),
     getState:()=>ipcRenderer.invoke('updates:get-state'),check:()=>ipcRenderer.invoke('updates:check'),download:()=>ipcRenderer.invoke('updates:download'),install:()=>ipcRenderer.invoke('updates:install'),setEnabled:enabled=>ipcRenderer.invoke('updates:set-enabled',enabled),
@@ -29,6 +51,8 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     onPrepare:callback=>{const listener=(_event,id)=>{if(typeof id!=='string')return;Promise.resolve().then(callback).then(ok=>ipcRenderer.send('updates:prepared',id,ok===true)).catch(()=>ipcRenderer.send('updates:prepared',id,false))};ipcRenderer.on('updates:prepare',listener);return()=>ipcRenderer.removeListener('updates:prepare',listener)},
   }),
   platform: process.platform,
+  getLaunchAtLogin:()=>ipcRenderer.invoke('desktop:get-launch-at-login'),
+  setLaunchAtLogin:enabled=>ipcRenderer.invoke('desktop:set-launch-at-login',enabled),
   flushSave:()=>ipcRenderer.invoke('desktop:flush-save'),
   localSaves:Object.freeze({
     inspect:()=>ipcRenderer.invoke('saves:inspect'),
@@ -46,8 +70,6 @@ contextBridge.exposeInMainWorld('desktop', Object.freeze({
     onSnapshot:callback=>{const listener=(_event,value)=>callback(value);ipcRenderer.on('board:snapshot',listener);return()=>ipcRenderer.removeListener('board:snapshot',listener)},
     onPatch:callback=>{const listener=(_event,request)=>{Promise.resolve().then(()=>callback(request)).then(result=>ipcRenderer.send('board:reply',request.id,result)).catch(()=>ipcRenderer.send('board:reply',request.id,{ok:false}))};ipcRenderer.on('board:patch',listener);return()=>ipcRenderer.removeListener('board:patch',listener)},
   }),
-  setMusicState: state=>ipcRenderer.invoke('desktop:set-music-state',state),
-  onMusicToggle: callback=>{const listener=(_event,enabled)=>callback(enabled);ipcRenderer.on('desktop:music-toggle',listener);return()=>ipcRenderer.removeListener('desktop:music-toggle',listener)},
   openMacSettings: kind=>ipcRenderer.invoke('desktop:open-mac-settings',kind),
   openMacGuide: ()=>ipcRenderer.invoke('desktop:open-mac-guide'),
   getState: () => ipcRenderer.invoke('desktop:get-state'),

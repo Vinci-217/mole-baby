@@ -3,6 +3,7 @@ import type {RefObject} from 'react';
 import SocialCue from './SocialCue';
 import CareAction from './CareAction';
 import RamSchool from './RamSchool';
+import NeedActionCue from './NeedActionCue';
 import './OutfitActionCue.css';
 
 /** Original prop artwork + explicitly project-authored missing choreography. */
@@ -10,6 +11,7 @@ export default function OutfitActionCue({spec,startedAt,stage,sound,clock}:{spec
  if(spec.kind==='social')return <SocialCue action={spec.action}/>;
  if(spec.kind==='care'&&spec.motion)return <CareAction motion={spec.motion}/>;
  if(spec.kind==='school')return <RamSchool action={spec.action} startedAt={startedAt} stage={stage} sound={sound} clock={clock}/>;
+ if(spec.kind==='need')return <NeedActionCue action={spec.action}/>;
  if(spec.kind==='toy')return <span className={`outfit-action-cue outfit-toy toy-${spec.toy}`} data-costume-toy={spec.toy} aria-hidden="true">
   {spec.toy==='180023'?<span className="outfit-spring">{[0,1,2,3].map(i=><i key={i}/>)}</span>:spec.toy==='180097'?<span className="outfit-gum"/>:<img className="outfit-moving-prop" src={spec.toy?.startsWith('tuya')?'./assets/original/items/180026.png':`./assets/original/items/${spec.toy}.png`} alt=""/>}
   {spec.toy?.startsWith('tuya')&&<svg className="outfit-doodle" viewBox="0 0 100 60"><path d="M8 39 Q24 2 39 33 T70 24 T92 35" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" pathLength="1"/></svg>}

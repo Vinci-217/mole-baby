@@ -1,0 +1,75 @@
+import type {RamBook, RamBookId} from './reading-books';
+
+type IllustratedSpine = readonly [art: string, title: string, hue?: number];
+
+const illustratedSpines: Partial<Record<RamBookId, IllustratedSpine>> = {
+  supplies: ['sprout', '拉姆手册'],
+  life: ['care', '拉姆生活'],
+  study: ['quill', '拉姆学习'],
+  food: ['cookie', '拉姆食谱'],
+  classroom: ['bell', '小导师'],
+  secret: ['moon', '超拉秘密'],
+  rescue: ['heart', '拉姆救治'],
+  'forest-longing': ['pine', '森林向往'],
+  'forest-super': ['acorn', '森林超拉'],
+  'ram-world': ['rosette', '拉姆世界'],
+  'ram-sports': ['pennant', '拉姆运动'],
+  'library-naturalnessbook': ['mushroom', '自然课本'],
+  'library-playerbook': ['shield', '公民手册'],
+  'library-guidebook': ['compass', '向导手册'],
+  'library-pressmanbook': ['camera', '记者手册'],
+  'library-angelguidebook': ['angel', '天使园'],
+  'library-chevalierclothbook': ['helmet', '骑士荣耀'],
+  'library-xihabook': ['vinyl', '嘻哈记'],
+  'library-zhuangyuangoodplaybookpanel': ['lantern', '贺岁好玩'],
+  'library-herowarbook': ['shield', '勇士之战', 23],
+  'library-tenyearsago': ['pine', '十年森林', 32],
+  'library-5': ['map', '庄园历史'],
+  'library-6': ['key', '摩尔王宝'],
+  'library-10': ['comet', '我在星上'],
+  'library-17': ['moon', '中秋神话', 32],
+  'library-32': ['quill', '网络征文', 32],
+  'library-101': ['heart', '消防手册', 146],
+  'library-102': ['compass', '驾驶手册', -23],
+  'library-103': ['helmet', '骑士手册', 25],
+  'library-106': ['shield', '警官手册', -32],
+  'library-108': ['drafting', '建筑手册'],
+  'library-1': ['camera', '公主游记', -20],
+  'library-3': ['trophy', '08火神'],
+  'library-4': ['rosette', '庄园08', -17],
+  'library-7': ['lantern', '一周年', -25],
+  'library-9': ['map', '庄园09', 32],
+  'library-13': ['acorn', '伊莲理财', 21],
+  'library-15': ['trophy', '和平村', 28],
+  'library-18': ['key', '黑森探险', 30],
+  'library-19': ['palm', '雨林①'],
+  'library-20': ['helmet', '瑞琪荣耀', -27],
+  'library-21': ['lantern', '穿越火神', 28],
+  'library-22': ['trophy', '团结火神', -25],
+  'library-23': ['palm', '雨林②', 18],
+  'library-24': ['palm', '雨林③', -30],
+  'library-25': ['palm', '雨林④', 71],
+  'library-26': ['palm', '雨林⑤', -49],
+  'library-27': ['palm', '雨林⑥', 40],
+  'library-28': ['palm', '雨林⑦', -66],
+  'library-30': ['bell', '摩尔童谣', -22],
+  'library-201': ['quill', '凯文征文', -25],
+  'library-202': ['berries', '感恩节'],
+  'library-203': ['heart', '爱心行动', 164],
+  'library-204': ['pennant', '运动征文', 27],
+  'library-211': ['berries', '浆果森林', 21],
+  'library-213': ['drafting', '庄园装潢', 37],
+  'library-214': ['ribbon', '绝版装扮'],
+  'library-215': ['ribbon', '装扮一届', 29],
+  'library-216': ['ribbon', '装扮二届', -38],
+  'dragon-handbook': ['dragon-wing', '飞龙图鉴'],
+  'super-ram-introduction': ['comet', '超拉特权', 26],
+};
+
+export function bookSpine(book: RamBook) {
+  if (book.id.startsWith('gazette-')) {
+    return {title: `${book.id.slice('gazette-'.length)}期`};
+  }
+  const [art, title, hue = 0] = illustratedSpines[book.id] ?? ['compass', [...book.title].slice(0, 4).join('')];
+  return {title, art: `./assets/generated/reading-spines/${art}.webp`, hue};
+}

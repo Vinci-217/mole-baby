@@ -3,6 +3,7 @@ import type {CostumeAction} from './costume-action';
 import {outfitPettingPose,type OutfitBodyBounds} from './outfit-petting';
 import {sampleSocialMotion,gesturePulse} from './social-motion';
 import {sampleGentleMouth} from './item-motion';
+import {needGesture} from './need-gesture';
 
 const clamp=(n:number,min=0,max=1)=>Math.max(min,Math.min(max,n));
 /** Project-authored movement of the INTACT original costume. The native
@@ -47,6 +48,15 @@ export function sampleCostumeMotion(spec:CostumeAction,body:OutfitBodyBounds,ela
   }else{
    pose.propX=centre+body.width*(.48+Math.sin(time/440)*.22);pose.propY=body.y/108*100-3+Math.cos(time/510)*10;pose.propAngle=Math.sin(time/360)*28;
    pose.angle=Math.sin(time/440)*3*envelope;pose.y=spec.toy==='180026'?0:-gesturePulse(time,(duration??4400)*.55,600)*5;
+  }
+ }else if(spec.kind==='need'){
+  const nod=gesturePulse(time,900,440)+gesturePulse(time,2200,480);
+  if(needGesture(spec.action)?.condition==='thirsty'){
+   pose.angle=-5*nod;
+   pose.y=-2*nod;
+  }else{
+   pose.angle=3*nod;
+   pose.scaleY=1-.035*nod;
   }
  }else if(spec.kind==='emotion'){
   if(['mood-joy','happy','reward','waving','review','catch'].includes(spec.action)){pose.y=-Math.abs(Math.sin(progress*Math.PI*3))*4*envelope;pose.angle=Math.sin(progress*Math.PI*4)*3*envelope;pose.affection=envelope;}

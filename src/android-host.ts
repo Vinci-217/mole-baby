@@ -33,7 +33,7 @@ export function hydrateAndroidStorage(storage:Storage,snapshot:Record<string,str
   if(deleted.has(key))storage.removeItem(key);
   else{const value=storage.getItem(key);if(value!==null)persist(key,value)}
  }
- for(const [key,value]of Object.entries(snapshot))if(allowedStorageKey(key)&&typeof value==='string')storage.setItem(key,value);
+ for(const [key,value]of Object.entries(snapshot))if(allowedStorageKey(key)&&typeof value==='string'&&storage.getItem(key)!==value)storage.setItem(key,value);
 }
 
 export function installAndroidHost(){
@@ -63,7 +63,9 @@ export function installAndroidHost(){
   const send=(method:string,args:Record<string,unknown>={})=>{void rpc(method,args).catch(()=>{});};
   window.__moleAndroidReceive=(id,value,error)=>{const task=pending.get(id);if(!task)return;pending.delete(id);clearTimeout(task.timer);if(error)task.reject(new Error(error));else task.resolve(value);};
   const prepare=new Set<()=>boolean|Promise<boolean>>();
+  let state=bootstrap.state;
   window.__moleAndroidEvent=(type,payload)=>{
+    if(type==='state')state=payload as unknown as DesktopState;
     if(type==='prepare')void(async()=>{let ok=true;for(const callback of prepare)try{if(!await callback())ok=false;}catch{ok=false;}send('prepared',{token:payload.token,ok});})();
     for(const callback of listeners.get(type)??[])callback(payload);
   };
@@ -80,6 +82,6 @@ export function installAndroidHost(){
     setPetMode:enabled=>rpc('setPetMode',{enabled}),setRoomFullscreen:enabled=>rpc('setRoomFullscreen',{enabled}),startRoomResize:edge=>rpc('startRoomResize',{edge}),endRoomResize:()=>rpc('endRoomResize'),adjustRoomSize:(dx,dy)=>rpc('adjustRoomSize',{dx,dy}),openManorSite:()=>rpc('openManorSite'),
     setCompanionPanel:(open,layout)=>rpc('setCompanionPanel',{open,layout}),setPetStatus:status=>rpc('setPetStatus',{status}),setPetEffectBounds:bounds=>rpc('setPetEffectBounds',{bounds}),setPetAppearance:form=>rpc('setPetAppearance',{form}),setPetCanMove:enabled=>rpc('setPetCanMove',{enabled}),
     setEdgeHiding:enabled=>rpc('setEdgeHiding',{enabled}),revealPet:()=>rpc('revealPet'),setEdgeHovered:hovered=>rpc('setEdgeHovered',{hovered}),setInteracting:enabled=>rpc('setInteracting',{enabled}),movePet:(dx,dy)=>rpc('movePet',{dx,dy}),wander:enabled=>rpc('wander',{enabled}),
-    onStateChanged:callback=>{const off=on('state',v=>callback(v as unknown as DesktopState));void rpc<DesktopState>('getState').then(callback).catch(()=>{});return off;},onPetModeChanged:callback=>on('state',v=>callback(v.petMode===true)),notify:(title,body)=>send('notify',{title,body}),
+    onStateChanged:callback=>{const off=on('state',v=>callback(v as unknown as DesktopState));callback(state);return off;},onPetModeChanged:callback=>on('state',v=>callback(v.petMode===true)),notify:(title,body)=>send('notify',{title,body}),
   };
 }

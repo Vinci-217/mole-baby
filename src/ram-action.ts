@@ -1,9 +1,12 @@
 import {isOfficialAction,officialClip} from './official-clips';
 
+export const isAmbientAction=(action:string)=>action.startsWith('ambient-');
+export const keepsOutfitForIdleAction=(action:string)=>isAmbientAction(action)||action==='play-alone';
+
 /** Resolve interruptions before choosing artwork, timers or clothing. */
 export function normalizeRamAction(action:string,stage:number){
  const clip=isOfficialAction(action)?officialClip(action.replace(/^(official-|ambient-)/,'')):undefined;
- return clip?.kind==='care'&&clip.path.endsWith('/180004.swf')&&stage>0?'play':action.startsWith('ambient-element-')?action.slice(8):action;
+ return action.startsWith('official-')&&clip?.kind==='care'&&clip.path.endsWith('/180004.swf')&&stage>0?'play':action.startsWith('ambient-element-')?action.slice(8):action;
 }
 export function effectiveRamAction({action='idle',stage,sleeping=false,shaking=false,dragging=false}:{action?:string;stage:number;sleeping?:boolean;shaking?:boolean;dragging?:boolean}){
  if(sleeping||action==='sleep')return 'sleep';

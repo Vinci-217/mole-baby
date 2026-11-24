@@ -49,8 +49,8 @@ jobs:
           npm test 2>&1 | tee artifacts/wardrobe-unit-tests.log
       - run: npm run build
       - run: node scripts/verify-offline-assets.cjs
-      - name: Package local test DMG and verification ZIP
-        run: npx --no-install electron-builder --config electron-builder.mac.cjs --mac dmg zip --arm64 --publish never
+      - name: Package local test DMG
+        run: npx --no-install electron-builder --config electron-builder.mac.cjs --mac dmg --arm64 --publish never
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Reproduce the reported sick-pet wardrobe case in the packaged application

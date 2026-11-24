@@ -2,6 +2,9 @@
 (async function(){
  const token=new URLSearchParams(location.search).get('token'),pollLimit=900; // 45s at 50ms, matching the host's cold-start budget
  let player,ready=false,visible=false,poseSettling=false,timer,lastPose,id,sequence=0,clip,looping,pose,requestAcknowledged=false,viewportScale=3.2,prepared=false,disposed=false;
+ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+ const windowVisible=()=>pose.windowVisible??!document.hidden;
+ const shouldSuspend=(checkReducedMotion=true)=>pose.paused||!windowVisible()||(checkReducedMotion&&looping&&reducedMotion.matches&&!pose.playInReducedMotion);
  const engines=new Map();let engineKey='';
  let nativeControlRoot=null,nativeControlObserver=null;
  let previewTimer,lastPreview='',queuedPreview='';
@@ -9,6 +12,7 @@
  // A failed first request must not poison every later outfit in this iframe.
  const manifest=()=>manifestRequest??(manifestRequest=fetch('manifest.json?v=9').then(response=>{if(!response.ok)throw Error('Manifest unavailable: '+response.status);return response.json()}).catch(error=>{manifestRequest=undefined;throw error}));
  const send=(type,value)=>parent.postMessage({type:'ram-original-'+type,token,id,sequence,value},'*');
+ function sendState(state){try{send('state',JSON.parse(JSON.stringify(state)));}catch(error){window.originalStateError=String(error);send('diagnostic',{phase:'state',error:String(error)});}}
  const call=(name,...args)=>player&&player.ruffle().callExternalInterface(name,...args);
  // Ruffle exposes its own play/unmute controls when its timeline is paused.
  // This player is fully driven by the parent app, so those controls must
@@ -57,8 +61,8 @@
   call('setBodyColor',...pose.color);
   if(!lastPose||lastPose.form!==pose.form||lastPose.direction!==pose.direction||lastPose.moving!==pose.moving){call('previewPose',pose.form,pose.direction,pose.moving,clip.kind==='outfit'&&!visible);poseSettling=clip.kind==='outfit';}
   player.ruffle().volume=pose.sound?Math.max(0,Math.min(1,pose.volume??.45)):0;lastPose={...pose};
-  if(!pose.paused&&!document.hidden)call('previewPlay');
-  if(!poseSettling&&(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches))player.ruffle().suspend();
+  if(!shouldSuspend()&&(looping||!token||requestAcknowledged))call('previewPlay');
+  if(!poseSettling&&shouldSuspend())player.ruffle().suspend();
   queuePreview();
  }
  async function load(request){
@@ -92,24 +96,24 @@
    send('diagnostic',{phase:'engine'});
    const referenceForm=request.value.referenceForm||pose.form;
    const formName={level1:'seed',level2:'junior',level3:'middle',level4:'senior',level101:'classic',level101_7:'super',level5_1:'fire',level5_2:'water',level5_4:'wood'}[referenceForm]||'junior';
-   await player.ruffle().load({url:'controller.swf?v=9',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,kind:clip.kind,viewportScale:String(viewportScale),effectBounds:(clip.effectBounds||[]).join(','),bodyReference:(clip.referenceBodyBounds||[]).join(','),effectFrames:String(clip.effectFrames||0),registerBody:request.value.registerBody!==false?'1':'',referenceForm,referenceBounds:library.bodyBounds[formName].join(','),bodyPath_down:(clip.namedBodyPaths?.down||[]).join(','),bodyPath_left:(clip.namedBodyPaths?.left||[]).join(','),bodyPath_right:(clip.namedBodyPaths?.right||[]).join(','),base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
+   await player.ruffle().load({url:'controller.swf?v=10',parameters:{source:'files/'+clip.path,symbol:clip.symbol,form:pose.form,kind:clip.kind,finite:looping?'':'1',viewportScale:String(viewportScale),effectBounds:(clip.effectBounds||[]).join(','),bodyReference:(clip.referenceBodyBounds||[]).join(','),effectFrames:String(clip.effectFrames||0),registerBody:request.value.registerBody!==false?'1':'',referenceForm,referenceBounds:library.bodyBounds[formName].join(','),bodyPath_down:(clip.namedBodyPaths?.down||[]).join(','),bodyPath_left:(clip.namedBodyPaths?.left||[]).join(','),bodyPath_right:(clip.namedBodyPaths?.right||[]).join(','),base:clip.base?'files/resource/NPC/lamubone.swf':''},autoplay:'on',splashScreen:false,unmuteOverlay:'hidden',wmode:'transparent',allowScriptAccess:true,openUrlMode:'deny',logLevel:'error',preferredRenderer:'canvas'});
    if(disposed||current!==sequence)return;
    send('diagnostic',{phase:'source'});
    player.ruffle().volume=0;
    }
    watchNativeControls();
    while(engines.size>1){const oldest=engines.keys().next().value;engines.get(oldest).player.remove();engines.delete(oldest);}
-   let tries=0,lastMask=0,lastStatus=0;
+   let tries=0,lastMask=0,lastStatus=0,activePlayback=0;
    timer=setInterval(()=>{
     try{
      // Catch initial readiness and pose changes sooner, without increasing
      // steady-state status/mask work once the outfit is actually playing.
-     const now=performance.now();if(ready&&visible&&!poseSettling&&now-lastStatus<150)return;lastStatus=now;
+     const now=performance.now(),delta=now-lastStatus;if(ready&&visible&&!poseSettling&&delta<150)return;lastStatus=now;
      hideNativeControls();
      // A suspended Ruffle timeline does not reliably service ExternalInterface.
      // Its loaded state remains valid; repeat the handshake and pixel mask
      // without asking the paused engine to run code.
-     if(ready&&visible&&!poseSettling&&(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)){
+     if(ready&&visible&&!poseSettling&&shouldSuspend()){
       hideNativeControls();
       if(!requestAcknowledged){send('ready',{path:clip.path,sha256:clip.sha256});sendMask();}
       return;
@@ -117,7 +121,15 @@
      const state=call('previewStatus');
      if(state&&state.error){send('error',state.error);clearInterval(timer);return;}
      if(state&&state.ready&&state.settled&&state.registration&&!prepared&&clip.kind!=='outfit'){call('previewPrepare',clip.symbol);prepared=true;return;}
-     if(state&&state.ended){if(looping){call('previewSymbol',clip.symbol);lastPose=null;}else{send('finished');clearInterval(timer);}return;}
+     if(state&&state.ended&&visible){
+      if(looping){call('previewSymbol',clip.symbol);lastPose=null;}
+      else{
+       clearInterval(timer);sendState(state);
+       // Let the host paint the final pose before it can unmount the player.
+       requestAnimationFrame(()=>requestAnimationFrame(()=>{if(current===sequence)send('finished');}));
+      }
+      return;
+     }
      if(state&&state.ready&&state.settled&&state.registration){
       if(!ready){
        ready=true;
@@ -135,10 +147,11 @@
       tries=0;
       // Ready is an idempotent handshake. Repeat until the host acknowledges;
       // custom-protocol frames may become ready before their host listener.
+      sendState(state);
       if(!requestAcknowledged)send('ready',{path:clip.path,sha256:clip.sha256});
       if(performance.now()-lastMask>600){lastMask=performance.now();sendMask();}
-      try{send('state',JSON.parse(JSON.stringify(state)));}catch(error){window.originalStateError=String(error);send('diagnostic',{phase:'state',error:String(error)});}
-      if(pose.paused||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)player.ruffle().suspend();
+      if(shouldSuspend())player.ruffle().suspend();
+      else if(!looping&&!state.holding&&(activePlayback+=Math.min(delta,250))>180000){send('error','Source did not signal completion');clearInterval(timer);}
      }else if(++tries>pollLimit){send('error','Source requires the full client');clearInterval(timer);}
     }catch(error){window.originalRuntimeError=String(error);send('diagnostic',{phase:'status',error:String(error)});if(++tries>pollLimit){send('error',String(error));clearInterval(timer);}}
    },50);
@@ -147,11 +160,17 @@
  addEventListener('message',event=>{
   if(disposed||event.source!==parent||!event.data||event.data.token!==token)return;
   if(event.data.type==='ram-original-load')load(event.data);
-  if(event.data.type==='ram-original-ack'&&event.data.sequence===sequence){requestAcknowledged=true;}
+  if(event.data.type==='ram-original-ack'&&event.data.sequence===sequence&&!requestAcknowledged){requestAcknowledged=true;apply();}
   if(event.data.type==='ram-original-pose'&&event.data.sequence===sequence){pose=event.data.value;apply();}
  });
  send('boot');
  const initial=new URLSearchParams(location.search);if(initial.get('id'))load({sequence:1,value:{id:initial.get('id'),loop:initial.get('loop')==='1',registerBody:initial.get('registerBody')==='1',pose:{form:initial.get('form')||'level2',direction:'down',moving:false,color:(initial.get('color')||'0,-21,-255').split(',').map(Number),sound:false,volume:.45}}});
- document.addEventListener('visibilitychange',()=>{if(player)player.ruffle()[document.hidden||pose?.paused?'suspend':'resume']();});
+ const syncPlayback=()=>{
+  if(!player)return;
+  const settled=ready&&visible&&!poseSettling;
+  player.ruffle()[shouldSuspend(settled)?'suspend':'resume']();
+ };
+ document.addEventListener('visibilitychange',syncPlayback);
+ reducedMotion.addEventListener('change',syncPlayback);
  addEventListener('pagehide',()=>{disposed=true;ready=false;sequence++;clearInterval(timer);clearTimeout(previewTimer);const retired=player;player=null;releaseNativeControls();if(retired)retired.remove();for(const saved of engines.values())saved.player.remove();engines.clear();});
 })();

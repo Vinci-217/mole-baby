@@ -1,7 +1,7 @@
 /** Real board writes and proportional resizing; only persistent isolated QA profiles. */
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium,_electron,expect}=require('@playwright/test');
-const {enterHome,toDesktop,roomTab}=require('./smoke-helpers.cjs');
+const {enterHome,toDesktop,openActions}=require('./smoke-helpers.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/board-scale-review');
 const native=process.argv.includes('--native'),url=process.env.PREVIEW_URL||'http://127.0.0.1:5173/';
 fs.mkdirSync(out,{recursive:true});
@@ -17,19 +17,18 @@ function assertBundledCss(){
  }
  return images;
 }
-async function openBoard(page,app){
- const opened=app?.waitForEvent('window');
+async function openBoard(page){
  if(!await page.locator('.room-placed-item[data-furniture="message-board"]').count()){
   await page.getByRole('button',{name:'布置小屋',exact:true}).click();
   const drawer=page.getByRole('complementary',{name:'小屋布置工具'}),layer=page.locator('.time-scene>.room-furnishing-layer.is-editing');
   const card=drawer.locator('.warehouse-drag-card');await card.scrollIntoViewIfNeeded();
   const box=await layer.boundingBox();await card.dragTo(layer,{targetPosition:{x:box.width*.3,y:box.height*.35}});
   await expect(page.locator('.room-placed-item[data-furniture="message-board"]')).toHaveCount(1);
-  await drawer.getByRole('button',{name:'完成布置',exact:true}).click();
+  await page.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
  }
  // A physical click on the visible board must win over the floor destination.
  await page.getByRole('button',{name:'小屋留言板',exact:true}).click();
- const board=app?await opened:page;await expect(board.getByRole('dialog',{name:'小屋留言板',exact:true})).toBeVisible();return board;
+ await expect(page.getByRole('dialog',{name:'小屋留言板',exact:true})).toBeVisible();return page;
 }
 const read=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
 async function exercise(page,app){
@@ -57,7 +56,8 @@ async function exercise(page,app){
  assert.equal(Number(await page.locator('.room-walker').getAttribute('data-pet-scale')),scale);
  await page.getByRole('button',{name:'调整小屋拉姆大小',exact:true}).click();await editor.getByRole('button',{name:'默认',exact:true}).click();await expect(page.locator('.room-walker')).toHaveAttribute('data-pet-scale','1');await editor.getByRole('button',{name:'取消',exact:true}).click();await expect(page.locator('.room-walker')).toHaveAttribute('data-pet-scale',String(scale));
  await page.screenshot({path:path.join(out,native?'native-house.png':'browser-house.png')});
- const b=await openBoard(page,app);if(b!==page){b.on('pageerror',e=>errors.push(e.message));b.on('requestfailed',r=>{if(r.failure()?.errorText.includes('ERR_FILE_NOT_FOUND'))missing.push(r.url())})}
+ const b=await openBoard(page);
+ if(app)assert.equal(app.windows().length,1,'The room board opens in the existing window');
  const note='留言回归 '+Date.now();await b.getByRole('button',{name:'我要留言',exact:true}).click();
  const emptySave=b.getByRole('button',{name:'保存',exact:true});await expect(emptySave).toBeDisabled();
  assert.equal(await emptySave.evaluate(n=>getComputedStyle(n).opacity),'1','Disabled button must fully cover the old label in the original background art');
@@ -78,10 +78,33 @@ async function exercise(page,app){
  await b.getByRole('button',{name:'回复留言：'+note+' 已编辑',exact:true}).click();await text.fill('回复也能保存');await b.getByRole('button',{name:'保存',exact:true}).click();await expect(b.locator('.board-compose')).toHaveCount(0);
  const card=b.getByRole('article',{name:'留言',exact:true}).filter({hasText:note});await card.getByRole('button',{name:'□ 待完成',exact:true}).click();await expect(card.getByRole('button',{name:'✓ 已完成',exact:true})).toBeVisible();
  await b.screenshot({path:path.join(out,native?'native-board.png':'browser-board.png')});
+ await b.getByRole('button',{name:'关闭留言板',exact:true}).last().click();
+ await toDesktop(page);
+ await (await openActions(page)).getByRole('button',{name:'玩耍',exact:true}).click();
+ const play=page.getByTestId('companion-panel');
+ await play.getByRole('button',{name:'留言板',exact:true}).click();
+ const compact=page.getByRole('dialog',{name:'桌面留言板',exact:true});
+ await expect(compact).toBeVisible();
+ if(app)assert.equal(app.windows().length,1,'The desktop checklist reuses the companion window');
+ const checked=compact.getByRole('checkbox',{name:`完成留言：${note} 已编辑`,exact:true});
+ await expect(checked).toBeChecked();await expect(compact.getByText('回复也能保存')).toBeVisible();
+ await checked.uncheck();
+ const quickNote=`桌面留言 ${Date.now()}`;
+ const quickInput=compact.getByRole('textbox',{name:'写留言或待办',exact:true});
+ await quickInput.fill(quickNote);await quickInput.press('Enter');
+ await expect(compact.getByRole('checkbox',{name:`完成留言：${quickNote}`,exact:true})).toBeVisible();
+ await compact.getByRole('button',{name:'关闭留言板',exact:true}).click();
+ await expect(compact).toHaveCount(0);
+ await enterHome(page);await openBoard(page);
+ await expect(card.getByRole('button',{name:'□ 待完成',exact:true})).toBeVisible();
+ const quickCard=b.getByRole('button',{name:`删除留言：${quickNote}`,exact:true});
+ await quickCard.click();await b.getByRole('button',{name:'确认删除',exact:true}).click();
+ await expect(quickCard).toHaveCount(0);
  await card.getByRole('button',{name:'删除留言：'+note+' 已编辑',exact:true}).click();await b.getByRole('button',{name:'确认删除',exact:true}).click();await expect(b.locator('.board-remove')).toHaveCount(0);
  await expect.poll(async()=>((await read(page)).notes??[]).some(n=>n.text.startsWith(note))).toBe(false);
  for(const note of initialNotes)assert.deepEqual((await read(page)).notes.find(n=>n.id===note.id),note);
- if(app){await b.getByRole('button',{name:'关闭留言板',exact:true}).last().click();await expect.poll(()=>b.isClosed()).toBe(true)}else await b.getByRole('button',{name:'关闭留言板',exact:true}).last().click();
+ await b.getByRole('button',{name:'关闭留言板',exact:true}).last().click();
+ await expect(page.getByRole('dialog',{name:'小屋留言板',exact:true})).toHaveCount(0);
  await page.reload();await expect(page.getByTestId('desktop-character')).toBeVisible({timeout:45000});
  if(before.wearing)await expect(page.locator('.desktop-character .official-cached-preview')).toBeVisible();
  await enterHome(page);
@@ -98,7 +121,7 @@ async function exercise(page,app){
   await mobileBoard.screenshot({path:path.join(out,'phone-compose.png')});await mobileBoard.getByRole('button',{name:'取消',exact:true}).click();await mobileBoard.getByRole('button',{name:'关闭留言板',exact:true}).first().click();
  }
  assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);
- return {proportionalScale:scale,resizeSavedAfterReload:true,cancelRetainedScale:true,messageCreateEditReplyCompleteDelete:true,failedWriteRetainsInput:true,retryAddsOnlyOneNote:true,priorNotesRetained:initialNotes.length,identityRetained:true,originalFrameCacheSurvivesReload:true,cachedViewFirstPaintMs:cachedFirstPaint,missingAssetRequests:missing,errors};
+ return {proportionalScale:scale,resizeSavedAfterReload:true,cancelRetainedScale:true,messageCreateEditReplyCompleteDelete:true,desktopAndRoomShareNotes:true,failedWriteRetainsInput:true,retryAddsOnlyOneNote:true,priorNotesRetained:initialNotes.length,identityRetained:true,originalFrameCacheSurvivesReload:true,cachedViewFirstPaintMs:cachedFirstPaint,missingAssetRequests:missing,errors};
 }
 (async()=>{let context,app;try{
  const cssImages=assertBundledCss();let page;

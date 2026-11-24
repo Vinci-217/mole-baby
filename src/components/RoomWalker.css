@@ -3,9 +3,13 @@
 .room-walk-surface{position:absolute;padding:0;border:0;background:none;pointer-events:auto;cursor:pointer;opacity:1!important;transform:none!important;touch-action:manipulation;z-index:-1}
 .room-walk-surface:disabled{pointer-events:none;cursor:default}
 .room-walk-surface:focus-visible{outline:2px dashed #fff6d3aa;outline-offset:-5px;border-radius:20px}
-.room-pet-position{position:absolute;width:0;height:0;pointer-events:none;z-index:2}
+.room-pet-position{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2}
+.room-walker.is-moving .room-pet-position{will-change:transform}
 .classic-app .room-pet-position>.scene-pet{left:0;bottom:0;width:var(--room-pet-width,150px);height:calc(var(--room-pet-height,163px) + 20px);transform:translateX(-50%);pointer-events:none}
 .classic-app .room-pet-position .scene-character{width:var(--room-pet-width,150px);height:var(--room-pet-height,163px);pointer-events:auto}
+.room-pet-position .scene-pet-name{top:calc(100% - var(--room-pet-foot-offset) + 8px);bottom:auto;line-height:1.3}
+.room-pet-position .scene-pet:has(.ram-official,.ram-uploaded,.ram-reading) .scene-pet-name{top:calc(100% + var(--room-performance-caption, 18px))}
+.room-pet-position .scene-pet-name small{margin-top:2px}
 .room-pet-position :is(.scene-bubble,.scene-pet-name button,.room-work-note){pointer-events:auto}
 .room-walk-target{position:absolute;width:20px;height:9px;border:2px solid #fff8d3bd;border-radius:50%;translate:-50% -50%;box-shadow:0 0 0 3px #9c723329;animation:room-target-pulse 1.2s ease-in-out infinite;z-index:1}
 @keyframes room-target-pulse{0%,100%{opacity:.65;scale:.85}50%{opacity:1;scale:1.1}}

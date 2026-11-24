@@ -10,6 +10,7 @@ import {emotionDuration,isMoodAction,isEmotionClip} from '../mood-motion'
 import {isPastime,pastimeBody} from '../pet-pastimes'
 import flightRuntime from '../../public/assets/original/flight/runtime.json'
 import seedSource from '../../public/assets/original/seed/source.json'
+import {needGesture,NEED_GESTURE_DURATION} from '../need-gesture'
 
 // The archived Super Ram timeline has 21 control frames; the final control
 // frame is intentionally empty, leaving 20 painted poses in the normal loop.
@@ -40,12 +41,13 @@ const ONCE: Record<string, { row: number; frames: number[]; step: number }> = {
 /** Public renderer vocabulary; the README catalogue checks every entry. */
 export const RAM_ACTIONS=[...new Set([...ELEMENT_SKILLS.map(skill=>`element-${skill.id}`),...Object.keys(CARE_ACTIONS),...Object.keys(CONDITIONS),...Object.keys(ONCE),'idle','waiting','still','drag','walk-left','walk-right','running-left','running-right','running','focus','dizzy','watch-butterfly','look-around','sleep','peek','hide','review','mood-joy','mood-grumpy','mood-content','mood-dozy','read-alone','play-alone','spell','school-language','school-english','school-magic','restaurant','skill-language','skill-english','skill-magic','skill-wind','skill-fire','skill-ice','skill-meteor'])]
 export function getRamActionDuration(action: string,form='junior'): number | null {
+  if(needGesture(action))return NEED_GESTURE_DURATION;
   if(isUploadedAction(action))return uploadedSpec(form,action.slice(9))?.durationMs??900;
   if(action==='play-alone'){const clip=uploadedSpec(form,'180004');if(clip)return clip.durationMs}
   if(action.startsWith('element-')){const clip=originalElementClips[action.slice(8) as keyof typeof originalElementClips];if(clip)return transformationTimeline(clip.durationMs).reduce((total,entry)=>total+entry.ms,0)}
   if(action==='skill-magic'||action==='spell')return 4280
   if(isSchoolAction(action))return action.startsWith('skill-')?action==='skill-language'||action==='skill-english'?2000:3000:null
-  if(isPastime(action))return action==='read-alone'?18000:action==='spell'?7200:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
+  if(isPastime(action))return action==='read-alone'?8000:action==='spell'?7200:form==='seed'?SOCIAL_DURATIONS.play:footballDuration(form)??4200
   if(isMoodAction(action))return emotionDuration(action,form)??3600
   if(action==='play'&&form!=='seed')return footballDuration(form)??SOCIAL_DURATIONS.play
   if (isSocialAction(action) && action !== 'focus') return SOCIAL_DURATIONS[action]
@@ -59,6 +61,8 @@ export function getRamActionDuration(action: string,form='junior'): number | nul
 /** Sample an event clock, never a React render count. Sleep closes the eyes
  * on the same grounded body instead of using another action's silhouette. */
 export function sampleRamPose(action: string, elapsed: number, reduced = false,form='junior'): Pose {
+  const need=needGesture(action)
+  if(need)return {...sampleRamPose(need.condition,elapsed,reduced,form),finished:elapsed>=NEED_GESTURE_DURATION}
   if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleRamPose(body.action,body.elapsed,reduced,form),finished:(action.startsWith('skill-')||action.startsWith('element-'))&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleRamPose(pastimeBody(action),elapsed,reduced,form),finished:elapsed>=(getRamActionDuration(action,form)??0)}
   if (action === 'sleep') return sleepPose(elapsed,reduced)
@@ -120,6 +124,13 @@ export function sampleRamPose(action: string, elapsed: number, reduced = false,f
 /** Original seed timeline has closed eyes in frames 4 and 5, and large eyes in
  * frame 0. Pot is an independent, completely static original image. */
 export function sampleSeedPose(action: string, elapsed: number, reduced = false): { frame: number; finished: boolean } {
+  const need=needGesture(action)
+  if(need){
+    // Animate only the seed body on its original stationary pot.
+    const frames=need.condition==='hungry'?[0,2,3,2,3,0]:[0,1,4,1,4,0]
+    const finished=elapsed>=NEED_GESTURE_DURATION
+    return {frame:finished?0:reduced?frames[2]:frames[Math.min(frames.length-1,Math.floor(elapsed/600))],finished}
+  }
   if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleSeedPose(body.action,body.elapsed,reduced),finished:(action.startsWith('skill-')||action.startsWith('element-'))&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleSeedPose(pastimeBody(action),elapsed,reduced),finished:elapsed>=(getRamActionDuration(action,'seed')??0)}
   if (action === 'sleep') return sleepPose(elapsed,reduced)
@@ -163,6 +174,7 @@ export function sampleEvolvedPose(action: string, elapsed: number, reduced = fal
  * Keep one source registration during affection instead of jumping to happy's
  * differently scaled, upright-leaf sequence. flightTime survives action changes. */
 export function sampleFlyingPose(action: string, elapsed: number, reduced = false, form = 'senior', flightTime = elapsed): Pose {
+  if(form==='senior'&&needGesture(action))return sampleRamPose(action,elapsed,reduced,form);
   if(isSchoolAction(action)){const body=schoolBody(action,elapsed);return {...sampleFlyingPose(body.action,body.elapsed,reduced,form,flightTime),finished:(action.startsWith('skill-')||action.startsWith('element-'))&&elapsed>=(getRamActionDuration(action)??0)}}
   if(isPastime(action))return {...sampleFlyingPose(pastimeBody(action),elapsed,reduced,form,flightTime),finished:elapsed>=(getRamActionDuration(action,form)??0)};
   if (action === 'sleep') return sleepPose(elapsed,reduced);

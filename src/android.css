@@ -1,7 +1,7 @@
 /* Mobile layout is opt-in; desktop windows retain their existing geometry. */
 html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 .android-host body,.android-host #root{margin:0;min-width:0;width:100%;min-height:var(--app-height,100vh);overscroll-behavior:none}
-.android-host button,.android-host input,.android-host select{touch-action:manipulation}
+.android-host button:not(.settings-slide-switch),.android-host input,.android-host select{touch-action:manipulation}
 .android-host:not(.pet-mode) .classic-app{min-height:var(--app-height,100vh);height:auto;min-width:0;padding:0 0 12px;overflow-x:clip}
 .android-host .window-bar,.android-host .window-controls,.android-host .room-resize-handles{display:none!important}
 .android-host .classic-titlebar{display:none!important}
@@ -25,8 +25,8 @@ html.android-host{background:#fff8e8;color-scheme:light;-webkit-tap-highlight-co
 .android-host .paper-tabs button{white-space:nowrap;min-height:44px;min-width:52px}
 .android-host .settings-panel{min-width:0;max-width:100%;padding:10px}
 .android-host .settings-row{gap:10px;min-height:48px;flex-wrap:wrap}
-.android-host .settings-row>span:first-child{flex:1;min-width:120px}
-.android-host .settings-row input[type=checkbox]{width:24px;height:24px}
+.android-host .settings-row>span:first-child{flex:1}
+.android-host .settings-row:not(.music-volume-setting)>span:first-child:not(.settings-switch-label){min-width:120px}
 .android-host .settings-row select,.android-host .settings-row input[type=number]{min-height:40px;max-width:160px}
 .android-host .android-settings{border-top:1px solid #dbc8a2;padding:14px 0;margin-top:14px}
 .android-host .android-settings p{font-size:14px;line-height:1.7;color:#856d51}

@@ -1,5 +1,5 @@
 import {getStage,type GameState} from './game'
-import {elementSkillById} from './element-skills'
+import {ELEMENT_TYPES,elementSkillById} from './element-skills'
 import {reconcileCourseRewards} from './course-rewards'
 import {ACTIVITY_REQUIREMENTS,RESTAURANT_REQUIREMENTS,RESTAURANT_ENERGY_COST,unmetNeedReason} from './pet-status'
 import {JOB_BEANS_PER_SECOND} from './economy'
@@ -25,6 +25,7 @@ export const JOB_MS=120_000,JOB_PAY=JOB_MS/1000*JOB_BEANS_PER_SECOND
 export const COURSE_MS=180_000
 export const courseById=(id:unknown)=>COURSES.find(c=>c.id===id)
 export const learned=(pet:Pick<GameState,'education'>,id:CourseId)=>Boolean(pet.education?.graduated[id])
+export const hasLearnedMagic=(pet:Pick<GameState,'education'>)=>learned(pet,'magic')||ELEMENT_TYPES.some(type=>learned(pet,`element-${type.id}`))
 export const isSchoolAction=(action:string)=>Boolean(elementSkillById(action.replace(/^element-/,'')))&&action.startsWith('element-')||action==='school-language'||action==='school-english'||action==='school-magic'||action==='restaurant'||action==='skill-language'||action==='skill-english'||action==='skill-magic'||['wind','fire','ice','meteor'].some(id=>action===`skill-${id}`)
 export function petSpeech(pet:Pick<GameState,'education'>|null,text:string){return pet&&!learned(pet,'language')?'bibo～ bibobibo！':text}
 export function normalizeEducation(value:unknown,now:number):Education|undefined{

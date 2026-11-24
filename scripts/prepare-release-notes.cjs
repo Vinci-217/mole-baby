@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-function prepareReleaseNotes(directory, sourceSha, notes, version = require('../package.json').version) {
+function prepareReleaseNotes(directory, sourceSha, notes, version = require('../package.json').version, booksOnDemand = false) {
   if (!/^\d+\.\d+\.\d+$/.test(version)) throw new Error('Release guide requires a stable version');
   const receipts = ['arm64', 'x64'].map(arch => {
     const receipt = JSON.parse(fs.readFileSync(path.join(directory, `macos-trust-${arch}.json`), 'utf8'));
@@ -15,6 +15,10 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
     ? '**Mac 信任状态：已通过 Developer ID 签名、Apple 公证、票据装订和 Gatekeeper 验证。**'
     : '**Mac 信任状态：本地签名，尚未经过 Apple 公证；首次打开需要在“隐私与安全”选择“仍要打开”。**';
   const download = name => `https://github.com/Vinci-217/mole-baby/releases/download/v${version}/mole-baby-${version}-${name}`;
+  const bookNote = booksOnDemand
+    ? '\n\n**图书素材在设置中下载。** 安装和软件更新使用主包。请在「小屋设置 → 图书素材」下载图书，完成后就能摆放拉姆书架并离线阅读。'
+    : '';
+  const webNote = booksOnDemand ? '\n- 网页部署文件保存在本次发布的 [网页部署 ZIP](' + download('web-preview.zip') + ')。' : '';
   const androidManifest=path.join(directory,'latest-android.json');
   let androidRow='';
   if(fs.existsSync(androidManifest)){
@@ -36,7 +40,7 @@ function prepareReleaseNotes(directory, sourceSha, notes, version = require('../
 | **Mac · Apple 芯片**（M1、M2、M3、M4、M5 及后续 M 系列） | **[⬇ 下载 Apple 芯片 Mac 版 .dmg](${download('mac-arm64.dmg')})** | 打开 → 拖入「应用程序」 |
 | **Mac · Intel 芯片** | **[⬇ 下载 Intel Mac 版 .dmg](${download('mac-x64.dmg')})** | 打开 → 拖入「应用程序」 |${androidRow}
 
-**不知道 Mac 选哪个？** 点击屏幕左上角苹果菜单 →「关于本机」：显示「芯片 Apple M…」选 Apple 芯片版，显示「处理器 Intel…」选 Intel 版。Mac 需要 **macOS 12 或更高版本**。
+**不知道 Mac 选哪个？** 点击屏幕左上角苹果菜单 →「关于本机」：显示「芯片 Apple M…」选 Apple 芯片版，显示「处理器 Intel…」选 Intel 版。Mac 需要 **macOS 12 或更高版本**。${bookNote}
 
 ## Windows 安装（推荐）
 
@@ -76,21 +80,21 @@ Windows 安装版确认安装后保存存档并更新重启；${verified ? 'Mac 
 同一渠道手动更新时，先从托盘／菜单栏退出旧版，再运行对应安装包或替换「应用程序」里的拉姆，**无需卸载，也不要删除存档**。小屋设置可导出存档，正常升级保留本机数据。首次切换到Windows兼容版则按上方说明导出、导入宠物。
 
 <details>
-<summary>其他附件怎么选？（便携版、备用包与源码）</summary>
+<summary>其他附件怎么选？（便携版、更新文件与源码）</summary>
 
 - **Windows 现代便携版**：[下载 x64.zip](${download('x64.zip')})。
 - **Windows 老系统便携版**：[下载64位兼容版ZIP](${download('legacy-x64.zip')}) / [下载32位兼容版ZIP](${download('legacy-ia32.zip')})。
 - 所有Windows ZIP内含「先看这里-启动说明.txt」和「启动拉姆.cmd」；先右键「全部解压」，在完整解压后的文件夹里打开「拉姆.exe」或「拉姆兼容版.exe」；不要直接在压缩包中运行，也不要只复制exe。便携版更新会提供对应渠道的安装包入口，想要确认后直接更新并重启请选择上面的安装版。
-- **Mac ZIP 备用包**：[Apple 芯片 ZIP](${download('mac-arm64.zip')}) / [Intel ZIP](${download('mac-x64.zip')})。解压后把应用移入「应用程序」再打开；普通用户优先下载上面的 DMG。
+- **Mac 自动更新文件**：Mac ZIP 由应用的更新程序使用。手动安装使用上表的 DMG。
 - **Source code (zip / tar.gz)** 是开发者用的源码，不能直接运行；普通用户不用下载。
 - **latest.yml、legacy-x64.yml、legacy-ia32.yml、latest-mac.yml、*.blockmap、SHA256SUMS.txt、macos-trust-*.json** 供更新程序或校验使用，不是安装包。
-- 下载没有开始时，请检查网络或稍后重试，直接点击上表链接即可。
+- 下载没有开始时，请检查网络或稍后重试，直接点击上表链接即可。${webNote}
 
 </details>`;
   return `${guide}\n\n---\n\n## 本次更新\n\n${notes}`;
 }
 function writeReleaseFiles(root,sourceSha){
-  const notes=prepareReleaseNotes(path.join(root,'release'),sourceSha,fs.readFileSync(path.join(root,'RELEASE_NOTES.md'),'utf8'));
+  const notes=prepareReleaseNotes(path.join(root,'release'),sourceSha,fs.readFileSync(path.join(root,'RELEASE_NOTES.md'),'utf8'),undefined,process.env.MOLE_BOOKS_ON_DEMAND==='1');
   const guide=fs.readFileSync(path.join(root,'electron/Mac 打开说明.html'));
   fs.writeFileSync(path.join(root,'release/mole-baby-mac-help.html'),guide);
   const sums=path.join(root,'release/SHA256SUMS.txt');

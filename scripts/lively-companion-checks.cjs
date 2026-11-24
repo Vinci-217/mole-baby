@@ -1,11 +1,68 @@
 const{expect}=require('@playwright/test'),assert=require('node:assert/strict'),path=require('node:path');
 const{enterHome,toDesktop,roomTab}=require('./smoke-helpers.cjs');
 const{reloadWithStorage}=require('./smoke-storage.cjs');
+
+async function verifyAutonomousPlayback(page,fixture){
+ const motionPreference=await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'reduce':'no-preference');
+ const desktop=await page.evaluate(()=>window.desktop?.getState());
+ const pet=JSON.parse(fixture['ramu-house-save-v1']);
+ delete pet.wearing;
+ const prefs={sound:false,lively:true,presence:false,outings:false,idleIntervalSeconds:10};
+ const memory={version:1,petId:String(pet.createdAt),facts:[{kind:'boundary',value:'请不要主动说话',at:pet.createdAt}],events:[],messages:[]};
+ try{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  if(desktop)await page.evaluate(async()=>{await window.desktop.wander(false);await window.desktop.setEdgeHiding(false)});
+  await reloadWithStorage(page,{...fixture,'ramu-house-save-v1':JSON.stringify(pet),'ramu-house-preferences-v2':JSON.stringify(prefs),[`ramu-companion-memory-v1:${pet.createdAt}`]:JSON.stringify(memory)});
+  await expect(page.getByTestId('desktop-character')).toBeVisible();
+  await page.evaluate(()=>{Math.random=()=>.05});
+  const clip=page.getByTestId('desktop-character').locator('.ram-sprite[data-action^="ambient-"] > .official-ram-clip');
+  await expect(clip).toHaveAttribute('data-loaded','true',{timeout:65000});
+  const frame=await(await clip.locator('iframe').elementHandle()).contentFrame();
+  const pixels=()=>frame.evaluate(()=>window.player.shadowRoot.querySelector('canvas').toDataURL());
+  const first=await pixels();
+  await expect.poll(pixels,{timeout:6000}).not.toBe(first);
+  await expect(page.locator('.compact-bubble')).toHaveCount(0);
+  console.log('PASS: a scheduled original action paints distinct frames with reduced motion and a saved quiet-speech preference');
+
+  const calmPet={...pet,createdAt:Date.UTC(2026,10,20,5),lastTick:Date.now(),growth:840,highestGrowth:840,naturalGrowth:840,
+   growthLocked:true,evolution:'super',stats:{...pet.stats,happiness:31}};
+  await reloadWithStorage(page,{...fixture,'ramu-house-save-v1':JSON.stringify(calmPet),'ramu-house-preferences-v2':JSON.stringify(prefs)});
+  await page.evaluate(()=>{Math.random=()=>.98});
+  const expression=page.getByTestId('desktop-character').locator('>.ram-sprite[data-action="mood-content"] canvas[data-loaded="true"]');
+  await expect(expression).toBeVisible({timeout:25000});
+  const startingPixels=await expression.evaluate(canvas=>canvas.toDataURL());
+  await expect.poll(async()=>expression.evaluate(canvas=>canvas.toDataURL(),{},{timeout:500}),{timeout:2200}).not.toBe(startingPixels);
+  console.log('PASS: a scheduled built-in expression paints distinct frames with reduced motion');
+
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const needsCare={...pet,lastTick:Date.now(),stats:{...pet.stats,hunger:23,thirst:21}};
+  await reloadWithStorage(page,{...fixture,'ramu-house-save-v1':JSON.stringify(needsCare),'ramu-house-preferences-v2':JSON.stringify(prefs),[`ramu-companion-memory-v1:${pet.createdAt}`]:JSON.stringify(memory)});
+  const actor=page.getByTestId('desktop-character').locator('>.ram-sprite');
+  await expect(actor).toHaveAttribute('data-action','hungry');
+  await expect(actor).toHaveAttribute('data-action',/^ambient-(hungry|thirsty)$/,{timeout:25000});
+  await expect(actor.locator('.ram-need-cue')).toBeVisible();
+  await expect(actor).toHaveAttribute('data-action','hungry',{timeout:12000});
+  console.log('PASS: needs care can do a quiet scheduled gesture and returns to its original status');
+  if(desktop){
+   await page.evaluate(()=>window.desktop.setPetMode(false));
+   await roomTab(page,'设置');
+   // The tray switches the native view directly while a room dialog is open.
+   await page.evaluate(()=>window.desktop.setPetMode(true));
+   await expect(actor).toHaveAttribute('data-action',/^ambient-(hungry|thirsty)$/,{timeout:25000});
+   console.log('PASS: direct native view switches clear room dialogs and resume scheduled actions');
+  }
+ }finally{
+  await page.emulateMedia({reducedMotion:motionPreference});
+  if(desktop)await page.evaluate(async state=>{await window.desktop.wander(state.wandering);await window.desktop.setEdgeHiding(state.edgeHiding)},desktop);
+ }
+}
+
 /** Run inside each real packaged platform; no test bridge is shipped. */
 async function verifyLivelyCompanion(page){
  const snapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
  try{
   const fixture=await page.evaluate(()=>{const entries=Object.fromEntries(Object.entries(localStorage)),p=JSON.parse(entries['ramu-house-save-v1']),now=Date.now();Object.assign(p,{createdAt:now-2*86400000,lastTick:now,growth:180,coins:50,education:{lessons:{language:3,magic:3},graduated:{language:now-1000,magic:now-500}},sleeping:false,color:'blue',wardrobe:['gold-feather','wizard-cap','rabbit-hood'],wearing:'gold-feather',stats:{hunger:95,thirst:95,cleanliness:95,happiness:95,health:100,energy:95}});delete p.evolution;delete p.checkIn;delete p.outing;delete p.lastOutingAt;delete p.activity;entries['ramu-house-save-v1']=JSON.stringify(p);entries['ramu-house-preferences-v2']=JSON.stringify({sound:false,lively:false,presence:false,outings:true});return entries;});
+  await verifyAutonomousPlayback(page,fixture);
   await reloadWithStorage(page,fixture);await expect(page.getByTestId('desktop-character')).toBeVisible();await enterHome(page);
   await expect.poll(async()=>{const p=await save();return{coins:p.coins,checkIn:p.checkIn}}).toEqual({coins:50,checkIn:undefined});
   const daily=page.getByRole('button',{name:'每日签到领取1000摩尔豆',exact:true});await daily.evaluate(b=>{b.click();b.click()});await expect.poll(async()=>(await save()).coins).toBe(1050);await expect(page.getByRole('button',{name:'今日已签到',exact:true})).toBeDisabled();await page.reload();await expect(page.getByTestId('desktop-character')).toBeVisible();await enterHome(page);await expect(page.getByRole('button',{name:'今日已签到',exact:true})).toBeDisabled();assert.equal((await save()).coins,1050);
@@ -41,4 +98,4 @@ async function verifyLivelyCompanion(page){
  }catch(error){console.error('Lively companion failure before cleanup:',await save().catch(()=>null));throw error}
  finally{await reloadWithStorage(page,snapshot);await page.getByTestId('desktop-character').waitFor()}
 }
-module.exports={verifyLivelyCompanion};
+module.exports={verifyLivelyCompanion,verifyAutonomousPlayback};

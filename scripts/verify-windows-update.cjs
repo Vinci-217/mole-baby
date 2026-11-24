@@ -9,6 +9,9 @@ const quote=value=>"'"+value.replaceAll("'","''")+"'";
 (async()=>{
  assert.equal(process.platform,'win32');fs.mkdirSync(profile,{recursive:true});fs.mkdirSync(fixture,{recursive:true});log=fs.openSync(path.join(root,'artifacts/windows-update-fixture.log'),'a');
  const payload={name:'小更新',color:'blue',growth:180,coins:1234,memories:['我们一起读过书。']},save=path.join(profile,'pet-save.json');fs.writeFileSync(save,JSON.stringify(payload));
+ const cachedBook=Buffer.from('verified book data carried across the installer upgrade');
+ const bookDirectory=path.join(profile,'resource-packs','books'),bookFile=path.join(bookDirectory,'cached-book.zip');
+ fs.mkdirSync(bookDirectory,{recursive:true});fs.writeFileSync(bookFile,cachedBook);
  if(forceFull)fs.writeFileSync(path.join(profile,'updates.json'),JSON.stringify({enabled:true,downloadPolicy:'full'}));
  const files=new Map();service=await createUpdateServer(files);
  fs.copyFileSync(path.join(root,'scripts/windows-update-fixture-main.cjs'),path.join(fixture,'main.cjs'));
@@ -35,6 +38,7 @@ const quote=value=>"'"+value.replaceAll("'","''")+"'";
  assert.ok(launches.some(v=>v.version==='1.0.0'),'initial installed fixture must run');assert.ok(launches.some(v=>v.version==='1.0.1'),`new installed version did not relaunch: ${fs.existsSync(path.join(profile,'state.json'))?fs.readFileSync(path.join(profile,'state.json'),'utf8'):'no update state'}`);
  assert.deepEqual(fs.readFileSync(path.join(profile,'consents.jsonl'),'utf8').trim().split('\n').map(JSON.parse),[{operation:'download',version:'1.0.0'},{operation:'install',version:'1.0.0'}]);
  assert.deepEqual(JSON.parse(fs.readFileSync(save,'utf8')),payload);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(profile,'checkpoint.json'),'utf8')),{saved:true,version:'1.0.0'});
+ assert.deepEqual(fs.readFileSync(bookFile),cachedBook,'Main installer upgrade must preserve the book cache');
  assert.equal(JSON.parse(asar.extractFile(path.join(install,'resources/app.asar'),'package.json')).version,'1.0.1');
  const state=JSON.parse(fs.readFileSync(path.join(profile,'download-result.json'),'utf8'));assert.equal(state.downloadMode,forceFull?'full':'differential');if(!forceFull)assert.ok(state.reusedBytes>0);
  const downloads=service.requests.filter(r=>r.path.endsWith('.exe'));assert.ok(downloads.length>0);assert.ok(downloads.every(r=>forceFull?!r.range&&r.status===200:r.range&&r.status===206),'Transfer must match the selected full/differential policy');
@@ -43,6 +47,7 @@ const quote=value=>"'"+value.replaceAll("'","''")+"'";
  const report={platform:'win32',arch,edition:legacy?'legacy':'modern',runtime:legacy?'22.3.27':require('../package.json').devDependencies.electron,fullProductPayload:fullPayload,fixtureVersions:['1.0.0','1.0.1'],fullPackageBytes:newSize,packageBytesTransferred:bytes,blockmapBytesTransferred:indices,totalUpdateBytesTransferred:service.requests.reduce((sum,r)=>sum+r.bodyBytes,0),savedPercent:Number(((1-(bytes+indices)/newSize)*100).toFixed(2)),rangeRequests:downloads.length,mode:state.downloadMode,installedVersion:'1.0.1',savePreserved:true,applicationRelaunched:true,limitation:'Two isolated installers contain the current product payload with a test main process and a version change; production release-to-release savings will vary'};
  fs.writeFileSync(path.join(root,`artifacts/${forceFull?'full-update':'incremental'}-windows-${legacy?'legacy-':''}${arch}.json`),JSON.stringify(report,null,2)+'\n');console.log('INCREMENTAL_REPORT '+JSON.stringify(report));
  console.log('PASS: real Windows differential download, separate download/install consent, NSIS installation and relaunch, SHA512 verification, save checkpoint and companion data preservation');
+ console.log('PASS: main installer upgrade preserved the separate book cache');
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{
  try{powershell(`Get-Process -ErrorAction SilentlyContinue | Where-Object {$_.Path -and $_.Path.StartsWith(${quote(install)},[StringComparison]::OrdinalIgnoreCase)} | Stop-Process -Force -ErrorAction SilentlyContinue`)}catch{}
  const uninstaller=path.join(install,'Uninstall MoleBabyUpdateFixture.exe');if(fs.existsSync(uninstaller))try{await run(uninstaller,['/S',`_?=${install}`])}catch{}

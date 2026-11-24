@@ -4,8 +4,14 @@ import type {RamForm} from './original-actions';
 
 export const MAGIC_BOX_DURATION=runtime.durationMs;
 export const MAGIC_BOX_TIMELINE=runtime.timeline;
-export function transformationTimeline(targetDuration:number){return [...MAGIC_BOX_TIMELINE.slice(0,17),{subject:'box',smoke:null,box:0,ms:targetDuration},...MAGIC_BOX_TIMELINE.slice(22)]}
-export const TRANSFORMATION_TARGET_START=1520;
+const targetStart=MAGIC_BOX_TIMELINE.findIndex(frame=>frame.subject==='box'&&frame.smoke===null);
+const targetEnd=MAGIC_BOX_TIMELINE.findIndex((frame,index)=>index>targetStart&&frame.smoke!==null);
+const incomingSmoke=MAGIC_BOX_TIMELINE.slice(0,targetStart);
+const outgoingSmoke=MAGIC_BOX_TIMELINE.slice(targetEnd);
+export function transformationTimeline(targetDuration:number){
+ return [...incomingSmoke,{...MAGIC_BOX_TIMELINE[targetStart],ms:targetDuration},...outgoingSmoke];
+}
+export const TRANSFORMATION_TARGET_START=incomingSmoke.reduce((elapsed,frame)=>elapsed+frame.ms,0);
 export function magicBoxFrame(elapsed:number,timeline=MAGIC_BOX_TIMELINE){
  let cursor=0;
  for(let index=0;index<timeline.length;index++){

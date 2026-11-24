@@ -6,26 +6,42 @@ export interface FrameRegistration {
 }
 
 const identity: FrameRegistration = { scaleX: 1, scaleY: 1, x: 0, y: 0 }
+const middleSideScale = Math.sqrt(7044 / 2563)
+const middleSideFloor = 189
+// The highest visible leaf in the two eight-frame neutral source rows is y=13.
+export const MIDDLE_WALK_RISE = (middleSideFloor - 13) * middleSideScale / 208
 
-/** Registration is fixed for a source sheet/row, never fitted to each frame.
- * Side loops are calibrated over the complete sampled cycle. In particular,
- * middle's first pose is the crouch before a hop, not its standing height.
- * Fitting that crouch to the front height almost doubled every later leap.
- * One uniform scale preserves the source poses and their original floor.
+/** Place a whole source timeline against the body baseline in 100 × 108 space. */
+export function registeredFrameRect(
+  {width, height, registration}: {width: number; height: number; registration: {centerX: number; baseY: number}},
+  bodyBaseline: number,
+  scale: number,
+) {
+  return {
+    x: 50 - registration.centerX * scale,
+    y: bodyBaseline - registration.baseY * scale,
+    width: width * scale,
+    height: height * scale,
+  }
+}
+
+/** Each direction keeps one uniform transform and a fixed floor anchor.
+ * The middle side atlas was exported smaller than the grounded front atlas.
+ * Match body ink area between the front pose and the neutral side pose, before
+ * the source's takeoff and landing. The original hop changes pose and height.
  */
 function sideRegistration(form: 'junior' | 'middle', row: 1 | 2): FrameRegistration {
   const target = form === 'junior'
-    ? { center: 95, height: 107, bottom: 154 }
-    : { center: 100, height: 87, bottom: 171 }
-  const [left, right, bottom, cycleHeight] = form === 'junior'
-    ? row === 1 ? [27, 142, 144, 98] : [50, 165, 144, 98]
-    : row === 1 ? [61, 132, 189, 95] : [58, 129, 189, 95]
-  const scale = target.height * (form === 'middle' ? 1.3 : 1.12) / cycleHeight
+    ? { center: 95, bottom: 154 }
+    : { center: 99, bottom: 171 }
+  const source = form === 'junior'
+    ? { center: row === 1 ? 84.5 : 107.5, bottom: 144, scale: 107 / 98 }
+    : { center: row === 1 ? 96.5 : 93.5, bottom: middleSideFloor, scale: middleSideScale }
   return {
-    scaleX: scale,
-    scaleY: scale,
-    x: target.center - (left + right) / 2 * scale,
-    y: target.bottom - bottom * scale,
+    scaleX: source.scale,
+    scaleY: source.scale,
+    x: target.center - source.center * source.scale,
+    y: target.bottom - source.bottom * source.scale,
   }
 }
 

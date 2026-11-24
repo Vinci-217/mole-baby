@@ -11,6 +11,7 @@ export interface RamProps {
   evolution?: Evolution
   action?: string
   sleeping?: boolean
+  sleepIntro?: boolean
   peeking?: boolean
   peekSide?: PetEdge
   edgeEntry?: PetEdge
@@ -30,5 +31,6 @@ export interface RamProps {
   shaking?: boolean
   paused?:boolean
   rawDaily?:boolean
+  onActionPainted?: () => void
   onActionEnd?: (completed?:boolean) => void
 }

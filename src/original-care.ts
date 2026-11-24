@@ -1,8 +1,7 @@
 import {getItem} from './catalog';
 import {getItemMotionByAction} from './item-motion';
-import {OFFICIAL_CLIPS,isOfficialAction,officialClip,supportsOfficial} from './official-clips';
+import {OFFICIAL_CLIPS,isOfficialAction,officialClip,originalActionForms,supportsOfficial} from './official-clips';
 import type {RamForm} from './original-actions';
-import {playToolForm} from './original-play-tools';
 
 const defaults:Record<string,string>={feed:'biscuit',eat:'biscuit',drink:'juice',wash:'180003',medical:'180005',use:'180005'};
 // Some archive entries retain only an icon or omit the middle-form movie.
@@ -22,9 +21,11 @@ export function careItemId(action:string,itemId?:string):string|undefined{
 export function originalCareClip(form:RamForm,action:string,itemId?:string,variant=0){
  const id=careItemId(action,itemId),item=getItem(id);if(!item)return;
  const sources=id&&item.animationIds?.includes(id)?[id]:item.animationIds??[item.id==='energy-drink'?'180014':item.sourceId];
- const target=playToolForm(form);
- const clips=sources.map(source=>OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.path.endsWith('/'+source+'.swf')&&supportsOfficial(clip,target))).filter(clip=>clip!==undefined);
- if(clips.length)return clips[Math.abs(Math.floor(Number.isFinite(variant)?variant:0))%clips.length];
  const shared=sharedFoodSources[item.sourceId];
- return shared?OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.path.endsWith('/'+shared+'.swf')&&supportsOfficial(clip,target)):undefined;
+ for(const target of originalActionForms[form]??[]){
+  const find=(source:string)=>OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.path.endsWith('/'+source+'.swf')&&supportsOfficial(clip,target));
+  const clips=sources.map(find).filter(clip=>clip!==undefined);
+  if(clips.length)return clips[Math.abs(Math.floor(Number.isFinite(variant)?variant:0))%clips.length];
+  if(shared){const clip=find(shared);if(clip)return clip;}
+ }
 }

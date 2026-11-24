@@ -1,0 +1,73 @@
+.settings-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-switch-label {
+  min-width: 0;
+}
+
+button.settings-slide-switch {
+  --slide-position: 0;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  place-items: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 108px;
+  min-height: 36px;
+  padding: 3px;
+  border: 1px solid #d6c4a9;
+  border-radius: 999px;
+  background: #f0e8da;
+  box-shadow: none;
+  color: #6a5744;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  text-shadow: none;
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.settings-slide-switch::before {
+  content: '';
+  position: absolute;
+  inset: 3px auto 3px 3px;
+  width: calc(50% - 3px);
+  border-radius: inherit;
+  background: #fffdf7;
+  box-shadow: 0 1px 3px #4e36263a;
+  transform: translateX(calc(var(--slide-position) * 100%));
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+button.settings-slide-switch[aria-checked='true'] {
+  --slide-position: 1;
+  border-color: #aaba96;
+  background: #e7eddc;
+}
+
+button.settings-slide-switch[aria-checked='true']::before { background: #4b6b3a; }
+button.settings-slide-switch > span { position: relative; pointer-events: none; }
+button.settings-slide-switch[aria-checked='false'] > .settings-slide-off { color: #493522; font-weight: 700; }
+button.settings-slide-switch[aria-checked='true'] > .settings-slide-on { color: #fff; font-weight: 700; }
+button.settings-slide-switch[data-dragging] { cursor: grabbing; }
+button.settings-slide-switch[data-dragging]::before { background: #fffdf7; transition: none; }
+button.settings-slide-switch[data-dragging] > .settings-slide-on { color: #493522; }
+button.settings-slide-switch:focus-visible { outline: 2px solid #627f42; outline-offset: 2px; }
+button.settings-slide-switch:disabled { opacity: .65; cursor: default; }
+
+@media (pointer: coarse) {
+  button.settings-slide-switch { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.settings-slide-switch::before { transition: none; }
+}

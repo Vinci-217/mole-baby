@@ -1,31 +1,69 @@
 import { useEffect, useRef } from 'react'
-import { chooseIdleBehavior, idleDelay } from './idle-behavior'
-import type { IdleAction } from './idle-behavior'
+import { canShowIdleGesture, chooseScheduledIdleAction, validIdleIntervalSeconds } from './idle-behavior'
 import type { GameState } from './game'
 import type { CompanionMemory } from './companion-memory'
+import { isPlaybackVisible, onPlaybackVisibilityChange } from './playback-visibility'
+import { recordAnimationLoad } from './animation-log'
 
-/** Local micro-behaviour only. Never moves a seed/window, alters needs, starts
- * timers, creates affection or pretends that the user did something. */
-export function useIdleLife({petId,pet,memory,enabled,blocked,onAction}:{petId?:number;pet?:GameState;memory?:CompanionMemory;enabled:boolean;blocked:boolean;onAction:(action:string,sequence:number)=>void}) {
-  const current=useRef(onAction);current.current=onAction
-  const live=useRef({pet,memory});live.current={pet,memory}
-  const identity=pet?.createdAt??petId
-  const sequence=useRef(0), deadline=useRef(0)
-  const previous=useRef<IdleAction|undefined>(undefined)
-  useEffect(()=>{sequence.current=0;deadline.current=0;previous.current=undefined},[identity])
-  useEffect(()=>{
-    if(!enabled||blocked||identity===undefined)return
-    const delay=()=>Math.round(idleDelay(identity,sequence.current)*(.75+Math.random()*.5))
-    deadline.current=Math.max(Date.now()+15000,deadline.current||Date.now()+delay())
-    const timer=setInterval(()=>{
-      if(document.hidden||Date.now()<deadline.current)return
-      const {pet:active,memory:remembered}=live.current
-      const behavior=active?chooseIdleBehavior(active,remembered,sequence.current,previous.current):null
-      // Retain the old observer-only behaviour for callers without a pet model.
-      const action=active?behavior?.action:previous.current==='look-around'?'watch-butterfly':'look-around'
-      if(action){previous.current=action;current.current(action,sequence.current)}
-      sequence.current++;deadline.current=Date.now()+delay()
-    },5000)
-    return()=>clearInterval(timer)
-  },[identity,enabled,blocked])
+interface IdleLifeOptions {
+  pet?: GameState
+  memory?: CompanionMemory
+  enabled: boolean
+  randomMagic?: boolean
+  blocked: boolean
+  intervalSeconds?: number
+  onAction: (action: string, sequence: number) => void
+}
+
+/** Movement, interactions and visibility suspend delivery of one pending action. */
+export function useIdleLife({ pet, memory, enabled, randomMagic = false, blocked, intervalSeconds, onAction }: IdleLifeOptions) {
+  const identity = pet?.createdAt
+  const intervalMs = validIdleIntervalSeconds(intervalSeconds) * 1000
+  const paused = blocked || !pet || !canShowIdleGesture(pet)
+  const live = useRef({ pet, memory, onAction, enabled, randomMagic, paused, intervalMs })
+  live.current = { pet, memory, onAction, enabled, randomMagic, paused, intervalMs }
+  const dueAt = useRef<number | undefined>(undefined)
+  const sequence = useRef(0)
+  const previous = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    sequence.current = 0
+    previous.current = undefined
+  }, [identity])
+  useEffect(() => {
+    dueAt.current = identity !== undefined && enabled ? performance.now() + intervalMs : undefined
+  }, [identity, intervalMs, enabled])
+
+  useEffect(() => {
+    if (!enabled || paused || identity === undefined) return
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    function schedule() {
+      clearTimeout(timer)
+      if (!isPlaybackVisible() || dueAt.current === undefined) return
+      timer = setTimeout(perform, Math.max(0, Math.ceil(dueAt.current - performance.now())))
+    }
+
+    function perform() {
+      const current = live.current
+      if (!isPlaybackVisible() || !current.enabled || current.paused || current.intervalMs !== intervalMs || !current.pet || current.pet.createdAt !== identity) return
+      const now = performance.now()
+      if (dueAt.current === undefined || now < dueAt.current) { schedule(); return }
+      const action = chooseScheduledIdleAction(current.pet, current.memory, sequence.current, previous.current, Math.random, Date.now(), current.randomMagic)
+      // Keep future opportunities even if the current state has no eligible clip.
+      dueAt.current = now + intervalMs
+      schedule()
+      if (!action) return
+      previous.current = action
+      recordAnimationLoad({ event: 'autonomous', clip: '', name: '自然小动作', form: '', action, attempt: 0 })
+      current.onAction(action, sequence.current++)
+    }
+
+    schedule()
+    const stopWatching = onPlaybackVisibilityChange(schedule)
+    return () => {
+      clearTimeout(timer)
+      stopWatching()
+    }
+  }, [identity, enabled, paused, intervalMs])
 }

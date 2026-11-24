@@ -1,5 +1,7 @@
 import {describe,it,expect} from 'vitest'
-import {roomWalkArea,roomWalkClickTop,roomWalkTarget,stepRoomWalk} from './room-walk'
+import {roomWalkArea,roomWalkClickTop,roomWalkLayout,roomWalkTarget,stepRoomWalk} from './room-walk'
+import {MIDDLE_WALK_RISE} from './frame-registration'
+import {ROOM_PET_BASE} from './room-pet-size'
 describe('room floor travel',()=>{
  it('restricts pointer, random and keyboard travel to the middle/lower floor',()=>{
   for(const [width,height,dock] of [[1180,790,650],[1000,690,540],[600,590,440]]){
@@ -14,7 +16,7 @@ describe('room floor travel',()=>{
   expect(area.bottom-area.top).toBeGreaterThanOrEqual(44)
   expect(area.top).toBeGreaterThanOrEqual(393*.5)
   expect(area.bottom).toBeLessThan(278)
-  const target=roomWalkTarget({x:760,y:200},area)
+  const target=roomWalkTarget({x:760,y:area.top-1},area)
   expect(target.x).toBe(760);expect(target.y).toBe(area.top)
  })
  it('uses one floor boundary for wall taps and all movement',()=>{
@@ -23,6 +25,16 @@ describe('room floor travel',()=>{
   expect(clickTop).toBe(area.top)
   expect(area.bottom-clickTop).toBeGreaterThanOrEqual(44)
   expect(clickTop).toBeLessThan(area.bottom)
+ })
+ it('reserves the complete two-leaf walking silhouette at one scale in short rooms',()=>{
+  const headroom=MIDDLE_WALK_RISE*ROOM_PET_BASE.height
+  const large=roomWalkLayout(1180,790,650,1,headroom)
+  expect(large.scale).toBe(1)
+  const short=roomWalkLayout(360,282,184,1,headroom)
+  expect(short.scale).toBeLessThan(1)
+  expect(short.area.top).toBeGreaterThan(short.scale*headroom)
+  expect(short.area.bottom-short.area.top).toBeGreaterThanOrEqual(44)
+  expect(roomWalkTarget({x:180,y:0},short.area).y).toBe(short.area.top)
  })
  it('travels at the same speed diagonally and never overshoots a nearby destination',()=>{
   const straight=stepRoomWalk({x:0,y:0},{x:100,y:0},40),diagonal=stepRoomWalk({x:0,y:0},{x:100,y:100},40)

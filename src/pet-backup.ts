@@ -1,10 +1,10 @@
-import {parseSave,legacyUnlockedGrowth,earnedGrowth} from './game'
+import {MAX_SAVE_LENGTH,normalizeSavedPet,legacyUnlockedGrowth,earnedGrowth} from './game'
 import type {GameState} from './game'
 import {memoryKey,parseMemory} from './companion-memory'
 import type {CompanionMemory} from './companion-memory'
 
 export const PET_SAVE_KEY='ramu-house-save-v1'
-export const MAX_BACKUP_BYTES=1_000_000
+export const MAX_BACKUP_BYTES=MAX_SAVE_LENGTH
 export class InvalidPetBackup extends Error {
  constructor(public reason:'size'|'format'){super(reason==='size'?'Backup is too large':'Invalid pet save')}
 }
@@ -32,7 +32,7 @@ export function validatePetBackup(text:string,now=Date.now()) {
  let raw:unknown;try{raw=JSON.parse(text)}catch{throw new InvalidPetBackup('format')}
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new InvalidPetBackup('format')
  const {companionMemory,localData,...saved}=raw as Record<string,unknown>
- const pet=parseSave(JSON.stringify(saved),now)
+ const pet=normalizeSavedPet(saved,now)
  if(!pet)throw new InvalidPetBackup('format')
  return {pet,companionMemory,localData};
 }

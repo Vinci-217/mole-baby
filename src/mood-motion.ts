@@ -1,9 +1,12 @@
 import {dozyDuration} from './original-actions'
 import emotions from '../public/assets/original/emotions/runtime.json'
 export type Emotion='joy'|'grumpy'
+interface EmotionFramesSpec {rows:number;frameCount:number;frameMap:number[];sourceFrames:number[];reducedFrame:number;viewport?:number[]}
+const forms:Record<string,Record<Emotion,EmotionFramesSpec>>=emotions.forms;
 export function emotionSpec(form:string,emotion:Emotion) {
-  return Object.hasOwn(emotions.forms,form)?emotions.forms[form as keyof typeof emotions.forms][emotion]:undefined
+  return Object.hasOwn(forms,form)?forms[form][emotion]:undefined
 }
+export const emotionViewport=(form:string,emotion:Emotion)=>emotionSpec(form,emotion)?.viewport??[0,0,192,208];
 export function isEmotionClip(action:string):action is 'mood-joy'|'mood-grumpy' {return action==='mood-joy'||action==='mood-grumpy'}
 export function isMoodAction(action:string) {return isEmotionClip(action)||action==='mood-content'||action==='mood-dozy'}
 export function emotionDuration(action:string,form:string):number|undefined {

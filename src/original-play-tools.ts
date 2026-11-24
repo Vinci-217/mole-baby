@@ -1,5 +1,5 @@
 import {getItem} from './catalog';
-import {isOfficialAction,officialClip,OFFICIAL_CLIPS,supportsOfficial} from './official-clips';
+import {isOfficialAction,officialClip,OFFICIAL_CLIPS,originalActionForms,originalClipForForms} from './official-clips';
 import type {RamForm} from './original-actions';
 
 /** The archived page-game pet2/pet3/pet4/pet101 timelines, not costume cues. */
@@ -16,7 +16,7 @@ export function playToolSource(action:string,itemId?:string):string|undefined{
  }
 }
 export function playToolClip(form:RamForm,action:string,itemId?:string){
- const source=playToolSource(action,itemId),target=playToolForm(form);
+ const source=playToolSource(action,itemId);
  if(!source||form==='seed')return;
- return OFFICIAL_CLIPS.find(clip=>clip.kind==='care'&&clip.path.endsWith('/'+source+'.swf')&&supportsOfficial(clip,target));
+ return originalClipForForms(OFFICIAL_CLIPS.filter(clip=>clip.kind==='care'&&clip.path.endsWith('/'+source+'.swf')),originalActionForms[form]);
 }

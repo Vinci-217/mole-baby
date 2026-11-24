@@ -13,7 +13,6 @@
 .status-pocket:has(.pocket-rules){overflow:auto}
 .warehouse-drag-card{cursor:grab;outline:1px dashed #dfaa4a;outline-offset:-4px}
 .warehouse-drag-card:active{cursor:grabbing}
-.warehouse-drag-hint{font-size:11px;color:#ad6d25;text-align:center}
 @media(max-width:700px),(max-height:600px){
  .classic-app.ramu-v6 .cottage-top{padding:8px;gap:8px;flex-wrap:nowrap;align-items:center}
  .classic-app.ramu-v6 .cottage-top .classic-logo{width:auto;flex:0 0 auto;display:flex;align-items:center;gap:4px;white-space:nowrap}
@@ -23,7 +22,6 @@
  .classic-app.ramu-v6 .scene-top-actions>*{flex:0 0 auto}
  .classic-app .scene-top-actions button{min-width:0;font-size:11px;padding:5px 8px;min-height:30px}
  .classic-app .scene-top-actions .coin-sign{font-size:10px}
- .classic-app.ramu-v6 .pet-plaque{display:none}
  .classic-app .room-dock{left:6px;right:6px;min-width:0;width:auto;max-width:none;transform:none;gap:6px;bottom:23px;padding:5px 8px;display:flex;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
  .classic-app .room-dock::-webkit-scrollbar{display:none}
  .classic-app .room-dock button{min-width:58px;flex:0 0 58px;padding:1px;font-size:10px}
@@ -36,7 +34,7 @@
  .classic-app .paper-tabs button{min-width:58px;flex:0 0 auto;padding:5px 8px;font-size:11px;white-space:nowrap}
 }
 @media(max-height:420px){
- .classic-app.ramu-v6 .cottage-top .classic-logo,.classic-app .pet-plaque{display:none}
+ .classic-app.ramu-v6 .cottage-top .classic-logo{display:none}
  .classic-app .cottage-top{padding:5px 12px}
  .classic-app .room-dock{bottom:17px;padding:2px}
  .classic-app .room-dock button img{width:20px;height:20px}
@@ -48,14 +46,86 @@
 .classic-app.ramu-v6 .game-panel .paper-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;gap:4px;padding-bottom:8px;margin-bottom:12px}
 .classic-app.ramu-v6 .game-panel .paper-tabs>button{flex:0 0 auto;min-width:42px;min-height:26px;height:26px;padding:3px 9px;font-size:11px;line-height:20px;white-space:nowrap}
 
-/* On narrow screens the room actions scroll as one strip. The return action
-   stays outside that strip so it remains reachable at the upper right. */
+/* Keep the right-hand header controls within the viewport. */
 .scene-top-scroll{display:contents}
 @media(max-width:700px),(max-height:600px){
  .classic-app.ramu-v6 .cottage-top .scene-top-actions{overflow:visible;flex:1;min-width:0}
- .classic-app.ramu-v6 .scene-top-scroll{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto;overflow-x:auto;scrollbar-width:thin;padding-bottom:3px}
+ .classic-app.ramu-v6 .scene-top-scroll{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto;overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;padding-bottom:3px}
  .classic-app.ramu-v6 .scene-top-scroll>*{flex:0 0 auto}
- .classic-app.ramu-v6 .desktop-return-action{position:relative;z-index:3;flex:0 0 auto!important;box-shadow:0 2px 0 #6b401b, -7px 0 10px #96653066}
+ .classic-app.ramu-v6 .room-decoration-action{white-space:nowrap}
+ .classic-app.ramu-v6 .desktop-return-action{position:relative;z-index:3;flex:0 0 auto;box-shadow:0 2px 0 #6b401b}
+}
+.classic-app.ramu-v6 .classic-titlebar,
+.classic-app.ramu-v6 .classic-footer {
+ background: #fff;
+ color: #614832;
+ border-color: #e8dfd3;
+}
+.classic-app.ramu-v6 .classic-titlebar button { color: #614832; }
+.classic-app.ramu-v6 .classic-titlebar button:hover { background: #f3ede6; }
+.classic-app.ramu-v6 .classic-footer { min-height: 30px; }
+.classic-app.ramu-v6 .cottage-top { align-items: center; }
+@media(min-width:701px) and (min-height:601px) {
+ .classic-app.ramu-v6 .time-scene:not(.is-decorating) > .cottage-top { padding: 10px 22px; }
+ .classic-app.ramu-v6 .time-scene:not(.is-decorating) .classic-logo > img { width: 50px; height: 50px; }
+}
+.classic-app.ramu-v6 .cottage-top .scene-top-actions,
+.classic-app.ramu-v6 .scene-top-scroll { justify-content: flex-end; align-items: center; }
+.room-side-tools {
+ position: absolute;
+ top: 50%;
+ right: 14px;
+ translate: 0 -50%;
+ z-index: 24;
+ display: grid;
+ gap: 7px;
+}
+.is-decorating > .room-side-tools { z-index: 92; }
+.room-decoration-action { position: relative; }
+.room-decoration-action .room-decoration-check {
+ position: absolute;
+ right: 1px;
+ bottom: 1px;
+ width: 17px;
+ height: 17px;
+ padding: 2px;
+ border-radius: 50%;
+ background: #537346;
+ color: #fff;
+}
+.classic-app.ramu-v6 .room-icon-button {
+ display: grid;
+ place-items: center;
+ width: 42px;
+ height: 42px;
+ min-width: 42px;
+ padding: 4px;
+ background: #fff;
+ color: #624d39;
+ border: 1px solid #dfd4c5;
+ border-radius: 10px;
+ box-shadow: 0 2px 7px #53372118;
+}
+.classic-app.ramu-v6 .room-icon-button:is(:hover, [aria-pressed='true']) { background: #f0eadf; }
+.classic-app.ramu-v6 .room-icon-button:disabled { opacity: .6; }
+.room-icon-button svg { width: 19px; height: 19px; flex-shrink: 0; }
+.room-balance img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.room-side-tools img { max-width: 100%; width: 32px; height: 32px; object-fit: contain; }
+.classic-app .room-balance {
+ gap: 6px;
+ margin: 0;
+ padding: 3px 8px;
+ color: #775726;
+ background: #f8f3e8;
+ border: 1px solid #e6d8bd;
+ font-variant-numeric: tabular-nums;
+ white-space: nowrap;
+}
+@media(max-width:700px),(max-height:600px) {
+ .classic-app.ramu-v6 .classic-footer { min-height: 26px; }
+ .classic-app.ramu-v6 .room-icon-button { width: 36px; height: 36px; min-width: 36px; }
+ .room-side-tools { right: 8px; }
+ .room-side-tools img { width: 27px; height: 27px; }
 }
 .android-host.pet-mode .care-inventory.pocket-compact{grid-template-columns:minmax(0,1fr) 42px;grid-template-rows:28px minmax(0,1fr) 24px}
 .android-host.pet-mode .care-inventory.pocket-compact>.pocket-items{width:100%;max-width:232px}
@@ -80,3 +150,7 @@
 .room-work-note .school-activity strong{font-size:11px}
 .room-work-note .school-activity button{font-size:11px;white-space:nowrap}
 .game-sound-toggle{position:fixed;right:18px;bottom:14px;z-index:260;min-height:28px;padding:5px 12px;border:1px solid #cba675;border-radius:16px;background:#fff6df;color:#80562e;font-size:12px;box-shadow:0 2px 7px #432b1720}
+.deferred-view-status{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px;color:#79583b}
+.cottage-scene>.deferred-view-status,.deferred-view-popup{z-index:300;border:1px solid #d9c5a1;border-radius:12px;background:#fffaf0}
+.cottage-scene>.deferred-view-status{position:absolute;left:50%;bottom:12px;transform:translateX(-50%)}
+.deferred-view-popup{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}

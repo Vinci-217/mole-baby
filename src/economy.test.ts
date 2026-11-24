@@ -24,7 +24,7 @@ describe('confirmed economy and save continuity',()=>{
  });
  it('awards collections to seeds without equipping or replacing existing possessions',()=>{
   const p={...createPet('种子','pink',now),coins:357,wardrobe:['party-cap' as const],room:{owned:['plant'],placed:[{id:'plant',x:50,y:70}]}};
-  const pool=gamePrizeChoices(p);expect(pool.some(p=>p.id==='party-cap'||p.id==='plant')).toBe(false);
+  const pool=gamePrizeChoices(p);expect(pool.some(p=>['party-cap','plant','music-box'].includes(p.id))).toBe(false);
   for(const kind of ['outfit','furniture'] as const){const index=pool.findIndex(p=>p.kind===kind),prize=pool[index];expect(index).toBeGreaterThan(0);
    const result=rewardGame(p,1,now,()=>(index+.5)/pool.length,{id:kind,activeMs:30000});expect(result.prize).toEqual(prize);
    const loaded=parseSave(JSON.stringify(result.state),now)!;expect(loaded.wearing).toBeUndefined();expect(loaded.wardrobe).toContain('party-cap');expect(loaded.room?.placed).toEqual(p.room.placed);expect(loaded.coins).toBe(p.coins+gameBeans(1));

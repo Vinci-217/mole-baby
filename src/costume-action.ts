@@ -4,8 +4,9 @@ import {getItemMotion,getItemMotionByAction,type ItemMotion} from './item-motion
 import {officialClip,isOfficialAction,type OfficialClip,OFFICIAL_DURATION} from './official-clips';
 import {isSocialAction,SOCIAL_DURATIONS} from './social-motion';
 import {getRamActionDuration} from './components/ram-animation';
+import {needGesture,NEED_GESTURE_DURATION} from './need-gesture';
 
-export type CostumeActionKind='native'|'social'|'care'|'toy'|'emotion'|'natural'|'school'|'transform';
+export type CostumeActionKind='native'|'social'|'care'|'toy'|'emotion'|'natural'|'school'|'transform'|'need';
 export interface CostumeAction {
  action:string;
  kind:CostumeActionKind;
@@ -27,6 +28,7 @@ const naturals:Record<string,NonNullable<CostumeAction['natural']>>={'0':'rest',
 export function costumeAction(action:string,form:RamForm,itemId?:string):CostumeAction {
  const base={action};
  if(native.has(action))return {...base,kind:'native',duration:null};
+ if(needGesture(action))return {...base,kind:'need',duration:NEED_GESTURE_DURATION};
  if(needs.has(action))return {...base,kind:'emotion',duration:null};
  if(action==='sleep')return {...base,kind:'emotion',duration:null};
  if(action.startsWith('element-'))return {...base,kind:'transform',duration:getRamActionDuration(action,form),elementId:action.slice(8)};
@@ -42,7 +44,7 @@ export function costumeAction(action:string,form:RamForm,itemId?:string):Costume
  const motion=id?getItem(id)?.category==='toy'?undefined:getItemMotion(id):getItemMotionByAction(action);
  if(motion?.itemId)return {...base,kind:'care',duration:motion.duration,motion};
  if(action==='play-alone')return {action:'play',kind:'social',duration:SOCIAL_DURATIONS.play};
- if(action==='read-alone')return {action:'focus',kind:'social',duration:18000};
+ if(action==='read-alone')return {action:'focus',kind:'social',duration:8000};
  if(isSocialAction(action))return {...base,kind:'social',duration:action==='focus'?null:SOCIAL_DURATIONS[action]};
  if(action.startsWith('school-')||action==='restaurant'||action.startsWith('skill-'))return {...base,kind:'school',duration:getRamActionDuration(action,form)};
  if(clip?.kind==='school')return {...base,kind:'natural',duration:4800,natural:naturals[source??'']??'think'};

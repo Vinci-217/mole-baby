@@ -14,10 +14,10 @@ async function main() {
   assert.ok(['arm64','x64'].includes(arch));
   assert.equal(process.arch,arch,'Each package must be launched on its native architecture');
   const release=path.resolve(__dirname,'../release');
-  const files=[`mole-baby-${version}-mac-${arch}.dmg`,`mole-baby-${version}-mac-${arch}.zip`];
-  for(const filename of files) requireFile(path.join(release,filename));
-  requireFile(path.join(release,files[1]),[0x50,0x4b,0x03,0x04]);
-  execFileSync('/usr/bin/unzip',['-tq',path.join(release,files[1])],{stdio:'pipe'});
+  const stem=`mole-baby-${version}-mac-${arch}`;
+  const dmg=path.join(release,`${stem}.dmg`);
+  const updateZip=process.argv.includes('--with-update-zip')?path.join(release,`${stem}.zip`):null;
+  requireFile(dmg);
   const app=path.join(release,arch==='arm64'?'mac-arm64':'mac',`${build.productName}.app`);
   const contents=path.join(app,'Contents');
   const plist=path.join(contents,'Info.plist');
@@ -37,11 +37,11 @@ async function main() {
     assert.equal(JSON.parse(require('@electron/asar').extractFile(archive,'package.json')).animationPreview,true,'Only a test bundle may separate container and application checks');
   }
   // Verify the disk image that users download, including its application payload.
-  execFileSync('/usr/bin/hdiutil',['verify',path.join(release,files[0])],{stdio:'pipe'});
+  execFileSync('/usr/bin/hdiutil',['verify',dmg],{stdio:'pipe'});
   const mount=fs.mkdtempSync(path.join(os.tmpdir(),'mole-dmg-check-'));
   let attached=false;
   try {
-    execFileSync('/usr/bin/hdiutil',['attach',path.join(release,files[0]),'-readonly','-nobrowse','-mountpoint',mount],{stdio:'pipe'});attached=true;
+    execFileSync('/usr/bin/hdiutil',['attach',dmg,'-readonly','-nobrowse','-mountpoint',mount],{stdio:'pipe'});attached=true;
     assert.ok(fs.lstatSync(path.join(mount,'Applications')).isSymbolicLink());
     const guide=fs.readFileSync(path.join(mount,'Mac 打开说明.html'),'utf8');assert.ok(guide.includes('x-apple.systempreferences:com.apple.preference.security?General'));assert.ok(guide.includes('仍要打开'));
     const diskArchive=path.join(mount,`${build.productName}.app/Contents/Resources/app.asar`);
@@ -53,18 +53,22 @@ async function main() {
     if(attached) execFileSync('/usr/bin/hdiutil',['detach',mount],{stdio:'pipe'});
     await fs.promises.rm(mount,{recursive:true,force:true});
   }
-  const zipFolder=fs.mkdtempSync(path.join(os.tmpdir(),'mole-zip-check-'));
-  try{
-    execFileSync('/usr/bin/ditto',['-x','-k',path.join(release,files[1]),zipFolder],{stdio:'pipe'});
-    const zipContents=path.join(zipFolder,`${build.productName}.app/Contents`),zipArchive=path.join(zipContents,'Resources/app.asar');
-    for(const [actual,expected]of [[zipArchive,archive],[path.join(zipContents,'MacOS',readPlist('CFBundleExecutable')),executable]])assert.equal(createHash('sha256').update(fs.readFileSync(actual)).digest('hex'),createHash('sha256').update(fs.readFileSync(expected)).digest('hex'),'ZIP payload must match the tested Mac application');
-    await require('./packaged-motion-assets.cjs').verifyMotionResources(zipArchive);
-    console.log('PASS Mac DMG and ZIP original animation resources match every tested source file');
-  }finally{await fs.promises.rm(zipFolder,{recursive:true,force:true})}
-  const trust = verifyMacTrust({ app, dmg: path.join(release,files[0]), mode: process.env.MOLE_MAC_DISTRIBUTION || 'local' });
-  console.log(`PASS: macOS ${arch} DMG/ZIP, bundle identity, native Mach-O architecture; trust mode=${trust.mode}`);
+  if(updateZip){
+    requireFile(updateZip,[0x50,0x4b,0x03,0x04]);
+    execFileSync('/usr/bin/unzip',['-tq',updateZip],{stdio:'pipe'});
+    const zipFolder=fs.mkdtempSync(path.join(os.tmpdir(),'mole-zip-check-'));
+    try{
+      execFileSync('/usr/bin/ditto',['-x','-k',updateZip,zipFolder],{stdio:'pipe'});
+      const zipContents=path.join(zipFolder,`${build.productName}.app/Contents`),zipArchive=path.join(zipContents,'Resources/app.asar');
+      for(const [actual,expected]of [[zipArchive,archive],[path.join(zipContents,'MacOS',readPlist('CFBundleExecutable')),executable]])assert.equal(createHash('sha256').update(fs.readFileSync(actual)).digest('hex'),createHash('sha256').update(fs.readFileSync(expected)).digest('hex'),'Update ZIP payload must match the tested Mac application');
+      await require('./packaged-motion-assets.cjs').verifyMotionResources(zipArchive);
+      console.log('PASS Mac updater archive resources match the verified DMG');
+    }finally{await fs.promises.rm(zipFolder,{recursive:true,force:true})}
+  }
+  const trust = verifyMacTrust({ app, dmg, mode: process.env.MOLE_MAC_DISTRIBUTION || 'local' });
+  console.log(`PASS: macOS ${arch} DMG, bundle identity, native Mach-O architecture; trust mode=${trust.mode}`);
   if(!bundleOnly)await verifyApplication({executable,archive,screenshot:`mac-${arch}-smoke.png`});
-  await writeChecksums(release,files,`SHA256SUMS-mac-${arch}.txt`);
+  await writeChecksums(release,[dmg,updateZip].filter(Boolean).map(file=>path.basename(file)),`SHA256SUMS-mac-${arch}.txt`);
   fs.writeFileSync(path.join(release,`macos-trust-${arch}.json`),JSON.stringify({ architecture:arch, sourceSha:process.env.GITHUB_SHA || null, ...trust },null,2)+'\n');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

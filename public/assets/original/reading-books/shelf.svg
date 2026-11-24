@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 520" fill="none">
+  <!-- Locally drawn frame. The two rows of book spines are rendered separately. -->
+  <ellipse cx="242" cy="498" rx="204" ry="17" fill="#54301e" opacity=".17"/>
+  <path d="M48 470v31q0 9 16 9h20q12 0 15-12l4-28M374 470l4 28q3 12 15 12h20q16 0 16-9v-31" fill="#b77432" stroke="#6b3d21" stroke-width="7"/>
+  <path d="M31 102Q16 83 40 61Q65 47 91 58Q160 13 241 12Q325 12 390 58Q418 47 443 64Q463 84 449 103L440 469H41Z" fill="#b66c2f" stroke="#6b3d21" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M76 96Q151 40 240 40Q331 40 404 96L403 449H77Z" fill="#e3a24d" stroke="#754521" stroke-width="6"/>
+  <path d="M80 121h321v140H80zm0 169h321v143H80z" fill="#87502b" stroke="#6b3d21" stroke-width="6"/>
+  <path d="M86 128h309v123H86zm0 170h309v126H86z" fill="#9d6439"/>
+  <path d="M40 101q202-28 400 0l-3 27q-194-20-394 0z" fill="#f0b458" stroke="#754521" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M41 112q199-24 398 0M63 140l-5 300M417 140l5 300" stroke="#ffd587" stroke-width="6" stroke-linecap="round"/>
+  <path d="M68 264h345v27H68zm-1 164h347v30H67z" fill="#edac51" stroke="#754521" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M75 270h329M75 436h329" stroke="#ffd181" stroke-width="5" stroke-linecap="round"/>
+  <path d="M28 460q213-18 427 0l-3 30q-205-13-420 0Z" fill="#eaa64a" stroke="#754521" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M45 466q196-15 391 0" stroke="#ffd78c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M237 85q-35-1-36-31 30-6 38 26-2-37 33-39 8 36-33 44Z" fill="#79a350" stroke="#5d612d" stroke-width="5" stroke-linejoin="round"/>
+</svg>

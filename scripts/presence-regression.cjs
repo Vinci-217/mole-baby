@@ -56,10 +56,10 @@ const memory=page=>page.evaluate(()=>JSON.parse(localStorage.getItem(`ramu-compa
  assert.ok(!(await memory(page)).facts.some(f=>f.value==='草莓'));
  console.log('PASS culture follow-up without API, actual preferences, remembered boundaries, explicit invitation and forgetting visible context');
 
- await enterHome(page);await roomTab(page,'设置');await page.getByRole('checkbox',{name:'主动陪伴',exact:true}).uncheck();
+ await enterHome(page);await roomTab(page,'设置');await page.getByRole('switch',{name:'主动陪伴',exact:true}).press('ArrowLeft');
  await page.getByRole('combobox',{name:'主动陪伴频率',exact:true}).selectOption('40');await toDesktop(page);await page.clock.fastForward(1800000);
  const disabledCount=(await journal(page)).history.length;await page.reload();await page.clock.fastForward(1800000);assert.equal((await journal(page)).history.length,disabledCount);
- await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('checkbox',{name:'主动陪伴',exact:true})).not.toBeChecked();await expect(page.getByRole('combobox',{name:'主动陪伴频率',exact:true})).toHaveValue('40');
+ await enterHome(page);await roomTab(page,'设置');await expect(page.getByRole('switch',{name:'主动陪伴',exact:true})).not.toBeChecked();await expect(page.getByRole('combobox',{name:'主动陪伴频率',exact:true})).toHaveValue('40');
  assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
  console.log('PASS disabled/restart preferences, adjustable frequency and zero DeepSeek requests');
  await page.close();

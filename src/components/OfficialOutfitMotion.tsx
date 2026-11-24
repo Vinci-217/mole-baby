@@ -9,11 +9,12 @@ import {itemSoundScore,socialSoundScore} from '../pet-sound-score';
 import {useOutfitDrag} from '../use-outfit-drag';
 import {paintCareAction} from './CareAction';
 import OutfitActionCue from './OutfitActionCue';
+import {isPlaybackVisible,onPlaybackVisibilityChange} from '../playback-visibility';
 
 type PlayerBinding={pose:string;onReady:()=>void;onLoading:()=>void;onError:()=>void;onBodyBounds:(body:OutfitBodyBounds)=>void};
 /** One mounted original costume engine, one cancellable gesture clock. All
  * missing actions are project adaptations of the complete source appearance. */
-export default function OfficialOutfitMotion({sourceKey,spec,actionId,stage,evolution,referenceBody,tilt,sound=false,paused=false,children,onEnd}:{sourceKey:string;spec:CostumeAction;actionId?:number|string;stage:Stage;evolution?:Evolution;referenceBody:OutfitBodyBounds;tilt:number;sound?:boolean;paused?:boolean;children:(binding:PlayerBinding)=>ReactNode;onEnd?:(completed?:boolean)=>void}){
+export default function OfficialOutfitMotion({sourceKey,spec,actionId,stage,evolution,referenceBody,tilt,sound=false,paused=false,playInReducedMotion=false,frameSource=false,children,onEnd}:{sourceKey:string;spec:CostumeAction;actionId?:number|string;stage:Stage;evolution?:Evolution;referenceBody:OutfitBodyBounds;tilt:number;sound?:boolean;paused?:boolean;playInReducedMotion?:boolean;frameSource?:boolean;children:(binding:PlayerBinding)=>ReactNode;onEnd?:(completed?:boolean)=>void}){
  const root=useRef<HTMLSpanElement>(null),poseLayer=useRef<HTMLSpanElement>(null),end=useRef(onEnd);end.current=onEnd;
  const dragPose=useOutfitDrag(root,spec.action==='drag');
  const voice=useRef(sound);voice.current=sound;
@@ -33,7 +34,11 @@ export default function OfficialOutfitMotion({sourceKey,spec,actionId,stage,evol
   // still releases finite actions instead of leaving interaction locked.
   const watchdog=setTimeout(()=>{if(!painted&&spec.duration!==null)finish(false)},OFFICIAL_LOAD_TIMEOUT);
   const paint=(now:number)=>{
-   if(done||!root.current?.isConnected||document.hidden){previous=0;return;}
+   if(done||!root.current?.isConnected||!isPlaybackVisible()){previous=0;return;}
+   if(frameSource&&!source.current.ready){
+    const fallback=poseLayer.current?.querySelector<HTMLImageElement>('img.ram-original-static');
+    source.current.ready=Boolean(poseLayer.current?.querySelector('canvas[data-loaded="true"]')||fallback?.naturalWidth);
+   }
    if(source.current.ready){
     const target=source.current.body??referenceBody;
     const delta=previous?Math.max(0,now-previous):0;previous=now;
@@ -41,7 +46,7 @@ export default function OfficialOutfitMotion({sourceKey,spec,actionId,stage,evol
     elapsed+=delta;playbackClock.current.elapsed=elapsed;
     const blend=1-Math.exp(-Math.min(50,delta)/70);
     if(!body)body={...target};else for(const key of ['x','y','width','height'] as const)body[key]+=(target[key]-body[key])*blend;
-    const p=sampleCostumeMotion(spec,body,elapsed,stage,evolution,reduced.matches);
+    const p=sampleCostumeMotion(spec,body,elapsed,stage,evolution,reduced.matches&&!playInReducedMotion);
     if(!reduced.matches)audio.tick(elapsed);
     const styles={opacity:p.opacity,angle:`${p.angle}deg`,lift:`${p.y}%`,x:`${p.x}%`,scaleX:p.scaleX,scaleY:p.scaleY,readTilt:'0deg',contact:p.contact,affection:p.affection,heartY:`${p.heartLift}%`,hx:`${p.handX}%`,hy:`${p.handY}%`,handwidth:`${p.handWidth}%`,bx:`${p.ballX}%`,by:`${p.ballY}%`,spin:`${p.ballAngle}deg`,bookx:`${p.bookX}%`,booky:`${p.bookY}%`,page:`${p.page}deg`,pageOpacity:p.pageOpacity,'affection-x':`${p.heartX}%`,'affection-y':`${p.heartY}%`,'affection-size':`${p.heartSize}%`};
     for(const [key,value] of Object.entries(styles))sprite.style.setProperty(`--social-${key}`,String(value));
@@ -57,11 +62,11 @@ export default function OfficialOutfitMotion({sourceKey,spec,actionId,stage,evol
    }else previous=0;
    request=requestAnimationFrame(paint);
   };
-  const resume=()=>{cancelAnimationFrame(request);previous=0;audio.stop();if(!document.hidden&&!done)request=requestAnimationFrame(paint)};
+  const resume=()=>{cancelAnimationFrame(request);previous=0;audio.pause();if(isPlaybackVisible()&&!done)request=requestAnimationFrame(paint)};
   request=requestAnimationFrame(paint);
-  document.addEventListener('visibilitychange',resume);reduced.addEventListener('change',resume);
-  return()=>{done=true;cancelAnimationFrame(request);clearTimeout(watchdog);audio.stop();failed.current=()=>{};document.removeEventListener('visibilitychange',resume);reduced.removeEventListener('change',resume);for(const property of Array.from(sprite.style))if(['--social-','--outfit-','--care-','--tray-','--bottle-','--clean-','--net-','--butterfly-'].some(prefix=>property.startsWith(prefix)))sprite.style.removeProperty(property);};
- },[sourceKey,spec,actionId,stage,evolution,referenceBody,paused]);
+  const stopWatching=onPlaybackVisibilityChange(resume);reduced.addEventListener('change',resume);
+  return()=>{done=true;cancelAnimationFrame(request);clearTimeout(watchdog);audio.stop();failed.current=()=>{};stopWatching();reduced.removeEventListener('change',resume);for(const property of Array.from(sprite.style))if(['--social-','--outfit-','--care-','--tray-','--bottle-','--clean-','--net-','--butterfly-'].some(prefix=>property.startsWith(prefix)))sprite.style.removeProperty(property);};
+ },[sourceKey,spec,actionId,stage,evolution,referenceBody,paused,playInReducedMotion,frameSource]);
  const nativePose=spec.action==='drag'?dragPose:spec.kind==='native'?spec.action:'idle';
  return <><span ref={root} className="ram-artwork" data-petting-adaptation={spec.action==='pet'?'project':undefined} data-drag-adaptation={spec.action==='drag'?'project':undefined} data-drag-pose={spec.action==='drag'?dragPose:undefined} data-costume-motion={spec.kind} style={{transform:`rotate(${tilt}deg)`}}><span className="ram-elastic-layer"><span ref={poseLayer} className="ram-pose-layer">{children({pose:nativePose,onReady:()=>{source.current.ready=true},onLoading:()=>{source.current.ready=false},onError:()=>{source.current.ready=false;failed.current()},onBodyBounds:body=>{source.current.body=body}})}</span></span></span><OutfitActionCue spec={spec} startedAt={playbackStart.current} stage={stage} sound={sound} clock={playbackClock}/></>;
 }

@@ -37,6 +37,9 @@ async function verifyDesktopStatus(page,desktop,{label='browser',out=path.resolv
   await setup(healthy);await (await openActions(page)).getByRole('button',{name:'开始计时',exact:true}).click();const timer=page.locator('.pet-focus-time');await expect(timer).toBeVisible();await expect(timer).toHaveText(/\d+:\d{2}/);a=await timer.boundingBox();b=await page.getByTestId('pet-actions').boundingBox();assert.ok(a.y+a.height<=(await page.getByTestId('desktop-character').boundingBox()).y,'countdown stays above the pet');
   const viewport=await page.evaluate(()=>({width:innerWidth,height:innerHeight}));assert.ok(a.x>=0&&a.x+a.width<=viewport.width&&a.y+a.height<=viewport.height,'native window must not clip the countdown');
   await page.locator('.compact-pet').screenshot({path:path.join(out,label+'-timer.png'),omitBackground:true});await page.getByTestId('pet-actions').getByRole('button',{name:'取消计时',exact:true}).click();
+  await expect(timer).toHaveCount(0);
+  await expect(page.getByTestId('desktop-character').locator('>.ram-sprite')).toHaveAttribute('data-action','waving');
+  await expect(page.locator('.compact-toast').filter({hasText:'开始专注'})).toHaveCount(0);
   fs.writeFileSync(path.join(out,label+'-layout.json'),JSON.stringify({label,...bounds},null,2)+'\n');
   console.log('PASS desktop status: persistent concrete needs below name, sleep/wake and lesson labels; all six custom progress bars and footer fit; help/backpack work; focus countdown fits the unchanged desktop window');
  }finally{

@@ -13,11 +13,19 @@ const books: { id: ItemCategory; title: string; short: string; color: string; ic
   { id: 'medicine', title: '健康宝典', short: '药水', color: '#cf88a5', icon: '180005' },
 ];
 
-export interface ShopBookProps { pet: GameState; onBuy: (id: string) => void; initialCategory?: ItemCategory }
+export interface ShopBookProps {
+  pet: GameState;
+  onBuy: (id: string) => void;
+  initialCategory?: ItemCategory;
+  onReadOriginal?: () => void;
+}
 
-/** This shop is mounted by the room only. The bag never performs a purchase. */
-export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopBookProps) {
-  const [category, setCategory] = useState<ItemCategory>(initialCategory==='toy'?'food':initialCategory);
+export default function ShopBook({pet, onBuy, initialCategory = 'food', onReadOriginal}: ShopBookProps) {
+  const handbook = Boolean(onReadOriginal);
+  const categories = handbook ? books.filter(book => book.id === 'food' || book.id === 'drink') : books;
+  const [category, setCategory] = useState<ItemCategory>(
+    categories.some(book => book.id === initialCategory) ? initialCategory : 'food',
+  );
   const [page, setPage] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const book = books.find(value => value.id === category)!;
@@ -33,9 +41,13 @@ export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopB
   function changeBook(next: ItemCategory) { setCategory(next); setPage(0); setSelectedId(null); }
   function turnPage(next: number) { setPage(Math.max(0, Math.min(pages - 1, next))); setSelectedId(null); }
 
-  return <section className="shop-book" aria-label="拉姆用品商店" style={{ '--book-color': book.color } as CSSProperties}>
-    <header className="bookshop-heading"><div><img src="./assets/original/ui/icon-book-large.png" alt="" draggable={false}/><h3>拉姆用品商店</h3></div><span>{pet.coins} 摩尔豆</span></header>
-    <nav className="bookshop-shelf" aria-label="商店图书分类">{books.map(value => <button type="button" key={value.id} className="bookshop-cover" style={{ '--cover-color': value.color } as CSSProperties} aria-label={`翻开${value.short}商品书`} aria-pressed={category === value.id} onClick={() => changeBook(value.id)}><span className="bookshop-cover-spine" aria-hidden="true"/><img src={`./assets/original/items/${value.icon}.png`} alt="" draggable={false}/><span>{value.title}</span></button>)}</nav>
+  return <section className={`shop-book ${handbook ? 'ram-handbook' : ''}`} aria-label={handbook ? '手册购物' : '拉姆用品商店'} style={{ '--book-color': book.color } as CSSProperties}>
+    <header className="bookshop-heading">
+      {handbook ? <button type="button" className="game-button small" onClick={onReadOriginal}>查看原版书页</button>
+        : <div><img src="./assets/original/ui/icon-book-large.png" alt="" draggable={false}/><h3>拉姆用品商店</h3></div>}
+      <span>{pet.coins} 摩尔豆</span>
+    </header>
+    <nav className="bookshop-shelf" aria-label={handbook ? '手册商品分类' : '商店图书分类'}>{categories.map(value => <button type="button" key={value.id} className="bookshop-cover" style={{ '--cover-color': value.color } as CSSProperties} aria-label={`翻开${value.short}商品书`} aria-pressed={category === value.id} onClick={() => changeBook(value.id)}><span className="bookshop-cover-spine" aria-hidden="true"/><img src={`./assets/original/items/${value.icon}.png`} alt="" draggable={false}/><span>{value.title}</span></button>)}</nav>
     <div className="open-shop-book" key={`${category}-${page}`}>
       <div className="book-left-page">
         <h4>{book.title}</h4>
@@ -48,15 +60,13 @@ export default function ShopBook({ pet, onBuy, initialCategory = 'food' }: ShopB
       </div>
       <div className="book-right-page">
         {selected && <article className="book-item-detail" data-selected-item={selected.id}>
-          <span className="book-item-category">{book.short}</span>
           <div className="book-item-portrait"><img src={selected.image} alt={selected.name} draggable={false}/></div>
           <h4>{selected.name}</h4>
           <p className="book-item-effects">{itemEffectLine(selected)}</p>
-          <p className="book-item-owned">背包里有 <b>{count}</b> 份{selected.reusable?' · 可以反复玩':''}</p>
+          <p className="book-item-owned" role="status">背包 <b>{count}</b> 份</p>
           {locked && <p className="book-item-stage">{['种子期', '初级', '中级', '高级'][selected.minStage]}时使用，可以先收好。</p>}
           <button type="button" className="book-buy" aria-label={`购买${selected.name}`} disabled={!enough || full} onClick={() => onBuy(selected.id)}><b>{selected.price} 摩尔豆</b><span>{full ? selected.reusable?'已拥有':'背包已满' : enough ? '买一份' : '摩尔豆不足'}</span></button>
         </article>}
-        <div className="book-page-number" aria-hidden="true">— {page * 2 + 2} —</div>
       </div>
     </div>
   </section>;

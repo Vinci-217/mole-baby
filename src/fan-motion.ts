@@ -1,5 +1,13 @@
 export interface FanMotion{angle:number;speed:number}
 export const createFanMotion=():FanMotion=>({angle:0,speed:.28});
+interface FlightPose { index:number; sourceFrame:number }
+export function sourceFlightPose(clip:{sourceFrameCount:number;frames:readonly FlightPose[]}, elapsed:number, fps:number):FlightPose {
+ const sourceFrame=1+Math.floor(Math.max(0,elapsed)*fps/1000)%clip.sourceFrameCount;
+ // Control-only frames hold the last visible pose.
+ let pose=clip.frames[0];
+ for(const next of clip.frames){if(next.sourceFrame>sourceFrame)break;pose=next;}
+ return pose;
+}
 /** Revolutions/second, driven by horizontal cursor speed in screen pixels/s.
  * Touching adds a short impulse; both acceleration and coasting are continuous. */
 export function stepFanMotion(state:FanMotion,elapsed:number,horizontalSpeed:number,petElapsed:number|null,reduced=false){

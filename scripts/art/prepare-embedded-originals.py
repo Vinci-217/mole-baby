@@ -47,6 +47,10 @@ def main():
    bytes=len(data),symbol=main['symbol'] if main else '',forms=forms,
    level=int(level[1]) if level else 0,fps=row.get('fps',24),animated=bool(row.get('multiFrameTimelines')),
    **({'clothingLayer':int(items[stem].get('Layer',0))} if kind=='outfit' else {})))
+  if kind=='school' and re.search(r'/lahmMovie/pet\d+Movie/',row['path']):
+   # The one-frame wrapper contains the complete performance in child
+   # timelines, which can loop without dispatching a completion event.
+   clips[-1]['effectFrames']=max(t['frames'] for t in timeline['timelines'])
   if row['path'] in bodyRegistrations:
    anatomy=bodyRegistrations[row['path']]
    assert anatomy['sha256']==row['sha256'], 'Recheck body paths against changed source artwork'
