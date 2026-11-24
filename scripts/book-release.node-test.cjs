@@ -103,6 +103,13 @@ test('book assets are published separately, verified, and reused without writes 
   let release;
   function run(args) {
     if (args[0] === 'api') {
+      if (args.includes('POST')) {
+        assert(args.includes('draft=true') && args.includes('prerelease=true') && args.includes('make_latest=false'));
+        assert(args.includes('tag_name=' + tag));
+        writes.push('create');
+        release = { id: 17, tag_name: tag, prerelease: true, draft: true };
+        return JSON.stringify(release);
+      }
       return JSON.stringify([args.at(-1).includes('/assets?')
         ? existingAssets
         : release ? [release] : []]);
@@ -110,10 +117,7 @@ test('book assets are published separately, verified, and reused without writes 
     assert.equal(args[0], 'release');
     assert.equal(args[2], tag);
     writes.push(args[1]);
-    if (args[1] === 'create') {
-      assert(args.includes('--draft') && args.includes('--prerelease') && args.includes('--latest=false'));
-      release = { id: 17, tag_name: tag, prerelease: true, draft: true };
-    } else if (args[1] === 'upload') {
+    if (args[1] === 'upload') {
       assert(release.draft);
       for (const file of args.slice(3, -2)) {
         const name = path.basename(file), info = attachments.get(name);

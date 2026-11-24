@@ -60,11 +60,13 @@ async function publishBookAssets({ directory, commit, run = gh, request = fetch 
   const releaseArgs = ['--repo', repository];
   let release = metadata();
   if (!release) {
-    run(['release', 'create', tag, '--target', commit, '--draft', '--prerelease', '--latest=false',
-      '--title', '拉姆图书素材 ' + tag, '--notes', '客户端可在设置中单独下载图书。', ...releaseArgs]);
-    release = metadata();
+    // Use the draft returned by creation. The releases list may lag behind it.
+    release = JSON.parse(run(['api', repos + '/releases', '--method', 'POST',
+      '-f', 'tag_name=' + tag, '-f', 'target_commitish=' + commit, '-F', 'draft=true',
+      '-F', 'prerelease=true', '-f', 'make_latest=false', '-f', 'name=拉姆图书素材 ' + tag,
+      '-f', 'body=客户端可在设置中单独下载图书。']));
   }
-  assert(release?.prerelease, 'Book assets require their own prerelease');
+  assert(release?.tag_name === tag && release.prerelease, 'Book assets require their own prerelease');
   const listAssets = () => JSON.parse(run(['api', '--paginate', '--slurp',
     `${repos}/releases/${release.id}/assets?per_page=100`])).flat();
   const verify = (asset, expected) => {

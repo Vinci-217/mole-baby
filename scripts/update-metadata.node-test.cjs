@@ -59,16 +59,19 @@ test('rejects duplicate checksum names and stale manifest sizes or SHA512 values
 test('publication waits for every platform and publishes the shared book sources before update feeds',()=>{
  const workflow=YAML.parse(fs.readFileSync(path.join(__dirname,'../.github/workflows/windows-build.yml'),'utf8'));
  const release=workflow.jobs.release;
- assert.deepEqual(release.needs,['book-assets','build','legacy','mac','android','web']);
+ assert.deepEqual(release.needs,['book-assets','publish-books','build','legacy','mac','android','web']);
  for(const platform of ['build','legacy','mac','android','web'])assert.equal(workflow.jobs[platform].needs,'book-assets');
  assert.equal(workflow.jobs.android.uses,'./.github/workflows/android-preview.yml');
  assert.deepEqual(workflow.jobs.legacy.strategy.matrix.arch,['x64','ia32']);
  assert.match(release.if,/refs\/tags\/v/);
  const upload=workflow.jobs.legacy.steps.find(s=>s.name==='Upload checked legacy downloads');
  assert.match(upload.with.path,/legacy-\$\{\{ matrix.arch \}\}.yml/);
- const publishBooks=release.steps.findIndex(s=>s.run?.includes('scripts/publish-book-assets.cjs'));
+ const publishBooks=workflow.jobs['publish-books'];
+ assert.equal(publishBooks.needs,'book-assets');
+ assert.equal(publishBooks.permissions.contents,'write');
+ assert(publishBooks.steps.some(s=>s.run?.includes('scripts/publish-book-assets.cjs')));
  const publishClients=release.steps.findIndex(s=>s.name==='Create release or replace its build attachments');
- assert(publishBooks>=0&&publishBooks<publishClients);
+ assert(publishClients>=0);
  const publish=release.steps[publishClients].run;
  assert.match(publish,/release\/legacy-x64.yml release\/legacy-ia32.yml/);
  assert.match(publish,/release\/\*\.blockmap/);

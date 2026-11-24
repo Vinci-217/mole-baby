@@ -31,13 +31,20 @@ async function verifySpellCare(page,desktop){
    const clip=clips[id],character=page.locator('.scene-character');
    await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clip.name}).getByRole('button',{name:'变身',exact:true}).click();
    const magic=character.locator('.magic-box-performance');await expect.poll(async()=>{await page.clock.runFor(16);return magic.getAttribute('data-ready')},{timeout:15000}).toBe('true');
-   const started=Number(await magic.getAttribute('data-magic-start'));
    const peak=clip.frameMap.map((index,frame)=>({frame:frame+1,area:clip.rectangles[index][3]*clip.rectangles[index][4]})).sort((a,b)=>b.area-a.area)[0].frame;
+   const canvas=magic.locator('canvas[data-element-skill]');
+   const sourceFrame=()=>canvas.evaluateAll(nodes=>Number(nodes[0]?.dataset.sourceFrame??0));
    const samples=[];
    for(const frame of [...new Set([1,peak,clip.frames])].sort((a,b)=>a-b)){
-    const target=started+1520+(frame-1)/clip.fps*1000+20;
-    await page.clock.runFor(Math.max(1,Math.ceil(target-await page.evaluate(()=>performance.now()))));
-    const canvas=magic.locator('canvas[data-element-skill]');await expect(canvas).toHaveAttribute('data-source-frame',String(frame));
+    // The target owns its frame clock and waits for a drawable surface.
+    await expect.poll(async()=>{
+     const current=await sourceFrame();
+     if(current<frame){
+      const step=current?Math.max(8,Math.min(320,Math.floor((frame-current-1)*1000/clip.fps))):16;
+      await page.clock.runFor(step);
+     }
+     return sourceFrame();
+    },{intervals:[0,8,16],timeout:15000}).toBe(frame);
     const result=await canvas.evaluate(c=>{
      const r=c.getBoundingClientRect(),p=c.parentElement.getBoundingClientRect(),d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
      let x0=c.width,y0=c.height,x1=0,y1=0;
@@ -50,20 +57,33 @@ async function verifySpellCare(page,desktop){
     const formBody=require('../electron/edge-visibility.json').forms.super.body;
     const expectedRatio=((formBody[2]-formBody[0])/clip.registration.referenceBodyWidth)*result.parentWidth/100;
     assert.ok(Math.abs(result.ratio-expectedRatio)<.01,`original calibrated scale must survive large effect bounds: ${JSON.stringify({result,expectedRatio})}`);
-    if(frame===1)assert.ok(Math.max(result.inkWidth,result.inkHeight)>70,'preparation pose remains readable at actual desktop size');
+    if(frame===1){
+     const [, , , width,height]=clip.rectangles[clip.frameMap[0]];
+     assert.ok(Math.abs(result.inkWidth/result.ratio-width)<=1&&Math.abs(result.inkHeight/result.ratio-height)<=1,
+      `the starting pose paints the full source at the current room scale: ${JSON.stringify(result)}`);
+    }
     samples.push({frame,...result});
     if(frame===peak)await page.screenshot({path:path.join(out,`${id}-${desktop?'native':'browser'}.png`),omitBackground:true});
    }
    receipt.spells.push({id,peak,samples});await page.clock.runFor(4000);await expect(magic).toHaveCount(0);await toDesktop(page);
   }
 
-  // Interrupt through real controls: no target may keep painting after its
-  // expanded host is restored or a different interaction surface is opened.
+  // An ordinary room panel can open during a cast. Leaving the room must
+  // remove that room's render surface and let the active cast settle.
   receipt.interruptions=[];
   for(const route of ['room','desktop']){
    await enterHome(page);await roomTab(page,'学院');await page.locator('.element-skill-list li').filter({hasText:clips['fire-1'].name}).getByRole('button',{name:'变身',exact:true}).click();
    await expect.poll(async()=>{await page.clock.runFor(16);return page.locator('.magic-box-performance').getAttribute('data-ready')},{timeout:15000}).toBe('true');await page.clock.runFor(2100);
-   if(route==='room')await roomTab(page,'设置');else await toDesktop(page);await expect(page.locator('.magic-box-performance')).toHaveCount(0);if(route==='room')await toDesktop(page);receipt.interruptions.push(route);
+   const roomCast=page.locator('.scene-character .magic-box-performance');
+   if(route==='room'){
+    await roomTab(page,'设置');await expect(roomCast).toHaveCount(1);
+   }else{
+    await toDesktop(page);await expect(roomCast).toHaveCount(0);
+   }
+   await page.clock.runFor(clips['fire-1'].durationMs+5000);
+   await expect(page.locator('.magic-box-performance')).toHaveCount(0);
+   if(route==='room')await toDesktop(page);
+   receipt.interruptions.push(route);
   }
   await fixture(22);await enterHome(page);await roomTab(page,'学院');
   const language=page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name:'语言课',exact:true})});
@@ -87,9 +107,13 @@ async function verifySpellCare(page,desktop){
    await desktop.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].show());
   }
   for(const roll of [.05,.5,.95]){
+   await page.clock.resume();
    await fixture(95);await enterHome(page);await roomTab(page,'游戏');
    await page.evaluate(roll=>{Math.random=()=>roll},roll);
-   await page.getByRole('button',{name:'开始翻牌',exact:true}).click();const before=await save();await page.getByTestId('memory-start').click();const kinds=await page.getByTestId('memory-card').evaluateAll(nodes=>nodes.map(n=>n.dataset.kind));await page.clock.runFor(3100);for(const kind of new Set(kinds)){for(let index=0;index<kinds.length;index++)if(kinds[index]===kind)await page.getByTestId('memory-card').nth(index).click();}await page.clock.runFor(7100);await expect(page.getByTestId('memory-result')).toBeVisible();
+   await page.getByRole('button',{name:'开始翻牌',exact:true}).click();
+   const start=page.getByTestId('memory-start');await expect(start).toBeVisible();
+   await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
+   const before=await save();await start.click();const kinds=await page.getByTestId('memory-card').evaluateAll(nodes=>nodes.map(n=>n.dataset.kind));await page.clock.runFor(3100);for(const kind of new Set(kinds)){for(let index=0;index<kinds.length;index++)if(kinds[index]===kind)await page.getByTestId('memory-card').nth(index).click();}await page.clock.runFor(7100);await expect(page.getByTestId('memory-result')).toBeVisible();
    const after=await save(),items=Object.keys(after.inventory).filter(id=>after.inventory[id]>(before.inventory[id]??0)),outfits=(after.wardrobe??[]).filter(id=>!before.wardrobe?.includes(id)),furniture=(after.room?.owned??[]).filter(id=>!before.room?.owned?.includes(id));
    assert.equal(items.length+outfits.length+furniture.length,1);assert.ok(after.coins>before.coins,'effective game time earns beans');
    const item=page.locator('.memory-rewards>div').nth(1),name=await item.locator('span').textContent();await expect(item.locator('strong')).toHaveText(items.length?'+1':'已解锁');await expect(item.locator('img')).toBeVisible();await expect(page.locator('.memory-saved')).toContainText(name);
