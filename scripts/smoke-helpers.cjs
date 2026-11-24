@@ -54,6 +54,7 @@ async function applyGrowthSettings(page,{mode}={}){
  await confirmation.getByRole('button',{name:'确认切换',exact:true}).click();await expect(confirmation).toHaveCount(0);
 }
 async function enterHome(page) {
+  await page.locator('.cottage-scene:visible, .pet-work-note:visible, [data-testid="desktop-character"]:visible').first().waitFor();
   if (await page.locator('.cottage-scene').isVisible()) return;
   const workHome=page.locator('.pet-work-note').getByRole('button',{name:'进入小屋',exact:true});
   if(await workHome.isVisible()){

@@ -47,6 +47,28 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  publish-books:
+    name: Publish and verify the GitHub book library
+    needs: book-assets
+    if: startsWith(github.ref, 'refs/heads/release/v') || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ramu-book-assets
+          path: ${{ runner.temp }}/ramu-book-assets
+      - name: Publish and verify the book archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-book-assets.cjs "$RUNNER_TEMP/ramu-book-assets"
+
   build:
     name: Build and check Windows x64
     needs: book-assets
@@ -460,7 +482,7 @@ jobs:
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v')
-    needs: [book-assets, build, legacy, mac, android, web]
+    needs: [book-assets, publish-books, build, legacy, mac, android, web]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -483,10 +505,10 @@ jobs:
           merge-multiple: true
           path: release
 
-      - name: Download the checked shared book archives
+      - name: Download the checked shared book index
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: ramu-book-assets
+          name: ramu-canonical-book-index
           path: ${{ runner.temp }}/ramu-book-assets
       - name: Download the other platform book indexes
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -514,12 +536,6 @@ jobs:
           sha256sum --check SHA256SUMS.txt
           sha256sum --check SHA256SUMS-android.txt
           sha256sum --check SHA256SUMS-web.txt
-
-      - name: Verify and publish GitHub book sources before client updates
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: node scripts/publish-book-assets.cjs "$RUNNER_TEMP/ramu-book-assets"
 
       - name: Create release or replace its build attachments
         env:

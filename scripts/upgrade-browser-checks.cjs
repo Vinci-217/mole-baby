@@ -10,7 +10,7 @@ function fixture({corrupt=false,seed=false}={}){
  const state={petMode:false,alwaysOnTop:true,wandering:false,companionPanel:false,panelSide:'right',edgeHiding:false,edgeSide:null,edgePose:'visible',windowVisible:true},listeners=new Set(),modes=new Set();
  window.__upgradeNative={state,music:null,tracks:[]};
  const NativeAudio=window.Audio;window.Audio=function(...args){const element=new NativeAudio(...args);window.__upgradeNative.tracks.push(element);return element;};window.Audio.prototype=NativeAudio.prototype;
- window.desktop=new Proxy({isElectron:false,platform:'darwin',messageBoard:undefined,getState:async()=>({...state}),updates:{onPrepare:()=>()=>{},onStateChanged:()=>()=>{},getState:async()=>null,setBusy(){}},
+ window.desktop=new Proxy({isElectron:false,platform:'darwin',messageBoard:undefined,bookDownloads:undefined,prepareBookPages:undefined,getState:async()=>({...state}),updates:{onPrepare:()=>()=>{},onStateChanged:()=>()=>{},getState:async()=>null,setBusy(){}},
  onStateChanged:callback=>{listeners.add(callback);queueMicrotask(()=>callback({...state}));return()=>listeners.delete(callback)},onPetModeChanged:callback=>{modes.add(callback);return()=>modes.delete(callback)},setMusicState:async value=>{window.__upgradeNative.music=value},
  setPetMode:async enabled=>{state.petMode=enabled;for(const callback of listeners)callback({...state});for(const callback of modes)callback(enabled);return enabled},
  },{get(object,key){if(key in object)return object[key];if(String(key).startsWith('on'))return()=>()=>{};return()=>Promise.resolve(true)}});
@@ -18,7 +18,11 @@ function fixture({corrupt=false,seed=false}={}){
 let browser;
 const save=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('ramu-house-save-v1')));
 const music=p=>p.evaluate(()=>{const a=window.__upgradeNative.tracks.filter(a=>a.src.includes('/original/audio/')).at(-1);return {src:a?.src,paused:a?.paused,ready:a?.readyState,...window.__upgradeNative.music}});
-async function home(p){await expect(p.getByTestId('desktop-character')).toBeVisible();await p.evaluate(()=>window.desktop.setPetMode(false));await expect(p.locator('.room-dock')).toBeVisible();}
+async function home(p){
+ await p.locator('.room-dock:visible, [data-testid="desktop-character"]:visible').first().waitFor();
+ if(!await p.locator('.room-dock').isVisible())await p.evaluate(()=>window.desktop.setPetMode(false));
+ await expect(p.locator('.room-dock')).toBeVisible();
+}
 async function panel(p,name){if(await p.locator('.game-panel').isVisible())await p.getByRole('button',{name:'关闭面板',exact:true}).click();await p.locator('.room-dock').getByRole('button',{name,exact:true}).click();await expect(p.locator('.game-panel')).toBeVisible();}
 async function openBoard(p){
  if(await p.locator('.game-panel').isVisible())await p.getByRole('button',{name:'关闭面板',exact:true}).click();

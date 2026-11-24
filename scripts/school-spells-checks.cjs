@@ -13,9 +13,10 @@ async function verifySchoolSpells(page){
   await page.clock.install({time:new Date(await page.evaluate(()=>Date.now()))});clock=true;
   await require('./smoke-storage.cjs').reloadStoredFixture(page);await enterHome(page);await roomTab(page,'衣橱');
   await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await expect(page.getByRole('button',{name:'魔法课结业获得',exact:true})).toBeDisabled();
+  await roomTab(page,'学院');const course=name=>page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name,exact:true})});
+  await expect(course('魔法入门课')).toBeVisible();
   console.log('School spells: fresh clock document loaded');await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
   console.log('School spells: clock paused');
-  await roomTab(page,'学院');const course=name=>page.locator('.school-course-grid article').filter({has:page.getByRole('heading',{name,exact:true})});
   await course('魔法入门课').getByRole('button',{name:'上这一课',exact:true}).click();
   const room=page.locator('.school-scene-status');await expect(room.getByRole('timer',{name:'魔法入门课倒计时',exact:true})).toHaveText('3:00');await expect(room.getByRole('progressbar')).toHaveAttribute('max','180000');
   await page.clock.fastForward(60000);await expect(room.getByRole('timer')).toHaveText('2:00');
@@ -41,6 +42,7 @@ async function verifySchoolSpells(page){
   // was verified above; complete the simulated deadlines in the bare form.
   await page.getByRole('button',{name:'收好装扮',exact:true}).click();assert.equal((await save()).wearing,undefined);assert.equal((await save()).evolution,'super');
   await expect(page.locator('.scene-character .ram-sprite').first()).toHaveAttribute('data-evolution','super');
+  await roomTab(page,'学院');await expect(course('火系变身课')).toBeVisible();
   await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now())+1000));
   for(const [name,id] of [['火系变身课','element-fire'],['水系变身课','element-water'],['木系变身课','element-wood']]){
    await roomTab(page,'学院');await course(name).getByRole('button',{name:'上这一课',exact:true}).click();await expect(room.getByRole('timer')).toHaveText('3:00');console.log('School spells: completing '+name);
