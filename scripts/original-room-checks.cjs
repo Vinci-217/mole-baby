@@ -28,7 +28,14 @@ async function verifyOriginalRoom(page,desktop){
   }
   const actions=await openActions(page);await actions.getByRole('button',{name:'玩耍',exact:true}).click();await expect(page.getByTestId('companion-panel').getByRole('button',{name:'睡一会儿',exact:true}).locator('img')).toHaveAttribute('src',/status-sleep\.(png|webp)$/);await page.getByTestId('companion-panel').getByRole('button',{name:'关闭小窗',exact:true}).click();
   await enterHome(page);const dock=page.getByRole('navigation',{name:'小屋功能',exact:true});await expect(dock.getByRole('button')).toHaveCount(10);const icons=await dock.locator('img').evaluateAll(items=>items.map(i=>i.getAttribute('src')));assert.equal(new Set(icons).size,10);await screenshot('room');
-  const site=page.getByRole('button',{name:'进入摩尔庄园',exact:true}),decor=page.getByRole('button',{name:'布置小屋',exact:true});assert.ok((await site.boundingBox()).x<(await decor.boundingBox()).x);
+  const tools=page.getByRole('navigation',{name:'小屋工具',exact:true});
+  const decor=tools.getByRole('button',{name:'布置小屋',exact:true});
+  const petSize=tools.getByRole('button',{name:'调整小屋拉姆大小',exact:true});
+  const site=tools.getByRole('button',{name:'进入摩尔庄园',exact:true});
+  const [decorBox,sizeBox,siteBox]=await Promise.all([decor.boundingBox(),petSize.boundingBox(),site.boundingBox()]);
+  assert.ok(decorBox&&sizeBox&&siteBox,'The right-side room tools must be visible');
+  assert.ok(Math.abs(decorBox.x-sizeBox.x)<=1&&Math.abs(sizeBox.x-siteBox.x)<=1,'The room tools must share one column');
+  assert.ok(decorBox.y<sizeBox.y&&sizeBox.y<siteBox.y,'The room tools should stack as decorate, resize and manor');
   if(desktop){
    await desktop.evaluate(({shell})=>{globalThis.__originalOpenExternal=shell.openExternal;globalThis.__manorLinks=[];shell.openExternal=async url=>globalThis.__manorLinks.push(url)});restoreExternal=true;
    await site.click();await expect.poll(()=>desktop.evaluate(()=>globalThis.__manorLinks)).toEqual(['https://mole.61.com/']);
