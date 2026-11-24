@@ -56,12 +56,12 @@ async function inspectSheet(page, phase, selector = '.cottage-scene > .time-scen
 async function reviewRooms(page) {
   const backgrounds = await page.evaluate(async () => (await import('/src/room-media.ts')).ROOM_BACKGROUNDS);
   const added = backgrounds.filter(background => background.src.includes('/v18-'));
-  assert.equal(backgrounds.length, 15); assert.equal(added.length, 3);
+  assert.equal(backgrounds.length, 28); assert.equal(added.length, 3);
   const phases = [['morning', '早晨'], ['noon', '白天'], ['dusk', '傍晚'], ['night', '夜晚']];
   for (const viewport of [{ width: 1180, height: 820 }, { width: 1000, height: 720 }]) {
     await page.setViewportSize(viewport);
     const { gallery, settings } = await openDecor(page);
-    await expect(gallery.getByRole('button')).toHaveCount(15);
+    await expect(gallery.getByRole('button')).toHaveCount(backgrounds.length);
     for (const background of added) {
       const choice = gallery.getByRole('button', { name: background.label, exact: true });
       await choice.click(); await expect(choice).toHaveAttribute('aria-pressed', 'true');

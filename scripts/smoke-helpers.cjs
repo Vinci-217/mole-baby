@@ -368,7 +368,7 @@ async function verifyRoomIteration(page){
   const decor=page.getByRole('complementary',{name:'小屋布置工具',exact:true});
   await decor.getByRole('tab',{name:'小屋风景',exact:true}).click();
   const gallery=decor.getByRole('group',{name:'选择小屋背景',exact:true});
-  await expect(gallery).toBeInViewport();await expect(gallery.getByRole('button')).toHaveCount(15);
+  await expect(gallery).toBeInViewport();await expect(gallery.getByRole('button')).toHaveCount(28);
   const previous=await gallery.locator('[aria-pressed=true]').getAttribute('aria-label');
   for(const [id,label] of [['berry-picnic','浆果野餐地'],['seashell-cottage','海风贝壳屋'],['sky-observatory','晴空观星阁']]){
     await gallery.getByRole('button',{name:label,exact:true}).click();await expect(page.locator('.cottage-scene')).toHaveAttribute('data-background',id);

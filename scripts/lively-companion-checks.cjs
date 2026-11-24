@@ -86,8 +86,11 @@ async function verifyLivelyCompanion(page){
   assert.equal((await save()).wearing,'gold-feather');assert.equal((await save()).coins,1050);
   await roomTab(page,'游戏');const roomRam=page.locator('.scene-character .ram-sprite').first(),dressed=roomRam.locator('.ram-outfit-source .official-ram-clip');
   await expect(dressed).toHaveAttribute('data-loaded','true',{timeout:60000});const dressedFrame=await dressed.locator('iframe').elementHandle();
-  await page.getByRole('button',{name:'一起翻翻书',exact:true}).click();await expect(roomRam).toHaveAttribute('data-action','read-alone');
-  const reading=roomRam.locator('.social-focus .social-book');await expect(reading).toBeVisible();await expect(reading.locator('>img')).toHaveAttribute('src',/v9-study-book\.(png|webp)$/);await expect.poll(()=>reading.locator('>img').evaluate(img=>img.naturalWidth)).toBeGreaterThan(0);
+  await page.getByRole('button',{name:'一起翻翻书',exact:true}).click();
+  const reading=roomRam.locator('[data-source$="Movie/14.swf"] canvas[data-uploaded-id="read"]');
+  await expect(reading).toHaveAttribute('data-loaded','true');
+  const firstPage=await reading.getAttribute('data-source-frame');
+  await expect.poll(()=>reading.getAttribute('data-source-frame')).not.toBe(firstPage);
   await expect(dressed).toHaveAttribute('data-loaded','true');assert(await dressedFrame.evaluate(node=>node.isConnected));assert.equal((await save()).wearing,'gold-feather');
   await page.getByRole('button',{name:'摸摸拉姆',exact:true}).press('Enter');await expect(roomRam).toHaveAttribute('data-action','pet');await expect(reading).toHaveCount(0);assert(await dressedFrame.evaluate(node=>node.isConnected));await expect(roomRam).toHaveAttribute('data-action','idle',{timeout:15000});
   await roomTab(page,'游戏');await page.getByRole('button',{name:'一起变魔术',exact:true}).click();const transformation=page.locator('.scene-character .magic-box-performance');await expect(transformation).toHaveAttribute('data-magic-subject','box',{timeout:5000});await expect(transformation.locator('.magic-box-layer').first()).toBeVisible();assert.equal((await save()).wearing,'gold-feather');await expect(transformation).toHaveCount(0,{timeout:10000});await expect(roomRam.locator('.official-ram-clip')).toHaveAttribute('data-loaded','true',{timeout:60000});assert.equal((await save()).wearing,'gold-feather');
