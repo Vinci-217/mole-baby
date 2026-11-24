@@ -88,6 +88,7 @@ async function placeMusicBox(page) {
   if (await piece.count()) return piece;
   await page.getByRole('button', {name:'布置小屋',exact:true}).click();
   const tile = page.locator('[data-furniture-item="music-box"]');
+  await expect(tile).toBeVisible();
   const buyBox = tile.getByRole('button', {name:'购买',exact:true});
   if (await buyBox.count()) await buyBox.click();
   await tile.getByRole('button', {name:'放进小屋',exact:true}).click();

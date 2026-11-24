@@ -107,8 +107,8 @@ def book_pages(target):
 
 
 def build(root, output, verify_only, books_only=False):
-    catalog = json.loads((root / 'offline-resources.json').read_text())
-    originals = json.loads((root / 'assets/original/official/manifest.json').read_text())
+    catalog = json.loads((root / 'offline-resources.json').read_bytes())
+    originals = json.loads((root / 'assets/original/official/manifest.json').read_bytes())
     outfits = {'assets/original/official/files/' + clip['path'] for clip in originals['clips'] if clip['kind'] == 'outfit'}
     revision = catalog['revision']
     if catalog['schema'] != 1 or not re.fullmatch(r'[a-f0-9]{24}', revision):
@@ -140,7 +140,7 @@ def build(root, output, verify_only, books_only=False):
                     meta['pages'] = book_pages(archive)
             packs.append(dict(group=group, feature=feature, part=part, name=name, files=files, **meta))
     if books_only:
-        catalogue = json.loads((root / 'assets/original/reading-books/catalog.json').read_text())
+        catalogue = json.loads((root / 'assets/original/reading-books/catalog.json').read_bytes())
         # Program-only edits must keep the same asset tag. The pack checksums
         # also let installed clients keep individual volumes across book sets.
         signature = [[pack['name'], pack['bytes'], pack['sha256']] for pack in packs]
@@ -154,13 +154,13 @@ def build(root, output, verify_only, books_only=False):
         raise ValueError('The packs and base must partition every installed file')
     plan = dict(schema=1, revision=revision, githubReleaseTag=tag, baseBytes=base_bytes, optionalBytes=optional_bytes,
                 base=base, packs=packs)
-    (output / 'resource-packs.json').write_text(json.dumps(plan, ensure_ascii=False, separators=(',', ':')) + '\n')
+    (output / 'resource-packs.json').write_bytes(encode(plan) + b'\n')
     print(f'{len(base)} base files, {len(packs)} verified optional ZIPs, {base_bytes} base bytes, {optional_bytes} optional bytes')
     return plan
 
 
 def build_book_index(source, plan):
-    catalogue = json.loads((source / 'assets/original/reading-books/catalog.json').read_text())
+    catalogue = json.loads((source / 'assets/original/reading-books/catalog.json').read_bytes())
     by_id = {pack['feature']: pack for pack in plan['packs'] if pack['part'] == 1}
     books = []
     for book in sorted(catalogue, key=lambda item: item['id']):
@@ -178,7 +178,7 @@ def encode(data):
 
 def write_light_renderer(source, target, base, manifest):
     index = json.loads(manifest)
-    catalogue = json.loads((source / 'assets/original/reading-books/catalog.json').read_text())
+    catalogue = json.loads((source / 'assets/original/reading-books/catalog.json').read_bytes())
     books = {book['id']: book for book in index['books']}
     if index['schema'] != 1 or not re.fullmatch(r'assets-[a-f0-9]{24}', index['release']) or books.keys() != {book['id'] for book in catalogue}:
         raise ValueError('Book source does not match the local catalogue')
@@ -192,7 +192,7 @@ def write_light_renderer(source, target, base, manifest):
         raise ValueError('Missing renderer head')
     changes['index.html'] = html.replace(b'<head>', b'<head><meta name="ramu-book-packs" content="1">', 1)
     if (source / 'sw.js').is_file():
-        worker = (source / 'sw.js').read_text()
+        worker = (source / 'sw.js').read_text(encoding='utf-8')
         match = re.search(r'(?m)^const CONFIG=(\{[^\r\n]+\});$', worker)
         if not match:
             raise ValueError('Missing PWA worker configuration')
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     if args.book_index:
         if not args.light_renderer:
             parser.error('--book-index requires --light-renderer')
-        installed = json.loads((args.renderer / 'offline-resources.json').read_text())
+        installed = json.loads((args.renderer / 'offline-resources.json').read_bytes())
         base = [entry for entry in installed['files']
                 if (feature_for(entry['path'], set()) or ('base',))[0] != 'books']
         write_light_renderer(args.renderer, args.light_renderer, base, args.book_index.read_bytes())

@@ -24,7 +24,7 @@ function buildFixture(t) {
       ['sw.js', Buffer.from(worker)],
       ['assets/original/official/manifest.json', Buffer.from('{"clips":[]}')],
       [`${prefix}/catalog.json`, Buffer.from(JSON.stringify([
-        { id: 'first', pages: [`./${prefix}/first/1.png`] },
+        { id: 'first', title: '拉姆手册', pages: [`./${prefix}/first/1.png`] },
         { id: 'second', pages: [`./${prefix}/second/1.png`] },
       ]))],
       [`${prefix}/first/1.webp`, Buffer.from(first)],
@@ -45,7 +45,7 @@ function buildFixture(t) {
     execFileSync(process.platform === 'win32' ? 'python' : 'python3', [
       path.join(__dirname, 'split-resource-packs.py'), renderer, assetsDir, '--light-renderer', light,
       ...(canonical ? ['--book-index', canonical] : []),
-    ]);
+    ], { env: { ...process.env, LC_ALL: 'C', PYTHONCOERCECLOCALE: '0', PYTHONUTF8: '0' } });
     return { assetsDir, light };
   }
   return { stage };

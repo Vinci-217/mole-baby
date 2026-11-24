@@ -40,6 +40,7 @@ android {
     testOptions {
         unitTests.includeAndroidResources = true
         unitTests.all {
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
             systemProperty 'mole.delta.old', providers.gradleProperty('moleDeltaOld').getOrElse('')
             systemProperty 'mole.delta.next', providers.gradleProperty('moleDeltaNext').getOrElse('')
             systemProperty 'mole.delta.output', providers.gradleProperty('moleDeltaOutput').getOrElse('')

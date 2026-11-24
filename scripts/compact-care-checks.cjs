@@ -30,7 +30,18 @@ async function verifyCompactCare(page,desktop){
  await useSupply('清洁','180003',0,'清洁');assert.ok((await save()).stats.cleanliness>before.stats.cleanliness);
  await openFood('清洁');await expect(pocket.locator('[data-item-id="180003"]')).toHaveCount(0);assert.equal((await save()).inventory['180003'],0);
  await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();for(let i=0;i<8;i++){await openActions(page);await tools.getByRole('button',{name:'状态',exact:true}).click();await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();const now=await screenPet();assert.ok(Math.abs(now.x-base.x)<1&&Math.abs(now.y-base.y)<1,'pocket resizing cannot move the pet');}
- await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:10000});if(desktop){await openActions(page);await tools.getByRole('button',{name:'状态',exact:true}).click();await page.waitForTimeout(220);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v26-native-pocket.png'),omitBackground:true});await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();}await openActions(page);await tools.getByRole('button',{name:'玩耍',exact:true}).click();await expect(panel.locator('.desktop-play>button')).toHaveCount(11);await expect(panel.getByText(/翻牌|寻宝|接果子|拼图/)).toHaveCount(0);await panel.getByRole('button',{name:'一起玩球',exact:true}).click();await expect(character.locator('canvas[data-uploaded-id="180004"]')).toHaveAttribute('data-loaded','true',{timeout:45000});await expect(character.locator('canvas[data-uploaded-id="180004"]')).toHaveAttribute('data-source-form','classic');await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:20000});
+ await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:10000});
+ if(desktop){await openActions(page);await tools.getByRole('button',{name:'状态',exact:true}).click();await page.waitForTimeout(220);await page.screenshot({path:path.resolve(__dirname,'../artifacts/v26-native-pocket.png'),omitBackground:true});await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();}
+ await openActions(page);
+ await tools.getByRole('button',{name:'玩耍',exact:true}).click();
+ await expect(panel.locator('.desktop-play>button')).toHaveCount(12);
+ await expect(panel.getByRole('button',{name:'回应心情',exact:true})).toBeEnabled();
+ await expect(panel.getByText(/翻牌|寻宝|接果子|拼图/)).toHaveCount(0);
+ await panel.getByRole('button',{name:'一起玩球',exact:true}).click();
+ const football=character.locator('canvas[data-uploaded-id="180004"]');
+ await expect(football).toHaveAttribute('data-loaded','true',{timeout:45000});
+ await expect(football).toHaveAttribute('data-source-form','classic');
+ await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:20000});
  await openActions(page);await tools.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer')).toBeVisible();await tools.getByRole('button',{name:'取消计时',exact:true}).click();await expect(page.getByRole('timer')).toHaveCount(0);
  console.log('PASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue');
  if(!desktop){const r=await character.boundingBox();await page.mouse.move(r.x+50,r.y+54);await page.mouse.down();await page.mouse.move(r.x+70,r.y+24,{steps:5});await page.mouse.up();const moved=await character.boundingBox();assert.ok(Math.abs(moved.x-r.x-20)<=2&&Math.abs(moved.y-r.y+30)<=2);}

@@ -20,7 +20,7 @@ async function verifyWorkflow(page,{full=false}={}){
   await panel.getByRole('button',{name:'状态值变化规则',exact:true}).click();await expect(panel.getByRole('table')).toContainText('每小时');await expect(panel.getByRole('table')).toContainText('+600');
   await panel.getByRole('button',{name:'状态值变化规则',exact:true}).click();await require('./smoke-helpers.cjs').enterBackpack(page);await panel.getByRole('tab',{name:'食物',exact:true}).click();await expect(panel.locator('.pocket-slot')).toHaveCount(16);await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();
   await openActions(page);await page.getByTestId('pet-actions').getByRole('button',{name:'玩耍',exact:true}).click();
-  const buttons=panel.locator('.desktop-play>button');await expect(buttons).toHaveCount(11);await expect(panel.getByRole('tab')).toHaveText(['活动','道具','魔法']);
+  const buttons=panel.locator('.desktop-play>button');await expect(buttons).toHaveCount(12);await expect(panel.getByRole('tab')).toHaveText(['活动','道具','魔法']);
   const boxes=await buttons.evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().toJSON()));for(const b of boxes)assert.ok(b.height>=32&&b.width>=40,'all play controls remain clickable');
   await page.screenshot({path:path.resolve(__dirname,'../artifacts/v30-nine-actions.png'),omitBackground:true});
   await expect(panel.getByRole('tab',{name:'魔法',exact:true})).toBeVisible();await panel.getByRole('button',{name:'关闭小窗',exact:true}).click();await enterHome(page);await roomTab(page,'游戏');await page.getByRole('button',{name:'一起变魔术',exact:true}).click();const magic=page.locator('.scene-character .magic-box-performance');
