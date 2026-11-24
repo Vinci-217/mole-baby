@@ -182,7 +182,9 @@ export function useRoomMedia(inRoom: boolean, musicBoxPlaced: boolean, sceneMusi
   }),[resumeMusic]);
   const builtInTrack = ROOM_MUSIC.find(track => track.id === settings.musicId) ?? ROOM_MUSIC[0];
   const selectedTrack = settings.musicId === 'custom' && custom ? custom.url : builtInTrack.src;
-  const source = active.current ? sceneMusic ?? (musicBoxPlaced ? selectedTrack : undefined) : undefined;
+  const availableSource = sceneMusic ?? (musicBoxPlaced ? selectedTrack : undefined);
+  // Keep the already loaded track while paused so it can resume from its playhead.
+  const source = active.current || audio.current?.getAttribute('src') === availableSource ? availableSource : undefined;
   const hasCustom = Boolean(custom);
   const nextMusic=useCallback(()=>{
     setSettings(previous=>({...previous,musicId:nextRoomMusic(previous,hasCustom)}));

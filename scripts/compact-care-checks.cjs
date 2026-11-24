@@ -38,9 +38,9 @@ async function verifyCompactCare(page,desktop){
  await expect(panel.getByRole('button',{name:'回应心情',exact:true})).toBeEnabled();
  await expect(panel.getByText(/翻牌|寻宝|接果子|拼图/)).toHaveCount(0);
  await panel.getByRole('button',{name:'一起玩球',exact:true}).click();
- const football=character.locator('canvas[data-uploaded-id="180004"]');
+ const football=character.locator('canvas[data-sheet="football"]');
  await expect(football).toHaveAttribute('data-loaded','true',{timeout:45000});
- await expect(football).toHaveAttribute('data-source-form','classic');
+ await expect(football).toHaveAttribute('data-form','super');
  await expect(character.locator('.ram-sprite').first()).toHaveAttribute('data-action','idle',{timeout:20000});
  await openActions(page);await tools.getByRole('button',{name:'开始计时',exact:true}).click();await expect(page.getByRole('timer')).toBeVisible();await tools.getByRole('button',{name:'取消计时',exact:true}).click();await expect(page.getByRole('timer')).toHaveCount(0);
  console.log('PASS: 216px compact care pocket, sixteen squares, single-click immediate food/drink/wash and direct play without desktop games or dialogue');

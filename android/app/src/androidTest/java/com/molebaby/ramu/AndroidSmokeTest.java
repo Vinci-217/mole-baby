@@ -77,9 +77,18 @@ public final class AndroidSmokeTest {
             waitFor(()->{try{return "true".equals(js("Array.from(document.images).filter(im=>im.getBoundingClientRect().width>0&&im.getBoundingClientRect().height>0).every(im=>im.complete&&im.naturalWidth>0)"));}catch(Exception e){return false;}},30000,"All visible original artwork must load from the active private resource pack");
             click(".room-dock [aria-label='打开背包']");waitFor(()->has(".pocket-items"));assertEquals("true",js("document.documentElement.scrollWidth<=innerWidth"));
             click("[aria-label='关闭面板']");click(".room-dock [aria-label='陪伴设置']");waitFor(()->has("[aria-label='安卓陪伴设置']"));assertEquals("true",js("document.documentElement.scrollWidth<=innerWidth"));
-            try{waitFor(()->host().musicPlaying,30000,"Built-in music should play in the house");}catch(AssertionError error){throw new AssertionError("Audio diagnostic: "+js("(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return {audio:!!a,ready:a?.readyState,network:a?.networkState,paused:a?.paused,error:a?.error?.code,visible:document.visibilityState,prefs:localStorage.getItem('ramu-room-media-v1')}})()"));}SystemClock.sleep(1000);assertTrue("Native audio focus must not pause our own WebView",host().musicPlaying);
+            click("[aria-label='关闭面板']");assertFalse("A fresh room has no music box",host().musicPlaying);
+            click(".room-side-tools [aria-label='布置小屋']");
+            click("[data-furniture-item='music-box'] [aria-label='购买']");
+            click("[data-furniture-item='music-box'] [aria-label='放进小屋']");
+            click(".room-side-tools [aria-label='完成布置']");
+            String musicBox=".room-placed-item[data-furniture='music-box']";
+            click(musicBox);
+            try{waitFor(()->host().musicPlaying,30000,"The placed music box should play in the house");}catch(AssertionError error){throw new AssertionError("Audio diagnostic: "+js("(()=>{const a=document.querySelector('audio[data-ramu-bgm]');return {audio:!!a,ready:a?.readyState,network:a?.networkState,paused:a?.paused,error:a?.error?.code,visible:document.visibilityState,prefs:localStorage.getItem('ramu-room-media-v1')}})()"));}SystemClock.sleep(1000);assertTrue("Native audio focus must not pause our own WebView",host().musicPlaying);
             click("[aria-label='允许后台播放音乐']");waitFor(()->host().backgroundMusic&&host().service!=null,10000,"Enabling background music should start its foreground service");UiDevice device=UiDevice.getInstance(instrumentation);device.pressHome();SystemClock.sleep(1200);assertTrue("Opted-in music should continue when the house is backgrounded",host().musicPlaying);
-            device.openNotification();UiObject musicHome=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue(musicHome.waitForExists(10000));musicHome.click();waitFor(()->host().activityVisible&&has("[aria-label='允许后台播放音乐']"));click("[aria-label='允许后台播放音乐']");waitFor(()->!host().backgroundMusic);
+            device.openNotification();UiObject musicHome=device.findObject(new UiSelector().text("安卓小蓝在陪着你"));assertTrue(musicHome.waitForExists(10000));musicHome.click();waitFor(()->host().activityVisible&&has(".room-dock"));
+            if(!has("[aria-label='允许后台播放音乐']"))click(musicBox);
+            click("[aria-label='允许后台播放音乐']");waitFor(()->!host().backgroundMusic);
             // A saved position from a larger display can already be outside
             // the current screen before the first overlay is attached.
             ui(()->{host().controller.x=80;host().controller.y=host().controller.area().y;});

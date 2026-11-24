@@ -28,10 +28,12 @@ async function verifySchoolSpells(page){
   await page.reload();await expect(page.locator('.school-desktop-status').getByRole('timer')).toHaveText('2:00');
   await page.clock.fastForward(119000);assert.ok(!(await save()).wardrobe?.includes('star-wand'));await expect(page.locator('.school-desktop-status').getByRole('timer')).toHaveText('0:01');
   await page.clock.fastForward(1100);await expect.poll(async()=>(await save()).wardrobe).toEqual(['star-wand']);await expect(page.locator('.school-desktop-status')).toContainText('学习完成');assert.equal((await save()).coins,10000);
-  await page.reload();assert.deepEqual((await save()).wardrobe,['star-wand']);await enterHome(page);await roomTab(page,'衣橱');await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await page.getByRole('button',{name:'给拉姆戴上',exact:true}).click();assert.equal((await save()).wearing,'star-wand');
   // Original SWF bootstrap must run on a live clock, not a paused WASM/RAF
   // scheduler. Course deadlines below are accelerated only after unequipping.
-  await page.clock.resume();console.log('School spells: waiting for native wand with a live clock');
+  await page.reload();assert.deepEqual((await save()).wardrobe,['star-wand']);
+  await page.clock.resume();
+  await enterHome(page);await roomTab(page,'衣橱');await page.getByRole('button',{name:'试戴魔法法杖',exact:true}).click();await page.getByRole('button',{name:'给拉姆戴上',exact:true}).click();assert.equal((await save()).wearing,'star-wand');
+  console.log('School spells: waiting for native wand with a live clock');
   const wornSource=page.locator('.scene-character .ram-outfit-source .official-ram-clip');
   await expect(wornSource).toHaveAttribute('data-loaded','true',{timeout:45000});
   console.log('School spells: wand earned, persisted, equipped and loaded');

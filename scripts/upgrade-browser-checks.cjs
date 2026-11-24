@@ -24,7 +24,9 @@ async function openBoard(p){
  if(await p.locator('.game-panel').isVisible())await p.getByRole('button',{name:'关闭面板',exact:true}).click();
  assert.equal(await p.locator('.room-dock').getByRole('button',{name:/留言板/}).count(),0);
  if(!await p.locator('.room-placed-item[data-furniture=message-board]').count()){
-  await p.getByRole('button',{name:'布置小屋',exact:true}).click();const drawer=p.getByRole('complementary',{name:'小屋布置工具'}),card=drawer.locator('.warehouse-drag-card'),layer=p.locator('.time-scene>.room-furnishing-layer.is-editing');
+  await p.getByRole('button',{name:'布置小屋',exact:true}).click();
+  const drawer=p.getByRole('complementary',{name:'小屋布置工具'}),card=drawer.locator('[data-furniture-item="message-board"]'),layer=p.locator('.time-scene>.room-furnishing-layer.is-editing');
+  await drawer.getByRole('searchbox',{name:'查找家具',exact:true}).fill('小屋留言板');
   await card.scrollIntoViewIfNeeded();const box=await layer.boundingBox();await card.dragTo(layer,{targetPosition:{x:box.width*.3,y:box.height*.35}});await expect(p.locator('.room-placed-item[data-furniture=message-board]')).toHaveCount(1);await p.locator('.room-side-tools').getByRole('button',{name:'完成布置',exact:true}).click();
  }
  // Verify keyboard access even when the pet overlaps the furnishing in a short room.
