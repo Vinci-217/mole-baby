@@ -18,7 +18,10 @@ async function verifyTransparentHover(page,desktop,options={}){
   if(await bubble.isVisible())await bubble.click();
   await page.mouse.move(1,1);
   await expect(page.locator('.compact-bubble.visible')).toHaveCount(0);
-  await expect(page.getByTestId('desktop-character').locator('.ram-sprite')).toHaveAttribute('data-action','idle',{timeout:15000});
+  // The original care clip can still contain its standby sprite while loading.
+  // Check both layers together and wait for the single idle sprite to return.
+  const sprites=page.getByTestId('desktop-character').locator('.ram-sprite');
+  await expect.poll(()=>sprites.evaluateAll(nodes=>nodes.map(node=>node.dataset.action)),{timeout:15000}).toEqual(['idle']);
   await expect(page.getByTestId('care-gain')).toHaveCount(0,{timeout:10000});
   await page.waitForTimeout(300);
   const png=await page.screenshot({path:path.join(out,name+'.png'),omitBackground:true});
