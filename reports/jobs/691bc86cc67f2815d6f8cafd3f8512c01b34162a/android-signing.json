@@ -1,0 +1,9 @@
+{
+  "sourceSha": "691bc86cc67f2815d6f8cafd3f8512c01b34162a",
+  "platform": "android",
+  "status": "success",
+  "runUrl": "https://github.com/Vinci-217/mole-baby/actions/runs/45534597489",
+  "log": "{\"fixedSigningConfigured\":true}",
+  "recordedAt": "2026-11-25T02:46:10.051Z",
+  "phase": "signing"
+}
